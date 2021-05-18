@@ -47,6 +47,7 @@ class user:
 			if tools.decrypt_string(site_obj.get_project_row_by_name(project_name)[3], password):
 				self.prefs_dic[user_vars._project_] = project_name
 				self.write_prefs_dic()
+				environment.build_project_env(project_name, site_obj.get_project_row_by_name(project_name)[2])
 				logging.info(f'Successfully signed in {project_name} project')
 			else:
 				logging.warning(f'Wrong password for {project_name}')

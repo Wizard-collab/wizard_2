@@ -14,70 +14,14 @@ from wizard.core import environment
 import os
 import time
 
-def init_site(site_path, admin_password, admin_email):
-    database_file = create_site_database(site_path)
-    if database_file:
-        create_admin_user(database_file, admin_password, admin_email)
-
-def create_site_database(site_path):
-    ''' This function init the wizard site '''
-    if os.path.isdir(site_path):
-        database_file = get_database_file(site_path)
-        if not os.path.isfile(database_file):
-            if create_database(database_file):
-                create_users_table(database_file)
-                create_projects_table(database_file)
-                return database_file
-        else:
-            logging.warning("Database file already exists")
-            return None
-    else:
-        logging.info("The given site path doesn't exists")
-        return None
-
-def create_admin_user(database_file, admin_password, admin_email):
-    if db_utils.create_row(database_file,
-                            'users', 
-                            ('user_name', 'pass', 'email', 'administrator'), 
-                            ('admin', tools.encrypt_string(admin_password), admin_email, 1)):
-        logging.info('Admin user created')
-
-def get_database_file(site_path):
-    if site_path:
-        database_file = os.path.join(site_path, site_vars._site_database_file_)
-    else:
-        database_file = None
-    return database_file
-
-def create_users_table(database_file):
-    sql_cmd = """ CREATE TABLE IF NOT EXISTS users (
-                                        id integer PRIMARY KEY,
-                                        user_name text NOT NULL,
-                                        pass text NOT NULL,
-                                        email text NOT NULL,
-                                        administrator integer
-                                    );"""
-    if db_utils.create_table(database_file, sql_cmd):
-        logging.info("Users table created")
-
-def create_projects_table(database_file):
-    sql_cmd = """ CREATE TABLE IF NOT EXISTS projects (
-                                        id integer PRIMARY KEY,
-                                        project_name text NOT NULL,
-                                        project_path text NOT NULL,
-                                        project_password text NOT NULL
-                                    );"""
-    if db_utils.create_table(database_file, sql_cmd):
-        logging.info("Projects table created")
-
 class site:
     def __init__(self):
         self.database_file = get_database_file(environment.get_site_path())
 
-    def create_project(self, project_name, project_path, project_password, administrator_pass=''):
+    def create_project(self, project_name, project_path, project_password):
         if project_name not in self.get_projects_names_list():
             if project_path not in self.get_projects_paths_list():
-                if tools.decrypt_string(site_vars._administrator_pass_, administrator_pass):
+                if self.get_user_row_by_name(environment.get_user())[4]:
                     if db_utils.create_row(self.database_file,
                                     'projects', 
                                     ('project_name', 'project_path', 'project_password'), 
@@ -87,12 +31,15 @@ class site:
                     else:
                         return None
                 else:
-                    logging.warning('Wrong administrator pass')
+                    logging.warning("You need to be administrator to create a project")
                     return None
             else:
                 logging.warning(f'Path {project_path} already assigned to another project')
         else:
             logging.warning(f'Project {project_name} already exists')
+
+    def get_administrator_pass(self):
+        return self.get_user_row_by_name('admin')[2]
 
     def get_projects_list(self):
         sql_cmd = ''' SELECT * FROM projects '''
@@ -123,7 +70,7 @@ class site:
         return self.get_project_row_by_name(name)[2]
 
     def modify_project_password(self, project_name, project_password, new_password, administrator_pass=''):
-        if tools.decrypt_string(site_vars._administrator_pass_, administrator_pass):
+        if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
             if project_name in self.get_projects_names_list():
                 if tools.decrypt_string(self.get_project_row_by_name(project_name)[3], project_password):
                     if db_utils.update_data(self.database_file,
@@ -144,7 +91,7 @@ class site:
     def create_user(self, user_name, password, email, administrator_pass=''):
         if user_name not in self.get_user_names_list():
             administrator = 0
-            if tools.decrypt_string(site_vars._administrator_pass_, administrator_pass):
+            if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
                 administrator = 1
             if db_utils.create_row(self.database_file,
                             'users', 
@@ -168,7 +115,7 @@ class site:
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
             if not user_row[4]:
-                if tools.decrypt_string(site_vars._administrator_pass_, administrator_pass):
+                if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
                     if db_utils.update_data(self.database_file,
                                             'users',
                                             ('administrator',1),
@@ -185,7 +132,7 @@ class site:
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
             if user_row[4]:
-                if tools.decrypt_string(site_vars._administrator_pass_, administrator_pass):
+                if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
                     if db_utils.update_data(self.database_file,
                                             'users',
                                             ('administrator',0),
@@ -236,3 +183,58 @@ class site:
     def get_user_row_by_name(self, name):
         users_rows = db_utils.get_row_by_column_data(self.database_file, 'users', ('user_name', name))
         return users_rows[0]
+
+def init_site(site_path, admin_password, admin_email):
+    database_file = create_site_database(site_path)
+    if database_file:
+        create_admin_user(database_file, admin_password, admin_email)
+
+def create_site_database(site_path):
+    if os.path.isdir(site_path):
+        database_file = get_database_file(site_path)
+        if not os.path.isfile(database_file):
+            if create_database(database_file):
+                create_users_table(database_file)
+                create_projects_table(database_file)
+                return database_file
+        else:
+            logging.warning("Database file already exists")
+            return None
+    else:
+        logging.info("The given site path doesn't exists")
+        return None
+
+def create_admin_user(database_file, admin_password, admin_email):
+    if db_utils.create_row(database_file,
+                            'users', 
+                            ('user_name', 'pass', 'email', 'administrator'), 
+                            ('admin', tools.encrypt_string(admin_password), admin_email, 1)):
+        logging.info('Admin user created')
+
+def get_database_file(site_path):
+    if site_path:
+        database_file = os.path.join(site_path, site_vars._site_database_file_)
+    else:
+        database_file = None
+    return database_file
+
+def create_users_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS users (
+                                        id integer PRIMARY KEY,
+                                        user_name text NOT NULL,
+                                        pass text NOT NULL,
+                                        email text NOT NULL,
+                                        administrator integer
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Users table created")
+
+def create_projects_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS projects (
+                                        id integer PRIMARY KEY,
+                                        project_name text NOT NULL,
+                                        project_path text NOT NULL,
+                                        project_password text NOT NULL
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Projects table created")

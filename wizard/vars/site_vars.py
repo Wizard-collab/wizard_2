@@ -2,4 +2,3 @@
 
 # SITE CONSTANTS
 _site_database_file_ = 'site.db'
-_administrator_pass_ = 'b0c49bdbaff737d8be77b9d3e7640b1107d73b435d0c17080111450ab3f4dd16a0bd65d6b0d07d98b9b10c65980e44f6989e1abcfca759c16783549090153679dd4e5e12245bc3956b2460e75a6861adffcfdb1368f928bc6969c1afcfcbc133'

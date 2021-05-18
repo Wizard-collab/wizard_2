@@ -1,6 +1,9 @@
 from wizard.core import site
 from wizard.core import user
 from wizard.core import environment
+from wizard.core import project
+from wizard.core import assets
+import time
 
 from wizard.core import logging
 logging = logging.get_logger(__name__)
@@ -12,6 +15,13 @@ else:
 		logging.info('Please connect a user')
 	else:
 		project_name = user.user().get_project()
-		if not environment.build_project_env(project_name=project_name,
-											project_path=site.site().get_project_path_by_name(project_name)):
+		if project_name:
+			if not environment.build_project_env(project_name=project_name,
+												project_path=site.site().get_project_path_by_name(project_name)):
+				logging.info('Please connect to a project')
+			else:
+				for a in range(0,600):
+					assets.create_category(str(time.time()), 2)
+		else:
 			logging.info('Please connect to a project')
+			

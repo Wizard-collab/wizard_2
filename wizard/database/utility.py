@@ -2,6 +2,7 @@
 
 import sqlite3
 from sqlite3 import Error
+import time
 
 from wizard.core import logging
 logging = logging.get_logger(__name__)
@@ -10,8 +11,10 @@ def create_connection(db_file):
     conn = None
     try:
         if db_file:
+            start_time = time.time()
             conn = sqlite3.connect(db_file)
-            logging.info('DB access')
+            print(f"db access time : " + str(time.time()-start_time))
+            #logging.info('DB access')
         else:
             logging.error("No database file given")
     except Error as e:
@@ -46,7 +49,7 @@ def create_row(db_file, table, columns, datas):
         c = conn.cursor()
         c.execute(sql_cmd, datas)
         conn.commit()
-        return 1
+        return c.lastrowid
     except Error as e:
         print(e)
         return 0
