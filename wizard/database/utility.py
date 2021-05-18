@@ -7,15 +7,11 @@ from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
     conn = None
     try:
         if db_file:
             conn = sqlite3.connect(db_file)
+            logging.info('DB access')
         else:
             logging.error("No database file given")
     except Error as e:
@@ -24,11 +20,6 @@ def create_connection(db_file):
     return conn
 
 def create_table(db_file, cmd):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
     try:
         c = create_connection(db_file).cursor()
         c.execute(cmd)
@@ -37,16 +28,23 @@ def create_table(db_file, cmd):
         print(e)
         return 0
 
-def commit_data(db_file, cmd, data_tuple):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
+def create_row(db_file, table, columns, datas):
+
+    # Construct sql command
+    sql_cmd = f''' INSERT INTO {table}('''
+    sql_cmd += (',').join(columns)
+    sql_cmd += ') VALUES('
+    data_abstract_list = []
+    for item in columns:
+        data_abstract_list.append('?')
+    sql_cmd += (',').join(data_abstract_list)
+    sql_cmd += ')'
+
     try:
+        # Execute command
         conn = create_connection(db_file)
         c = conn.cursor()
-        c.execute(cmd, data_tuple)
+        c.execute(sql_cmd, datas)
         conn.commit()
         return 1
     except Error as e:
@@ -64,19 +62,33 @@ def get_rows(db_file, cmd):
         print(e)
         return None
 
-def get_row_by_column_data(db_file, cmd, data):
-    """
-    Query tasks by priority
-    :param conn: the Connection object
-    :param priority:
-    :return:
-    """
+def get_row_by_column_data(db_file, table, column_tuple):
+
+    sql_cmd = f"SELECT * FROM {table} WHERE {column_tuple[0]}=?"
+
     try:
         conn = create_connection(db_file)
         cur = conn.cursor()
-        cur.execute(cmd, (data,))
+        cur.execute(sql_cmd, (column_tuple[1],))
         rows = cur.fetchall()
         return rows
+    except Error as e:
+        print(e)
+        return None
+
+def update_data(db_file, table, set_tuple, where_tuple):
+
+    # Construct sql command
+    sql_cmd = f''' UPDATE {table}'''
+    sql_cmd += f''' SET {set_tuple[0]} = ?'''
+    sql_cmd += f''' WHERE {where_tuple[0]} = ?'''
+
+    try:
+        conn = create_connection(db_file)
+        cur = conn.cursor()
+        cur.execute(sql_cmd, (set_tuple[1], where_tuple[1]))
+        conn.commit()
+        return 1
     except Error as e:
         print(e)
         return None

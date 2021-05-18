@@ -1,22 +1,23 @@
 # coding: utf-8
 
+# Python modules
 import logging
 
-def get_logger(name):
-	# create logger
-	logger = logging.getLogger(name)
-	logger.setLevel(logging.DEBUG)
+# Wizard modules
+from wizard.vars import user_vars
 
-	# create console handler and set level to debug
-	ch = logging.StreamHandler()
-	ch.setLevel(logging.DEBUG)
+def get_logger(name=None):
+    # create logger
+    logging_level = logging.INFO
 
-	# create formatter
-	formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s')
+    file = user_vars._user_logging_file_
 
-	# add formatter to ch
-	ch.setFormatter(formatter)
+    logging.basicConfig(level=logging_level,
+        format="%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s")
+    
+    if name:
+        logger = logging.getLogger(name)
+    else:
+        logger = logging.getLogger()
 
-	# add ch to logger
-	logger.addHandler(ch)
-	return logger
+    return logger
