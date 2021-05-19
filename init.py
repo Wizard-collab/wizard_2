@@ -20,8 +20,7 @@ else:
 												project_path=site.site().get_project_path_by_name(project_name)):
 				logging.info('Please connect to a project')
 			else:
-				for a in range(0,600):
-					assets.create_category(str(time.time()), 2)
+				pass
 		else:
 			logging.info('Please connect to a project')
 			

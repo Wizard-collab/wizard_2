@@ -42,8 +42,7 @@ class site:
         return self.get_user_row_by_name('admin')[2]
 
     def get_projects_list(self):
-        sql_cmd = ''' SELECT * FROM projects '''
-        projects_rows = db_utils.get_rows(self.database_file, sql_cmd)
+        projects_rows = db_utils.get_rows(self.database_file, 'projects')
         return projects_rows
 
     def get_projects_names_list(self):
@@ -169,8 +168,7 @@ class site:
             return None
 
     def get_users_list(self):
-        sql_cmd = ''' SELECT * FROM users '''
-        users_rows = db_utils.get_rows(self.database_file, sql_cmd)
+        users_rows = db_utils.get_rows(self.database_file, 'users')
         return users_rows
 
     def get_user_names_list(self):

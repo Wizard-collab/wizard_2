@@ -11,10 +11,8 @@ def create_connection(db_file):
     conn = None
     try:
         if db_file:
-            start_time = time.time()
             conn = sqlite3.connect(db_file)
-            print(f"db access time : " + str(time.time()-start_time))
-            #logging.info('DB access')
+            logging.debug(f'*{db_file}')
         else:
             logging.error("No database file given")
     except Error as e:
@@ -49,16 +47,20 @@ def create_row(db_file, table, columns, datas):
         c = conn.cursor()
         c.execute(sql_cmd, datas)
         conn.commit()
+        logging.debug(f'*{db_file}-write')
         return c.lastrowid
     except Error as e:
         print(e)
         return 0
 
-def get_rows(db_file, cmd):
+def get_rows(db_file, table):
+
+    sql_cmd = f''' SELECT * FROM {table}'''
+
     try:
         conn = create_connection(db_file)
         cur = conn.cursor()
-        cur.execute(cmd)
+        cur.execute(sql_cmd)
         rows = cur.fetchall()
         return rows
     except Error as e:
