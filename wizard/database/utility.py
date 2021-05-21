@@ -97,3 +97,21 @@ def update_data(db_file, table, set_tuple, where_tuple):
     except Error as e:
         print(e)
         return None
+
+def delete_row(db_file, table, id):
+    """
+    Delete a task by task id
+    :param conn:  Connection to the SQLite database
+    :param id: id of the task
+    :return:
+    """
+    sql = f'DELETE FROM {table} WHERE id=?'
+    try:
+        conn = create_connection(db_file)
+        cur = conn.cursor()
+        cur.execute(sql, (id,))
+        conn.commit()
+        return 1
+    except Error as e:
+        print(e)
+        return None
