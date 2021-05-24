@@ -7,6 +7,7 @@ import time
 # Wizard modules
 from wizard.core import environment
 from wizard.core import project
+from wizard.core import tools
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
@@ -14,55 +15,65 @@ from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def create_domain(name):
-	dir_name = os.path.join(environment.get_project_path(), name)
-	domain_id = project.project().add_domain(name)
-	if domain_id:
-		if not os.path.isdir(dir_name):
-			try:
-				os.mkdir(dir_name)
-				logging.info(f'{dir_name} created')
-			except FileNotFoundError:
-				logging.error(f"{environment.get_project_path()} doesn't exists")
-				project.project().remove_domain(domain_id)
-				domain_id = None
+	domain_id = None
+	if tools.is_safe(name):
+		dir_name = os.path.normpath(os.path.join(environment.get_project_path(), name))
+		domain_id = project.project().add_domain(name)
+		if domain_id:
+			if not os.path.isdir(dir_name):
+				try:
+					os.mkdir(dir_name)
+					logging.info(f'{dir_name} created')
+				except FileNotFoundError:
+					logging.error(f"{environment.get_project_path()} doesn't exists")
+					project.project().remove_domain(domain_id)
+					domain_id = None
+	else:
+		logging.warning(f"{name} contains illegal characters")
 	return domain_id
 
 def create_category(name, domain_id):
 	category_id = None
-	domain_path = get_domain_path(domain_id)
-	if domain_path:
-		dir_name = os.path.join(domain_path, name)
-		category_id = project.project().add_category(name, domain_id)
-		if category_id:
-			if not os.path.isdir(dir_name):
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{domain_path} doesn't exists")
-					project.project().remove_category(category_id)
-					category_id = None
+	if tools.is_safe(name):
+		domain_path = get_domain_path(domain_id)
+		if domain_path:
+			dir_name = os.path.normpath(os.path.join(domain_path, name))
+			category_id = project.project().add_category(name, domain_id)
+			if category_id:
+				if not os.path.isdir(dir_name):
+					try:
+						os.mkdir(dir_name)
+						logging.info(f'{dir_name} created')
+					except FileNotFoundError:
+						logging.error(f"{domain_path} doesn't exists")
+						project.project().remove_category(category_id)
+						category_id = None
+		else:
+			logging.error("Can't create category")
 	else:
-		logging.error("Can't create category")
+		logging.warning(f"{name} contains illegal characters")
 	return category_id
 
 def create_asset(name, category_id):
 	asset_id = None
-	category_path = get_category_path(category_id)
-	if category_path:
-		dir_name = os.path.join(category_path, name)
-		asset_id = project.project().add_asset(name, category_id)
-		if asset_id:
-			if not os.path.isdir(dir_name):
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{category_path} doesn't exists")
-					project.project().remove_asset(asset_id)
-					asset_id = None
+	if tools.is_safe(name):
+		category_path = get_category_path(category_id)
+		if category_path:
+			dir_name = os.path.normpath(os.path.join(category_path, name))
+			asset_id = project.project().add_asset(name, category_id)
+			if asset_id:
+				if not os.path.isdir(dir_name):
+					try:
+						os.mkdir(dir_name)
+						logging.info(f'{dir_name} created')
+					except FileNotFoundError:
+						logging.error(f"{category_path} doesn't exists")
+						project.project().remove_asset(asset_id)
+						asset_id = None
+		else:
+			logging.error("Can't create asset")
 	else:
-		logging.error("Can't create asset")
+		logging.warning(f"{name} contains illegal characters")
 	return asset_id
 
 def create_stage(name, asset_id):
@@ -82,7 +93,7 @@ def create_stage(name, asset_id):
 	if allowed:
 		asset_path = get_asset_path(asset_id)
 		if asset_path:
-			dir_name = os.path.join(asset_path, name)
+			dir_name = os.path.normpath(os.path.join(asset_path, name))
 			stage_id = project.project().add_stage(name, asset_id)
 			if stage_id:
 				if not os.path.isdir(dir_name):
@@ -105,41 +116,50 @@ def create_stage(name, asset_id):
 
 def create_variant(name, stage_id, comment=''):
 	variant_id = None
-	stage_path = get_stage_path(stage_id)
-	if stage_path:
-		dir_name = os.path.join(stage_path, name)
-		variant_id = project.project().add_variant(name, stage_id, comment)
-		if variant_id:
-			if not os.path.isdir(dir_name):
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{stage_path} doesn't exists")
-					project.project().remove_variant(variant_id)
-					variant_id = None
+	if tools.is_safe(name):
+		stage_path = get_stage_path(stage_id)
+		if stage_path:
+			dir_name = os.path.normpath(os.path.join(stage_path, name))
+			variant_id = project.project().add_variant(name, stage_id, comment)
+			if variant_id:
+				if not os.path.isdir(dir_name):
+					try:
+						os.mkdir(dir_name)
+						logging.info(f'{dir_name} created')
+					except FileNotFoundError:
+						logging.error(f"{stage_path} doesn't exists")
+						project.project().remove_variant(variant_id)
+						variant_id = None
+		else:
+			logging.error("Can't create variant")
 	else:
-		logging.error("Can't create variant")
+		logging.warning(f"{name} contains illegal characters")
 	return variant_id
 
 def create_work_env(name, variant_id):
 	work_env_id = None
-	variant_path = get_variant_path(variant_id)
-	if variant_path:
-		dir_name = os.path.join(variant_path, name)
-		work_env_id = project.project().add_work_env(name, variant_id)
-		if work_env_id:
-			if not os.path.isdir(dir_name):
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{variant_path} doesn't exists")
-					project.project().remove_work_env(work_env_id)
-					work_env_id = None
-			add_version(work_env_id)
+	if tools.is_safe(name):
+		if name in project.project().get_softwares_names_list():
+			variant_path = get_variant_path(variant_id)
+			if variant_path:
+				dir_name = os.path.normpath(os.path.join(variant_path, name))
+				work_env_id = project.project().add_work_env(name, variant_id)
+				if work_env_id:
+					if not os.path.isdir(dir_name):
+						try:
+							os.mkdir(dir_name)
+							logging.info(f'{dir_name} created')
+						except FileNotFoundError:
+							logging.error(f"{variant_path} doesn't exists")
+							project.project().remove_work_env(work_env_id)
+							work_env_id = None
+					add_version(work_env_id)
+			else:
+				logging.error("Can't create work env")
+		else:
+			logging.warning(f"{name} is not a valid work environment ( software not handled )")
 	else:
-		logging.error("Can't create work env")
+		logging.warning(f"{name} contains illegal characters")
 	return work_env_id
 
 def add_version(work_env_id, comment="Nope."):
@@ -148,7 +168,7 @@ def add_version(work_env_id, comment="Nope."):
 		new_version =  str(int(versions_list[-1])+1).zfill(4)
 	else:
 		new_version = '0001'
-	file_name = os.path.join(get_work_env_path(work_env_id), build_version_file_name(work_env_id, new_version))
+	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), build_version_file_name(work_env_id, new_version)))
 	version_id = project.project().add_version(new_version, file_name, work_env_id, comment)
 	return version_id
 

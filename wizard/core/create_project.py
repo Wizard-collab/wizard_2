@@ -5,6 +5,7 @@ from wizard.core import project
 from wizard.core import assets
 from wizard.core import environment
 from wizard.vars import assets_vars
+from wizard.vars import softwares_vars
 
 # Python modules
 import os
@@ -16,3 +17,8 @@ def create_project(project_name, project_path, project_password):
 		assets_domain_id = 1
 		for category in assets_vars._assets_categories_list_:
 			assets.create_category(category, assets_domain_id)
+		for software in softwares_vars._softwares_list_:
+			project.project().add_software(software,
+							softwares_vars._softwares_extensions_dic_[software],
+							softwares_vars._softwares_file_command_[software],
+							softwares_vars._softwares_no_file_command_[software])

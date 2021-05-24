@@ -53,12 +53,14 @@ def create_row(db_file, table, columns, datas):
         print(e)
         return 0
 
-def get_rows(db_file, table):
+def get_rows(db_file, table, column='*'):
 
-    sql_cmd = f''' SELECT * FROM {table}'''
+    sql_cmd = f''' SELECT {column} FROM {table}'''
 
     try:
         conn = create_connection(db_file)
+        if column != '*':
+            conn.row_factory = lambda cursor, row: row[0]
         cur = conn.cursor()
         cur.execute(sql_cmd)
         rows = cur.fetchall()
@@ -67,12 +69,14 @@ def get_rows(db_file, table):
         print(e)
         return None
 
-def get_row_by_column_data(db_file, table, column_tuple):
+def get_row_by_column_data(db_file, table, column_tuple, column='*'):
 
-    sql_cmd = f"SELECT * FROM {table} WHERE {column_tuple[0]}=?"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=?"
 
     try:
         conn = create_connection(db_file)
+        if column != '*':
+            conn.row_factory = lambda cursor, row: row[0]
         cur = conn.cursor()
         cur.execute(sql_cmd, (column_tuple[1],))
         rows = cur.fetchall()

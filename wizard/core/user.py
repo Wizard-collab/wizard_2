@@ -28,7 +28,8 @@ class user:
 	def set_user(self, user_name, password):
 		site_obj = site()
 		if user_name in site_obj.get_user_names_list():
-			if tools.decrypt_string(site_obj.get_user_row_by_name(user_name)[2], password):
+			if tools.decrypt_string(site_obj.get_user_row_by_name(user_name)[2],
+									password):
 				self.prefs_dic[user_vars._user_] = user_name
 				self.write_prefs_dic()
 				environment.build_user_env(user_name)
@@ -44,10 +45,12 @@ class user:
 	def set_project(self, project_name, password):
 		site_obj = site()
 		if project_name in site_obj.get_projects_names_list():
-			if tools.decrypt_string(site_obj.get_project_row_by_name(project_name)[3], password):
+			if tools.decrypt_string(site_obj.get_project_row_by_name(project_name)[3],
+									password):
 				self.prefs_dic[user_vars._project_] = project_name
 				self.write_prefs_dic()
-				environment.build_project_env(project_name, site_obj.get_project_row_by_name(project_name)[2])
+				environment.build_project_env(project_name, 
+							site_obj.get_project_row_by_name(project_name)[2])
 				logging.info(f'Successfully signed in {project_name} project')
 			else:
 				logging.warning(f'Wrong password for {project_name}')

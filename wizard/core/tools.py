@@ -3,6 +3,7 @@
 # Python modules
 import hashlib, binascii
 import os
+import re
 
 def encrypt_string(string):
     """Hash a string for storing."""
@@ -22,3 +23,8 @@ def decrypt_string(stored_string, provided_string):
                                   100000)
     pwdhash = binascii.hexlify(pwdhash).decode('ascii')
     return pwdhash == stored_string
+
+def is_safe(input):
+    charRe = re.compile(r'[^a-zA-Z0-9._]')
+    string = charRe.search(input)
+    return not bool(string)

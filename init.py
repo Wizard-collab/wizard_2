@@ -42,33 +42,26 @@ else:
 											print(f'            {version_tuple[0]} - {version_tuple[1]}')
 
 				print(str(time.time()-start_time))
-
 				'''
-				for a in range(0,100):
+				for a in range(0,5):
 					asset_id = assets.create_asset(str(time.time()), 1)
 					stage_id = assets.create_stage('modeling', asset_id)
 					variant_id = project.project().get_stage_childs(stage_id)[0][0]
 					assets.create_work_env('maya', variant_id)
-					assets.create_work_env('guerilla', variant_id)
-					assets.create_work_env('substance', variant_id)
-					assets.create_work_env('mari', variant_id)
+					assets.create_work_env('guerilla_render', variant_id)
+					assets.create_work_env('substance_painter', variant_id)
 					stage_id = assets.create_stage('rigging', asset_id)
 					variant_id = project.project().get_stage_childs(stage_id)[0][0]
 					assets.create_work_env('maya', variant_id)
-					assets.create_work_env('guerilla', variant_id)
-					assets.create_work_env('substance', variant_id)
-					assets.create_work_env('mari', variant_id)
+					assets.create_work_env('guerilla_render', variant_id)
+					assets.create_work_env('substance_painter', variant_id)
 					stage_id = assets.create_stage('texturing', asset_id)
 					variant_id = project.project().get_stage_childs(stage_id)[0][0]
 					assets.create_work_env('maya', variant_id)
-					assets.create_work_env('guerilla', variant_id)
-					assets.create_work_env('substance', variant_id)
-					assets.create_work_env('mari', variant_id)
+					assets.create_work_env('guerilla_render', variant_id)
+					assets.create_work_env('substance_painter', variant_id)
 				'''
-
-
 				
-
 		else:
 			logging.info('Please connect to a project')
 			

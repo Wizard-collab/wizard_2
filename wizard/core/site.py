@@ -25,7 +25,9 @@ class site:
                     if db_utils.create_row(self.database_file,
                                     'projects', 
                                     ('project_name', 'project_path', 'project_password'), 
-                                    (project_name, project_path, tools.encrypt_string(project_password))):
+                                    (project_name,
+                                    project_path,
+                                    tools.encrypt_string(project_password))):
                         logging.info(f'Project {project_name} added to site')
                         return 1
                     else:
@@ -68,14 +70,19 @@ class site:
     def get_project_path_by_name(self, name):
         return self.get_project_row_by_name(name)[2]
 
-    def modify_project_password(self, project_name, project_password, new_password, administrator_pass=''):
+    def modify_project_password(self,
+                                project_name,
+                                project_password,
+                                new_password,
+                                administrator_pass=''):
         if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
             if project_name in self.get_projects_names_list():
-                if tools.decrypt_string(self.get_project_row_by_name(project_name)[3], project_password):
+                if tools.decrypt_string(self.get_project_row_by_name(project_name)[3],
+                                        project_password):
                     if db_utils.update_data(self.database_file,
-                                            'projects',
-                                            ('project_password', tools.encrypt_string(new_password)),
-                                            ('project_name', project_name)):
+                                'projects',
+                                ('project_password', tools.encrypt_string(new_password)),
+                                ('project_name', project_name)):
                             logging.info(f'{project_name} password modified')
                             return 1
                     else:
