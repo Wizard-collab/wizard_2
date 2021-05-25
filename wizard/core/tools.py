@@ -3,9 +3,16 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+from zipfile import ZipFile
 import hashlib, binascii
 import os
 import re
+import traceback
+import shutil
+
+# Wizard modules
+from wizard.core import logging
+logging = logging.get_logger(__name__)
 
 def encrypt_string(string):
     # Hash a string for storing.
@@ -32,3 +39,39 @@ def is_safe(input):
     charRe = re.compile(r'[^a-zA-Z0-9._]')
     string = charRe.search(input)
     return not bool(string)
+
+def zip_files(files_list, destination):
+    try:
+        with ZipFile(destination, 'a') as zip:
+            for file in files_list:
+                zip.write(file, os.path.split(file)[-1])
+        logging.info("Files archived")
+        return 1
+    except:
+        logging.error(str(traceback.format_exc()))
+        return None
+
+def make_archive(source):
+    try:
+        format = 'zip'
+        root_dir = os.path.dirname(source)
+        base_dir = os.path.basename(source.strip(os.sep))
+        base_name = get_filename_without_override(os.path.join(root_dir, f"{base_dir}_archive.zip"))
+        shutil.make_archive(os.path.splitext(base_name)[0], format, root_dir, base_dir)
+        logging.info(f"Folder {base_dir} archived in {base_name}")
+        return 1
+    except:
+        logging.error(str(traceback.format_exc()))
+        return None
+
+def get_filename_without_override(file):
+    folder = os.path.dirname(file)
+    basename = os.path.basename(file)
+    extension = os.path.splitext(basename)[-1]
+    filename = os.path.splitext(basename)[0]
+    index = 1
+    while os.path.isfile(file):
+        new_filename = "{}_{}{}".format(filename, index, extension)
+        file = os.path.join(folder, new_filename)
+        index+=1
+    return file

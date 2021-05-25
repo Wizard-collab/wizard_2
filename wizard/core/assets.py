@@ -5,10 +5,12 @@
 # Python modules
 import os
 import time
+import shutil
 
 # Wizard modules
 from wizard.core import environment
 from wizard.core import project
+from wizard.core import site
 from wizard.core import tools
 from wizard.core import screenshot
 from wizard.vars import assets_vars
@@ -212,6 +214,24 @@ def create_work_env(software_id, variant_id):
 		logging.warning(f"{name} is not a valid work environment ( software not handled )")
 	return work_env_id
 
+def archive_work_env(work_env_id):
+	if site.site().is_admin():
+		work_env_row = project.project().get_work_env_data(work_env_id)
+		if work_env_row:
+			dir_name = get_work_env_path(work_env_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					print(shutil.rmtree(dir_name))
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			project.project().remove_work_env(work_env_id)
+		else:
+			return None
+	else:
+		return None
+
+
 def add_version(work_env_id, comment="", do_screenshot=1):
 	versions_list = project.project().get_work_versions(work_env_id, 'name')
 	if versions_list and versions_list != []:
@@ -232,9 +252,24 @@ def add_version(work_env_id, comment="", do_screenshot=1):
 	return version_id
 
 def archive_version(version_id):
-	version_row = project.project().get_version_data(version_id)
-	if os.path.isfile(version_row['file_path']):
-		pass
+	if site.site().is_admin():
+		version_row = project.project().get_version_data(version_id)
+		if version_row:
+			if os.path.isfile(version_row['file_path']):
+				zip_file = os.path.join(os.path.split(version_row['file_path'])[0], 
+							'archives.zip')
+				if tools.zip_files([version_row['file_path']], zip_file):
+					os.remove(version_row['file_path'])
+					logging.info(f"{version_row['file_path']} deleted")
+			else:
+				logging.warning(f"{version_row['file_path']} not found")
+			project.project().remove_version(version_row['id'])
+			return 1
+		else:
+			return None		
+	else:
+		return None
+
 
 def get_domain_path(domain_id):
 	dir_name = None
