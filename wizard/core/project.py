@@ -35,28 +35,16 @@ class project:
         domain_rows = db_utils.get_rows(self.database_file, 'domains')
         return domain_rows
 
-    def get_domain_name(self, domain_id):
-        domain_rows = db_utils.get_row_by_column_data(self.database_file, 'domains', ('id', domain_id), 'name')
+    def get_domain_data(self, domain_id, column='*'):
+        domain_rows = db_utils.get_row_by_column_data(self.database_file, 'domains', ('id', domain_id), column)
         if len(domain_rows) >= 1:
             return domain_rows[0]
         else:
             logging.error("Domain not found")
             return None
 
-    def get_domain_path(self, domain_id):
-        domain_rows = db_utils.get_row_by_column_data(self.database_file, 'domains', ('id', domain_id))
-        if len(domain_rows) >= 1:
-            return domain_rows[0][4]
-        else:
-            logging.error("Domain not found")
-            return None
-
-    def get_domain_childs_names(self, domain_id):
-        categories_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('domain_id', domain_id), 'name')
-        return categories_rows
-
-    def get_domain_childs(self, domain_id):
-        categories_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('domain_id', domain_id))
+    def get_domain_childs(self, domain_id, column='*'):
+        categories_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('domain_id', domain_id), column)
         return categories_rows
 
     def remove_domain(self, domain_id):
@@ -64,9 +52,9 @@ class project:
         logging.info(f"Domain removed from project")
 
     def add_category(self, name, domain_id):
-        if name not in self.get_domain_childs_names(domain_id):
+        if name not in self.get_domain_childs(domain_id, 'name'):
             category_id = db_utils.create_row(self.database_file,
-                                'categories', 
+                                'categories',
                                 ('name', 'creation_time', 'creation_user', 'domain_id'), 
                                 (name, time.time(), environment.get_user(), domain_id))
             if category_id:
@@ -81,24 +69,12 @@ class project:
         db_utils.delete_row(self.database_file, 'categories', category_id)
         logging.info(f"Category removed from project")
 
-    def get_category_childs_names(self, category_id):
-        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('category_id', category_id), 'name')
+    def get_category_childs(self, category_id, column="*"):
+        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('category_id', category_id), column)
         return assets_rows
 
-    def get_category_childs(self, category_id):
-        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('category_id', category_id))
-        return assets_rows
-
-    def get_category_parent_id(self, category_id):
-        category_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('id', category_id), 'domain_id')
-        if category_rows and len(category_rows) >= 1:
-            return category_rows[0]
-        else:
-            logging.error("Category not found")
-            return None
-
-    def get_category_name(self, category_id):
-        category_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('id', category_id), 'name')
+    def get_category_data(self, category_id, column='*'):
+        category_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('id', category_id), column)
         if category_rows and len(category_rows) >= 1:
             return category_rows[0]
         else:
@@ -106,7 +82,7 @@ class project:
             return None
 
     def add_asset(self, name, category_id):
-        if name not in self.get_category_childs_names(category_id):
+        if name not in self.get_category_childs(category_id, 'name'):
             asset_id = db_utils.create_row(self.database_file,
                                 'assets', 
                                 ('name', 'creation_time', 'creation_user', 'category_id'), 
@@ -123,24 +99,12 @@ class project:
         db_utils.delete_row(self.database_file, 'assets', asset_id)
         logging.info(f"Asset removed from project")
 
-    def get_asset_childs_names(self, asset_id):
-        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('asset_id', asset_id), 'name')
+    def get_asset_childs(self, asset_id, column='*'):
+        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('asset_id', asset_id), column)
         return stages_rows
 
-    def get_asset_childs(self, asset_id):
-        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('asset_id', asset_id))
-        return stages_rows
-
-    def get_asset_parent_id(self, asset_id):
-        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('id', asset_id), 'category_id')
-        if assets_rows and len(assets_rows) >= 1:
-            return assets_rows[0]
-        else:
-            logging.error("Asset not found")
-            return None
-
-    def get_asset_name(self, asset_id):
-        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('id', asset_id), 'name')
+    def get_asset_data(self, asset_id, colmun='*'):
+        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('id', asset_id), colmun)
         if assets_rows and len(assets_rows) >= 1:
             return assets_rows[0]
         else:
@@ -148,7 +112,7 @@ class project:
             return None
 
     def add_stage(self, name, asset_id):
-        if name not in self.get_asset_childs_names(asset_id):
+        if name not in self.get_asset_childs(asset_id, 'name'):
             stage_id = db_utils.create_row(self.database_file,
                                 'stages', 
                                 ('name', 'creation_time', 'creation_user', 'asset_id'), 
@@ -165,14 +129,6 @@ class project:
         db_utils.delete_row(self.database_file, 'stages', stage_id)
         logging.info(f"Stage removed from project")
 
-    def get_stage_parent_id(self, stage_id):
-        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('id', stage_id), 'asset_id')
-        if stages_rows and len(stages_rows) >= 1:
-            return stages_rows[0]
-        else:
-            logging.error("Stage not found")
-            return None
-
     def set_stage_default_variant(self, stage_id, variant_id):
         if db_utils.update_data(self.database_file,
                             'stages',
@@ -180,24 +136,20 @@ class project:
                             ('id', stage_id)):
             logging.info('Default variant modified')
 
-    def get_stage_name(self, stage_id):
-        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('id', stage_id), 'name')
+    def get_stage_data(self, stage_id, column='*'):
+        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('id', stage_id), column)
         if stages_rows and len(stages_rows) >= 1:
             return stages_rows[0]
         else:
             logging.error("Stage not found")
             return None
 
-    def get_stage_childs_names(self, stage_id):
-        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('stage_id', stage_id), 'name')
-        return variants_rows
-
-    def get_stage_childs(self, stage_id):
-        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('stage_id', stage_id))
+    def get_stage_childs(self, stage_id, column='*'):
+        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('stage_id', stage_id), column)
         return variants_rows
 
     def add_variant(self, name, stage_id, comment):
-        if name not in self.get_stage_childs_names(stage_id):
+        if name not in self.get_stage_childs(stage_id, 'name'):
             variant_id = db_utils.create_row(self.database_file,
                                 'variants', 
                                 ('name', 'creation_time', 'creation_user', 'comment', 'stage_id'), 
@@ -214,36 +166,24 @@ class project:
         db_utils.delete_row(self.database_file, 'variants', variant_id)
         logging.info(f"Variant removed from project")
 
-    def get_variant_parent_id(self, variant_id):
-        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('id', variant_id), 'stage_id')
+    def get_variant_data(self, variant_id, column='*'):
+        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('id', variant_id), column)
         if variants_rows and len(variants_rows) >= 1:
             return variants_rows[0]
         else:
             logging.error("Variant not found")
             return None
 
-    def get_variant_name(self, variant_id):
-        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('id', variant_id), 'name')
-        if variants_rows and len(variants_rows) >= 1:
-            return variants_rows[0]
-        else:
-            logging.error("Variant not found")
-            return None
-
-    def get_variant_work_envs_childs_names(self, variant_id):
-        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('variant_id', variant_id), 'name')
+    def get_variant_work_envs_childs(self, variant_id, column='*'):
+        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('variant_id', variant_id), column)
         return work_envs_rows
 
-    def get_variant_work_envs_childs(self, variant_id):
-        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('variant_id', variant_id))
-        return work_envs_rows
-
-    def add_work_env(self, name, variant_id):
-        if name not in self.get_variant_work_envs_childs_names(variant_id):
+    def add_work_env(self, name, software_id, variant_id):
+        if name not in self.get_variant_work_envs_childs(variant_id, 'name'):
             work_env_id = db_utils.create_row(self.database_file,
                                 'work_envs', 
-                                ('name', 'creation_time', 'creation_user', 'variant_id'), 
-                                (name, time.time(), environment.get_user(), variant_id))
+                                ('name', 'creation_time', 'creation_user', 'variant_id', 'software_id'), 
+                                (name, time.time(), environment.get_user(), variant_id, software_id))
             if work_env_id:
                 logging.info(f"Work env {name} added to project")
                 return work_env_id
@@ -257,32 +197,20 @@ class project:
         db_utils.delete_row(self.database_file, 'work_envs', work_env_id)
         logging.info(f"Work env removed from project")
 
-    def get_work_versions_names(self, work_env_id):
-        versions_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('work_env_id', work_env_id), 'name')
+    def get_work_versions(self, work_env_id, column='*'):
+        versions_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('work_env_id', work_env_id), column)
         return versions_rows
 
-    def get_work_versions(self, work_env_id):
-        versions_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('work_env_id', work_env_id))
-        return versions_rows
-
-    def get_work_env_parent_id(self, work_env_id):
-        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('id', work_env_id), 'variant_id')
-        if work_envs_rows and len(work_envs_rows) >= 1:
-            return work_envs_rows[0]
-        else:
-            logging.error("Work env not found")
-            return None
-
-    def get_work_env_name(self, work_env_id):
-        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('id', work_env_id), 'name')
-        if work_envs_rows and len(work_envs_rows ) >= 1:
-            return work_envs_rows[0]
+    def get_work_env_data(self, work_env_id, column='*'):
+        work_env_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('id', work_env_id), column)
+        if work_env_rows and len(work_env_rows) >= 1:
+            return work_env_rows[0]
         else:
             logging.error("Work env not found")
             return None
 
     def add_version(self, name, dir_name, work_env_id, comment=''):
-        if name not in self.get_work_versions_names(work_env_id):
+        if name not in self.get_work_versions(work_env_id, 'name'):
             version_id = db_utils.create_row(self.database_file,
                                 'versions', 
                                 ('name', 'creation_time', 'creation_user', 'comment', 'dir_name', 'work_env_id'), 
@@ -294,6 +222,14 @@ class project:
                 return None
         else:
             logging.warning(f"{name} already exists")
+            return None
+
+    def get_version_data(self, version_id, column='*'):
+        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('id', version_id), column)
+        if work_envs_rows and len(work_envs_rows) >= 1:
+            return work_envs_rows[0]
+        else:
+            logging.error("Version not found")
             return None
 
     def remove_version(self, version_id):
@@ -345,7 +281,7 @@ class project:
         else:
             logging.warning(f"{path} is not a valid executable")
 
-    def get_software_data(self, software_id, column):
+    def get_software_data(self, software_id, column='*'):
         softwares_rows = db_utils.get_row_by_column_data(self.database_file, 'softwares', ('id', software_id), column)
         if softwares_rows and len(softwares_rows) >= 1:
             return softwares_rows[0]
@@ -459,7 +395,9 @@ def create_work_envs_table(database_file):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         variant_id integer NOT NULL,
+                                        software_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id)
+                                        FOREIGN KEY (software_id) REFERENCES softwares (id)
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Work envs table created")
@@ -485,9 +423,7 @@ def create_versions_table(database_file):
                                         comment text,
                                         dir_name text NOT NULL,
                                         work_env_id integer NOT NULL,
-                                        software_id integer NOT NULL,
-                                        FOREIGN KEY (work_env_id) REFERENCES work_envs (id),
-                                        FOREIGN KEY (software_id) REFERENCES softwares (id)
+                                        FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Versions table created")

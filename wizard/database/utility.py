@@ -22,8 +22,8 @@ def create_connection(db_file):
 
 def create_table(db_file, cmd):
     try:
-        c = create_connection(db_file).cursor()
-        c.execute(cmd)
+        conn = create_connection(db_file).cursor()
+        conn.execute(cmd)
         return 1
     except Error as e:
         print(e)
@@ -44,11 +44,11 @@ def create_row(db_file, table, columns, datas):
     try:
         # Execute command
         conn = create_connection(db_file)
-        c = conn.cursor()
-        c.execute(sql_cmd, datas)
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, datas)
         conn.commit()
         logging.debug(f'*{db_file}-write')
-        return c.lastrowid
+        return cursor.lastrowid
     except Error as e:
         print(e)
         return 0
@@ -61,9 +61,11 @@ def get_rows(db_file, table, column='*'):
         conn = create_connection(db_file)
         if column != '*':
             conn.row_factory = lambda cursor, row: row[0]
-        cur = conn.cursor()
-        cur.execute(sql_cmd)
-        rows = cur.fetchall()
+        else:
+            conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd)
+        rows = cursor.fetchall()
         return rows
     except Error as e:
         print(e)
@@ -77,9 +79,11 @@ def get_row_by_column_data(db_file, table, column_tuple, column='*'):
         conn = create_connection(db_file)
         if column != '*':
             conn.row_factory = lambda cursor, row: row[0]
-        cur = conn.cursor()
-        cur.execute(sql_cmd, (column_tuple[1],))
-        rows = cur.fetchall()
+        else:
+            conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, (column_tuple[1],))
+        rows = cursor.fetchall()
         return rows
     except Error as e:
         print(e)
@@ -94,8 +98,8 @@ def update_data(db_file, table, set_tuple, where_tuple):
 
     try:
         conn = create_connection(db_file)
-        cur = conn.cursor()
-        cur.execute(sql_cmd, (set_tuple[1], where_tuple[1]))
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, (set_tuple[1], where_tuple[1]))
         conn.commit()
         return 1
     except Error as e:
@@ -112,10 +116,16 @@ def delete_row(db_file, table, id):
     sql = f'DELETE FROM {table} WHERE id=?'
     try:
         conn = create_connection(db_file)
-        cur = conn.cursor()
-        cur.execute(sql, (id,))
+        cursor = conn.cursor()
+        cursor.execute(sql, (id,))
         conn.commit()
         return 1
     except Error as e:
         print(e)
         return None
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d

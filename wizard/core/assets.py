@@ -78,10 +78,10 @@ def create_asset(name, category_id):
 
 def create_stage(name, asset_id):
 
-	category_id = project.project().get_asset_parent_id(asset_id)
-	category_name = project.project().get_category_name(category_id)
-	domain_id = project.project().get_category_parent_id(category_id)
-	domain_name = project.project().get_domain_name(domain_id)
+	category_id = project.project().get_asset_data(asset_id, 'category_id')
+	category_name = project.project().get_category_data(category_id, 'name')
+	domain_id = project.project().get_category_data(category_id, 'domain_id')
+	domain_name = project.project().get_domain_data(domain_id, 'name')
 
 	allowed = None
 
@@ -136,109 +136,105 @@ def create_variant(name, stage_id, comment=''):
 		logging.warning(f"{name} contains illegal characters")
 	return variant_id
 
-def create_work_env(name, variant_id):
+def create_work_env(software_id, variant_id):
 	work_env_id = None
-	if tools.is_safe(name):
-		if name in project.project().get_softwares_names_list():
-			variant_path = get_variant_path(variant_id)
-			if variant_path:
-				dir_name = os.path.normpath(os.path.join(variant_path, name))
-				work_env_id = project.project().add_work_env(name, variant_id)
-				if work_env_id:
-					if not os.path.isdir(dir_name):
-						try:
-							os.mkdir(dir_name)
-							logging.info(f'{dir_name} created')
-						except FileNotFoundError:
-							logging.error(f"{variant_path} doesn't exists")
-							project.project().remove_work_env(work_env_id)
-							work_env_id = None
-					add_version(work_env_id)
-			else:
-				logging.error("Can't create work env")
+	name = project.project().get_software_data(software_id, 'name')
+	if name in project.project().get_softwares_names_list():
+		variant_path = get_variant_path(variant_id)
+		if variant_path:
+			dir_name = os.path.normpath(os.path.join(variant_path, name))
+			work_env_id = project.project().add_work_env(name, software_id, variant_id)
+			if work_env_id:
+				if not os.path.isdir(dir_name):
+					try:
+						os.mkdir(dir_name)
+						logging.info(f'{dir_name} created')
+					except FileNotFoundError:
+						logging.error(f"{variant_path} doesn't exists")
+						project.project().remove_work_env(work_env_id)
+						work_env_id = None
+				add_version(work_env_id)
 		else:
-			logging.warning(f"{name} is not a valid work environment ( software not handled )")
+			logging.error("Can't create work env")
 	else:
-		logging.warning(f"{name} contains illegal characters")
+		logging.warning(f"{name} is not a valid work environment ( software not handled )")
 	return work_env_id
 
 def add_version(work_env_id, comment="Nope."):
-	versions_list = project.project().get_work_versions_names(work_env_id)
+	versions_list = project.project().get_work_versions(work_env_id, 'name')
 	if versions_list and versions_list != []:
 		new_version =  str(int(versions_list[-1])+1).zfill(4)
 	else:
 		new_version = '0001'
-	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), build_version_file_name(work_env_id, new_version)))
+	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
+							build_version_file_name(work_env_id, new_version)))
 	version_id = project.project().add_version(new_version, file_name, work_env_id, comment)
 	return version_id
 
 def get_domain_path(domain_id):
 	dir_name = None
-	domain_name = project.project().get_domain_name(domain_id)
+	domain_name = project.project().get_domain_data(domain_id, 'name')
 	if domain_name:
 		dir_name = os.path.join(environment.get_project_path(), domain_name)
 	return dir_name
 
 def get_category_path(category_id):
 	dir_name = None
-	domain_id = project.project().get_category_parent_id(category_id)
-	if domain_id:
-		category_name = project.project().get_category_name(category_id)
-		domain_path = get_domain_path(domain_id)
+	category_row = project.project().get_category_data(category_id)
+	if category_row:
+		category_name = category_row['name']
+		domain_path = get_domain_path(category_row['domain_id'])
 		if category_name and domain_path:
 			dir_name = os.path.join(domain_path, category_name)
 	return dir_name
 
 def get_asset_path(asset_id):
 	dir_name = None
-	category_id = project.project().get_asset_parent_id(asset_id)
-	if category_id:
-		asset_name = project.project().get_asset_name(asset_id)
-		category_path = get_category_path(category_id)
+	asset_row = project.project().get_asset_data(asset_id)
+	if asset_row:
+		asset_name = asset_row['name']
+		category_path = get_category_path(asset_row['category_id'])
 		if asset_name and category_path:
 			dir_name = os.path.join(category_path, asset_name)
 	return dir_name
 
 def get_stage_path(stage_id):
 	dir_name = None
-	asset_id = project.project().get_stage_parent_id(stage_id)
-	if asset_id:
-		stage_name = project.project().get_stage_name(stage_id)
-		asset_path = get_asset_path(asset_id)
+	stage_row = project.project().get_stage_data(stage_id)
+	if stage_row:
+		stage_name = stage_row['name']
+		asset_path = get_asset_path(stage_row['asset_id'])
 		if stage_name and asset_path:
 			dir_name = os.path.join(asset_path, stage_name)
 	return dir_name
 
 def get_variant_path(variant_id):
 	dir_name = None
-	stage_id = project.project().get_variant_parent_id(variant_id)
-	if stage_id:
-		variant_name = project.project().get_variant_name(variant_id)
-		stage_path = get_stage_path(stage_id)
+	variant_row = project.project().get_variant_data(variant_id)
+	if variant_row:
+		variant_name = variant_row['name']
+		stage_path = get_stage_path(variant_row['stage_id'])
 		if variant_name and stage_path:
 			dir_name = os.path.join(stage_path, variant_name)
 	return dir_name
 
 def get_work_env_path(work_env_id):
 	dir_name = None
-	variant_id = project.project().get_work_env_parent_id(work_env_id)
-	if variant_id:
-		work_env_name = project.project().get_work_env_name(work_env_id)
-		variant_path = get_variant_path(variant_id)
+	work_env_row = project.project().get_work_env_data(work_env_id)
+	if work_env_row:
+		work_env_name = work_env_row['name']
+		variant_path = get_variant_path(work_env_row['variant_id'])
 		if work_env_name and variant_path:
 			dir_name = os.path.join(variant_path, work_env_name)
 	return dir_name
 
 def build_version_file_name(work_env_id, name):
-	variant_id = project.project().get_work_env_parent_id(work_env_id)
-	variant_name = project.project().get_variant_name(variant_id)
-	stage_id = project.project().get_variant_parent_id(variant_id)
-	stage_name = project.project().get_stage_name(stage_id)
-	asset_id = project.project().get_stage_parent_id(stage_id)
-	asset_name = project.project().get_asset_name(asset_id)
-	category_id = project.project().get_asset_parent_id(asset_id)
-	category_name = project.project().get_category_name(category_id)
-	work_env_name = project.project().get_work_env_name(work_env_id)
-	extension = softwares_vars._softwares_extensions_dic_[work_env_name]
-	file_name = f'{category_name}_{asset_name}_{stage_name}_{variant_name}.{name}.{extension}'
+	project_obj = project.project()
+	work_env_row = project_obj.get_work_env_data(work_env_id)
+	variant_row = project_obj.get_variant_data(work_env_row['variant_id'])
+	stage_row = project_obj.get_stage_data(variant_row['stage_id'])
+	asset_row = project_obj.get_asset_data(stage_row['asset_id'])
+	category_row = project_obj.get_category_data(asset_row['category_id'])
+	extension = project_obj.get_software_data(work_env_row['software_id'], 'extension')
+	file_name = f"{category_row['name']}_{asset_row['name']}_{stage_row['name']}_{variant_row['name']}_{work_env_row['name']}.{name}.{extension}"
 	return file_name

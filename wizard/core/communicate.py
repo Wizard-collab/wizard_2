@@ -6,12 +6,15 @@ import sys
 from threading import *
 import time
 import traceback
+import json
 
 # Wizard modules
+from wizard.core import assets
+from wizard.core import project
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-class communicate_server(thread):
+class communicate_server(Thread):
     def __init__(self):
         super(communicate_server, self).__init__()
         hostname = 'localhost'
@@ -30,8 +33,17 @@ class communicate_server(thread):
                 if addr[0] == self.server_address:
                     signal_as_str = conn.recv(2048).decode('utf8')
                     if signal_as_str:
-                        self.analyse_signal(signal_as_str)
-                        #time.sleep(0.05)
+                        self.analyse_signal(signal_as_str, conn)
             except:
                 logging.error(str(traceback.format_exc()))
                 continue
+
+    def analyse_signal(self, signal_as_str, conn):
+        signal_dic = json.loads(signal_as_str)
+        if signal_dic['function'] == 'add_version':
+            self.add_version(signal_dic['work_env_id'], conn)
+
+    def add_version(self, work_env_id, conn):
+        version_id = assets.add_version(work_env_id)
+        version_path = project.project().get_version_data(version_id, 'dir_name')
+        conn.send(json.dumps(version_path).encode('utf8'))

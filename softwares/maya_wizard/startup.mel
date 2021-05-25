@@ -1,0 +1,2 @@
+string $command = "from maya_wizard import startup\nstartup.init()";
+python($command);

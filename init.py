@@ -3,6 +3,7 @@ from wizard.core import user
 from wizard.core import environment
 from wizard.core import project
 from wizard.core import assets
+from wizard.core import communicate
 import time
 
 from wizard.core import logging
@@ -25,42 +26,23 @@ else:
 
 				#show tree
 				
-				start_time = time.time()
 				for domain_tuple in project.project().get_domains():
-					print(f'{domain_tuple[0]} - {domain_tuple[1]}')
-					for category_tuple in project.project().get_domain_childs(domain_tuple[0]):
-						print(f'  {category_tuple[0]} - {category_tuple[1]}')
-						for asset_tuple in project.project().get_category_childs(category_tuple[0]):
-							print(f'    {asset_tuple[0]} - {asset_tuple[1]}')
-							for stage_tuple in project.project().get_asset_childs(asset_tuple[0]):
-								print(f'      {stage_tuple[0]} - {stage_tuple[1]}')
-								for variant_tuple in project.project().get_stage_childs(stage_tuple[0]):
-									print(f'        {variant_tuple[0]} - {variant_tuple[1]}')
-									for work_env_tuple in project.project().get_variant_work_envs_childs(variant_tuple[0]):
-										print(f'          {work_env_tuple[0]} - {work_env_tuple[1]}')
-										for version_tuple in project.project().get_work_versions(work_env_tuple[0]):
-											print(f'            {version_tuple[0]} - {version_tuple[1]}')
+					print(f"{domain_tuple['id']} - {domain_tuple['name']}")
+					for category_tuple in project.project().get_domain_childs(domain_tuple['id']):
+						print(f"  {category_tuple['id']} - {category_tuple['name']}")
+						for asset_tuple in project.project().get_category_childs(category_tuple['id']):
+							print(f"    {asset_tuple['id']} - {asset_tuple['name']}")
+							for stage_tuple in project.project().get_asset_childs(asset_tuple['id']):
+								print(f"      {stage_tuple['id']} - {stage_tuple['name']}")
+								for variant_tuple in project.project().get_stage_childs(stage_tuple['id']):
+									print(f"        {variant_tuple['id']} - {variant_tuple['name']}")
+									for work_env_tuple in project.project().get_variant_work_envs_childs(variant_tuple['id']):
+										print(f"          {work_env_tuple['id']} - {work_env_tuple['name']}")
+										for version_tuple in project.project().get_work_versions(work_env_tuple['id']):
+											print(f"            {version_tuple['id']} - {version_tuple['name']}")
 
-				print(str(time.time()-start_time))
-				'''
-				for a in range(0,5):
-					asset_id = assets.create_asset(str(time.time()), 1)
-					stage_id = assets.create_stage('modeling', asset_id)
-					variant_id = project.project().get_stage_childs(stage_id)[0][0]
-					assets.create_work_env('maya', variant_id)
-					assets.create_work_env('guerilla_render', variant_id)
-					assets.create_work_env('substance_painter', variant_id)
-					stage_id = assets.create_stage('rigging', asset_id)
-					variant_id = project.project().get_stage_childs(stage_id)[0][0]
-					assets.create_work_env('maya', variant_id)
-					assets.create_work_env('guerilla_render', variant_id)
-					assets.create_work_env('substance_painter', variant_id)
-					stage_id = assets.create_stage('texturing', asset_id)
-					variant_id = project.project().get_stage_childs(stage_id)[0][0]
-					assets.create_work_env('maya', variant_id)
-					assets.create_work_env('guerilla_render', variant_id)
-					assets.create_work_env('substance_painter', variant_id)
-				'''
+				server = communicate.communicate_server()
+				server.start()
 				
 		else:
 			logging.info('Please connect to a project')

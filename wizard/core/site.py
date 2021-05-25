@@ -21,7 +21,7 @@ class site:
     def create_project(self, project_name, project_path, project_password):
         if project_name not in self.get_projects_names_list():
             if project_path not in self.get_projects_paths_list():
-                if self.get_user_row_by_name(environment.get_user())[4]:
+                if self.get_user_row_by_name(environment.get_user())['pass']:
                     if db_utils.create_row(self.database_file,
                                     'projects', 
                                     ('project_name', 'project_path', 'project_password'), 
@@ -41,25 +41,19 @@ class site:
             logging.warning(f'Project {project_name} already exists')
 
     def get_administrator_pass(self):
-        return self.get_user_row_by_name('admin')[2]
+        return self.get_user_row_by_name('admin')['pass']
 
     def get_projects_list(self):
         projects_rows = db_utils.get_rows(self.database_file, 'projects')
         return projects_rows
 
     def get_projects_names_list(self):
-        projects_rows = self.get_projects_list()
-        projects_names = []
-        for project_row in projects_rows:
-            projects_names.append(project_row[1])
-        return projects_names
+        projects_rows = db_utils.get_rows(self.database_file, 'projects', 'project_name')
+        return projects_rows
 
     def get_projects_paths_list(self):
-        projects_rows = self.get_projects_list()
-        projects_paths = []
-        for project_row in projects_rows:
-            projects_paths.append(project_row[2])
-        return projects_paths
+        projects_rows = db_utils.get_rows(self.database_file, 'projects', 'project_path')
+        return projects_rows
 
     def get_project_row_by_name(self, name):
         projects_rows = db_utils.get_row_by_column_data(self.database_file,
@@ -68,7 +62,7 @@ class site:
         return projects_rows[0]
 
     def get_project_path_by_name(self, name):
-        return self.get_project_row_by_name(name)[2]
+        return self.get_project_row_by_name(name)['project_path']
 
     def modify_project_password(self,
                                 project_name,
@@ -77,7 +71,7 @@ class site:
                                 administrator_pass=''):
         if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
             if project_name in self.get_projects_names_list():
-                if tools.decrypt_string(self.get_project_row_by_name(project_name)[3],
+                if tools.decrypt_string(self.get_project_row_by_name(project_name)['project_password'],
                                         project_password):
                     if db_utils.update_data(self.database_file,
                                 'projects',
@@ -114,7 +108,7 @@ class site:
             else:
                 return None
         else:
-            logging.warning('User {user_name} already exists')
+            logging.warning(f'User {user_name} already exists')
             return None
 
     def upgrade_user_privilege(self, user_name, administrator_pass):
@@ -137,7 +131,7 @@ class site:
     def downgrade_user_privilege(self, user_name, administrator_pass):
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
-            if user_row[4]:
+            if user_row['administrator']:
                 if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
                     if db_utils.update_data(self.database_file,
                                             'users',
@@ -158,7 +152,7 @@ class site:
     def modify_user_password(self, user_name, password, new_password):
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
-            if tools.decrypt_string(user_row[2], password):
+            if tools.decrypt_string(user_row['pass'], password):
                 if db_utils.update_data(self.database_file,
                                         'users',
                                         ('pass', tools.encrypt_string(new_password)),
@@ -179,11 +173,8 @@ class site:
         return users_rows
 
     def get_user_names_list(self):
-        users_rows = self.get_users_list()
-        user_names = []
-        for user_row in users_rows:
-            user_names.append(user_row[1])
-        return user_names
+        users_rows = db_utils.get_rows(self.database_file, 'users', 'user_name')
+        return users_rows
 
     def get_user_row_by_name(self, name):
         users_rows = db_utils.get_row_by_column_data(self.database_file, 'users', ('user_name', name))

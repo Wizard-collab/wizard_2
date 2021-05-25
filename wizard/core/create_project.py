@@ -19,6 +19,6 @@ def create_project(project_name, project_path, project_password):
 			assets.create_category(category, assets_domain_id)
 		for software in softwares_vars._softwares_list_:
 			project.project().add_software(software,
-							softwares_vars._softwares_extensions_dic_[software],
-							softwares_vars._softwares_file_command_[software],
-							softwares_vars._softwares_no_file_command_[software])
+							softwares_vars._extensions_dic_[software],
+							softwares_vars._file_command_[software],
+							softwares_vars._no_file_command_[software])
