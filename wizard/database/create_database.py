@@ -1,8 +1,12 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
+# Python modules
 import sqlite3
 from sqlite3 import Error
 
+# Wizard modules
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
@@ -20,4 +24,4 @@ def create_database(db_file):
             conn.close()
             return 1
         else:
-            return 0
+            return None

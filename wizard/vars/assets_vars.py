@@ -1,4 +1,6 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
 # Domain vars
 _assets_ = 'assets'

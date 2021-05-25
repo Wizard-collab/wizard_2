@@ -1,4 +1,10 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
+
+# Python modules
+import os
+import subprocess
 
 # Wizard modules
 from wizard.core import project
@@ -7,21 +13,17 @@ from wizard.vars import softwares_vars
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-# Python modules
-import os
-import subprocess
-
 def launch_work_version(version_id):
 	work_version_row = project.project().get_version_data(version_id)
-	file_path = work_version_row['dir_name']
+	file_path = work_version_row['file_path']
 	work_env_id = work_version_row['work_env_id']
 	software_id = project.project().get_work_env_data(work_env_id, 'software_id')
 	software_row = project.project().get_software_data(software_id)
 	command = build_command(file_path, software_row)
 	env = build_env(work_env_id, software_row)
-	print(command)
-	print(env)
-	subprocess.Popen(command, env=env)
+	if command:
+		subprocess.Popen(command, env=env, cwd='softwares')
+		logging.info(f"{software_row['name']} launched")
 
 def build_command(file_path, software_row):
 	software_path = software_row['path']
@@ -35,7 +37,8 @@ def build_command(file_path, software_row):
 		raw_command = raw_command.replace(softwares_vars._executable_key_, software_path)
 		raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
 		if software_row['name'] in softwares_vars._scripts_dic_.keys():
-			raw_command = raw_command.replace(softwares_vars._script_key_, softwares_vars._scripts_dic_[software_row['name']])
+			raw_command = raw_command.replace(softwares_vars._script_key_,
+								softwares_vars._scripts_dic_[software_row['name']])
 		return raw_command
 
 	else:
@@ -45,6 +48,5 @@ def build_command(file_path, software_row):
 def build_env(work_env_id, software_row):
 	env = os.environ.copy()
 	env['wizard_work_env_id'] = str(work_env_id)
-	env[softwares_vars._script_env_dic_[software_row['name']]]=softwares_vars._plugins_path_[software_row['name']]
-	env[softwares_vars._script_env_dic_[software_row['name']]]+=os.pathsep+softwares_vars._main_script_path_
+	env[softwares_vars._script_env_dic_[software_row['name']]] = os.pathsep+softwares_vars._main_script_path_
 	return env

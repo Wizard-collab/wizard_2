@@ -1,4 +1,10 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
+
+# Python modules
+import os
+import time
 
 # Wizard modules
 from wizard.core import logging
@@ -9,10 +15,6 @@ from wizard.database import utility as db_utils
 from wizard.vars import site_vars
 from wizard.core import tools
 from wizard.core import environment
-
-# Python modules
-import os
-import time
 
 class site:
     def __init__(self):
@@ -71,8 +73,9 @@ class site:
                                 administrator_pass=''):
         if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
             if project_name in self.get_projects_names_list():
-                if tools.decrypt_string(self.get_project_row_by_name(project_name)['project_password'],
-                                        project_password):
+                if tools.decrypt_string(
+                            self.get_project_row_by_name(project_name)['project_password'],
+                            project_password):
                     if db_utils.update_data(self.database_file,
                                 'projects',
                                 ('project_password', tools.encrypt_string(new_password)),
@@ -176,9 +179,15 @@ class site:
         users_rows = db_utils.get_rows(self.database_file, 'users', 'user_name')
         return users_rows
 
-    def get_user_row_by_name(self, name):
-        users_rows = db_utils.get_row_by_column_data(self.database_file, 'users', ('user_name', name))
+    def get_user_row_by_name(self, name, column='*'):
+        users_rows = db_utils.get_row_by_column_data(self.database_file, 'users', ('user_name', name), column)
         return users_rows[0]
+
+    def is_admin(self):
+        is_admin = self.get_user_row_by_name(environment.get_user(), 'administrator')
+        if not is_admin:
+            logging.info("You are not administrator")
+        return is_admin
 
 def init_site(site_path, admin_password, admin_email):
     database_file = create_site_database(site_path)

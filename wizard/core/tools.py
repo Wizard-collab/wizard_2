@@ -1,4 +1,6 @@
-# condig: utf-8
+# coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
 # Python modules
 import hashlib, binascii
@@ -6,7 +8,7 @@ import os
 import re
 
 def encrypt_string(string):
-    """Hash a string for storing."""
+    # Hash a string for storing.
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
     pwdhash = hashlib.pbkdf2_hmac('sha512', string.encode('utf-8'),
                                   salt, 100000)
@@ -14,7 +16,7 @@ def encrypt_string(string):
     return (salt + pwdhash).decode('ascii')
 
 def decrypt_string(stored_string, provided_string):
-    """Verify a stored password against one provided by user"""
+    # Verify a stored string against one provided by user
     salt = stored_string[:64]
     stored_string = stored_string[64:]
     pwdhash = hashlib.pbkdf2_hmac('sha512',
@@ -25,6 +27,8 @@ def decrypt_string(stored_string, provided_string):
     return pwdhash == stored_string
 
 def is_safe(input):
+    # Check if the given string doesn't 
+    # contains illegal characters
     charRe = re.compile(r'[^a-zA-Z0-9._]')
     string = charRe.search(input)
     return not bool(string)

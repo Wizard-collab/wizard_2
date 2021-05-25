@@ -1,9 +1,13 @@
-# conding: utf-8
+# coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
+# Python modules
 import sqlite3
 from sqlite3 import Error
 import time
 
+# Wizard modules
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 

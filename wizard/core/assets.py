@@ -1,4 +1,6 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
 # Python modules
 import os
@@ -8,6 +10,7 @@ import time
 from wizard.core import environment
 from wizard.core import project
 from wizard.core import tools
+from wizard.core import screenshot
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
@@ -20,14 +23,21 @@ def create_domain(name):
 		dir_name = os.path.normpath(os.path.join(environment.get_project_path(), name))
 		domain_id = project.project().add_domain(name)
 		if domain_id:
-			if not os.path.isdir(dir_name):
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{environment.get_project_path()} doesn't exists")
-					project.project().remove_domain(domain_id)
-					domain_id = None
+			try:
+				os.mkdir(dir_name)
+				logging.info(f'{dir_name} created')
+			except FileNotFoundError:
+				logging.error(f"{environment.get_project_path()} doesn't exists")
+				project.project().remove_domain(domain_id)
+				domain_id = None
+			except FileExistsError:
+				logging.error(f"{dir_name} already exists on filesystem")
+				project.project().remove_domain(domain_id)
+				domain_id = None
+			except PermissionError:
+				logging.error(f"{dir_name} access denied")
+				project.project().remove_domain(domain_id)
+				domain_id = None
 	else:
 		logging.warning(f"{name} contains illegal characters")
 	return domain_id
@@ -40,14 +50,21 @@ def create_category(name, domain_id):
 			dir_name = os.path.normpath(os.path.join(domain_path, name))
 			category_id = project.project().add_category(name, domain_id)
 			if category_id:
-				if not os.path.isdir(dir_name):
-					try:
-						os.mkdir(dir_name)
-						logging.info(f'{dir_name} created')
-					except FileNotFoundError:
-						logging.error(f"{domain_path} doesn't exists")
-						project.project().remove_category(category_id)
-						category_id = None
+				try:
+					os.mkdir(dir_name)
+					logging.info(f'{dir_name} created')
+				except FileNotFoundError:
+					logging.error(f"{domain_path} doesn't exists")
+					project.project().remove_category(category_id)
+					category_id = None
+				except FileExistsError:
+					logging.error(f"{dir_name} already exists on filesystem")
+					project.project().remove_category(category_id)
+					category_id = None
+				except PermissionError:
+					logging.error(f"{dir_name} access denied")
+					project.project().remove_category(category_id)
+					category_id = None
 		else:
 			logging.error("Can't create category")
 	else:
@@ -62,14 +79,21 @@ def create_asset(name, category_id):
 			dir_name = os.path.normpath(os.path.join(category_path, name))
 			asset_id = project.project().add_asset(name, category_id)
 			if asset_id:
-				if not os.path.isdir(dir_name):
-					try:
-						os.mkdir(dir_name)
-						logging.info(f'{dir_name} created')
-					except FileNotFoundError:
-						logging.error(f"{category_path} doesn't exists")
-						project.project().remove_asset(asset_id)
-						asset_id = None
+				try:
+					os.mkdir(dir_name)
+					logging.info(f'{dir_name} created')
+				except FileNotFoundError:
+					logging.error(f"{category_path} doesn't exists")
+					project.project().remove_asset(asset_id)
+					asset_id = None
+				except FileExistsError:
+					logging.error(f"{dir_name} already exists on filesystem")
+					project.project().remove_asset(asset_id)
+					asset_id = None
+				except PermissionError:
+					logging.error(f"{dir_name} access denied")
+					project.project().remove_asset(asset_id)
+					asset_id = None
 		else:
 			logging.error("Can't create asset")
 	else:
@@ -77,6 +101,13 @@ def create_asset(name, category_id):
 	return asset_id
 
 def create_stage(name, asset_id):
+	# The stage creation need to follow some name rules
+	# if category is assets, the rules are :
+	#	modeling
+	#	rigging
+	#	grooming
+	#	texturing
+	#	shading
 
 	category_id = project.project().get_asset_data(asset_id, 'category_id')
 	category_name = project.project().get_category_data(category_id, 'name')
@@ -96,16 +127,23 @@ def create_stage(name, asset_id):
 			dir_name = os.path.normpath(os.path.join(asset_path, name))
 			stage_id = project.project().add_stage(name, asset_id)
 			if stage_id:
-				if not os.path.isdir(dir_name):
-					try:
-						os.mkdir(dir_name)
-						logging.info(f'{dir_name} created')
-						variant_id = create_variant('main', stage_id, 'default variant')
-						project.project().set_stage_default_variant(stage_id, variant_id)
-					except FileNotFoundError:
-						logging.error(f"{asset_path} doesn't exists")
-						project.project().remove_stage(stage_id)
-						stage_id = None
+				try:
+					os.mkdir(dir_name)
+					logging.info(f'{dir_name} created')
+					variant_id = create_variant('main', stage_id, 'default variant')
+					project.project().set_stage_default_variant(stage_id, variant_id)
+				except FileNotFoundError:
+					logging.error(f"{asset_path} doesn't exists")
+					project.project().remove_stage(stage_id)
+					stage_id = None
+				except FileExistsError:
+					logging.error(f"{dir_name} already exists on filesystem")
+					project.project().remove_stage(stage_id)
+					stage_id = None
+				except PermissionError:
+					logging.error(f"{dir_name} access denied")
+					project.project().remove_stage(stage_id)
+					stage_id = None
 			return stage_id
 		else:
 			logging.error("Can't create stage")
@@ -122,14 +160,21 @@ def create_variant(name, stage_id, comment=''):
 			dir_name = os.path.normpath(os.path.join(stage_path, name))
 			variant_id = project.project().add_variant(name, stage_id, comment)
 			if variant_id:
-				if not os.path.isdir(dir_name):
-					try:
-						os.mkdir(dir_name)
-						logging.info(f'{dir_name} created')
-					except FileNotFoundError:
-						logging.error(f"{stage_path} doesn't exists")
-						project.project().remove_variant(variant_id)
-						variant_id = None
+				try:
+					os.mkdir(dir_name)
+					logging.info(f'{dir_name} created')
+				except FileNotFoundError:
+					logging.error(f"{stage_path} doesn't exists")
+					project.project().remove_variant(variant_id)
+					variant_id = None
+				except FileExistsError:
+					logging.error(f"{dir_name} already exists on filesystem")
+					project.project().remove_variant(variant_id)
+					variant_id = None
+				except PermissionError:
+					logging.error(f"{dir_name} access denied")
+					project.project().remove_variant(variant_id)
+					variant_id = None
 		else:
 			logging.error("Can't create variant")
 	else:
@@ -145,22 +190,29 @@ def create_work_env(software_id, variant_id):
 			dir_name = os.path.normpath(os.path.join(variant_path, name))
 			work_env_id = project.project().add_work_env(name, software_id, variant_id)
 			if work_env_id:
-				if not os.path.isdir(dir_name):
-					try:
-						os.mkdir(dir_name)
-						logging.info(f'{dir_name} created')
-					except FileNotFoundError:
-						logging.error(f"{variant_path} doesn't exists")
-						project.project().remove_work_env(work_env_id)
-						work_env_id = None
-				add_version(work_env_id)
+				try:
+					os.mkdir(dir_name)
+					logging.info(f'{dir_name} created')
+					add_version(work_env_id, do_screenshot=0)
+				except FileNotFoundError:
+					logging.error(f"{variant_path} doesn't exists")
+					project.project().remove_work_env(work_env_id)
+					work_env_id = None
+				except FileExistsError:
+					logging.error(f"{dir_name} already exists on filesystem")
+					project.project().remove_work_env(work_env_id)
+					work_env_id = None
+				except PermissionError:
+					logging.error(f"{dir_name} access denied")
+					project.project().remove_work_env(work_env_id)
+					work_env_id = None
 		else:
 			logging.error("Can't create work env")
 	else:
 		logging.warning(f"{name} is not a valid work environment ( software not handled )")
 	return work_env_id
 
-def add_version(work_env_id, comment="Nope."):
+def add_version(work_env_id, comment="", do_screenshot=1):
 	versions_list = project.project().get_work_versions(work_env_id, 'name')
 	if versions_list and versions_list != []:
 		new_version =  str(int(versions_list[-1])+1).zfill(4)
@@ -168,8 +220,21 @@ def add_version(work_env_id, comment="Nope."):
 		new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
 							build_version_file_name(work_env_id, new_version)))
-	version_id = project.project().add_version(new_version, file_name, work_env_id, comment)
+	if screenshot:
+		screenshot_bytes = screenshot.screenshot_to_bytes()
+	else:
+		screenshot_bytes = None
+	version_id = project.project().add_version(new_version,
+												file_name,
+												work_env_id,
+												comment,
+												screenshot_bytes)
 	return version_id
+
+def archive_version(version_id):
+	version_row = project.project().get_version_data(version_id)
+	if os.path.isfile(version_row['file_path']):
+		pass
 
 def get_domain_path(domain_id):
 	dir_name = None
@@ -236,5 +301,11 @@ def build_version_file_name(work_env_id, name):
 	asset_row = project_obj.get_asset_data(stage_row['asset_id'])
 	category_row = project_obj.get_category_data(asset_row['category_id'])
 	extension = project_obj.get_software_data(work_env_row['software_id'], 'extension')
-	file_name = f"{category_row['name']}_{asset_row['name']}_{stage_row['name']}_{variant_row['name']}_{work_env_row['name']}.{name}.{extension}"
+	file_name = f"{category_row['name']}"
+	file_name += f"_{asset_row['name']}"
+	file_name += f"_{stage_row['name']}"
+	file_name += f"_{variant_row['name']}"
+	file_name += f"_{work_env_row['name']}"
+	file_name += f".{name}"
+	file_name += f".{extension}"
 	return file_name

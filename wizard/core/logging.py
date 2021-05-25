@@ -1,4 +1,6 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
 # Python modules
 import logging
@@ -8,6 +10,9 @@ from wizard.vars import user_vars
 
 def get_logger(name=None):
     # create logger
+    # Use this module to keep logging format
+    # integrity across wizard application
+    
     logging_level = logging.INFO
 
     file = user_vars._user_logging_file_

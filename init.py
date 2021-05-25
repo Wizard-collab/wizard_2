@@ -42,7 +42,7 @@ else:
 											print(f"            {version_tuple['id']} - {version_tuple['name']}")
 
 				server = communicate.communicate_server()
-				server.start()
+				#server.start()
 				
 		else:
 			logging.info('Please connect to a project')

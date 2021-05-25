@@ -1,4 +1,6 @@
 # coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
 
 # Python modules
 import os
@@ -48,8 +50,11 @@ class project:
         return categories_rows
 
     def remove_domain(self, domain_id):
-        db_utils.delete_row(self.database_file, 'domains', domain_id)
-        logging.info(f"Domain removed from project")
+        if site.site().is_admin():
+            for category_id in self.get_domain_childs(domain_id, 'id'):
+                self.remove_category(category_id)
+            db_utils.delete_row(self.database_file, 'domains', domain_id)
+            logging.info(f"Domain removed from project")
 
     def add_category(self, name, domain_id):
         if name not in self.get_domain_childs(domain_id, 'name'):
@@ -66,8 +71,11 @@ class project:
             logging.warning(f"{name} already exists")
 
     def remove_category(self, category_id):
-        db_utils.delete_row(self.database_file, 'categories', category_id)
-        logging.info(f"Category removed from project")
+        if site.site().is_admin():
+            for asset_id in self.get_category_childs(category_id, 'id'):
+                self.remove_asset(asset_id)
+            db_utils.delete_row(self.database_file, 'categories', category_id)
+            logging.info(f"Category removed from project")
 
     def get_category_childs(self, category_id, column="*"):
         assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('category_id', category_id), column)
@@ -96,8 +104,11 @@ class project:
             logging.warning(f"{name} already exists")
 
     def remove_asset(self, asset_id):
-        db_utils.delete_row(self.database_file, 'assets', asset_id)
-        logging.info(f"Asset removed from project")
+        if site.site().is_admin():
+            for stage_id in self.get_asset_childs(asset_id, 'id'):
+                self.remove_stage(stage_id)
+            db_utils.delete_row(self.database_file, 'assets', asset_id)
+            logging.info(f"Asset removed from project")
 
     def get_asset_childs(self, asset_id, column='*'):
         stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('asset_id', asset_id), column)
@@ -126,8 +137,11 @@ class project:
             logging.warning(f"{name} already exists")
 
     def remove_stage(self, stage_id):
-        db_utils.delete_row(self.database_file, 'stages', stage_id)
-        logging.info(f"Stage removed from project")
+        if site.site().is_admin():
+            for variant_id in self.get_stage_childs(stage_id, 'id'):
+                self.remove_variant(variant_id)
+            db_utils.delete_row(self.database_file, 'stages', stage_id)
+            logging.info(f"Stage removed from project")
 
     def set_stage_default_variant(self, stage_id, variant_id):
         if db_utils.update_data(self.database_file,
@@ -163,8 +177,11 @@ class project:
             logging.warning(f"{name} already exists")
 
     def remove_variant(self, variant_id):
-        db_utils.delete_row(self.database_file, 'variants', variant_id)
-        logging.info(f"Variant removed from project")
+        if site.site().is_admin():
+            for work_env_id in self.get_variant_work_envs_childs(variant_id, 'id'):
+                self.remove_work_env(work_env_id)
+            db_utils.delete_row(self.database_file, 'variants', variant_id)
+            logging.info(f"Variant removed from project")
 
     def get_variant_data(self, variant_id, column='*'):
         variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('id', variant_id), column)
@@ -194,8 +211,11 @@ class project:
             return None
 
     def remove_work_env(self, work_env_id):
-        db_utils.delete_row(self.database_file, 'work_envs', work_env_id)
-        logging.info(f"Work env removed from project")
+        if site.site().is_admin():
+            for version_id in self.get_work_versions(work_env_id, 'id'):
+                self.remove_version(version_id)
+            db_utils.delete_row(self.database_file, 'work_envs', work_env_id)
+            logging.info(f"Work env removed from project")
 
     def get_work_versions(self, work_env_id, column='*'):
         versions_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('work_env_id', work_env_id), column)
@@ -209,12 +229,12 @@ class project:
             logging.error("Work env not found")
             return None
 
-    def add_version(self, name, dir_name, work_env_id, comment=''):
+    def add_version(self, name, file_path, work_env_id, comment='', screenshot=None):
         if name not in self.get_work_versions(work_env_id, 'name'):
             version_id = db_utils.create_row(self.database_file,
                                 'versions', 
-                                ('name', 'creation_time', 'creation_user', 'comment', 'dir_name', 'work_env_id'), 
-                                (name, time.time(), environment.get_user(), comment, dir_name, work_env_id))
+                                ('name', 'creation_time', 'creation_user', 'comment', 'file_path', 'screenshot', 'work_env_id'), 
+                                (name, time.time(), environment.get_user(), comment, file_path, screenshot, work_env_id))
             if version_id:
                 logging.info(f"Version {name} added to project")
                 return version_id
@@ -233,8 +253,9 @@ class project:
             return None
 
     def remove_version(self, version_id):
-        db_utils.delete_row(self.database_file, 'versions', version_id)
-        logging.info(f"Version removed from project")
+        if site.site().is_admin():
+            db_utils.delete_row(self.database_file, 'versions', version_id)
+            logging.info(f"Version removed from project")
 
     def add_software(self, name, extension, file_command, no_file_command):
         if name in softwares_vars._softwares_list_:
@@ -421,7 +442,8 @@ def create_versions_table(database_file):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
-                                        dir_name text NOT NULL,
+                                        file_path text NOT NULL,
+                                        screenshot blob,
                                         work_env_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
@@ -435,7 +457,7 @@ def create_export_versions_table(database_file):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
-                                        dir_name text NOT NULL,
+                                        file_list text NOT NULL,
                                         export_id integer NOT NULL,
                                         FOREIGN KEY (export_id) REFERENCES exports (id)
                                     );"""
