@@ -136,7 +136,7 @@ class site:
     def upgrade_user_privilege(self, user_name, administrator_pass):
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
-            if not user_row[4]:
+            if not user_row['administrator']:
                 if tools.decrypt_string(self.get_administrator_pass(),
                                             administrator_pass):
                     if db_utils.update_data(self.database_file,
