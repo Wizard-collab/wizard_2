@@ -2,10 +2,17 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# This module is used to handle third party softwares commands
+# For example if you want to save a version within a 
+# Maya, the software plugin sends a socket signal
+# here and waits for a return ( also socket signal )
+
+# It roughly is a lan access to the wizard core functions
+
 # Python modules
 import socket
 import sys
-from threading import *
+from threading import Thread
 import time
 import traceback
 import json
@@ -46,13 +53,18 @@ class communicate_server(Thread):
     def analyse_signal(self, signal_as_str, conn):
         # The signal_as_str is already decoded ( from utf8 )
         # The incoming signal needs to be a json string
+        returned = None
         signal_dic = json.loads(signal_as_str)
-        if signal_dic['function'] == 'add_version':
-            self.add_version(signal_dic['work_env_id'], conn)
 
-    def add_version(self, work_env_id, conn):
-        # Add a version using the wizard core and return the file path 
-        # of the new version
-        version_id = assets.add_version(work_env_id)
-        version_path = project.project().get_version_data(version_id, 'file_path')
-        conn.send(json.dumps(version_path).encode('utf8'))
+        if signal_dic['function'] == 'add_version':
+            returned = self.add_version(signal_dic['work_env_id'])
+
+        conn.send(json.dumps(returned).encode('utf8'))
+
+def add_version(work_env_id):
+    # Add a version using the wizard core and return the file path 
+    # of the new version
+    version_id = assets.add_version(work_env_id)
+    version_path = project.project().get_version_data(version_id,
+                                                    'file_path')
+    return version_path

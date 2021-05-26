@@ -5,6 +5,7 @@
 # Python modules
 import os
 import time
+import json
 
 # Wizard modules
 from wizard.core import logging
@@ -376,8 +377,12 @@ class project:
                                 ('path', path),
                                 ('id', software_id)):
                 logging.info('Software path modified')
+                return 1
+            else:
+                return None
         else:
             logging.warning(f"{path} is not a valid executable")
+            return None
 
     def get_software_data(self, software_id, column='*'):
         softwares_rows = db_utils.get_row_by_column_data(self.database_file,
@@ -389,6 +394,100 @@ class project:
         else:
             logging.error("Software not found")
             return None
+
+    def create_settings_row(self, frame_rate, image_format):
+        if len(db_utils.get_rows(self.database_file, 'settings', 'id'))==0:
+            if db_utils.create_row(self.database_file,
+                                                'settings',
+                                                ('frame_rate',
+                                                    'image_format',
+                                                    'users_ids'),
+                                                (frame_rate,
+                                                    json.dumps(image_format),
+                                                    json.dumps(list()))):
+                logging.info("Project settings initiated")
+                return 1
+            else:
+                return None
+        else:
+            logging.error("Settings row already exists")
+            return None
+
+    def set_frame_rate(self, frame_rate):
+        if db_utils.update_data(self.database_file,
+                                'settings',
+                                ('frame_rate', frame_rate),
+                                ('id', 1)):
+            logging.info('Project frame rate modified')
+            return 1
+        else:
+            return None
+
+    def get_frame_rate(self):
+        frame_rate_list = db_utils.get_row_by_column_data(self.database_file,
+                                                            'settings',
+                                                            ('id', 1),
+                                                            'frame_rate')
+        if frame_rate_list and len(frame_rate_list) >= 1:
+            return json.loads(frame_rate_list[0])
+        else:
+            logging.error("Project settings not found")
+            return None
+
+    def set_image_format(self, image_format):
+        if db_utils.update_data(self.database_file,
+                                'settings',
+                                ('image_format', json.dumps(image_format)),
+                                ('id', 1)):
+            logging.info('Project format modified')
+            return 1
+        else:
+            return None
+
+    def get_image_format(self):
+        image_format_list = db_utils.get_row_by_column_data(self.database_file,
+                                                            'settings',
+                                                            ('id', 1),
+                                                            'image_format')
+        if image_format_list and len(image_format_list) >= 1:
+            return json.loads(image_format_list[0])
+        else:
+            logging.error("Project settings not found")
+            return None
+
+    def get_users_ids_list(self):
+        users_ids_list = db_utils.get_row_by_column_data(self.database_file,
+                                                            'settings',
+                                                            ('id', 1),
+                                                            'users_ids')
+        if users_ids_list and len(users_ids_list) >= 1:
+            return json.loads(users_ids_list[0])
+        else:
+            logging.error("Project settings not found")
+            return None
+
+    def add_user(self, user_id):
+        users_ids_list = self.get_users_ids_list()
+        if user_id not in users_ids_list:
+            users_ids_list.append(user_id)
+            self.update_users_list(users_ids_list)
+
+    def remove_user(self, user_id):
+        users_ids_list = self.get_users_ids_list()
+        if user_id in users_ids_list:
+            users_ids_list.remove(user_id)
+            self.update_users_list(users_ids_list)
+
+    def update_users_list(self, users_ids_list):
+        if db_utils.update_data(self.database_file,
+                                'settings',
+                                ('users_ids', json.dumps(users_ids_list)),
+                                ('id', 1)):
+            logging.info('Project users list updated')
+            return 1
+        else:
+            return None
+
 
 def get_database_file(project_path):
     if project_path:
@@ -424,6 +523,7 @@ def init_project(project_path):
             create_versions_table(database_file)
             create_export_versions_table(database_file)
             create_softwares_table(database_file)
+            create_settings_table(database_file)
             return database_file
     else:
         logging.warning("Database file already exists")
@@ -557,3 +657,13 @@ def create_softwares_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Softwares table created")
+
+def create_settings_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS settings (
+                                        id integer PRIMARY KEY,
+                                        frame_rate text NOT NULL,
+                                        image_format text NOT NULL,
+                                        users_ids text
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Settings table created")

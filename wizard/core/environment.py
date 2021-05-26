@@ -12,29 +12,17 @@ from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def build_site_env(site_path):
-	if site_path:
-		os.environ[env_vars._site_path_env_] = site_path
-		return 1
-	else:
-		logging.warning('No site path defined')
-		return None
+	os.environ[env_vars._site_path_env_] = site_path
+	return 1
 
 def build_user_env(user_name):
-	if user_name:
-		os.environ[env_vars._username_env_] = user_name
-		return 1
-	else:
-		logging.warning('No user defined')
-		return None
+	os.environ[env_vars._username_env_] = user_name
+	return 1
 
 def build_project_env(project_name, project_path):
-	if project_name:
-		os.environ[env_vars._project_name_env_] = project_name
-		os.environ[env_vars._project_path_env_] = project_path
-		return 1
-	else:
-		logging.warning('No project defined')
-		return None
+	os.environ[env_vars._project_name_env_] = project_name
+	os.environ[env_vars._project_path_env_] = project_path
+	return 1
 
 def get_user():
 	if env_vars._username_env_ in os.environ.keys():

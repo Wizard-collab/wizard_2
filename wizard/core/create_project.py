@@ -12,8 +12,13 @@ from wizard.vars import softwares_vars
 # Python modules
 import os
 
-def create_project(project_name, project_path, project_password):
+def create_project(project_name,
+					project_path,
+					project_password,
+					frame_rate=24,
+					image_format=[1920,1080]):
 	if project.create_project(project_name, project_path, project_password):
+		project.project().create_settings_row(frame_rate, image_format)
 		for domain in assets_vars._domains_list_:
 			assets.create_domain(domain)
 		assets_domain_id = 1

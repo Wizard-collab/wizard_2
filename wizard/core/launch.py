@@ -2,6 +2,16 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# The main wizard software launching module
+# This module permits to launch a work version ( id )
+# It build the command and environment for the Popen
+# call
+
+# If no file is found for the given version id
+# it launches the software without a file but 
+# with the correct environment in order to save
+# a version later within the software
+
 # Python modules
 import os
 import subprocess

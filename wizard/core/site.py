@@ -2,9 +2,18 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# This module is used to manage and access 
+# the site database
+
+# The site database stores the following informations:
+#       - The users list ( name, hashed password, email )
+#       - The projects list ( name, path, hashed password )
+#       - The ip wraps ( roughly looks like cookies in web )
+
 # Python modules
 import os
 import time
+import socket
 
 # Wizard modules
 from wizard.core import logging
@@ -63,6 +72,13 @@ class site:
                                                         ('project_name', name))
         return projects_rows[0]
 
+    def get_project_row(self, project_id, column='*'):
+        projects_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'projects',
+                                                        ('id', project_id),
+                                                        column)
+        return projects_rows[0]
+
     def get_project_path_by_name(self, name):
         return self.get_project_row_by_name(name)['project_path']
 
@@ -71,11 +87,12 @@ class site:
                                 project_password,
                                 new_password,
                                 administrator_pass=''):
-        if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
+        if tools.decrypt_string(self.get_administrator_pass(),
+                                administrator_pass):
             if project_name in self.get_projects_names_list():
                 if tools.decrypt_string(
-                            self.get_project_row_by_name(project_name)['project_password'],
-                            project_password):
+                        self.get_project_row_by_name(project_name)['project_password'],
+                        project_password):
                     if db_utils.update_data(self.database_file,
                                 'projects',
                                 ('project_password', tools.encrypt_string(new_password)),
@@ -94,13 +111,14 @@ class site:
     def create_user(self, user_name, password, email, administrator_pass=''):
         if user_name not in self.get_user_names_list():
             administrator = 0
-            if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
+            if tools.decrypt_string(self.get_administrator_pass(),
+                                    administrator_pass):
                 administrator = 1
             if db_utils.create_row(self.database_file,
-                            'users', 
-                            ('user_name', 'pass', 'email', 'administrator'), 
-                            (user_name, tools.encrypt_string(password),
-                                email, administrator)):
+                        'users', 
+                        ('user_name', 'pass', 'email', 'administrator'), 
+                        (user_name, tools.encrypt_string(password),
+                            email, administrator)):
 
                 info = f"User {user_name} created"
                 if administrator:
@@ -190,11 +208,50 @@ class site:
                                                         column)
         return users_rows[0]
 
+    def get_user_row(self, user_id, column='*'):
+        users_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'users',
+                                                        ('id', user_id),
+                                                        column)
+        return users_rows[0]
+
     def is_admin(self):
         is_admin = self.get_user_row_by_name(environment.get_user(), 'administrator')
         if not is_admin:
             logging.info("You are not administrator")
         return is_admin
+
+    def get_ips(self, column='*'):
+        ip_rows = db_utils.get_rows(self.database_file, 'ips_wrap', column)
+        return ip_rows
+
+    def add_ip_user(self):
+        ip = socket.gethostbyname(socket.gethostname())
+        ip_rows = self.get_ips('ip')
+        if not ip_rows:
+            ip_rows=[]
+        if ip not in ip_rows:
+            if db_utils.create_row(self.database_file,
+                                'ips_wrap', 
+                                ('ip', 'user_id', 'project_id'), 
+                                (ip, None, None)):
+                logging.debug("Machine ip added to ips wrap table")
+
+    def update_current_ip_data(self, column, data):
+        ip = socket.gethostbyname(socket.gethostname())
+        if db_utils.update_data(self.database_file,
+                                        'ips_wrap',
+                                        (column, data),
+                                        ('ip', ip)):
+            logging.debug("Ip wrap data updated")
+
+    def get_current_ip_data(self, column='*'):
+        ip = socket.gethostbyname(socket.gethostname())
+        ip_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'ips_wrap',
+                                                        ('ip', ip),
+                                                        column)
+        return ip_rows[0]
 
 def init_site(site_path, admin_password, admin_email):
     database_file = create_site_database(site_path)
@@ -208,6 +265,7 @@ def create_site_database(site_path):
             if create_database(database_file):
                 create_users_table(database_file)
                 create_projects_table(database_file)
+                create_ip_wrap_table(database_file)
                 return database_file
         else:
             logging.warning("Database file already exists")
@@ -250,3 +308,15 @@ def create_projects_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Projects table created")
+
+def create_ip_wrap_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS ips_wrap (
+                                        id integer PRIMARY KEY,
+                                        ip text NOT NULL UNIQUE,
+                                        user_id text,
+                                        project_id,
+                                        FOREIGN KEY (user_id) REFERENCES users (id)
+                                        FOREIGN KEY (project_id) REFERENCES projects (id)
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Ips wrap table created")
