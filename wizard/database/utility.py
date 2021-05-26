@@ -2,6 +2,12 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# The database core
+# This module permits to access a given database
+# and simplify the requests with python
+# It permits to avoid SQL commands in the others
+# wizard functions
+
 # Python modules
 import sqlite3
 from sqlite3 import Error

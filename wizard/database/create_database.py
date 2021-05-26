@@ -11,7 +11,7 @@ from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def create_database(db_file):
-    """ create a database connection to a SQLite database """
+    # create a database connection to a SQLite database
     conn = None
     try:
         conn = sqlite3.connect(db_file)
