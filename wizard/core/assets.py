@@ -44,6 +44,23 @@ def create_domain(name):
 		logging.warning(f"{name} contains illegal characters")
 	return domain_id
 
+def archive_domain(domain_id):
+	if site.site().is_admin():
+		domain_row = project.project().get_domain_data(domain_id)
+		if domain_row:
+			dir_name = get_domain_path(domain_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_domain(domain_id)
+		else:
+			return None
+	else:
+		return None
+
 def create_category(name, domain_id):
 	category_id = None
 	if tools.is_safe(name):
@@ -73,6 +90,23 @@ def create_category(name, domain_id):
 		logging.warning(f"{name} contains illegal characters")
 	return category_id
 
+def archive_category(category_id):
+	if site.site().is_admin():
+		category_row = project.project().get_category_data(category_id)
+		if category_row:
+			dir_name = get_category_path(category_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_category(category_id)
+		else:
+			return None
+	else:
+		return None
+
 def create_asset(name, category_id):
 	asset_id = None
 	if tools.is_safe(name):
@@ -101,6 +135,23 @@ def create_asset(name, category_id):
 	else:
 		logging.warning(f"{name} contains illegal characters")
 	return asset_id
+
+def archive_asset(asset_id):
+	if site.site().is_admin():
+		asset_row = project.project().get_asset_data(asset_id)
+		if asset_row:
+			dir_name = get_asset_path(asset_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_asset(asset_id)
+		else:
+			return None
+	else:
+		return None
 
 def create_stage(name, asset_id):
 	# The stage creation need to follow some name rules
@@ -154,6 +205,23 @@ def create_stage(name, asset_id):
 		logging.warning(f"{name} doesn't match stages rules")
 		return None
 
+def archive_stage(stage_id):
+	if site.site().is_admin():
+		stage_row = project.project().get_stage_data(stage_id)
+		if stage_row:
+			dir_name = get_stage_path(stage_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_stage(stage_id)
+		else:
+			return None
+	else:
+		return None
+
 def create_variant(name, stage_id, comment=''):
 	variant_id = None
 	if tools.is_safe(name):
@@ -182,6 +250,23 @@ def create_variant(name, stage_id, comment=''):
 	else:
 		logging.warning(f"{name} contains illegal characters")
 	return variant_id
+
+def archive_variant(variant_id):
+	if site.site().is_admin():
+		variant_row = project.project().get_variant_data(variant_id)
+		if variant_row:
+			dir_name = get_variant_path(variant_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_variant(variant_id)
+		else:
+			return None
+	else:
+		return None
 
 def create_work_env(software_id, variant_id):
 	work_env_id = None
@@ -221,11 +306,11 @@ def archive_work_env(work_env_id):
 			dir_name = get_work_env_path(work_env_id)
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
-					print(shutil.rmtree(dir_name))
+					shutil.rmtree(dir_name)
 					logging.info(f"{dir_name} deleted")
 			else:
 				logging.warning(f"{dir_name} not found")
-			project.project().remove_work_env(work_env_id)
+			return project.project().remove_work_env(work_env_id)
 		else:
 			return None
 	else:
@@ -263,8 +348,7 @@ def archive_version(version_id):
 					logging.info(f"{version_row['file_path']} deleted")
 			else:
 				logging.warning(f"{version_row['file_path']} not found")
-			project.project().remove_version(version_row['id'])
-			return 1
+			return project.project().remove_version(version_row['id'])
 		else:
 			return None		
 	else:

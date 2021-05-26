@@ -99,7 +99,8 @@ class site:
             if db_utils.create_row(self.database_file,
                             'users', 
                             ('user_name', 'pass', 'email', 'administrator'), 
-                            (user_name, tools.encrypt_string(password), email, administrator)):
+                            (user_name, tools.encrypt_string(password),
+                                email, administrator)):
 
                 info = f"User {user_name} created"
                 if administrator:
@@ -118,7 +119,8 @@ class site:
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
             if not user_row[4]:
-                if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
+                if tools.decrypt_string(self.get_administrator_pass(),
+                                            administrator_pass):
                     if db_utils.update_data(self.database_file,
                                             'users',
                                             ('administrator',1),
@@ -135,7 +137,8 @@ class site:
         if user_name in self.get_user_names_list():
             user_row = self.get_user_row_by_name(user_name)
             if user_row['administrator']:
-                if tools.decrypt_string(self.get_administrator_pass(), administrator_pass):
+                if tools.decrypt_string(self.get_administrator_pass(),
+                                            administrator_pass):
                     if db_utils.update_data(self.database_file,
                                             'users',
                                             ('administrator',0),
@@ -158,7 +161,8 @@ class site:
             if tools.decrypt_string(user_row['pass'], password):
                 if db_utils.update_data(self.database_file,
                                         'users',
-                                        ('pass', tools.encrypt_string(new_password)),
+                                        ('pass',
+                                            tools.encrypt_string(new_password)),
                                         ('user_name', user_name)):
                         logging.info(f'{user_name} password modified')
                         return 1
@@ -180,7 +184,10 @@ class site:
         return users_rows
 
     def get_user_row_by_name(self, name, column='*'):
-        users_rows = db_utils.get_row_by_column_data(self.database_file, 'users', ('user_name', name), column)
+        users_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'users',
+                                                        ('user_name', name),
+                                                        column)
         return users_rows[0]
 
     def is_admin(self):

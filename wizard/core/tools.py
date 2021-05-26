@@ -41,6 +41,11 @@ def is_safe(input):
     return not bool(string)
 
 def zip_files(files_list, destination):
+    # Create an archive with the given file list
+    # No folder structure, the files are just inserted in the
+    # archive
+    # If the destination .zip file exists it appends 
+    # the new files in it
     try:
         with ZipFile(destination, 'a') as zip:
             for file in files_list:
@@ -52,6 +57,10 @@ def zip_files(files_list, destination):
         return None
 
 def make_archive(source):
+    # Create an archive of a given folder
+    # /path/to/folder will become
+    # /path/to/folder_archive.zip
+    # The root of the archive is folder/
     try:
         format = 'zip'
         root_dir = os.path.dirname(source)
@@ -65,6 +74,9 @@ def make_archive(source):
         return None
 
 def get_filename_without_override(file):
+    # Check if a given file exists
+    # While it exists, increment the filename 
+    # as /path/to/filename_#.extension
     folder = os.path.dirname(file)
     basename = os.path.basename(file)
     extension = os.path.splitext(basename)[-1]

@@ -2,5 +2,5 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
-# SITE CONSTANTS
+# Site constants
 _site_database_file_ = 'site.db'

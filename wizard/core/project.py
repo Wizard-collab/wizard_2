@@ -29,16 +29,17 @@ class project:
                             (name, time.time(), environment.get_user()))
         if domain_id:
             logging.info(f"Domain {name} added to project")
-            return domain_id
-        else:
-            return None
+        return domain_id
 
     def get_domains(self):
         domain_rows = db_utils.get_rows(self.database_file, 'domains')
         return domain_rows
 
     def get_domain_data(self, domain_id, column='*'):
-        domain_rows = db_utils.get_row_by_column_data(self.database_file, 'domains', ('id', domain_id), column)
+        domain_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'domains',
+                                                        ('id', domain_id),
+                                                        column)
         if len(domain_rows) >= 1:
             return domain_rows[0]
         else:
@@ -46,15 +47,21 @@ class project:
             return None
 
     def get_domain_childs(self, domain_id, column='*'):
-        categories_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('domain_id', domain_id), column)
+        categories_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'categories',
+                                                        ('domain_id', domain_id),
+                                                        column)
         return categories_rows
 
     def remove_domain(self, domain_id):
+        success = None
         if site.site().is_admin():
             for category_id in self.get_domain_childs(domain_id, 'id'):
                 self.remove_category(category_id)
-            db_utils.delete_row(self.database_file, 'domains', domain_id)
-            logging.info(f"Domain removed from project")
+            success = db_utils.delete_row(self.database_file, 'domains', domain_id)
+            if success:
+                logging.info(f"Domain removed from project")
+        return success
 
     def add_category(self, name, domain_id):
         if name not in self.get_domain_childs(domain_id, 'name'):
@@ -64,25 +71,32 @@ class project:
                                 (name, time.time(), environment.get_user(), domain_id))
             if category_id:
                 logging.info(f"Category {name} added to project")
-                return category_id
-            else:
-                return None
+            return category_id
         else:
             logging.warning(f"{name} already exists")
 
     def remove_category(self, category_id):
+        success = None
         if site.site().is_admin():
             for asset_id in self.get_category_childs(category_id, 'id'):
                 self.remove_asset(asset_id)
-            db_utils.delete_row(self.database_file, 'categories', category_id)
-            logging.info(f"Category removed from project")
+            success = db_utils.delete_row(self.database_file, 'categories', category_id)
+            if success:
+                logging.info(f"Category removed from project")
+        return success
 
     def get_category_childs(self, category_id, column="*"):
-        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('category_id', category_id), column)
+        assets_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'assets',
+                                                        ('category_id', category_id),
+                                                        column)
         return assets_rows
 
     def get_category_data(self, category_id, column='*'):
-        category_rows = db_utils.get_row_by_column_data(self.database_file, 'categories', ('id', category_id), column)
+        category_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'categories',
+                                                        ('id', category_id),
+                                                        column)
         if category_rows and len(category_rows) >= 1:
             return category_rows[0]
         else:
@@ -97,25 +111,32 @@ class project:
                                 (name, time.time(), environment.get_user(), category_id))
             if asset_id:
                 logging.info(f"Asset {name} added to project")
-                return asset_id
-            else:
-                return None
+            return asset_id
         else:
             logging.warning(f"{name} already exists")
 
     def remove_asset(self, asset_id):
+        success = None
         if site.site().is_admin():
             for stage_id in self.get_asset_childs(asset_id, 'id'):
                 self.remove_stage(stage_id)
-            db_utils.delete_row(self.database_file, 'assets', asset_id)
-            logging.info(f"Asset removed from project")
+            success = db_utils.delete_row(self.database_file, 'assets', asset_id)
+            if success:
+                logging.info(f"Asset removed from project")
+        return success
 
     def get_asset_childs(self, asset_id, column='*'):
-        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('asset_id', asset_id), column)
+        stages_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'stages',
+                                                            ('asset_id', asset_id),
+                                                            column)
         return stages_rows
 
     def get_asset_data(self, asset_id, colmun='*'):
-        assets_rows = db_utils.get_row_by_column_data(self.database_file, 'assets', ('id', asset_id), colmun)
+        assets_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'assets',
+                                                            ('id', asset_id),
+                                                            colmun)
         if assets_rows and len(assets_rows) >= 1:
             return assets_rows[0]
         else:
@@ -126,22 +147,29 @@ class project:
         if name not in self.get_asset_childs(asset_id, 'name'):
             stage_id = db_utils.create_row(self.database_file,
                                 'stages', 
-                                ('name', 'creation_time', 'creation_user', 'asset_id'), 
-                                (name, time.time(), environment.get_user(), asset_id))
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'asset_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    asset_id))
             if stage_id:
                 logging.info(f"Stage {name} added to project")
-                return stage_id
-            else:
-                return None
+            return stage_id
         else:
             logging.warning(f"{name} already exists")
 
     def remove_stage(self, stage_id):
+        success = None
         if site.site().is_admin():
             for variant_id in self.get_stage_childs(stage_id, 'id'):
                 self.remove_variant(variant_id)
-            db_utils.delete_row(self.database_file, 'stages', stage_id)
-            logging.info(f"Stage removed from project")
+            success = db_utils.delete_row(self.database_file, 'stages', stage_id)
+            if success:
+                logging.info(f"Stage removed from project")
+        return success
 
     def set_stage_default_variant(self, stage_id, variant_id):
         if db_utils.update_data(self.database_file,
@@ -151,7 +179,10 @@ class project:
             logging.info('Default variant modified')
 
     def get_stage_data(self, stage_id, column='*'):
-        stages_rows = db_utils.get_row_by_column_data(self.database_file, 'stages', ('id', stage_id), column)
+        stages_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'stages',
+                                                            ('id', stage_id),
+                                                            column)
         if stages_rows and len(stages_rows) >= 1:
             return stages_rows[0]
         else:
@@ -159,32 +190,46 @@ class project:
             return None
 
     def get_stage_childs(self, stage_id, column='*'):
-        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('stage_id', stage_id), column)
+        variants_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'variants',
+                                                            ('stage_id', stage_id),
+                                                            column)
         return variants_rows
 
     def add_variant(self, name, stage_id, comment):
         if name not in self.get_stage_childs(stage_id, 'name'):
             variant_id = db_utils.create_row(self.database_file,
                                 'variants', 
-                                ('name', 'creation_time', 'creation_user', 'comment', 'stage_id'), 
-                                (name, time.time(), environment.get_user(), comment, stage_id))
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'comment',
+                                    'stage_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    comment, stage_id))
             if variant_id:
                 logging.info(f"Variant {name} added to project")
-                return variant_id
-            else:
-                return None
+            return variant_id
         else:
             logging.warning(f"{name} already exists")
 
     def remove_variant(self, variant_id):
+        success = None
         if site.site().is_admin():
             for work_env_id in self.get_variant_work_envs_childs(variant_id, 'id'):
                 self.remove_work_env(work_env_id)
-            db_utils.delete_row(self.database_file, 'variants', variant_id)
-            logging.info(f"Variant removed from project")
+            success = db_utils.delete_row(self.database_file, 'variants', variant_id)
+            if success:
+                logging.info(f"Variant removed from project")
+        return success
 
     def get_variant_data(self, variant_id, column='*'):
-        variants_rows = db_utils.get_row_by_column_data(self.database_file, 'variants', ('id', variant_id), column)
+        variants_rows = db_utils.get_row_by_column_data(self.database_file, 
+                                                            'variants', 
+                                                            ('id', variant_id), 
+                                                            column)
         if variants_rows and len(variants_rows) >= 1:
             return variants_rows[0]
         else:
@@ -192,37 +237,55 @@ class project:
             return None
 
     def get_variant_work_envs_childs(self, variant_id, column='*'):
-        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('variant_id', variant_id), column)
+        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 
+                                                            'work_envs', 
+                                                            ('variant_id', variant_id), 
+                                                            column)
         return work_envs_rows
 
     def add_work_env(self, name, software_id, variant_id):
         if name not in self.get_variant_work_envs_childs(variant_id, 'name'):
             work_env_id = db_utils.create_row(self.database_file,
                                 'work_envs', 
-                                ('name', 'creation_time', 'creation_user', 'variant_id', 'software_id'), 
-                                (name, time.time(), environment.get_user(), variant_id, software_id))
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'variant_id',
+                                    'software_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    variant_id,
+                                    software_id))
             if work_env_id:
                 logging.info(f"Work env {name} added to project")
-                return work_env_id
-            else:
-                return None
+            return work_env_id
         else:
             logging.warning(f"{name} already exists")
             return None
 
     def remove_work_env(self, work_env_id):
+        success = None
         if site.site().is_admin():
             for version_id in self.get_work_versions(work_env_id, 'id'):
                 self.remove_version(version_id)
-            db_utils.delete_row(self.database_file, 'work_envs', work_env_id)
-            logging.info(f"Work env removed from project")
+            success = db_utils.delete_row(self.database_file, 'work_envs', work_env_id)
+            if success:
+                logging.info("Work env removed from project")
+        return success
 
     def get_work_versions(self, work_env_id, column='*'):
-        versions_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('work_env_id', work_env_id), column)
+        versions_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'versions',
+                                                            ('work_env_id', work_env_id),
+                                                            column)
         return versions_rows
 
     def get_work_env_data(self, work_env_id, column='*'):
-        work_env_rows = db_utils.get_row_by_column_data(self.database_file, 'work_envs', ('id', work_env_id), column)
+        work_env_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'work_envs',
+                                                            ('id', work_env_id),
+                                                            column)
         if work_env_rows and len(work_env_rows) >= 1:
             return work_env_rows[0]
         else:
@@ -233,19 +296,32 @@ class project:
         if name not in self.get_work_versions(work_env_id, 'name'):
             version_id = db_utils.create_row(self.database_file,
                                 'versions', 
-                                ('name', 'creation_time', 'creation_user', 'comment', 'file_path', 'screenshot', 'work_env_id'), 
-                                (name, time.time(), environment.get_user(), comment, file_path, screenshot, work_env_id))
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'comment',
+                                    'file_path',
+                                    'screenshot',
+                                    'work_env_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    comment,
+                                    file_path,
+                                    screenshot,
+                                    work_env_id))
             if version_id:
                 logging.info(f"Version {name} added to project")
-                return version_id
-            else:
-                return None
+            return version_id
         else:
             logging.warning(f"{name} already exists")
             return None
 
     def get_version_data(self, version_id, column='*'):
-        work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 'versions', ('id', version_id), column)
+        work_envs_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'versions',
+                                                            ('id', version_id),
+                                                            column)
         if work_envs_rows and len(work_envs_rows) >= 1:
             return work_envs_rows[0]
         else:
@@ -253,9 +329,12 @@ class project:
             return None
 
     def remove_version(self, version_id):
+        success = None
         if site.site().is_admin():
-            db_utils.delete_row(self.database_file, 'versions', version_id)
-            logging.info(f"Version removed from project")
+            success = db_utils.delete_row(self.database_file, 'versions', version_id)
+            if success :
+                logging.info(f"Version removed from project")
+        return success
 
     def add_software(self, name, extension, file_command, no_file_command):
         if name in softwares_vars._softwares_list_:
@@ -278,9 +357,7 @@ class project:
                                     no_file_command))
                 if software_id:
                     logging.info(f"Software {name} added to project")
-                    return software_id
-                else:
-                    return None
+                return software_id
             else:
                 logging.warning(f"{name} already exists")
                 return None
@@ -303,7 +380,10 @@ class project:
             logging.warning(f"{path} is not a valid executable")
 
     def get_software_data(self, software_id, column='*'):
-        softwares_rows = db_utils.get_row_by_column_data(self.database_file, 'softwares', ('id', software_id), column)
+        softwares_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'softwares',
+                                                            ('id', software_id),
+                                                            column)
         if softwares_rows and len(softwares_rows) >= 1:
             return softwares_rows[0]
         else:
