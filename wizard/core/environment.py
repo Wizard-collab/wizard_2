@@ -2,6 +2,11 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# This module build the wizard environment
+# ( Current project and current user )
+# It permits to avoid some database access
+# during the use of the application
+
 # Pyton modules
 import os
 

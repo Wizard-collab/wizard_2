@@ -2,6 +2,20 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# Main wizard module to create a project
+# This module basically store the new project
+# in the site database, create the project database
+# and create the intial instances :
+# - assets
+#	- characters
+#	- props
+#	- sets
+#	- set_dress
+# - library
+# - sequences
+# It intialize the defaults softwares in the 
+# project database and initialize the project settings
+
 # Wizard modules
 from wizard.core import project
 from wizard.core import assets

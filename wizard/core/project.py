@@ -2,6 +2,24 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# This module is used to manage and access 
+# the project database
+
+# The project database stores the following informations:
+#       - The instances ( domains,
+#                         categories,
+#                         assets,
+#                         stages,
+#                         variants, 
+#                         work_envs and versions )
+#       - The project settings ( frame rate,
+#                                image format and users ids )
+#       - The softwares datas (software name,
+#                              executable path,
+#                              extension,
+#                              the additional environments,
+#                              the additionnal scripts paths)
+
 # Python modules
 import os
 import time

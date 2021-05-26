@@ -2,6 +2,30 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# This module is the main instances management module
+# You can create, get the path and archive the following instances
+# - domains
+# - categories
+# - assets
+# - stages
+# - variants
+# - work env
+# - versions
+# - export assets
+# - export versions
+
+# The creation of an instance basically log the instance 
+# in the project database and create the corresponding folders
+# on the file system
+
+# The archiving of an instance basically archive the corresponding 
+# folder, delete the original folder from the file
+# system and remove the instance from the project database
+
+# The path query of an instance will only access the database and
+# construct the directory name, this modules doesn't
+# query the file system
+
 # Python modules
 import os
 import time
@@ -19,25 +43,28 @@ from wizard.vars import softwares_vars
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
+def create_folder(dir_name):
+	success = None
+	try:
+		os.mkdir(dir_name)
+		logging.info(f'{dir_name} created')
+		success = 1
+	except FileNotFoundError:
+		logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+	except FileExistsError:
+		logging.error(f"{dir_name} already exists on filesystem")
+	except PermissionError:
+		logging.error(f"{dir_name} access denied")
+	return success
+
 def create_domain(name):
 	domain_id = None
 	if tools.is_safe(name):
-		dir_name = os.path.normpath(os.path.join(environment.get_project_path(), name))
+		dir_name = os.path.normpath(os.path.join(environment.get_project_path(),
+									name))
 		domain_id = project.project().add_domain(name)
 		if domain_id:
-			try:
-				os.mkdir(dir_name)
-				logging.info(f'{dir_name} created')
-			except FileNotFoundError:
-				logging.error(f"{environment.get_project_path()} doesn't exists")
-				project.project().remove_domain(domain_id)
-				domain_id = None
-			except FileExistsError:
-				logging.error(f"{dir_name} already exists on filesystem")
-				project.project().remove_domain(domain_id)
-				domain_id = None
-			except PermissionError:
-				logging.error(f"{dir_name} access denied")
+			if not create_folder(dir_name):
 				project.project().remove_domain(domain_id)
 				domain_id = None
 	else:
@@ -69,19 +96,7 @@ def create_category(name, domain_id):
 			dir_name = os.path.normpath(os.path.join(domain_path, name))
 			category_id = project.project().add_category(name, domain_id)
 			if category_id:
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{domain_path} doesn't exists")
-					project.project().remove_category(category_id)
-					category_id = None
-				except FileExistsError:
-					logging.error(f"{dir_name} already exists on filesystem")
-					project.project().remove_category(category_id)
-					category_id = None
-				except PermissionError:
-					logging.error(f"{dir_name} access denied")
+				if not create_folder(dir_name):
 					project.project().remove_category(category_id)
 					category_id = None
 		else:
@@ -115,19 +130,7 @@ def create_asset(name, category_id):
 			dir_name = os.path.normpath(os.path.join(category_path, name))
 			asset_id = project.project().add_asset(name, category_id)
 			if asset_id:
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{category_path} doesn't exists")
-					project.project().remove_asset(asset_id)
-					asset_id = None
-				except FileExistsError:
-					logging.error(f"{dir_name} already exists on filesystem")
-					project.project().remove_asset(asset_id)
-					asset_id = None
-				except PermissionError:
-					logging.error(f"{dir_name} access denied")
+				if not create_folder(dir_name):
 					project.project().remove_asset(asset_id)
 					asset_id = None
 		else:
@@ -180,21 +183,7 @@ def create_stage(name, asset_id):
 			dir_name = os.path.normpath(os.path.join(asset_path, name))
 			stage_id = project.project().add_stage(name, asset_id)
 			if stage_id:
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-					variant_id = create_variant('main', stage_id, 'default variant')
-					project.project().set_stage_default_variant(stage_id, variant_id)
-				except FileNotFoundError:
-					logging.error(f"{asset_path} doesn't exists")
-					project.project().remove_stage(stage_id)
-					stage_id = None
-				except FileExistsError:
-					logging.error(f"{dir_name} already exists on filesystem")
-					project.project().remove_stage(stage_id)
-					stage_id = None
-				except PermissionError:
-					logging.error(f"{dir_name} access denied")
+				if not create_folder(dir_name):
 					project.project().remove_stage(stage_id)
 					stage_id = None
 			return stage_id
@@ -230,19 +219,7 @@ def create_variant(name, stage_id, comment=''):
 			dir_name = os.path.normpath(os.path.join(stage_path, name))
 			variant_id = project.project().add_variant(name, stage_id, comment)
 			if variant_id:
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-				except FileNotFoundError:
-					logging.error(f"{stage_path} doesn't exists")
-					project.project().remove_variant(variant_id)
-					variant_id = None
-				except FileExistsError:
-					logging.error(f"{dir_name} already exists on filesystem")
-					project.project().remove_variant(variant_id)
-					variant_id = None
-				except PermissionError:
-					logging.error(f"{dir_name} access denied")
+				if not create_folder(dir_name):
 					project.project().remove_variant(variant_id)
 					variant_id = None
 		else:
@@ -275,22 +252,11 @@ def create_work_env(software_id, variant_id):
 		variant_path = get_variant_path(variant_id)
 		if variant_path:
 			dir_name = os.path.normpath(os.path.join(variant_path, name))
-			work_env_id = project.project().add_work_env(name, software_id, variant_id)
+			work_env_id = project.project().add_work_env(name,
+														software_id,
+														variant_id)
 			if work_env_id:
-				try:
-					os.mkdir(dir_name)
-					logging.info(f'{dir_name} created')
-					add_version(work_env_id, do_screenshot=0)
-				except FileNotFoundError:
-					logging.error(f"{variant_path} doesn't exists")
-					project.project().remove_work_env(work_env_id)
-					work_env_id = None
-				except FileExistsError:
-					logging.error(f"{dir_name} already exists on filesystem")
-					project.project().remove_work_env(work_env_id)
-					work_env_id = None
-				except PermissionError:
-					logging.error(f"{dir_name} access denied")
+				if not create_folder(dir_name):
 					project.project().remove_work_env(work_env_id)
 					work_env_id = None
 		else:
@@ -419,7 +385,8 @@ def build_version_file_name(work_env_id, name):
 	stage_row = project_obj.get_stage_data(variant_row['stage_id'])
 	asset_row = project_obj.get_asset_data(stage_row['asset_id'])
 	category_row = project_obj.get_category_data(asset_row['category_id'])
-	extension = project_obj.get_software_data(work_env_row['software_id'], 'extension')
+	extension = project_obj.get_software_data(work_env_row['software_id'],
+												'extension')
 	file_name = f"{category_row['name']}"
 	file_name += f"_{asset_row['name']}"
 	file_name += f"_{stage_row['name']}"
