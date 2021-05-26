@@ -95,6 +95,42 @@ def get_row_by_column_data(db_file,
         print(e)
         return None
 
+def get_last_row_by_column_data(db_file,
+                            table,
+                            column_tuple,
+                            column='*'):
+
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=? ORDER BY rowid DESC LIMIT 1;"
+    try:
+        conn = create_connection(db_file)
+        if column != '*':
+            conn.row_factory = lambda cursor, row: row[0]
+        else:
+            conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, (column_tuple[1],))
+        rows = cursor.fetchall()
+        return rows
+    except Error as e:
+        print(e)
+        return None
+
+def check_existence(db_file,
+                    table,
+                    columns_tuple,
+                    data_tuple):
+
+    sql_cmd = f"SELECT id FROM {table} WHERE {columns_tuple[0]}=? AND {columns_tuple[1]}=?;"
+    try:
+        conn = create_connection(db_file)
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, (data_tuple[0], data_tuple[1]))
+        rows = cursor.fetchall()
+        return len(rows)
+    except Error as e:
+        print(e)
+        return None
+
 def update_data(db_file,
                     table,
                     set_tuple,

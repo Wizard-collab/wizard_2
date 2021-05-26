@@ -186,6 +186,10 @@ def create_stage(name, asset_id):
 				if not create_folder(dir_name):
 					project.project().remove_stage(stage_id)
 					stage_id = None
+				else:
+					variant_id = create_variant('main', stage_id)
+					if variant_id:
+						project.project().set_stage_default_variant(stage_id, variant_id)
 			return stage_id
 		else:
 			logging.error("Can't create stage")
@@ -259,6 +263,8 @@ def create_work_env(software_id, variant_id):
 				if not create_folder(dir_name):
 					project.project().remove_work_env(work_env_id)
 					work_env_id = None
+				else:
+					add_version(work_env_id, fresh=1)
 		else:
 			logging.error("Can't create work env")
 	else:
@@ -283,10 +289,14 @@ def archive_work_env(work_env_id):
 		return None
 
 
-def add_version(work_env_id, comment="", do_screenshot=1):
-	versions_list = project.project().get_work_versions(work_env_id, 'name')
-	if versions_list and versions_list != []:
-		new_version =  str(int(versions_list[-1])+1).zfill(4)
+def add_version(work_env_id, comment="", do_screenshot=1, fresh=0):
+	if not fresh:
+		last_version_list = project.project().get_last_work_version(work_env_id, 'name')
+		if len(last_version_list) == 1:
+			last_version = last_version_list[0]
+			new_version =  str(int(last_version)+1).zfill(4)
+		else:
+			new_version = '0001'
 	else:
 		new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 

@@ -83,7 +83,10 @@ class project:
         return success
 
     def add_category(self, name, domain_id):
-        if name not in self.get_domain_childs(domain_id, 'name'):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'categories',
+                                        ('name', 'domain_id'),
+                                        (name, domain_id))):
             category_id = db_utils.create_row(self.database_file,
                                 'categories',
                                 ('name', 'creation_time', 'creation_user', 'domain_id'), 
@@ -123,7 +126,10 @@ class project:
             return None
 
     def add_asset(self, name, category_id):
-        if name not in self.get_category_childs(category_id, 'name'):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'assets',
+                                        ('name', 'category_id'),
+                                        (name, category_id))):
             asset_id = db_utils.create_row(self.database_file,
                                 'assets', 
                                 ('name', 'creation_time', 'creation_user', 'category_id'), 
@@ -163,7 +169,10 @@ class project:
             return None
 
     def add_stage(self, name, asset_id):
-        if name not in self.get_asset_childs(asset_id, 'name'):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'stages',
+                                        ('name', 'asset_id'),
+                                        (name, asset_id))):
             stage_id = db_utils.create_row(self.database_file,
                                 'stages', 
                                 ('name',
@@ -216,7 +225,10 @@ class project:
         return variants_rows
 
     def add_variant(self, name, stage_id, comment):
-        if name not in self.get_stage_childs(stage_id, 'name'):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'variants',
+                                        ('name', 'stage_id'),
+                                        (name, stage_id))):
             variant_id = db_utils.create_row(self.database_file,
                                 'variants', 
                                 ('name',
@@ -263,7 +275,10 @@ class project:
         return work_envs_rows
 
     def add_work_env(self, name, software_id, variant_id):
-        if name not in self.get_variant_work_envs_childs(variant_id, 'name'):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'work_envs',
+                                        ('name', 'variant_id'),
+                                        (name, variant_id))):
             work_env_id = db_utils.create_row(self.database_file,
                                 'work_envs', 
                                 ('name',
@@ -300,6 +315,13 @@ class project:
                                                             column)
         return versions_rows
 
+    def get_last_work_version(self, work_env_id, column='*'):
+        versions_rows = db_utils.get_last_row_by_column_data(self.database_file,
+                                                            'versions',
+                                                            ('work_env_id', work_env_id),
+                                                            column)
+        return versions_rows
+
     def get_work_env_data(self, work_env_id, column='*'):
         work_env_rows = db_utils.get_row_by_column_data(self.database_file,
                                                             'work_envs',
@@ -312,29 +334,25 @@ class project:
             return None
 
     def add_version(self, name, file_path, work_env_id, comment='', screenshot=None):
-        if name not in self.get_work_versions(work_env_id, 'name'):
-            version_id = db_utils.create_row(self.database_file,
-                                'versions', 
-                                ('name',
-                                    'creation_time',
-                                    'creation_user',
-                                    'comment',
-                                    'file_path',
-                                    'screenshot',
-                                    'work_env_id'), 
-                                (name,
-                                    time.time(),
-                                    environment.get_user(),
-                                    comment,
-                                    file_path,
-                                    screenshot,
-                                    work_env_id))
-            if version_id:
-                logging.info(f"Version {name} added to project")
-            return version_id
-        else:
-            logging.warning(f"{name} already exists")
-            return None
+        version_id = db_utils.create_row(self.database_file,
+                            'versions', 
+                            ('name',
+                                'creation_time',
+                                'creation_user',
+                                'comment',
+                                'file_path',
+                                'screenshot',
+                                'work_env_id'), 
+                            (name,
+                                time.time(),
+                                environment.get_user(),
+                                comment,
+                                file_path,
+                                screenshot,
+                                work_env_id))
+        if version_id:
+            logging.info(f"Version {name} added to project")
+        return version_id
 
     def get_version_data(self, version_id, column='*'):
         work_envs_rows = db_utils.get_row_by_column_data(self.database_file,

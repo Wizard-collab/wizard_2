@@ -57,7 +57,7 @@ class communicate_server(Thread):
         signal_dic = json.loads(signal_as_str)
 
         if signal_dic['function'] == 'add_version':
-            returned = self.add_version(signal_dic['work_env_id'])
+            returned = add_version(signal_dic['work_env_id'])
 
         conn.send(json.dumps(returned).encode('utf8'))
 
