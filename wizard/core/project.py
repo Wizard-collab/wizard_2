@@ -450,6 +450,26 @@ class project:
             logging.warning(f"{path} is not a valid executable")
             return None
 
+    def set_software_additionnal_scripts(self, software_id, paths_list):
+        if db_utils.update_data(self.database_file,
+                                'softwares',
+                                ('additionnal_scripts', json.dumps(paths_list)),
+                                ('id', software_id)):
+            logging.info('Additionnal script env modified')
+            return 1
+        else:
+            return None
+
+    def set_software_additionnal_env(self, software_id, env_dic):
+        if db_utils.update_data(self.database_file,
+                                'softwares',
+                                ('additionnal_env', json.dumps(env_dic)),
+                                ('id', software_id)):
+            logging.info('Additionnal env modified')
+            return 1
+        else:
+            return None
+
     def get_software_data(self, software_id, column='*'):
         softwares_rows = db_utils.get_row_by_column_data(self.database_file,
                                                             'softwares',

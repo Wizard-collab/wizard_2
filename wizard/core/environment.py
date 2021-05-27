@@ -9,6 +9,7 @@
 
 # Pyton modules
 import os
+import json
 
 # Wizard modules
 from wizard.vars import env_vars
@@ -28,6 +29,28 @@ def build_project_env(project_name, project_path):
 	os.environ[env_vars._project_name_env_] = project_name
 	os.environ[env_vars._project_path_env_] = project_path
 	return 1
+
+def add_running_work_env(work_env_id):
+	if env_vars._running_work_envs_ not in os.environ.keys():
+		os.environ[env_vars._running_work_envs_] = json.dumps([work_env_id])
+	else:
+		work_env_list = json.loads(os.environ[env_vars._running_work_envs_])
+		work_env_list.append(work_env_id)
+		os.environ[env_vars._running_work_envs_] = json.dumps(work_env_list)
+
+def remove_running_work_env(work_env_id):
+	if env_vars._running_work_envs_ not in os.environ.keys():
+		os.environ[env_vars._running_work_envs_] = json.dumps([])
+	else:
+		work_env_list = json.loads(os.environ[env_vars._running_work_envs_])
+		work_env_list.remove(work_env_id)
+		os.environ[env_vars._running_work_envs_] = json.dumps(work_env_list)
+
+def get_running_work_envs():
+	work_envs_list = []
+	if env_vars._running_work_envs_ in os.environ.keys():
+		work_envs_list = json.loads(os.environ[env_vars._running_work_envs_])
+	return work_envs_list
 
 def get_user():
 	if env_vars._username_env_ in os.environ.keys():

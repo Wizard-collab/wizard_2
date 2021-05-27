@@ -15,9 +15,12 @@
 # Python modules
 import os
 import subprocess
+import json
+from threading import Thread
 
 # Wizard modules
 from wizard.core import project
+from wizard.core import environment
 from wizard.vars import softwares_vars
 
 from wizard.core import logging
@@ -28,14 +31,21 @@ def launch_work_version(version_id):
 	if work_version_row:
 		file_path = work_version_row['file_path']
 		work_env_id = work_version_row['work_env_id']
-		if not project.project().get_lock(work_env_id):
-			software_id = project.project().get_work_env_data(work_env_id, 'software_id')
-			software_row = project.project().get_software_data(software_id)
-			command = build_command(file_path, software_row)
-			env = build_env(work_env_id, software_row)
-			if command :
-				subprocess.Popen(command, env=env, cwd='softwares')
-				logging.info(f"{software_row['name']} launched")
+		if work_env_id not in environment.get_running_work_envs():
+			if not project.project().get_lock(work_env_id):
+				software_id = project.project().get_work_env_data(work_env_id, 'software_id')
+				software_row = project.project().get_software_data(software_id)
+				command = build_command(file_path, software_row)
+				env = build_env(work_env_id, software_row)
+				if command :
+					thread = software_thread(command,
+												env,
+												software_row['name'],
+												work_env_id)
+					thread.start()
+					logging.info(f"{software_row['name']} launched")
+		else:
+			logging.warning(f"You are already running a work instance of this asset")
 
 def build_command(file_path, software_row):
 	software_path = software_row['path']
@@ -58,7 +68,38 @@ def build_command(file_path, software_row):
 		return None
 
 def build_env(work_env_id, software_row):
+	# Building the default software environment for wizard workflow
 	env = os.environ.copy()
 	env['wizard_work_env_id'] = str(work_env_id)
-	env[softwares_vars._script_env_dic_[software_row['name']]] = os.pathsep+softwares_vars._main_script_path_
+	env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
+	
+	# Getting the project software additionnal environment
+	additionnal_script_paths = json.loads(software_row['additionnal_scripts'])
+	additionnal_env = json.loads(software_row['additionnal_env'])
+
+	# Merging the project software additionnal environment
+	# to the main env variable
+	for script_path in additionnal_script_paths:
+		env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+script_path
+	for key in additionnal_env.keys():
+		if key in env.keys():
+			env[key] += os.pathsep+additionnal_env[key]
+		else:
+			env[key] = additionnal_env[key]
+
 	return env
+
+class software_thread(Thread):
+	def __init__(self, command, env, software, work_env_id):
+		super(software_thread, self).__init__()
+		self.command = command
+		self.env = env
+		self.software = software
+		self.work_env_id = work_env_id
+ 
+	def run(self):
+		environment.add_running_work_env(self.work_env_id)
+		self.process = subprocess.Popen(self.command, env=self.env, cwd='softwares')
+		self.process.wait()
+		environment.remove_running_work_env(self.work_env_id)
+		logging.info(f"{self.software} closed")
