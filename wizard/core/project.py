@@ -285,11 +285,13 @@ class project:
                                     'creation_time',
                                     'creation_user',
                                     'variant_id',
+                                    'lock_id',
                                     'software_id'), 
                                 (name,
                                     time.time(),
                                     environment.get_user(),
                                     variant_id,
+                                    None,
                                     software_id))
             if work_env_id:
                 logging.info(f"Work env {name} added to project")
@@ -332,6 +334,34 @@ class project:
         else:
             logging.error("Work env not found")
             return None
+
+    def get_lock(self, work_env_id):
+        current_user_id = site.site().get_user_row_by_name(environment.get_user(), 'id')
+        work_env_lock_id = self.get_work_env_data(work_env_id, 'lock_id')
+        if (not work_env_lock_id) or (work_env_lock_id == current_user_id):
+            return None
+        else:
+            lock_user_name = site.site().get_user_row(work_env_lock_id, 'user_name')
+            logging.warning(f"Work env locked by {lock_user_name}")
+            return lock_user_name
+
+    def set_work_env_lock(self, work_env_id, lock=1):
+        if lock:
+            user_id = site.site().get_user_row_by_name(environment.get_user(), 'id')
+        else:
+            user_id = None
+        if not self.get_lock(work_env_id):
+            if db_utils.update_data(self.database_file,
+                                    'work_envs',
+                                    ('lock_id', user_id),
+                                    ('id', work_env_id)):
+                if user_id:
+                    logging.info(f'Work env locked')
+                else:
+                    logging.info(f'Work env unlocked')
+                return 1
+            else:
+                return None
 
     def add_version(self, name, file_path, work_env_id, comment='', screenshot=None):
         version_id = db_utils.create_row(self.database_file,
@@ -632,6 +662,7 @@ def create_work_envs_table(database_file):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         variant_id integer NOT NULL,
+                                        lock_id integer,
                                         software_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id)
                                         FOREIGN KEY (software_id) REFERENCES softwares (id)

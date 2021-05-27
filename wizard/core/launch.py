@@ -25,15 +25,17 @@ logging = logging.get_logger(__name__)
 
 def launch_work_version(version_id):
 	work_version_row = project.project().get_version_data(version_id)
-	file_path = work_version_row['file_path']
-	work_env_id = work_version_row['work_env_id']
-	software_id = project.project().get_work_env_data(work_env_id, 'software_id')
-	software_row = project.project().get_software_data(software_id)
-	command = build_command(file_path, software_row)
-	env = build_env(work_env_id, software_row)
-	if command:
-		subprocess.Popen(command, env=env, cwd='softwares')
-		logging.info(f"{software_row['name']} launched")
+	if work_version_row:
+		file_path = work_version_row['file_path']
+		work_env_id = work_version_row['work_env_id']
+		if not project.project().get_lock(work_env_id):
+			software_id = project.project().get_work_env_data(work_env_id, 'software_id')
+			software_row = project.project().get_software_data(software_id)
+			command = build_command(file_path, software_row)
+			env = build_env(work_env_id, software_row)
+			if command :
+				subprocess.Popen(command, env=env, cwd='softwares')
+				logging.info(f"{software_row['name']} launched")
 
 def build_command(file_path, software_row):
 	software_path = software_row['path']
