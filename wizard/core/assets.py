@@ -57,6 +57,18 @@ def create_folder(dir_name):
 		logging.error(f"{dir_name} access denied")
 	return success
 
+def remove_folder(dir_name):
+	success = None
+	try:
+		os.rmdir(dir_name)
+		logging.info(f'{dir_name} removed')
+		success = 1
+	except FileNotFoundError:
+		logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+	except PermissionError:
+		logging.error(f"{dir_name} access denied")
+	return success
+
 def create_domain(name):
 	domain_id = None
 	if tools.is_safe(name):
@@ -187,7 +199,7 @@ def create_stage(name, asset_id):
 					project.project().remove_stage(stage_id)
 					stage_id = None
 				else:
-					variant_id = create_variant('main', stage_id)
+					variant_id = create_variant('main', stage_id, 'default variant')
 					if variant_id:
 						project.project().set_stage_default_variant(stage_id, variant_id)
 			return stage_id
@@ -226,6 +238,10 @@ def create_variant(name, stage_id, comment=''):
 				if not create_folder(dir_name):
 					project.project().remove_variant(variant_id)
 					variant_id = None
+				else:
+					# Add other folders
+					create_folder(os.path.normpath(os.path.join(dir_name, '_EXPORTS')))
+					create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
 		else:
 			logging.error("Can't create variant")
 	else:
@@ -288,6 +304,58 @@ def archive_work_env(work_env_id):
 	else:
 		return None
 
+def add_export_version(export_name, files, variant_id, comment=''):
+	export_id = get_or_add_export(export_name, variant_id)
+	if export_id:
+		last_version_list = project.project().get_last_export_version(export_id, 'name')
+		if len(last_version_list) == 1:
+			last_version = last_version_list[0]
+			new_version =  str(int(last_version)+1).zfill(4)
+		else:
+			new_version = '0001'
+		export_path = get_export_path(export_id)
+		if export_path:
+			dir_name = os.path.normpath(os.path.join(export_path, new_version))
+			if not create_folder(dir_name):
+				project.project().remove_export_version(export_version_id)
+				export_version_id = None
+			else:
+				copied_files = tools.copy_files(files, dir_name)
+				if not copied_files:
+					if remove_folder(dir_name):
+						project.project().remove_export_version(export_version_id)
+					else:
+						logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+					export_version_id = None
+				else:
+					export_version_id = project.project().add_export_version(new_version,
+																	copied_files,
+																	export_id,
+																	comment)
+
+		return export_version_id
+	else:
+		return None
+
+def get_or_add_export(name, variant_id):
+	export_id = None
+	if tools.is_safe(name):
+		variant_path = get_variant_path(variant_id)
+		if variant_path:
+			dir_name = os.path.normpath(os.path.join(variant_path, '_EXPORTS', name))
+			is_export = project.project().is_export(name, variant_id)
+			if not is_export:
+				export_id = project.project().add_export(name, variant_id)
+				if not create_folder(dir_name):
+					project.project().remove_export(export_id)
+					export_id = None
+			else:
+				export_id = project.project().get_export_by_name(name, variant_id)['id']
+		else:
+			logging.error("Can't create export")
+	else:
+		logging.warning(f"{name} contains illegal characters")
+	return export_id
 
 def add_version(work_env_id, comment="", do_screenshot=1, fresh=0):
 	if not fresh:
@@ -388,6 +456,16 @@ def get_work_env_path(work_env_id):
 			dir_name = os.path.join(variant_path, work_env_name)
 	return dir_name
 
+def get_export_path(export_id):
+	dir_name = None
+	export_row = project.project().get_export_data(export_id)
+	if export_row:
+		export_name = export_row['name']
+		variant_path = get_variant_path(export_row['variant_id'])
+		if export_name and variant_path:
+			dir_name = os.path.join(variant_path, '_EXPORTS', export_name)
+	return dir_name
+
 def build_version_file_name(work_env_id, name):
 	project_obj = project.project()
 	work_env_row = project_obj.get_work_env_data(work_env_id)
@@ -401,7 +479,6 @@ def build_version_file_name(work_env_id, name):
 	file_name += f"_{asset_row['name']}"
 	file_name += f"_{stage_row['name']}"
 	file_name += f"_{variant_row['name']}"
-	file_name += f"_{work_env_row['name']}"
 	file_name += f".{name}"
 	file_name += f".{extension}"
 	return file_name

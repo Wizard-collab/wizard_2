@@ -109,7 +109,8 @@ def get_project():
 	project_id = site().get_current_ip_data('project_id')
 	if project_id:
 		project_row = site().get_project_row(project_id) 
-		environment.build_project_env(project_name=project_row['project_name'], project_path=project_row['project_path'])
+		environment.build_project_env(project_name=project_row['project_name'],
+										project_path=project_row['project_path'])
 		return 1
 	else:
 		return None

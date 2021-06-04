@@ -12,6 +12,7 @@ import traceback
 
 # Wizard modules
 from wizard.core import user
+from wizard.core import project
 from wizard.core import site
 from wizard.core import create_project
 from wizard.core import communicate
@@ -49,6 +50,26 @@ while not user.get_project():
 		project_name = input('Project name : ')
 		project_password = input('Project password : ')
 		user.log_project(project_name, project_password)
+
+def stdout_tree():
+	project_obj = project.project()
+	domains_rows = project_obj.get_domains()
+	for domain_row in domains_rows:
+		print(f"{domain_row['id']}-{domain_row['name']}")
+		for category_row in project_obj.get_domain_childs(domain_row['id']):
+			print(f"  {category_row['id']}-{category_row['name']}")
+			for asset_row in project_obj.get_category_childs(category_row['id']):
+				print(f"    {asset_row['id']}-{asset_row['name']}")
+				for stage_row in project_obj.get_asset_childs(asset_row['id']):
+					print(f"      {stage_row['id']}-{stage_row['name']}")
+					for variant_row in project_obj.get_stage_childs(stage_row['id']):
+						print(f"        {variant_row['id']}-{variant_row['name']}")
+						for work_env_row in project_obj.get_variant_work_envs_childs(variant_row['id']):
+							print(f"          {work_env_row['id']}-{work_env_row['name']}")
+							for version_row in project_obj.get_work_versions(work_env_row['id']):
+								print(f"            {version_row['id']}-{version_row['name']}")
+
+
 
 def main():
 	try:

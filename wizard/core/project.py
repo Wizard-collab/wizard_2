@@ -235,11 +235,14 @@ class project:
                                     'creation_time',
                                     'creation_user',
                                     'comment',
+                                    'state',
                                     'stage_id'), 
                                 (name,
                                     time.time(),
                                     environment.get_user(),
-                                    comment, stage_id))
+                                    comment,
+                                    'todo',
+                                    stage_id))
             if variant_id:
                 logging.info(f"Variant {name} added to project")
             return variant_id
@@ -267,12 +270,144 @@ class project:
             logging.error("Variant not found")
             return None
 
+    def set_variant_data(self, variant_id, column, data):
+        if db_utils.update_data(self.database_file,
+                                'variants',
+                                (column, data),
+                                ('id', variant_id)):
+            logging.info('Variant modified')
+            return 1
+        else:
+            return None
+
     def get_variant_work_envs_childs(self, variant_id, column='*'):
         work_envs_rows = db_utils.get_row_by_column_data(self.database_file, 
                                                             'work_envs', 
                                                             ('variant_id', variant_id), 
                                                             column)
         return work_envs_rows
+
+    def get_variant_export_childs(self, variant_id, column='*'):
+        exports_rows = db_utils.get_row_by_column_data(self.database_file, 
+                                                            'exports', 
+                                                            ('variant_id', variant_id), 
+                                                            column)
+        return exports_rows
+
+    def get_export_by_name(self, name, variant_id):
+            export_row = db_utils.get_row_by_multiple_data(self.database_file, 
+                                                                'exports', 
+                                                                ('name', 'variant_id'), 
+                                                                (name, variant_id))
+            if export_row and len(export_row) >= 1:
+                return export_row[0]
+            else:
+                logging.error("Export not found")
+                return None
+
+    def get_export_data(self, export_id, column='*'):
+        export_rows = db_utils.get_row_by_column_data(self.database_file, 
+                                                            'exports', 
+                                                            ('id', export_id), 
+                                                            column)
+        if export_rows and len(export_rows) >= 1:
+            return export_rows[0]
+        else:
+            logging.error("Export not found")
+            return None
+
+    def is_export(self, name, variant_id):
+        return db_utils.check_existence(self.database_file, 
+                                        'exports',
+                                        ('name', 'variant_id'),
+                                        (name, variant_id))
+
+    def add_export(self, name, variant_id):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'exports',
+                                        ('name', 'variant_id'),
+                                        (name, variant_id))):
+            export_id = db_utils.create_row(self.database_file,
+                                'exports', 
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'variant_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    variant_id))
+            if export_id:
+                logging.info(f"Export root {name} added to project")
+            return export_id
+        else:
+            logging.warning(f"{name} already exists")
+
+    def remove_export(self, export_id):
+        success = None
+        if site.site().is_admin():
+            success = db_utils.delete_row(self.database_file, 'exports', export_id)
+            if success:
+                logging.info("Export removed from project")
+        return success
+
+    def get_export_versions(self, export_id, column='*'):
+        export_versions_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'export_versions',
+                                                            ('export_id', export_id),
+                                                            column)
+        return export_versions_rows
+
+    def get_last_export_version(self, export_id, column='*'):
+        versions_rows = db_utils.get_last_row_by_column_data(self.database_file,
+                                                            'export_versions',
+                                                            ('export_id', export_id),
+                                                            column)
+        return versions_rows
+
+    def add_export_version(self, name, files, export_id, comment=''):
+        if not (db_utils.check_existence(self.database_file, 
+                                        'export_versions',
+                                        ('name', 'export_id'),
+                                        (name, export_id))):
+            export_version_id = db_utils.create_row(self.database_file,
+                                'export_versions', 
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'comment',
+                                    'files',
+                                    'export_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    comment,
+                                    json.dumps(files),
+                                    export_id))
+            if export_version_id:
+                logging.info(f"Export version {name} added to project")
+            return export_version_id
+        else:
+            logging.warning(f"{name} already exists")
+
+    def remove_export_version(self, export_version_id):
+        success = None
+        if site.site().is_admin():
+            success = db_utils.delete_row(self.database_file, 'export_versions', export_version_id)
+            if success:
+                logging.info("Export version removed from project")
+        return success
+
+    def get_export_version_data(self, export_version_id, column='*'):
+        export_versions_rows = db_utils.get_row_by_column_data(self.database_file, 
+                                                            'export_versions', 
+                                                            ('id', export_version_id), 
+                                                            column)
+        if export_versions_rows and len(export_versions_rows) >= 1:
+            return export_versions_rows[0]
+        else:
+            logging.error("Export version not found")
+            return None
 
     def add_work_env(self, name, software_id, variant_id):
         if not (db_utils.check_existence(self.database_file, 
@@ -669,6 +804,7 @@ def create_variants_table(database_file):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
+                                        state text NOT NULL,
                                         stage_id integer NOT NULL,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""
@@ -724,7 +860,7 @@ def create_export_versions_table(database_file):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
-                                        file_list text NOT NULL,
+                                        files text NOT NULL,
                                         export_id integer NOT NULL,
                                         FOREIGN KEY (export_id) REFERENCES exports (id)
                                     );"""

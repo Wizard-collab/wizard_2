@@ -15,6 +15,7 @@
 # Python modules
 import os
 import subprocess
+import shlex
 import json
 from threading import Thread
 
@@ -74,8 +75,12 @@ def build_env(work_env_id, software_row):
 	env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
 	
 	# Getting the project software additionnal environment
-	additionnal_script_paths = json.loads(software_row['additionnal_scripts'])
-	additionnal_env = json.loads(software_row['additionnal_env'])
+	additionnal_script_paths = []
+	if software_row['additionnal_scripts']:
+		additionnal_script_paths = json.loads(software_row['additionnal_scripts'])
+	additionnal_env = dict()
+	if software_row['additionnal_env']:
+		additionnal_env = json.loads(software_row['additionnal_env'])
 
 	# Merging the project software additionnal environment
 	# to the main env variable
@@ -99,7 +104,7 @@ class software_thread(Thread):
  
 	def run(self):
 		environment.add_running_work_env(self.work_env_id)
-		self.process = subprocess.Popen(self.command, env=self.env, cwd='softwares')
+		self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
 		self.process.wait()
 		environment.remove_running_work_env(self.work_env_id)
 		logging.info(f"{self.software} closed")

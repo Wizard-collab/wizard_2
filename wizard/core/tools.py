@@ -87,3 +87,29 @@ def get_filename_without_override(file):
         file = os.path.join(folder, new_filename)
         index+=1
     return file
+
+def copy_files(files_list, destination):
+    # Copy the given files list to the
+    # given destination folder
+    # First check if the copy is possible
+    # if not, return None
+    sanity = 1
+    for file in files_list:
+        if not os.path.isfile(file):
+            sanity = 0
+            logging.warning(f"{file} doesn't exists")
+    if not os.path.isdir(destination):
+        logging.warning(f"{destination} doesn't exists")
+        sanity=0
+    if sanity:
+        new_files = []
+        for file in files_list:
+            file_name = os.path.split(file)[-1]
+            destination_file = os.path.join(destination, file_name)
+            shutil.copyfile(file, destination_file)
+            new_files.append(destination_file)
+            logging.info(f"{destination_file} copied")
+        return new_files
+    else:
+        logging.warning("Can't execute copy")
+        return None
