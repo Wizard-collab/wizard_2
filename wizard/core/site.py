@@ -19,8 +19,7 @@ import socket
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-from wizard.database.create_database import create_database
-from wizard.database import utility as db_utils
+from wizard.core import db_utils
 from wizard.vars import site_vars
 from wizard.core import tools
 from wizard.core import environment
@@ -262,7 +261,7 @@ def create_site_database(site_path):
     if os.path.isdir(site_path):
         database_file = get_database_file(site_path)
         if not os.path.isfile(database_file):
-            if create_database(database_file):
+            if db_utils.create_database(database_file):
                 create_users_table(database_file)
                 create_projects_table(database_file)
                 create_ip_wrap_table(database_file)

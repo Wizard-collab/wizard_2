@@ -29,8 +29,7 @@ import json
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-from wizard.database.create_database import create_database
-from wizard.database import utility as db_utils
+from wizard.core import db_utils
 from wizard.core import tools
 from wizard.vars import project_vars
 from wizard.vars import softwares_vars
@@ -733,7 +732,7 @@ def init_project(project_path):
         os.mkdir(project_path)
     database_file = get_database_file(project_path)
     if not os.path.isfile(database_file):
-        if create_database(database_file):
+        if db_utils.create_database(database_file):
             create_domains_table(database_file)
             create_categories_table(database_file)
             create_assets_table(database_file)
