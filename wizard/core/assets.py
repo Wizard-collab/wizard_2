@@ -369,7 +369,7 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=0):
 		new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
 							build_version_file_name(work_env_id, new_version)))
-	if screenshot:
+	if do_screenshot:
 		screenshot_bytes = image.screenshot()
 	else:
 		screenshot_bytes = None

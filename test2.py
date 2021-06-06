@@ -184,5 +184,5 @@ if __name__ == "__main__":
     window = Window()
     window.show()
     server = communicate.communicate_server()
-    #server.start()
+    server.start()
     sys.exit(app.exec_())
