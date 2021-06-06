@@ -475,7 +475,7 @@ class project:
         if (not work_env_lock_id) or (work_env_lock_id == current_user_id):
             return None
         else:
-            lock_user_name = site.site().get_user_row(work_env_lock_id, 'user_name')
+            lock_user_name = site.site().get_user_data(work_env_lock_id, 'user_name')
             logging.warning(f"Work env locked by {lock_user_name}")
             return lock_user_name
 

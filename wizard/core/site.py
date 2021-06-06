@@ -20,9 +20,11 @@ from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 from wizard.core import db_utils
-from wizard.vars import site_vars
 from wizard.core import tools
 from wizard.core import environment
+from wizard.core import image
+from wizard.vars import site_vars
+from wizard.vars import ressources
 
 class site:
     def __init__(self):
@@ -107,17 +109,30 @@ class site:
         else:
             logging.warning('Wrong administrator pass')
 
-    def create_user(self, user_name, password, email, administrator_pass=''):
+    def create_user(self, user_name, password, email, administrator_pass='', profile_picture=ressources._default_profile_):
+        print(profile_picture)
         if user_name not in self.get_user_names_list():
             administrator = 0
             if tools.decrypt_string(self.get_administrator_pass(),
                                     administrator_pass):
                 administrator = 1
+            if os.path.isfile(profile_picture):
+                profile_picture_bytes = image.convert_profile_picture(profile_picture)
+            else:
+                logging.warning(f"{profile_picture} doesn't exists, assigning default profile picture")
+                profile_picture_bytes = image.convert_profile_picture(ressources._default_profile_)
             if db_utils.create_row(self.database_file,
                         'users', 
-                        ('user_name', 'pass', 'email', 'administrator'), 
-                        (user_name, tools.encrypt_string(password),
-                            email, administrator)):
+                        ('user_name',
+                            'pass',
+                            'email',
+                            'profile_picture',
+                            'administrator'), 
+                        (user_name,
+                            tools.encrypt_string(password),
+                            email,
+                            profile_picture_bytes,
+                            administrator)):
 
                 info = f"User {user_name} created"
                 if administrator:
@@ -207,7 +222,7 @@ class site:
                                                         column)
         return users_rows[0]
 
-    def get_user_row(self, user_id, column='*'):
+    def get_user_data(self, user_id, column='*'):
         users_rows = db_utils.get_row_by_column_data(self.database_file,
                                                         'users',
                                                         ('id', user_id),
@@ -274,10 +289,19 @@ def create_site_database(site_path):
         return None
 
 def create_admin_user(database_file, admin_password, admin_email):
+    profile_picture_bytes = image.convert_profile_picture(ressources._default_profile_)
     if db_utils.create_row(database_file,
                             'users', 
-                            ('user_name', 'pass', 'email', 'administrator'), 
-                            ('admin', tools.encrypt_string(admin_password), admin_email, 1)):
+                            ('user_name', 
+                                'pass', 
+                                'email', 
+                                'profile_picture', 
+                                'administrator'), 
+                            ('admin', 
+                                tools.encrypt_string(admin_password),
+                                admin_email,
+                                profile_picture_bytes,
+                                1)):
         logging.info('Admin user created')
 
 def get_database_file(site_path):
@@ -293,6 +317,7 @@ def create_users_table(database_file):
                                         user_name text NOT NULL,
                                         pass text NOT NULL,
                                         email text NOT NULL,
+                                        profile_picture blob NOT NULL,
                                         administrator integer
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):

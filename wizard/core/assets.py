@@ -36,7 +36,7 @@ from wizard.core import environment
 from wizard.core import project
 from wizard.core import site
 from wizard.core import tools
-from wizard.core import screenshot
+from wizard.core import image
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
@@ -370,7 +370,7 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=0):
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
 							build_version_file_name(work_env_id, new_version)))
 	if screenshot:
-		screenshot_bytes = screenshot.screenshot_to_bytes()
+		screenshot_bytes = image.screenshot()
 	else:
 		screenshot_bytes = None
 	version_id = project.project().add_version(new_version,

@@ -81,7 +81,7 @@ def disconnect_user():
 def get_user():
 	user_id = site().get_current_ip_data('user_id')
 	if user_id:
-		environment.build_user_env(user_name=site().get_user_row(user_id, 'user_name'))
+		environment.build_user_env(user_name=site().get_user_data(user_id, 'user_name'))
 		return 1
 	else:
 		return None
