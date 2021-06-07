@@ -35,3 +35,4 @@ def resize_image(image, fixed_height):
 	width_size = int((float(image.size[0]) * float(height_percent)))
 	image = image.resize((width_size, fixed_height), Image.ANTIALIAS)
 	return image
+	

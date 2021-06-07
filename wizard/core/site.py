@@ -271,6 +271,9 @@ def init_site(site_path, admin_password, admin_email):
     database_file = create_site_database(site_path)
     if database_file:
         create_admin_user(database_file, admin_password, admin_email)
+        return 1
+    else:
+        return None
 
 def create_site_database(site_path):
     if os.path.isdir(site_path):
