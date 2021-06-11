@@ -58,6 +58,10 @@ _assets_stage_rules_dic_[_set_dress_] = [_modeling_,
 										_shading_]
 
 # Export rules
+''' The _export_ext_dic_ dictionnary 
+stores the software export extensions rules as
+list depending on the software and the stage 
+'''
 _export_ext_dic_ = {}
 _export_ext_dic_[_maya_] = {}
 _export_ext_dic_[_blender_] = {}
@@ -80,6 +84,10 @@ _export_ext_dic_[_houdini_][_fx_] = ['hip', 'vdb', 'abc']
 
 
 # Default export dic
+''' The _default_ext_dic_ dictionnary 
+stores the default software export extensions as
+strings depending on the software and the stage
+'''
 _default_ext_dic_ = {}
 _default_ext_dic_[_maya_] = {}
 _default_ext_dic_[_blender_] = {}

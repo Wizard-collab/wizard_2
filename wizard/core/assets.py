@@ -280,7 +280,7 @@ def create_work_env(software_id, variant_id):
 					project.project().remove_work_env(work_env_id)
 					work_env_id = None
 				else:
-					add_version(work_env_id, fresh=1)
+					add_version(work_env_id)
 		else:
 			logging.error("Can't create work env")
 	else:
@@ -305,6 +305,9 @@ def archive_work_env(work_env_id):
 		return None
 
 def add_export_version(export_name, files, version_id, comment=''):
+	# For adding an export version, wizard need an existing files list
+	# it will just create the new version in the database
+	# and copy the files in the corresponding directory
 	work_env_id = project.project().get_version_data(version_id, 'work_env_id')
 	variant_id = project.project().get_work_env_data(work_env_id, 'variant_id')
 	if variant_id:
@@ -340,7 +343,9 @@ def add_export_version(export_name, files, version_id, comment=''):
 			return None
 
 def request_export(work_env_id, export_name):
-	dir_name = tools.temp_dir()
+	# Gives a temporary ( and local ) export file name
+	# for the softwares
+ 	dir_name = tools.temp_dir()
 	file_name = build_export_file_name(work_env_id, export_name)
 	if file_name:
 		return os.path.normpath(os.path.join(dir_name, file_name))
@@ -348,6 +353,10 @@ def request_export(work_env_id, export_name):
 		return None
 
 def get_or_add_export(name, variant_id):
+	# If the given export name exists, it return
+	# the corresponding export_id
+	# If i doesn't exists, it add it to the database
+	# and rreturn the new export_id
 	export_id = None
 	if tools.is_safe(name):
 		variant_path = get_variant_path(variant_id)
@@ -367,14 +376,13 @@ def get_or_add_export(name, variant_id):
 		logging.warning(f"{name} contains illegal characters")
 	return export_id
 
-def add_version(work_env_id, comment="", do_screenshot=1, fresh=0):
-	if not fresh:
-		last_version_list = project.project().get_last_work_version(work_env_id, 'name')
-		if len(last_version_list) == 1:
-			last_version = last_version_list[0]
-			new_version =  str(int(last_version)+1).zfill(4)
-		else:
-			new_version = '0001'
+def add_version(work_env_id, comment="", do_screenshot=1):
+	last_version_list = project.project().get_last_work_version(work_env_id, 'name')
+	if len(last_version_list) == 1:
+		last_version = last_version_list[0]
+		new_version =  str(int(last_version)+1).zfill(4)
+	else:
+		new_version = '0001'
 	else:
 		new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 

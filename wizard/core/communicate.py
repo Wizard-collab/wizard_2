@@ -70,7 +70,7 @@ class communicate_server(Thread):
         conn.send(json.dumps(returned).encode('utf8'))
 
 def add_version(work_env_id):
-    # Add a version using the wizard core and return the file path 
+    # Add a version using the 'assets' module and return the file path 
     # of the new version
     version_id = assets.add_version(work_env_id)
     version_path = project.project().get_version_data(version_id,
@@ -78,10 +78,13 @@ def add_version(work_env_id):
     return version_path
 
 def request_export(work_env_id, export_name):
+    # Just return a temporary file name using the 'assets' module
     file_path = assets.request_export(work_env_id, export_name)
     return file_path
 
 def add_export_version(export_name, files, version_id, comment):
+    # Add an export version using the 'assets' module and return the export_version_id 
+    # of the new export version
     export_version_id = assets.add_export_version(export_name, files, version_id, comment)
     return export_version_id
 

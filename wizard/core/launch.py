@@ -95,6 +95,9 @@ def build_env(work_env_id, software_row):
 	return env
 
 class software_thread(Thread):
+	''' A thread that runs until the given software process is active
+	When the software process is exited, the thread is deleted
+	'''
 	def __init__(self, command, env, software, work_env_id):
 		super(software_thread, self).__init__()
 		self.command = command
