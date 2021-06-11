@@ -253,6 +253,8 @@ class project:
         if site.site().is_admin():
             for work_env_id in self.get_variant_work_envs_childs(variant_id, 'id'):
                 self.remove_work_env(work_env_id)
+            for export_id in self.get_variant_export_childs(variant_id, 'id'):
+                self.remove_export(export_id)
             success = db_utils.delete_row(self.database_file, 'variants', variant_id)
             if success:
                 logging.info(f"Variant removed from project")
@@ -315,6 +317,13 @@ class project:
             logging.error("Export not found")
             return None
 
+    def get_export_childs(self, export_id, column='*'):
+        exports_versions_rows = db_utils.get_row_by_column_data(self.database_file, 
+                                                            'export_versions', 
+                                                            ('export_id', export_id), 
+                                                            column)
+        return exports_versions_rows
+
     def is_export(self, name, variant_id):
         return db_utils.check_existence(self.database_file, 
                                         'exports',
@@ -345,6 +354,8 @@ class project:
     def remove_export(self, export_id):
         success = None
         if site.site().is_admin():
+            for export_version_id in self.get_export_childs(export_id, 'id'):
+                self.remove_export_version(export_version_id)
             success = db_utils.delete_row(self.database_file, 'exports', export_id)
             if success:
                 logging.info("Export removed from project")

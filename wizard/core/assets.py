@@ -372,6 +372,23 @@ def request_export(work_env_id, export_name, multiple=None, only_dir=None):
 	else:
 		return None
 
+def archive_export(export_id):
+	if site.site().is_admin():
+		export_row = project.project().get_export_data(export_id)
+		if export_row:
+			dir_name = get_export_path(export_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_export(export_id)
+		else:
+			return None
+	else:
+		return None
+
 def get_or_add_export(name, variant_id):
 	# If the given export name exists, it return
 	# the corresponding export_id
@@ -395,6 +412,23 @@ def get_or_add_export(name, variant_id):
 	else:
 		logging.warning(f"{name} contains illegal characters")
 	return export_id
+
+def archive_export_version(export_version_id):
+	if site.site().is_admin():
+		export_version_row = project.project().get_export_version_data(export_version_id)
+		if export_version_row:
+			dir_name = get_export_version_path(export_version_id)
+			if os.path.isdir(dir_name):
+				if tools.make_archive(dir_name):
+					shutil.rmtree(dir_name)
+					logging.info(f"{dir_name} deleted")
+			else:
+				logging.warning(f"{dir_name} not found")
+			return project.project().remove_export_version(export_version_id)
+		else:
+			return None
+	else:
+		return None
 
 def add_version(work_env_id, comment="", do_screenshot=1):
 	last_version_list = project.project().get_last_work_version(work_env_id, 'name')
@@ -499,6 +533,16 @@ def get_export_path(export_id):
 		variant_path = get_variant_path(export_row['variant_id'])
 		if export_name and variant_path:
 			dir_name = os.path.join(variant_path, '_EXPORTS', export_name)
+	return dir_name
+
+def get_export_version_path(export_version_id):
+	dir_name = None
+	export_version_row = project.project().get_export_version_data(export_version_id)
+	if export_version_row:
+		export_version_name = export_version_row['name']
+		export_path = get_export_path(export_version_row['export_id'])
+		if export_version_name and export_path:
+			dir_name = os.path.join(export_path, export_version_name)
 	return dir_name
 
 def build_version_file_name(work_env_id, name):
