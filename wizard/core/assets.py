@@ -308,47 +308,67 @@ def add_export_version(export_name, files, version_id, comment=''):
 	# For adding an export version, wizard need an existing files list
 	# it will just create the new version in the database
 	# and copy the files in the corresponding directory
+
 	work_env_id = project.project().get_version_data(version_id, 'work_env_id')
-	variant_id = project.project().get_work_env_data(work_env_id, 'variant_id')
-	if variant_id:
-		export_id = get_or_add_export(export_name, variant_id)
-		if export_id:
-			last_version_list = project.project().get_last_export_version(export_id, 'name')
-			if len(last_version_list) == 1:
-				last_version = last_version_list[0]
-				new_version =  str(int(last_version)+1).zfill(4)
-			else:
-				new_version = '0001'
-			export_path = get_export_path(export_id)
-			if export_path:
-				dir_name = os.path.normpath(os.path.join(export_path, new_version))
-				if not create_folder(dir_name):
-					project.project().remove_export_version(export_version_id)
-					export_version_id = None
-				else:
-					copied_files = tools.copy_files(files, dir_name)
-					if not copied_files:
-						if not remove_folder(dir_name):
-							logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
-						export_version_id = None
+	if work_env_id:
+		work_env_row = project.project().get_work_env_data(work_env_id)
+		variant_id = work_env_row['variant_id']
+		variant_row = project.project().get_variant_data(variant_id)
+
+		stage_name = project.project().get_stage_data(variant_row['stage_id'], 'name')
+		extension_errors = []
+		for file in files:
+			if os.path.splitext(file)[-1].replace('.', '') not in assets_vars._export_ext_dic_[stage_name]:
+				extension_errors.append(file)
+		if extension_errors == []:
+			if variant_row:
+				export_id = get_or_add_export(export_name, variant_id)
+				if export_id:
+					last_version_list = project.project().get_last_export_version(export_id, 'name')
+					if len(last_version_list) == 1:
+						last_version = last_version_list[0]
+						new_version =  str(int(last_version)+1).zfill(4)
 					else:
-						export_version_id = project.project().add_export_version(new_version,
-																		copied_files,
-																		export_id,
-																		version_id,
-																		comment)
-
-			return export_version_id
+						new_version = '0001'
+					export_path = get_export_path(export_id)
+					if export_path:
+						dir_name = os.path.normpath(os.path.join(export_path, new_version))
+						if not create_folder(dir_name):
+							project.project().remove_export_version(export_version_id)
+							export_version_id = None
+						else:
+							copied_files = tools.copy_files(files, dir_name)
+							if not copied_files:
+								if not remove_folder(dir_name):
+									logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+								export_version_id = None
+							else:
+								export_version_id = project.project().add_export_version(new_version,
+																				copied_files,
+																				export_id,
+																				version_id,
+																				comment)
+					return export_version_id
+				else:
+					return None
+			else:
+				return None
 		else:
-			return None
+			for file in extension_errors:
+				logging.warning(f"{file} format doesn't math the stage export rules ( {os.path.splitext(file)[-1]} )")
+	else:
+		return None
 
-def request_export(work_env_id, export_name):
+def request_export(work_env_id, export_name, multiple=None, only_dir=None):
 	# Gives a temporary ( and local ) export file name
 	# for the softwares
- 	dir_name = tools.temp_dir()
-	file_name = build_export_file_name(work_env_id, export_name)
-	if file_name:
+	dir_name = tools.temp_dir()
+	logging.info(f"Temporary directory created : {dir_name}, if something goes wrong in the export please go there to find your temporary export file")
+	file_name = build_export_file_name(work_env_id, export_name, multiple)
+	if file_name and not only_dir:
 		return os.path.normpath(os.path.join(dir_name, file_name))
+	elif file_name and only_dir:
+		return dir_name
 	else:
 		return None
 
@@ -381,8 +401,6 @@ def add_version(work_env_id, comment="", do_screenshot=1):
 	if len(last_version_list) == 1:
 		last_version = last_version_list[0]
 		new_version =  str(int(last_version)+1).zfill(4)
-	else:
-		new_version = '0001'
 	else:
 		new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
@@ -500,7 +518,7 @@ def build_version_file_name(work_env_id, name):
 	file_name += f".{extension}"
 	return file_name
 
-def build_export_file_name(work_env_id, export_name):
+def build_export_file_name(work_env_id, export_name, multiple=None):
 	project_obj = project.project()
 	work_env_row = project_obj.get_work_env_data(work_env_id)
 	variant_row = project_obj.get_variant_data(work_env_row['variant_id'])
@@ -516,6 +534,8 @@ def build_export_file_name(work_env_id, export_name):
 		file_name += f"_{stage_row['name']}"
 		file_name += f"_{variant_row['name']}"
 		file_name += f"_{export_name}"
+		if multiple:
+			file_name += f".{multiple}"
 		file_name += f".{extension}"
 		return file_name
 	else:

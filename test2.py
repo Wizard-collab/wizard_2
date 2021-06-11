@@ -146,7 +146,7 @@ class Window(QWidget):
         self.versions_listwidget.clear()
         versions_list = project.project().get_work_versions(item.id)
         for version_row in versions_list:
-            version_item = QtWidgets.QListWidgetItem(f"{version_row['name']}-{version_row['comment']}-{version_row['creation_user']}-{self.convert_time(version_row['creation_time'])}")
+            version_item = QtWidgets.QListWidgetItem(f"{version_row['id']}-{version_row['name']}-{version_row['comment']}-{version_row['creation_user']}-{self.convert_time(version_row['creation_time'])}")
             version_item.id = version_row['id']
             self.versions_listwidget.addItem(version_item)
 

@@ -63,24 +63,17 @@ stores the software export extensions rules as
 list depending on the software and the stage 
 '''
 _export_ext_dic_ = {}
-_export_ext_dic_[_maya_] = {}
-_export_ext_dic_[_blender_] = {}
-_export_ext_dic_[_substance_painter_] = {}
-_export_ext_dic_[_substance_designer_] = {}
-_export_ext_dic_[_guerilla_render_] = {}
-_export_ext_dic_[_nuke_] = {}
-_export_ext_dic_[_houdini_] = {}
-_export_ext_dic_[_maya_][_modeling_] = ['abc', 'ma']
-_export_ext_dic_[_maya_][_rigging_] = ['ma']
-_export_ext_dic_[_maya_][_grooming_] = ['ma']
-_export_ext_dic_[_maya_][_shading_] = ['ma']
-_export_ext_dic_[_blender_][_modeling_] = ['abc', 'blend']
-_export_ext_dic_[_blender_][_rigging_] = ['blend']
-_export_ext_dic_[_substance_painter_][_texturing_] = ['exr', 'png', 'tiff']
-_export_ext_dic_[_substance_designer_][_texturing_] = ['sbsar']
-_export_ext_dic_[_guerilla_render_][_shading_] = ['gnode']
-_export_ext_dic_[_nuke_][_compositing_] = ['exr']
-_export_ext_dic_[_houdini_][_fx_] = ['hip', 'vdb', 'abc']
+_export_ext_dic_[_modeling_] = ['abc', 'ma']
+_export_ext_dic_[_rigging_] = ['ma']
+_export_ext_dic_[_grooming_] = ['ma']
+_export_ext_dic_[_shading_] = ['ma']
+_export_ext_dic_[_modeling_] = ['abc', 'blend']
+_export_ext_dic_[_rigging_] = ['blend']
+_export_ext_dic_[_texturing_] = ['exr', 'png', 'tiff']
+_export_ext_dic_[_texturing_] = ['sbsar']
+_export_ext_dic_[_shading_] = ['gnode']
+_export_ext_dic_[_compositing_] = ['exr']
+_export_ext_dic_[_fx_] = ['hip', 'vdb', 'abc']
 
 
 # Default export dic
