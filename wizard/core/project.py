@@ -39,6 +39,7 @@ from wizard.core import environment
 class project:
     def __init__(self):
         self.database_file = get_database_file(environment.get_project_path())
+        self.project_path = environment.get_project_path()
 
     def add_domain(self, name):
         domain_id = db_utils.create_row(self.database_file,
@@ -405,10 +406,19 @@ class project:
     def remove_export_version(self, export_version_id):
         success = None
         if site.site().is_admin():
+            for ticket_id in self.get_export_version_tickets(export_version_id, 'id'):
+                self.remove_ticket(ticket_id)
             success = db_utils.delete_row(self.database_file, 'export_versions', export_version_id)
             if success:
                 logging.info("Export version removed from project")
         return success
+
+    def get_export_version_tickets(self, export_version_id, column='*'):
+        tickets_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'tickets',
+                                                            ('export_version_id', export_version_id),
+                                                            column)
+        return tickets_rows
 
     def get_export_version_data(self, export_version_id, column='*'):
         export_versions_rows = db_utils.get_row_by_column_data(self.database_file, 
@@ -746,6 +756,83 @@ class project:
         else:
             return None
 
+    def create_ticket(self, title, message, export_version_id, destination_user=None, files=[]):
+        ticket_id = None
+        export_id = self.get_export_version_data(export_version_id, 'export_id')
+
+        is_user = None
+        if not destination_user:
+            is_user=1
+        elif destination_user:
+            if site.site().get_user_row_by_name(destination_user):
+                is_user=1
+
+        copied_files = tools.copy_files(files, self.get_shared_files_folder())
+
+        if is_user:
+            if copied_files is not None:
+                if export_id:
+                    variant_id = self.get_export_data(export_id, 'variant_id')
+                    if variant_id:
+                        ticket_id = db_utils.create_row(self.database_file,
+                                                            'tickets',
+                                                            ('creation_user',
+                                                                'creation_time',
+                                                                'title',
+                                                                'message',
+                                                                'state',
+                                                                'variant_id',
+                                                                'export_version_id',
+                                                                'destination_user', 
+                                                                'files'),
+                                                            (environment.get_user(),
+                                                                time.time(),
+                                                                title,
+                                                                message,
+                                                                1,
+                                                                variant_id,
+                                                                export_version_id,
+                                                                destination_user,
+                                                                json.dumps(copied_files)))
+                        if ticket_id:
+                            logging.info("Ticket created")
+        return ticket_id
+
+    def get_ticket_data(self, ticket_id, column='*'):
+        tickets_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'tickets',
+                                                            ('id', ticket_id),
+                                                            column)
+        if tickets_rows and len(tickets_rows) >= 1:
+            return tickets_rows[0]
+        else:
+            logging.error("Ticket not found")
+            return None
+
+    def change_ticket_state(self, ticket_id, state):
+        if db_utils.update_data(self.database_file,
+                                        'tickets',
+                                        ('state', state),
+                                        ('id', ticket_id)):
+            if not state:
+                logging.info('Ticket closed')
+            else:
+                logging.info('Ticket openned')
+            return 1
+        else:
+            return None
+
+    def remove_ticket(self, ticket_id):
+        success = None
+        if site.site().is_admin():
+            success = db_utils.delete_row(self.database_file, 'tickets', ticket_id)
+            if success :
+                logging.info(f"Ticket removed from project")
+        return success
+
+    def get_shared_files_folder(self):
+        shared_files_folder = os.path.join(self.project_path, project_vars._shared_files_folder_)
+        return shared_files_folder
 
 def get_database_file(project_path):
     if project_path:
@@ -783,6 +870,7 @@ def init_project(project_path):
             create_softwares_table(database_file)
             create_settings_table(database_file)
             create_extensions_table(database_file)
+            create_tickets_table(database_file)
             return database_file
     else:
         logging.warning("Database file already exists")
@@ -941,3 +1029,21 @@ def create_extensions_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Extensions table created")
+
+def create_tickets_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS tickets (
+                                        id integer PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        title text NOT NULL,
+                                        message text NOT NULL,
+                                        state bool,
+                                        variant_id integer NOT NULL,
+                                        export_version_id integer NOT NULL,
+                                        destination_user text,
+                                        files text
+                                        FOREIGN KEY (variant_id) REFERENCES variants (id)
+                                        FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Tickets table created")

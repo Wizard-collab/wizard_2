@@ -106,7 +106,7 @@ def copy_files(files_list, destination):
         new_files = []
         for file in files_list:
             file_name = os.path.split(file)[-1]
-            destination_file = os.path.join(destination, file_name)
+            destination_file = get_filename_without_override(os.path.join(destination, file_name))
             shutil.copyfile(file, destination_file)
             new_files.append(destination_file)
             logging.info(f"{destination_file} copied")
@@ -119,3 +119,41 @@ def temp_dir():
     # Return a temp directory
     tempdir = tempfile.mkdtemp()
     return tempdir
+
+def create_folder(dir_name):
+    success = None
+    try:
+        os.mkdir(dir_name)
+        logging.info(f'{dir_name} created')
+        success = 1
+    except FileNotFoundError:
+        logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+    except FileExistsError:
+        logging.error(f"{dir_name} already exists on filesystem")
+    except PermissionError:
+        logging.error(f"{dir_name} access denied")
+    return success
+
+def remove_folder(dir_name):
+    success = None
+    try:
+        os.rmdir(dir_name)
+        logging.info(f'{dir_name} removed')
+        success = 1
+    except FileNotFoundError:
+        logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+    except PermissionError:
+        logging.error(f"{dir_name} access denied")
+    return success
+
+def remove_tree(dir_name):
+    success = None
+    try:
+        os.rmtree(dir_name)
+        logging.info(f'{dir_name} removed')
+        success = 1
+    except FileNotFoundError:
+        logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+    except PermissionError:
+        logging.error(f"{dir_name} access denied")
+    return success

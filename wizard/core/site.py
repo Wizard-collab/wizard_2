@@ -110,7 +110,6 @@ class site:
             logging.warning('Wrong administrator pass')
 
     def create_user(self, user_name, password, email, administrator_pass='', profile_picture=ressources._default_profile_):
-        print(profile_picture)
         if user_name not in self.get_user_names_list():
             administrator = 0
             if tools.decrypt_string(self.get_administrator_pass(),
@@ -220,14 +219,22 @@ class site:
                                                         'users',
                                                         ('user_name', name),
                                                         column)
-        return users_rows[0]
+        if users_rows and len(users_rows) >= 1:
+            return users_rows[0]
+        else:
+            logging.error("User not found")
+            return None
 
     def get_user_data(self, user_id, column='*'):
         users_rows = db_utils.get_row_by_column_data(self.database_file,
                                                         'users',
                                                         ('id', user_id),
                                                         column)
-        return users_rows[0]
+        if users_rows and len(users_rows) >= 1:
+            return users_rows[0]
+        else:
+            logging.error("User not found")
+            return None
 
     def is_admin(self):
         is_admin = self.get_user_row_by_name(environment.get_user(), 'administrator')

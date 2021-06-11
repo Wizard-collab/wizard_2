@@ -20,7 +20,9 @@
 from wizard.core import project
 from wizard.core import assets
 from wizard.core import environment
+from wizard.core import tools
 from wizard.vars import assets_vars
+from wizard.vars import project_vars
 from wizard.vars import softwares_vars
 
 # Python modules
@@ -46,3 +48,5 @@ def create_project(project_name,
 			for stage in assets_vars._default_ext_dic_[software].keys():
 				extension = assets_vars._default_ext_dic_[software][stage]
 				project.project().create_extension_row(stage, software_id, extension)
+
+		tools.create_folder(project.project().get_shared_files_folder())

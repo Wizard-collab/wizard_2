@@ -43,44 +43,6 @@ from wizard.vars import softwares_vars
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-def create_folder(dir_name):
-	success = None
-	try:
-		os.mkdir(dir_name)
-		logging.info(f'{dir_name} created')
-		success = 1
-	except FileNotFoundError:
-		logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
-	except FileExistsError:
-		logging.error(f"{dir_name} already exists on filesystem")
-	except PermissionError:
-		logging.error(f"{dir_name} access denied")
-	return success
-
-def remove_folder(dir_name):
-	success = None
-	try:
-		os.rmdir(dir_name)
-		logging.info(f'{dir_name} removed')
-		success = 1
-	except FileNotFoundError:
-		logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
-	except PermissionError:
-		logging.error(f"{dir_name} access denied")
-	return success
-
-def remove_tree(dir_name):
-	success = None
-	try:
-		os.rmtree(dir_name)
-		logging.info(f'{dir_name} removed')
-		success = 1
-	except FileNotFoundError:
-		logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
-	except PermissionError:
-		logging.error(f"{dir_name} access denied")
-	return success
-
 def create_domain(name):
 	domain_id = None
 	if tools.is_safe(name):
@@ -88,7 +50,7 @@ def create_domain(name):
 									name))
 		domain_id = project.project().add_domain(name)
 		if domain_id:
-			if not create_folder(dir_name):
+			if not tools.create_folder(dir_name):
 				project.project().remove_domain(domain_id)
 				domain_id = None
 	else:
@@ -120,7 +82,7 @@ def create_category(name, domain_id):
 			dir_name = os.path.normpath(os.path.join(domain_path, name))
 			category_id = project.project().add_category(name, domain_id)
 			if category_id:
-				if not create_folder(dir_name):
+				if not tools.create_folder(dir_name):
 					project.project().remove_category(category_id)
 					category_id = None
 		else:
@@ -154,7 +116,7 @@ def create_asset(name, category_id):
 			dir_name = os.path.normpath(os.path.join(category_path, name))
 			asset_id = project.project().add_asset(name, category_id)
 			if asset_id:
-				if not create_folder(dir_name):
+				if not tools.create_folder(dir_name):
 					project.project().remove_asset(asset_id)
 					asset_id = None
 		else:
@@ -207,7 +169,7 @@ def create_stage(name, asset_id):
 			dir_name = os.path.normpath(os.path.join(asset_path, name))
 			stage_id = project.project().add_stage(name, asset_id)
 			if stage_id:
-				if not create_folder(dir_name):
+				if not tools.create_folder(dir_name):
 					project.project().remove_stage(stage_id)
 					stage_id = None
 				else:
@@ -247,13 +209,13 @@ def create_variant(name, stage_id, comment=''):
 			dir_name = os.path.normpath(os.path.join(stage_path, name))
 			variant_id = project.project().add_variant(name, stage_id, comment)
 			if variant_id:
-				if not create_folder(dir_name):
+				if not tools.create_folder(dir_name):
 					project.project().remove_variant(variant_id)
 					variant_id = None
 				else:
 					# Add other folders
-					create_folder(os.path.normpath(os.path.join(dir_name, '_EXPORTS')))
-					create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
+					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_EXPORTS')))
+					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
 		else:
 			logging.error("Can't create variant")
 	else:
@@ -288,7 +250,7 @@ def create_work_env(software_id, variant_id):
 														software_id,
 														variant_id)
 			if work_env_id:
-				if not create_folder(dir_name):
+				if not tools.create_folder(dir_name):
 					project.project().remove_work_env(work_env_id)
 					work_env_id = None
 				else:
@@ -345,13 +307,13 @@ def add_export_version(export_name, files, version_id, comment=''):
 					export_path = get_export_path(export_id)
 					if export_path:
 						dir_name = os.path.normpath(os.path.join(export_path, new_version))
-						if not create_folder(dir_name):
+						if not tools.create_folder(dir_name):
 							project.project().remove_export_version(export_version_id)
 							export_version_id = None
 						else:
 							copied_files = tools.copy_files(files, dir_name)
 							if not copied_files:
-								if not remove_folder(dir_name):
+								if not tools.remove_folder(dir_name):
 									logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
 								export_version_id = None
 							else:
@@ -391,7 +353,7 @@ def archive_export(export_id):
 			dir_name = get_export_path(export_id)
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
-					remove_tree(dir_name)	
+					tools.remove_tree(dir_name)	
 			else:
 				logging.warning(f"{dir_name} not found")
 			return project.project().remove_export(export_id)
@@ -413,7 +375,7 @@ def get_or_add_export(name, variant_id):
 			is_export = project.project().is_export(name, variant_id)
 			if not is_export:
 				export_id = project.project().add_export(name, variant_id)
-				if not create_folder(dir_name):
+				if not tools.create_folder(dir_name):
 					project.project().remove_export(export_id)
 					export_id = None
 			else:
