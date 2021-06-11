@@ -66,8 +66,12 @@ def make_archive(source):
         format = 'zip'
         root_dir = os.path.dirname(source)
         base_dir = os.path.basename(source.strip(os.sep))
-        base_name = get_filename_without_override(os.path.join(root_dir, f"{base_dir}_archive.zip"))
-        shutil.make_archive(os.path.splitext(base_name)[0], format, root_dir, base_dir)
+        base_name = get_filename_without_override(os.path.join(root_dir,
+                                                    f"{base_dir}_archive.zip"))
+        shutil.make_archive(os.path.splitext(base_name)[0],
+                                                format,
+                                                root_dir,
+                                                base_dir)
         logging.info(f"Folder {base_dir} archived in {base_name}")
         return 1
     except:
@@ -106,7 +110,8 @@ def copy_files(files_list, destination):
         new_files = []
         for file in files_list:
             file_name = os.path.split(file)[-1]
-            destination_file = get_filename_without_override(os.path.join(destination, file_name))
+            destination_file = get_filename_without_override(os.path.join(destination, 
+                                                                            file_name))
             shutil.copyfile(file, destination_file)
             new_files.append(destination_file)
             logging.info(f"{destination_file} copied")
@@ -121,6 +126,9 @@ def temp_dir():
     return tempdir
 
 def create_folder(dir_name):
+    # Tries to create a folder
+    # If not possible return None and
+    # log the corresponding error
     success = None
     try:
         os.mkdir(dir_name)
@@ -135,6 +143,9 @@ def create_folder(dir_name):
     return success
 
 def remove_folder(dir_name):
+    # Tries to remove a folder
+    # If not possible return None and
+    # log the corresponding error
     success = None
     try:
         os.rmdir(dir_name)
@@ -147,6 +158,9 @@ def remove_folder(dir_name):
     return success
 
 def remove_tree(dir_name):
+    # Tries to remove a folder tree
+    # If not possible return None and
+    # log the corresponding error
     success = None
     try:
         os.rmtree(dir_name)

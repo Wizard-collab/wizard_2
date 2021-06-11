@@ -109,7 +109,12 @@ class site:
         else:
             logging.warning('Wrong administrator pass')
 
-    def create_user(self, user_name, password, email, administrator_pass='', profile_picture=ressources._default_profile_):
+    def create_user(self,
+                        user_name,
+                        password,
+                        email,
+                        administrator_pass='',
+                        profile_picture=ressources._default_profile_):
         if user_name not in self.get_user_names_list():
             administrator = 0
             if tools.decrypt_string(self.get_administrator_pass(),
@@ -316,7 +321,8 @@ def create_admin_user(database_file, admin_password, admin_email):
 
 def get_database_file(site_path):
     if site_path:
-        database_file = os.path.join(site_path, site_vars._site_database_file_)
+        database_file = os.path.join(site_path,
+                                        site_vars._site_database_file_)
     else:
         database_file = None
     return database_file

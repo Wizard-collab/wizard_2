@@ -39,11 +39,13 @@ while not user.get_user():
 		user_name = input('User name : ')
 		password = input('Password : ')
 		email = input('Email : ')
+		profile_picture = input('Profile picture ( without any "\\" ) ( Optional ) : ')
 		administrator_pass = input('Administrator pass ( Optional ) : ')
 		site.site().create_user(user_name,
 								password,
 								email,
-								administrator_pass)
+								administrator_pass,
+								profile_picture)
 	else:
 		user_name = input('User name : ')
 		password = input('Password : ')
