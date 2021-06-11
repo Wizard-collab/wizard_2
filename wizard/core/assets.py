@@ -69,6 +69,18 @@ def remove_folder(dir_name):
 		logging.error(f"{dir_name} access denied")
 	return success
 
+def remove_tree(dir_name):
+	success = None
+	try:
+		os.rmtree(dir_name)
+		logging.info(f'{dir_name} removed')
+		success = 1
+	except FileNotFoundError:
+		logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+	except PermissionError:
+		logging.error(f"{dir_name} access denied")
+	return success
+
 def create_domain(name):
 	domain_id = None
 	if tools.is_safe(name):
@@ -379,8 +391,7 @@ def archive_export(export_id):
 			dir_name = get_export_path(export_id)
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
-					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					remove_tree(dir_name)	
 			else:
 				logging.warning(f"{dir_name} not found")
 			return project.project().remove_export(export_id)
