@@ -304,36 +304,46 @@ def archive_work_env(work_env_id):
 	else:
 		return None
 
-def add_export_version(export_name, files, variant_id, comment=''):
-	export_id = get_or_add_export(export_name, variant_id)
-	if export_id:
-		last_version_list = project.project().get_last_export_version(export_id, 'name')
-		if len(last_version_list) == 1:
-			last_version = last_version_list[0]
-			new_version =  str(int(last_version)+1).zfill(4)
-		else:
-			new_version = '0001'
-		export_path = get_export_path(export_id)
-		if export_path:
-			dir_name = os.path.normpath(os.path.join(export_path, new_version))
-			if not create_folder(dir_name):
-				project.project().remove_export_version(export_version_id)
-				export_version_id = None
+def add_export_version(export_name, files, version_id, comment=''):
+	work_env_id = project.project().get_version_data(version_id, 'work_env_id')
+	variant_id = project.project().get_work_env_data(work_env_id, 'variant_id')
+	if variant_id:
+		export_id = get_or_add_export(export_name, variant_id)
+		if export_id:
+			last_version_list = project.project().get_last_export_version(export_id, 'name')
+			if len(last_version_list) == 1:
+				last_version = last_version_list[0]
+				new_version =  str(int(last_version)+1).zfill(4)
 			else:
-				copied_files = tools.copy_files(files, dir_name)
-				if not copied_files:
-					if remove_folder(dir_name):
-						project.project().remove_export_version(export_version_id)
-					else:
-						logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+				new_version = '0001'
+			export_path = get_export_path(export_id)
+			if export_path:
+				dir_name = os.path.normpath(os.path.join(export_path, new_version))
+				if not create_folder(dir_name):
+					project.project().remove_export_version(export_version_id)
 					export_version_id = None
 				else:
-					export_version_id = project.project().add_export_version(new_version,
-																	copied_files,
-																	export_id,
-																	comment)
+					copied_files = tools.copy_files(files, dir_name)
+					if not copied_files:
+						if not remove_folder(dir_name):
+							logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+						export_version_id = None
+					else:
+						export_version_id = project.project().add_export_version(new_version,
+																		copied_files,
+																		export_id,
+																		version_id,
+																		comment)
 
-		return export_version_id
+			return export_version_id
+		else:
+			return None
+
+def request_export(work_env_id, export_name):
+	dir_name = tools.temp_dir()
+	file_name = build_export_file_name(work_env_id, export_name)
+	if file_name:
+		return os.path.normpath(os.path.join(dir_name, file_name))
 	else:
 		return None
 
@@ -397,7 +407,6 @@ def archive_version(version_id):
 			return None		
 	else:
 		return None
-
 
 def get_domain_path(domain_id):
 	dir_name = None
@@ -482,3 +491,25 @@ def build_version_file_name(work_env_id, name):
 	file_name += f".{name}"
 	file_name += f".{extension}"
 	return file_name
+
+def build_export_file_name(work_env_id, export_name):
+	project_obj = project.project()
+	work_env_row = project_obj.get_work_env_data(work_env_id)
+	variant_row = project_obj.get_variant_data(work_env_row['variant_id'])
+	stage_row = project_obj.get_stage_data(variant_row['stage_id'])
+	asset_row = project_obj.get_asset_data(stage_row['asset_id'])
+	category_row = project_obj.get_category_data(asset_row['category_id'])
+	extension = work_env_row['export_extension']
+	if not extension:
+		extension = project_obj.get_extension(stage_row['name'], work_env_row['software_id'])
+	if extension:
+		file_name = f"{category_row['name']}"
+		file_name += f"_{asset_row['name']}"
+		file_name += f"_{stage_row['name']}"
+		file_name += f"_{variant_row['name']}"
+		file_name += f"_{export_name}"
+		file_name += f".{extension}"
+		return file_name
+	else:
+		logging.error("Can't build file name")
+		return None

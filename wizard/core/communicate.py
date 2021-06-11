@@ -58,6 +58,14 @@ class communicate_server(Thread):
 
         if signal_dic['function'] == 'add_version':
             returned = add_version(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'request_export':
+            returned = request_export(signal_dic['work_env_id'],
+                                        signal_dic['export_name'])
+        elif signal_dic['function'] == 'add_export_version':
+            returned = add_export_version(signal_dic['export_name'],
+                                        signal_dic['files'],
+                                        signal_dic['version_id'], 
+                                        signal_dic['comment'])
 
         conn.send(json.dumps(returned).encode('utf8'))
 
@@ -68,3 +76,13 @@ def add_version(work_env_id):
     version_path = project.project().get_version_data(version_id,
                                                     'file_path')
     return version_path
+
+def request_export(work_env_id, export_name):
+    file_path = assets.request_export(work_env_id, export_name)
+    return file_path
+
+def add_export_version(export_name, files, version_id, comment):
+    export_version_id = assets.add_export_version(export_name, files, version_id, comment)
+    return export_version_id
+
+

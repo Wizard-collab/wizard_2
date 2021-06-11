@@ -39,7 +39,10 @@ def create_project(project_name,
 		for category in assets_vars._assets_categories_list_:
 			assets.create_category(category, assets_domain_id)
 		for software in softwares_vars._softwares_list_:
-			project.project().add_software(software,
+			software_id = project.project().add_software(software,
 							softwares_vars._extensions_dic_[software],
 							softwares_vars._file_command_[software],
 							softwares_vars._no_file_command_[software])
+			for stage in assets_vars._default_ext_dic_[software].keys():
+				extension = assets_vars._default_ext_dic_[software][stage]
+				project.project().create_extension_row(stage, software_id, extension)

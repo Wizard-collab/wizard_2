@@ -294,15 +294,15 @@ class project:
         return exports_rows
 
     def get_export_by_name(self, name, variant_id):
-            export_row = db_utils.get_row_by_multiple_data(self.database_file, 
-                                                                'exports', 
-                                                                ('name', 'variant_id'), 
-                                                                (name, variant_id))
-            if export_row and len(export_row) >= 1:
-                return export_row[0]
-            else:
-                logging.error("Export not found")
-                return None
+        export_row = db_utils.get_row_by_multiple_data(self.database_file, 
+                                                            'exports', 
+                                                            ('name', 'variant_id'), 
+                                                            (name, variant_id))
+        if export_row and len(export_row) >= 1:
+            return export_row[0]
+        else:
+            logging.error("Export not found")
+            return None
 
     def get_export_data(self, export_id, column='*'):
         export_rows = db_utils.get_row_by_column_data(self.database_file, 
@@ -364,7 +364,7 @@ class project:
                                                             column)
         return versions_rows
 
-    def add_export_version(self, name, files, export_id, comment=''):
+    def add_export_version(self, name, files, export_id, work_version_id=None, comment=''):
         if not (db_utils.check_existence(self.database_file, 
                                         'export_versions',
                                         ('name', 'export_id'),
@@ -376,12 +376,14 @@ class project:
                                     'creation_user',
                                     'comment',
                                     'files',
+                                    'work_version_id',
                                     'export_id'), 
                                 (name,
                                     time.time(),
                                     environment.get_user(),
                                     comment,
                                     json.dumps(files),
+                                    work_version_id,
                                     export_id))
             if export_version_id:
                 logging.info(f"Export version {name} added to project")
@@ -615,6 +617,31 @@ class project:
             logging.error("Software not found")
             return None
 
+    def create_extension_row(self, stage, software_id, extension):
+        if db_utils.create_row(self.database_file,
+                                    'extensions',
+                                    ('stage',
+                                        'software_id',
+                                        'extension'),
+                                    (stage,
+                                        software_id,
+                                        extension)):
+            logging.info("Extension added")
+            return 1
+        else:
+            return None
+
+    def get_extension(self, stage, software_id):
+        export_row = db_utils.get_row_by_multiple_data(self.database_file, 
+                                                            'extensions', 
+                                                            ('stage', 'software_id'), 
+                                                            (stage, software_id))
+        if export_row and len(export_row) >= 1:
+            return export_row[0]['extension']
+        else:
+            logging.error("Extension not found")
+            return None
+
     def create_settings_row(self, frame_rate, image_format):
         if len(db_utils.get_rows(self.database_file, 'settings', 'id'))==0:
             if db_utils.create_row(self.database_file,
@@ -744,6 +771,7 @@ def init_project(project_path):
             create_export_versions_table(database_file)
             create_softwares_table(database_file)
             create_settings_table(database_file)
+            create_extensions_table(database_file)
             return database_file
     else:
         logging.warning("Database file already exists")
@@ -816,6 +844,7 @@ def create_work_envs_table(database_file):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
+                                        export_extension text,
                                         variant_id integer NOT NULL,
                                         lock_id integer,
                                         software_id integer NOT NULL,
@@ -860,8 +889,10 @@ def create_export_versions_table(database_file):
                                         creation_user text NOT NULL,
                                         comment text,
                                         files text NOT NULL,
+                                        work_version_id integer,
                                         export_id integer NOT NULL,
                                         FOREIGN KEY (export_id) REFERENCES exports (id)
+                                        FOREIGN KEY (work_version_id) REFERENCES versions (id)
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Export versions table created")
@@ -889,3 +920,13 @@ def create_settings_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Settings table created")
+
+def create_extensions_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS extensions (
+                                        id integer PRIMARY KEY,
+                                        stage text NOT NULL,
+                                        software_id integer NOT NULL,
+                                        extension text NOT NULL
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Extensions table created")

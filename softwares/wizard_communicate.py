@@ -47,3 +47,30 @@ def add_version(work_env_id):
     if file_path:
         file_path = json.loads(file_path)
     return file_path
+
+def request_export(work_env_id, export_name):
+    # Get a temporary export dir and file from wizard
+    signal_dic=dict()
+    signal_dic['function'] = 'request_export'
+    signal_dic['work_env_id'] = work_env_id
+    signal_dic['export_name'] = export_name
+    signal_as_str = json.dumps(signal_dic)
+    file_path = send_signal(signal_as_str)
+    if file_path:
+        file_path = json.loads(file_path)
+    return file_path
+
+def add_export_version(export_name, files, version_id, comment=''):
+    # Send a new export version request to wizard
+    # Wizard return the export version id 
+    signal_dic=dict()
+    signal_dic['function'] = 'add_export_version'
+    signal_dic['export_name'] = export_name
+    signal_dic['files'] = files
+    signal_dic['version_id'] = version_id
+    signal_dic['comment'] = comment
+    signal_as_str = json.dumps(signal_dic)
+    export_version_id = send_signal(signal_as_str)
+    if export_version_id:
+        export_version_id = json.loads(export_version_id)
+    return export_version_id

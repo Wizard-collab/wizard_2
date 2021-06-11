@@ -9,6 +9,7 @@ import os
 import re
 import traceback
 import shutil
+import tempfile
 
 # Wizard modules
 from wizard.core import logging
@@ -113,3 +114,8 @@ def copy_files(files_list, destination):
     else:
         logging.warning("Can't execute copy")
         return None
+
+def temp_dir():
+    # Return a temp directory
+    tempdir = tempfile.mkdtemp()
+    return tempdir
