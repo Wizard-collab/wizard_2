@@ -2,7 +2,11 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
-# Python modules
+# This module manages the project events
+# the events are stored in the project database
+# and are accessed by the 'project' module but
+# this module decode what is stored in the
+# event rows
 
 # Wizard modules
 from wizard.core import logging
@@ -30,7 +34,7 @@ def add_creation_event(instance_type, instance_id):
 		message = f"Created {category_name}|{asset_row['name']}|{stage_row['name']}|{variant_row['name']}"
 	project_obj.add_event('creation', message, data)
 
-def add_export_event(export_version_id, comment):
+def add_export_event(export_version_id):
 	data = export_version_id
 	project_obj=project.project()
 	export_version_row = project_obj.get_export_version_data(export_version_id)
@@ -45,7 +49,6 @@ def add_export_event(export_version_id, comment):
 	message += f"|{variant_row['name']}"
 	message += f"|{export_row['name']}"
 	message += f"|{export_version_row['name']}"
-	message += f"\n{comment}"
 	project_obj.add_event('export', message, data)
 
 def add_ticket_openned_event(ticket_id):
