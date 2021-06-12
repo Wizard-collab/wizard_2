@@ -260,7 +260,7 @@ def create_work_env(software_id, variant_id):
 					project.project().remove_work_env(work_env_id)
 					work_env_id = None
 				else:
-					add_version(work_env_id)
+					add_version(work_env_id, fresh=1)
 		else:
 			logging.error("Can't create work env")
 	else:
@@ -410,13 +410,16 @@ def archive_export_version(export_version_id):
 	else:
 		return None
 
-def add_version(work_env_id, comment="", do_screenshot=1):
-	last_version_list = project.project().get_last_work_version(work_env_id, 'name')
-	if len(last_version_list) == 1:
-		last_version = last_version_list[0]
-		new_version =  str(int(last_version)+1).zfill(4)
-	else:
+def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
+	if fresh:
 		new_version = '0001'
+	else:
+		last_version_list = project.project().get_last_work_version(work_env_id, 'name')
+		if len(last_version_list) == 1:
+			last_version = last_version_list[0]
+			new_version =  str(int(last_version)+1).zfill(4)
+		else:
+			new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
 							build_version_file_name(work_env_id, new_version)))
 	if do_screenshot:
