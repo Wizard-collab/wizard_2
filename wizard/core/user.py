@@ -81,7 +81,8 @@ def disconnect_user():
 def get_user():
 	user_id = site().get_current_ip_data('user_id')
 	if user_id:
-		environment.build_user_env(user_name=site().get_user_data(user_id, 'user_name'))
+		environment.build_user_env(user_name=site().get_user_data(user_id,
+																'user_name'))
 		return 1
 	else:
 		return None
@@ -95,7 +96,8 @@ def log_project(project_name, password):
 			site().update_current_ip_data('project_id', project_row['id'])
 			environment.build_project_env(project_name, project_row['project_path'])
 			logging.info(f'Successfully signed in {project_name} project')
-			project().add_user(site_obj.get_user_row_by_name(environment.get_user(), 'id'))
+			project().add_user(site_obj.get_user_row_by_name(environment.get_user(),
+																'id'))
 		else:
 			logging.warning(f'Wrong password for {project_name}')
 	else:

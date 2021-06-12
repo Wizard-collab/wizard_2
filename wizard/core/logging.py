@@ -19,7 +19,7 @@ def get_logger(name=None):
         logger = logging.getLogger(name)
     else:
         logger = logging.getLogger()
-    file_handler = logging.FileHandler(user_vars._user_logging_file_)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
-    logger.addHandler(file_handler)
+    #file_handler = logging.FileHandler(user_vars._user_logging_file_)
+    #file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
+    #logger.addHandler(file_handler)
     return logger

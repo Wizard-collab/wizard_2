@@ -14,6 +14,7 @@
 import os
 import time
 import socket
+import json
 
 # Wizard modules
 from wizard.core import logging
@@ -192,8 +193,8 @@ class site:
             return None
 
     def modify_user_password(self, user_name, password, new_password):
-        if user_name in self.get_user_names_list():
-            user_row = self.get_user_row_by_name(user_name)
+        user_row = self.get_user_row_by_name(user_name)
+        if user_row:
             if tools.decrypt_string(user_row['pass'], password):
                 if db_utils.update_data(self.database_file,
                                         'users',
@@ -207,9 +208,6 @@ class site:
             else:
                 logging.warning(f'Wrong password for {user_name}')
                 return None
-        else:
-            logging.error(f'{user_name} not found')
-            return None
 
     def get_users_list(self):
         users_rows = db_utils.get_rows(self.database_file, 'users')
@@ -246,6 +244,75 @@ class site:
         if not is_admin:
             logging.info("You are not administrator")
         return is_admin
+
+    def add_quote(self, content):
+        quote_id = None
+        if content and content != '':
+            quote_id = db_utils.create_row(self.database_file,
+                                    'quotes', 
+                                    ('creation_user',
+                                        'content',
+                                        'score',
+                                        'voters'), 
+                                    (environment.get_user(),
+                                        content,
+                                        json.dumps([]),
+                                        json.dumps([])))
+            if quote_id:
+                logging.info("Quote added")
+        else:
+            logging.warning("Please enter quote content")
+        return quote_id
+
+    def add_quote_score(self, quote_id, score):
+        sanity = 1
+        if not 0 <= score <= 5:
+            logging.warning(f"Please note between 0 and 5")
+            sanity = 0
+        if type(score) != int:
+            logging.warning(f"{score} is not an integer")
+            sanity = 0
+        if sanity:
+            current_quote_row = db_utils.get_row_by_column_data(self.database_file,
+                                                            'quotes',
+                                                            ('id', quote_id))
+
+            if current_quote_row is not None:
+                if current_quote_row[0]['creation_user'] != environment.get_user():
+                    voters_list = json.loads(current_quote_row[0]['voters'])
+                    if environment.get_user() not in voters_list:
+                        current_scores_list = json.loads(current_quote_row[0]['score'])
+                        current_scores_list.append(score)
+                        voters_list.append(environment.get_user())
+                        if db_utils.update_data(self.database_file,
+                                                        'quotes',
+                                                        ('score',
+                                                            json.dumps(current_scores_list)),
+                                                        ('id',
+                                                            quote_id)):
+                            logging.info("Quote score updated")
+                        if db_utils.update_data(self.database_file,
+                                                        'quotes',
+                                                        ('voters',
+                                                            json.dumps(voters_list)),
+                                                        ('id',
+                                                            quote_id)):
+                            logging.info("Quote voters updated")
+                    else:
+                        logging.warning("You already voted for this quote")
+                else:
+                    logging.warning("You can't vote for your own quote")
+
+    def get_quote_data(self, quote_id, column='*'):
+        quotes_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                        'quotes',
+                                                        ('id', quote_id),
+                                                        column)
+        if quotes_rows and len(quotes_rows) >= 1:
+            return quotes_rows[0]
+        else:
+            logging.error("Quote not found")
+            return None
 
     def get_ips(self, column='*'):
         ip_rows = db_utils.get_rows(self.database_file, 'ips_wrap', column)
@@ -295,6 +362,7 @@ def create_site_database(site_path):
                 create_users_table(database_file)
                 create_projects_table(database_file)
                 create_ip_wrap_table(database_file)
+                create_quotes_table(database_file)
                 return database_file
         else:
             logging.warning("Database file already exists")
@@ -360,3 +428,14 @@ def create_ip_wrap_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Ips wrap table created")
+
+def create_quotes_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS quotes (
+                                        id integer PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        content text NOT NULL,
+                                        score text NOT NULL,
+                                        voters text NOT NULL
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Quotes table created")
