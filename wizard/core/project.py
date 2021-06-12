@@ -834,6 +834,34 @@ class project:
         shared_files_folder = os.path.join(self.project_path, project_vars._shared_files_folder_)
         return shared_files_folder
 
+    def add_event(self, event_type, message, data):
+        event_id = db_utils.create_row(self.database_file,
+                                                'events',
+                                                ('creation_user',
+                                                    'creation_time',
+                                                    'type',
+                                                    'message',
+                                                    'data'),
+                                                (environment.get_user(),
+                                                    time.time(),
+                                                    event_type,
+                                                    message,
+                                                    json.dumps(data)))
+        if event_id:
+            logging.info("Event added")
+        return event_id
+
+    def get_event_data(self, event_id, column='*'):
+        events_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'events',
+                                                            ('id', event_id),
+                                                            column)
+        if events_rows and len(events_rows) >= 1:
+            return events_rows[0]
+        else:
+            logging.error("Event not found")
+            return None
+
 def get_database_file(project_path):
     if project_path:
         database_file = os.path.join(project_path, project_vars._project_database_file_)
@@ -871,6 +899,7 @@ def init_project(project_path):
             create_settings_table(database_file)
             create_extensions_table(database_file)
             create_tickets_table(database_file)
+            create_events_table(database_file)
             return database_file
     else:
         logging.warning("Database file already exists")
@@ -1041,9 +1070,21 @@ def create_tickets_table(database_file):
                                         variant_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         destination_user text,
-                                        files text
+                                        files text,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id)
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Tickets table created")
+
+def create_events_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS events (
+                                        id integer PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        type text NOT NULL,
+                                        message text NOT NULL,
+                                        data text
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Events table created")

@@ -33,6 +33,7 @@ import shutil
 
 # Wizard modules
 from wizard.core import environment
+from wizard.core import events
 from wizard.core import project
 from wizard.core import site
 from wizard.core import tools
@@ -85,6 +86,8 @@ def create_category(name, domain_id):
 				if not tools.create_folder(dir_name):
 					project.project().remove_category(category_id)
 					category_id = None
+				else:
+					events.add_creation_event('category', category_id)
 		else:
 			logging.error("Can't create category")
 	else:
@@ -119,6 +122,8 @@ def create_asset(name, category_id):
 				if not tools.create_folder(dir_name):
 					project.project().remove_asset(asset_id)
 					asset_id = None
+				else:
+					events.add_creation_event('asset', asset_id)
 		else:
 			logging.error("Can't create asset")
 	else:
@@ -216,6 +221,7 @@ def create_variant(name, stage_id, comment=''):
 					# Add other folders
 					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_EXPORTS')))
 					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
+					events.add_creation_event('variant', variant_id)
 		else:
 			logging.error("Can't create variant")
 	else:
@@ -322,6 +328,7 @@ def add_export_version(export_name, files, version_id, comment=''):
 																				export_id,
 																				version_id,
 																				comment)
+								events.add_export_event(export_version_id, comment)
 					return export_version_id
 				else:
 					return None
@@ -440,6 +447,15 @@ def archive_version(version_id):
 			return None		
 	else:
 		return None
+
+def create_ticket(title, message, export_version_id, destination_user=None, files=[]):
+	ticket_id = project.project().create_ticket(title, message, export_version_id, destination_user, files)
+	if ticket_id:
+		events.add_ticket_openned_event(ticket_id)
+
+def close_ticket(ticket_id):
+	if project.project().change_ticket_state(ticket_id, 0):
+		events.add_ticket_closed_event(ticket_id)
 
 def get_domain_path(domain_id):
 	dir_name = None
