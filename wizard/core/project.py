@@ -836,6 +836,10 @@ class project:
         shared_files_folder = os.path.join(self.project_path, project_vars._shared_files_folder_)
         return shared_files_folder
 
+    def get_scripts_folder(self):
+        shared_files_folder = os.path.join(self.project_path, project_vars._scripts_folder_)
+        return shared_files_folder
+
     def add_event(self, event_type, message, data):
         event_id = db_utils.create_row(self.database_file,
                                                 'events',
@@ -866,7 +870,7 @@ class project:
 
     def add_shelf_script(self,
                             name,
-                            script,
+                            py_file,
                             only_subprocess=0,
                             icon=ressources._default_script_shelf_icon_):
         shelf_script_id = None
@@ -876,18 +880,19 @@ class project:
             else:
                 logging.warning(f"{icon} doesn't exists, assigning default icon")
                 icon_bytes = tools.convert_image_to_bytes(ressources._default_script_shelf_icon_, 45)
+
             shelf_script_id = db_utils.create_row(self.database_file,
                                                     'shelf_scripts',
                                                     ('creation_user',
                                                         'creation_time',
                                                         'name',
-                                                        'script',
+                                                        'py_file',
                                                         'only_subprocess',
                                                         'icon'),
                                                     (environment.get_user(),
                                                         time.time(),
                                                         name,
-                                                        script,
+                                                        py_file,
                                                         only_subprocess,
                                                         icon_bytes))
             if shelf_script_id:
@@ -1141,7 +1146,7 @@ def create_shelf_scripts_table(database_file):
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL,
                                         name text NOT NULL UNIQUE,
-                                        script text NOT NULL,
+                                        py_file text NOT NULL,
                                         only_subprocess bool NOT NULL,
                                         icon blob NOT NULL
                                     );"""

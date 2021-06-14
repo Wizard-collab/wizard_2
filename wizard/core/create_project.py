@@ -50,3 +50,4 @@ def create_project(project_name,
 				project.project().create_extension_row(stage, software_id, extension)
 
 		tools.create_folder(project.project().get_shared_files_folder())
+		tools.create_folder(project.project().get_scripts_folder())

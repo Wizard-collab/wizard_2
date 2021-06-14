@@ -14,6 +14,8 @@
 # Python modules
 import yaml
 import os
+import importlib
+import sys
 
 # Wizard modules
 from wizard.vars import user_vars
@@ -24,6 +26,13 @@ from wizard.core import tools
 
 from wizard.core import logging
 logging = logging.get_logger(__name__)
+
+if not os.path.isdir(user_vars._script_path_):
+	os.mkdir(user_vars._script_path_)
+sys.path.append(user_vars._script_path_)
+with open(user_vars._session_file_, 'w') as f:
+	f.write('')
+import session
 
 class user:
 	def __init__(self):
@@ -59,6 +68,19 @@ class user:
 	def write_prefs_dic(self):
 		with open(self.user_prefs_file, 'w') as f:
 			yaml.dump(self.prefs_dic, f)
+
+def execute_session(script):
+	with open(user_vars._session_file_, 'w') as f:
+			f.write(script)
+	importlib.reload(session)
+
+def execute_py(file):
+	if os.path.isfile(file):
+		with open(file, 'r') as f:
+			data = f.read()
+		execute_session(data)
+	else:
+		logging.warning(f"{file} doesn't exists")
 
 def log_user(user_name, password):
 	site_obj = site()
