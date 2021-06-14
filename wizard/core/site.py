@@ -132,11 +132,17 @@ class site:
                             'pass',
                             'email',
                             'profile_picture',
+                            'xp',
+                            'level',
+                            'life',
                             'administrator'), 
                         (user_name,
                             tools.encrypt_string(password),
                             email,
                             profile_picture_bytes,
+                            0,
+                            0,
+                            100,
                             administrator)):
 
                 info = f"User {user_name} created"
@@ -237,6 +243,36 @@ class site:
             return users_rows[0]
         else:
             logging.error("User not found")
+            return None
+
+    def modify_user_xp(self, user_name, xp):
+        if db_utils.update_data(self.database_file,
+                                        'users',
+                                        ('xp', xp),
+                                        ('user_name', user_name)):
+            logging.info(f'{user_name} won some xps')
+            return 1
+        else:
+            return None
+
+    def modify_user_level(self, user_name, level):
+        if db_utils.update_data(self.database_file,
+                                        'users',
+                                        ('level', level),
+                                        ('user_name', user_name)):
+            logging.info(f'{user_name} is now level {level}')
+            return 1
+        else:
+            return None
+
+    def modify_user_life(self, user_name, life):
+        if db_utils.update_data(self.database_file,
+                                        'users',
+                                        ('life', life),
+                                        ('user_name', user_name)):
+            logging.info(f'{user_name} life is {life}%')
+            return 1
+        else:
             return None
 
     def is_admin(self):
@@ -378,12 +414,18 @@ def create_admin_user(database_file, admin_password, admin_email):
                             ('user_name', 
                                 'pass', 
                                 'email', 
-                                'profile_picture', 
+                                'profile_picture',
+                                'xp',
+                                'level',
+                                'life', 
                                 'administrator'), 
-                            ('admin', 
+                            ('admin',
                                 tools.encrypt_string(admin_password),
                                 admin_email,
                                 profile_picture_bytes,
+                                0,
+                                0,
+                                100,
                                 1)):
         logging.info('Admin user created')
 
@@ -402,7 +444,10 @@ def create_users_table(database_file):
                                         pass text NOT NULL,
                                         email text NOT NULL,
                                         profile_picture blob NOT NULL,
-                                        administrator integer
+                                        xp integer NOT NULL,
+                                        level integer NOT NULL,
+                                        life integer NOT NULL,
+                                        administrator integer NOT NULL
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Users table created")

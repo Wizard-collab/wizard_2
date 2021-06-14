@@ -38,6 +38,7 @@ from wizard.core import project
 from wizard.core import site
 from wizard.core import tools
 from wizard.core import image
+from wizard.core import game
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
@@ -88,6 +89,7 @@ def create_category(name, domain_id):
 					category_id = None
 				else:
 					events.add_creation_event('category', category_id)
+					game.add_xps(2)
 		else:
 			logging.error("Can't create category")
 	else:
@@ -124,6 +126,7 @@ def create_asset(name, category_id):
 					asset_id = None
 				else:
 					events.add_creation_event('asset', asset_id)
+					game.add_xps(2)
 		else:
 			logging.error("Can't create asset")
 	else:
@@ -222,6 +225,7 @@ def create_variant(name, stage_id, comment=''):
 					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_EXPORTS')))
 					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
 					events.add_creation_event('variant', variant_id)
+					game.add_xps(2)
 		else:
 			logging.error("Can't create variant")
 	else:
@@ -328,7 +332,9 @@ def add_export_version(export_name, files, version_id, comment=''):
 																				export_id,
 																				version_id,
 																				comment)
-								events.add_export_event(export_version_id, comment)
+								events.add_export_event(export_version_id)
+								game.add_xps(3)
+								game.analyse_comment(comment, 10)
 					return export_version_id
 				else:
 					return None
@@ -431,6 +437,9 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 												work_env_id,
 												comment,
 												screenshot_bytes)
+	if not fresh:
+		game.add_xps(1)
+		game.analyse_comment(comment, 2)
 	return version_id
 
 def archive_version(version_id):
