@@ -386,6 +386,17 @@ def init_site(site_path, admin_password, admin_email):
     database_file = create_site_database(site_path)
     if database_file:
         create_admin_user(database_file, admin_password, admin_email)
+        for quote in site_vars._default_quotes_list_:
+            db_utils.create_row(database_file,
+                                    'quotes', 
+                                    ('creation_user',
+                                        'content',
+                                        'score',
+                                        'voters'), 
+                                    ('admin',
+                                        quote,
+                                        json.dumps([]),
+                                        json.dumps([])))
         return 1
     else:
         return None
