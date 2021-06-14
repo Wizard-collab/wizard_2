@@ -34,6 +34,7 @@ def launch_work_version(version_id):
 		work_env_id = work_version_row['work_env_id']
 		if work_env_id not in environment.get_running_work_envs():
 			if not project.project().get_lock(work_env_id):
+				project.project().set_work_env_lock(work_env_id)
 				software_id = project.project().get_work_env_data(work_env_id, 'software_id')
 				software_row = project.project().get_software_data(software_id)
 				command = build_command(file_path, software_row)
