@@ -31,10 +31,12 @@ logging = logging.get_logger(__name__)
 
 from wizard.core import db_utils
 from wizard.core import tools
-from wizard.vars import project_vars
-from wizard.vars import softwares_vars
 from wizard.core import site
 from wizard.core import environment
+from wizard.core import image
+from wizard.vars import softwares_vars
+from wizard.vars import project_vars
+from wizard.vars import ressources
 
 class project:
     def __init__(self):
@@ -83,7 +85,7 @@ class project:
         return success
 
     def add_category(self, name, domain_id):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'categories',
                                         ('name', 'domain_id'),
                                         (name, domain_id))):
@@ -126,7 +128,7 @@ class project:
             return None
 
     def add_asset(self, name, category_id):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'assets',
                                         ('name', 'category_id'),
                                         (name, category_id))):
@@ -169,7 +171,7 @@ class project:
             return None
 
     def add_stage(self, name, asset_id):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'stages',
                                         ('name', 'asset_id'),
                                         (name, asset_id))):
@@ -225,7 +227,7 @@ class project:
         return variants_rows
 
     def add_variant(self, name, stage_id, comment):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'variants',
                                         ('name', 'stage_id'),
                                         (name, stage_id))):
@@ -326,13 +328,13 @@ class project:
         return exports_versions_rows
 
     def is_export(self, name, variant_id):
-        return db_utils.check_existence(self.database_file, 
+        return db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'exports',
                                         ('name', 'variant_id'),
                                         (name, variant_id))
 
     def add_export(self, name, variant_id):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'exports',
                                         ('name', 'variant_id'),
                                         (name, variant_id))):
@@ -377,7 +379,7 @@ class project:
         return versions_rows
 
     def add_export_version(self, name, files, export_id, work_version_id=None, comment=''):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'export_versions',
                                         ('name', 'export_id'),
                                         (name, export_id))):
@@ -432,7 +434,7 @@ class project:
             return None
 
     def add_work_env(self, name, software_id, variant_id):
-        if not (db_utils.check_existence(self.database_file, 
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'work_envs',
                                         ('name', 'variant_id'),
                                         (name, variant_id))):
@@ -862,6 +864,49 @@ class project:
             logging.error("Event not found")
             return None
 
+    def add_shelf_script(self,
+                            name,
+                            script,
+                            only_subprocess=0,
+                            icon=ressources._default_script_shelf_icon_):
+        shelf_script_id = None
+        if not db_utils.check_existence(self.database_file, 'shelf_scripts', 'name', name):
+            if os.path.isfile(icon):
+                icon_bytes = image.convert_image_to_bytes(icon, 45)
+            else:
+                logging.warning(f"{icon} doesn't exists, assigning default icon")
+                icon_bytes = tools.convert_image_to_bytes(ressources._default_script_shelf_icon_, 45)
+            shelf_script_id = db_utils.create_row(self.database_file,
+                                                    'shelf_scripts',
+                                                    ('creation_user',
+                                                        'creation_time',
+                                                        'name',
+                                                        'script',
+                                                        'only_subprocess',
+                                                        'icon'),
+                                                    (environment.get_user(),
+                                                        time.time(),
+                                                        name,
+                                                        script,
+                                                        only_subprocess,
+                                                        icon_bytes))
+            if shelf_script_id:
+                logging.info("Shelf script created")
+        else:
+            logging.warning(f"{name} already exists")
+        return shelf_script_id
+
+    def get_shelf_script_data(self, shelf_script_id, column='*'):
+        shelf_scripts_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'shelf_scripts',
+                                                            ('id', shelf_script_id),
+                                                            column)
+        if shelf_scripts_rows and len(shelf_scripts_rows) >= 1:
+            return shelf_scripts_rows[0]
+        else:
+            logging.error("Shelf script not found")
+            return None
+
 def get_database_file(project_path):
     if project_path:
         database_file = os.path.join(project_path, project_vars._project_database_file_)
@@ -900,6 +945,7 @@ def init_project(project_path):
             create_extensions_table(database_file)
             create_tickets_table(database_file)
             create_events_table(database_file)
+            create_shelf_scripts_table(database_file)
             return database_file
     else:
         logging.warning("Database file already exists")
@@ -1088,3 +1134,16 @@ def create_events_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Events table created")
+
+def create_shelf_scripts_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS shelf_scripts (
+                                        id integer PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        name text NOT NULL UNIQUE,
+                                        script text NOT NULL,
+                                        only_subprocess bool NOT NULL,
+                                        icon blob NOT NULL
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("Shelf scripts table created")

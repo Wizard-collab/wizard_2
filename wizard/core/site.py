@@ -122,10 +122,10 @@ class site:
                                     administrator_pass):
                 administrator = 1
             if os.path.isfile(profile_picture):
-                profile_picture_bytes = image.convert_profile_picture(profile_picture)
+                profile_picture_bytes = image.convert_image_to_bytes(profile_picture)
             else:
                 logging.warning(f"{profile_picture} doesn't exists, assigning default profile picture")
-                profile_picture_bytes = image.convert_profile_picture(ressources._default_profile_)
+                profile_picture_bytes = image.convert_image_to_bytes(ressources._default_profile_)
             if db_utils.create_row(self.database_file,
                         'users', 
                         ('user_name',
@@ -419,7 +419,7 @@ def create_site_database(site_path):
         return None
 
 def create_admin_user(database_file, admin_password, admin_email):
-    profile_picture_bytes = image.convert_profile_picture(ressources._default_profile_)
+    profile_picture_bytes = image.convert_image_to_bytes(ressources._default_profile_)
     if db_utils.create_row(database_file,
                             'users', 
                             ('user_name', 

@@ -20,11 +20,11 @@ def screenshot():
 	imagebytes = stream.getvalue()
 	return imagebytes
 
-def convert_profile_picture(image_file):
+def convert_image_to_bytes(image_file, resize=100):
 	# Resize the given file to 100*100
 	# and return the jpg bytes
 	image = Image.open(image_file)
-	image = resize_image(image, 100)
+	image = resize_image(image, resize)
 	stream = io.BytesIO()
 	image.save(stream, format="PNG")
 	imagebytes = stream.getvalue()

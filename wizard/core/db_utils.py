@@ -131,7 +131,7 @@ def get_last_row_by_column_data(db_file,
         print(e)
         return None
 
-def check_existence(db_file,
+def check_existence_by_multiple_data(db_file,
                     table,
                     columns_tuple,
                     data_tuple):
@@ -140,7 +140,23 @@ def check_existence(db_file,
     try:
         conn = create_connection(db_file)
         cursor = conn.cursor()
-        cursor.execute(sql_cmd, (data_tuple[0], data_tuple[1]))
+        cursor.execute(sql_cmd, data_tuple)
+        rows = cursor.fetchall()
+        return len(rows)
+    except Error as e:
+        print(e)
+        return None
+
+def check_existence(db_file,
+                    table,
+                    column,
+                    data):
+
+    sql_cmd = f"SELECT id FROM {table} WHERE {column}=?;"
+    try:
+        conn = create_connection(db_file)
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, (data, ))
         rows = cursor.fetchall()
         return len(rows)
     except Error as e:
