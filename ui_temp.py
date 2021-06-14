@@ -12,6 +12,7 @@ import PyWizard
 import time
 from wizard.core import launch
 from wizard.core import communicate
+from wizard.core import user
 import json
 
 class Window(QWidget):
@@ -19,11 +20,17 @@ class Window(QWidget):
         super().__init__()
         self.setWindowTitle("QHBoxLayout Example")
         # Create a QHBoxLayout instance
-        layout = QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         # Add widgets to the layout
+
+        self.top_widget= QtWidgets.QWidget()
+        self.top_layout=QtWidgets.QHBoxLayout()
+        self.top_widget.setLayout(self.top_layout)
+        layout.addWidget(self.top_widget)
+
         self.tree = QtWidgets.QTreeWidget()
         self.tree.currentItemChanged.connect(self.item_changed)
-        layout.addWidget(self.tree)
+        self.top_layout.addWidget(self.tree)
 
         #root = QtWidgets.QTreeWidgetItem()
         #tree.addTopLevelItem(root)
@@ -52,12 +59,12 @@ class Window(QWidget):
 
         self.variant_listwidget = QtWidgets.QListWidget()
         self.variant_listwidget.itemClicked.connect(self.variant_changed)
-        layout.addWidget(self.variant_listwidget)
+        self.top_layout.addWidget(self.variant_listwidget)
 
         self.variant_childs_widget = QtWidgets.QWidget()
         self.variant_childs_layout = QtWidgets.QVBoxLayout()
         self.variant_childs_widget.setLayout(self.variant_childs_layout)
-        layout.addWidget(self.variant_childs_widget)
+        self.top_layout.addWidget(self.variant_childs_widget)
         self.variant_childs_layout.addWidget(QtWidgets.QLabel('WORK'))
 
         self.work_childs_widget = QtWidgets.QWidget()
@@ -103,12 +110,22 @@ class Window(QWidget):
         self.export_files_listWidget = QtWidgets.QListWidget()
         self.export_childs_layout.addWidget(self.export_files_listWidget)
 
+        self.script_text_edit = QtWidgets.QTextEdit()
+        layout.addWidget(self.script_text_edit)
+        self.exec_button = QtWidgets.QPushButton("Exec")
+        self.exec_button.clicked.connect(self.exec_script)
+        layout.addWidget(self.exec_button)
+
         # Set the layout on the application's window
         self.setLayout(layout)
         #print(self.children())
 
     def launch(self, item):
     	launch.launch_work_version(item.id)
+
+    def exec_script(self):
+        data = self.script_text_edit.toPlainText()
+        user.execute_session(data)
 
     def item_changed(self, item):
         self.variant_listwidget.clear()
