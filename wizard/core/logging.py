@@ -4,6 +4,7 @@
 
 # Python modules
 import logging
+import os
 
 # Wizard modules
 from wizard.vars import user_vars
@@ -19,7 +20,12 @@ def get_logger(name=None):
         logger = logging.getLogger(name)
     else:
         logger = logging.getLogger()
-    #file_handler = logging.FileHandler(user_vars._user_logging_file_)
-    #file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
-    #logger.addHandler(file_handler)
+    create_prefs_folder()
+    file_handler = logging.FileHandler(user_vars._user_logging_file_)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
+    logger.addHandler(file_handler)
     return logger
+
+def create_prefs_folder():
+    if not os.path.isdir(user_vars._user_path_):
+        os.mkdir(user_vars._user_path_)
