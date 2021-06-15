@@ -901,10 +901,10 @@ class project:
             logging.warning(f"{name} already exists")
         return shelf_script_id
 
-    def get_shelf_script_data(self, shelf_script_id, column='*'):
+    def get_shelf_script_data(self, name, column='*'):
         shelf_scripts_rows = db_utils.get_row_by_column_data(self.database_file,
                                                             'shelf_scripts',
-                                                            ('id', shelf_script_id),
+                                                            ('name', name),
                                                             column)
         if shelf_scripts_rows and len(shelf_scripts_rows) >= 1:
             return shelf_scripts_rows[0]
