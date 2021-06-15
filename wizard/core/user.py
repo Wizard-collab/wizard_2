@@ -33,6 +33,9 @@ from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def create_user_folders():
+    # Init the user folders
+    # ~/Documets/wizard/icons
+    # ~/Documets/wizard/scripts
     if not os.path.isdir(user_vars._script_path_):
         os.mkdir(user_vars._script_path_)
     sys.path.append(user_vars._script_path_)
@@ -40,6 +43,10 @@ def create_user_folders():
         os.mkdir(user_vars._icons_path_)
 
 def init_user_session():
+    # Init the session.py file
+    # This file permits to execute
+    # user scripts in the
+    # of the application environment
     with open(user_vars._session_file_, 'w') as f:
         f.write('')
 
@@ -62,6 +69,8 @@ class user:
             return None
 
     def set_site_path(self, site_path):
+        # Store the site path in 
+        # ~/Documents/wizard/preferences.yaml
         self.prefs_dic[user_vars._site_path_] = site_path
         self.write_prefs_dic()
         environment.build_site_env(site_path)
@@ -72,6 +81,10 @@ class user:
                             py_file,
                             only_subprocess=0,
                             icon=ressources._default_script_shelf_icon_):
+        # This function store a new shelf script in user context
+        # it adds a dictionnary key in user preferences.yaml
+        # The icon is stored as file in ~/Documents/wizard/icons
+        # The script ( .py ) is stored as file in ~/Documents/wizard/scripts
         if name not in self.prefs_dic[user_vars._scripts_].keys():
             if not os.path.isfile(icon):
                 logging.warning(f"{icon} doesn't exists, assigning default icon")
@@ -93,7 +106,10 @@ class user:
             logging.warning(f"{name} already exists")
             return 0
 
-    def get_shelf_script_data(self, name, data=None):
+    def get_shelf_script_data(self, name, column=None):
+        # Return the data of the given shelf script name
+        # To match the 'project' database system, the icon
+        # stored as file is readen and returned as bytes
         if name in self.prefs_dic[user_vars._scripts_].keys():
             script_dic = self.prefs_dic[user_vars._scripts_][name]
             icon = self.prefs_dic[user_vars._scripts_][name]['icon']
@@ -101,9 +117,9 @@ class user:
                 icon = ressources._default_script_shelf_icon_
             image_bytes = image.convert_image_to_bytes(icon)
             self.prefs_dic[user_vars._scripts_][name]['icon'] = image_bytes
-            if data:
-                if data in self.prefs_dic[user_vars._scripts_][name].keys():
-                    return self.prefs_dic[user_vars._scripts_][name][data]
+            if column:
+                if column in self.prefs_dic[user_vars._scripts_][name].keys():
+                    return self.prefs_dic[user_vars._scripts_][name][column]
                 else:
                     logging.warning(f"{data} column doesn't seems to exists")
             else:
@@ -113,6 +129,9 @@ class user:
             return None
 
     def get_user_prefs_dic(self):
+        # Read ~/Documents/wizard/prefences.yaml
+        # or init it if not found
+        # return the preferences dictionnary
         self.user_prefs_file = user_vars._user_prefs_file_
         if not os.path.isdir(user_vars._user_path_):
             os.mkdir(user_vars._user_path_)
@@ -130,11 +149,18 @@ class user:
             yaml.dump(self.prefs_dic, f)
 
     def execute_session(self, script):
+        # Execute a custom script
+        # in the application environment
+        # It write the script in 
+        # ~/Documents/wizard/scripts/session.py
+        # and reload the "session" module
         with open(user_vars._session_file_, 'w') as f:
                 f.write(script)
         importlib.reload(session)
 
     def execute_py(self, file):
+        # Read a .py file and execute the data
+        # with "execute_session()"
         if os.path.isfile(file):
             with open(file, 'r') as f:
                 data = f.read()
