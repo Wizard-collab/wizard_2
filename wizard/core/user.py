@@ -4,7 +4,8 @@
 
 # This wizard module is used to build the user environment
 # when launching the application
-# It can get the site path from $Documents/preferences.yaml
+# It can get the site path and some user
+# preferences from $Documents/preferences.yaml
 
 # If a site path is defined this module
 # is used to get the current machine user and project
@@ -78,7 +79,8 @@ class user:
             icon_name = os.path.basename(icon)
             destination_icon = os.path.join(user_vars._icons_path_, icon_name)
             icon_file = tools.get_filename_without_override(destination_icon)
-            shutil.copyfile(icon, icon_file)
+            with open(icon_file, 'wb') as f:
+                f.write(image.convert_image_to_bytes(icon))
             self.prefs_dic[user_vars._scripts_][name]=dict()
             self.prefs_dic[user_vars._scripts_][name]['name'] = name
             self.prefs_dic[user_vars._scripts_][name]['py_file'] = py_file
@@ -94,6 +96,11 @@ class user:
     def get_shelf_script_data(self, name, data=None):
         if name in self.prefs_dic[user_vars._scripts_].keys():
             script_dic = self.prefs_dic[user_vars._scripts_][name]
+            icon = self.prefs_dic[user_vars._scripts_][name]['icon']
+            if not os.path.isfile(icon):
+                icon = ressources._default_script_shelf_icon_
+            image_bytes = image.convert_image_to_bytes(icon)
+            self.prefs_dic[user_vars._scripts_][name]['icon'] = image_bytes
             if data:
                 if data in self.prefs_dic[user_vars._scripts_][name].keys():
                     return self.prefs_dic[user_vars._scripts_][name][data]

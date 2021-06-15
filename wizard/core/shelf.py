@@ -32,11 +32,6 @@ def create_project_script(name,
 		with open(file, 'w') as f:
 			f.write(script)
 
-def execute_project_script(name):
-	py_file = project.project().get_shelf_script_data(name, 'py_file')
-	if py_file:
-		user.user().execute_py(py_file)
-
 def create_user_script(name,
 						script,
 						only_subprocess=0,
@@ -47,7 +42,11 @@ def create_user_script(name,
 	if user.user().add_shelf_script(name, file, only_subprocess, icon):
 		with open(file, 'w') as f:
 			f.write(script)
-		
+
+def execute_project_script(name):
+	py_file = project.project().get_shelf_script_data(name, 'py_file')
+	if py_file:
+		user.user().execute_py(py_file)
 
 def execute_user_script(name):
 	py_file = user.user().get_shelf_script_data(name, 'py_file')
