@@ -879,7 +879,7 @@ class project:
                 icon_bytes = image.convert_image_to_bytes(icon, 45)
             else:
                 logging.warning(f"{icon} doesn't exists, assigning default icon")
-                icon_bytes = tools.convert_image_to_bytes(ressources._default_script_shelf_icon_, 45)
+                icon_bytes = image.convert_image_to_bytes(ressources._default_script_shelf_icon_, 45)
 
             shelf_script_id = db_utils.create_row(self.database_file,
                                                     'shelf_scripts',

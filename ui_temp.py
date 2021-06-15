@@ -125,7 +125,7 @@ class Window(QWidget):
 
     def exec_script(self):
         data = self.script_text_edit.toPlainText()
-        user.execute_session(data)
+        user.user().execute_session(data)
 
     def item_changed(self, item):
         self.variant_listwidget.clear()

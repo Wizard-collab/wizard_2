@@ -78,7 +78,7 @@ class user:
                 icon = ressources._default_script_shelf_icon_
             icon_name = os.path.basename(icon)
             destination_icon = os.path.join(user_vars._icons_path_, icon_name)
-            icon_file = tools.get_filename_without_override(destination_icon)
+            icon_file = os.path.normpath(tools.get_filename_without_override(destination_icon))
             with open(icon_file, 'wb') as f:
                 f.write(image.convert_image_to_bytes(icon))
             self.prefs_dic[user_vars._scripts_][name]=dict()
