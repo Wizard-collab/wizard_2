@@ -84,6 +84,12 @@ class project:
                 logging.info(f"Domain removed from project")
         return success
 
+    def get_all_categories(self, column='*'):
+        categories_rows = db_utils.get_rows(self.database_file,
+                                                'categories',
+                                                column)
+        return categories_rows
+
     def add_category(self, name, domain_id):
         if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'categories',
@@ -142,6 +148,12 @@ class project:
         else:
             logging.warning(f"{name} already exists")
 
+    def get_all_assets(self, column='*'):
+        assets_rows = db_utils.get_rows(self.database_file,
+                                                'assets',
+                                                column)
+        return assets_rows
+
     def search_asset(self, name, column='*'):
         asset_rows = db_utils.get_row_by_column_part_data(self.database_file,
                                                             'assets',
@@ -197,6 +209,12 @@ class project:
             return stage_id
         else:
             logging.warning(f"{name} already exists")
+
+    def get_all_stages(self, column='*'):
+        stages_rows = db_utils.get_rows(self.database_file,
+                                                'stages',
+                                                column)
+        return stages_rows
 
     def remove_stage(self, stage_id):
         success = None
