@@ -475,19 +475,28 @@ class project:
             logging.warning(f"{name} already exists")
             return None
 
-    def create_reference(self, work_env_id, export_version_id):
-        reference_id = db_utils.create_row(self.database_file,
-                                'references_data', 
-                                ('creation_time',
-                                    'creation_user',
-                                    'work_env_id',
-                                    'export_version_id'),
-                                (time.time(),
-                                    environment.get_user(),
-                                    work_env_id,
-                                    export_version_id))
-        if work_env_id:
-            logging.info(f"Reference created")
+    def create_reference(self, work_env_id, export_version_id, namespace):
+        reference_id = None
+        if not (db_utils.check_existence_by_multiple_data(self.database_file, 
+                                        'references_data',
+                                        ('namespace', 'work_env_id'),
+                                        (namespace, work_env_id))):
+            reference_id = db_utils.create_row(self.database_file,
+                                    'references_data', 
+                                    ('creation_time',
+                                        'creation_user',
+                                        'namespace',
+                                        'work_env_id',
+                                        'export_version_id'),
+                                    (time.time(),
+                                        environment.get_user(),
+                                        namespace,
+                                        work_env_id,
+                                        export_version_id))
+            if work_env_id:
+                logging.info(f"Reference created")
+        else:
+            logging.warning(f"{namespace} already exists")
         return reference_id
 
     def remove_reference(self, reference_id):
@@ -1084,6 +1093,7 @@ def create_references_table(database_file):
                                         id integer PRIMARY KEY,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
+                                        namespace text NOT NULL,
                                         work_env_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)

@@ -271,6 +271,18 @@ def create_work_env(software_id, variant_id):
 		logging.warning(f"{name} is not a valid work environment ( software not handled )")
 	return work_env_id
 
+def create_reference(work_env_id, export_version_id):
+	namespaces_list = project.project().get_references(work_env_id, 'namespace')
+	count = 0
+	namespace_raw = build_namespace(export_version_id)
+	namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+	while namespace in namespaces_list:
+		count+=1
+		namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+	project.project().create_reference(work_env_id,
+											export_version_id,
+											namespace)
+
 def archive_work_env(work_env_id):
 	if site.site().is_admin():
 		work_env_row = project.project().get_work_env_data(work_env_id)
@@ -588,3 +600,16 @@ def build_export_file_name(work_env_id, export_name, multiple=None):
 	else:
 		logging.error("Can't build file name")
 		return None
+
+def build_namespace(export_version_id):
+	project_obj = project.project()
+	export_version_row = project_obj.get_export_version_data(export_version_id)
+	export_row = project_obj.get_export_data(export_version_row['export_id'])
+	variant_row = project_obj.get_variant_data(export_row['variant_id'])
+	stage_row = project_obj.get_stage_data(variant_row['stage_id'])
+	asset_row = project_obj.get_asset_data(stage_row['asset_id'])
+	category_row = project_obj.get_category_data(asset_row['category_id'])
+	namespace = f"{category_row['name']}" 
+	namespace += f"_{asset_row['name']}" 
+	namespace += f"_{stage_row['name']}"
+	return namespace
