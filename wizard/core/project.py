@@ -412,11 +412,20 @@ class project:
         else:
             logging.warning(f"{name} already exists")
 
+    def get_export_version_destinations(self, export_version_id, column='*'):
+        references_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'references_data',
+                                                            ('export_version_id', export_version_id),
+                                                            column)
+        return references_rows
+
     def remove_export_version(self, export_version_id):
         success = None
         if site.site().is_admin():
             for ticket_id in self.get_export_version_tickets(export_version_id, 'id'):
                 self.remove_ticket(ticket_id)
+            for reference_id in self.get_export_version_destinations(export_version_id, 'id'):
+                self.remove_reference(reference_id)
             success = db_utils.delete_row(self.database_file, 'export_versions', export_version_id)
             if success:
                 logging.info("Export version removed from project")
@@ -466,11 +475,41 @@ class project:
             logging.warning(f"{name} already exists")
             return None
 
+    def create_reference(self, work_env_id, export_version_id):
+        reference_id = db_utils.create_row(self.database_file,
+                                'references_data', 
+                                ('creation_time',
+                                    'creation_user',
+                                    'work_env_id',
+                                    'export_version_id'),
+                                (time.time(),
+                                    environment.get_user(),
+                                    work_env_id,
+                                    export_version_id))
+        if work_env_id:
+            logging.info(f"Reference created")
+        return reference_id
+
+    def remove_reference(self, reference_id):
+        success = db_utils.delete_row(self.database_file, 'references_data', reference_id)
+        if success:
+            logging.info("Reference deleted")
+        return success
+
+    def get_references(self, work_env_id, column='*'):
+        references_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'references_data',
+                                                            ('work_env_id', work_env_id),
+                                                            column)
+        return references_rows
+
     def remove_work_env(self, work_env_id):
         success = None
         if site.site().is_admin():
             for version_id in self.get_work_versions(work_env_id, 'id'):
                 self.remove_version(version_id)
+            for reference_id in self.get_references(work_env_id, 'id'):
+                self.remove_reference(reference_id)
             success = db_utils.delete_row(self.database_file, 'work_envs', work_env_id)
             if success:
                 logging.info("Work env removed from project")
@@ -949,6 +988,7 @@ def init_project(project_path):
             create_stages_table(database_file)
             create_variants_table(database_file)
             create_work_envs_table(database_file)
+            create_references_table(database_file)
             create_exports_table(database_file)
             create_versions_table(database_file)
             create_export_versions_table(database_file)
@@ -1030,7 +1070,6 @@ def create_work_envs_table(database_file):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
-                                        export_extension text,
                                         variant_id integer NOT NULL,
                                         lock_id integer,
                                         software_id integer NOT NULL,
@@ -1039,6 +1078,19 @@ def create_work_envs_table(database_file):
                                     );"""
     if db_utils.create_table(database_file, sql_cmd):
         logging.info("Work envs table created")
+
+def create_references_table(database_file):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS references_data (
+                                        id integer PRIMARY KEY,
+                                        creation_time real NOT NULL,
+                                        creation_user text NOT NULL,
+                                        work_env_id integer NOT NULL,
+                                        export_version_id integer NOT NULL,
+                                        FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
+                                        FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
+                                    );"""
+    if db_utils.create_table(database_file, sql_cmd):
+        logging.info("References table created")
 
 def create_exports_table(database_file):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS exports (
