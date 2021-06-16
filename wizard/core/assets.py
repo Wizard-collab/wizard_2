@@ -428,15 +428,17 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 			new_version = '0001'
 	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
 							build_version_file_name(work_env_id, new_version)))
+	file_name_ext = os.path.splitext(file_name)[-1]
+	image_file = file_name.replace(file_name_ext, '.jpg')
 	if do_screenshot:
-		screenshot_bytes = image.screenshot()
+		screenshot_file = image.screenshot(image_file)
 	else:
-		screenshot_bytes = None
+		screenshot_file = None
 	version_id = project.project().add_version(new_version,
 												file_name,
 												work_env_id,
 												comment,
-												screenshot_bytes)
+												screenshot_file)
 	if not fresh:
 		game.add_xps(1)
 		game.analyse_comment(comment, 2)

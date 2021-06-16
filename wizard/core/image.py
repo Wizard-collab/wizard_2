@@ -9,16 +9,17 @@ import pyautogui
 from PIL import Image
 import io
 
-def screenshot():
+# Wizard modules
+from wizard.core import tools
+
+def screenshot(file):
 	# Capture the screen
 	# Divide the image size by ≈3
-	# Convert the image to bytes and return it
 	image = pyautogui.screenshot()
 	image = resize_image(image, 500)
-	stream = io.BytesIO()
-	image.save(stream, format="JPEG")
-	imagebytes = stream.getvalue()
-	return imagebytes
+	save_file = tools.get_filename_without_override(file)
+	image.save(save_file, format="JPEG")
+	return save_file
 
 def convert_image_to_bytes(image_file, resize=100):
 	# Resize the given file to 100*100

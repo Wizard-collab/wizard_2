@@ -95,11 +95,13 @@ def get_row_by_column_data(db_file,
                             table,
                             column_tuple,
                             column='*'):
-
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=?"
+    if type(column)==list:
+        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=?"
+    else:
+        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=?"
     try:
         conn = create_connection(db_file)
-        if column != '*':
+        if column != '*' and type(column)!=list:
             conn.row_factory = lambda cursor, row: row[0]
         else:
             conn.row_factory = dict_factory

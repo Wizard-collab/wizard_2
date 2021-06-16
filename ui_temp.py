@@ -161,7 +161,7 @@ class Window(QWidget):
 
     def work_env_changed(self, item):
         self.versions_listwidget.clear()
-        versions_list = project.project().get_work_versions(item.id)
+        versions_list = project.project().get_work_versions(item.id, ['id', 'name', 'comment', 'creation_user', 'creation_time'])
         for version_row in versions_list:
             version_item = QtWidgets.QListWidgetItem(f"{version_row['id']}-{version_row['name']}-{version_row['comment']}-{version_row['creation_user']}-{self.convert_time(version_row['creation_time'])}")
             version_item.id = version_row['id']
@@ -185,12 +185,11 @@ class Window(QWidget):
 
     def update_image(self, item):
     	if item:
-	    	image_data = project.project().get_version_data(item.id, 'screenshot')
-	    	self.image_label.setPixmap(self.get_tray_icon(image_data))
+	    	image_file = project.project().get_version_data(item.id, 'screenshot_path')
+	    	self.image_label.setPixmap(self.get_tray_icon(image_file))
 
-    def get_tray_icon(self, data):
-        pm = QtGui.QPixmap()
-        pm.loadFromData(data)
+    def get_tray_icon(self, image_file):
+        pm = QtGui.QPixmap(image_file)
         return pm
 
     def convert_time(self, time_float):

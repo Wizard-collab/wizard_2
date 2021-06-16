@@ -529,7 +529,7 @@ class project:
             else:
                 return None
 
-    def add_version(self, name, file_path, work_env_id, comment='', screenshot=None):
+    def add_version(self, name, file_path, work_env_id, comment='', screenshot_path=None):
         version_id = db_utils.create_row(self.database_file,
                             'versions', 
                             ('name',
@@ -537,14 +537,14 @@ class project:
                                 'creation_user',
                                 'comment',
                                 'file_path',
-                                'screenshot',
+                                'screenshot_path',
                                 'work_env_id'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
                                 comment,
                                 file_path,
-                                screenshot,
+                                screenshot_path,
                                 work_env_id))
         if version_id:
             logging.info(f"Version {name} added to project")
@@ -1060,7 +1060,7 @@ def create_versions_table(database_file):
                                         creation_user text NOT NULL,
                                         comment text,
                                         file_path text NOT NULL,
-                                        screenshot blob,
+                                        screenshot_path text,
                                         work_env_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
