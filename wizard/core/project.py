@@ -142,6 +142,13 @@ class project:
         else:
             logging.warning(f"{name} already exists")
 
+    def search_asset(self, name, column='*'):
+        asset_rows = db_utils.get_row_by_column_part_data(self.database_file,
+                                                            'assets',
+                                                            ('name', name),
+                                                            column)
+        return asset_rows
+
     def remove_asset(self, asset_id):
         success = None
         if site.site().is_admin():

@@ -111,6 +111,26 @@ def get_row_by_column_data(db_file,
         print(e)
         return None
 
+def get_row_by_column_part_data(db_file,
+                            table,
+                            column_tuple,
+                            column='*'):
+
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE ?"
+    try:
+        conn = create_connection(db_file)
+        if column != '*':
+            conn.row_factory = lambda cursor, row: row[0]
+        else:
+            conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        cursor.execute(sql_cmd, (f"%{column_tuple[1]}%",))
+        rows = cursor.fetchall()
+        return rows
+    except Error as e:
+        print(e)
+        return None
+
 def get_last_row_by_column_data(db_file,
                             table,
                             column_tuple,

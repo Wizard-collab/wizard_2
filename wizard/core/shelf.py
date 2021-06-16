@@ -21,7 +21,7 @@ from wizard.core import tools
 from wizard.vars import ressources
 from wizard.vars import user_vars
 
-def create_shelf_script(name,
+def create_script(name,
 							script,
 							only_subprocess=0,
 							icon=ressources._default_script_shelf_icon_,
