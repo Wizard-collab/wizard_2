@@ -133,6 +133,17 @@ class project:
             logging.error("Category not found")
             return None
 
+    def get_category_data_by_name(self, name, column='*'):
+        category_rows = db_utils.get_row_by_column_data(self.database_file,
+                                                            'categories',
+                                                            ('name', name),
+                                                            column)
+        if category_rows and len(category_rows) >= 1:
+            return category_rows[0]
+        else:
+            logging.error("Category not found")
+            return None
+
     def add_asset(self, name, category_id):
         if not (db_utils.check_existence_by_multiple_data(self.database_file, 
                                         'assets',
@@ -154,11 +165,18 @@ class project:
                                                 column)
         return assets_rows
 
-    def search_asset(self, name, column='*'):
-        asset_rows = db_utils.get_row_by_column_part_data(self.database_file,
+    def search_asset(self, name, category_id=None, column='*'):
+        if category_id:
+            asset_rows = db_utils.get_row_by_column_part_data_and_data(self.database_file,
                                                             'assets',
                                                             ('name', name),
+                                                            ('category_id', category_id),
                                                             column)
+        else:
+            asset_rows = db_utils.get_row_by_column_part_data(self.database_file,
+                                                                'assets',
+                                                                ('name', name),
+                                                                column)
         return asset_rows
 
     def remove_asset(self, asset_id):
