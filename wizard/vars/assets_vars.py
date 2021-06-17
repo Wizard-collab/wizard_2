@@ -37,25 +37,11 @@ _compositing_ = 'compositing'
 _fx_ = 'fx'
 
 # Stage rules
-_assets_stage_rules_dic_ = dict()
-_assets_stage_rules_dic_[_characters_] = [_modeling_,
-										_rigging_,
-										_grooming_,
-										_texturing_,
-										_shading_]
-_assets_stage_rules_dic_[_props_] = [_modeling_,
-									_rigging_,
-									_grooming_,
-									_texturing_,
-									_shading_]
-_assets_stage_rules_dic_[_sets_] = [_modeling_,
-									_grooming_,
-									_texturing_,
-									_shading_]
-_assets_stage_rules_dic_[_set_dress_] = [_modeling_,
-										_grooming_,
-										_texturing_,
-										_shading_]
+_assets_stages_list_ = [_modeling_,
+							_rigging_,
+							_grooming_,
+							_texturing_,
+							_shading_]
 
 # Export rules
 ''' The _export_ext_dic_ dictionnary 

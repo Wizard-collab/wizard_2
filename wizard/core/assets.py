@@ -167,7 +167,7 @@ def create_stage(name, asset_id):
 	allowed = None
 
 	if domain_name == assets_vars._assets_:
-		if name in assets_vars._assets_stage_rules_dic_[category_name]:
+		if name in assets_vars._assets_stages_list_:
 			allowed = 1
 	if domain_name == assets_vars._sequences_:
 			allowed = 1
