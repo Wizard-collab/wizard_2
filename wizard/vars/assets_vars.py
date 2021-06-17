@@ -33,8 +33,14 @@ _rigging_ = 'rigging'
 _grooming_ = 'grooming'
 _texturing_ = 'texturing'
 _shading_ = 'shading'
-_compositing_ = 'compositing'
+
+_layout_ = 'layout'
+_animation_ = 'animation'
+_cfx_ = 'cfx'
 _fx_ = 'fx'
+_camera_ = 'camera'
+_lighting_ = 'lighting'
+_compositing_ = 'compositing'
 
 # Stage rules
 _assets_stages_list_ = [_modeling_,
@@ -42,6 +48,19 @@ _assets_stages_list_ = [_modeling_,
 							_grooming_,
 							_texturing_,
 							_shading_]
+
+_sequences_stages_rules_ = [_layout_, 
+								_animation_,
+								_cfx_,
+								_fx_,
+								_camera_,
+								_lighting_,
+								_compositing_,
+								]
+
+_stages_rules_dic_ = dict()
+_stages_rules_dic_[_assets_] = _assets_stages_list_
+_stages_rules_dic_[_sequences_] = _sequences_stages_rules_
 
 # Export rules
 ''' The _export_ext_dic_ dictionnary 
