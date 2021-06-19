@@ -12,6 +12,8 @@
 import sqlite3
 from sqlite3 import Error
 import time
+import traceback
+import os
 
 # Wizard modules
 from wizard.core import logging
@@ -37,11 +39,13 @@ def create_connection(db_file):
     conn = None
     try:
         if db_file:
-            conn = sqlite3.connect(db_file)
+            db_file = os.path.normpath(os.path.abspath(db_file))
+            conn = sqlite3.connect(db_file, timeout=3000)
             logging.debug(f'*{db_file}')
         else:
             logging.error("No database file given")
     except Error as e:
+        logging.error('HERE')
         print(e)
 
     return conn
@@ -54,6 +58,9 @@ def create_table(db_file, cmd):
     except Error as e:
         print(e)
         return 0
+    finally:
+        if conn:
+            conn.close()
 
 def create_row(db_file, table, columns, datas):
     sql_cmd = f''' INSERT INTO {table}('''
@@ -63,17 +70,26 @@ def create_row(db_file, table, columns, datas):
     for item in columns:
         data_abstract_list.append('?')
     sql_cmd += (',').join(data_abstract_list)
-    sql_cmd += ')'
+    sql_cmd += ');'
     try:
+        success = 0
         conn = create_connection(db_file)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, datas)
-        conn.commit()
+        while not success:
+            try:
+                cursor = conn.cursor()
+                cursor.execute(sql_cmd, datas)
+                conn.commit()
+                success = 1
+            except sqlite3.OperationalError:
+                logging.info("Can't execute, retrying")
         logging.debug(f'*{db_file}-write')
         return cursor.lastrowid
     except Error as e:
         print(e)
         return 0
+    finally:
+        if conn:
+            conn.close()
 
 def get_rows(db_file, table, column='*'):
     sql_cmd = f''' SELECT {column} FROM {table}'''
@@ -90,6 +106,9 @@ def get_rows(db_file, table, column='*'):
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def get_row_by_column_data(db_file,
                             table,
@@ -112,6 +131,9 @@ def get_row_by_column_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def get_row_by_column_part_data(db_file,
                             table,
@@ -132,6 +154,9 @@ def get_row_by_column_part_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def get_row_by_column_part_data_and_data(db_file,
                             table,
@@ -153,6 +178,9 @@ def get_row_by_column_part_data_and_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def get_last_row_by_column_data(db_file,
                             table,
@@ -173,6 +201,9 @@ def get_last_row_by_column_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def check_existence_by_multiple_data(db_file,
                     table,
@@ -189,6 +220,9 @@ def check_existence_by_multiple_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def check_existence(db_file,
                     table,
@@ -205,6 +239,9 @@ def check_existence(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def get_row_by_multiple_data(db_file,
                     table,
@@ -226,6 +263,9 @@ def get_row_by_multiple_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def update_data(db_file,
                     table,
@@ -244,6 +284,9 @@ def update_data(db_file,
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def delete_row(db_file, table, id):
     sql = f'DELETE FROM {table} WHERE id=?'
@@ -256,6 +299,9 @@ def delete_row(db_file, table, id):
     except Error as e:
         print(e)
         return None
+    finally:
+        if conn:
+            conn.close()
 
 def dict_factory(cursor, row):
     d = {}
