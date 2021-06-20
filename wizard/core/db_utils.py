@@ -45,7 +45,6 @@ def create_connection(db_file):
         else:
             logging.error("No database file given")
     except Error as e:
-        logging.error('HERE')
         print(e)
 
     return conn
@@ -82,6 +81,7 @@ def create_row(db_file, table, columns, datas):
                 success = 1
             except sqlite3.OperationalError:
                 logging.info("Can't execute, retrying")
+                time.sleep(1)
         logging.debug(f'*{db_file}-write')
         return cursor.lastrowid
     except Error as e:
