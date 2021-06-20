@@ -29,13 +29,13 @@ from wizard.vars import ressources
 
 class site:
     def __init__(self):
-        self.conn = db_utils.create_connection('site')
+        self.level = 'site'
 
     def create_project(self, project_name, project_path, project_password):
         if project_name not in self.get_projects_names_list():
             if project_path not in self.get_projects_paths_list():
                 if self.get_user_row_by_name(environment.get_user())['pass']:
-                    if db_utils.create_row(self.conn,
+                    if db_utils.create_row(self.level,
                                     'projects', 
                                     ('project_name', 'project_path', 'project_password'), 
                                     (project_name,
@@ -57,25 +57,25 @@ class site:
         return self.get_user_row_by_name('admin')['pass']
 
     def get_projects_list(self):
-        projects_rows = db_utils.get_rows(self.conn, 'projects')
+        projects_rows = db_utils.get_rows(self.level, 'projects')
         return projects_rows
 
     def get_projects_names_list(self):
-        projects_rows = db_utils.get_rows(self.conn, 'projects', 'project_name')
+        projects_rows = db_utils.get_rows(self.level, 'projects', 'project_name')
         return projects_rows
 
     def get_projects_paths_list(self):
-        projects_rows = db_utils.get_rows(self.conn, 'projects', 'project_path')
+        projects_rows = db_utils.get_rows(self.level, 'projects', 'project_path')
         return projects_rows
 
     def get_project_row_by_name(self, name):
-        projects_rows = db_utils.get_row_by_column_data(self.conn,
+        projects_rows = db_utils.get_row_by_column_data(self.level,
                                                         'projects',
                                                         ('project_name', name))
         return projects_rows[0]
 
     def get_project_row(self, project_id, column='*'):
-        projects_rows = db_utils.get_row_by_column_data(self.conn,
+        projects_rows = db_utils.get_row_by_column_data(self.level,
                                                         'projects',
                                                         ('id', project_id),
                                                         column)
@@ -95,7 +95,7 @@ class site:
                 if tools.decrypt_string(
                         self.get_project_row_by_name(project_name)['project_password'],
                         project_password):
-                    if db_utils.update_data(self.conn,
+                    if db_utils.update_data(self.level,
                                 'projects',
                                 ('project_password', tools.encrypt_string(new_password)),
                                 ('project_name', project_name)):
@@ -122,11 +122,8 @@ class site:
                                     administrator_pass):
                 administrator = 1
             if os.path.isfile(profile_picture):
-                profile_picture_bytes = image.convert_image_to_bytes(profile_picture)
-            else:
-                logging.warning(f"{profile_picture} doesn't exists, assigning default profile picture")
-                profile_picture_bytes = image.convert_image_to_bytes(ressources._default_profile_)
-            if db_utils.create_row(self.conn,
+                profile_picture = ressources._default_profile_
+            if db_utils.create_row(self.level,
                         'users', 
                         ('user_name',
                             'pass',
@@ -139,7 +136,7 @@ class site:
                         (user_name,
                             tools.encrypt_string(password),
                             email,
-                            profile_picture_bytes,
+                            profile_picture,
                             0,
                             0,
                             100,
@@ -164,7 +161,7 @@ class site:
             if not user_row['administrator']:
                 if tools.decrypt_string(self.get_administrator_pass(),
                                             administrator_pass):
-                    if db_utils.update_data(self.conn,
+                    if db_utils.update_data(self.level,
                                             'users',
                                             ('administrator',1),
                                             ('user_name', user_name)):
@@ -182,7 +179,7 @@ class site:
             if user_row['administrator']:
                 if tools.decrypt_string(self.get_administrator_pass(),
                                             administrator_pass):
-                    if db_utils.update_data(self.conn,
+                    if db_utils.update_data(self.level,
                                             'users',
                                             ('administrator',0),
                                             ('user_name', user_name)):
@@ -202,7 +199,7 @@ class site:
         user_row = self.get_user_row_by_name(user_name)
         if user_row:
             if tools.decrypt_string(user_row['pass'], password):
-                if db_utils.update_data(self.conn,
+                if db_utils.update_data(self.level,
                                         'users',
                                         ('pass',
                                             tools.encrypt_string(new_password)),
@@ -216,15 +213,15 @@ class site:
                 return None
 
     def get_users_list(self):
-        users_rows = db_utils.get_rows(self.conn, 'users')
+        users_rows = db_utils.get_rows(self.level, 'users')
         return users_rows
 
     def get_user_names_list(self):
-        users_rows = db_utils.get_rows(self.conn, 'users', 'user_name')
+        users_rows = db_utils.get_rows(self.level, 'users', 'user_name')
         return users_rows
 
     def get_user_row_by_name(self, name, column='*'):
-        users_rows = db_utils.get_row_by_column_data(self.conn,
+        users_rows = db_utils.get_row_by_column_data(self.level,
                                                         'users',
                                                         ('user_name', name),
                                                         column)
@@ -235,7 +232,7 @@ class site:
             return None
 
     def get_user_data(self, user_id, column='*'):
-        users_rows = db_utils.get_row_by_column_data(self.conn,
+        users_rows = db_utils.get_row_by_column_data(self.level,
                                                         'users',
                                                         ('id', user_id),
                                                         column)
@@ -246,7 +243,7 @@ class site:
             return None
 
     def modify_user_xp(self, user_name, xp):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                         'users',
                                         ('xp', xp),
                                         ('user_name', user_name)):
@@ -256,7 +253,7 @@ class site:
             return None
 
     def modify_user_level(self, user_name, level):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                         'users',
                                         ('level', level),
                                         ('user_name', user_name)):
@@ -266,7 +263,7 @@ class site:
             return None
 
     def modify_user_life(self, user_name, life):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                         'users',
                                         ('life', life),
                                         ('user_name', user_name)):
@@ -284,7 +281,7 @@ class site:
     def add_quote(self, content):
         quote_id = None
         if content and content != '':
-            quote_id = db_utils.create_row(self.conn,
+            quote_id = db_utils.create_row(self.level,
                                     'quotes', 
                                     ('creation_user',
                                         'content',
@@ -309,7 +306,7 @@ class site:
             logging.warning(f"{score} is not an integer")
             sanity = 0
         if sanity:
-            current_quote_row = db_utils.get_row_by_column_data(self.conn,
+            current_quote_row = db_utils.get_row_by_column_data(self.level,
                                                             'quotes',
                                                             ('id', quote_id))
 
@@ -320,14 +317,14 @@ class site:
                         current_scores_list = json.loads(current_quote_row[0]['score'])
                         current_scores_list.append(score)
                         voters_list.append(environment.get_user())
-                        if db_utils.update_data(self.conn,
+                        if db_utils.update_data(self.level,
                                                         'quotes',
                                                         ('score',
                                                             json.dumps(current_scores_list)),
                                                         ('id',
                                                             quote_id)):
                             logging.info("Quote score updated")
-                        if db_utils.update_data(self.conn,
+                        if db_utils.update_data(self.level,
                                                         'quotes',
                                                         ('voters',
                                                             json.dumps(voters_list)),
@@ -340,7 +337,7 @@ class site:
                     logging.warning("You can't vote for your own quote")
 
     def get_quote_data(self, quote_id, column='*'):
-        quotes_rows = db_utils.get_row_by_column_data(self.conn,
+        quotes_rows = db_utils.get_row_by_column_data(self.level,
                                                         'quotes',
                                                         ('id', quote_id),
                                                         column)
@@ -351,7 +348,7 @@ class site:
             return None
 
     def get_ips(self, column='*'):
-        ip_rows = db_utils.get_rows(self.conn, 'ips_wrap', column)
+        ip_rows = db_utils.get_rows(self.level, 'ips_wrap', column)
         return ip_rows
 
     def add_ip_user(self):
@@ -360,7 +357,7 @@ class site:
         if not ip_rows:
             ip_rows=[]
         if ip not in ip_rows:
-            if db_utils.create_row(self.conn,
+            if db_utils.create_row(self.level,
                                 'ips_wrap', 
                                 ('ip', 'user_id', 'project_id'), 
                                 (ip, None, None)):
@@ -368,7 +365,7 @@ class site:
 
     def update_current_ip_data(self, column, data):
         ip = socket.gethostbyname(socket.gethostname())
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                         'ips_wrap',
                                         (column, data),
                                         ('ip', ip)):
@@ -376,30 +373,27 @@ class site:
 
     def get_current_ip_data(self, column='*'):
         ip = socket.gethostbyname(socket.gethostname())
-        ip_rows = db_utils.get_row_by_column_data(self.conn,
+        ip_rows = db_utils.get_row_by_column_data(self.level,
                                                         'ips_wrap',
                                                         ('ip', ip),
                                                         column)
         return ip_rows[0]
 
 def init_site(admin_password, admin_email):
-    if create_site_database():
-        create_admin_user(admin_password, admin_email)
-        for quote in site_vars._default_quotes_list_:
-            conn = db_utils.create_connection('site')
-            db_utils.create_row(conn,
-                                'quotes', 
-                                ('creation_user',
-                                    'content',
-                                    'score',
-                                    'voters'), 
-                                ('admin',
-                                    quote,
-                                    json.dumps([]),
-                                    json.dumps([])))
-        return 1
-    else:
-        return None
+    create_admin_user(admin_password, admin_email)
+    for quote in site_vars._default_quotes_list_:
+        conn = db_utils.create_connection('site')
+        db_utils.create_row('site',
+                            'quotes', 
+                            ('creation_user',
+                                'content',
+                                'score',
+                                'voters'), 
+                            ('admin',
+                                quote,
+                                json.dumps([]),
+                                json.dumps([])))
+    return 1
 
 def create_site_database():
     if db_utils.create_database('site'):
@@ -415,9 +409,8 @@ def is_site_database():
     return db_utils.check_database_existence('site')
 
 def create_admin_user(admin_password, admin_email):
-    profile_picture_bytes = image.convert_image_to_bytes(ressources._default_profile_)
-    conn = db_utils.create_connection('site')
-    if db_utils.create_row(conn,
+    profile_picture = ressources._default_profile_
+    if db_utils.create_row('site',
                             'users', 
                             ('user_name', 
                                 'pass', 
@@ -430,7 +423,7 @@ def create_admin_user(admin_password, admin_email):
                             ('admin',
                                 tools.encrypt_string(admin_password),
                                 admin_email,
-                                profile_picture_bytes,
+                                profile_picture,
                                 0,
                                 0,
                                 100,
@@ -443,7 +436,7 @@ def create_users_table():
                                         user_name text NOT NULL,
                                         pass text NOT NULL,
                                         email text NOT NULL,
-                                        profile_picture bytea NOT NULL,
+                                        profile_picture text NOT NULL,
                                         xp integer NOT NULL,
                                         level integer NOT NULL,
                                         life integer NOT NULL,

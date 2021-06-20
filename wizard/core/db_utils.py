@@ -15,6 +15,9 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import time
 import traceback
 import os
+import socket
+import json
+from wizard.core import socket_utils
 
 # Wizard modules
 from wizard.core import logging
@@ -67,7 +70,7 @@ def create_table(database, cmd):
         if conn:
             conn.close()
 
-def create_row(conn, table, columns, datas):
+def create_row(level, table, columns, datas):
     sql_cmd = f''' INSERT INTO {table}('''
     sql_cmd += (',').join(columns)
     sql_cmd += ') VALUES('
@@ -76,38 +79,17 @@ def create_row(conn, table, columns, datas):
         data_abstract_list.append('%s')
     sql_cmd += (',').join(data_abstract_list)
     sql_cmd += ') RETURNING id;'
-    try:
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, datas)
-        conn.commit()
-        return cursor.fetchone()[0]
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
+    return execute_sql(sql_cmd, level, 0, datas, 1)
 
-def get_rows(conn, table, column='*'):
+def get_rows(level, table, column='*'):
     sql_cmd = f''' SELECT {column} FROM {table}'''
-    try:
-        #conn = create_connection(conn)
-        if column != '*':
-            cursor = conn.cursor()
-        else:
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor.execute(sql_cmd)
-        rows = cursor.fetchall()
-        if column != '*':
-            rows = [r[0] for r in rows]
-        return rows
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict)
 
-def get_row_by_column_data(conn,
+def get_row_by_column_data(level,
                             table,
                             column_tuple,
                             column='*'):
@@ -115,176 +97,79 @@ def get_row_by_column_data(conn,
         sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=%s"
     else:
         sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s"
-    try:
-        if column != '*' and type(column)!=list:
-            cursor = conn.cursor()
-        else:
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        #cursor = conn.cursor()
-        cursor.execute(sql_cmd, (column_tuple[1],))
-        rows = cursor.fetchall()
-        if column != '*':
-            rows = [r[0] for r in rows]
-        return rows
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (column_tuple[1],))
 
-def get_row_by_column_part_data(conn,
+def get_row_by_column_part_data(level,
                             table,
                             column_tuple,
                             column='*'):
 
     sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s"
-    try:
-        #conn = create_connection(conn)
-        if column != '*':
-            cursor = conn.cursor()
-        else:
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor.execute(sql_cmd, (f"%{column_tuple[1]}%",))
-        rows = cursor.fetchall()
-        if column != '*':
-            rows = [r[0] for r in rows]
-        return rows
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (f"%{column_tuple[1]}%",))
 
-def get_row_by_column_part_data_and_data(conn,
+def get_row_by_column_part_data_and_data(level,
                             table,
                             column_tuple,
                             second_column_tuple,
                             column='*'):
 
     sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s AND {second_column_tuple[0]}=%s;"
-    try:
-        #conn = create_connection(conn)
-        if column != '*':
-            cursor = conn.cursor()
-        else:
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor.execute(sql_cmd, (f"%{column_tuple[1]}%",second_column_tuple[1]))
-        rows = cursor.fetchall()
-        if column != '*':
-            rows = [r[0] for r in rows]
-        return rows
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
-
-def get_last_row_by_column_data(conn,
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (f"%{column_tuple[1]}%",second_column_tuple[1]))
+   
+def get_last_row_by_column_data(level,
                             table,
                             column_tuple,
                             column='*'):
 
     sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY rowid DESC LIMIT 1;"
-    try:
-        #conn = create_connection(conn)
-        if column != '*':
-            cursor = conn.cursor()
-        else:
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor.execute(sql_cmd, (column_tuple[1],))
-        rows = cursor.fetchall()
-        if column != '*':
-            rows = [r[0] for r in rows]
-        return rows
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (column_tuple[1],))
 
-def check_existence_by_multiple_data(conn,
+def check_existence_by_multiple_data(level,
                     table,
                     columns_tuple,
                     data_tuple):
 
     sql_cmd = f"SELECT id FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s;"
-    try:
-        #conn = create_connection(conn)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, data_tuple)
-        rows = cursor.fetchall()
+    return execute_sql(sql_cmd, level, 0, data_tuple)
 
-        return len(rows)
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
-
-def check_existence(conn,
+def check_existence(level,
                     table,
                     column,
                     data):
 
     sql_cmd = f"SELECT id FROM {table} WHERE {column}=%s;"
-    try:
-        #conn = create_connection(conn)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (data, ))
-        rows = cursor.fetchall()
-        return len(rows)
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    return execute_sql(sql_cmd, level, 0, (data,))
 
-def get_row_by_multiple_data(conn,
+def get_row_by_multiple_data(level,
                     table,
                     columns_tuple,
                     data_tuple,
                     column='*'):
 
     sql_cmd = f"SELECT {column} FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s;"
-    try:
-        #conn = create_connection(conn)
-        if column != '*':
-            cursor = conn.cursor()
-        else:
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cursor.execute(sql_cmd, (data_tuple[0], data_tuple[1]))
-        rows = cursor.fetchall()
-        if column != '*':
-            rows = [r[0] for r in rows]
-        return rows
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, data_tuple)
 
-def update_data(conn,
+def update_data(level,
                     table,
                     set_tuple,
                     where_tuple):
@@ -292,36 +177,11 @@ def update_data(conn,
     sql_cmd = f''' UPDATE {table}'''
     sql_cmd += f''' SET {set_tuple[0]} = %s'''
     sql_cmd += f''' WHERE {where_tuple[0]} = %s'''
-    try:
-        #conn = create_connection(conn)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (set_tuple[1], where_tuple[1]))
-        conn.commit()
-        return 1
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
-def delete_row(conn, table, id):
-    sql = f'DELETE FROM {table} WHERE id=%s'
-    try:
-        #conn = create_connection(conn)
-        cursor = conn.cursor()
-        cursor.execute(sql, (id,))
-        conn.commit()
-        return 1
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    '''
-    finally:
-        if conn:
-            conn.close()
-    '''
+    return execute_sql(sql_cmd, level, 0, (set_tuple[1], where_tuple[1]))
+    
+def delete_row(level, table, id):
+    sql_cmd = f'DELETE FROM {table} WHERE id=%s'
+    return execute_sql(sql_cmd, level, 0, (id,))
 
 def check_database_existence(database):
     conn = None
@@ -347,3 +207,41 @@ def check_database_existence(database):
         else:
             logging.debug("'{}' Database doesn't exist.".format(database))
             return None
+
+def execute_sql(sql, level, as_dict, data=None, fetchone=0):
+    signal_dic = dict()
+    signal_dic['sql'] = sql
+    signal_dic['level'] = level
+    signal_dic['as_dict'] = as_dict
+    signal_dic['data'] = data
+    signal_dic['fetchone'] = fetchone
+    signal_as_str = json.dumps(signal_dic)
+    return send_signal(signal_as_str)
+
+def send_signal(signal_as_str):
+    # Send a signal to wizard
+    # The signal_as_str is converted to json string
+    # Before sending to wizard the signal 
+    # will be encoded in utf-8 (bytes)
+    try:
+        host_name = 'localhost'
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.connect((host_name, 11112))
+        server.settimeout(5.0)
+        server.send(signal_as_str.encode('utf8'))
+        returned = socket_utils.recvall(server).decode('utf8')
+        server.close()
+        return json.loads(returned)
+    except ConnectionRefusedError:
+        logging.error("No wizard local server found. Please verify if Wizard is openned")
+        return None
+    except socket.timeout:
+        logging.error("Wizard has been too long to give a response, please retry.")
+        return None
+
+def recv_all(sock):
+    arr = bytearray(msg_len)
+    pos = 0
+    while pos < msg_len:
+        arr[pos:pos+max_msg_size] = sock.recv(max_msg_size)
+        pos += max_msg_size

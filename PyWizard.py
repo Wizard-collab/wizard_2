@@ -17,16 +17,26 @@ from wizard.core import project
 from wizard.core import site
 from wizard.core import create_project
 from wizard.core import communicate
+from wizard.core import environment
+from wizard.core import db_core
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-while not site.is_site_database():
-	init_site = input("Site database doesn't exists, init database (y/n) ? : ")
-	if init_site == 'y':
-		admin_password = input('Administator password : ')
-		admin_email = input('Administator email : ')
-		site.init_site(admin_password, admin_email)
+server = None
 
+if not site.is_site_database():
+	while not site.is_site_database():
+		init_site = input("Site database doesn't exists, init database (y/n) ? : ")
+		if init_site == 'y':
+			admin_password = input('Administator password : ')
+			admin_email = input('Administator email : ')
+			site.create_site_database()
+			server = db_core.db_server()
+			server.start()
+			site.init_site(admin_password, admin_email)
+else:
+	server = db_core.db_server()
+	server.start()
 site.site().add_ip_user()
 
 while not user.get_user():
@@ -47,17 +57,27 @@ while not user.get_user():
 		password = input('Password : ')
 		user.log_user(user_name, password)
 
+project_name = None
+
 while not user.get_project():
 	do_create_project = input('Create project (y/n) ? : ')
 	if do_create_project == 'y':
 		project_name = input('Project name : ')
 		project_path = input('Project path : ')
 		project_password = input('Project password : ')
-		create_project.create_project(project_name, project_path, project_password)
+		if project.create_project(project_name, project_path, project_password):
+			print('lol')
+			server.project_name = project_name
+			create_project.create_project(project_name, project_path, project_password)
+			print('prout')
+
 	else:
 		project_name = input('Project name : ')
 		project_password = input('Project password : ')
 		user.log_project(project_name, project_password)
+
+project_name = environment.get_project_name()
+server.project_name = project_name
 
 def stdout_tree():
 	project_obj = project.project()

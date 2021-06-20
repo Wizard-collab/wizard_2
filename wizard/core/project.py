@@ -40,11 +40,11 @@ from wizard.vars import ressources
 
 class project:
     def __init__(self):
-        self.conn = db_utils.create_connection(environment.get_project_name())
+        self.level = 'project'
         self.project_path = environment.get_project_path()
 
     def add_domain(self, name):
-        domain_id = db_utils.create_row(self.conn,
+        domain_id = db_utils.create_row(self.level,
                             'domains', 
                             ('name', 'creation_time', 'creation_user'), 
                             (name, time.time(), environment.get_user()))
@@ -53,11 +53,11 @@ class project:
         return domain_id
 
     def get_domains(self):
-        domain_rows = db_utils.get_rows(self.conn, 'domains')
+        domain_rows = db_utils.get_rows(self.level, 'domains')
         return domain_rows
 
     def get_domain_data(self, domain_id, column='*'):
-        domain_rows = db_utils.get_row_by_column_data(self.conn,
+        domain_rows = db_utils.get_row_by_column_data(self.level,
                                                         'domains',
                                                         ('id', domain_id),
                                                         column)
@@ -68,7 +68,7 @@ class project:
             return None
 
     def get_domain_childs(self, domain_id, column='*'):
-        categories_rows = db_utils.get_row_by_column_data(self.conn,
+        categories_rows = db_utils.get_row_by_column_data(self.level,
                                                         'categories',
                                                         ('domain_id', domain_id),
                                                         column)
@@ -79,23 +79,23 @@ class project:
         if site.site().is_admin():
             for category_id in self.get_domain_childs(domain_id, 'id'):
                 self.remove_category(category_id)
-            success = db_utils.delete_row(self.conn, 'domains', domain_id)
+            success = db_utils.delete_row(self.level, 'domains', domain_id)
             if success:
                 logging.info(f"Domain removed from project")
         return success
 
     def get_all_categories(self, column='*'):
-        categories_rows = db_utils.get_rows(self.conn,
+        categories_rows = db_utils.get_rows(self.level,
                                                 'categories',
                                                 column)
         return categories_rows
 
     def add_category(self, name, domain_id):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'categories',
                                         ('name', 'domain_id'),
                                         (name, domain_id))):
-            category_id = db_utils.create_row(self.conn,
+            category_id = db_utils.create_row(self.level,
                                 'categories',
                                 ('name', 'creation_time', 'creation_user', 'domain_id'), 
                                 (name, time.time(), environment.get_user(), domain_id))
@@ -110,20 +110,20 @@ class project:
         if site.site().is_admin():
             for asset_id in self.get_category_childs(category_id, 'id'):
                 self.remove_asset(asset_id)
-            success = db_utils.delete_row(self.conn, 'categories', category_id)
+            success = db_utils.delete_row(self.level, 'categories', category_id)
             if success:
                 logging.info(f"Category removed from project")
         return success
 
     def get_category_childs(self, category_id, column="*"):
-        assets_rows = db_utils.get_row_by_column_data(self.conn,
+        assets_rows = db_utils.get_row_by_column_data(self.level,
                                                         'assets',
                                                         ('category_id', category_id),
                                                         column)
         return assets_rows
 
     def get_category_data(self, category_id, column='*'):
-        category_rows = db_utils.get_row_by_column_data(self.conn,
+        category_rows = db_utils.get_row_by_column_data(self.level,
                                                         'categories',
                                                         ('id', category_id),
                                                         column)
@@ -134,7 +134,7 @@ class project:
             return None
 
     def get_category_data_by_name(self, name, column='*'):
-        category_rows = db_utils.get_row_by_column_data(self.conn,
+        category_rows = db_utils.get_row_by_column_data(self.level,
                                                             'categories',
                                                             ('name', name),
                                                             column)
@@ -145,11 +145,11 @@ class project:
             return None
 
     def add_asset(self, name, category_id):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'assets',
                                         ('name', 'category_id'),
                                         (name, category_id))):
-            asset_id = db_utils.create_row(self.conn,
+            asset_id = db_utils.create_row(self.level,
                                 'assets', 
                                 ('name', 'creation_time', 'creation_user', 'category_id'), 
                                 (name, time.time(), environment.get_user(), category_id))
@@ -160,20 +160,20 @@ class project:
             logging.warning(f"{name} already exists")
 
     def get_all_assets(self, column='*'):
-        assets_rows = db_utils.get_rows(self.conn,
+        assets_rows = db_utils.get_rows(self.level,
                                                 'assets',
                                                 column)
         return assets_rows
 
     def search_asset(self, name, category_id=None, column='*'):
         if category_id:
-            asset_rows = db_utils.get_row_by_column_part_data_and_data(self.conn,
+            asset_rows = db_utils.get_row_by_column_part_data_and_data(self.level,
                                                             'assets',
                                                             ('name', name),
                                                             ('category_id', category_id),
                                                             column)
         else:
-            asset_rows = db_utils.get_row_by_column_part_data(self.conn,
+            asset_rows = db_utils.get_row_by_column_part_data(self.level,
                                                                 'assets',
                                                                 ('name', name),
                                                                 column)
@@ -184,20 +184,20 @@ class project:
         if site.site().is_admin():
             for stage_id in self.get_asset_childs(asset_id, 'id'):
                 self.remove_stage(stage_id)
-            success = db_utils.delete_row(self.conn, 'assets', asset_id)
+            success = db_utils.delete_row(self.level, 'assets', asset_id)
             if success:
                 logging.info(f"Asset removed from project")
         return success
 
     def get_asset_childs(self, asset_id, column='*'):
-        stages_rows = db_utils.get_row_by_column_data(self.conn,
+        stages_rows = db_utils.get_row_by_column_data(self.level,
                                                             'stages',
                                                             ('asset_id', asset_id),
                                                             column)
         return stages_rows
 
     def get_asset_data(self, asset_id, colmun='*'):
-        assets_rows = db_utils.get_row_by_column_data(self.conn,
+        assets_rows = db_utils.get_row_by_column_data(self.level,
                                                             'assets',
                                                             ('id', asset_id),
                                                             colmun)
@@ -208,11 +208,11 @@ class project:
             return None
 
     def add_stage(self, name, asset_id):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'stages',
                                         ('name', 'asset_id'),
                                         (name, asset_id))):
-            stage_id = db_utils.create_row(self.conn,
+            stage_id = db_utils.create_row(self.level,
                                 'stages', 
                                 ('name',
                                     'creation_time',
@@ -229,7 +229,7 @@ class project:
             logging.warning(f"{name} already exists")
 
     def get_all_stages(self, column='*'):
-        stages_rows = db_utils.get_rows(self.conn,
+        stages_rows = db_utils.get_rows(self.level,
                                                 'stages',
                                                 column)
         return stages_rows
@@ -239,20 +239,20 @@ class project:
         if site.site().is_admin():
             for variant_id in self.get_stage_childs(stage_id, 'id'):
                 self.remove_variant(variant_id)
-            success = db_utils.delete_row(self.conn, 'stages', stage_id)
+            success = db_utils.delete_row(self.level, 'stages', stage_id)
             if success:
                 logging.info(f"Stage removed from project")
         return success
 
     def set_stage_default_variant(self, stage_id, variant_id):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                             'stages',
                             ('default_variant_id', variant_id),
                             ('id', stage_id)):
             logging.info('Default variant modified')
 
     def get_stage_data(self, stage_id, column='*'):
-        stages_rows = db_utils.get_row_by_column_data(self.conn,
+        stages_rows = db_utils.get_row_by_column_data(self.level,
                                                             'stages',
                                                             ('id', stage_id),
                                                             column)
@@ -263,18 +263,18 @@ class project:
             return None
 
     def get_stage_childs(self, stage_id, column='*'):
-        variants_rows = db_utils.get_row_by_column_data(self.conn,
+        variants_rows = db_utils.get_row_by_column_data(self.level,
                                                             'variants',
                                                             ('stage_id', stage_id),
                                                             column)
         return variants_rows
 
     def add_variant(self, name, stage_id, comment):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'variants',
                                         ('name', 'stage_id'),
                                         (name, stage_id))):
-            variant_id = db_utils.create_row(self.conn,
+            variant_id = db_utils.create_row(self.level,
                                 'variants', 
                                 ('name',
                                     'creation_time',
@@ -301,13 +301,13 @@ class project:
                 self.remove_work_env(work_env_id)
             for export_id in self.get_variant_export_childs(variant_id, 'id'):
                 self.remove_export(export_id)
-            success = db_utils.delete_row(self.conn, 'variants', variant_id)
+            success = db_utils.delete_row(self.level, 'variants', variant_id)
             if success:
                 logging.info(f"Variant removed from project")
         return success
 
     def get_variant_data(self, variant_id, column='*'):
-        variants_rows = db_utils.get_row_by_column_data(self.conn, 
+        variants_rows = db_utils.get_row_by_column_data(self.level, 
                                                             'variants', 
                                                             ('id', variant_id), 
                                                             column)
@@ -318,7 +318,7 @@ class project:
             return None
 
     def set_variant_data(self, variant_id, column, data):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                 'variants',
                                 (column, data),
                                 ('id', variant_id)):
@@ -328,21 +328,21 @@ class project:
             return None
 
     def get_variant_work_envs_childs(self, variant_id, column='*'):
-        work_envs_rows = db_utils.get_row_by_column_data(self.conn, 
+        work_envs_rows = db_utils.get_row_by_column_data(self.level, 
                                                             'work_envs', 
                                                             ('variant_id', variant_id), 
                                                             column)
         return work_envs_rows
 
     def get_variant_export_childs(self, variant_id, column='*'):
-        exports_rows = db_utils.get_row_by_column_data(self.conn, 
+        exports_rows = db_utils.get_row_by_column_data(self.level, 
                                                             'exports', 
                                                             ('variant_id', variant_id), 
                                                             column)
         return exports_rows
 
     def get_export_by_name(self, name, variant_id):
-        export_row = db_utils.get_row_by_multiple_data(self.conn, 
+        export_row = db_utils.get_row_by_multiple_data(self.level, 
                                                             'exports', 
                                                             ('name', 'variant_id'), 
                                                             (name, variant_id))
@@ -353,7 +353,7 @@ class project:
             return None
 
     def get_export_data(self, export_id, column='*'):
-        export_rows = db_utils.get_row_by_column_data(self.conn, 
+        export_rows = db_utils.get_row_by_column_data(self.level, 
                                                             'exports', 
                                                             ('id', export_id), 
                                                             column)
@@ -364,24 +364,24 @@ class project:
             return None
 
     def get_export_childs(self, export_id, column='*'):
-        exports_versions_rows = db_utils.get_row_by_column_data(self.conn, 
+        exports_versions_rows = db_utils.get_row_by_column_data(self.level, 
                                                             'export_versions', 
                                                             ('export_id', export_id), 
                                                             column)
         return exports_versions_rows
 
     def is_export(self, name, variant_id):
-        return db_utils.check_existence_by_multiple_data(self.conn, 
+        return db_utils.check_existence_by_multiple_data(self.level, 
                                         'exports',
                                         ('name', 'variant_id'),
                                         (name, variant_id))
 
     def add_export(self, name, variant_id):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'exports',
                                         ('name', 'variant_id'),
                                         (name, variant_id))):
-            export_id = db_utils.create_row(self.conn,
+            export_id = db_utils.create_row(self.level,
                                 'exports', 
                                 ('name',
                                     'creation_time',
@@ -402,31 +402,31 @@ class project:
         if site.site().is_admin():
             for export_version_id in self.get_export_childs(export_id, 'id'):
                 self.remove_export_version(export_version_id)
-            success = db_utils.delete_row(self.conn, 'exports', export_id)
+            success = db_utils.delete_row(self.level, 'exports', export_id)
             if success:
                 logging.info("Export removed from project")
         return success
 
     def get_export_versions(self, export_id, column='*'):
-        export_versions_rows = db_utils.get_row_by_column_data(self.conn,
+        export_versions_rows = db_utils.get_row_by_column_data(self.level,
                                                             'export_versions',
                                                             ('export_id', export_id),
                                                             column)
         return export_versions_rows
 
     def get_last_export_version(self, export_id, column='*'):
-        versions_rows = db_utils.get_last_row_by_column_data(self.conn,
+        versions_rows = db_utils.get_last_row_by_column_data(self.level,
                                                             'export_versions',
                                                             ('export_id', export_id),
                                                             column)
         return versions_rows
 
     def add_export_version(self, name, files, export_id, work_version_id=None, comment=''):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'export_versions',
                                         ('name', 'export_id'),
                                         (name, export_id))):
-            export_version_id = db_utils.create_row(self.conn,
+            export_version_id = db_utils.create_row(self.level,
                                 'export_versions', 
                                 ('name',
                                     'creation_time',
@@ -449,7 +449,7 @@ class project:
             logging.warning(f"{name} already exists")
 
     def get_export_version_destinations(self, export_version_id, column='*'):
-        references_rows = db_utils.get_row_by_column_data(self.conn,
+        references_rows = db_utils.get_row_by_column_data(self.level,
                                                             'references_data',
                                                             ('export_version_id', export_version_id),
                                                             column)
@@ -462,20 +462,20 @@ class project:
                 self.remove_ticket(ticket_id)
             for reference_id in self.get_export_version_destinations(export_version_id, 'id'):
                 self.remove_reference(reference_id)
-            success = db_utils.delete_row(self.conn, 'export_versions', export_version_id)
+            success = db_utils.delete_row(self.level, 'export_versions', export_version_id)
             if success:
                 logging.info("Export version removed from project")
         return success
 
     def get_export_version_tickets(self, export_version_id, column='*'):
-        tickets_rows = db_utils.get_row_by_column_data(self.conn,
+        tickets_rows = db_utils.get_row_by_column_data(self.level,
                                                             'tickets',
                                                             ('export_version_id', export_version_id),
                                                             column)
         return tickets_rows
 
     def get_export_version_data(self, export_version_id, column='*'):
-        export_versions_rows = db_utils.get_row_by_column_data(self.conn, 
+        export_versions_rows = db_utils.get_row_by_column_data(self.level, 
                                                             'export_versions', 
                                                             ('id', export_version_id), 
                                                             column)
@@ -486,11 +486,11 @@ class project:
             return None
 
     def add_work_env(self, name, software_id, variant_id):
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'work_envs',
                                         ('name', 'variant_id'),
                                         (name, variant_id))):
-            work_env_id = db_utils.create_row(self.conn,
+            work_env_id = db_utils.create_row(self.level,
                                 'work_envs', 
                                 ('name',
                                     'creation_time',
@@ -513,11 +513,11 @@ class project:
 
     def create_reference(self, work_env_id, export_version_id, namespace):
         reference_id = None
-        if not (db_utils.check_existence_by_multiple_data(self.conn, 
+        if not (db_utils.check_existence_by_multiple_data(self.level, 
                                         'references_data',
                                         ('namespace', 'work_env_id'),
                                         (namespace, work_env_id))):
-            reference_id = db_utils.create_row(self.conn,
+            reference_id = db_utils.create_row(self.level,
                                     'references_data', 
                                     ('creation_time',
                                         'creation_user',
@@ -536,13 +536,13 @@ class project:
         return reference_id
 
     def remove_reference(self, reference_id):
-        success = db_utils.delete_row(self.conn, 'references_data', reference_id)
+        success = db_utils.delete_row(self.level, 'references_data', reference_id)
         if success:
             logging.info("Reference deleted")
         return success
 
     def get_references(self, work_env_id, column='*'):
-        references_rows = db_utils.get_row_by_column_data(self.conn,
+        references_rows = db_utils.get_row_by_column_data(self.level,
                                                             'references_data',
                                                             ('work_env_id', work_env_id),
                                                             column)
@@ -555,27 +555,27 @@ class project:
                 self.remove_version(version_id)
             for reference_id in self.get_references(work_env_id, 'id'):
                 self.remove_reference(reference_id)
-            success = db_utils.delete_row(self.conn, 'work_envs', work_env_id)
+            success = db_utils.delete_row(self.level, 'work_envs', work_env_id)
             if success:
                 logging.info("Work env removed from project")
         return success
 
     def get_work_versions(self, work_env_id, column='*'):
-        versions_rows = db_utils.get_row_by_column_data(self.conn,
+        versions_rows = db_utils.get_row_by_column_data(self.level,
                                                             'versions',
                                                             ('work_env_id', work_env_id),
                                                             column)
         return versions_rows
 
     def get_last_work_version(self, work_env_id, column='*'):
-        versions_rows = db_utils.get_last_row_by_column_data(self.conn,
+        versions_rows = db_utils.get_last_row_by_column_data(self.level,
                                                             'versions',
                                                             ('work_env_id', work_env_id),
                                                             column)
         return versions_rows
 
     def get_work_env_data(self, work_env_id, column='*'):
-        work_env_rows = db_utils.get_row_by_column_data(self.conn,
+        work_env_rows = db_utils.get_row_by_column_data(self.level,
                                                             'work_envs',
                                                             ('id', work_env_id),
                                                             column)
@@ -601,7 +601,7 @@ class project:
         else:
             user_id = None
         if not self.get_lock(work_env_id):
-            if db_utils.update_data(self.conn,
+            if db_utils.update_data(self.level,
                                     'work_envs',
                                     ('lock_id', user_id),
                                     ('id', work_env_id)):
@@ -614,7 +614,7 @@ class project:
                 return None
 
     def add_version(self, name, file_path, work_env_id, comment='', screenshot_path=None):
-        version_id = db_utils.create_row(self.conn,
+        version_id = db_utils.create_row(self.level,
                             'versions', 
                             ('name',
                                 'creation_time',
@@ -635,7 +635,7 @@ class project:
         return version_id
 
     def get_version_data(self, version_id, column='*'):
-        work_envs_rows = db_utils.get_row_by_column_data(self.conn,
+        work_envs_rows = db_utils.get_row_by_column_data(self.level,
                                                             'versions',
                                                             ('id', version_id),
                                                             column)
@@ -648,7 +648,7 @@ class project:
     def remove_version(self, version_id):
         success = None
         if site.site().is_admin():
-            success = db_utils.delete_row(self.conn, 'versions', version_id)
+            success = db_utils.delete_row(self.level, 'versions', version_id)
             if success :
                 logging.info(f"Version removed from project")
         return success
@@ -656,7 +656,7 @@ class project:
     def add_software(self, name, extension, file_command, no_file_command):
         if name in softwares_vars._softwares_list_:
             if name not in self.get_softwares_names_list():
-                software_id = db_utils.create_row(self.conn,
+                software_id = db_utils.create_row(self.level,
                                 'softwares', 
                                 ('name', 
                                     'extension',
@@ -683,12 +683,12 @@ class project:
             return None
 
     def get_softwares_names_list(self):
-        softwares_rows = db_utils.get_rows(self.conn, 'softwares', 'name')
+        softwares_rows = db_utils.get_rows(self.level, 'softwares', 'name')
         return softwares_rows
 
     def set_software_path(self, software_id, path):
         if os.path.isfile(path):
-            if db_utils.update_data(self.conn,
+            if db_utils.update_data(self.level,
                                 'softwares',
                                 ('path', path),
                                 ('id', software_id)):
@@ -701,7 +701,7 @@ class project:
             return None
 
     def set_software_additionnal_scripts(self, software_id, paths_list):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                 'softwares',
                                 ('additionnal_scripts', json.dumps(paths_list)),
                                 ('id', software_id)):
@@ -711,7 +711,7 @@ class project:
             return None
 
     def set_software_additionnal_env(self, software_id, env_dic):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                 'softwares',
                                 ('additionnal_env', json.dumps(env_dic)),
                                 ('id', software_id)):
@@ -721,7 +721,7 @@ class project:
             return None
 
     def get_software_data(self, software_id, column='*'):
-        softwares_rows = db_utils.get_row_by_column_data(self.conn,
+        softwares_rows = db_utils.get_row_by_column_data(self.level,
                                                             'softwares',
                                                             ('id', software_id),
                                                             column)
@@ -732,7 +732,7 @@ class project:
             return None
 
     def create_extension_row(self, stage, software_id, extension):
-        if db_utils.create_row(self.conn,
+        if db_utils.create_row(self.level,
                                     'extensions',
                                     ('stage',
                                         'software_id',
@@ -746,7 +746,7 @@ class project:
             return None
 
     def get_extension(self, stage, software_id):
-        export_row = db_utils.get_row_by_multiple_data(self.conn, 
+        export_row = db_utils.get_row_by_multiple_data(self.level, 
                                                             'extensions', 
                                                             ('stage', 'software_id'), 
                                                             (stage, software_id))
@@ -757,8 +757,8 @@ class project:
             return None
 
     def create_settings_row(self, frame_rate, image_format):
-        if len(db_utils.get_rows(self.conn, 'settings', 'id'))==0:
-            if db_utils.create_row(self.conn,
+        if len(db_utils.get_rows(self.level, 'settings', 'id'))==0:
+            if db_utils.create_row(self.level,
                                                 'settings',
                                                 ('frame_rate',
                                                     'image_format',
@@ -775,7 +775,7 @@ class project:
             return None
 
     def set_frame_rate(self, frame_rate):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                 'settings',
                                 ('frame_rate', frame_rate),
                                 ('id', 1)):
@@ -785,7 +785,7 @@ class project:
             return None
 
     def get_frame_rate(self):
-        frame_rate_list = db_utils.get_row_by_column_data(self.conn,
+        frame_rate_list = db_utils.get_row_by_column_data(self.level,
                                                             'settings',
                                                             ('id', 1),
                                                             'frame_rate')
@@ -796,7 +796,7 @@ class project:
             return None
 
     def set_image_format(self, image_format):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                 'settings',
                                 ('image_format', json.dumps(image_format)),
                                 ('id', 1)):
@@ -806,7 +806,7 @@ class project:
             return None
 
     def get_image_format(self):
-        image_format_list = db_utils.get_row_by_column_data(self.conn,
+        image_format_list = db_utils.get_row_by_column_data(self.level,
                                                             'settings',
                                                             ('id', 1),
                                                             'image_format')
@@ -817,7 +817,7 @@ class project:
             return None
 
     def get_users_ids_list(self):
-        users_ids_list = db_utils.get_row_by_column_data(self.conn,
+        users_ids_list = db_utils.get_row_by_column_data(self.level,
                                                             'settings',
                                                             ('id', 1),
                                                             'users_ids')
@@ -840,7 +840,7 @@ class project:
             self.update_users_list(users_ids_list)
 
     def update_users_list(self, users_ids_list):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                 'settings',
                                 ('users_ids', json.dumps(users_ids_list)),
                                 ('id', 1)):
@@ -867,7 +867,7 @@ class project:
                 if export_id:
                     variant_id = self.get_export_data(export_id, 'variant_id')
                     if variant_id:
-                        ticket_id = db_utils.create_row(self.conn,
+                        ticket_id = db_utils.create_row(self.level,
                                                             'tickets',
                                                             ('creation_user',
                                                                 'creation_time',
@@ -892,7 +892,7 @@ class project:
         return ticket_id
 
     def get_ticket_data(self, ticket_id, column='*'):
-        tickets_rows = db_utils.get_row_by_column_data(self.conn,
+        tickets_rows = db_utils.get_row_by_column_data(self.level,
                                                             'tickets',
                                                             ('id', ticket_id),
                                                             column)
@@ -903,7 +903,7 @@ class project:
             return None
 
     def change_ticket_state(self, ticket_id, state):
-        if db_utils.update_data(self.conn,
+        if db_utils.update_data(self.level,
                                         'tickets',
                                         ('state', state),
                                         ('id', ticket_id)):
@@ -918,7 +918,7 @@ class project:
     def remove_ticket(self, ticket_id):
         success = None
         if site.site().is_admin():
-            success = db_utils.delete_row(self.conn, 'tickets', ticket_id)
+            success = db_utils.delete_row(self.level, 'tickets', ticket_id)
             if success :
                 logging.info(f"Ticket removed from project")
         return success
@@ -932,7 +932,7 @@ class project:
         return shared_files_folder
 
     def add_event(self, event_type, message, data):
-        event_id = db_utils.create_row(self.conn,
+        event_id = db_utils.create_row(self.level,
                                                 'events',
                                                 ('creation_user',
                                                     'creation_time',
@@ -949,7 +949,7 @@ class project:
         return event_id
 
     def get_event_data(self, event_id, column='*'):
-        events_rows = db_utils.get_row_by_column_data(self.conn,
+        events_rows = db_utils.get_row_by_column_data(self.level,
                                                             'events',
                                                             ('id', event_id),
                                                             column)
@@ -965,14 +965,11 @@ class project:
                             only_subprocess=0,
                             icon=ressources._default_script_shelf_icon_):
         shelf_script_id = None
-        if not db_utils.check_existence(self.conn, 'shelf_scripts', 'name', name):
+        if not db_utils.check_existence(self.level, 'shelf_scripts', 'name', name):
             if os.path.isfile(icon):
-                icon_bytes = image.convert_image_to_bytes(icon, 45)
-            else:
-                logging.warning(f"{icon} doesn't exists, assigning default icon")
-                icon_bytes = image.convert_image_to_bytes(ressources._default_script_shelf_icon_, 45)
+                icon = ressources._default_script_shelf_icon_
 
-            shelf_script_id = db_utils.create_row(self.conn,
+            shelf_script_id = db_utils.create_row(self.level,
                                                     'shelf_scripts',
                                                     ('creation_user',
                                                         'creation_time',
@@ -985,7 +982,7 @@ class project:
                                                         name,
                                                         py_file,
                                                         only_subprocess,
-                                                        icon_bytes))
+                                                        icon))
             if shelf_script_id:
                 logging.info("Shelf script created")
         else:
@@ -993,7 +990,7 @@ class project:
         return shelf_script_id
 
     def get_shelf_script_data(self, name, column='*'):
-        shelf_scripts_rows = db_utils.get_row_by_column_data(self.conn,
+        shelf_scripts_rows = db_utils.get_row_by_column_data(self.level,
                                                             'shelf_scripts',
                                                             ('name', name),
                                                             column)
@@ -1252,7 +1249,7 @@ def create_shelf_scripts_table(database):
                                         name text NOT NULL UNIQUE,
                                         py_file text NOT NULL,
                                         only_subprocess bool NOT NULL,
-                                        icon bytea NOT NULL
+                                        icon text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logging.info("Shelf scripts table created")
