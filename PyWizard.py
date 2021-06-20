@@ -20,18 +20,14 @@ from wizard.core import communicate
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-while not user.user().get_site_path():
-	site_path = input('Please set a site path : ')
-	if not os.path.isfile(site.get_database_file(site_path)):
-		init_site = input("Site database doesn't exists, init database (y/n) ? : ")
-		if init_site == 'y':
-			admin_password = input('Administator password : ')
-			admin_email = input('Administator email : ')
-			if site.init_site(site_path, admin_password, admin_email):
-				user.user().set_site_path(site_path)
-	else:
-		user.user().set_site_path(site_path)
+while not site.is_site_database():
+	init_site = input("Site database doesn't exists, init database (y/n) ? : ")
+	if init_site == 'y':
+		admin_password = input('Administator password : ')
+		admin_email = input('Administator email : ')
+		site.init_site(admin_password, admin_email)
 
+site.site().add_ip_user()
 
 while not user.get_user():
 	do_create_user = input('Create user (y/n) ? : ')
