@@ -4,6 +4,7 @@
 
 # Python modules
 import time
+import os
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
@@ -31,8 +32,8 @@ class tree_widget(QtWidgets.QWidget):
         self.creation_items=[]
 
         self.build_ui()
-        self.refresh()
         self.connect_functions()
+        self.refresh()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -131,6 +132,8 @@ class tree_widget(QtWidgets.QWidget):
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
+
+        self.apply_search()
         
         if hard:
             self.set_context()
@@ -203,7 +206,6 @@ class tree_widget(QtWidgets.QWidget):
             self.asset_ids[id].setHidden(visibility)
 
     def filter_stage(self, string):
-        print(string)
         if not string or len(string)<2:
             for id in self.asset_ids.keys():
                 for i in range(self.asset_ids[id].childCount()):
@@ -215,6 +217,15 @@ class tree_widget(QtWidgets.QWidget):
                         self.asset_ids[id].child(i).setHidden(1)
                     else:
                         self.asset_ids[id].child(i).setHidden(0)
+
+    def focus_on_item(self, item):
+        self.tree.scrollToItem(item)
+        self.tree.setCurrentItem(item)
+        item.setExpanded(1)
+
+    def apply_search(self):
+        search = self.search_bar.text()
+        self.search_asset(search)
 
     def search_asset(self, search):
         stage_filter = None
@@ -237,35 +248,71 @@ class tree_widget(QtWidgets.QWidget):
 
 
     def double_click(self, item):
+
+        new_stage_id = None
+        new_asset_id = None
+        new_category_id = None
+
         if item.type == 'stage_creation':
             stage_name = item.text(0)
             parent_id = item.parent_id
-            assets.create_stage(stage_name, parent_id)
+            new_stage_id = assets.create_stage(stage_name, parent_id)
             self.refresh()
         elif item.type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 asset_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.parent_id
-                assets.create_asset(asset_name, parent_id)
+                new_asset_id = assets.create_asset(asset_name, parent_id)
                 self.refresh()
         elif item.type == 'category_creation':
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.parent_id
-                assets.create_category(category_name, parent_id)
+                new_category_id = assets.create_category(category_name, parent_id)
                 self.refresh()
+
+        if new_stage_id:
+            if new_stage_id in self.stage_ids.keys():
+                self.focus_on_item(self.stage_ids[new_stage_id])
+        if new_asset_id:
+            if new_asset_id in self.asset_ids.keys():
+                self.focus_on_item(self.asset_ids[new_asset_id])
+        if new_category_id:
+            if new_category_id in self.stage_ids.keys():
+                self.focus_on_item(self.new_category_id[new_category_id])
 
     def context_menu_requested(self, point):
         item = self.tree.itemAt(point)
         if item:
             self.menu_widget = menu_widget.menu_widget(self)
+            open_folder_action = None
+            archive_action = None
+            if 'creation' not in item.type:
+                open_folder_action = self.menu_widget.add_action(f'Open folder')
             if 'creation' not in item.type and item.type != 'domain':
                 archive_action = self.menu_widget.add_action(f'Archive {item.type}')
-                if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.menu_widget.function_name is not None:
                     if self.menu_widget.function_name == archive_action:
                         self.archive_instance(item)
+                    elif self.menu_widget.function_name == open_folder_action:
+                        self.open_folder(item)
+
+    def open_folder(self, item):
+        if item.type == 'domain':
+            path = assets.get_domain_path(item.id)
+        elif item.type == 'category':
+            path = assets.get_category_path(item.id)
+        elif item.type == 'asset':
+            path = assets.get_asset_path(item.id)
+        elif item.type== 'stage':
+            path = assets.get_stage_path(item.id)
+        if os.path.isdir(path):
+            os.startfile(path)
+        else:
+            logging.error(f"{path} not found")
 
     def archive_instance(self, item):
         if item.type == 'category':
@@ -346,7 +393,6 @@ class search_thread(QtCore.QThread):
         parent_id = None
         if self.category and len(self.category)>2:
             category_id=project.get_category_data_by_name(self.category, 'id')
-            logging.info(category_id)
             if category_id:
                 parent_id = category_id
         if self.category and not parent_id:

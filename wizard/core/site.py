@@ -27,13 +27,11 @@ from wizard.core import image
 from wizard.vars import site_vars
 from wizard.vars import ressources
 
-level = 'site'
-
 def create_project(project_name, project_path, project_password):
     if project_name not in get_projects_names_list():
         if project_path not in get_projects_paths_list():
             if get_user_row_by_name(environment.get_user())['pass']:
-                if db_utils.create_row(level,
+                if db_utils.create_row('site',
                                 'projects', 
                                 ('project_name', 'project_path', 'project_password'), 
                                 (project_name,
@@ -55,25 +53,25 @@ def get_administrator_pass():
     return get_user_row_by_name('admin')['pass']
 
 def get_projects_list():
-    projects_rows = db_utils.get_rows(level, 'projects')
+    projects_rows = db_utils.get_rows('site', 'projects')
     return projects_rows
 
 def get_projects_names_list():
-    projects_rows = db_utils.get_rows(level, 'projects', 'project_name')
+    projects_rows = db_utils.get_rows('site', 'projects', 'project_name')
     return projects_rows
 
 def get_projects_paths_list():
-    projects_rows = db_utils.get_rows(level, 'projects', 'project_path')
+    projects_rows = db_utils.get_rows('site', 'projects', 'project_path')
     return projects_rows
 
 def get_project_row_by_name(name):
-    projects_rows = db_utils.get_row_by_column_data(level,
+    projects_rows = db_utils.get_row_by_column_data('site',
                                                     'projects',
                                                     ('project_name', name))
     return projects_rows[0]
 
 def get_project_row(project_id, column='*'):
-    projects_rows = db_utils.get_row_by_column_data(level,
+    projects_rows = db_utils.get_row_by_column_data('site',
                                                     'projects',
                                                     ('id', project_id),
                                                     column)
@@ -92,7 +90,7 @@ def modify_project_password(project_name,
             if tools.decrypt_string(
                     get_project_row_by_name(project_name)['project_password'],
                     project_password):
-                if db_utils.update_data(level,
+                if db_utils.update_data('site',
                             'projects',
                             ('project_password', tools.encrypt_string(new_password)),
                             ('project_name', project_name)):
@@ -119,7 +117,7 @@ def create_user(user_name,
             administrator = 1
         if os.path.isfile(profile_picture):
             profile_picture = ressources._default_profile_
-        if db_utils.create_row(level,
+        if db_utils.create_row('site',
                     'users', 
                     ('user_name',
                         'pass',
@@ -157,7 +155,7 @@ def upgrade_user_privilege(user_name, administrator_pass):
         if not user_row['administrator']:
             if tools.decrypt_string(get_administrator_pass(),
                                         administrator_pass):
-                if db_utils.update_data(level,
+                if db_utils.update_data('site',
                                         'users',
                                         ('administrator',1),
                                         ('user_name', user_name)):
@@ -175,7 +173,7 @@ def downgrade_user_privilege(user_name, administrator_pass):
         if user_row['administrator']:
             if tools.decrypt_string(get_administrator_pass(),
                                         administrator_pass):
-                if db_utils.update_data(level,
+                if db_utils.update_data('site',
                                         'users',
                                         ('administrator',0),
                                         ('user_name', user_name)):
@@ -195,7 +193,7 @@ def modify_user_password(user_name, password, new_password):
     user_row = get_user_row_by_name(user_name)
     if user_row:
         if tools.decrypt_string(user_row['pass'], password):
-            if db_utils.update_data(level,
+            if db_utils.update_data('site',
                                     'users',
                                     ('pass',
                                         tools.encrypt_string(new_password)),
@@ -209,15 +207,15 @@ def modify_user_password(user_name, password, new_password):
             return None
 
 def get_users_list():
-    users_rows = db_utils.get_rows(level, 'users')
+    users_rows = db_utils.get_rows('site', 'users')
     return users_rows
 
 def get_user_names_list():
-    users_rows = db_utils.get_rows(level, 'users', 'user_name')
+    users_rows = db_utils.get_rows('site', 'users', 'user_name')
     return users_rows
 
 def get_user_row_by_name(name, column='*'):
-    users_rows = db_utils.get_row_by_column_data(level,
+    users_rows = db_utils.get_row_by_column_data('site',
                                                     'users',
                                                     ('user_name', name),
                                                     column)
@@ -228,7 +226,7 @@ def get_user_row_by_name(name, column='*'):
         return None
 
 def get_user_data(user_id, column='*'):
-    users_rows = db_utils.get_row_by_column_data(level,
+    users_rows = db_utils.get_row_by_column_data('site',
                                                     'users',
                                                     ('id', user_id),
                                                     column)
@@ -239,27 +237,27 @@ def get_user_data(user_id, column='*'):
         return None
 
 def modify_user_xp(user_name, xp):
-    if db_utils.update_data(level,
-                                    'users',
-                                    ('xp', xp),
-                                    ('user_name', user_name)):
+    if db_utils.update_data('site',
+                                'users',
+                                ('xp', xp),
+                                ('user_name', user_name)):
         logging.info(f'{user_name} won some xps')
         return 1
     else:
         return None
 
-def modify_user_level(user_name, level):
-    if db_utils.update_data(level,
-                                    'users',
-                                    ('level', level),
-                                    ('user_name', user_name)):
-        logging.info(f'{user_name} is now level {level}')
+def modify_user_level(user_name, new_level):
+    if db_utils.update_data('site',
+                            'users',
+                            ('level', new_level),
+                            ('user_name', user_name)):
+        logging.info(f'{user_name} is now level {new_level}')
         return 1
     else:
         return None
 
 def modify_user_life(user_name, life):
-    if db_utils.update_data(level,
+    if db_utils.update_data('site',
                                     'users',
                                     ('life', life),
                                     ('user_name', user_name)):
@@ -277,7 +275,7 @@ def is_admin():
 def add_quote(content):
     quote_id = None
     if content and content != '':
-        quote_id = db_utils.create_row(level,
+        quote_id = db_utils.create_row('site',
                                 'quotes', 
                                 ('creation_user',
                                     'content',
@@ -302,7 +300,7 @@ def add_quote_score(quote_id, score):
         logging.warning(f"{score} is not an integer")
         sanity = 0
     if sanity:
-        current_quote_row = db_utils.get_row_by_column_data(level,
+        current_quote_row = db_utils.get_row_by_column_data('site',
                                                         'quotes',
                                                         ('id', quote_id))
 
@@ -313,14 +311,14 @@ def add_quote_score(quote_id, score):
                     current_scores_list = json.loads(current_quote_row[0]['score'])
                     current_scores_list.append(score)
                     voters_list.append(environment.get_user())
-                    if db_utils.update_data(level,
+                    if db_utils.update_data('site',
                                                     'quotes',
                                                     ('score',
                                                         json.dumps(current_scores_list)),
                                                     ('id',
                                                         quote_id)):
                         logging.info("Quote score updated")
-                    if db_utils.update_data(level,
+                    if db_utils.update_data('site',
                                                     'quotes',
                                                     ('voters',
                                                         json.dumps(voters_list)),
@@ -333,7 +331,7 @@ def add_quote_score(quote_id, score):
                 logging.warning("You can't vote for your own quote")
 
 def get_quote_data(quote_id, column='*'):
-    quotes_rows = db_utils.get_row_by_column_data(level,
+    quotes_rows = db_utils.get_row_by_column_data('site',
                                                     'quotes',
                                                     ('id', quote_id),
                                                     column)
@@ -344,7 +342,7 @@ def get_quote_data(quote_id, column='*'):
         return None
 
 def get_ips(column='*'):
-    ip_rows = db_utils.get_rows(level, 'ips_wrap', column)
+    ip_rows = db_utils.get_rows('site', 'ips_wrap', column)
     return ip_rows
 
 def add_ip_user():
@@ -353,7 +351,7 @@ def add_ip_user():
     if not ip_rows:
         ip_rows=[]
     if ip not in ip_rows:
-        if db_utils.create_row(level,
+        if db_utils.create_row('site',
                             'ips_wrap', 
                             ('ip', 'user_id', 'project_id'), 
                             (ip, None, None)):
@@ -361,7 +359,7 @@ def add_ip_user():
 
 def update_current_ip_data(column, data):
     ip = socket.gethostbyname(socket.gethostname())
-    if db_utils.update_data(level,
+    if db_utils.update_data('site',
                                     'ips_wrap',
                                     (column, data),
                                     ('ip', ip)):
@@ -369,7 +367,7 @@ def update_current_ip_data(column, data):
 
 def get_current_ip_data(column='*'):
     ip = socket.gethostbyname(socket.gethostname())
-    ip_rows = db_utils.get_row_by_column_data(level,
+    ip_rows = db_utils.get_row_by_column_data('site',
                                                     'ips_wrap',
                                                     ('ip', ip),
                                                     column)

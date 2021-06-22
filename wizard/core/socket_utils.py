@@ -7,6 +7,10 @@ import socket
 import json
 import traceback
 
+# Wizard modules
+from wizard.core import logging
+logging = logging.get_logger(__name__)
+
 def recvall(sock):
     BUFF_SIZE = 4096 # 4 KiB
     data = b''
