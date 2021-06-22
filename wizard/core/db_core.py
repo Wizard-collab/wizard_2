@@ -2,19 +2,9 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
-# This module is used to handle third party softwares commands
-# For example if you want to save a version within a 
-# Maya, the software plugin sends a socket signal
-# here and waits for a return ( also socket signal )
-
-# It roughly is a lan access to the wizard core functions
-
 # Python modules
 import socket
-import sys
 import threading
-import time
-import traceback
 import json
 
 # PostgreSQL python modules
@@ -107,7 +97,7 @@ class db_server(threading.Thread):
             logging.error(error)
             return None
 
-def create_connection(database):
+def create_connection(database=None):
     try:
         conn=None
         conn = psycopg2.connect(environment.get_psql_dns(), database=database)
@@ -115,3 +105,33 @@ def create_connection(database):
     except (Exception, psycopg2.DatabaseError) as error:
         logging.error(error)
         return None
+
+def create_database(database):
+    conn=None
+    try:
+        conn = create_connection()
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+        cur.execute(f"CREATE DATABASE {database};")
+        conn.commit()
+        return 1
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error(error)
+        return None
+    finally:
+        if conn is not None:
+            conn.close()
+
+def create_table(database, cmd):
+    try:
+        conn = create_connection(database)
+        cursor = conn.cursor()
+        cursor.execute(cmd)
+        conn.commit()
+        return 1
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error(error)
+        return None
+    finally:
+        if conn:
+            conn.close()

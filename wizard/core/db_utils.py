@@ -9,52 +9,21 @@
 # wizard functions
 
 # Python modules
-import psycopg2
-import psycopg2.extras
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-import time
 import traceback
-import os
 import socket
 import json
-from wizard.core import socket_utils
 
 # Wizard modules
-from wizard.core import environment
 from wizard.core import db_core
-
+from wizard.core import socket_utils
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def create_database(database):
-    conn=None
-    try:
-        conn = psycopg2.connect(environment.get_psql_dns())
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = conn.cursor()
-        cur.execute(f"CREATE DATABASE {database};")
-        conn.commit()
-        return 1
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    finally:
-        if conn is not None:
-            conn.close()
+    return db_core.create_database(database)
 
 def create_table(database, cmd):
-    try:
-        conn = db_core.create_connection(database)
-        cursor = conn.cursor()
-        cursor.execute(cmd)
-        conn.commit()
-        return 1
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    return db_core.create_table(database, cmd)
 
 def create_row(level, table, columns, datas):
     sql_cmd = f''' INSERT INTO {table}('''
@@ -170,13 +139,7 @@ def delete_row(level, table, id):
     return execute_sql(sql_cmd, level, 0, (id,), 0)
 
 def check_database_existence(database):
-    conn = None
-    try:
-        conn = psycopg2.connect(environment.get_psql_dns())
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-
+    conn = db_core.create_connection()
     if conn is not None:
         conn.autocommit = True
         cur = conn.cursor()
