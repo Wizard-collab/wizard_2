@@ -51,7 +51,7 @@ if not site.is_site_database():
 else:
 	server = db_core.db_server()
 	server.start()
-site.site().add_ip_user()
+site.add_ip_user()
 
 while not user.get_user():
 	do_create_user = input('Create user (y/n) ? : ')
@@ -61,7 +61,7 @@ while not user.get_user():
 		email = input('Email : ')
 		profile_picture = input('Profile picture ( without any "\\" ) ( Optional ) : ')
 		administrator_pass = input('Administrator pass ( Optional ) : ')
-		site.site().create_user(user_name,
+		site.create_user(user_name,
 								password,
 								email,
 								administrator_pass,
@@ -80,10 +80,8 @@ while not user.get_project():
 		project_path = input('Project path : ')
 		project_password = input('Project password : ')
 		if project.create_project(project_name, project_path, project_password):
-			print('lol')
 			server.project_name = project_name
 			create_project.create_project(project_name, project_path, project_password)
-			print('prout')
 
 	else:
 		project_name = input('Project name : ')
@@ -94,21 +92,20 @@ project_name = environment.get_project_name()
 server.project_name = project_name
 
 def stdout_tree():
-	project_obj = project.project()
-	domains_rows = project_obj.get_domains()
+	domains_rows = project.get_domains()
 	for domain_row in domains_rows:
 		print(f"{domain_row['id']}-{domain_row['name']}")
-		for category_row in project_obj.get_domain_childs(domain_row['id']):
+		for category_row in project.get_domain_childs(domain_row['id']):
 			print(f"  {category_row['id']}-{category_row['name']}")
-			for asset_row in project_obj.get_category_childs(category_row['id']):
+			for asset_row in project.get_category_childs(category_row['id']):
 				print(f"    {asset_row['id']}-{asset_row['name']}")
-				for stage_row in project_obj.get_asset_childs(asset_row['id']):
+				for stage_row in project.get_asset_childs(asset_row['id']):
 					print(f"      {stage_row['id']}-{stage_row['name']}")
-					for variant_row in project_obj.get_stage_childs(stage_row['id']):
+					for variant_row in project.get_stage_childs(stage_row['id']):
 						print(f"        {variant_row['id']}-{variant_row['name']}")
-						for work_env_row in project_obj.get_variant_work_envs_childs(variant_row['id']):
+						for work_env_row in project.get_variant_work_envs_childs(variant_row['id']):
 							print(f"          {work_env_row['id']}-{work_env_row['name']}")
-							for version_row in project_obj.get_work_versions(work_env_row['id']):
+							for version_row in project.get_work_versions(work_env_row['id']):
 								print(f"            {version_row['id']}-{version_row['name']}")
 
 

@@ -22,10 +22,10 @@ from wizard.vars import ressources
 from wizard.vars import user_vars
 
 def create_script(name,
-							script,
-							only_subprocess=0,
-							icon=ressources._default_script_shelf_icon_,
-							project=0):
+					script,
+					only_subprocess=0,
+					icon=ressources._default_script_shelf_icon_,
+					project=0):
 	if project:
 		create_project_script(name,
 								script,
@@ -41,10 +41,10 @@ def create_project_script(name,
 							script,
 							only_subprocess=0,
 							icon=ressources._default_script_shelf_icon_):
-	scripts_folder = project.project().get_scripts_folder()
+	scripts_folder = project.get_scripts_folder()
 	file_name = f"{name}.py"
 	file = tools.get_filename_without_override(os.path.normpath(os.path.join(scripts_folder, file_name)))
-	if project.project().add_shelf_script(name, file, only_subprocess, icon):
+	if project.add_shelf_script(name, file, only_subprocess, icon):
 		with open(file, 'w') as f:
 			f.write(script)
 
@@ -60,7 +60,7 @@ def create_user_script(name,
 			f.write(script)
 
 def execute_project_script(name):
-	py_file = project.project().get_shelf_script_data(name, 'py_file')
+	py_file = project.get_shelf_script_data(name, 'py_file')
 	if py_file:
 		user.user().execute_py(py_file)
 
