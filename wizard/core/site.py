@@ -378,7 +378,6 @@ def get_current_ip_data(column='*'):
 def init_site(admin_password, admin_email):
     create_admin_user(admin_password, admin_email)
     for quote in site_vars._default_quotes_list_:
-        conn = db_utils.create_connection('site')
         db_utils.create_row('site',
                             'quotes', 
                             ('creation_user',

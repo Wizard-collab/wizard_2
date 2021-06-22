@@ -101,21 +101,19 @@ class tree_widget(QtWidgets.QWidget):
         if hard:
             self.init_tree()
 
-        project_obj = project.project()
-
         self.project_category_ids = []
         self.project_asset_ids = []
         self.project_stage_ids = []
 
-        for domain_row in project_obj.get_domains():
+        for domain_row in project.get_domains():
             self.add_domain(domain_row)
-        for category_row in project_obj.get_all_categories():
+        for category_row in project.get_all_categories():
             self.add_category(category_row)
             self.project_category_ids.append(category_row['id'])
-        for asset_row in project_obj.get_all_assets():
+        for asset_row in project.get_all_assets():
             self.add_asset(asset_row)
             self.project_asset_ids.append(asset_row['id'])
-        for stage_row in project_obj.get_all_stages():
+        for stage_row in project.get_all_stages():
             self.add_stage(stage_row)
             self.project_stage_ids.append(stage_row['id'])
 
@@ -165,8 +163,8 @@ class tree_widget(QtWidgets.QWidget):
             asset_item.id = row['id']
             self.asset_ids[row['id']] = asset_item
             parent_widget.addChild(asset_item)
-            domain_id = project.project().get_category_data(row['category_id'], 'domain_id')
-            domain_name = project.project().get_domain_data(domain_id, 'name')
+            domain_id = project.get_category_data(row['category_id'], 'domain_id')
+            domain_name = project.get_domain_data(domain_id, 'name')
             for stage in assets_vars._stages_rules_dic_[domain_name]:
                 self.add_creation_item(asset_item, stage, 'stage_creation')
 
@@ -344,22 +342,21 @@ class search_thread(QtCore.QThread):
         self.start()
 
     def run(self):
-        project_obj = project.project()
         process=1
         parent_id = None
         if self.category and len(self.category)>2:
-            category_id=project.project().get_category_data_by_name(self.category, 'id')
+            category_id=project.get_category_data_by_name(self.category, 'id')
             logging.info(category_id)
             if category_id:
                 parent_id = category_id
         if self.category and not parent_id:
             process=None
         if process:
-            assets_list = project_obj.search_asset(self.asset, parent_id)
+            assets_list = project.search_asset(self.asset, parent_id)
             for asset_row in assets_list:
                 if not self.running:
                     break
-                domain_id = project_obj.get_category_data(project_obj.get_asset_data(asset_row['id'], 'category_id'), 'domain_id')
+                domain_id = project.get_category_data(project.get_asset_data(asset_row['id'], 'category_id'), 'domain_id')
                 self.item_signal.emit([domain_id, asset_row['category_id'], asset_row['id']])
 
 def main():
