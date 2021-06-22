@@ -20,17 +20,16 @@ import json
 from wizard.core import socket_utils
 
 # Wizard modules
+from wizard.core import environment
+from wizard.core import db_core
+
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 def create_database(database):
     conn=None
     try:
-        conn = psycopg2.connect(
-            host="192.168.1.21",
-            port='5432',
-            user='pi',
-            password='Tv8ams23061995')
+        conn = psycopg2.connect(environment.get_psql_dns())
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
         cur.execute(f"CREATE DATABASE {database};")
@@ -43,22 +42,9 @@ def create_database(database):
         if conn is not None:
             conn.close()
 
-def create_connection(database):
-    try:
-        conn=None
-        conn = psycopg2.connect(
-            host="192.168.1.21",
-            database=database,
-            user='pi',
-            password='Tv8ams23061995')
-        return conn
-    except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
-        return None
-
 def create_table(database, cmd):
     try:
-        conn = create_connection(database)
+        conn = db_core.create_connection(database)
         cursor = conn.cursor()
         cursor.execute(cmd)
         conn.commit()
@@ -177,20 +163,16 @@ def update_data(level,
     sql_cmd = f''' UPDATE {table}'''
     sql_cmd += f''' SET {set_tuple[0]} = %s'''
     sql_cmd += f''' WHERE {where_tuple[0]} = %s'''
-    return execute_sql(sql_cmd, level, 0, (set_tuple[1], where_tuple[1]))
+    return execute_sql(sql_cmd, level, 0, (set_tuple[1], where_tuple[1]), 0)
     
 def delete_row(level, table, id):
     sql_cmd = f'DELETE FROM {table} WHERE id=%s'
-    return execute_sql(sql_cmd, level, 0, (id,))
+    return execute_sql(sql_cmd, level, 0, (id,), 0)
 
 def check_database_existence(database):
     conn = None
     try:
-        conn = psycopg2.connect(
-                                host='192.168.1.21',
-                                port='5432',
-                                user='pi',
-                                password='Tv8ams23061995')
+        conn = psycopg2.connect(environment.get_psql_dns())
     except (Exception, psycopg2.DatabaseError) as error:
         logging.error(error)
         return None
@@ -208,21 +190,17 @@ def check_database_existence(database):
             logging.debug("'{}' Database doesn't exist.".format(database))
             return None
 
-def execute_sql(sql, level, as_dict, data=None, fetchone=0):
+def execute_sql(sql, level, as_dict, data=None, fetch=2):
     signal_dic = dict()
     signal_dic['sql'] = sql
     signal_dic['level'] = level
     signal_dic['as_dict'] = as_dict
     signal_dic['data'] = data
-    signal_dic['fetchone'] = fetchone
+    signal_dic['fetch'] = fetch
     signal_as_str = json.dumps(signal_dic)
     return send_signal(signal_as_str)
 
 def send_signal(signal_as_str):
-    # Send a signal to wizard
-    # The signal_as_str is converted to json string
-    # Before sending to wizard the signal 
-    # will be encoded in utf-8 (bytes)
     try:
         host_name = 'localhost'
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -238,10 +216,3 @@ def send_signal(signal_as_str):
     except socket.timeout:
         logging.error("Wizard has been too long to give a response, please retry.")
         return None
-
-def recv_all(sock):
-    arr = bytearray(msg_len)
-    pos = 0
-    while pos < msg_len:
-        arr[pos:pos+max_msg_size] = sock.recv(max_msg_size)
-        pos += max_msg_size

@@ -12,19 +12,23 @@
 # Python modules
 import socket
 import sys
-from threading import Thread
+import threading
 import time
 import traceback
 import json
+
+# PostgreSQL python modules
 import psycopg2
 import psycopg2.extras
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 # Wizard modules
+from wizard.core import environment
+from wizard.core import socket_utils
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-class db_server(Thread):
+class db_server(threading.Thread):
     def __init__(self, project_name=None):
         super(db_server, self).__init__()
         hostname = 'localhost'
@@ -49,13 +53,19 @@ class db_server(Thread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = conn.recv(2048).decode('utf8')
+                    signal_as_str = socket_utils.recvall(conn).decode('utf8')
                     if signal_as_str:
                         returned = self.execute_sql(signal_as_str)
                         conn.send(json.dumps(returned).encode('utf-8'))
+                        conn.close()
             except:
                 logging.error(str(traceback.format_exc()))
                 continue
+        if self.site_conn is not None:
+            self.site_conn.close()
+        if self.project_conn is not None:
+            self.project_conn.close()
+
 
     def stop(self):
         self.running = False
@@ -73,6 +83,7 @@ class db_server(Thread):
                         self.project_conn.autocommit = True
                 conn = self.project_conn
             if conn:
+                rows = None
                 if signal_dic['as_dict']:
                     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                 else:
@@ -81,12 +92,13 @@ class db_server(Thread):
                     cursor.execute(signal_dic['sql'], signal_dic['data'])
                 else:
                     cursor.execute(signal_dic['sql'])
-                if not signal_dic['fetchone']:
+                if signal_dic['fetch'] == 2:
                     rows = cursor.fetchall()
-                else:
+                elif signal_dic['fetch'] == 1:
                     rows = cursor.fetchone()[0]
-                if not signal_dic['as_dict'] and not signal_dic['fetchone']:
-                    rows = [r[0] for r in rows]
+                if not signal_dic['as_dict'] and signal_dic['fetch'] != 1:
+                    if rows:
+                        rows = [r[0] for r in rows]
                 return rows
             else:
                logging.error("No connection")
@@ -98,11 +110,7 @@ class db_server(Thread):
 def create_connection(database):
     try:
         conn=None
-        conn = psycopg2.connect(
-            host="192.168.1.21",
-            database=database,
-            user='pi',
-            password='Tv8ams23061995')
+        conn = psycopg2.connect(environment.get_psql_dns(), database=database)
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         logging.error(error)

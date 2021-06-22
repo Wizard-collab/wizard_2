@@ -6,7 +6,7 @@ logging = logging.get_logger(__name__)
 
 import time
 start_time = time.time()
-for a in range(0,100):
+for a in range(0,1000):
 	begin_time = time.time()
 	asset_id = assets.create_asset(str(time.time()), 2)
 	for stage in assets_vars._assets_stages_list_:

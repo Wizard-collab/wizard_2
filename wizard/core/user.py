@@ -58,23 +58,20 @@ import session
 class user:
     def __init__(self):
         self.get_user_prefs_dic()
-    
-    def get_site_path(self):
-        site_path = self.prefs_dic[user_vars._site_path_]
-        if site_path:
-            environment.build_site_env(site_path)
-            site().add_ip_user()
-            return 1
-        else:
-            return None
 
-    def set_site_path(self, site_path):
-        # Store the site path in 
-        # ~/Documents/wizard/preferences.yaml
-        self.prefs_dic[user_vars._site_path_] = site_path
+    def set_psql_dns(self, host, port, user, password):
+        DNS = f"host={host} port={port} user={user} password={password}"
+        self.prefs_dic[user_vars._psql_dns_] = DNS
         self.write_prefs_dic()
-        environment.build_site_env(site_path)
-        site().add_ip_user()
+        environment.set_psql_dns(DNS)
+
+    def get_psql_dns(self):
+        if self.prefs_dic[user_vars._psql_dns_]:
+            environment.set_psql_dns(self.prefs_dic[user_vars._psql_dns_])
+            return self.prefs_dic[user_vars._psql_dns_]
+        else:
+            logging.info("No postgreSQL DNS set")
+            return None
 
     def add_shelf_script(self,
                             name,
@@ -137,7 +134,7 @@ class user:
             os.mkdir(user_vars._user_path_)
         if not os.path.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
-            self.prefs_dic[user_vars._site_path_] = None
+            self.prefs_dic[user_vars._psql_dns_] = None
             self.prefs_dic[user_vars._scripts_] = dict()
             self.write_prefs_dic()
         else:

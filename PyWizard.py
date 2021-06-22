@@ -24,6 +24,20 @@ logging = logging.get_logger(__name__)
 
 server = None
 
+while not user.user().get_psql_dns():
+	psql_host = input("PostgreSQL host : ")
+	psql_port = input("PostgreSQL port : ")
+	psql_user = input("PostgreSQL user : ")
+	psql_password = input("PostgreSQL password : ")
+	user.user().set_psql_dns(
+							psql_host,
+							psql_port,
+							psql_user,
+							psql_password
+							)
+
+print(user.user().get_psql_dns())
+
 if not site.is_site_database():
 	while not site.is_site_database():
 		init_site = input("Site database doesn't exists, init database (y/n) ? : ")

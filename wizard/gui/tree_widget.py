@@ -3,6 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+import time
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
@@ -30,7 +31,7 @@ class tree_widget(QtWidgets.QWidget):
         self.creation_items=[]
 
         self.build_ui()
-        self.fill_ui()
+        self.refresh()
         self.connect_functions()
 
     def build_ui(self):
@@ -96,7 +97,7 @@ class tree_widget(QtWidgets.QWidget):
             if id in self.asset_ids.keys():
                 self.asset_ids[id].setExpanded(1)
 
-    def fill_ui(self, hard=None):
+    def refresh(self, hard=None):
         if hard:
             self.init_tree()
 
@@ -242,21 +243,21 @@ class tree_widget(QtWidgets.QWidget):
             stage_name = item.text(0)
             parent_id = item.parent_id
             assets.create_stage(stage_name, parent_id)
-            self.fill_ui()
+            self.refresh()
         elif item.type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 asset_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.parent_id
                 assets.create_asset(asset_name, parent_id)
-                self.fill_ui()
+                self.refresh()
         elif item.type == 'category_creation':
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.parent_id
                 assets.create_category(category_name, parent_id)
-                self.fill_ui()
+                self.refresh()
 
     def context_menu_requested(self, point):
         item = self.tree.itemAt(point)
@@ -275,7 +276,7 @@ class tree_widget(QtWidgets.QWidget):
             assets.archive_asset(item.id)
         elif item.type== 'stage':
             assets.archive_stage(item.id)
-        self.fill_ui()
+        self.refresh()
 
     def remove_category(self, id):
         item = self.category_ids[id]
