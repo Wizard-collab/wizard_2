@@ -22,8 +22,6 @@ from wizard.core import db_core
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-server = None
-
 while not user.user().get_psql_dns():
 	psql_host = input("PostgreSQL host : ")
 	psql_port = input("PostgreSQL port : ")
@@ -36,7 +34,8 @@ while not user.user().get_psql_dns():
 							psql_password
 							)
 
-print(user.user().get_psql_dns())
+db_server = db_core.db_server()
+db_server.start()
 
 if not site.is_site_database():
 	while not site.is_site_database():
@@ -45,12 +44,10 @@ if not site.is_site_database():
 			admin_password = input('Administator password : ')
 			admin_email = input('Administator email : ')
 			site.create_site_database()
-			server = db_core.db_server()
-			server.start()
+			db_server.site='site'
 			site.init_site(admin_password, admin_email)
-else:
-	server = db_core.db_server()
-	server.start()
+
+db_server.site='site'
 site.add_ip_user()
 
 while not user.get_user():
@@ -71,8 +68,6 @@ while not user.get_user():
 		password = input('Password : ')
 		user.log_user(user_name, password)
 
-project_name = None
-
 while not user.get_project():
 	do_create_project = input('Create project (y/n) ? : ')
 	if do_create_project == 'y':
@@ -88,40 +83,4 @@ while not user.get_project():
 		project_password = input('Project password : ')
 		user.log_project(project_name, project_password)
 
-project_name = environment.get_project_name()
-server.project_name = project_name
-
-def stdout_tree():
-	domains_rows = project.get_domains()
-	for domain_row in domains_rows:
-		print(f"{domain_row['id']}-{domain_row['name']}")
-		for category_row in project.get_domain_childs(domain_row['id']):
-			print(f"  {category_row['id']}-{category_row['name']}")
-			for asset_row in project.get_category_childs(category_row['id']):
-				print(f"    {asset_row['id']}-{asset_row['name']}")
-				for stage_row in project.get_asset_childs(asset_row['id']):
-					print(f"      {stage_row['id']}-{stage_row['name']}")
-					for variant_row in project.get_stage_childs(stage_row['id']):
-						print(f"        {variant_row['id']}-{variant_row['name']}")
-						for work_env_row in project.get_variant_work_envs_childs(variant_row['id']):
-							print(f"          {work_env_row['id']}-{work_env_row['name']}")
-							for version_row in project.get_work_versions(work_env_row['id']):
-								print(f"            {version_row['id']}-{version_row['name']}")
-
-
-
-def main():
-	try:
-		file = sys.argv[1]
-		exec(open(file).read())
-	except IndexError:
-		server = communicate.communicate_server()
-		server.start()
-		import code
-		console = code.InteractiveConsole()
-		console.interact(banner=None, exitmsg=None)
-	except:
-		logging.error(str(traceback.format_exc()))
-
-if __name__ == '__main__':
-	main()
+db_server.project_name = environment.get_project_name()

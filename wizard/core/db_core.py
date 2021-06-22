@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-import socket
 import threading
+import traceback
 import json
 
 # PostgreSQL python modules
@@ -15,30 +15,21 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 # Wizard modules
 from wizard.core import environment
 from wizard.core import socket_utils
+from wizard.vars import db_vars
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
 class db_server(threading.Thread):
     def __init__(self, project_name=None):
         super(db_server, self).__init__()
-        hostname = 'localhost'
-        port = 11112
-        self.server_address = socket.gethostbyname(hostname)
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server.bind((hostname, port))
-        self.server.listen(100) 
+        self.server, self.server_address = socket_utils.get_server(db_vars._LOCAL_DNS_)
         self.running = True
-        self.project_name = project_name
+        self.project_name = None
+        self.site = None
         self.site_conn = None
         self.project_conn = None
 
     def run(self):
-        self.site_conn = create_connection('site')
-        self.site_conn.autocommit = True
-        if self.project_name:
-            self.project_conn = create_connection(self.project_name)
-            self.project_conn.autocommit = True
         while self.running:
             try:
                 conn, addr = self.server.accept()
@@ -56,21 +47,21 @@ class db_server(threading.Thread):
         if self.project_conn is not None:
             self.project_conn.close()
 
-
     def stop(self):
         self.running = False
 
     def execute_sql(self, signal_as_str):
         try:
             signal_dic = json.loads(signal_as_str)
-
             if signal_dic['level'] == 'site':
+                if not self.site_conn:
+                    if self.site:
+                        self.site_conn = create_connection(self.site)
                 conn = self.site_conn
             else:
                 if not self.project_conn:
                     if self.project_name:
                         self.project_conn = create_connection(self.project_name)
-                        self.project_conn.autocommit = True
                 conn = self.project_conn
             if conn:
                 rows = None
@@ -86,8 +77,10 @@ class db_server(threading.Thread):
                     rows = cursor.fetchall()
                 elif signal_dic['fetch'] == 1:
                     rows = cursor.fetchone()[0]
+                else:
+                    rows = 1
                 if not signal_dic['as_dict'] and signal_dic['fetch'] != 1:
-                    if rows:
+                    if rows != 1:
                         rows = [r[0] for r in rows]
                 return rows
             else:
@@ -101,9 +94,24 @@ def create_connection(database=None):
     try:
         conn=None
         conn = psycopg2.connect(environment.get_psql_dns(), database=database)
+        if conn and database:
+            conn.autocommit=True
+            logging.info(f"Wizard is connected to {database} database")
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         logging.error(error)
+        return None
+
+def try_connection(DNS):
+    try:
+        conn=None
+        conn = psycopg2.connect(DNS)
+        if conn is not None:
+            conn.close()
+        return 1
+    except psycopg2.OperationalError as e:
+        logging.error(e)
+        logging.error(f"Wizard could not connect to PostgreSQL server with this DNS : {DNS}")
         return None
 
 def create_database(database):

@@ -28,6 +28,7 @@ from wizard.core import tools
 from wizard.core import environment
 from wizard.core import project
 from wizard.core import site
+from wizard.core import db_core
 
 from wizard.core import logging
 logging = logging.get_logger(__name__)
@@ -61,14 +62,20 @@ class user:
 
     def set_psql_dns(self, host, port, user, password):
         DNS = f"host={host} port={port} user={user} password={password}"
-        self.prefs_dic[user_vars._psql_dns_] = DNS
-        self.write_prefs_dic()
-        environment.set_psql_dns(DNS)
+        if db_core.try_connection(DNS):
+            self.prefs_dic[user_vars._psql_dns_] = DNS
+            self.write_prefs_dic()
+            environment.set_psql_dns(DNS)
 
     def get_psql_dns(self):
         if self.prefs_dic[user_vars._psql_dns_]:
-            environment.set_psql_dns(self.prefs_dic[user_vars._psql_dns_])
-            return self.prefs_dic[user_vars._psql_dns_]
+            if db_core.try_connection(self.prefs_dic[user_vars._psql_dns_]):
+                environment.set_psql_dns(self.prefs_dic[user_vars._psql_dns_])
+                return 1
+            else:
+                self.prefs_dic[user_vars._psql_dns_] = None
+                self.write_prefs_dic()
+                return None
         else:
             logging.info("No postgreSQL DNS set")
             return None

@@ -16,6 +16,7 @@ import json
 # Wizard modules
 from wizard.core import db_core
 from wizard.core import socket_utils
+from wizard.vars import db_vars
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
@@ -160,22 +161,4 @@ def execute_sql(sql, level, as_dict, data=None, fetch=2):
     signal_dic['as_dict'] = as_dict
     signal_dic['data'] = data
     signal_dic['fetch'] = fetch
-    signal_as_str = json.dumps(signal_dic)
-    return send_signal(signal_as_str)
-
-def send_signal(signal_as_str):
-    try:
-        host_name = 'localhost'
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.connect((host_name, 11112))
-        server.settimeout(5.0)
-        server.send(signal_as_str.encode('utf8'))
-        returned = socket_utils.recvall(server).decode('utf8')
-        server.close()
-        return json.loads(returned)
-    except ConnectionRefusedError:
-        logging.error("No wizard local server found. Please verify if Wizard is openned")
-        return None
-    except socket.timeout:
-        logging.error("Wizard has been too long to give a response, please retry.")
-        return None
+    return socket_utils.send_signal(db_vars._LOCAL_DNS_, signal_dic)
