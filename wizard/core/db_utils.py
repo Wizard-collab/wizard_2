@@ -9,302 +9,210 @@
 # wizard functions
 
 # Python modules
-import sqlite3
-from sqlite3 import Error
+import psycopg2
+import psycopg2.extras
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import time
 import traceback
 import os
+import socket
+import json
+from wizard.core import socket_utils
 
 # Wizard modules
+from wizard.core import environment
+from wizard.core import db_core
+
 from wizard.core import logging
 logging = logging.get_logger(__name__)
 
-def create_database(db_file):
-    # create a database connection to a SQLite database
-    conn = None
+def create_database(database):
+    conn=None
     try:
-        conn = sqlite3.connect(db_file)
-        logging.info("Database file created")
-    except Error as e:
-        logging.error(e)
-        logging.error("Can't create database file")
-    finally:
-        if conn:
-            conn.close()
-            return 1
-        else:
-            return None
-
-def create_connection(db_file):
-    conn = None
-    try:
-        if db_file:
-            db_file = os.path.normpath(os.path.abspath(db_file))
-            conn = sqlite3.connect(db_file, timeout=3000)
-            logging.debug(f'*{db_file}')
-        else:
-            logging.error("No database file given")
-    except Error as e:
-        print(e)
-
-    return conn
-
-def create_table(db_file, cmd):
-    try:
-        conn = create_connection(db_file).cursor()
-        conn.execute(cmd)
+        conn = psycopg2.connect(environment.get_psql_dns())
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+        cur.execute(f"CREATE DATABASE {database};")
+        conn.commit()
         return 1
-    except Error as e:
-        print(e)
-        return 0
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error(error)
+        return None
+    finally:
+        if conn is not None:
+            conn.close()
+
+def create_table(database, cmd):
+    try:
+        conn = db_core.create_connection(database)
+        cursor = conn.cursor()
+        cursor.execute(cmd)
+        conn.commit()
+        return 1
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error(error)
+        return None
     finally:
         if conn:
             conn.close()
 
-def create_row(db_file, table, columns, datas):
+def create_row(level, table, columns, datas):
     sql_cmd = f''' INSERT INTO {table}('''
     sql_cmd += (',').join(columns)
     sql_cmd += ') VALUES('
     data_abstract_list = []
     for item in columns:
-        data_abstract_list.append('?')
+        data_abstract_list.append('%s')
     sql_cmd += (',').join(data_abstract_list)
-    sql_cmd += ');'
-    try:
-        success = 0
-        conn = create_connection(db_file)
-        while not success:
-            try:
-                cursor = conn.cursor()
-                cursor.execute(sql_cmd, datas)
-                conn.commit()
-                success = 1
-            except sqlite3.OperationalError:
-                logging.info("Can't execute, retrying")
-                time.sleep(1)
-        logging.debug(f'*{db_file}-write')
-        return cursor.lastrowid
-    except Error as e:
-        print(e)
-        return 0
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd += ') RETURNING id;'
+    return execute_sql(sql_cmd, level, 0, datas, 1)
 
-def get_rows(db_file, table, column='*'):
+def get_rows(level, table, column='*'):
     sql_cmd = f''' SELECT {column} FROM {table}'''
-    try:
-        conn = create_connection(db_file)
-        if column != '*':
-            conn.row_factory = lambda cursor, row: row[0]
-        else:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd)
-        rows = cursor.fetchall()
-        return rows
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict)
 
-def get_row_by_column_data(db_file,
+def get_row_by_column_data(level,
                             table,
                             column_tuple,
                             column='*'):
     if type(column)==list:
-        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=?"
+        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=%s"
     else:
-        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=?"
-    try:
-        conn = create_connection(db_file)
-        if column != '*' and type(column)!=list:
-            conn.row_factory = lambda cursor, row: row[0]
-        else:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (column_tuple[1],))
-        rows = cursor.fetchall()
-        return rows
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s"
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (column_tuple[1],))
 
-def get_row_by_column_part_data(db_file,
+def get_row_by_column_part_data(level,
                             table,
                             column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE ?"
-    try:
-        conn = create_connection(db_file)
-        if column != '*':
-            conn.row_factory = lambda cursor, row: row[0]
-        else:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (f"%{column_tuple[1]}%",))
-        rows = cursor.fetchall()
-        return rows
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s"
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (f"%{column_tuple[1]}%",))
 
-def get_row_by_column_part_data_and_data(db_file,
+def get_row_by_column_part_data_and_data(level,
                             table,
                             column_tuple,
                             second_column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE ? AND {second_column_tuple[0]}=?;"
-    try:
-        conn = create_connection(db_file)
-        if column != '*':
-            conn.row_factory = lambda cursor, row: row[0]
-        else:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (f"%{column_tuple[1]}%",second_column_tuple[1]))
-        rows = cursor.fetchall()
-        return rows
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
-
-def get_last_row_by_column_data(db_file,
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s AND {second_column_tuple[0]}=%s;"
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (f"%{column_tuple[1]}%",second_column_tuple[1]))
+   
+def get_last_row_by_column_data(level,
                             table,
                             column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=? ORDER BY rowid DESC LIMIT 1;"
-    try:
-        conn = create_connection(db_file)
-        if column != '*':
-            conn.row_factory = lambda cursor, row: row[0]
-        else:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (column_tuple[1],))
-        rows = cursor.fetchall()
-        return rows
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY rowid DESC LIMIT 1;"
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, (column_tuple[1],))
 
-def check_existence_by_multiple_data(db_file,
+def check_existence_by_multiple_data(level,
                     table,
                     columns_tuple,
                     data_tuple):
 
-    sql_cmd = f"SELECT id FROM {table} WHERE {columns_tuple[0]}=? AND {columns_tuple[1]}=?;"
-    try:
-        conn = create_connection(db_file)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, data_tuple)
-        rows = cursor.fetchall()
-        return len(rows)
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd = f"SELECT id FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s;"
+    return execute_sql(sql_cmd, level, 0, data_tuple)
 
-def check_existence(db_file,
+def check_existence(level,
                     table,
                     column,
                     data):
 
-    sql_cmd = f"SELECT id FROM {table} WHERE {column}=?;"
-    try:
-        conn = create_connection(db_file)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (data, ))
-        rows = cursor.fetchall()
-        return len(rows)
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd = f"SELECT id FROM {table} WHERE {column}=%s;"
+    return execute_sql(sql_cmd, level, 0, (data,))
 
-def get_row_by_multiple_data(db_file,
+def get_row_by_multiple_data(level,
                     table,
                     columns_tuple,
                     data_tuple,
                     column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {columns_tuple[0]}=? AND {columns_tuple[1]}=?;"
-    try:
-        conn = create_connection(db_file)
-        if column != '*':
-            conn.row_factory = lambda cursor, row: row[0]
-        else:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (data_tuple[0], data_tuple[1]))
-        rows = cursor.fetchall()
-        return rows
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s;"
+    if column != '*':
+        as_dict=0
+    else:
+        as_dict=1
+    return execute_sql(sql_cmd, level, as_dict, data_tuple)
 
-def update_data(db_file,
+def update_data(level,
                     table,
                     set_tuple,
                     where_tuple):
 
     sql_cmd = f''' UPDATE {table}'''
-    sql_cmd += f''' SET {set_tuple[0]} = ?'''
-    sql_cmd += f''' WHERE {where_tuple[0]} = ?'''
-    try:
-        conn = create_connection(db_file)
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd, (set_tuple[1], where_tuple[1]))
-        conn.commit()
-        return 1
-    except Error as e:
-        print(e)
-        return None
-    finally:
-        if conn:
-            conn.close()
+    sql_cmd += f''' SET {set_tuple[0]} = %s'''
+    sql_cmd += f''' WHERE {where_tuple[0]} = %s'''
+    return execute_sql(sql_cmd, level, 0, (set_tuple[1], where_tuple[1]), 0)
+    
+def delete_row(level, table, id):
+    sql_cmd = f'DELETE FROM {table} WHERE id=%s'
+    return execute_sql(sql_cmd, level, 0, (id,), 0)
 
-def delete_row(db_file, table, id):
-    sql = f'DELETE FROM {table} WHERE id=?'
+def check_database_existence(database):
+    conn = None
     try:
-        conn = create_connection(db_file)
-        cursor = conn.cursor()
-        cursor.execute(sql, (id,))
-        conn.commit()
-        return 1
-    except Error as e:
-        print(e)
+        conn = psycopg2.connect(environment.get_psql_dns())
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error(error)
         return None
-    finally:
-        if conn:
-            conn.close()
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
+    if conn is not None:
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute("SELECT datname FROM pg_database;")
+        list_database = cur.fetchall()
+        conn.close()
+        if (database,) in list_database:
+            logging.debug("'{}' Database already exist".format(database))
+            return 1
+        else:
+            logging.debug("'{}' Database doesn't exist.".format(database))
+            return None
+
+def execute_sql(sql, level, as_dict, data=None, fetch=2):
+    signal_dic = dict()
+    signal_dic['sql'] = sql
+    signal_dic['level'] = level
+    signal_dic['as_dict'] = as_dict
+    signal_dic['data'] = data
+    signal_dic['fetch'] = fetch
+    signal_as_str = json.dumps(signal_dic)
+    return send_signal(signal_as_str)
+
+def send_signal(signal_as_str):
+    try:
+        host_name = 'localhost'
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.connect((host_name, 11112))
+        server.settimeout(5.0)
+        server.send(signal_as_str.encode('utf8'))
+        returned = socket_utils.recvall(server).decode('utf8')
+        server.close()
+        return json.loads(returned)
+    except ConnectionRefusedError:
+        logging.error("No wizard local server found. Please verify if Wizard is openned")
+        return None
+    except socket.timeout:
+        logging.error("Wizard has been too long to give a response, please retry.")
+        return None

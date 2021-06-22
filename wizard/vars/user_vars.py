@@ -14,7 +14,7 @@ _icons_path_ = os.path.join(_user_path_, 'icons')
 _session_file_ = os.path.join(_script_path_, 'session.py')
 
 # Dictionary keys
-_site_path_ = 'site_path'
 _user_ = 'user'
 _project_ = 'project'
 _scripts_ = 'scripts'
+_psql_dns_ = 'psql_dns'

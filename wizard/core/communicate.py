@@ -73,7 +73,7 @@ def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 
     # of the new version
     version_id = assets.add_version(work_env_id)
-    version_path = project.project().get_version_data(version_id,
+    version_path = project.get_version_data(version_id,
                                                     'file_path')
     return version_path
 

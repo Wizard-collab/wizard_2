@@ -26,8 +26,8 @@ from wizard.vars import ressources
 from wizard.core import image
 from wizard.core import tools
 from wizard.core import environment
-from wizard.core.project import project
-from wizard.core.site import site
+from wizard.core import project
+from wizard.core import site
 
 from wizard.core import logging
 logging = logging.get_logger(__name__)
@@ -58,23 +58,20 @@ import session
 class user:
     def __init__(self):
         self.get_user_prefs_dic()
-    
-    def get_site_path(self):
-        site_path = self.prefs_dic[user_vars._site_path_]
-        if site_path:
-            environment.build_site_env(site_path)
-            site().add_ip_user()
-            return 1
-        else:
-            return None
 
-    def set_site_path(self, site_path):
-        # Store the site path in 
-        # ~/Documents/wizard/preferences.yaml
-        self.prefs_dic[user_vars._site_path_] = site_path
+    def set_psql_dns(self, host, port, user, password):
+        DNS = f"host={host} port={port} user={user} password={password}"
+        self.prefs_dic[user_vars._psql_dns_] = DNS
         self.write_prefs_dic()
-        environment.build_site_env(site_path)
-        site().add_ip_user()
+        environment.set_psql_dns(DNS)
+
+    def get_psql_dns(self):
+        if self.prefs_dic[user_vars._psql_dns_]:
+            environment.set_psql_dns(self.prefs_dic[user_vars._psql_dns_])
+            return self.prefs_dic[user_vars._psql_dns_]
+        else:
+            logging.info("No postgreSQL DNS set")
+            return None
 
     def add_shelf_script(self,
                             name,
@@ -137,7 +134,7 @@ class user:
             os.mkdir(user_vars._user_path_)
         if not os.path.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
-            self.prefs_dic[user_vars._site_path_] = None
+            self.prefs_dic[user_vars._psql_dns_] = None
             self.prefs_dic[user_vars._scripts_] = dict()
             self.write_prefs_dic()
         else:
@@ -169,12 +166,11 @@ class user:
             logging.warning(f"{file} doesn't exists")
 
 def log_user(user_name, password):
-    site_obj = site()
-    if user_name in site_obj.get_user_names_list():
-        user_row = site_obj.get_user_row_by_name(user_name)
+    if user_name in site.get_user_names_list():
+        user_row = site.get_user_row_by_name(user_name)
         if tools.decrypt_string(user_row['pass'],
                                 password):
-            site().update_current_ip_data('user_id', user_row['id'])
+            site.update_current_ip_data('user_id', user_row['id'])
             environment.build_user_env(user_name)
             logging.info(f'{user_name} signed in')
         else:
@@ -183,28 +179,27 @@ def log_user(user_name, password):
         logging.error(f"{user_name} doesn't exists")
 
 def disconnect_user():
-    site().update_current_ip_data('user_id', None)
+    site.update_current_ip_data('user_id', None)
     logging.info('You are now disconnected')
 
 def get_user():
-    user_id = site().get_current_ip_data('user_id')
+    user_id = site.get_current_ip_data('user_id')
     if user_id:
-        environment.build_user_env(user_name=site().get_user_data(user_id,
+        environment.build_user_env(user_name=site.get_user_data(user_id,
                                                                 'user_name'))
         return 1
     else:
         return None
 
 def log_project(project_name, password):
-    site_obj = site()
-    if project_name in site_obj.get_projects_names_list():
-        project_row = site_obj.get_project_row_by_name(project_name)
+    if project_name in site.get_projects_names_list():
+        project_row = site.get_project_row_by_name(project_name)
         if tools.decrypt_string(project_row['project_password'],
                                 password):
-            site().update_current_ip_data('project_id', project_row['id'])
+            site.update_current_ip_data('project_id', project_row['id'])
             environment.build_project_env(project_name, project_row['project_path'])
             logging.info(f'Successfully signed in {project_name} project')
-            project().add_user(site_obj.get_user_row_by_name(environment.get_user(),
+            project.add_user(site.get_user_row_by_name(environment.get_user(),
                                                                 'id'))
         else:
             logging.warning(f'Wrong password for {project_name}')
@@ -212,13 +207,13 @@ def log_project(project_name, password):
         logging.error(f"{project_name} doesn't exists")
 
 def disconnect_project():
-    site().update_current_ip_data('project_id', None)
+    site.update_current_ip_data('project_id', None)
     logging.info('Successfully disconnect from project')
 
 def get_project():
-    project_id = site().get_current_ip_data('project_id')
+    project_id = site.get_current_ip_data('project_id')
     if project_id:
-        project_row = site().get_project_row(project_id) 
+        project_row = site.get_project_row(project_id) 
         environment.build_project_env(project_name=project_row['project_name'],
                                         project_path=project_row['project_path'])
         return 1
