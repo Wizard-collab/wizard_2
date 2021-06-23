@@ -132,6 +132,16 @@ class user:
             logging.warning(f"Script {name} not found")
             return None
 
+    def add_context(self, context_dic):
+        self.prefs_dic[user_vars._tree_context_][environment.get_project_name()] = context_dic
+        self.write_prefs_dic()
+
+    def get_context(self):
+        if environment.get_project_name() in self.prefs_dic[user_vars._tree_context_].keys():
+            return self.prefs_dic[user_vars._tree_context_][environment.get_project_name()]
+        else:
+            return None
+
     def get_user_prefs_dic(self):
         # Read ~/Documents/wizard/prefences.yaml
         # or init it if not found
@@ -143,6 +153,7 @@ class user:
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
             self.prefs_dic[user_vars._scripts_] = dict()
+            self.prefs_dic[user_vars._tree_context_] = dict()
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:

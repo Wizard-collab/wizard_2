@@ -13,7 +13,9 @@ from PyQt5.QtCore import pyqtSignal
 from wizard.core import project
 from wizard.core import assets
 from wizard.core import environment
+from wizard.core import user
 from wizard.vars import assets_vars
+from wizard.vars import ressources
 
 from wizard.core import logging
 logging = logging.get_logger(__name__)
@@ -34,8 +36,30 @@ class tree_widget(QtWidgets.QWidget):
         self.build_ui()
         self.connect_functions()
         self.refresh()
+        self.get_context()
 
     def build_ui(self):
+
+        self.icons_dic = dict()
+        self.icons_dic['add'] = QtGui.QIcon(ressources._add_icon_small_)
+        self.icons_dic['domain'] = dict()
+        self.icons_dic['domain']['assets'] = QtGui.QIcon(ressources._assets_icon_small_)
+        self.icons_dic['domain']['library'] = QtGui.QIcon(ressources._library_icon_small_)
+        self.icons_dic['domain']['sequences'] = QtGui.QIcon(ressources._sequences_icon_small_)
+        self.icons_dic['stage'] = dict()
+        self.icons_dic['stage']['modeling'] = QtGui.QIcon(ressources._modeling_icon_small_)
+        self.icons_dic['stage']['rigging'] = QtGui.QIcon(ressources._rigging_icon_small_)
+        self.icons_dic['stage']['grooming'] = QtGui.QIcon(ressources._grooming_icon_small_)
+        self.icons_dic['stage']['texturing'] = QtGui.QIcon(ressources._texturing_icon_small_)
+        self.icons_dic['stage']['shading'] = QtGui.QIcon(ressources._shading_icon_small_)
+        self.icons_dic['stage']['layout'] = QtGui.QIcon(ressources._layout_icon_small_)
+        self.icons_dic['stage']['animation'] = QtGui.QIcon(ressources._animation_icon_small_)
+        self.icons_dic['stage']['cfx'] = QtGui.QIcon(ressources._cfx_icon_small_)
+        self.icons_dic['stage']['fx'] = QtGui.QIcon(ressources._fx_icon_small_)
+        self.icons_dic['stage']['lighting'] = QtGui.QIcon(ressources._lighting_icon_small_)
+        self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_small_)
+        self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_small_)
+
         self.main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.main_layout)
 
@@ -51,9 +75,12 @@ class tree_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_widget)
 
         self.search_bar = QtWidgets.QLineEdit()
+        self.search_bar.setClearButtonEnabled(True)
+        self.search_bar.setPlaceholderText('characters:Lola*grooming')
         self.main_layout.addWidget(self.search_bar)
 
         self.tree = QtWidgets.QTreeWidget()
+        self.tree.setIconSize(QtCore.QSize(16, 16))
         self.main_layout.addWidget(self.tree)
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setHeaderHidden(True)
@@ -66,46 +93,70 @@ class tree_widget(QtWidgets.QWidget):
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
 
     def init_tree(self):
-        self.get_context()
+        self.set_context()
         self.domain_ids=dict()
         self.category_ids=dict()
         self.asset_ids=dict()
         self.stage_ids=dict()
         self.tree.clear()
 
-    def get_context(self):
-        self.expanded_domains = []
-        self.expanded_categories = []
-        self.expanded_assets = []
+    def set_context(self):
+        context_dic = dict()
+        context_dic['expanded_domains'] = []
+        context_dic['expanded_categories'] = []
+        context_dic['expanded_assets'] = []
+        context_dic['selected_instance'] = None
+        context_dic['search_string'] = self.search_bar.text()
         for domain_id in self.domain_ids.keys():
             if self.domain_ids[domain_id].isExpanded():
-                self.expanded_domains.append(domain_id)
+                context_dic['expanded_domains'].append(domain_id)
         for category_id in self.category_ids.keys():
             if self.category_ids[category_id].isExpanded():
-                self.expanded_categories.append(category_id)
+                context_dic['expanded_categories'].append(category_id)
         for asset_id in self.asset_ids.keys():
             if self.asset_ids[asset_id].isExpanded():
-                self.expanded_assets.append(asset_id)
+                context_dic['expanded_assets'].append(asset_id)
+        selected_item = self.tree.currentItem()
+        if selected_item:
+            if 'creation' not in selected_item.type:
+                context_dic['selected_instance'] = (selected_item.type,
+                                                            selected_item.id)
+        user.user().add_context(context_dic)
 
-    def set_context(self):
-        for id in self.expanded_domains:
-            if id in self.domain_ids.keys():
-                self.domain_ids[id].setExpanded(1)
-        for id in self.expanded_categories:
-            if id in self.category_ids.keys():
-                self.category_ids[id].setExpanded(1)
-        for id in self.expanded_assets:
-            if id in self.asset_ids.keys():
-                self.asset_ids[id].setExpanded(1)
+    def get_context(self):
+        context_dic = user.user().get_context()
+        if context_dic is not None:
+            for id in context_dic['expanded_domains']:
+                if id in self.domain_ids.keys():
+                    self.domain_ids[id].setExpanded(1)
+            for id in context_dic['expanded_categories']:
+                if id in self.category_ids.keys():
+                    self.category_ids[id].setExpanded(1)
+            for id in context_dic['expanded_assets']:
+                if id in self.asset_ids.keys():
+                    self.asset_ids[id].setExpanded(1)
+            if context_dic['selected_instance']:
+                if context_dic['selected_instance'][0] == 'domain':
+                    if context_dic['selected_instance'][1] in self.domain_ids.keys():
+                        self.focus_on_item(self.domain_ids[context_dic['selected_instance'][1]])
+                if context_dic['selected_instance'][0] == 'category':
+                    if context_dic['selected_instance'][1] in self.category_ids.keys():
+                        self.focus_on_item(self.category_ids[context_dic['selected_instance'][1]])
+                if context_dic['selected_instance'][0] == 'asset':
+                    if context_dic['selected_instance'][1] in self.asset_ids.keys():
+                        self.focus_on_item(self.asset_ids[context_dic['selected_instance'][1]])
+                if context_dic['selected_instance'][0] == 'stage':
+                    if context_dic['selected_instance'][1] in self.stage_ids.keys():
+                        self.focus_on_item(self.stage_ids[context_dic['selected_instance'][1]])
+            self.search_bar.setText(context_dic['search_string'])
+            self.apply_search()
 
     def refresh(self, hard=None):
         if hard:
             self.init_tree()
-
         self.project_category_ids = []
         self.project_asset_ids = []
         self.project_stage_ids = []
-
         for domain_row in project.get_domains():
             self.add_domain(domain_row)
         for category_row in project.get_all_categories():
@@ -117,32 +168,28 @@ class tree_widget(QtWidgets.QWidget):
         for stage_row in project.get_all_stages():
             self.add_stage(stage_row)
             self.project_stage_ids.append(stage_row['id'])
-
         stage_ids = list(self.stage_ids.keys())
         for id in stage_ids:
             if id not in self.project_stage_ids:
                 self.remove_stage(id)  
-
         asset_ids = list(self.asset_ids.keys())
         for id in asset_ids:
             if id not in self.project_asset_ids:
                 self.remove_asset(id)     
-
         category_ids = list(self.category_ids.keys())
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
-
         self.apply_search()
-        
         if hard:
-            self.set_context()
+            self.get_context()
 
     def add_domain(self, row):
         if row['id'] not in self.domain_ids.keys():
             domain_item = QtWidgets.QTreeWidgetItem([f"{row['name']}"])
             domain_item.type = 'domain'
             domain_item.id = row['id']
+            domain_item.setIcon(0, self.icons_dic['domain'][f"{row['name']}"])
             self.domain_ids[row['id']] = domain_item
             self.tree.addTopLevelItem(domain_item)
             if row['id'] == 3:
@@ -174,7 +221,10 @@ class tree_widget(QtWidgets.QWidget):
     def add_stage(self, row):
         if row['id'] not in self.stage_ids.keys():
             parent_widget = self.asset_ids[row['asset_id']]
-            stage_item = QtWidgets.QTreeWidgetItem([f"{row['name']}"])
+            stage_item = QtWidgets.QTreeWidgetItem()
+            #stage_item = QtWidgets.QTreeWidgetItem([f"{row['name']}"])
+            stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
+            self.tree.setItemWidget(stage_item, 0, QtWidgets.QPushButton('mdr'))
             stage_item.type = 'stage'
             stage_item.id = row['id']
             self.stage_ids[row['id']] = stage_item
@@ -193,9 +243,18 @@ class tree_widget(QtWidgets.QWidget):
         creation_item = QtWidgets.QTreeWidgetItem([text])
         creation_item.type = item_type
         creation_item.parent_id = parent_widget.id
+        creation_item.setIcon(0, self.icons_dic['add'])
         parent_widget.addChild(creation_item)
         creation_item.setForeground(0, QtGui.QBrush(QtGui.QColor('gray')))
         self.creation_items.append(creation_item)
+
+    def reduce_all(self):
+        for id in self.domain_ids.keys():
+            self.domain_ids[id].setExpanded(0)
+        for id in self.category_ids.keys():
+            self.category_ids[id].setExpanded(0)
+        for id in self.asset_ids.keys():
+            self.asset_ids[id].setExpanded(0)
 
     def toggle_all_visibility(self, visibility):
         for id in self.domain_ids.keys():
@@ -218,10 +277,11 @@ class tree_widget(QtWidgets.QWidget):
                     else:
                         self.asset_ids[id].child(i).setHidden(0)
 
-    def focus_on_item(self, item):
+    def focus_on_item(self, item, expand=None):
         self.tree.scrollToItem(item)
         self.tree.setCurrentItem(item)
-        item.setExpanded(1)
+        if expand is not None:
+            item.setExpanded(expand)
 
     def apply_search(self):
         search = self.search_bar.text()
@@ -229,9 +289,9 @@ class tree_widget(QtWidgets.QWidget):
 
     def search_asset(self, search):
         stage_filter = None
-        if '.' in search:
-            stage_filter = search.split('.')[-1]
-            search = search.split('.')[0]
+        if '*' in search:
+            stage_filter = search.split('*')[-1]
+            search = search.split('*')[0]
         self.filter_stage(stage_filter)
         if len(search) > 2:
             self.toggle_all_visibility(1)
@@ -248,7 +308,6 @@ class tree_widget(QtWidgets.QWidget):
 
 
     def double_click(self, item):
-
         new_stage_id = None
         new_asset_id = None
         new_category_id = None
@@ -275,30 +334,36 @@ class tree_widget(QtWidgets.QWidget):
 
         if new_stage_id:
             if new_stage_id in self.stage_ids.keys():
-                self.focus_on_item(self.stage_ids[new_stage_id])
+                self.focus_on_item(self.stage_ids[new_stage_id], expand=1)
         if new_asset_id:
             if new_asset_id in self.asset_ids.keys():
-                self.focus_on_item(self.asset_ids[new_asset_id])
+                self.focus_on_item(self.asset_ids[new_asset_id], expand=1)
         if new_category_id:
             if new_category_id in self.stage_ids.keys():
-                self.focus_on_item(self.new_category_id[new_category_id])
+                self.focus_on_item(self.new_category_id[new_category_id], expand=1)
 
     def context_menu_requested(self, point):
+        self.menu_widget = menu_widget.menu_widget(self)
         item = self.tree.itemAt(point)
+        reduce_all_action = self.menu_widget.add_action(f'Reduce all')
+        hard_refresh_action = self.menu_widget.add_action(f'Hard refresh')
+        archive_action = None
+        open_folder_action = None
         if item:
-            self.menu_widget = menu_widget.menu_widget(self)
-            open_folder_action = None
-            archive_action = None
             if 'creation' not in item.type:
                 open_folder_action = self.menu_widget.add_action(f'Open folder')
             if 'creation' not in item.type and item.type != 'domain':
                 archive_action = self.menu_widget.add_action(f'Archive {item.type}')
-            if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
-                if self.menu_widget.function_name is not None:
-                    if self.menu_widget.function_name == archive_action:
-                        self.archive_instance(item)
-                    elif self.menu_widget.function_name == open_folder_action:
-                        self.open_folder(item)
+        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.menu_widget.function_name is not None:
+                if self.menu_widget.function_name == archive_action:
+                    self.archive_instance(item)
+                elif self.menu_widget.function_name == open_folder_action:
+                    self.open_folder(item)
+                elif self.menu_widget.function_name == hard_refresh_action:
+                    self.refresh(1)
+                elif self.menu_widget.function_name == reduce_all_action:
+                    self.reduce_all()
 
     def open_folder(self, item):
         if item.type == 'domain':
