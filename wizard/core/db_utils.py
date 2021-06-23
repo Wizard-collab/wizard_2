@@ -89,7 +89,7 @@ def get_last_row_by_column_data(level,
                             column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY rowid DESC LIMIT 1;"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY id DESC LIMIT 1;"
     if column != '*':
         as_dict=0
     else:

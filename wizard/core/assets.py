@@ -314,6 +314,8 @@ def add_export_version(export_name, files, version_id, comment=''):
 		stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
 		extension_errors = []
 		for file in files:
+			print(os.path.splitext(file)[-1].replace('.', ''))
+			print(assets_vars._export_ext_dic_[stage_name])
 			if os.path.splitext(file)[-1].replace('.', '') not in assets_vars._export_ext_dic_[stage_name]:
 				extension_errors.append(file)
 		if extension_errors == []:
@@ -321,7 +323,7 @@ def add_export_version(export_name, files, version_id, comment=''):
 				export_id = get_or_add_export(export_name, variant_id)
 				if export_id:
 					last_version_list = project.get_last_export_version(export_id, 'name')
-					if len(last_version_list) == 1:
+					if last_version_list is not None and len(last_version_list) == 1:
 						last_version = last_version_list[0]
 						new_version =  str(int(last_version)+1).zfill(4)
 					else:

@@ -75,7 +75,7 @@ while not user.get_project():
 		project_path = input('Project path : ')
 		project_password = input('Project password : ')
 		if project.create_project(project_name, project_path, project_password):
-			server.project_name = project_name
+			db_server.project_name = project_name
 			create_project.create_project(project_name, project_path, project_password)
 
 	else:

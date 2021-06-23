@@ -292,10 +292,10 @@ def add_variant(name, stage_id, comment):
 def remove_variant(variant_id):
     success = None
     if site.is_admin():
-        for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
-            remove_work_env(work_env_id)
         for export_id in get_variant_export_childs(variant_id, 'id'):
             remove_export(export_id)
+        for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
+            remove_work_env(work_env_id)
         success = db_utils.delete_row('project', 'variants', variant_id)
         if success:
             logging.info(f"Variant removed from project")
@@ -409,6 +409,12 @@ def get_export_versions(export_id, column='*'):
                                                         column)
     return export_versions_rows
 
+def get_all_export_versions(column='*'):
+    export_versions_rows = db_utils.get_rows('project',
+                                                'export_versions',
+                                                column)
+    return export_versions_rows
+
 def get_last_export_version(export_id, column='*'):
     versions_rows = db_utils.get_last_row_by_column_data('project',
                                                         'export_versions',
@@ -421,6 +427,8 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                     'export_versions',
                                     ('name', 'export_id'),
                                     (name, export_id))):
+        variant_id = get_export_data(export_id, 'variant_id')
+        stage_id = get_variant_data(variant_id, 'stage_id')
         export_version_id = db_utils.create_row('project',
                             'export_versions', 
                             ('name',
@@ -428,6 +436,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 'creation_user',
                                 'comment',
                                 'files',
+                                'stage_id',
                                 'work_version_id',
                                 'export_id'), 
                             (name,
@@ -435,6 +444,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 environment.get_user(),
                                 comment,
                                 json.dumps(files),
+                                stage_id,
                                 work_version_id,
                                 export_id))
         if export_version_id:
@@ -861,6 +871,7 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
         if copied_files is not None:
             if export_id:
                 variant_id = get_export_data(export_id, 'variant_id')
+                stage_id = get_variant_data(variant_id, 'stage_id')
                 if variant_id:
                     ticket_id = db_utils.create_row('project',
                                                         'tickets',
@@ -869,6 +880,7 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
                                                             'title',
                                                             'message',
                                                             'state',
+                                                            'stage_id',
                                                             'variant_id',
                                                             'export_version_id',
                                                             'destination_user', 
@@ -877,7 +889,8 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
                                                             time.time(),
                                                             title,
                                                             message,
-                                                            1,
+                                                            True,
+                                                            stage_id,
                                                             variant_id,
                                                             export_version_id,
                                                             destination_user,
@@ -898,6 +911,10 @@ def get_ticket_data(ticket_id, column='*'):
         return None
 
 def change_ticket_state(ticket_id, state):
+    if state == 1:
+        state = True
+    if state == 0:
+        state = False
     if db_utils.update_data('project',
                                     'tickets',
                                     ('state', state),
@@ -909,6 +926,13 @@ def change_ticket_state(ticket_id, state):
         return 1
     else:
         return None
+
+def get_all_openned_tickets(column='*'):
+    tickets_rows = db_utils.get_row_by_column_data('project',
+                                                        'tickets',
+                                                        ('state', True),
+                                                        column)
+    return tickets_rows
 
 def remove_ticket(ticket_id):
     success = None
@@ -1163,8 +1187,10 @@ def create_export_versions_table(database):
                                         creation_user text NOT NULL,
                                         comment text,
                                         files text NOT NULL,
+                                        stage_id integer NOT NULL,
                                         work_version_id integer,
                                         export_id integer NOT NULL,
+                                        FOREIGN KEY (stage_id) REFERENCES stages (id),
                                         FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (work_version_id) REFERENCES versions (id)
                                     );"""
@@ -1213,10 +1239,12 @@ def create_tickets_table(database):
                                         title text NOT NULL,
                                         message text NOT NULL,
                                         state bool,
+                                        stage_id integer NOT NULL,
                                         variant_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         destination_user text,
                                         files text,
+                                        FOREIGN KEY (stage_id) REFERENCES stages (id),
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
                                     );"""
