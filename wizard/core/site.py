@@ -115,8 +115,9 @@ def create_user(user_name,
         if tools.decrypt_string(get_administrator_pass(),
                                 administrator_pass):
             administrator = 1
-        if os.path.isfile(profile_picture):
+        if not os.path.isfile(profile_picture):
             profile_picture = ressources._default_profile_
+        profile_picture_ascii = image.convert_image_to_str_data(profile_picture)
         if db_utils.create_row('site',
                     'users', 
                     ('user_name',
@@ -130,7 +131,7 @@ def create_user(user_name,
                     (user_name,
                         tools.encrypt_string(password),
                         email,
-                        profile_picture,
+                        profile_picture_ascii,
                         0,
                         0,
                         100,
@@ -402,7 +403,7 @@ def is_site_database():
     return db_utils.check_database_existence('site')
 
 def create_admin_user(admin_password, admin_email):
-    profile_picture = ressources._default_profile_
+    profile_picture = image.convert_image_to_str_data(ressources._default_profile_)
     if db_utils.create_row('site',
                             'users', 
                             ('user_name', 

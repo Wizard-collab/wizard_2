@@ -8,6 +8,8 @@
 import pyautogui
 from PIL import Image
 import io
+import base64
+import json
 
 # Wizard modules
 from wizard.core import tools
@@ -23,13 +25,20 @@ def screenshot(file):
 
 def convert_image_to_bytes(image_file, resize=100):
 	# Resize the given file to 100*100
-	# and return the jpg bytes
+	# and return the png bytes
 	image = Image.open(image_file)
 	image = resize_image(image, resize)
 	stream = io.BytesIO()
 	image.save(stream, format="PNG")
 	imagebytes = stream.getvalue()
 	return imagebytes
+
+def convert_image_to_str_data(image_file, resize=100):
+	encoded = base64.b64encode(convert_image_to_bytes(image_file, resize)).decode('ascii')
+	return encoded
+
+def convert_str_data_to_image_bytes(str_data):
+	return base64.b64decode(str_data)
 
 def resize_image(image, fixed_height):
 	height_percent = (fixed_height / float(image.size[1]))
