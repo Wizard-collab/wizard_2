@@ -39,7 +39,6 @@ class tree_widget(QtWidgets.QWidget):
         self.get_context()
 
     def build_ui(self):
-
         self.icons_dic = dict()
         self.icons_dic['add'] = QtGui.QIcon(ressources._add_icon_small_)
         self.icons_dic['folder'] = QtGui.QIcon(ressources._folder_icon_small_)
@@ -62,23 +61,25 @@ class tree_widget(QtWidgets.QWidget):
         self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_small_)
 
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
-        self.header_widget = QtWidgets.QWidget()
-        self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_widget.setLayout(self.header_layout)
-
-        self.header_layout.addWidget(QtWidgets.QLabel("Project :"))
-        self.project_label = QtWidgets.QLabel(environment.get_project_name())
-        self.header_layout.addWidget(self.project_label)
-        self.spaceItem = QtWidgets.QSpacerItem(150,10,QtWidgets.QSizePolicy.Expanding)
-        self.header_layout.addSpacerItem(self.spaceItem)
-        self.main_layout.addWidget(self.header_widget)
-
+        self.search_frame = QtWidgets.QFrame()
+        self.search_frame.setObjectName('tree_widget_search_frame')
+        self.search_layout = QtWidgets.QHBoxLayout()
+        self.search_layout.setContentsMargins(6,6,6,6)
+        self.search_layout.setSpacing(4)
+        self.search_frame.setLayout(self.search_layout)
+        self.search_icon_label = QtWidgets.QLabel()
+        self.search_icon_label.setPixmap(QtGui.QPixmap(ressources._search_icon_).scaled(
+            18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.search_layout.addWidget(self.search_icon_label)
         self.search_bar = QtWidgets.QLineEdit()
         self.search_bar.setClearButtonEnabled(True)
         self.search_bar.setPlaceholderText('characters:Lola*grooming')
-        self.main_layout.addWidget(self.search_bar)
+        self.search_layout.addWidget(self.search_bar)
+        self.main_layout.addWidget(self.search_frame)
 
         self.tree = QtWidgets.QTreeWidget()
         self.tree.setIconSize(QtCore.QSize(16, 16))
