@@ -9,6 +9,7 @@ _ressources_path_ = os.path.abspath('ressources/icons')
 _default_profile_ = os.path.join(_ressources_path_, 'default_profile.png')
 _default_script_shelf_icon_ = os.path.join(_ressources_path_, 'shelf_script.png')
 _add_icon_small_ = os.path.join(_ressources_path_, 'add_small.png')
+_folder_icon_small_ = os.path.join(_ressources_path_, 'folder_small.png')
 
 # Domains icons
 _assets_icon_small_ = os.path.join(_ressources_path_, 'assets_small.png')

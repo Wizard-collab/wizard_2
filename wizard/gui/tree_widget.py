@@ -42,6 +42,7 @@ class tree_widget(QtWidgets.QWidget):
 
         self.icons_dic = dict()
         self.icons_dic['add'] = QtGui.QIcon(ressources._add_icon_small_)
+        self.icons_dic['folder'] = QtGui.QIcon(ressources._folder_icon_small_)
         self.icons_dic['domain'] = dict()
         self.icons_dic['domain']['assets'] = QtGui.QIcon(ressources._assets_icon_small_)
         self.icons_dic['domain']['library'] = QtGui.QIcon(ressources._library_icon_small_)
@@ -81,9 +82,10 @@ class tree_widget(QtWidgets.QWidget):
 
         self.tree = QtWidgets.QTreeWidget()
         self.tree.setIconSize(QtCore.QSize(16, 16))
-        self.main_layout.addWidget(self.tree)
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setHeaderHidden(True)
+        self.tree.setIndentation(20)
+        self.main_layout.addWidget(self.tree)
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
@@ -209,6 +211,7 @@ class tree_widget(QtWidgets.QWidget):
                                                     instance_name = row['name'],
                                                     instance_type = 'category',
                                                     instance_id = row['id'])
+            category_item.setIcon(0, self.icons_dic['folder'])
             category_item.setText(0, row['name'])
             self.category_ids[row['id']] = category_item
             parent_widget.addChild(category_item)
@@ -221,6 +224,7 @@ class tree_widget(QtWidgets.QWidget):
                                                     instance_name = row['name'],
                                                     instance_type = 'asset',
                                                     instance_id = row['id'])
+            asset_item.setIcon(0, self.icons_dic['folder'])
             asset_item.setText(0, row['name'])
             self.asset_ids[row['id']] = asset_item
             parent_widget.addChild(asset_item)
