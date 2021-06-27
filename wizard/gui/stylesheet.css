@@ -1,0 +1,71 @@
+QWidget{
+background-color:#24242b;
+color:white;
+border:none;
+font:14px;
+}
+
+QTreeView {
+show-decoration-selected: 1;
+outline:none;
+padding:10px;
+}
+ 
+QTreeView::item {
+padding:5px;
+border-radius:5px;
+}
+ 
+QTreeView::item:hover {
+background-color:rgba(255,255,255,10);
+}
+ 
+QTreeView::item:selected {
+background-color:rgba(255,255,255,30);
+}
+ 
+QTreeView::item:selected:active{
+background-color:rgba(255,255,255,30);
+}
+ 
+QTreeView::item:selected:!active {
+background-color:rgba(255,255,255,30);
+color:white;
+}
+
+QScrollBar:vertical{
+width:6px;
+background-color: rgba(0,0,0,30);
+border-radius:3px;
+}
+
+QScrollBar::handle:vertical {	
+	background-color:  rgba(255,255,255,30);
+	min-height: 30px;
+	border-radius: 3px;
+}
+QScrollBar::handle:vertical:hover{	
+	background-color: rgba(255,255,255,50);
+}
+QScrollBar::handle:vertical:pressed {	
+	background-color: rgba(255,255,255,50);
+}
+
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical
+{
+      border: none;
+      background: none;
+      color: none;
+	  height:0px;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+	background: none;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+	background: none;
+}
+
+#tree_stage_item{
+	background-color: transparent;
+}

@@ -454,11 +454,13 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
                                                 parent_id)
         
         self.widget = QtWidgets.QWidget()
+        self.widget.setStyleSheet('background:green;font:14px;')
         self.widget_layout = QtWidgets.QHBoxLayout()
         self.widget_layout.setContentsMargins(2,2,2,2)
         self.widget.setLayout(self.widget_layout)
         self.name_label = QtWidgets.QLabel(self.instance_name)
         self.name_label.setFixedWidth(100)
+        self.name_label.setStyleSheet('background:red;')
         self.widget_layout.addWidget(self.name_label)
         self.publish_indicator = indicator('#83cc56')
         self.publish_indicator.setVisible(0)
