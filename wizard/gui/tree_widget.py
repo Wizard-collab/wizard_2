@@ -215,54 +215,57 @@ class tree_widget(QtWidgets.QWidget):
                 self.add_creation_item(domain_item, 'new', 'category_creation')
 
     def add_category(self, row):
-        if row['id'] not in self.category_ids.keys():
-            parent_widget = self.domain_ids[row['domain_id']]
-            category_item = custom_treeWidgetItem(parent_widget, 
-                                                    instance_name = row['name'],
-                                                    instance_type = 'category',
-                                                    instance_id = row['id'])
-            category_item.setIcon(0, self.icons_dic['folder'])
-            category_item.setText(0, row['name'])
-            self.category_ids[row['id']] = category_item
-            parent_widget.addChild(category_item)
-            self.add_creation_item(category_item, 'new', 'asset_creation')
+        if row['domain_id'] in self.domain_ids.keys():
+            if row['id'] not in self.category_ids.keys():
+                parent_widget = self.domain_ids[row['domain_id']]
+                category_item = custom_treeWidgetItem(parent_widget, 
+                                                        instance_name = row['name'],
+                                                        instance_type = 'category',
+                                                        instance_id = row['id'])
+                category_item.setIcon(0, self.icons_dic['folder'])
+                category_item.setText(0, row['name'])
+                self.category_ids[row['id']] = category_item
+                parent_widget.addChild(category_item)
+                self.add_creation_item(category_item, 'new', 'asset_creation')
 
     def add_asset(self, row):
-        if row['id'] not in self.asset_ids.keys():
-            parent_widget = self.category_ids[row['category_id']]
-            asset_item = custom_treeWidgetItem(parent_widget, 
-                                                    instance_name = row['name'],
-                                                    instance_type = 'asset',
-                                                    instance_id = row['id'])
-            asset_item.setIcon(0, self.icons_dic['folder'])
-            asset_item.setText(0, row['name'])
-            self.asset_ids[row['id']] = asset_item
-            parent_widget.addChild(asset_item)
-            domain_id = project.get_category_data(row['category_id'], 'domain_id')
-            domain_name = project.get_domain_data(domain_id, 'name')
-            for stage in assets_vars._stages_rules_dic_[domain_name]:
-                self.add_creation_item(asset_item, stage, 'stage_creation')
+        if row['category_id'] in self.category_ids.keys():
+            if row['id'] not in self.asset_ids.keys():
+                parent_widget = self.category_ids[row['category_id']]
+                asset_item = custom_treeWidgetItem(parent_widget, 
+                                                        instance_name = row['name'],
+                                                        instance_type = 'asset',
+                                                        instance_id = row['id'])
+                asset_item.setIcon(0, self.icons_dic['folder'])
+                asset_item.setText(0, row['name'])
+                self.asset_ids[row['id']] = asset_item
+                parent_widget.addChild(asset_item)
+                domain_id = project.get_category_data(row['category_id'], 'domain_id')
+                domain_name = project.get_domain_data(domain_id, 'name')
+                for stage in assets_vars._stages_rules_dic_[domain_name]:
+                    self.add_creation_item(asset_item, stage, 'stage_creation')
 
     def add_stage(self, row):
-        if row['id'] not in self.stage_ids.keys():
-            parent_widget = self.asset_ids[row['asset_id']]
-            stage_item = stage_treeWidgetItem( parent_widget,
-                                                    instance_name = row['name'],
-                                                    instance_id = row['id'],
-                                                    instance_type = 'stage')
-            stage_item.setText(0, row['name'])
-            stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
-            self.stage_ids[row['id']] = stage_item
-            parent_widget.addChild(stage_item)
-            self.remove_stage_creation_item(parent_widget, row['name'])
-        if self.all_export_versions_stage_ids is not None and row['id'] in self.all_export_versions_stage_ids:
-            self.stage_ids[row['id']].publish_indicator.setVisible(1)
-        else:
-            self.stage_ids[row['id']].publish_indicator.setVisible(0)
-        if self.openned_tickets_stage_ids is not None and row['id'] in self.openned_tickets_stage_ids:
-            self.stage_ids[row['id']].ticket_indicator.setVisible(1)
-        else:
-            self.stage_ids[row['id']].ticket_indicator.setVisible(0)
+        if row['asset_id'] in self.asset_ids.keys():
+            if row['id'] not in self.stage_ids.keys():
+                parent_widget = self.asset_ids[row['asset_id']]
+                stage_item = stage_treeWidgetItem( parent_widget,
+                                                        instance_name = row['name'],
+                                                        instance_id = row['id'],
+                                                        instance_type = 'stage')
+                stage_item.setText(0, row['name'])
+                stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
+                self.stage_ids[row['id']] = stage_item
+                parent_widget.addChild(stage_item)
+                self.remove_stage_creation_item(parent_widget, row['name'])
+            if self.all_export_versions_stage_ids is not None and row['id'] in self.all_export_versions_stage_ids:
+                self.stage_ids[row['id']].publish_indicator.setVisible(1)
+            else:
+                self.stage_ids[row['id']].publish_indicator.setVisible(0)
+            if self.openned_tickets_stage_ids is not None and row['id'] in self.openned_tickets_stage_ids:
+                self.stage_ids[row['id']].ticket_indicator.setVisible(1)
+            else:
+                self.stage_ids[row['id']].ticket_indicator.setVisible(0)
 
     def remove_stage_creation_item(self, parent_widget, stage_name):
         child_count = parent_widget.childCount()

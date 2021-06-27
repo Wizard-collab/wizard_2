@@ -10,6 +10,7 @@ QFrame{
 
 QPushButton{
 	background-color: #42424d;
+	padding: 12px;
 }
 
 QPushButton::hover{
@@ -143,4 +144,8 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 }
 #tree_clear_pushButton::hover{
 	background-image: url(ressources/icons/tree_clear_hover.png);
+}
+
+#menu_widget_frame{
+	border-radius: 10px;
 }
