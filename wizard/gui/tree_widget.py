@@ -66,7 +66,6 @@ class tree_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.search_frame = QtWidgets.QFrame()
-        self.search_frame.setObjectName('tree_widget_search_frame')
         self.search_layout = QtWidgets.QHBoxLayout()
         self.search_layout.setContentsMargins(6,6,6,6)
         self.search_layout.setSpacing(4)
@@ -76,9 +75,17 @@ class tree_widget(QtWidgets.QWidget):
             18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
         self.search_layout.addWidget(self.search_icon_label)
         self.search_bar = QtWidgets.QLineEdit()
-        self.search_bar.setClearButtonEnabled(True)
+        self.search_bar.setObjectName("tree_search_lineEdit")
         self.search_bar.setPlaceholderText('characters:Lola*grooming')
         self.search_layout.addWidget(self.search_bar)
+        self.clear_search_button = QtWidgets.QPushButton()
+        self.clear_search_button.setFixedSize(16,16)
+        self.clear_search_button.setObjectName('tree_clear_pushButton')
+        self.search_layout.addWidget(self.clear_search_button)
+        self.refresh_tree_button = QtWidgets.QPushButton()
+        self.refresh_tree_button.setObjectName('tree_refresh_pushButton')
+        self.refresh_tree_button.setFixedSize(16,16)
+        self.search_layout.addWidget(self.refresh_tree_button)
         self.main_layout.addWidget(self.search_frame)
 
         self.tree = QtWidgets.QTreeWidget()
@@ -94,6 +101,8 @@ class tree_widget(QtWidgets.QWidget):
         self.search_thread.item_signal.connect(self.add_search_item)
         self.tree.itemDoubleClicked.connect(self.double_click)
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
+        self.refresh_tree_button.clicked.connect(self.refresh)
+        self.clear_search_button.clicked.connect(self.search_bar.clear)
 
     def init_tree(self):
         self.set_context()
@@ -241,6 +250,7 @@ class tree_widget(QtWidgets.QWidget):
                                                     instance_name = row['name'],
                                                     instance_id = row['id'],
                                                     instance_type = 'stage')
+            stage_item.setText(0, row['name'])
             stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
             self.stage_ids[row['id']] = stage_item
             parent_widget.addChild(stage_item)
@@ -314,6 +324,10 @@ class tree_widget(QtWidgets.QWidget):
         self.search_asset(search)
 
     def search_asset(self, search):
+        if search != '':
+            self.clear_search_button.setVisible(1)
+        else:
+            self.clear_search_button.setVisible(0)
         stage_filter = None
         if '*' in search:
             stage_filter = search.split('*')[-1]
@@ -454,14 +468,12 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
                                                 parent_id)
         
         self.widget = QtWidgets.QWidget()
-        self.widget.setStyleSheet('background:green;font:14px;')
+        self.widget.setStyleSheet('background:transparent;')
         self.widget_layout = QtWidgets.QHBoxLayout()
         self.widget_layout.setContentsMargins(2,2,2,2)
         self.widget.setLayout(self.widget_layout)
-        self.name_label = QtWidgets.QLabel(self.instance_name)
-        self.name_label.setFixedWidth(100)
-        self.name_label.setStyleSheet('background:red;')
-        self.widget_layout.addWidget(self.name_label)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Fixed)
+        self.widget_layout.addSpacerItem(self.spaceItem)
         self.publish_indicator = indicator('#83cc56')
         self.publish_indicator.setVisible(0)
         self.ticket_indicator = indicator('#ffa27a')
@@ -496,6 +508,9 @@ class instance_creation_widget(QtWidgets.QDialog):
 
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
+
+    def leaveEvent(self, event):
+        self.reject()
 
     def move_ui(self):
         win_size = (self.frameSize().width(), self.frameSize().height())

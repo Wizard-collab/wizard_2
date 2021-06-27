@@ -1,42 +1,95 @@
 QWidget{
-background-color:#24242b;
-color:white;
-border:none;
-font:14px;
+	background-color:#24242b;
+	color:white;
+	border:none;
+}
+
+QFrame{
+	background-color: #2c2c33;
+}
+
+QPushButton{
+	background-color: #42424d;
+}
+
+QPushButton::hover{
+	background-color: #4b4b57;
+}
+
+QPushButton::pressed{
+	background-color: #1d1d21;
 }
 
 QTreeView {
-show-decoration-selected: 1;
-outline:none;
-padding:10px;
+	background-color:#24242b;
+	show-decoration-selected: 0;
+	outline:none;
+	padding:10px;
 }
  
 QTreeView::item {
-padding:5px;
-border-radius:5px;
+	padding:5px;
+	border-radius:5px;
 }
  
 QTreeView::item:hover {
-background-color:rgba(255,255,255,10);
+	background-color:rgba(255,255,255,10);
 }
  
 QTreeView::item:selected {
-background-color:rgba(255,255,255,30);
+	background-color:rgba(255,255,255,30);
 }
  
 QTreeView::item:selected:active{
-background-color:rgba(255,255,255,30);
+	background-color:rgba(255,255,255,30);
 }
  
-QTreeView::item:selected:!active {
+	QTreeView::item:selected:!active {
 background-color:rgba(255,255,255,30);
-color:white;
+	color:white;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        image: url(ressources/icons/QTreeViewRight.png);
+        background:none;
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+        image: url(ressources/icons/QTreeViewDown.png);
+        background:none;
+}
+
+QTreeView::branch:selected {
+    background: none;
+    color: white;
+}
+
+QTreeView::branch {
+    background: none;
+}
+
+QTreeView::branch:!selected {
+    background: none;
+}
+
+QTreeView::branch:selected:active {
+    background: none;
+}
+
+QTreeView::branch:selected:!active {
+    background: none;
+}
+
+QTreeView::branch:hover {
+   background: none;
 }
 
 QScrollBar:vertical{
-width:6px;
-background-color: rgba(0,0,0,30);
-border-radius:3px;
+	width:6px;
+	background-color: rgba(0,0,0,30);
+	border-radius:3px;
 }
 
 QScrollBar::handle:vertical {	
@@ -68,4 +121,26 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 
 #tree_stage_item{
 	background-color: transparent;
+}
+
+#tree_search_lineEdit{
+	background: transparent;
+}
+
+#tree_clear_pushButton, #tree_refresh_pushButton{
+	background: transparent;
+}
+
+#tree_refresh_pushButton{
+	background-image: url(ressources/icons/tree_refresh.png);
+}
+#tree_refresh_pushButton::hover{
+	background-image: url(ressources/icons/tree_refresh_hover.png);
+}
+
+#tree_clear_pushButton{
+	background-image: url(ressources/icons/tree_clear.png);
+}
+#tree_clear_pushButton::hover{
+	background-image: url(ressources/icons/tree_clear_hover.png);
 }
