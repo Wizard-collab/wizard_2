@@ -289,6 +289,12 @@ def add_variant(name, stage_id, comment):
     else:
         logging.warning(f"{name} already exists")
 
+def get_all_variants(column='*'):
+    variants_rows = db_utils.get_rows('project',
+                                            'variants',
+                                            column)
+    return variants_rows
+
 def remove_variant(variant_id):
     success = None
     if site.is_admin():
