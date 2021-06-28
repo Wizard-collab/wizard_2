@@ -48,6 +48,7 @@ class confirm_widget(QtWidgets.QDialog):
         self.reject_button = QtWidgets.QPushButton(self.reject_text)
         self.buttons_layout.addWidget(self.reject_button)
         self.accept_button = QtWidgets.QPushButton(self.accept_text)
+        self.accept_button.setObjectName("blue_button")
         self.buttons_layout.addWidget(self.accept_button)
         self.main_layout.addWidget(self.buttons_widget)
 

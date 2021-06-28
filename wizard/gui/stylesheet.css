@@ -2,6 +2,7 @@ QWidget{
 	background-color:#24242b;
 	color:white;
 	border:none;
+	font-family: Roboto;
 }
 
 QFrame{
@@ -15,7 +16,7 @@ QLabel{
 QPushButton{
 	background-color: #42424d;
 	padding: 12px;
-	border-radius: 10px;
+	border-radius: 5px;
 }
 
 QPushButton::hover{
@@ -26,9 +27,10 @@ QPushButton::pressed{
 	background-color: #1d1d21;
 }
 
-QLineEdit{
+QLineEdit, QSpinBox{
 	background-color:#24242b;
 	padding: 4px;
+	border-radius: 5px;
 }
 
 QTreeView {
@@ -130,6 +132,18 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 	background: none;
 }
 
+#blue_button{
+	background-color: #7785de;
+}
+
+#blue_button::hover{
+	background-color: #8e9dfa;
+}
+
+#blue_button::pressed{
+	background-color: #6772b5;
+}
+
 #tree_stage_item{
 	background-color: transparent;
 }
@@ -150,10 +164,10 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 }
 
 #tree_clear_pushButton{
-	background-image: url(ressources/icons/tree_clear.png);
+	background-image: url(ressources/icons/close.png);
 }
 #tree_clear_pushButton::hover{
-	background-image: url(ressources/icons/tree_clear_hover.png);
+	background-image: url(ressources/icons/close_hover.png);
 }
 
 #menu_widget_frame{
@@ -176,4 +190,25 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 #tree_datas_label{
 	color: gray;
 	padding: 5px;
+}
+
+#tree_project_label{
+	font: bold;
+	font-size: 22px;
+	color: gray;
+	padding: 10px;
+	padding-bottom: 0px;
+}
+
+#close_button{
+	background-color: #f0605b;
+	border-radius: 8px;
+}
+
+#close_button::hover{
+	background-color: #ff817d;
+}
+
+#close_button::pressed{
+	background-color: #ab4946;
 }

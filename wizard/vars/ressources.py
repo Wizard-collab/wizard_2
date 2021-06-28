@@ -13,6 +13,7 @@ _add_icon_small_ = os.path.join(_icons_path_, 'add_small.png')
 _folder_icon_small_ = os.path.join(_icons_path_, 'folder_small.png')
 _search_icon_ = os.path.join(_icons_path_, 'search_icon.png')
 _warning_icon_ = os.path.join(_icons_path_, 'warning_icon.png')
+_close_icon_ = os.path.join(_icons_path_, 'close_hover.png')
 
 # Domains icons
 _assets_icon_small_ = os.path.join(_icons_path_, 'assets_small.png')

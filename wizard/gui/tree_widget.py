@@ -64,7 +64,7 @@ class tree_widget(QtWidgets.QWidget):
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(6)
+        self.main_layout.setSpacing(2)
         self.setLayout(self.main_layout)
 
         self.search_frame = QtWidgets.QFrame()
@@ -89,6 +89,10 @@ class tree_widget(QtWidgets.QWidget):
         self.refresh_tree_button.setFixedSize(16,16)
         self.search_layout.addWidget(self.refresh_tree_button)
         self.main_layout.addWidget(self.search_frame)
+
+        self.project_label = QtWidgets.QLabel(environment.get_project_name())
+        self.project_label.setObjectName('tree_project_label')
+        self.main_layout.addWidget(self.project_label)
 
         self.tree = QtWidgets.QTreeWidget()
         self.tree.setIconSize(QtCore.QSize(16, 16))
@@ -375,11 +379,13 @@ class tree_widget(QtWidgets.QWidget):
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 asset_name = self.instance_creation_widget.name_field.text()
+                inframe = self.instance_creation_widget.inframe
+                outframe = self.instance_creation_widget.outframe
                 parent_id = item.instance_parent_id
-                new_asset_id = assets.create_asset(asset_name, parent_id)
+                new_asset_id = assets.create_asset(asset_name, parent_id, inframe, outframe)
                 self.refresh()
         elif item.instance_type == 'category_creation':
-            self.instance_creation_widget = instance_creation_widget(self)
+            self.instance_creation_widget = instance_creation_widget(self, request_frames=None)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.instance_parent_id
@@ -507,8 +513,11 @@ class indicator(QtWidgets.QFrame):
         self.setStyleSheet(f'background-color:{color};border-radius:4px;')
  
 class instance_creation_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, request_frames=1):
         super(instance_creation_widget, self).__init__(parent)
+        self.request_frames = request_frames
+        self.inframe = 100
+        self.outframe = 220
         self.build_ui()
         self.connect_functions()
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
@@ -524,6 +533,7 @@ class instance_creation_widget(QtWidgets.QDialog):
         corner = gui_utils.move_ui(self)
         self.apply_round_corners(corner)
         event.accept()
+        self.name_field.setFocus()
 
     def apply_round_corners(self, corner):
         self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
@@ -538,16 +548,65 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.frame_layout.setSpacing(6)
         self.main_frame.setLayout(self.frame_layout)
         self.main_layout.addWidget(self.main_frame)
+
+        self.close_frame = QtWidgets.QFrame()
+        self.close_layout = QtWidgets.QHBoxLayout()
+        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setSpacing(2)
+        self.close_frame.setLayout(self.close_layout)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.close_layout.addSpacerItem(self.spaceItem)
+        self.close_pushButton = QtWidgets.QPushButton()
+        self.close_pushButton.setObjectName('close_button')
+        self.close_pushButton.setIcon(QtGui.QIcon(ressources._close_icon_))
+        self.close_pushButton.setFixedSize(16,16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_layout.addWidget(self.close_pushButton)
+        self.frame_layout.addWidget(self.close_frame)
+
         self.name_field = QtWidgets.QLineEdit()
         self.frame_layout.addWidget(self.name_field)
+
+        self.frange_frame = QtWidgets.QFrame()
+        self.frange_layout = QtWidgets.QHBoxLayout()
+        self.frange_layout.setContentsMargins(0,0,0,0)
+        self.frange_layout.setSpacing(6)
+        self.frange_frame.setLayout(self.frange_layout)
+
+        frange_label = QtWidgets.QLabel("Frame range")
+        frange_label.setStyleSheet('color:gray;')
+        self.frange_layout.addWidget(frange_label)
+        self.inframe_spinBox = QtWidgets.QSpinBox()
+        self.inframe_spinBox.setRange(-100000, 219)
+        self.inframe_spinBox.setValue(100)
+        self.inframe_spinBox.setButtonSymbols(2)
+        self.frange_layout.addWidget(self.inframe_spinBox)
+        self.outframe_spinBox = QtWidgets.QSpinBox()
+        self.outframe_spinBox.setRange(101, 100000)
+        self.outframe_spinBox.setValue(220)
+        self.outframe_spinBox.setButtonSymbols(2)
+        self.frange_layout.addWidget(self.outframe_spinBox)
+
+        self.frame_layout.addWidget(self.frange_frame)
+
+        if not self.request_frames:
+            self.frange_frame.setVisible(0)
+
         self.accept_button = QtWidgets.QPushButton('Create')
+        self.accept_button.setObjectName("blue_button")
         self.frame_layout.addWidget(self.accept_button)
+
+    def update_range(self):
+        self.inframe = self.inframe_spinBox.value()
+        self.outframe = self.outframe_spinBox.value()
+        self.inframe_spinBox.setRange(-100000, self.outframe-1)
+        self.outframe_spinBox.setRange(self.inframe+1, 100000)
 
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
-
-    def leaveEvent(self, event):
-        self.reject()
+        self.inframe_spinBox.valueChanged.connect(self.update_range)
+        self.outframe_spinBox.valueChanged.connect(self.update_range)
+        self.close_pushButton.clicked.connect(self.reject)
 
 class search_thread(QtCore.QThread):
 
