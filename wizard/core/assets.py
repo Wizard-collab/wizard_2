@@ -113,13 +113,13 @@ def archive_category(category_id):
 	else:
 		return None
 
-def create_asset(name, category_id):
+def create_asset(name, category_id, inframe=100, outframe=220):
 	asset_id = None
 	if tools.is_safe(name):
 		category_path = get_category_path(category_id)
 		if category_path:
 			dir_name = os.path.normpath(os.path.join(category_path, name))
-			asset_id = project.add_asset(name, category_id)
+			asset_id = project.add_asset(name, category_id, inframe, outframe)
 			if asset_id:
 				if not tools.create_folder(dir_name):
 					project.remove_asset(asset_id)
