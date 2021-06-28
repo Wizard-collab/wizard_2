@@ -7,6 +7,9 @@ import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 
+# Wizard gui modules
+from wizard.gui import gui_utils
+
 
 class menu_widget(QtWidgets.QDialog):
 
@@ -37,25 +40,37 @@ class menu_widget(QtWidgets.QDialog):
         self.setLayout(self.main_layout)
 
     def showEvent(self, event):
-        self.move_ui()
-        self.apply_round_corners()
+        corner = gui_utils.move_ui(self)
+        self.apply_round_corners(corner)
         event.accept()
 
-    def apply_round_corners(self):
+    def apply_round_corners(self, corner):
         if len(self.buttons) > 1:
-            self.buttons[0].setStyleSheet('border-top-left-radius:10px;border-top-right-radius:10px')
-            self.buttons[-1].setStyleSheet('border-bottom-right-radius:10px')
+            if corner == 'top-right':
+                self.buttons[0].setStyleSheet('border-top-left-radius:10px')
+                self.buttons[-1].setStyleSheet('border-bottom-right-radius:10px;border-bottom-left-radius:10px')
+            elif corner == 'top-left':
+                self.buttons[0].setStyleSheet('border-top-right-radius:10px')
+                self.buttons[-1].setStyleSheet('border-bottom-right-radius:10px;border-bottom-left-radius:10px')
+            elif corner == 'bottom-right':
+                self.buttons[0].setStyleSheet('border-top-right-radius:10px;border-top-left-radius:10px')
+                self.buttons[-1].setStyleSheet('border-bottom-left-radius:10px')
+            elif corner == 'bottom-left':
+                self.buttons[0].setStyleSheet('border-top-right-radius:10px;border-top-left-radius:10px')
+                self.buttons[-1].setStyleSheet('border-bottom-right-radius:10px')
         else:
-            self.buttons[0].setStyleSheet('border-top-left-radius:10px;border-top-right-radius:10px;border-bottom-right-radius:10px')
+            if corner == 'top-right':
+                self.buttons[0].setStyleSheet('border-top-left-radius:10px;border-bottom-left-radius:10px;border-bottom-right-radius:10px')
+            elif corner == 'top-left':
+                self.buttons[0].setStyleSheet('border-top-right-radius:10px;border-bottom-left-radius:10px;border-bottom-right-radius:10px')
+            elif corner == 'bottom-right':
+                self.buttons[0].setStyleSheet('border-top-right-radius:10px;border-bottom-left-radius:10px;border-top-right-radius:10px')
+            elif corner == 'bottom-left':
+                self.buttons[0].setStyleSheet('border-top-right-radius:10px;border-bottom-right-radius:10px;border-top-right-radius:10px')
+
 
     def leaveEvent(self, event):
         self.reject()
-
-    def move_ui(self):
-        win_size = (self.frameSize().width(), self.frameSize().height())
-        posx = QtGui.QCursor.pos().x() - 10
-        posy = int(QtGui.QCursor.pos().y()) - win_size[1] + 10
-        self.move(posx, posy)
 
     def set_function_name_and_close(self, function_name):
         self.function_name = function_name
@@ -63,6 +78,7 @@ class menu_widget(QtWidgets.QDialog):
 
     def add_action(self, function_name):
         pushButton = QtWidgets.QPushButton(function_name)
+        pushButton.setObjectName('menu_widget_button')
         self.buttons.append(pushButton)
         self.frame_layout.addWidget(pushButton)
         pushButton.clicked.connect(self.close)

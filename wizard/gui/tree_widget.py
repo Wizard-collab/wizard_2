@@ -22,6 +22,8 @@ logging = logging.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import menu_widget
+from wizard.gui import confirm_widget
+from wizard.gui import gui_utils
 
 class tree_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -423,13 +425,15 @@ class tree_widget(QtWidgets.QWidget):
             logging.error(f"{path} not found")
 
     def archive_instance(self, item):
-        if item.instance_type == 'category':
-            assets.archive_category(item.instance_id)
-        elif item.instance_type == 'asset':
-            assets.archive_asset(item.instance_id)
-        elif item.instance_type== 'stage':
-            assets.archive_stage(item.instance_id)
-        self.refresh()
+        self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+        if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if item.instance_type == 'category':
+                assets.archive_category(item.instance_id)
+            elif item.instance_type == 'asset':
+                assets.archive_asset(item.instance_id)
+            elif item.instance_type== 'stage':
+                assets.archive_stage(item.instance_id)
+            self.refresh()
 
     def remove_category(self, id):
         item = self.category_ids[id]
@@ -494,32 +498,47 @@ class indicator(QtWidgets.QFrame):
         self.setStyleSheet(f'background-color:{color};border-radius:4px;')
  
 class instance_creation_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None, context='assets'):
+    def __init__(self, parent=None):
         super(instance_creation_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.move_ui()
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.setGraphicsEffect(self.shadow)
+
+    def showEvent(self, event):
+        corner = gui_utils.move_ui(self)
+        self.apply_round_corners(corner)
+        event.accept()
+
+    def apply_round_corners(self, corner):
+        self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(8,8,8,8)
         self.setLayout(self.main_layout)
+        self.main_frame = QtWidgets.QFrame()
+        self.main_frame.setObjectName('instance_creation_frame')
+        self.frame_layout = QtWidgets.QVBoxLayout()
+        self.frame_layout.setSpacing(6)
+        self.main_frame.setLayout(self.frame_layout)
+        self.main_layout.addWidget(self.main_frame)
         self.name_field = QtWidgets.QLineEdit()
-        self.main_layout.addWidget(self.name_field)
+        self.frame_layout.addWidget(self.name_field)
         self.accept_button = QtWidgets.QPushButton('Create')
-        self.main_layout.addWidget(self.accept_button)
+        self.frame_layout.addWidget(self.accept_button)
 
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
 
     def leaveEvent(self, event):
         self.reject()
-
-    def move_ui(self):
-        win_size = (self.frameSize().width(), self.frameSize().height())
-        posx = QtGui.QCursor.pos().x()
-        posy = int(QtGui.QCursor.pos().y()) - win_size[1] + 10
-        self.move(posx, posy)
 
 class search_thread(QtCore.QThread):
 
