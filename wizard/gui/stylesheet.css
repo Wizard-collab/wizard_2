@@ -172,3 +172,8 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 #menu_widget_button{
 	border-radius: 0px;
 }
+
+#tree_datas_label{
+	color: gray;
+	padding: 5px;
+}

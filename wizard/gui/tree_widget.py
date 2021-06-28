@@ -97,6 +97,10 @@ class tree_widget(QtWidgets.QWidget):
         self.tree.setIndentation(20)
         self.main_layout.addWidget(self.tree)
 
+        self.data_label = QtWidgets.QLabel()
+        self.data_label.setObjectName('tree_datas_label')
+        self.main_layout.addWidget(self.data_label)
+
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
         self.search_thread = search_thread()
@@ -200,8 +204,13 @@ class tree_widget(QtWidgets.QWidget):
             if id not in self.project_category_ids:
                 self.remove_category(id)
         self.apply_search()
+        self.refresh_datas()
         if hard:
             self.get_context()
+
+    def refresh_datas(self):
+        text = f"{len(self.asset_ids.keys())} assets, {len(self.stage_ids.keys())} stages"
+        self.data_label.setText(text)
 
     def add_domain(self, row):
         if row['id'] not in self.domain_ids.keys():
