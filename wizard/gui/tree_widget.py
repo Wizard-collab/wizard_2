@@ -90,10 +90,6 @@ class tree_widget(QtWidgets.QWidget):
         self.search_layout.addWidget(self.refresh_tree_button)
         self.main_layout.addWidget(self.search_frame)
 
-        self.project_label = QtWidgets.QLabel(environment.get_project_name())
-        self.project_label.setObjectName('tree_project_label')
-        self.main_layout.addWidget(self.project_label)
-
         self.tree = QtWidgets.QTreeWidget()
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -213,7 +209,7 @@ class tree_widget(QtWidgets.QWidget):
             self.get_context()
 
     def refresh_datas(self):
-        text = f"{len(self.asset_ids.keys())} assets, {len(self.stage_ids.keys())} stages"
+        text = f"{len(self.category_ids.keys())} categories, {len(self.asset_ids.keys())} assets, {len(self.stage_ids.keys())} stages"
         self.data_label.setText(text)
 
     def add_domain(self, row):

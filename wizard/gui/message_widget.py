@@ -5,13 +5,11 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-class confirm_widget(QtWidgets.QDialog):
-    def __init__(self, message, title='Warning', reject_text='Cancel', accept_text='Continue', parent=None):
-        super(confirm_widget, self).__init__(parent)
+class message_widget(QtWidgets.QDialog):
+    def __init__(self, title, message, parent=None):
+        super(message_widget, self).__init__(parent)
         self.title = title
         self.message = message
-        self.reject_text = reject_text
-        self.accept_text = accept_text
         self.build_ui()
         self.connect_functions()
 
@@ -46,13 +44,10 @@ class confirm_widget(QtWidgets.QDialog):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.spaceItem = QtWidgets.QSpacerItem(10,100,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
-        self.reject_button = QtWidgets.QPushButton(self.reject_text)
-        self.buttons_layout.addWidget(self.reject_button)
-        self.accept_button = QtWidgets.QPushButton(self.accept_text)
-        self.accept_button.setObjectName("blue_button")
-        self.buttons_layout.addWidget(self.accept_button)
+        self.ok_button = QtWidgets.QPushButton('Ok')
+        self.ok_button.setObjectName("red_button")
+        self.buttons_layout.addWidget(self.ok_button)
         self.main_layout.addWidget(self.buttons_widget)
 
     def connect_functions(self):
-        self.reject_button.clicked.connect(self.reject)
-        self.accept_button.clicked.connect(self.accept)
+        self.ok_button.clicked.connect(self.accept)

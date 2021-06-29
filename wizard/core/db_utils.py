@@ -156,9 +156,17 @@ def check_database_existence(database):
 
 def execute_sql(sql, level, as_dict, data=None, fetch=2):
     signal_dic = dict()
+    signal_dic['request'] = 'sql_cmd'
     signal_dic['sql'] = sql
     signal_dic['level'] = level
     signal_dic['as_dict'] = as_dict
     signal_dic['data'] = data
     signal_dic['fetch'] = fetch
+    return socket_utils.send_signal(db_vars._LOCAL_DNS_, signal_dic)
+
+def modify_db_name(level, db_name):
+    signal_dic = dict()
+    signal_dic['request'] = 'modify_database_name'
+    signal_dic['level'] = level
+    signal_dic['db_name'] = db_name
     return socket_utils.send_signal(db_vars._LOCAL_DNS_, signal_dic)

@@ -36,7 +36,7 @@ class db_server(threading.Thread):
                 if addr[0] == self.server_address:
                     signal_as_str = socket_utils.recvall(conn).decode('utf8')
                     if signal_as_str:
-                        returned = self.execute_sql(signal_as_str)
+                        returned = self.execute_signal(signal_as_str)
                         conn.send(json.dumps(returned).encode('utf-8'))
                         conn.close()
             except:
@@ -50,45 +50,53 @@ class db_server(threading.Thread):
     def stop(self):
         self.running = False
 
-    def execute_sql(self, signal_as_str):
-        try:
+    def execute_signal(self, signal_as_str):
             signal_dic = json.loads(signal_as_str)
-            if signal_dic['level'] == 'site':
-                if not self.site_conn:
-                    if self.site:
-                        self.site_conn = create_connection(self.site)
-                conn = self.site_conn
-            else:
-                if not self.project_conn:
-                    if self.project_name:
-                        self.project_conn = create_connection(self.project_name)
-                conn = self.project_conn
-            if conn:
-                rows = None
-                if signal_dic['as_dict']:
-                    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            if signal_dic['request'] == 'sql_cmd':
+                try:
+                    if signal_dic['level'] == 'site':
+                        if not self.site_conn:
+                            if self.site:
+                                self.site_conn = create_connection(self.site)
+                        conn = self.site_conn
+                    else:
+                        if not self.project_conn:
+                            if self.project_name:
+                                self.project_conn = create_connection(self.project_name)
+                        conn = self.project_conn
+                    if conn:
+                        rows = None
+                        if signal_dic['as_dict']:
+                            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                        else:
+                            cursor = conn.cursor()
+                        if signal_dic['data']:
+                            cursor.execute(signal_dic['sql'], signal_dic['data'])
+                        else:
+                            cursor.execute(signal_dic['sql'])
+                        if signal_dic['fetch'] == 2:
+                            rows = cursor.fetchall()
+                        elif signal_dic['fetch'] == 1:
+                            rows = cursor.fetchone()[0]
+                        else:
+                            rows = 1
+                        if not signal_dic['as_dict'] and signal_dic['fetch'] != 1:
+                            if rows != 1:
+                                rows = [r[0] for r in rows]
+                        return rows
+                    else:
+                       logging.error("No connection")
+                       return None
+                except (Exception, psycopg2.DatabaseError) as error:
+                    logging.error(error)
+                    return None
+            elif signal_dic['request'] == 'modify_database_name':
+                if signal_dic['level'] == 'site':
+                    self.site = signal_dic['db_name']
                 else:
-                    cursor = conn.cursor()
-                if signal_dic['data']:
-                    cursor.execute(signal_dic['sql'], signal_dic['data'])
-                else:
-                    cursor.execute(signal_dic['sql'])
-                if signal_dic['fetch'] == 2:
-                    rows = cursor.fetchall()
-                elif signal_dic['fetch'] == 1:
-                    rows = cursor.fetchone()[0]
-                else:
-                    rows = 1
-                if not signal_dic['as_dict'] and signal_dic['fetch'] != 1:
-                    if rows != 1:
-                        rows = [r[0] for r in rows]
-                return rows
-            else:
-               logging.error("No connection")
-               return None
-        except (Exception, psycopg2.DatabaseError) as error:
-            logging.error(error)
-            return None
+                    self.project = signal_dic['db_name']
+                return 1
+
 
 def create_connection(database=None):
     try:

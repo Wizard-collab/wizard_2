@@ -1,8 +1,17 @@
-import PyWizard
+#import PyWizard
 from wizard.gui import tree_widget
 from wizard.gui import user_widget
+from wizard.gui import quotes_widget
+from wizard.gui import psql_widget
+from wizard.gui import create_db_widget
+from wizard.gui import user_log_widget
 import sys
+import time
 from PyQt5 import QtWidgets, QtCore, QtGui
+from wizard.core import user
+from wizard.core import site
+from wizard.core import db_core
+from wizard.core import db_utils
 
 app = QtWidgets.QApplication(sys.argv)
 
@@ -42,8 +51,34 @@ QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Cabin-VariableFont_wdth
 
 with open('wizard/gui/stylesheet.css', 'r') as f:
 	app.setStyleSheet(f.read())
-my_tree_widget = tree_widget.tree_widget()
-my_user_widget = user_widget.user_widget()
-my_tree_widget.show()
+#my_tree_widget = tree_widget.tree_widget()
+#my_user_widget = user_widget.user_widget()
+#my_quotes_widget = quotes_widget.quotes_widget()
+#my_tree_widget.show()
 #my_user_widget.show()
+#my_quotes_widget.show()
+#my_psql_widget.show()
+#my_create_db_widget.show()
+
+if not user.user().get_psql_dns():
+	my_psql_widget = psql_widget.psql_widget()
+	if my_psql_widget.exec_() != QtWidgets.QDialog.Accepted:
+		sys.exit()
+
+db_server = db_core.db_server()
+db_server.start()
+
+if not site.is_site_database():
+	my_create_db_widget = create_db_widget.create_db_widget()
+	if my_create_db_widget.exec_() != QtWidgets.QDialog.Accepted:
+		sys.exit()
+
+db_utils.modify_db_name('site', 'site')
+site.add_ip_user()
+
+if not user.get_user():
+	my_user_log_widget = user_log_widget.user_log_widget()
+	if my_user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
+		sys.exit()
+
 sys.exit(app.exec_())

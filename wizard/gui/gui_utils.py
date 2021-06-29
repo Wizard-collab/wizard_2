@@ -33,3 +33,44 @@ def move_ui(widget):
 
     widget.move(posx, posy)
     return f"{angley}-{anglex}"
+
+class password_lineEdit(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(password_lineEdit, self).__init__(parent)
+        self.build_ui()
+        self.connect_functions()
+        self.toggle_password_visibility()
+
+    def build_ui(self):
+        self.setObjectName('password_lineEdit_frame')
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,10,0)
+
+        self.setLayout(self.main_layout)
+
+        self.password_lineEdit = QtWidgets.QLineEdit()
+        self.main_layout.addWidget(self.password_lineEdit)
+
+        self.toggle_visibility_button = QtWidgets.QPushButton()
+        self.toggle_visibility_button.setObjectName('password_visibility_button')
+        self.toggle_visibility_button.setCheckable(True)
+        self.toggle_visibility_button.setFixedSize(16,16)
+        self.main_layout.addWidget(self.toggle_visibility_button)
+
+    def connect_functions(self):
+        self.toggle_visibility_button.clicked.connect(self.toggle_password_visibility)
+
+    def toggle_password_visibility(self):
+        if not self.toggle_visibility_button.isChecked():
+            self.password_lineEdit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+        else:
+            self.password_lineEdit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
+
+    def text(self):
+        return self.password_lineEdit.text()
+
+    def setPlaceholderText(self, placeholderText):
+        self.password_lineEdit.setPlaceholderText(placeholderText)
+
+
+

@@ -66,6 +66,9 @@ class user:
             self.prefs_dic[user_vars._psql_dns_] = DNS
             self.write_prefs_dic()
             environment.set_psql_dns(DNS)
+            return 1
+        else:
+            return None
 
     def get_psql_dns(self):
         if self.prefs_dic[user_vars._psql_dns_]:
@@ -191,10 +194,13 @@ def log_user(user_name, password):
             site.update_current_ip_data('user_id', user_row['id'])
             environment.build_user_env(user_name)
             logging.info(f'{user_name} signed in')
+            return 1
         else:
             logging.warning(f'Wrong password for {user_name}')
+            return None
     else:
         logging.error(f"{user_name} doesn't exists")
+        return None
 
 def disconnect_user():
     site.update_current_ip_data('user_id', None)

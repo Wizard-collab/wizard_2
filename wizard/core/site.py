@@ -110,45 +110,60 @@ def create_user(user_name,
                     email,
                     administrator_pass='',
                     profile_picture=ressources._default_profile_):
-    if user_name not in get_user_names_list():
-        administrator = 0
-        if tools.decrypt_string(get_administrator_pass(),
-                                administrator_pass):
-            administrator = 1
-        if not os.path.isfile(profile_picture):
-            profile_picture = ressources._default_profile_
-        profile_picture_ascii = image.convert_image_to_str_data(profile_picture)
-        if db_utils.create_row('site',
-                    'users', 
-                    ('user_name',
-                        'pass',
-                        'email',
-                        'profile_picture',
-                        'xp',
-                        'level',
-                        'life',
-                        'administrator'), 
-                    (user_name,
-                        tools.encrypt_string(password),
-                        email,
-                        profile_picture_ascii,
-                        0,
-                        0,
-                        100,
-                        administrator)):
-
-            info = f"User {user_name} created"
-            if administrator:
-                info += ' ( privilege : administrator )'
+    do_creation = 1
+    if user_name == '':
+        logging.warning('Please provide a user name')
+        do_creation = None
+    if password == '':
+        logging.warning('Please provide a password')
+        do_creation = None
+    if email == '':
+        logging.warning('Please provide an email')
+        do_creation = None
+        
+    if do_creation:
+        if user_name not in get_user_names_list():
+            administrator = 0
+            if tools.decrypt_string(get_administrator_pass(),
+                                    administrator_pass):
+                administrator = 1
+            if profile_picture:
+                if not os.path.isfile(profile_picture):
+                    profile_picture = ressources._default_profile_
             else:
-                info += ' ( privilege : user )'
-            logging.info(info)
-            return 1
+                profile_picture = ressources._default_profile_
+            profile_picture_ascii = image.convert_image_to_str_data(profile_picture)
+            if db_utils.create_row('site',
+                        'users', 
+                        ('user_name',
+                            'pass',
+                            'email',
+                            'profile_picture',
+                            'xp',
+                            'level',
+                            'life',
+                            'administrator'), 
+                        (user_name,
+                            tools.encrypt_string(password),
+                            email,
+                            profile_picture_ascii,
+                            0,
+                            0,
+                            100,
+                            administrator)):
+
+                info = f"User {user_name} created"
+                if administrator:
+                    info += ' ( privilege : administrator )'
+                else:
+                    info += ' ( privilege : user )'
+                logging.info(info)
+                return 1
+            else:
+                return None
         else:
+            logging.warning(f'User {user_name} already exists')
             return None
-    else:
-        logging.warning(f'User {user_name} already exists')
-        return None
 
 def upgrade_user_privilege(user_name, administrator_pass):
     if user_name in get_user_names_list():
@@ -341,6 +356,10 @@ def get_quote_data(quote_id, column='*'):
     else:
         logging.error("Quote not found")
         return None
+
+def get_all_quotes(column='*'):
+    quotes_rows = db_utils.get_rows('site', 'quotes', column)
+    return quotes_rows
 
 def get_ips(column='*'):
     ip_rows = db_utils.get_rows('site', 'ips_wrap', column)
