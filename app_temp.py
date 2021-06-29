@@ -6,6 +6,7 @@ from wizard.gui import psql_widget
 from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
 from wizard.gui import project_log_widget
+from wizard.gui import create_project_widget
 
 import sys
 import time
@@ -85,10 +86,21 @@ if not user.get_user():
 		sys.exit()
 
 if not user.get_project():
+	if not site.get_projects_names_list():
+		my_create_project_widget = create_project_widget.create_project_widget()
+		if my_create_project_widget.exec_() != QtWidgets.QDialog.Accepted:
+			sys.exit()
 	my_project_log_widget = project_log_widget.project_log_widget()
 	if my_project_log_widget.exec_() != QtWidgets.QDialog.Accepted:
 		sys.exit()
 
 db_utils.modify_db_name('project', environment.get_project_name())
+
+my_tree_widget = tree_widget.tree_widget()
+my_user_widget = user_widget.user_widget()
+my_quotes_widget = quotes_widget.quotes_widget()
+my_tree_widget.show()
+my_user_widget.show()
+my_quotes_widget.show()
 
 sys.exit(app.exec_())

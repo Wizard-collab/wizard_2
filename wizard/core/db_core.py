@@ -93,8 +93,14 @@ class db_server(threading.Thread):
             elif signal_dic['request'] == 'modify_database_name':
                 if signal_dic['level'] == 'site':
                     self.site = signal_dic['db_name']
+                    if self.site_conn:
+                        self.site_conn.close()
+                    self.site_conn = create_connection(self.site)
                 else:
                     self.project_name = signal_dic['db_name']
+                    if self.project_conn:
+                        self.project_conn.close()
+                    self.project_conn = create_connection(self.project_name)
                 return 1
 
 

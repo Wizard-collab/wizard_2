@@ -10,6 +10,7 @@ from wizard.core import site
 from wizard.core import user
 
 # Wizard gui modules
+from wizard.gui import create_project_widget
 from wizard.gui import gui_utils
 
 class project_log_widget(QtWidgets.QDialog):
@@ -68,17 +69,24 @@ class project_log_widget(QtWidgets.QDialog):
         self.info_label = QtWidgets.QLabel("Or create a project :")
         self.sign_up_line_layout.addWidget(self.info_label)
 
-        self.register_button = QtWidgets.QPushButton('New project')
-        self.register_button.setObjectName('blue_text_button')
-        self.sign_up_line_layout.addWidget(self.register_button)
+        self.create_project_button = QtWidgets.QPushButton('New project')
+        self.create_project_button.setObjectName('blue_text_button')
+        self.sign_up_line_layout.addWidget(self.create_project_button)
 
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)
         self.sign_in_button.clicked.connect(self.apply)
+        self.create_project_button.clicked.connect(self.create_project)
 
     def fill_ui(self):
+        self.projects_comboBox.clear()
         for project_name in site.get_projects_names_list():
             self.projects_comboBox.addItem(project_name)
+
+    def create_project(self):
+        self.create_project_widget = create_project_widget.create_project_widget(self)
+        self.create_project_widget.exec_()
+        self.fill_ui()
 
     def apply(self):
         project_name = self.projects_comboBox.currentText()
