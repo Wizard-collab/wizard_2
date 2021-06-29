@@ -94,7 +94,7 @@ class db_server(threading.Thread):
                 if signal_dic['level'] == 'site':
                     self.site = signal_dic['db_name']
                 else:
-                    self.project = signal_dic['db_name']
+                    self.project_name = signal_dic['db_name']
                 return 1
 
 

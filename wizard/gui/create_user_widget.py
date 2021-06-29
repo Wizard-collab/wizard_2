@@ -30,7 +30,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.title_label.setObjectName('title_label')
         self.main_layout.addWidget(self.title_label)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
+                                                    QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Credentials")
@@ -52,7 +53,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.email_lineEdit.setPlaceholderText('User Email')
         self.main_layout.addWidget(self.email_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed,
+                                                    QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Profile picture")
@@ -64,7 +66,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.profile_picture_button.setIconSize(QtCore.QSize(54,54))
         self.main_layout.addWidget(self.profile_picture_button)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed,
+                                                    QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.admin_label = QtWidgets.QLabel("The section below is optional")
@@ -75,7 +78,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.admin_password_lineEdit)
 
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
+                                                    QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
@@ -102,23 +106,27 @@ class create_user_widget(QtWidgets.QDialog):
         confirm_password = self.password_confirm_lineEdit.text()
         email = self.email_lineEdit.text()
         admin_password = self.admin_password_lineEdit.text()
-        if site.create_user(user_name,
-                                password,
-                                email,
-                                admin_password,
-                                self.image_file):
-            self.accept()
+        if confirm_password == password:
+            if site.create_user(user_name,
+                                    password,
+                                    email,
+                                    admin_password,
+                                    self.image_file):
+                self.accept()
+        else:
+            logging.warning("User passwords doesn't matches")
 
     def update_profile_picture(self):
         options = QtWidgets.QFileDialog.Options()
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
-                                                  "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)", options=options)
-        if fileName:
-            extension = fileName.split('.')[-1].upper()
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
+                            options=options)
+        if image_file:
+            extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
-                self.image_file = fileName
-                self.profile_picture_button.setIcon(QtGui.QIcon(fileName))
+                self.image_file = image_file
+                self.profile_picture_button.setIcon(QtGui.QIcon(image_file))
             else:
-                logging.warning('{} is not a valid image file...'.format(fileName))
+                logging.warning('{} is not a valid image file...'.format(image_file))
 
 

@@ -5,10 +5,13 @@ from wizard.gui import quotes_widget
 from wizard.gui import psql_widget
 from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
+from wizard.gui import project_log_widget
+
 import sys
 import time
 from PyQt5 import QtWidgets, QtCore, QtGui
 from wizard.core import user
+from wizard.core import environment
 from wizard.core import site
 from wizard.core import db_core
 from wizard.core import db_utils
@@ -80,5 +83,12 @@ if not user.get_user():
 	my_user_log_widget = user_log_widget.user_log_widget()
 	if my_user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
 		sys.exit()
+
+if not user.get_project():
+	my_project_log_widget = project_log_widget.project_log_widget()
+	if my_project_log_widget.exec_() != QtWidgets.QDialog.Accepted:
+		sys.exit()
+
+db_utils.modify_db_name('project', environment.get_project_name())
 
 sys.exit(app.exec_())

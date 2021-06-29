@@ -40,6 +40,50 @@ QLineEdit, QSpinBox{
 	border-radius: 5px;
 }
 
+QComboBox{
+	background-color:#24242b;
+	padding: 6px;
+	border-radius: 5px;
+}
+
+QComboBox::hover{
+	background-color: #42424d;
+}
+
+QComboBox QAbstractItemView {
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    selection-background-color: #4b4b57;
+}
+
+QComboBox QAbstractItemView::item {
+	background-color: #24242b;
+	min-height: 28px;
+}
+
+QComboBox QAbstractItemView::item::hover {
+	background-color: #4b4b57;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 25px;
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    background-color: transparent;
+}
+
+QComboBox::drop-down::hover {
+    background-color: #4b4b57;
+}
+
+QComboBox::down-arrow {
+    image: url(ressources/icons/combobox.png);
+}
+
 QCheckBox::indicator {
     width: 20px;
     height: 20px;
