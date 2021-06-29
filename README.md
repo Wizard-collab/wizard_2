@@ -18,3 +18,4 @@ http://www.wizard-files.com/
 	* PyYaml
 	* pillow
 	* pyautogui
+	* psycopg2
