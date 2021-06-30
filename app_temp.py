@@ -9,6 +9,7 @@ from wizard.gui import project_log_widget
 from wizard.gui import create_project_widget
 from wizard.gui import wall_widget
 from wizard.gui import logging_widget
+from wizard.gui import launcher_widget
 
 import sys
 import time
@@ -105,5 +106,8 @@ my_wall_widget = wall_widget.wall_widget()
 my_wall_widget.show()
 my_logging_widget = logging_widget.logging_widget()
 my_logging_widget.show()
+my_launcher_widget = launcher_widget.launcher_widget()
+my_launcher_widget.show()
+
 
 sys.exit(app.exec_())
