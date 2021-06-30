@@ -24,8 +24,8 @@ from wizard.core import project
 from wizard.core import environment
 from wizard.vars import softwares_vars
 
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def launch_work_version(version_id):
 	work_version_row = project.get_version_data(version_id)
@@ -45,9 +45,9 @@ def launch_work_version(version_id):
 												software_row['name'],
 												work_env_id)
 					thread.start()
-					logging.info(f"{software_row['name']} launched")
+					logger.info(f"{software_row['name']} launched")
 		else:
-			logging.warning(f"You are already running a work instance of this asset")
+			logger.warning(f"You are already running a work instance of this asset")
 
 def build_command(file_path, software_row):
 	software_path = software_row['path']
@@ -56,7 +56,7 @@ def build_command(file_path, software_row):
 			raw_command = software_row['file_command']
 		else:
 			raw_command = software_row['no_file_command']
-			logging.info("File not existing, launching software with empty scene")
+			logger.info("File not existing, launching software with empty scene")
 
 		raw_command = raw_command.replace(softwares_vars._executable_key_, software_path)
 		raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
@@ -66,7 +66,7 @@ def build_command(file_path, software_row):
 		return raw_command
 
 	else:
-		logging.warning(f"{software_row['name']} path not defined")
+		logger.warning(f"{software_row['name']} path not defined")
 		return None
 
 def build_env(work_env_id, software_row):
@@ -111,4 +111,4 @@ class software_thread(Thread):
 		self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
 		self.process.wait()
 		environment.remove_running_work_env(self.work_env_id)
-		logging.info(f"{self.software} closed")
+		logger.info(f"{self.software} closed")

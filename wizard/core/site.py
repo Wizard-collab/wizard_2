@@ -17,8 +17,8 @@ import socket
 import json
 
 # Wizard modules
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 from wizard.core import db_utils
 from wizard.core import tools
@@ -28,26 +28,43 @@ from wizard.vars import site_vars
 from wizard.vars import ressources
 
 def create_project(project_name, project_path, project_password):
-    if project_name not in get_projects_names_list():
-        if project_path not in get_projects_paths_list():
-            if get_user_row_by_name(environment.get_user())['pass']:
-                if db_utils.create_row('site',
-                                'projects', 
-                                ('project_name', 'project_path', 'project_password'), 
-                                (project_name,
-                                project_path,
-                                tools.encrypt_string(project_password))):
-                    logging.info(f'Project {project_name} added to site')
-                    return 1
+    do_creation = 1
+
+    if project_name == '':
+        logger.warning("Please provide a project name")
+        do_creation = 0
+    if project_path == '':
+        logger.warning("Please provide a project path")
+        do_creation = 0
+    if project_password == '':
+        logger.warning("Please provide a password")
+        do_creation = 0
+
+    if do_creation:
+        if project_name not in get_projects_names_list():
+            if project_path not in get_projects_paths_list():
+                if get_user_row_by_name(environment.get_user())['pass']:
+                    if db_utils.create_row('site',
+                                    'projects', 
+                                    ('project_name', 'project_path', 'project_password'), 
+                                    (project_name,
+                                    project_path,
+                                    tools.encrypt_string(project_password))):
+                        logger.info(f'Project {project_name} added to site')
+                        return 1
+                    else:
+                        return None
                 else:
+                    logger.warning("You need to be administrator to create a project")
                     return None
             else:
-                logging.warning("You need to be administrator to create a project")
+                logger.warning(f'Path {project_path} already assigned to another project')
                 return None
         else:
-            logging.warning(f'Path {project_path} already assigned to another project')
+            logger.warning(f'Project {project_name} already exists')
+            return None
     else:
-        logging.warning(f'Project {project_name} already exists')
+        return None
 
 def get_administrator_pass():
     return get_user_row_by_name('admin')['pass']
@@ -94,16 +111,16 @@ def modify_project_password(project_name,
                             'projects',
                             ('project_password', tools.encrypt_string(new_password)),
                             ('project_name', project_name)):
-                        logging.info(f'{project_name} password modified')
+                        logger.info(f'{project_name} password modified')
                         return 1
                 else:
                     return None
             else:
-                logging.warning(f'Wrong password for {project_name}')
+                logger.warning(f'Wrong password for {project_name}')
         else:
-            logging.warning(f'{project_name} not found')
+            logger.warning(f'{project_name} not found')
     else:
-        logging.warning('Wrong administrator pass')
+        logger.warning('Wrong administrator pass')
 
 def create_user(user_name,
                     password,
@@ -112,13 +129,13 @@ def create_user(user_name,
                     profile_picture=ressources._default_profile_):
     do_creation = 1
     if user_name == '':
-        logging.warning('Please provide a user name')
+        logger.warning('Please provide a user name')
         do_creation = None
     if password == '':
-        logging.warning('Please provide a password')
+        logger.warning('Please provide a password')
         do_creation = None
     if email == '':
-        logging.warning('Please provide an email')
+        logger.warning('Please provide an email')
         do_creation = None
         
     if do_creation:
@@ -157,12 +174,12 @@ def create_user(user_name,
                     info += ' ( privilege : administrator )'
                 else:
                     info += ' ( privilege : user )'
-                logging.info(info)
+                logger.info(info)
                 return 1
             else:
                 return None
         else:
-            logging.warning(f'User {user_name} already exists')
+            logger.warning(f'User {user_name} already exists')
             return None
 
 def upgrade_user_privilege(user_name, administrator_pass):
@@ -175,13 +192,13 @@ def upgrade_user_privilege(user_name, administrator_pass):
                                         'users',
                                         ('administrator',1),
                                         ('user_name', user_name)):
-                    logging.info(f'Administrator privilege set for {user_name}')
+                    logger.info(f'Administrator privilege set for {user_name}')
             else:
-                logging.warning('Wrong administrator pass')
+                logger.warning('Wrong administrator pass')
         else:
-            logging.info(f'User {user_name} is already administrator')
+            logger.info(f'User {user_name} is already administrator')
     else:
-        logging.error(f'{user_name} not found')
+        logger.error(f'{user_name} not found')
 
 def downgrade_user_privilege(user_name, administrator_pass):
     if user_name in get_user_names_list():
@@ -193,16 +210,16 @@ def downgrade_user_privilege(user_name, administrator_pass):
                                         'users',
                                         ('administrator',0),
                                         ('user_name', user_name)):
-                    logging.info(f'Privilege downgraded to user for {user_name}')
+                    logger.info(f'Privilege downgraded to user for {user_name}')
                     return 1
             else:
-                logging.warning('Wrong administrator pass')
+                logger.warning('Wrong administrator pass')
                 return None
         else:
-            logging.info(f'User {user_name} is not administrator')
+            logger.info(f'User {user_name} is not administrator')
             return None
     else:
-        logging.error(f'{user_name} not found')
+        logger.error(f'{user_name} not found')
         return None
 
 def modify_user_password(user_name, password, new_password):
@@ -214,12 +231,12 @@ def modify_user_password(user_name, password, new_password):
                                     ('pass',
                                         tools.encrypt_string(new_password)),
                                     ('user_name', user_name)):
-                    logging.info(f'{user_name} password modified')
+                    logger.info(f'{user_name} password modified')
                     return 1
             else:
                 return None
         else:
-            logging.warning(f'Wrong password for {user_name}')
+            logger.warning(f'Wrong password for {user_name}')
             return None
 
 def get_users_list():
@@ -238,7 +255,7 @@ def get_user_row_by_name(name, column='*'):
     if users_rows and len(users_rows) >= 1:
         return users_rows[0]
     else:
-        logging.error("User not found")
+        logger.error("User not found")
         return None
 
 def get_user_data(user_id, column='*'):
@@ -249,7 +266,7 @@ def get_user_data(user_id, column='*'):
     if users_rows and len(users_rows) >= 1:
         return users_rows[0]
     else:
-        logging.error("User not found")
+        logger.error("User not found")
         return None
 
 def modify_user_xp(user_name, xp):
@@ -257,7 +274,7 @@ def modify_user_xp(user_name, xp):
                                 'users',
                                 ('xp', xp),
                                 ('user_name', user_name)):
-        logging.info(f'{user_name} won some xps')
+        logger.debug(f'{user_name} won some xps')
         return 1
     else:
         return None
@@ -267,7 +284,7 @@ def modify_user_level(user_name, new_level):
                             'users',
                             ('level', new_level),
                             ('user_name', user_name)):
-        logging.info(f'{user_name} is now level {new_level}')
+        logger.info(f'{user_name} is now level {new_level}')
         return 1
     else:
         return None
@@ -277,7 +294,7 @@ def modify_user_life(user_name, life):
                                     'users',
                                     ('life', life),
                                     ('user_name', user_name)):
-        logging.info(f'{user_name} life is {life}%')
+        logger.debug(f'{user_name} life is {life}%')
         return 1
     else:
         return None
@@ -285,7 +302,7 @@ def modify_user_life(user_name, life):
 def is_admin():
     is_admin = get_user_row_by_name(environment.get_user(), 'administrator')
     if not is_admin:
-        logging.info("You are not administrator")
+        logger.info("You are not administrator")
     return is_admin
 
 def add_quote(content):
@@ -302,18 +319,18 @@ def add_quote(content):
                                     json.dumps([]),
                                     json.dumps([])))
         if quote_id:
-            logging.info("Quote added")
+            logger.info("Quote added")
     else:
-        logging.warning("Please enter quote content")
+        logger.warning("Please enter quote content")
     return quote_id
 
 def add_quote_score(quote_id, score):
     sanity = 1
     if not 0 <= score <= 5:
-        logging.warning(f"Please note between 0 and 5")
+        logger.warning(f"Please note between 0 and 5")
         sanity = 0
     if type(score) != int:
-        logging.warning(f"{score} is not an integer")
+        logger.warning(f"{score} is not an integer")
         sanity = 0
     if sanity:
         current_quote_row = db_utils.get_row_by_column_data('site',
@@ -333,18 +350,18 @@ def add_quote_score(quote_id, score):
                                                         json.dumps(current_scores_list)),
                                                     ('id',
                                                         quote_id)):
-                        logging.info("Quote score updated")
+                        logger.info("Quote score updated")
                     if db_utils.update_data('site',
                                                     'quotes',
                                                     ('voters',
                                                         json.dumps(voters_list)),
                                                     ('id',
                                                         quote_id)):
-                        logging.info("Quote voters updated")
+                        logger.info("Quote voters updated")
                 else:
-                    logging.warning("You already voted for this quote")
+                    logger.warning("You already voted for this quote")
             else:
-                logging.warning("You can't vote for your own quote")
+                logger.warning("You can't vote for your own quote")
 
 def get_quote_data(quote_id, column='*'):
     quotes_rows = db_utils.get_row_by_column_data('site',
@@ -354,7 +371,7 @@ def get_quote_data(quote_id, column='*'):
     if quotes_rows and len(quotes_rows) >= 1:
         return quotes_rows[0]
     else:
-        logging.error("Quote not found")
+        logger.error("Quote not found")
         return None
 
 def get_all_quotes(column='*'):
@@ -375,7 +392,7 @@ def add_ip_user():
                             'ips_wrap', 
                             ('ip', 'user_id', 'project_id'), 
                             (ip, None, None)):
-            logging.debug("Machine ip added to ips wrap table")
+            logger.debug("Machine ip added to ips wrap table")
 
 def update_current_ip_data(column, data):
     ip = socket.gethostbyname(socket.gethostname())
@@ -383,7 +400,7 @@ def update_current_ip_data(column, data):
                                     'ips_wrap',
                                     (column, data),
                                     ('ip', ip)):
-        logging.debug("Ip wrap data updated")
+        logger.debug("Ip wrap data updated")
 
 def get_current_ip_data(column='*'):
     ip = socket.gethostbyname(socket.gethostname())
@@ -441,7 +458,7 @@ def create_admin_user(admin_password, admin_email):
                                 0,
                                 100,
                                 1)):
-        logging.info('Admin user created')
+        logger.info('Admin user created')
 
 def create_users_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS users (
@@ -456,7 +473,7 @@ def create_users_table():
                                         administrator integer NOT NULL
                                     );"""
     if db_utils.create_table('site', sql_cmd):
-        logging.info("Users table created")
+        logger.info("Users table created")
 
 def create_projects_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS projects (
@@ -466,7 +483,7 @@ def create_projects_table():
                                         project_password text NOT NULL
                                     );"""
     if db_utils.create_table('site', sql_cmd):
-        logging.info("Projects table created")
+        logger.info("Projects table created")
 
 def create_ip_wrap_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS ips_wrap (
@@ -478,7 +495,7 @@ def create_ip_wrap_table():
                                         FOREIGN KEY (project_id) REFERENCES projects (id)
                                     );"""
     if db_utils.create_table('site', sql_cmd):
-        logging.info("Ips wrap table created")
+        logger.info("Ips wrap table created")
 
 def create_quotes_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS quotes (
@@ -489,4 +506,4 @@ def create_quotes_table():
                                         voters text NOT NULL
                                     );"""
     if db_utils.create_table('site', sql_cmd):
-        logging.info("Quotes table created")
+        logger.info("Quotes table created")

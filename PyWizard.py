@@ -19,8 +19,8 @@ from wizard.core import create_project
 from wizard.core import communicate
 from wizard.core import environment
 from wizard.core import db_core
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 while not user.user().get_psql_dns():
 	psql_host = input("PostgreSQL host : ")

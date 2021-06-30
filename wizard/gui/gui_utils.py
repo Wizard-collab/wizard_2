@@ -55,6 +55,35 @@ def round_image(label, image_bytes, radius):
         painter.drawPixmap(0, 0, pixmap)
         label.setPixmap(label.target)
 
+class ElidedLabel(QtWidgets.QLabel):
+    _width = _text = _elided = None
+
+    def __init__(self, text='', width=40, parent=None):
+        super(ElidedLabel, self).__init__(text, parent)
+        self.setMinimumWidth(width if width > 0 else 1)
+
+    def elidedText(self):
+        return self._elided or ''
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        self.drawFrame(painter)
+        margin = self.margin()
+        rect = self.contentsRect()
+        rect.adjust(margin, margin, -margin, -margin)
+        text = self.text()
+        width = rect.width()
+        if text != self._text or width != self._width:
+            self._text = text
+            self._width = width
+            self._elided = self.fontMetrics().elidedText(
+                text, QtCore.Qt.ElideRight, width)
+        option = QtWidgets.QStyleOption()
+        option.initFrom(self)
+        self.style().drawItemText(
+            painter, rect, self.alignment(), option.palette,
+            self.isEnabled(), self._elided, self.foregroundRole())
+
 class QProgressBar(QtWidgets.QProgressBar):
     def __init__(self, parent=None):
         super(QProgressBar, self).__init__(parent)
@@ -92,6 +121,7 @@ class password_lineEdit(QtWidgets.QFrame):
         self.main_layout.addWidget(self.password_lineEdit)
 
         self.toggle_visibility_button = QtWidgets.QPushButton()
+        self.toggle_visibility_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.toggle_visibility_button.setObjectName('password_visibility_button')
         self.toggle_visibility_button.setCheckable(True)
         self.toggle_visibility_button.setFixedSize(16,16)

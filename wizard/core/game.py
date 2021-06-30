@@ -9,8 +9,8 @@
 # remove levels and remove life
 
 # Wizard modules
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 from wizard.core import site
 from wizard.core import environment
@@ -57,4 +57,4 @@ def analyse_comment(comment, life_amount):
 	# minimum, if not, removes life_amount from the user
 	if len(comment) < 10:
 		remove_life(life_amount)
-		logging.info(f"Warning, bad commenting just made you loose {life_amount}% of life")
+		logger.info(f"Warning, bad commenting just made you loose {life_amount}% of life")

@@ -20,8 +20,8 @@ import json
 # Wizard modules
 from wizard.core import assets
 from wizard.core import project
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class communicate_server(Thread):
     def __init__(self):
@@ -44,7 +44,7 @@ class communicate_server(Thread):
                     if signal_as_str:
                         self.analyse_signal(signal_as_str, conn)
             except:
-                logging.error(str(traceback.format_exc()))
+                logger.error(str(traceback.format_exc()))
                 continue
 
     def stop(self):

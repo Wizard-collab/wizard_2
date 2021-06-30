@@ -17,8 +17,9 @@ from wizard.core import user
 from wizard.vars import assets_vars
 from wizard.vars import ressources
 
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import menu_widget
@@ -433,7 +434,7 @@ class tree_widget(QtWidgets.QWidget):
         if os.path.isdir(path):
             os.startfile(path)
         else:
-            logging.error(f"{path} not found")
+            logger.error(f"{path} not found")
 
     def archive_instance(self, item):
         self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)

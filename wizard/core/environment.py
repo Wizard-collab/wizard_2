@@ -14,8 +14,8 @@ import json
 # Wizard modules
 from wizard.vars import env_vars
 
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def build_user_env(user_name):
 	os.environ[env_vars._username_env_] = user_name
@@ -34,7 +34,7 @@ def get_psql_dns():
 	if env_vars._psql_dns_ in os.environ.keys():
 		return os.environ[env_vars._psql_dns_]
 	else:
-		logging.error('No PostgreSQL DNS defined')
+		logger.error('No PostgreSQL DNS defined')
 		return None
 
 def add_running_work_env(work_env_id):
@@ -63,19 +63,19 @@ def get_user():
 	if env_vars._username_env_ in os.environ.keys():
 		return os.environ[env_vars._username_env_]
 	else:
-		logging.error('No user defined')
+		logger.error('No user defined')
 		return None
 
 def get_project_name():
 	if env_vars._project_name_env_ in os.environ.keys():
 		return os.environ[env_vars._project_name_env_]
 	else:
-		logging.error('No project defined')
+		logger.error('No project defined')
 		return None
 
 def get_project_path():
 	if env_vars._project_path_env_ in os.environ.keys():
 		return os.environ[env_vars._project_path_env_]
 	else:
-		logging.error('No project defined')
+		logger.error('No project defined')
 		return None

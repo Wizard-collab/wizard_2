@@ -8,6 +8,7 @@ from wizard.gui import user_log_widget
 from wizard.gui import project_log_widget
 from wizard.gui import create_project_widget
 from wizard.gui import wall_widget
+from wizard.gui import logging_widget
 
 import sys
 import time
@@ -18,6 +19,10 @@ from wizard.core import site
 from wizard.core import project
 from wizard.core import db_core
 from wizard.core import db_utils
+
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
+
 
 app = QtWidgets.QApplication(sys.argv)
 
@@ -57,14 +62,6 @@ QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Cabin-VariableFont_wdth
 
 with open('wizard/gui/stylesheet.css', 'r') as f:
 	app.setStyleSheet(f.read())
-#my_tree_widget = tree_widget.tree_widget()
-#my_user_widget = user_widget.user_widget()
-#my_quotes_widget = quotes_widget.quotes_widget()
-#my_tree_widget.show()
-#my_user_widget.show()
-#my_quotes_widget.show()
-#my_psql_widget.show()
-#my_create_db_widget.show()
 
 if not user.user().get_psql_dns():
 	my_psql_widget = psql_widget.psql_widget()
@@ -103,8 +100,10 @@ my_user_widget = user_widget.user_widget()
 my_quotes_widget = quotes_widget.quotes_widget()
 my_tree_widget.show()
 my_user_widget.show()
-my_quotes_widget.show()
+#my_quotes_widget.show()
 my_wall_widget = wall_widget.wall_widget()
 my_wall_widget.show()
+my_logging_widget = logging_widget.logging_widget()
+my_logging_widget.show()
 
 sys.exit(app.exec_())

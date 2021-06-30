@@ -18,8 +18,8 @@ from wizard.core import user
 import json
 import traceback
 
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class Window(QWidget):
     def __init__(self):

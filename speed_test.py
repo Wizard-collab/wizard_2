@@ -1,8 +1,8 @@
 from wizard.core import assets
 from wizard.core import project
-from wizard.core import logging
+from wizard.core import logger
 from wizard.vars import assets_vars
-logging = logging.get_logger(__name__)
+logger = logger.get_logger(__name__)
 
 import time
 start_time = time.time()

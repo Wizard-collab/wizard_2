@@ -13,8 +13,8 @@ import tempfile
 import time
 
 # Wizard modules
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def convert_time(time_float):
     day = time.strftime('%Y-%m-%d', time.localtime(time_float))
@@ -57,10 +57,10 @@ def zip_files(files_list, destination):
         with ZipFile(destination, 'a') as zip:
             for file in files_list:
                 zip.write(file, os.path.split(file)[-1])
-        logging.info("Files archived")
+        logger.info("Files archived")
         return 1
     except:
-        logging.error(str(traceback.format_exc()))
+        logger.error(str(traceback.format_exc()))
         return None
 
 def make_archive(source):
@@ -78,10 +78,10 @@ def make_archive(source):
                                                 format,
                                                 root_dir,
                                                 base_dir)
-        logging.info(f"Folder {base_dir} archived in {base_name}")
-        return 1
+        logger.info(f"Folder {base_dir} archived in {base_name}")
+        return base_name
     except:
-        logging.error(str(traceback.format_exc()))
+        logger.error(str(traceback.format_exc()))
         return None
 
 def get_filename_without_override(file):
@@ -108,9 +108,9 @@ def copy_files(files_list, destination):
     for file in files_list:
         if not os.path.isfile(file):
             sanity = 0
-            logging.warning(f"{file} doesn't exists")
+            logger.warning(f"{file} doesn't exists")
     if not os.path.isdir(destination):
-        logging.warning(f"{destination} doesn't exists")
+        logger.warning(f"{destination} doesn't exists")
         sanity=0
     if sanity:
         new_files = []
@@ -120,10 +120,10 @@ def copy_files(files_list, destination):
                                                                             file_name))
             shutil.copyfile(file, destination_file)
             new_files.append(destination_file)
-            logging.info(f"{destination_file} copied")
+            logger.info(f"{destination_file} copied")
         return new_files
     else:
-        logging.warning("Can't execute copy")
+        logger.warning("Can't execute copy")
         return None
 
 def temp_dir():
@@ -138,14 +138,14 @@ def create_folder(dir_name):
     success = None
     try:
         os.mkdir(dir_name)
-        logging.info(f'{dir_name} created')
+        logger.debug(f'{dir_name} created')
         success = 1
     except FileNotFoundError:
-        logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
     except FileExistsError:
-        logging.error(f"{dir_name} already exists on filesystem")
+        logger.error(f"{dir_name} already exists on filesystem")
     except PermissionError:
-        logging.error(f"{dir_name} access denied")
+        logger.error(f"{dir_name} access denied")
     return success
 
 def remove_folder(dir_name):
@@ -155,12 +155,12 @@ def remove_folder(dir_name):
     success = None
     try:
         os.rmdir(dir_name)
-        logging.info(f'{dir_name} removed')
+        logger.info(f'{dir_name} removed')
         success = 1
     except FileNotFoundError:
-        logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
     except PermissionError:
-        logging.error(f"{dir_name} access denied")
+        logger.error(f"{dir_name} access denied")
     return success
 
 def remove_tree(dir_name):
@@ -170,10 +170,10 @@ def remove_tree(dir_name):
     success = None
     try:
         os.rmtree(dir_name)
-        logging.info(f'{dir_name} removed')
+        logger.info(f'{dir_name} removed')
         success = 1
     except FileNotFoundError:
-        logging.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
     except PermissionError:
-        logging.error(f"{dir_name} access denied")
+        logger.error(f"{dir_name} access denied")
     return success

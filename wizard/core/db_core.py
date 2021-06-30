@@ -16,8 +16,8 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from wizard.core import environment
 from wizard.core import socket_utils
 from wizard.vars import db_vars
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class db_server(threading.Thread):
     def __init__(self, project_name=None):
@@ -40,7 +40,7 @@ class db_server(threading.Thread):
                         conn.send(json.dumps(returned).encode('utf-8'))
                         conn.close()
             except:
-                logging.error(str(traceback.format_exc()))
+                logger.error(str(traceback.format_exc()))
                 continue
         if self.site_conn is not None:
             self.site_conn.close()
@@ -85,10 +85,10 @@ class db_server(threading.Thread):
                                 rows = [r[0] for r in rows]
                         return rows
                     else:
-                       logging.error("No connection")
+                       logger.error("No connection")
                        return None
                 except (Exception, psycopg2.DatabaseError) as error:
-                    logging.error(error)
+                    logger.error(error)
                     return None
             elif signal_dic['request'] == 'modify_database_name':
                 if signal_dic['level'] == 'site':
@@ -110,10 +110,10 @@ def create_connection(database=None):
         conn = psycopg2.connect(environment.get_psql_dns(), database=database)
         if conn and database:
             conn.autocommit=True
-            logging.info(f"Wizard is connected to {database} database")
+            logger.info(f"Wizard is connected to {database} database")
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
+        logger.error(error)
         return None
 
 def try_connection(DNS):
@@ -124,8 +124,8 @@ def try_connection(DNS):
             conn.close()
         return 1
     except psycopg2.OperationalError as e:
-        logging.error(e)
-        logging.error(f"Wizard could not connect to PostgreSQL server with this DNS : {DNS}")
+        logger.error(e)
+        logger.error(f"Wizard could not connect to PostgreSQL server with this DNS : {DNS}")
         return None
 
 def create_database(database):
@@ -138,7 +138,7 @@ def create_database(database):
         conn.commit()
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
+        logger.error(error)
         return None
     finally:
         if conn is not None:
@@ -152,7 +152,7 @@ def create_table(database, cmd):
         conn.commit()
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
-        logging.error(error)
+        logger.error(error)
         return None
     finally:
         if conn:

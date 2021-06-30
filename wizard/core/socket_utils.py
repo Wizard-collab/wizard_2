@@ -8,8 +8,8 @@ import json
 import traceback
 
 # Wizard modules
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def recvall(sock):
     BUFF_SIZE = 4096 # 4 KiB
@@ -40,13 +40,13 @@ def send_signal(DNS, msg_raw):
         returned = recvall(server).decode('utf8')
         return json.loads(returned)
     except ConnectionRefusedError:
-        logging.error(f"Socket connection refused : host={host}, port={port}")
+        logger.error(f"Socket connection refused : host={host}, port={port}")
         return None
     except socket.timeout:
-        logging.error(f"Socket timeout (5s) : host={host}, port={port}")
+        logger.error(f"Socket timeout (5s) : host={host}, port={port}")
         return None
     except:
-        logging.error(str(traceback.format_exc()))
+        logger.error(str(traceback.format_exc()))
     finally:
         if server is not None:
             server.close()

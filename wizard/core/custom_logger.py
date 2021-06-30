@@ -11,17 +11,17 @@ from wizard.vars import user_vars
 
 def get_logger(name=None):
     # create logger
-    # Use this module to keep logging format
+    # Use this module to keep logger format
     # integrity across wizard application
-    logging_level = logging.INFO
-    logging.basicConfig(level=logging_level,
+    logger_level = logging.INFO
+    logging.basicConfig(level=logger_level,
         format="%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s")
     if name:
         logger = logging.getLogger(name)
     else:
         logger = logging.getLogger()
     create_prefs_folder()
-    file_handler = logging.FileHandler(user_vars._user_logging_file_)
+    file_handler = logging.FileHandler(user_vars._user_logger_file_)
     file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
     logger.addHandler(file_handler)
     return logger

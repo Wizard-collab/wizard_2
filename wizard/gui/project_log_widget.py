@@ -10,6 +10,7 @@ from wizard.core import site
 from wizard.core import user
 
 # Wizard gui modules
+from wizard.gui import logging_widget
 from wizard.gui import create_project_widget
 from wizard.gui import gui_utils
 
@@ -72,6 +73,9 @@ class project_log_widget(QtWidgets.QDialog):
         self.create_project_button = QtWidgets.QPushButton('New project')
         self.create_project_button.setObjectName('blue_text_button')
         self.sign_up_line_layout.addWidget(self.create_project_button)
+
+        self.logging_widget = logging_widget.logging_widget(self)
+        self.main_layout.addWidget(self.logging_widget)
 
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)

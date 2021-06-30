@@ -17,8 +17,8 @@ import json
 from wizard.core import db_core
 from wizard.core import socket_utils
 from wizard.vars import db_vars
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def create_database(database):
     return db_core.create_database(database)
@@ -148,10 +148,10 @@ def check_database_existence(database):
         list_database = cur.fetchall()
         conn.close()
         if (database,) in list_database:
-            logging.debug("'{}' Database already exist".format(database))
+            logger.debug("'{}' Database already exist".format(database))
             return 1
         else:
-            logging.debug("'{}' Database doesn't exist.".format(database))
+            logger.debug("'{}' Database doesn't exist.".format(database))
             return None
 
 def execute_sql(sql, level, as_dict, data=None, fetch=2):

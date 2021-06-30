@@ -8,8 +8,8 @@ import json
 # Wizard modules
 from wizard.core import assets
 from wizard.core import project
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class test(Thread):
     def __init__(self):
@@ -33,7 +33,7 @@ class test(Thread):
                         print(json.loads(signal_as_str))
                         conn.send(json.dumps(["prout", "proutuututututiuj itj itjti jti jtij tij tij tij "]).encode('utf8'))
             except:
-                logging.error(str(traceback.format_exc()))
+                logger.error(str(traceback.format_exc()))
                 continue
 
     def stop(self):
@@ -58,10 +58,10 @@ def send_signal(signal_as_str):
         server.close()
         return returned
     except ConnectionRefusedError:
-        logging.error("No wizard local server found. Please verify if Wizard is openned")
+        logger.error("No wizard local server found. Please verify if Wizard is openned")
         return None
     except socket.timeout:
-        logging.error("Wizard has been too long to give a response, please retry.")
+        logger.error("Wizard has been too long to give a response, please retry.")
         return None
 
 def make_request():

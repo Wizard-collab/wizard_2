@@ -171,6 +171,8 @@ class wall_event_widget(QtWidgets.QFrame):
             profile_color = '#9cf277'
         elif 'ticket' in self.event_row['type']:
             profile_color = '#f79360'
+        elif self.event_row['type'] == 'archive':
+            profile_color = '#f0605b'
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
 

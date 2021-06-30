@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
+from wizard.gui import logging_widget
 from wizard.gui import gui_utils
 
 # Wizard modules
@@ -13,6 +14,8 @@ from wizard.core import project
 from wizard.core import create_project
 from wizard.core import db_utils
 from wizard.vars import ressources
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class create_project_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -133,6 +136,9 @@ class create_project_widget(QtWidgets.QDialog):
         self.create_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.create_button)
 
+        self.logging_widget = logging_widget.logging_widget(self)
+        self.main_layout.addWidget(self.logging_widget)
+
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)
         self.create_button.clicked.connect(self.apply)
@@ -167,4 +173,4 @@ class create_project_widget(QtWidgets.QDialog):
                 create_project.create_project(project_name, project_path, password)
                 self.accept()
         else:
-            logging.warning("Project passwords doesn't matches")
+            logger.warning("Project passwords doesn't matches")

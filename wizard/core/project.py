@@ -26,8 +26,8 @@ import time
 import json
 
 # Wizard modules
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 from wizard.core import db_utils
 from wizard.core import tools
@@ -44,7 +44,7 @@ def add_domain(name):
                         ('name', 'creation_time', 'creation_user'), 
                         (name, time.time(), environment.get_user()))
     if domain_id:
-        logging.info(f"Domain {name} added to project")
+        logger.info(f"Domain {name} added to project")
     return domain_id
 
 def get_domains():
@@ -59,7 +59,7 @@ def get_domain_data(domain_id, column='*'):
     if len(domain_rows) >= 1:
         return domain_rows[0]
     else:
-        logging.error("Domain not found")
+        logger.error("Domain not found")
         return None
 
 def get_domain_childs(domain_id, column='*'):
@@ -76,7 +76,7 @@ def remove_domain(domain_id):
             remove_category(category_id)
         success = db_utils.delete_row('project', 'domains', domain_id)
         if success:
-            logging.info(f"Domain removed from project")
+            logger.info(f"Domain removed from project")
     return success
 
 def get_all_categories(column='*'):
@@ -95,10 +95,10 @@ def add_category(name, domain_id):
                             ('name', 'creation_time', 'creation_user', 'domain_id'), 
                             (name, time.time(), environment.get_user(), domain_id))
         if category_id:
-            logging.info(f"Category {name} added to project")
+            logger.info(f"Category {name} added to project")
         return category_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
 
 def remove_category(category_id):
     success = None
@@ -107,7 +107,7 @@ def remove_category(category_id):
             remove_asset(asset_id)
         success = db_utils.delete_row('project', 'categories', category_id)
         if success:
-            logging.info(f"Category removed from project")
+            logger.info(f"Category removed from project")
     return success
 
 def get_category_childs(category_id, column="*"):
@@ -125,7 +125,7 @@ def get_category_data(category_id, column='*'):
     if category_rows and len(category_rows) >= 1:
         return category_rows[0]
     else:
-        logging.error("Category not found")
+        logger.error("Category not found")
         return None
 
 def get_category_data_by_name(name, column='*'):
@@ -136,7 +136,7 @@ def get_category_data_by_name(name, column='*'):
     if category_rows and len(category_rows) >= 1:
         return category_rows[0]
     else:
-        logging.error("Category not found")
+        logger.error("Category not found")
         return None
 
 def add_asset(name, category_id, inframe=100, outframe=220):
@@ -159,10 +159,10 @@ def add_asset(name, category_id, inframe=100, outframe=220):
                                 outframe,
                                 category_id))
         if asset_id:
-            logging.info(f"Asset {name} added to project")
+            logger.info(f"Asset {name} added to project")
         return asset_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
 
 def get_all_assets(column='*'):
     assets_rows = db_utils.get_rows('project',
@@ -191,7 +191,7 @@ def remove_asset(asset_id):
             remove_stage(stage_id)
         success = db_utils.delete_row('project', 'assets', asset_id)
         if success:
-            logging.info(f"Asset removed from project")
+            logger.info(f"Asset removed from project")
     return success
 
 def get_asset_childs(asset_id, column='*'):
@@ -209,7 +209,7 @@ def get_asset_data(asset_id, colmun='*'):
     if assets_rows and len(assets_rows) >= 1:
         return assets_rows[0]
     else:
-        logging.error("Asset not found")
+        logger.error("Asset not found")
         return None
 
 def add_stage(name, asset_id):
@@ -228,10 +228,10 @@ def add_stage(name, asset_id):
                                 environment.get_user(),
                                 asset_id))
         if stage_id:
-            logging.info(f"Stage {name} added to project")
+            logger.info(f"Stage {name} added to project")
         return stage_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
 
 def get_all_stages(column='*'):
     stages_rows = db_utils.get_rows('project',
@@ -246,7 +246,7 @@ def remove_stage(stage_id):
             remove_variant(variant_id)
         success = db_utils.delete_row('project', 'stages', stage_id)
         if success:
-            logging.info(f"Stage removed from project")
+            logger.info(f"Stage removed from project")
     return success
 
 def set_stage_default_variant(stage_id, variant_id):
@@ -254,7 +254,7 @@ def set_stage_default_variant(stage_id, variant_id):
                         'stages',
                         ('default_variant_id', variant_id),
                         ('id', stage_id)):
-        logging.info('Default variant modified')
+        logger.info('Default variant modified')
 
 def get_stage_data(stage_id, column='*'):
     stages_rows = db_utils.get_row_by_column_data('project',
@@ -264,7 +264,7 @@ def get_stage_data(stage_id, column='*'):
     if stages_rows and len(stages_rows) >= 1:
         return stages_rows[0]
     else:
-        logging.error("Stage not found")
+        logger.error("Stage not found")
         return None
 
 def get_stage_childs(stage_id, column='*'):
@@ -294,10 +294,10 @@ def add_variant(name, stage_id, comment):
                                 'todo',
                                 stage_id))
         if variant_id:
-            logging.info(f"Variant {name} added to project")
+            logger.info(f"Variant {name} added to project")
         return variant_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
 
 def get_all_variants(column='*'):
     variants_rows = db_utils.get_rows('project',
@@ -314,7 +314,7 @@ def remove_variant(variant_id):
             remove_work_env(work_env_id)
         success = db_utils.delete_row('project', 'variants', variant_id)
         if success:
-            logging.info(f"Variant removed from project")
+            logger.info(f"Variant removed from project")
     return success
 
 def get_variant_data(variant_id, column='*'):
@@ -325,7 +325,7 @@ def get_variant_data(variant_id, column='*'):
     if variants_rows and len(variants_rows) >= 1:
         return variants_rows[0]
     else:
-        logging.error("Variant not found")
+        logger.error("Variant not found")
         return None
 
 def set_variant_data(variant_id, column, data):
@@ -333,7 +333,7 @@ def set_variant_data(variant_id, column, data):
                             'variants',
                             (column, data),
                             ('id', variant_id)):
-        logging.info('Variant modified')
+        logger.info('Variant modified')
         return 1
     else:
         return None
@@ -360,7 +360,7 @@ def get_export_by_name(name, variant_id):
     if export_row and len(export_row) >= 1:
         return export_row[0]
     else:
-        logging.error("Export not found")
+        logger.error("Export not found")
         return None
 
 def get_export_data(export_id, column='*'):
@@ -371,7 +371,7 @@ def get_export_data(export_id, column='*'):
     if export_rows and len(export_rows) >= 1:
         return export_rows[0]
     else:
-        logging.error("Export not found")
+        logger.error("Export not found")
         return None
 
 def get_export_childs(export_id, column='*'):
@@ -403,10 +403,10 @@ def add_export(name, variant_id):
                                 environment.get_user(),
                                 variant_id))
         if export_id:
-            logging.info(f"Export root {name} added to project")
+            logger.info(f"Export root {name} added to project")
         return export_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
 
 def remove_export(export_id):
     success = None
@@ -415,7 +415,7 @@ def remove_export(export_id):
             remove_export_version(export_version_id)
         success = db_utils.delete_row('project', 'exports', export_id)
         if success:
-            logging.info("Export removed from project")
+            logger.info("Export removed from project")
     return success
 
 def get_export_versions(export_id, column='*'):
@@ -464,10 +464,10 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 work_version_id,
                                 export_id))
         if export_version_id:
-            logging.info(f"Export version {name} added to project")
+            logger.info(f"Export version {name} added to project")
         return export_version_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
 
 def get_export_version_destinations(export_version_id, column='*'):
     references_rows = db_utils.get_row_by_column_data('project',
@@ -485,7 +485,7 @@ def remove_export_version(export_version_id):
             remove_reference(reference_id)
         success = db_utils.delete_row('project', 'export_versions', export_version_id)
         if success:
-            logging.info("Export version removed from project")
+            logger.info("Export version removed from project")
     return success
 
 def get_export_version_tickets(export_version_id, column='*'):
@@ -503,7 +503,7 @@ def get_export_version_data(export_version_id, column='*'):
     if export_versions_rows and len(export_versions_rows) >= 1:
         return export_versions_rows[0]
     else:
-        logging.error("Export version not found")
+        logger.error("Export version not found")
         return None
 
 def add_work_env(name, software_id, variant_id):
@@ -526,10 +526,10 @@ def add_work_env(name, software_id, variant_id):
                                 None,
                                 software_id))
         if work_env_id:
-            logging.info(f"Work env {name} added to project")
+            logger.info(f"Work env {name} added to project")
         return work_env_id
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
         return None
 
 def create_reference(work_env_id, export_version_id, namespace):
@@ -551,15 +551,15 @@ def create_reference(work_env_id, export_version_id, namespace):
                                     work_env_id,
                                     export_version_id))
         if work_env_id:
-            logging.info(f"Reference created")
+            logger.info(f"Reference created")
     else:
-        logging.warning(f"{namespace} already exists")
+        logger.warning(f"{namespace} already exists")
     return reference_id
 
 def remove_reference(reference_id):
     success = db_utils.delete_row('project', 'references_data', reference_id)
     if success:
-        logging.info("Reference deleted")
+        logger.info("Reference deleted")
     return success
 
 def get_references(work_env_id, column='*'):
@@ -578,7 +578,7 @@ def remove_work_env(work_env_id):
             remove_reference(reference_id)
         success = db_utils.delete_row('project', 'work_envs', work_env_id)
         if success:
-            logging.info("Work env removed from project")
+            logger.info("Work env removed from project")
     return success
 
 def get_work_versions(work_env_id, column='*'):
@@ -603,7 +603,7 @@ def get_work_env_data(work_env_id, column='*'):
     if work_env_rows and len(work_env_rows) >= 1:
         return work_env_rows[0]
     else:
-        logging.error("Work env not found")
+        logger.error("Work env not found")
         return None
 
 def get_lock(work_env_id):
@@ -613,7 +613,7 @@ def get_lock(work_env_id):
         return None
     else:
         lock_user_name = site.get_user_data(work_env_lock_id, 'user_name')
-        logging.warning(f"Work env locked by {lock_user_name}")
+        logger.warning(f"Work env locked by {lock_user_name}")
         return lock_user_name
 
 def set_work_env_lock(work_env_id, lock=1):
@@ -627,9 +627,9 @@ def set_work_env_lock(work_env_id, lock=1):
                                 ('lock_id', user_id),
                                 ('id', work_env_id)):
             if user_id:
-                logging.info(f'Work env locked')
+                logger.info(f'Work env locked')
             else:
-                logging.info(f'Work env unlocked')
+                logger.info(f'Work env unlocked')
             return 1
         else:
             return None
@@ -652,7 +652,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None):
                             screenshot_path,
                             work_env_id))
     if version_id:
-        logging.info(f"Version {name} added to project")
+        logger.info(f"Version {name} added to project")
     return version_id
 
 def get_version_data(version_id, column='*'):
@@ -663,7 +663,7 @@ def get_version_data(version_id, column='*'):
     if work_envs_rows and len(work_envs_rows) >= 1:
         return work_envs_rows[0]
     else:
-        logging.error("Version not found")
+        logger.error("Version not found")
         return None
 
 def remove_version(version_id):
@@ -671,7 +671,7 @@ def remove_version(version_id):
     if site.is_admin():
         success = db_utils.delete_row('project', 'versions', version_id)
         if success :
-            logging.info(f"Version removed from project")
+            logger.info(f"Version removed from project")
     return success
 
 def add_software(name, extension, file_command, no_file_command):
@@ -694,13 +694,13 @@ def add_software(name, extension, file_command, no_file_command):
                                 file_command,
                                 no_file_command))
             if software_id:
-                logging.info(f"Software {name} added to project")
+                logger.info(f"Software {name} added to project")
             return software_id
         else:
-            logging.warning(f"{name} already exists")
+            logger.warning(f"{name} already exists")
             return None
     else:
-        logging.warning("Unregistered software")
+        logger.warning("Unregistered software")
         return None
 
 def get_softwares_names_list():
@@ -713,12 +713,12 @@ def set_software_path(software_id, path):
                             'softwares',
                             ('path', path),
                             ('id', software_id)):
-            logging.info('Software path modified')
+            logger.info('Software path modified')
             return 1
         else:
             return None
     else:
-        logging.warning(f"{path} is not a valid executable")
+        logger.warning(f"{path} is not a valid executable")
         return None
 
 def set_software_additionnal_scripts(software_id, paths_list):
@@ -726,7 +726,7 @@ def set_software_additionnal_scripts(software_id, paths_list):
                             'softwares',
                             ('additionnal_scripts', json.dumps(paths_list)),
                             ('id', software_id)):
-        logging.info('Additionnal script env modified')
+        logger.info('Additionnal script env modified')
         return 1
     else:
         return None
@@ -736,7 +736,7 @@ def set_software_additionnal_env(software_id, env_dic):
                             'softwares',
                             ('additionnal_env', json.dumps(env_dic)),
                             ('id', software_id)):
-        logging.info('Additionnal env modified')
+        logger.info('Additionnal env modified')
         return 1
     else:
         return None
@@ -749,7 +749,7 @@ def get_software_data(software_id, column='*'):
     if softwares_rows and len(softwares_rows) >= 1:
         return softwares_rows[0]
     else:
-        logging.error("Software not found")
+        logger.error("Software not found")
         return None
 
 def create_extension_row(stage, software_id, extension):
@@ -761,7 +761,7 @@ def create_extension_row(stage, software_id, extension):
                                 (stage,
                                     software_id,
                                     extension)):
-        logging.info("Extension added")
+        logger.info("Extension added")
         return 1
     else:
         return None
@@ -774,7 +774,7 @@ def get_extension(stage, software_id):
     if export_row and len(export_row) >= 1:
         return export_row[0]['extension']
     else:
-        logging.error("Extension not found")
+        logger.error("Extension not found")
         return None
 
 def create_settings_row(frame_rate, image_format):
@@ -787,12 +787,12 @@ def create_settings_row(frame_rate, image_format):
                                             (frame_rate,
                                                 json.dumps(image_format),
                                                 json.dumps(list()))):
-            logging.info("Project settings initiated")
+            logger.info("Project settings initiated")
             return 1
         else:
             return None
     else:
-        logging.error("Settings row already exists")
+        logger.error("Settings row already exists")
         return None
 
 def set_frame_rate(frame_rate):
@@ -800,7 +800,7 @@ def set_frame_rate(frame_rate):
                             'settings',
                             ('frame_rate', frame_rate),
                             ('id', 1)):
-        logging.info('Project frame rate modified')
+        logger.info('Project frame rate modified')
         return 1
     else:
         return None
@@ -813,7 +813,7 @@ def get_frame_rate():
     if frame_rate_list and len(frame_rate_list) >= 1:
         return json.loads(frame_rate_list[0])
     else:
-        logging.error("Project settings not found")
+        logger.error("Project settings not found")
         return None
 
 def set_image_format(image_format):
@@ -821,7 +821,7 @@ def set_image_format(image_format):
                             'settings',
                             ('image_format', json.dumps(image_format)),
                             ('id', 1)):
-        logging.info('Project format modified')
+        logger.info('Project format modified')
         return 1
     else:
         return None
@@ -834,7 +834,7 @@ def get_image_format():
     if image_format_list and len(image_format_list) >= 1:
         return json.loads(image_format_list[0])
     else:
-        logging.error("Project settings not found")
+        logger.error("Project settings not found")
         return None
 
 def get_users_ids_list():
@@ -845,7 +845,7 @@ def get_users_ids_list():
     if users_ids_list and len(users_ids_list) >= 1:
         return json.loads(users_ids_list[0])
     else:
-        logging.error("Project settings not found")
+        logger.error("Project settings not found")
         return None
 
 def add_user(user_id):
@@ -865,7 +865,7 @@ def update_users_list(users_ids_list):
                             'settings',
                             ('users_ids', json.dumps(users_ids_list)),
                             ('id', 1)):
-        logging.info('Project users list updated')
+        logger.info('Project users list updated')
         return 1
     else:
         return None
@@ -912,7 +912,7 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
                                                             destination_user,
                                                             json.dumps(copied_files)))
                     if ticket_id:
-                        logging.info("Ticket created")
+                        logger.info("Ticket created")
     return ticket_id
 
 def get_ticket_data(ticket_id, column='*'):
@@ -923,7 +923,7 @@ def get_ticket_data(ticket_id, column='*'):
     if tickets_rows and len(tickets_rows) >= 1:
         return tickets_rows[0]
     else:
-        logging.error("Ticket not found")
+        logger.error("Ticket not found")
         return None
 
 def change_ticket_state(ticket_id, state):
@@ -936,9 +936,9 @@ def change_ticket_state(ticket_id, state):
                                     ('state', state),
                                     ('id', ticket_id)):
         if not state:
-            logging.info('Ticket closed')
+            logger.info('Ticket closed')
         else:
-            logging.info('Ticket openned')
+            logger.info('Ticket openned')
         return 1
     else:
         return None
@@ -955,7 +955,7 @@ def remove_ticket(ticket_id):
     if site.is_admin():
         success = db_utils.delete_row('project', 'tickets', ticket_id)
         if success :
-            logging.info(f"Ticket removed from project")
+            logger.info(f"Ticket removed from project")
     return success
 
 def get_shared_files_folder():
@@ -982,7 +982,7 @@ def add_event(event_type, title, message, data):
                                                 message,
                                                 json.dumps(data)))
     if event_id:
-        logging.info("Event added")
+        logger.debug("Event added")
     return event_id
 
 def get_event_data(event_id, column='*'):
@@ -993,7 +993,7 @@ def get_event_data(event_id, column='*'):
     if events_rows and len(events_rows) >= 1:
         return events_rows[0]
     else:
-        logging.error("Event not found")
+        logger.error("Event not found")
         return None
 
 def get_all_events(column='*'):
@@ -1026,9 +1026,9 @@ def add_shelf_script(name,
                                                     only_subprocess,
                                                     icon))
         if shelf_script_id:
-            logging.info("Shelf script created")
+            logger.info("Shelf script created")
     else:
-        logging.warning(f"{name} already exists")
+        logger.warning(f"{name} already exists")
     return shelf_script_id
 
 def get_shelf_script_data(name, column='*'):
@@ -1039,7 +1039,7 @@ def get_shelf_script_data(name, column='*'):
     if shelf_scripts_rows and len(shelf_scripts_rows) >= 1:
         return shelf_scripts_rows[0]
     else:
-        logging.error("Shelf script not found")
+        logger.error("Shelf script not found")
         return None
 
 def get_database_file(project_path):
@@ -1050,11 +1050,26 @@ def get_database_file(project_path):
     return database_file
 
 def create_project(project_name, project_path, project_password):
-    if site.create_project(project_name, project_path, project_password):
-        if init_project(project_path, project_name):
-            logging.info(f"{project_name} created")
-            environment.build_project_env(project_name, project_path)
-            return 1
+    do_creation = 1
+
+    if project_name == '':
+        logger.warning("Please provide a project name")
+        do_creation = 0
+    if project_path == '':
+        logger.warning("Please provide a project path")
+        do_creation = 0
+    if project_password == '':
+        logger.warning("Please provide a password")
+        do_creation = 0
+
+    if do_creation:
+        if site.create_project(project_name, project_path, project_password):
+            if init_project(project_path, project_name):
+                logger.info(f"{project_name} created")
+                environment.build_project_env(project_name, project_path)
+                return 1
+            else:
+                return None
         else:
             return None
     else:
@@ -1083,7 +1098,7 @@ def init_project(project_path, project_name):
             create_shelf_scripts_table(project_name)
             return project_name
     else:
-        logging.warning("Project database already exists")
+        logger.warning("Project database already exists")
         return None
 
 def create_domains_table(database):
@@ -1094,7 +1109,7 @@ def create_domains_table(database):
                                         creation_user text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Categories table created")
+        logger.info("Categories table created")
 
 def create_categories_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS categories (
@@ -1106,7 +1121,7 @@ def create_categories_table(database):
                                         FOREIGN KEY (domain_id) REFERENCES domains (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Categories table created")
+        logger.info("Categories table created")
 
 def create_assets_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS assets (
@@ -1120,7 +1135,7 @@ def create_assets_table(database):
                                         FOREIGN KEY (category_id) REFERENCES categories (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Assets table created")
+        logger.info("Assets table created")
 
 def create_stages_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS stages (
@@ -1133,7 +1148,7 @@ def create_stages_table(database):
                                         FOREIGN KEY (asset_id) REFERENCES assets (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Stages table created")
+        logger.info("Stages table created")
 
 def create_variants_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS variants (
@@ -1147,7 +1162,7 @@ def create_variants_table(database):
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Variants table created")
+        logger.info("Variants table created")
 
 def create_work_envs_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS work_envs (
@@ -1162,7 +1177,7 @@ def create_work_envs_table(database):
                                         FOREIGN KEY (software_id) REFERENCES softwares (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Work envs table created")
+        logger.info("Work envs table created")
 
 def create_references_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS references_data (
@@ -1176,7 +1191,7 @@ def create_references_table(database):
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("References table created")
+        logger.info("References table created")
 
 def create_exports_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS exports (
@@ -1188,7 +1203,7 @@ def create_exports_table(database):
                                         FOREIGN KEY (variant_id) REFERENCES variants (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Exports table created")
+        logger.info("Exports table created")
 
 def create_versions_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS versions (
@@ -1203,7 +1218,7 @@ def create_versions_table(database):
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Versions table created")
+        logger.info("Versions table created")
 
 def create_export_versions_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS export_versions (
@@ -1221,7 +1236,7 @@ def create_export_versions_table(database):
                                         FOREIGN KEY (work_version_id) REFERENCES versions (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Export versions table created")
+        logger.info("Export versions table created")
 
 def create_softwares_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS softwares (
@@ -1235,7 +1250,7 @@ def create_softwares_table(database):
                                         no_file_command text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Softwares table created")
+        logger.info("Softwares table created")
 
 def create_settings_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS settings (
@@ -1245,7 +1260,7 @@ def create_settings_table(database):
                                         users_ids text
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Settings table created")
+        logger.info("Settings table created")
 
 def create_extensions_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS extensions (
@@ -1255,7 +1270,7 @@ def create_extensions_table(database):
                                         extension text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Extensions table created")
+        logger.info("Extensions table created")
 
 def create_tickets_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS tickets (
@@ -1275,7 +1290,7 @@ def create_tickets_table(database):
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Tickets table created")
+        logger.info("Tickets table created")
 
 def create_events_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS events (
@@ -1288,7 +1303,7 @@ def create_events_table(database):
                                         data text
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Events table created")
+        logger.info("Events table created")
 
 def create_shelf_scripts_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS shelf_scripts (
@@ -1301,4 +1316,4 @@ def create_shelf_scripts_table(database):
                                         icon text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
-        logging.info("Shelf scripts table created")
+        logger.info("Shelf scripts table created")

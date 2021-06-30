@@ -9,8 +9,8 @@
 # event rows
 
 # Wizard modules
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 from wizard.core import environment
 from wizard.core import project
@@ -50,6 +50,11 @@ def add_export_event(export_version_id):
 	message += f" | {export_row['name']}"
 	message += f" | {export_version_row['name']}"
 	project.add_event('export', title, message, data)
+
+def add_archive_event(message, archive_path):
+	title = 'Archive event'
+	data = archive_path
+	project.add_event('archive', title, message, data)
 
 def add_ticket_openned_event(ticket_id):
 	data = ticket_id

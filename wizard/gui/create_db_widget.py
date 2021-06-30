@@ -8,10 +8,14 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 # Wizard modules
 from wizard.core import site
 from wizard.core import db_utils
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import message_widget
+from wizard.gui import logging_widget
 from wizard.gui import gui_utils
+
 
 class create_db_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -62,6 +66,9 @@ class create_db_widget(QtWidgets.QDialog):
         self.continue_button = QtWidgets.QPushButton('Continue')
         self.continue_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.continue_button)
+
+        self.logging_widget = logging_widget.logging_widget(self)
+        self.main_layout.addWidget(self.logging_widget)
 
     def connect_functions(self):
         self.continue_button.clicked.connect(self.apply)

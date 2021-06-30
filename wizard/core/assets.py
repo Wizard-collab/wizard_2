@@ -42,8 +42,8 @@ from wizard.core import game
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def create_domain(name):
 	domain_id = None
@@ -56,7 +56,7 @@ def create_domain(name):
 				project.remove_domain(domain_id)
 				domain_id = None
 	else:
-		logging.warning(f"{name} contains illegal characters")
+		logger.warning(f"{name} contains illegal characters")
 	return domain_id
 
 def archive_domain(domain_id):
@@ -67,9 +67,9 @@ def archive_domain(domain_id):
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_domain(domain_id)
 		else:
 			return None
@@ -91,9 +91,9 @@ def create_category(name, domain_id):
 					events.add_creation_event('category', category_id)
 					game.add_xps(2)
 		else:
-			logging.error("Can't create category")
+			logger.error("Can't create category")
 	else:
-		logging.warning(f"{name} contains illegal characters")
+		logger.warning(f"{name} contains illegal characters")
 	return category_id
 
 def archive_category(category_id):
@@ -102,11 +102,14 @@ def archive_category(category_id):
 		if category_row:
 			dir_name = get_category_path(category_id)
 			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
+				archive_file = tools.make_archive(dir_name)
+				if archive_file:
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
+					events.add_archive_event(f"Archived category : {category_row['name']}",
+												archive_file)
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_category(category_id)
 		else:
 			return None
@@ -128,9 +131,9 @@ def create_asset(name, category_id, inframe=100, outframe=220):
 					events.add_creation_event('asset', asset_id)
 					game.add_xps(2)
 		else:
-			logging.error("Can't create asset")
+			logger.error("Can't create asset")
 	else:
-		logging.warning(f"{name} contains illegal characters")
+		logger.warning(f"{name} contains illegal characters")
 	return asset_id
 
 def archive_asset(asset_id):
@@ -139,11 +142,14 @@ def archive_asset(asset_id):
 		if asset_row:
 			dir_name = get_asset_path(asset_id)
 			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
+				archive_file = tools.make_archive(dir_name)
+				if archive_file:
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
+					events.add_archive_event(f"Archived asset : {asset_row['name']}",
+												archive_file)
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_asset(asset_id)
 		else:
 			return None
@@ -186,10 +192,10 @@ def create_stage(name, asset_id):
 						project.set_stage_default_variant(stage_id, variant_id)
 			return stage_id
 		else:
-			logging.error("Can't create stage")
+			logger.error("Can't create stage")
 			return None
 	else:
-		logging.warning(f"{name} doesn't match stages rules")
+		logger.warning(f"{name} doesn't match stages rules")
 		return None
 
 def archive_stage(stage_id):
@@ -198,11 +204,14 @@ def archive_stage(stage_id):
 		if stage_row:
 			dir_name = get_stage_path(stage_id)
 			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
+				archive_file = tools.make_archive(dir_name)
+				if archive_file:
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
+					events.add_archive_event(f"Archived stage : {stage_row['name']}",
+												archive_file)
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_stage(stage_id)
 		else:
 			return None
@@ -227,9 +236,9 @@ def create_variant(name, stage_id, comment=''):
 					events.add_creation_event('variant', variant_id)
 					game.add_xps(2)
 		else:
-			logging.error("Can't create variant")
+			logger.error("Can't create variant")
 	else:
-		logging.warning(f"{name} contains illegal characters")
+		logger.warning(f"{name} contains illegal characters")
 	return variant_id
 
 def archive_variant(variant_id):
@@ -238,11 +247,14 @@ def archive_variant(variant_id):
 		if variant_row:
 			dir_name = get_variant_path(variant_id)
 			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
+				archive_file = tools.make_archive(dir_name)
+				if archive_file:
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
+					events.add_archive_event(f"Archived variant : {variant_row['name']}",
+												archive_file)
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_variant(variant_id)
 		else:
 			return None
@@ -266,9 +278,9 @@ def create_work_env(software_id, variant_id):
 				else:
 					add_version(work_env_id, fresh=1)
 		else:
-			logging.error("Can't create work env")
+			logger.error("Can't create work env")
 	else:
-		logging.warning(f"{name} is not a valid work environment ( software not handled )")
+		logger.warning(f"{name} is not a valid work environment ( software not handled )")
 	return work_env_id
 
 def create_reference(work_env_id, export_version_id):
@@ -291,9 +303,9 @@ def archive_work_env(work_env_id):
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_work_env(work_env_id)
 		else:
 			return None
@@ -338,7 +350,7 @@ def add_export_version(export_name, files, version_id, comment=''):
 							copied_files = tools.copy_files(files, dir_name)
 							if not copied_files:
 								if not tools.remove_folder(dir_name):
-									logging.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+									logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
 								export_version_id = None
 							else:
 								export_version_id = project.add_export_version(new_version,
@@ -356,7 +368,7 @@ def add_export_version(export_name, files, version_id, comment=''):
 				return None
 		else:
 			for file in extension_errors:
-				logging.warning(f"{file} format doesn't math the stage export rules ( {os.path.splitext(file)[-1]} )")
+				logger.warning(f"{file} format doesn't math the stage export rules ( {os.path.splitext(file)[-1]} )")
 	else:
 		return None
 
@@ -364,7 +376,7 @@ def request_export(work_env_id, export_name, multiple=None, only_dir=None):
 	# Gives a temporary ( and local ) export file name
 	# for the softwares
 	dir_name = tools.temp_dir()
-	logging.info(f"Temporary directory created : {dir_name}, if something goes wrong in the export please go there to find your temporary export file")
+	logger.info(f"Temporary directory created : {dir_name}, if something goes wrong in the export please go there to find your temporary export file")
 	file_name = build_export_file_name(work_env_id, export_name, multiple)
 	if file_name and not only_dir:
 		return os.path.normpath(os.path.join(dir_name, file_name))
@@ -382,7 +394,7 @@ def archive_export(export_id):
 				if tools.make_archive(dir_name):
 					tools.remove_tree(dir_name)	
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_export(export_id)
 		else:
 			return None
@@ -408,9 +420,9 @@ def get_or_add_export(name, variant_id):
 			else:
 				export_id = project.get_export_by_name(name, variant_id)['id']
 		else:
-			logging.error("Can't create export")
+			logger.error("Can't create export")
 	else:
-		logging.warning(f"{name} contains illegal characters")
+		logger.warning(f"{name} contains illegal characters")
 	return export_id
 
 def archive_export_version(export_version_id):
@@ -421,9 +433,9 @@ def archive_export_version(export_version_id):
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
-					logging.info(f"{dir_name} deleted")
+					logger.info(f"{dir_name} deleted")
 			else:
-				logging.warning(f"{dir_name} not found")
+				logger.warning(f"{dir_name} not found")
 			return project.remove_export_version(export_version_id)
 		else:
 			return None
@@ -467,9 +479,9 @@ def archive_version(version_id):
 							'archives.zip')
 				if tools.zip_files([version_row['file_path']], zip_file):
 					os.remove(version_row['file_path'])
-					logging.info(f"{version_row['file_path']} deleted")
+					logger.info(f"{version_row['file_path']} deleted")
 			else:
-				logging.warning(f"{version_row['file_path']} not found")
+				logger.warning(f"{version_row['file_path']} not found")
 			return project.remove_version(version_row['id'])
 		else:
 			return None		
@@ -598,7 +610,7 @@ def build_export_file_name(work_env_id, export_name, multiple=None):
 		file_name += f".{extension}"
 		return file_name
 	else:
-		logging.error("Can't build file name")
+		logger.error("Can't build file name")
 		return None
 
 def build_namespace(export_version_id):

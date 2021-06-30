@@ -9,7 +9,9 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from wizard.core import user
 
 # Wizard gui modules
+from wizard.gui import gui_utils
 from wizard.gui import message_widget
+from wizard.gui import logging_widget
 
 class psql_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -45,7 +47,7 @@ class psql_widget(QtWidgets.QDialog):
         self.user_lineEdit.setPlaceholderText('User')
         self.main_layout.addWidget(self.user_lineEdit)
 
-        self.password_lineEdit = QtWidgets.QLineEdit()
+        self.password_lineEdit = gui_utils.password_lineEdit()
         self.password_lineEdit.setPlaceholderText('Password')
         self.main_layout.addWidget(self.password_lineEdit)
 
@@ -69,6 +71,9 @@ class psql_widget(QtWidgets.QDialog):
         self.continue_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.continue_button)
 
+        self.logging_widget = logging_widget.logging_widget(self)
+        self.main_layout.addWidget(self.logging_widget)
+
     def connect_functions(self):
         self.continue_button.clicked.connect(self.apply)
         self.quit_button.clicked.connect(self.close)
@@ -85,6 +90,3 @@ class psql_widget(QtWidgets.QDialog):
                             psql_password
                             ):
             self.accept()
-        else:
-            self.message_widget = message_widget.message_widget('PostgreSQL Error', "Wizard could not reach any server with those credentials")
-            self.message_widget.exec_()

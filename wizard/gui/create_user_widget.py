@@ -6,13 +6,14 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
+from wizard.gui import logging_widget
 from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.core import site
 from wizard.vars import ressources
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class create_user_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -95,6 +96,9 @@ class create_user_widget(QtWidgets.QDialog):
         self.sign_up_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.sign_up_button)
 
+        self.logging_widget = logging_widget.logging_widget(self)
+        self.main_layout.addWidget(self.logging_widget)
+
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)
         self.sign_up_button.clicked.connect(self.apply)
@@ -114,7 +118,7 @@ class create_user_widget(QtWidgets.QDialog):
                                     self.image_file):
                 self.accept()
         else:
-            logging.warning("User passwords doesn't matches")
+            logger.warning("User passwords doesn't matches")
 
     def update_profile_picture(self):
         options = QtWidgets.QFileDialog.Options()
@@ -127,6 +131,6 @@ class create_user_widget(QtWidgets.QDialog):
                 self.image_file = image_file
                 self.profile_picture_button.setIcon(QtGui.QIcon(image_file))
             else:
-                logging.warning('{} is not a valid image file...'.format(image_file))
+                logger.warning('{} is not a valid image file...'.format(image_file))
 
 

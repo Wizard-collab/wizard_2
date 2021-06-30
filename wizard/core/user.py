@@ -31,8 +31,8 @@ from wizard.core import site
 from wizard.core import db_core
 from wizard.core import db_utils
 
-from wizard.core import logging
-logging = logging.get_logger(__name__)
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 def create_user_folders():
     # Init the user folders
@@ -81,7 +81,7 @@ class user:
                 self.write_prefs_dic()
                 return None
         else:
-            logging.info("No postgreSQL DNS set")
+            logger.info("No postgreSQL DNS set")
             return None
 
     def add_shelf_script(self,
@@ -95,7 +95,7 @@ class user:
         # The script ( .py ) is stored as file in ~/Documents/wizard/scripts
         if name not in self.prefs_dic[user_vars._scripts_].keys():
             if not os.path.isfile(icon):
-                logging.warning(f"{icon} doesn't exists, assigning default icon")
+                logger.warning(f"{icon} doesn't exists, assigning default icon")
                 icon = ressources._default_script_shelf_icon_
             icon_name = os.path.basename(icon)
             destination_icon = os.path.join(user_vars._icons_path_, icon_name)
@@ -108,10 +108,10 @@ class user:
             self.prefs_dic[user_vars._scripts_][name]['only_subprocess'] = only_subprocess
             self.prefs_dic[user_vars._scripts_][name]['icon'] = icon_file
             self.write_prefs_dic()
-            logging.info("Shelf script created")
+            logger.info("Shelf script created")
             return 1
         else:
-            logging.warning(f"{name} already exists")
+            logger.warning(f"{name} already exists")
             return 0
 
     def get_shelf_script_data(self, name, column=None):
@@ -129,11 +129,11 @@ class user:
                 if column in self.prefs_dic[user_vars._scripts_][name].keys():
                     return self.prefs_dic[user_vars._scripts_][name][column]
                 else:
-                    logging.warning(f"{data} column doesn't seems to exists")
+                    logger.warning(f"{data} column doesn't seems to exists")
             else:
                 return self.prefs_dic[user_vars._scripts_][name]
         else:
-            logging.warning(f"Script {name} not found")
+            logger.warning(f"Script {name} not found")
             return None
 
     def add_context(self, context_dic):
@@ -185,7 +185,7 @@ class user:
                 data = f.read()
             self.execute_session(data)
         else:
-            logging.warning(f"{file} doesn't exists")
+            logger.warning(f"{file} doesn't exists")
 
 def log_user(user_name, password):
     if user_name in site.get_user_names_list():
@@ -194,18 +194,18 @@ def log_user(user_name, password):
                                 password):
             site.update_current_ip_data('user_id', user_row['id'])
             environment.build_user_env(user_name)
-            logging.info(f'{user_name} signed in')
+            logger.info(f'{user_name} signed in')
             return 1
         else:
-            logging.warning(f'Wrong password for {user_name}')
+            logger.warning(f'Wrong password for {user_name}')
             return None
     else:
-        logging.error(f"{user_name} doesn't exists")
+        logger.error(f"{user_name} doesn't exists")
         return None
 
 def disconnect_user():
     site.update_current_ip_data('user_id', None)
-    logging.info('You are now disconnected')
+    logger.info('You are now disconnected')
 
 def get_user():
     user_id = site.get_current_ip_data('user_id')
@@ -224,20 +224,20 @@ def log_project(project_name, password):
             site.update_current_ip_data('project_id', project_row['id'])
             environment.build_project_env(project_name, project_row['project_path'])
             db_utils.modify_db_name('project', project_name)
-            logging.info(f'Successfully signed in {project_name} project')
+            logger.info(f'Successfully signed in {project_name} project')
             project.add_user(site.get_user_row_by_name(environment.get_user(),
                                                                 'id'))
             return 1
         else:
-            logging.warning(f'Wrong password for {project_name}')
+            logger.warning(f'Wrong password for {project_name}')
             return None
     else:
-        logging.error(f"{project_name} doesn't exists")
+        logger.error(f"{project_name} doesn't exists")
         return None
 
 def disconnect_project():
     site.update_current_ip_data('project_id', None)
-    logging.info('Successfully disconnect from project')
+    logger.info('Successfully disconnect from project')
 
 def get_project():
     project_id = site.get_current_ip_data('project_id')
