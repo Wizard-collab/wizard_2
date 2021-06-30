@@ -212,11 +212,30 @@ QProgressBar::chunk {
 }
 
 #user_xp_progressBar::chunk{
-	background-color: #ffea80;
+	border-radius:5px;
+	background-color:qlineargradient(spread:pad, x1:0, y1:0.273, x2:1, y2:0.262, stop:0 #ffea80, stop:1 #e4ff5c);
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+#user_xp_progressBar{
+	border-radius:5px;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 
 #user_life_progressBar::chunk{
-	background-color: #e96c6c;
+	border-radius:5px;
+	background-color: #e05c5c;
+	background-color:qlineargradient(spread:pad, x1:0, y1:0.273, x2:1, y2:0.262, stop:0 #fc4242, stop:1 #e96c6c);
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+#user_life_progressBar{
+	border-radius:5px;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
 }
 
 #blue_button{

@@ -34,22 +34,24 @@ class user_widget(QtWidgets.QFrame):
 
         self.infos_layout.addWidget(QtWidgets.QLabel(environment.get_user()))
 
-        #self.info_xp_label = QtWidgets.QLabel('Experience')
-        #self.info_xp_label.setObjectName('gray_label')
-        #self.infos_layout.addWidget(self.info_xp_label)
+        self.progress_bars_widget = QtWidgets.QWidget()
+        self.progress_bars_layout = QtWidgets.QVBoxLayout()
+        self.progress_bars_layout.setContentsMargins(0,0,0,0)
+        self.progress_bars_layout.setSpacing(0)
+        self.progress_bars_widget.setLayout(self.progress_bars_layout)
+        self.infos_layout.addWidget(self.progress_bars_widget)
+
         self.xp_progress_bar = QtWidgets.QProgressBar()
         self.xp_progress_bar.setObjectName('user_xp_progressBar')
         self.xp_progress_bar.setFixedHeight(6)
         self.xp_progress_bar.setTextVisible(0)
-        self.infos_layout.addWidget(self.xp_progress_bar)
-        #self.info_life_label = QtWidgets.QLabel('Life')
-        #self.info_life_label.setObjectName('gray_label')
-        #self.infos_layout.addWidget(self.info_life_label)
+        self.progress_bars_layout.addWidget(self.xp_progress_bar)
+        
         self.life_progress_bar = QtWidgets.QProgressBar()
         self.life_progress_bar.setObjectName('user_life_progressBar')
         self.life_progress_bar.setFixedHeight(6)
         self.life_progress_bar.setTextVisible(0)
-        self.infos_layout.addWidget(self.life_progress_bar)
+        self.progress_bars_layout.addWidget(self.life_progress_bar)
 
         self.badges_frame = QtWidgets.QFrame()
         self.badges_layout = QtWidgets.QHBoxLayout()
