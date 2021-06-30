@@ -966,17 +966,19 @@ def get_scripts_folder():
     shared_files_folder = os.path.join(environment.get_project_path(), project_vars._scripts_folder_)
     return shared_files_folder
 
-def add_event(event_type, message, data):
+def add_event(event_type, title, message, data):
     event_id = db_utils.create_row('project',
                                             'events',
                                             ('creation_user',
                                                 'creation_time',
                                                 'type',
+                                                'title',
                                                 'message',
                                                 'data'),
                                             (environment.get_user(),
                                                 time.time(),
                                                 event_type,
+                                                title,
                                                 message,
                                                 json.dumps(data)))
     if event_id:
@@ -993,6 +995,12 @@ def get_event_data(event_id, column='*'):
     else:
         logging.error("Event not found")
         return None
+
+def get_all_events(column='*'):
+    events_rows = db_utils.get_rows('project',
+                                        'events',
+                                        column)
+    return events_rows
 
 def add_shelf_script(name,
                         py_file,
@@ -1275,6 +1283,7 @@ def create_events_table(database):
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL,
                                         type text NOT NULL,
+                                        title text NOT NULL,
                                         message text NOT NULL,
                                         data text
                                     );"""

@@ -7,6 +7,7 @@ from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
 from wizard.gui import project_log_widget
 from wizard.gui import create_project_widget
+from wizard.gui import wall_widget
 
 import sys
 import time
@@ -14,6 +15,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from wizard.core import user
 from wizard.core import environment
 from wizard.core import site
+from wizard.core import project
 from wizard.core import db_core
 from wizard.core import db_utils
 
@@ -102,5 +104,7 @@ my_quotes_widget = quotes_widget.quotes_widget()
 my_tree_widget.show()
 my_user_widget.show()
 my_quotes_widget.show()
+my_wall_widget = wall_widget.wall_widget()
+my_wall_widget.show()
 
 sys.exit(app.exec_())

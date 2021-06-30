@@ -34,6 +34,46 @@ def move_ui(widget):
     widget.move(posx, posy)
     return f"{angley}-{anglex}"
 
+def round_image(label, image_bytes, radius):
+        label.Antialiasing = True
+        label.radius = radius/2
+        label.target = QtGui.QPixmap(label.size())
+        label.target.fill(QtCore.Qt.transparent)
+        pixmap = QtGui.QPixmap()
+        pixmap.loadFromData(image_bytes, 'png')
+        pixmap = pixmap.scaled(
+            radius, radius, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
+        painter = QtGui.QPainter(label.target)
+        if label.Antialiasing:
+            painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
+            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
+        path = QtGui.QPainterPath()
+        path.addRoundedRect(
+            0, 0, label.width(), label.height(), label.radius, label.radius)
+        painter.setClipPath(path)
+        painter.drawPixmap(0, 0, pixmap)
+        label.setPixmap(label.target)
+
+class QProgressBar(QtWidgets.QProgressBar):
+    def __init__(self, parent=None):
+        super(QProgressBar, self).__init__(parent)
+
+    def paintEvent(self, event):
+        qp = QtWidgets.QStylePainter(self)
+        opt = QtWidgets.QStyleOptionProgressBar()
+        self.initStyleOption(opt)
+        rect = self.style().subElementRect(QtWidgets.QStyle.SE_ProgressBarContents, opt, self)
+        minSize = rect.height()
+        grooveSize = rect.width() - minSize - 1
+        valueRange = self.maximum() - self.minimum()
+        offset = self.value() / valueRange * grooveSize
+        newValue = (minSize + 1 + offset) / rect.width() * valueRange
+        if int(newValue) != newValue:
+            newValue = min(self.maximum(), newValue + 1)
+        opt.progress = newValue
+        qp.drawControl(QtWidgets.QStyle.CE_ProgressBar, opt)
+
 class password_lineEdit(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(password_lineEdit, self).__init__(parent)

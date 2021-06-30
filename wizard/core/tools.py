@@ -10,10 +10,16 @@ import re
 import traceback
 import shutil
 import tempfile
+import time
 
 # Wizard modules
 from wizard.core import logging
 logging = logging.get_logger(__name__)
+
+def convert_time(time_float):
+    day = time.strftime('%Y-%m-%d', time.localtime(time_float))
+    hour = time.strftime('%H:%M', time.localtime(time_float))
+    return day, hour
 
 def encrypt_string(string):
     # Hash a string for storing.

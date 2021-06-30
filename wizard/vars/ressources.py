@@ -16,6 +16,7 @@ _search_icon_ = os.path.join(_icons_path_, 'search_icon.png')
 _warning_icon_ = os.path.join(_icons_path_, 'warning_icon.png')
 _close_icon_ = os.path.join(_icons_path_, 'close_hover.png')
 _admin_badge_ = os.path.join(_icons_path_, 'admin_badge.png')
+_rigth_arrow_icon_ = os.path.join(_icons_path_, 'right_arrow.png')
 
 # Domains icons
 _assets_icon_small_ = os.path.join(_icons_path_, 'assets_small.png')

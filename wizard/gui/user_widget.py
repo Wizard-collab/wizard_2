@@ -5,6 +5,9 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
+# Wizard gui modules
+from wizard.gui import gui_utils
+
 # Wizard modules
 from wizard.core import environment
 from wizard.core import site
@@ -41,13 +44,13 @@ class user_widget(QtWidgets.QFrame):
         self.progress_bars_widget.setLayout(self.progress_bars_layout)
         self.infos_layout.addWidget(self.progress_bars_widget)
 
-        self.xp_progress_bar = QtWidgets.QProgressBar()
+        self.xp_progress_bar = gui_utils.QProgressBar()
         self.xp_progress_bar.setObjectName('user_xp_progressBar')
         self.xp_progress_bar.setFixedHeight(6)
         self.xp_progress_bar.setTextVisible(0)
         self.progress_bars_layout.addWidget(self.xp_progress_bar)
         
-        self.life_progress_bar = QtWidgets.QProgressBar()
+        self.life_progress_bar = gui_utils.QProgressBar()
         self.life_progress_bar.setObjectName('user_life_progressBar')
         self.life_progress_bar.setFixedHeight(6)
         self.life_progress_bar.setTextVisible(0)
@@ -81,25 +84,8 @@ class user_widget(QtWidgets.QFrame):
         self.life_progress_bar.setValue(user_row['life'])
         self.level_label.setText(str(user_row['level']))
         self.admin_badge_label.setVisible(user_row['administrator'])
-        self.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(user_row['profile_picture']))
+        gui_utils.round_image(self.profile_picture,
+                                image.convert_str_data_to_image_bytes(user_row['profile_picture']),
+                                70)
 
-    def round_image(self, label, image_bytes):
-        label.Antialiasing = True
-        label.radius = 35
-        label.target = QtGui.QPixmap(label.size())
-        label.target.fill(QtCore.Qt.transparent)
-        pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(image_bytes, 'png')
-        pixmap = pixmap.scaled(
-            70, 70, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-        painter = QtGui.QPainter(label.target)
-        if label.Antialiasing:
-            painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
-            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
-            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-        path = QtGui.QPainterPath()
-        path.addRoundedRect(
-            0, 0, label.width(), label.height(), label.radius, label.radius)
-        painter.setClipPath(path)
-        painter.drawPixmap(0, 0, pixmap)
-        label.setPixmap(label.target)
+    

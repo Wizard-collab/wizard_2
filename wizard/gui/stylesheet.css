@@ -211,11 +211,16 @@ QProgressBar::chunk {
 	color: gray;
 }
 
+#bold_label{
+	font: bold;
+}
+
 #user_xp_progressBar::chunk{
 	border-radius:5px;
 	background-color:qlineargradient(spread:pad, x1:0, y1:0.273, x2:1, y2:0.262, stop:0 #ffea80, stop:1 #e4ff5c);
 	border-bottom-left-radius: 0px;
 	border-bottom-right-radius: 0px;
+	min-width: 20px;
 }
 
 #user_xp_progressBar{
@@ -230,6 +235,7 @@ QProgressBar::chunk {
 	background-color:qlineargradient(spread:pad, x1:0, y1:0.273, x2:1, y2:0.262, stop:0 #fc4242, stop:1 #e96c6c);
 	border-top-left-radius: 0px;
 	border-top-right-radius: 0px;
+	min-width: 20px;
 }
 
 #user_life_progressBar{
@@ -254,6 +260,7 @@ QProgressBar::chunk {
 }
 
 #blue_text_button{
+	font: bold;
 	background-color: transparent;
 	color: #7785de;
 	padding: 0px;
@@ -363,4 +370,12 @@ QProgressBar::chunk {
 #password_lineEdit_frame{
 	background-color: #24242b;
 	border-radius: 5px;
+}
+
+#wall_scrollArea_widget{
+	background-color: #24242b;
+}
+
+#wall_event_frame{
+	border-radius: 10px;
 }
