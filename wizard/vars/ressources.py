@@ -25,9 +25,11 @@ _folder_icon_ = os.path.join(_icons_path_, 'folder.png')
 _search_icon_ = os.path.join(_icons_path_, 'search_icon.png')
 _warning_icon_ = os.path.join(_icons_path_, 'warning_icon.png')
 _close_icon_ = os.path.join(_icons_path_, 'close_hover.png')
+_close_thin_icon_ = os.path.join(_icons_path_, 'close_thin.png')
 _admin_badge_ = os.path.join(_icons_path_, 'admin_badge.png')
 _rigth_arrow_icon_ = os.path.join(_icons_path_, 'right_arrow.png')
 _no_screenshot_ = os.path.join(_icons_path_, 'no_screenshot.png')
+_dragdrop_ = os.path.join(_icons_path_, 'dragdrop.png')
 
 # Lock icons
 _lock_icons_ = dict()

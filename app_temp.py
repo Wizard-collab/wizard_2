@@ -10,6 +10,7 @@ from wizard.gui import create_project_widget
 from wizard.gui import wall_widget
 from wizard.gui import logging_widget
 from wizard.gui import launcher_widget
+from wizard.gui import create_ticket_widget
 
 import sys
 import time
@@ -117,6 +118,8 @@ class app():
 		self.my_tree_widget.show()
 		self.my_launcher_widget.show()
 		self.my_tree_widget.get_context()
+		self.my_create_ticket_widget = create_ticket_widget.create_ticket_widget()
+		self.my_create_ticket_widget.show()
 
 		self.softwares_server = communicate.communicate_server()
 		self.softwares_server.start()

@@ -34,7 +34,7 @@ QPushButton::pressed, #classic_button::pressed{
 	background-color: #1d1d21;
 }
 
-QLineEdit, QSpinBox{
+QLineEdit, QSpinBox, QTextEdit{
 	background-color:#24242b;
 	padding: 4px;
 	border-radius: 5px;
@@ -195,6 +195,45 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 	background: none;
 }
+
+
+
+QScrollBar:horizontal{
+	height:6px;
+	background-color: rgba(0,0,0,50);
+	border-radius:3px;
+}
+
+QScrollBar::handle:horizontal {	
+	background-color:  rgba(255,255,255,30);
+	min-width: 30px;
+	border-radius: 3px;
+}
+QScrollBar::handle:horizontal:hover{	
+	background-color: rgba(255,255,255,50);
+}
+QScrollBar::handle:horizontal:pressed {	
+	background-color: rgba(255,255,255,50);
+}
+
+QScrollBar::sub-line:horizontal, QScrollBar::add-line:horizontal
+{
+      border: none;
+      background: none;
+      color: none;
+	  width:0px;
+}
+
+QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+	background: none;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+	background: none;
+}
+
+
+
+
 
 QProgressBar {
     height:6px;
@@ -378,4 +417,25 @@ QProgressBar::chunk {
 
 #wall_event_frame{
 	border-radius: 10px;
+}
+
+#drop_files_button{
+	background-color: transparent;
+	border: 2px solid gray;
+	border-style : dashed;
+	border-radius: 5;
+	color: gray;
+}
+
+#drop_files_button::hover{
+	background-color: #4b4b57;
+}
+
+#drop_files_button::pressed{
+	background-color: #1d1d21;
+}
+
+#file_frame{
+	background-color: #42424d;
+	border-radius: 3px;
 }

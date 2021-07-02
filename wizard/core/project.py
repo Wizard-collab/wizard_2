@@ -929,47 +929,59 @@ def update_users_list(users_ids_list):
 
 def create_ticket(title, message, export_version_id, destination_user=None, files=[]):
     ticket_id = None
-    export_id = get_export_version_data(export_version_id, 'export_id')
 
-    is_user = None
-    if not destination_user:
-        is_user=1
-    elif destination_user:
-        if site.get_user_row_by_name(destination_user):
+    do_creation = 1
+
+    if title == '':
+        logger.warning("Please enter a title")
+        do_creation = None
+    if message == '':
+        logger.warning("Please enter a message")
+        do_creation = None
+
+    if do_creation:
+
+        export_id = get_export_version_data(export_version_id, 'export_id')
+
+        is_user = None
+        if not destination_user:
             is_user=1
+        elif destination_user:
+            if site.get_user_row_by_name(destination_user):
+                is_user=1
 
-    copied_files = tools.copy_files(files, get_shared_files_folder())
+        copied_files = tools.copy_files(files, get_shared_files_folder())
 
-    if is_user:
-        if copied_files is not None:
-            if export_id:
-                variant_id = get_export_data(export_id, 'variant_id')
-                stage_id = get_variant_data(variant_id, 'stage_id')
-                if variant_id:
-                    ticket_id = db_utils.create_row('project',
-                                                        'tickets',
-                                                        ('creation_user',
-                                                            'creation_time',
-                                                            'title',
-                                                            'message',
-                                                            'state',
-                                                            'stage_id',
-                                                            'variant_id',
-                                                            'export_version_id',
-                                                            'destination_user', 
-                                                            'files'),
-                                                        (environment.get_user(),
-                                                            time.time(),
-                                                            title,
-                                                            message,
-                                                            True,
-                                                            stage_id,
-                                                            variant_id,
-                                                            export_version_id,
-                                                            destination_user,
-                                                            json.dumps(copied_files)))
-                    if ticket_id:
-                        logger.info("Ticket created")
+        if is_user:
+            if copied_files is not None:
+                if export_id:
+                    variant_id = get_export_data(export_id, 'variant_id')
+                    stage_id = get_variant_data(variant_id, 'stage_id')
+                    if variant_id:
+                        ticket_id = db_utils.create_row('project',
+                                                            'tickets',
+                                                            ('creation_user',
+                                                                'creation_time',
+                                                                'title',
+                                                                'message',
+                                                                'state',
+                                                                'stage_id',
+                                                                'variant_id',
+                                                                'export_version_id',
+                                                                'destination_user', 
+                                                                'files'),
+                                                            (environment.get_user(),
+                                                                time.time(),
+                                                                title,
+                                                                message,
+                                                                True,
+                                                                stage_id,
+                                                                variant_id,
+                                                                export_version_id,
+                                                                destination_user,
+                                                                json.dumps(copied_files)))
+                        if ticket_id:
+                            logger.info("Ticket created")
     return ticket_id
 
 def get_ticket_data(ticket_id, column='*'):

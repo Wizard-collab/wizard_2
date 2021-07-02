@@ -492,6 +492,7 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
 	ticket_id = project.create_ticket(title, message, export_version_id, destination_user, files)
 	if ticket_id:
 		events.add_ticket_openned_event(ticket_id)
+	return ticket_id
 
 def close_ticket(ticket_id):
 	if project.change_ticket_state(ticket_id, 0):
