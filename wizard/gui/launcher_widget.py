@@ -18,157 +18,162 @@ from wizard.core import launch
 # Wizard gui modules
 from wizard.gui import gui_utils
 
-red_button_css = '''#plain_red_button{
-                        border: 2px solid #f0605b;
-                        background-color: #f0605b;
-                    }
-
-                    #plain_red_button::hover{
-                        background-color: #ff817d;
-                        border: 2px solid #ff817d;
-                    }
-
-                    #plain_red_button::pressed{
-                        background-color: #ab4946;
-                        border: 2px solid #ab4946;
-                    }'''
-
-classic_button_css = '''QPushButton, #classic_button{
-                        border: 2px solid #42424d;
-                        background-color: #42424d;
-                        padding: 12px;
-                        border-radius: 5px;
-                    }
-
-                    QPushButton::hover, #classic_button::hover{
-                        border: 2px solid #4b4b57;
-                        background-color: #4b4b57;
-                    }
-
-                    QPushButton::pressed, #classic_button::pressed{
-                        border: 2px solid #1d1d21;
-                        background-color: #1d1d21;
-                    }'''
-
 class launcher_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(launcher_widget, self).__init__(parent)
+        
         self.stage_id = None
         self.stage_row = None
+        self.variant_row = None
+        self.work_env_row = None
+        self.version_row = None
 
+        self.refresh_variant_changed = None
         self.update_state = None
-        self.update_work_env = None
-        self.update_versions = None
-        self.update_infos = None
+        self.refresh_work_env_changed = None
+        self.refresh_version_changed = None
 
         self.build_ui()
         self.connect_functions()
-        self.fill_state_comboBox()
 
-    def refresh(self, stage_id):
+    def change_stage(self, stage_id):
         self.stage_id = stage_id
+        self.refresh_variants_hard()
+
+    def refresh(self):
+        self.refresh_variants_hard()
+
+    def refresh_variants_hard(self):
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
         else:
             self.stage_row = None
-        self.refresh_variants()
-
-    def refresh_variants(self):
-        self.update_state = None
-        self.update_work_env = None
-
         self.variant_comboBox.clear()
-        self.variants_dic = dict()
+        self.refresh_variant_changed = None
 
         if self.stage_row is not None:
-            self.setEnabled(True)
-            variants_rows = project.get_stage_childs(self.stage_id)
+            variant_rows = project.get_stage_childs(self.stage_row['id'])
+            if variant_rows is not None:
+                for variant_row in variant_rows:
+                    self.variant_comboBox.addItem(variant_row['name'])
+                default_variant_name = project.get_variant_data(self.stage_row['default_variant_id'], 'name')
+                self.variant_comboBox.setCurrentText(default_variant_name)
+        
+        self.refresh_variant_changed = 1
+        self.variant_changed(by_user=None)
 
-            for variant_row in variants_rows:
-                self.variants_dic[variant_row['name']] = variant_row['id']
-                self.variant_comboBox.addItem(variant_row['name'])
-
-            default_variant_row = project.get_variant_data(self.stage_row['default_variant_id'])
-            self.variant_comboBox.setCurrentText(default_variant_row['name'])
-
-        else:
-            self.setEnabled(False)
-            self.state_comboBox.setCurrentText('todo')
-
-        self.update_work_env = 1
-        self.update_state = 1
-        self.refresh_work_envs()
-
-    def refresh_work_envs(self):
-        if self.update_work_env:
-            self.update_versions = None
+    def variant_changed(self, by_user=1):
+        if self.refresh_variant_changed:
             self.variant_row = None
-            self.work_env_comboBox.clear()
-            
             if self.stage_row is not None:
+                self.variant_row = project.get_variant_by_name(self.stage_row['id'],
+                                                                self.variant_comboBox.currentText())
 
-                for software_name in assets_vars._stage_softwares_rules_dic_[self.stage_row['name']]:
+                if by_user:
+                    if self.variant_row is not None:
+                        project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
+
+        self.refresh_state()
+        self.refresh_work_envs_hard()
+
+    def refresh_state(self):
+        self.update_state = None
+        self.state_comboBox.setCurrentText('todo')
+
+        if self.variant_row is not None:
+            self.state_comboBox.setCurrentText(self.variant_row['state'])
+
+        self.update_state = 1
+
+    def refresh_work_envs_hard(self):
+        self.work_env_comboBox.clear()
+        self.refresh_work_env_changed = None
+
+        if self.variant_row is not None:
+            self.variant_row = project.get_variant_data(self.variant_row['id'])
+            for software_name in assets_vars._stage_softwares_rules_dic_[self.stage_row['name']]:
                     icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
                     self.work_env_comboBox.addItem(icon, software_name)
 
-                self.variant_row = project.get_variant_data(self.variants_dic[self.variant_comboBox.currentText()])
-                project.set_stage_default_variant(self.stage_id, self.variant_row['id'])
+            if self.variant_row['default_work_env_id'] is not None:
+                default_work_env_name = project.get_work_env_data(self.variant_row['default_work_env_id'], 'name')
+                self.work_env_comboBox.setCurrentText(default_work_env_name)
 
-                self.state_comboBox.setCurrentText(self.variant_row['state'])
+        self.refresh_work_env_changed = 1
+        self.work_env_changed(by_user=None)
 
-                if self.variant_row['default_work_env_id'] is not None:
-                    default_work_env_name = project.get_work_env_data(self.variant_row['default_work_env_id'], 'name')
-                    self.work_env_comboBox.setCurrentText(default_work_env_name)
-
-            self.update_versions = 1
-            self.refresh_versions(1)
-
-    def refresh_versions(self, set_last=None):
-        if self.update_versions:
-            self.update_infos = None
+    def work_env_changed(self, by_user=1):
+        if self.refresh_work_env_changed:
             self.work_env_row = None
-            self.version_comboBox.clear()
-            self.versions_dic = dict()
-
             if self.variant_row is not None:
-                self.work_env_row = project.get_work_env_by_name(self.variant_row['id'], self.work_env_comboBox.currentText())
-                if self.work_env_row is not None:
-                    project.set_variant_data(self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
-                    version_rows = project.get_work_versions(self.work_env_row['id'])
-                    for version_row in version_rows:
-                        self.versions_dic[version_row['name']] = version_row['id']
-                        self.version_comboBox.addItem(version_row['name'])
-                    if set_last:
-                        self.version_comboBox.setCurrentText(version_rows[-1]['name'])
-                else:
-                    self.version_comboBox.addItem('0001')
+                self.work_env_row = project.get_work_env_by_name(self.variant_row['id'],
+                                                                self.work_env_comboBox.currentText())
 
-            self.update_infos = 1
-            self.refresh_infos()
+                if by_user:
+                    if self.work_env_row is not None:
+                        project.set_variant_data(self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
 
-    def toggle_lock(self):
-        if self.work_env_row:
-            project.toggle_lock(self.work_env_row['id'])
-            self.refresh_infos()
+        self.refresh_versions_hard()
+
+    def refresh_versions_hard(self):
+        self.version_comboBox.clear()
+        self.refresh_version_changed = None
+
+        if self.work_env_row is not None:
+            version_rows = project.get_work_versions(self.work_env_row['id'])
+            for version_row in version_rows:
+                self.version_comboBox.addItem(version_row['name'])
+
+            self.version_comboBox.setCurrentText(version_rows[-1]['name'])
+
+        elif self.work_env_row == None and self.variant_row is not None:
+            self.version_comboBox.addItem('0001')
+
+        self.refresh_version_changed = 1
+        self.version_changed()
+
+    def refresh_versions_soft(self):
+
+        selected_version = self.version_comboBox.currentText()
+
+        self.version_comboBox.clear()
+        self.refresh_version_changed = None
+
+        if self.work_env_row is not None:
+            version_rows = project.get_work_versions(self.work_env_row['id'])
+            for version_row in version_rows:
+                self.version_comboBox.addItem(version_row['name'])
+
+            self.version_comboBox.setCurrentText(selected_version)
+
+        elif self.work_env_row == None and self.variant_row is not None:
+            self.version_comboBox.addItem('0001')
+
+        self.refresh_version_changed = 1
+        self.version_changed()
+
+    def version_changed(self):
+        if self.refresh_version_changed:
+            self.version_row = None
+            if self.work_env_row is not None:
+                self.version_row = project.get_work_version_by_name(self.work_env_row['id'], 
+                                                                    self.version_comboBox.currentText())
+        self.refresh_infos()
 
     def refresh_infos(self):
-        if self.update_infos:
-            if self.work_env_row:
-                self.version_id = self.versions_dic[self.version_comboBox.currentText()]
-                version_row = project.get_version_data(self.version_id)
-                self.user_label.setText(version_row['creation_user'])
-                self.comment_label.setText(version_row['comment'])
-                day, hour = tools.convert_time(version_row['creation_time'])
-                self.date_label.setText(f"{day} - {hour}")
-                self.refresh_screenshot(version_row['screenshot_path'])
-                self.refresh_lock_button()
-            else:
-                self.version_id = None
-                self.user_label.setText('')
-                self.comment_label.setText('')
-                self.date_label.setText('')
-                self.refresh_screenshot('')
-                self.refresh_lock_button()
+        if self.version_row:
+            self.user_label.setText(self.version_row['creation_user'])
+            self.comment_label.setText(self.version_row['comment'])
+            day, hour = tools.convert_time(self.version_row['creation_time'])
+            self.date_label.setText(f"{day} - {hour}")
+            self.refresh_screenshot(self.version_row['screenshot_path'])
+            self.refresh_lock_button()
+        else:
+            self.user_label.setText('')
+            self.comment_label.setText('')
+            self.date_label.setText('')
+            self.refresh_screenshot('')
+            self.refresh_lock_button()
 
     def refresh_screenshot(self, screenshot_path):
         if not os.path.isfile(screenshot_path):
@@ -178,73 +183,74 @@ class launcher_widget(QtWidgets.QWidget):
         gui_utils.round_corners_image(self.screenshot_label, image_bytes, (width, height), 10)
 
     def refresh_lock_button(self):
+        self.lock_button.setStyleSheet('')
+        self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
         if self.work_env_row is not None:
             lock_id = project.get_work_env_data(self.work_env_row['id'], 'lock_id')
             if lock_id is not None:
-                self.lock_button.setObjectName('plain_red_button')
-                self.lock_button.setStyleSheet(red_button_css)
+                css = "QPushButton{border: 2px solid #f0605b;background-color: #f0605b;}"
+                css += "QPushButton::hover{border: 2px solid #ff817d;background-color: #ff817d;}"
+                css += "QPushButton::pressed{border: 2px solid #ab4946;background-color: #ab4946;}"
+                self.lock_button.setStyleSheet(css)
                 self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
-            else:
-                self.lock_button.setObjectName('classic_button')
-                self.lock_button.setStyleSheet(classic_button_css)
-                self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
-        else:
-            self.lock_button.setObjectName('classic_button')
-            self.lock_button.setStyleSheet(classic_button_css)
-            self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
+
+    def toggle_lock(self):
+        if self.work_env_row is not None:
+            project.toggle_lock(self.work_env_row['id'])
+            self.refresh_lock_button()
 
     def launch(self):
         if self.variant_row is not None:
             if self.work_env_row is not None:
-                version_id = self.versions_dic[self.version_comboBox.currentText()]
-                launch.launch_work_version(version_id)
+                launch.launch_work_version(self.version_row['id'])
                 self.refresh_infos()
             else:
                 software_name = self.work_env_comboBox.currentText()
                 software_id = project.get_software_data_by_name(software_name, 'id')
                 work_env_id = assets.create_work_env(software_id, self.variant_row['id'])
                 project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
-                self.refresh_work_envs()
+                self.refresh_work_envs_hard()
                 self.launch()
 
-    def fill_state_comboBox(self):
-        self.state_comboBox.addItem('todo')
-        self.state_comboBox.addItem('wip')
-        self.state_comboBox.addItem('done')
-        self.state_comboBox.addItem('error')
-
-    def update_variant_state(self, state):
+    def state_changed(self, state):
         if self.update_state:
             if self.variant_row is not None:
                 project.set_variant_data(self.variant_row['id'], 'state', state)
+        self.update_state_comboBox_style()
 
     def update_state_comboBox_style(self):
         current_state = self.state_comboBox.currentText()
         if current_state == 'todo':
-            color = 'gray'
+            color = '#a8a8a8'
+            hover_color = '#bfbfbf'
         elif current_state == 'wip':
             color = '#f79360'
+            hover_color = '#fca97e'
         elif current_state == 'done':
-            color = '#9cf277'
+            color = '#98d47f'
+            hover_color = '#abe094'
         elif current_state == 'error':
             color = '#f0605b'
-        self.state_comboBox.setStyleSheet(f"background-color:{color};")
+            hover_color = '#f0817d'
+
+        css = "QComboBox{font:bold;background-color:%s;}"%color
+        css += "QComboBox::drop-down::hover{background-color:%s;}"%hover_color
+        self.state_comboBox.setStyleSheet(css)
 
     def create_variant(self):
         if self.stage_row is not None:
             self.variant_creation_widget = variant_creation_widget(self)
             if self.variant_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 variant_name = self.variant_creation_widget.name_field.text()
-                new_variant_id = assets.create_variant(variant_name, self.stage_id)
-                project.set_stage_default_variant(self.stage_id, new_variant_id)
-                self.refresh_variants()
+                new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
+                project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
+                self.refresh_variants_hard()
 
     def connect_functions(self):
-        self.state_comboBox.currentTextChanged.connect(self.update_state_comboBox_style)
-        self.state_comboBox.currentTextChanged.connect(self.update_variant_state)
-        self.variant_comboBox.currentTextChanged.connect(self.refresh_work_envs)
-        self.work_env_comboBox.currentTextChanged.connect(self.refresh_versions)
-        self.version_comboBox.currentTextChanged.connect(self.refresh_infos)
+        self.state_comboBox.currentTextChanged.connect(self.state_changed)
+        self.variant_comboBox.currentTextChanged.connect(self.variant_changed)
+        self.work_env_comboBox.currentTextChanged.connect(self.work_env_changed)
+        self.version_comboBox.currentTextChanged.connect(self.version_changed)
         self.launch_button.clicked.connect(self.launch)
         self.lock_button.clicked.connect(self.toggle_lock)
         self.add_variant_button.clicked.connect(self.create_variant)
@@ -272,6 +278,10 @@ class launcher_widget(QtWidgets.QWidget):
         self.state_comboBox = QtWidgets.QComboBox()
         self.state_comboBox.setFixedWidth(80)
         self.state_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
+        self.state_comboBox.addItem('todo')
+        self.state_comboBox.addItem('wip')
+        self.state_comboBox.addItem('done')
+        self.state_comboBox.addItem('error')
         self.variant_layout.addWidget(self.state_comboBox)
 
         self.add_variant_button = QtWidgets.QPushButton()

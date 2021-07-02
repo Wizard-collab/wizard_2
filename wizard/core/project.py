@@ -301,6 +301,17 @@ def add_variant(name, stage_id, comment):
     else:
         logger.warning(f"{name} already exists")
 
+def get_variant_by_name(stage_id, name, column='*'):
+    variant_row = db_utils.get_row_by_multiple_data('project', 
+                                                        'variants', 
+                                                        ('name', 'stage_id'), 
+                                                        (name, stage_id))
+    if variant_row and len(variant_row) >= 1:
+        return variant_row[0]
+    else:
+        logger.debug("Variant not found")
+        return None
+
 def get_all_variants(column='*'):
     variants_rows = db_utils.get_rows('project',
                                             'variants',
@@ -589,6 +600,17 @@ def get_work_versions(work_env_id, column='*'):
                                                         ('work_env_id', work_env_id),
                                                         column)
     return versions_rows
+
+def get_work_version_by_name(work_env_id, name, column='*'):
+    version_row = db_utils.get_row_by_multiple_data('project', 
+                                                        'versions', 
+                                                        ('name', 'work_env_id'), 
+                                                        (name, work_env_id))
+    if version_row and len(version_row) >= 1:
+        return version_row[0]
+    else:
+        logger.debug("Version not found")
+        return None
 
 def get_last_work_version(work_env_id, column='*'):
     versions_rows = db_utils.get_last_row_by_column_data('project',
