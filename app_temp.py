@@ -11,6 +11,8 @@ from wizard.gui import wall_widget
 from wizard.gui import logging_widget
 from wizard.gui import launcher_widget
 from wizard.gui import create_ticket_widget
+from wizard.gui import script_editor_widget
+from wizard.gui import ticket_widget
 
 import sys
 import time
@@ -71,7 +73,7 @@ class app():
 
 		with open('wizard/gui/stylesheet.css', 'r') as f:
 			self.app.setStyleSheet(f.read())
-
+		
 		if not user.user().get_psql_dns():
 			my_psql_widget = psql_widget.psql_widget()
 			if my_psql_widget.exec_() != QtWidgets.QDialog.Accepted:
@@ -103,7 +105,6 @@ class app():
 				sys.exit()
 
 		db_utils.modify_db_name('project', environment.get_project_name())
-
 		self.my_tree_widget = tree_widget.tree_widget()
 		self.my_user_widget = user_widget.user_widget()
 		self.my_quotes_widget = quotes_widget.quotes_widget()
@@ -120,10 +121,12 @@ class app():
 		self.my_tree_widget.get_context()
 		self.my_create_ticket_widget = create_ticket_widget.create_ticket_widget()
 		self.my_create_ticket_widget.show()
-
+		self.script_editor_widget = script_editor_widget.script_editor_widget()
+		self.script_editor_widget.show()
 		self.softwares_server = communicate.communicate_server()
 		self.softwares_server.start()
-
+		self.ticket_widget = ticket_widget.ticket_widget(1)
+		self.ticket_widget.show()
 
 
 		sys.exit(self.app.exec_())

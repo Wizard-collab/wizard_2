@@ -439,3 +439,7 @@ QProgressBar::chunk {
 	background-color: #42424d;
 	border-radius: 3px;
 }
+
+#ticket_header_frame{
+	background-color: #313139;
+}
