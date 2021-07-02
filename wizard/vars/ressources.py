@@ -5,6 +5,15 @@
 # Python modules
 import os
 
+# Softwares
+_maya_ = 'maya'
+_guerilla_render_ = 'guerilla_render'
+_substance_painter_ = 'substance_painter'
+_substance_designer_ = 'substance_designer'
+_nuke_ = 'nuke'
+_houdini_ = 'houdini'
+_blender_ = 'blender'
+
 _ressources_path_ = os.path.abspath('ressources')
 _icons_path_ = os.path.abspath('ressources/icons')
 _default_profile_ = os.path.join(_icons_path_, 'default_profile.png')
@@ -18,6 +27,12 @@ _warning_icon_ = os.path.join(_icons_path_, 'warning_icon.png')
 _close_icon_ = os.path.join(_icons_path_, 'close_hover.png')
 _admin_badge_ = os.path.join(_icons_path_, 'admin_badge.png')
 _rigth_arrow_icon_ = os.path.join(_icons_path_, 'right_arrow.png')
+_no_screenshot_ = os.path.join(_icons_path_, 'no_screenshot.png')
+
+# Lock icons
+_lock_icons_ = dict()
+_lock_icons_[1] = os.path.join(_icons_path_, 'locked.png')
+_lock_icons_[0] = os.path.join(_icons_path_, 'unlocked.png')
 
 # Domains icons
 _assets_icon_small_ = os.path.join(_icons_path_, 'assets_small.png')
@@ -38,3 +53,13 @@ _fx_icon_small_ = os.path.join(_icons_path_, 'fx_small.png')
 _lighting_icon_small_ = os.path.join(_icons_path_, 'lighting_small.png')
 _compositing_icon_small_ = os.path.join(_icons_path_, 'compositing_small.png')
 _camera_icon_small_ = os.path.join(_icons_path_, 'camera_small.png')
+
+# Softwares icons
+_sofwares_icons_dic_ = dict()
+_sofwares_icons_dic_[_maya_] = os.path.join(_icons_path_, 'maya.png')
+_sofwares_icons_dic_[_guerilla_render_] = os.path.join(_icons_path_, 'guerilla_render.png')
+_sofwares_icons_dic_[_substance_painter_] = os.path.join(_icons_path_, 'substance_painter.png')
+_sofwares_icons_dic_[_substance_designer_] = os.path.join(_icons_path_, 'substance_designer.png')
+_sofwares_icons_dic_[_nuke_] = os.path.join(_icons_path_, 'nuke.png')
+_sofwares_icons_dic_[_houdini_] = os.path.join(_icons_path_, 'houdini.png')
+_sofwares_icons_dic_[_blender_] = os.path.join(_icons_path_, 'blender.png')

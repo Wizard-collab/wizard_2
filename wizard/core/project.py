@@ -254,7 +254,7 @@ def set_stage_default_variant(stage_id, variant_id):
                         'stages',
                         ('default_variant_id', variant_id),
                         ('id', stage_id)):
-        logger.info('Default variant modified')
+        logger.debug('Default variant modified')
 
 def get_stage_data(stage_id, column='*'):
     stages_rows = db_utils.get_row_by_column_data('project',
@@ -286,12 +286,14 @@ def add_variant(name, stage_id, comment):
                                 'creation_user',
                                 'comment',
                                 'state',
+                                'default_work_env_id',
                                 'stage_id'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
                                 comment,
                                 'todo',
+                                None,
                                 stage_id))
         if variant_id:
             logger.info(f"Variant {name} added to project")
@@ -333,7 +335,7 @@ def set_variant_data(variant_id, column, data):
                             'variants',
                             (column, data),
                             ('id', variant_id)):
-        logger.info('Variant modified')
+        logger.debug('Variant modified')
         return 1
     else:
         return None
@@ -606,6 +608,17 @@ def get_work_env_data(work_env_id, column='*'):
         logger.error("Work env not found")
         return None
 
+def get_work_env_by_name(variant_id, name, column='*'):
+    work_env_row = db_utils.get_row_by_multiple_data('project', 
+                                                        'work_envs', 
+                                                        ('name', 'variant_id'), 
+                                                        (name, variant_id))
+    if work_env_row and len(work_env_row) >= 1:
+        return work_env_row[0]
+    else:
+        logger.debug("Work env not found")
+        return None
+
 def get_lock(work_env_id):
     current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
     work_env_lock_id = get_work_env_data(work_env_id, 'lock_id')
@@ -633,6 +646,17 @@ def set_work_env_lock(work_env_id, lock=1):
             return 1
         else:
             return None
+
+def toggle_lock(work_env_id):
+    current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+    lock_id = get_work_env_data(work_env_id, 'lock_id')
+    if lock_id == None:
+        set_work_env_lock(work_env_id)
+    elif lock_id == current_user_id:
+        set_work_env_lock(work_env_id, 0)
+    else:
+        lock_user_name = site.get_user_data(lock_id, 'user_name')
+        logger.warning(f"Work env locked by {lock_user_name}")
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None):
     version_id = db_utils.create_row('project',
@@ -745,6 +769,17 @@ def get_software_data(software_id, column='*'):
     softwares_rows = db_utils.get_row_by_column_data('project',
                                                         'softwares',
                                                         ('id', software_id),
+                                                        column)
+    if softwares_rows and len(softwares_rows) >= 1:
+        return softwares_rows[0]
+    else:
+        logger.error("Software not found")
+        return None
+
+def get_software_data_by_name(software_name, column='*'):
+    softwares_rows = db_utils.get_row_by_column_data('project',
+                                                        'softwares',
+                                                        ('name', software_name),
                                                         column)
     if softwares_rows and len(softwares_rows) >= 1:
         return softwares_rows[0]
@@ -1158,6 +1193,7 @@ def create_variants_table(database):
                                         creation_user text NOT NULL,
                                         comment text,
                                         state text NOT NULL,
+                                        default_work_env_id integer,
                                         stage_id integer NOT NULL,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""

@@ -27,6 +27,9 @@ from wizard.gui import confirm_widget
 from wizard.gui import gui_utils
 
 class tree_widget(QtWidgets.QWidget):
+
+    stage_changed = pyqtSignal(object)
+
     def __init__(self, parent=None):
         super(tree_widget, self).__init__(parent)
 
@@ -39,7 +42,6 @@ class tree_widget(QtWidgets.QWidget):
         self.build_ui()
         self.connect_functions()
         self.refresh()
-        self.get_context()
 
     def build_ui(self):
         self.icons_dic = dict()
@@ -107,9 +109,19 @@ class tree_widget(QtWidgets.QWidget):
         self.search_thread = search_thread()
         self.search_thread.item_signal.connect(self.add_search_item)
         self.tree.itemDoubleClicked.connect(self.double_click)
+        self.tree.currentItemChanged.connect(self.item_changed)
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
         self.refresh_tree_button.clicked.connect(self.refresh)
         self.clear_search_button.clicked.connect(self.search_bar.clear)
+
+    def item_changed(self, item):
+        if item:
+            if item.instance_type == 'stage':
+                self.stage_changed.emit(item.instance_id)
+            else:
+                self.stage_changed.emit(None)
+        else:
+            self.stage_changed.emit(None)
 
     def init_tree(self):
         self.set_context()
@@ -333,6 +345,7 @@ class tree_widget(QtWidgets.QWidget):
         self.tree.setCurrentItem(item)
         if expand is not None:
             item.setExpanded(expand)
+        self.item_changed(item)
 
     def apply_search(self):
         search = self.search_bar.text()

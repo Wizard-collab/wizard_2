@@ -17,19 +17,19 @@ QLabel{
 	background-color: transparent;
 }
 
-QPushButton{
+QPushButton, #classic_button{
 	border: 2px solid #42424d;
 	background-color: #42424d;
 	padding: 12px;
 	border-radius: 5px;
 }
 
-QPushButton::hover{
+QPushButton::hover, #classic_button::hover{
 	border: 2px solid #4b4b57;
 	background-color: #4b4b57;
 }
 
-QPushButton::pressed{
+QPushButton::pressed, #classic_button::pressed{
 	border: 2px solid #1d1d21;
 	background-color: #1d1d21;
 }

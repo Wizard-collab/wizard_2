@@ -33,6 +33,16 @@ def convert_image_to_bytes(image_file, resize=100):
 	imagebytes = stream.getvalue()
 	return imagebytes
 
+def convert_screenshot(image_file, resize=300):
+	# Resize the given file to 100*100
+	# and return the png bytes
+	image = Image.open(image_file)
+	image, width, height = resize_image_with_fixed_width(image, resize)
+	stream = io.BytesIO()
+	image.save(stream, format="PNG")
+	imagebytes = stream.getvalue()
+	return imagebytes, width, height
+
 def convert_image_to_str_data(image_file, resize=100):
 	encoded = base64.b64encode(convert_image_to_bytes(image_file, resize)).decode('ascii')
 	return encoded
@@ -45,4 +55,10 @@ def resize_image(image, fixed_height):
 	width_size = int((float(image.size[0]) * float(height_percent)))
 	image = image.resize((width_size, fixed_height), Image.ANTIALIAS)
 	return image
+
+def resize_image_with_fixed_width(image, fixed_width):
+	width_percent = (fixed_width / float(image.size[0]))
+	height_size = int((float(image.size[1]) * float(width_percent)))
+	image = image.resize((fixed_width, height_size), Image.ANTIALIAS)
+	return image, fixed_width, height_size
 	

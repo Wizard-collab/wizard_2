@@ -8,8 +8,8 @@ import socket
 import time
 import traceback
 import json
-import logger
-logger.basicConfig(level=logger.INFO)
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # Handle ConnectionRefusedError in python 2
 if sys.version_info[0] == 2:
@@ -30,10 +30,10 @@ def send_signal(signal_as_str):
         server.close()
         return returned
     except ConnectionRefusedError:
-        logger.error("No wizard local server found. Please verify if Wizard is openned")
+        logging.error("No wizard local server found. Please verify if Wizard is openned")
         return None
     except socket.timeout:
-        logger.error("Wizard has been too long to give a response, please retry.")
+        logging.error("Wizard has been too long to give a response, please retry.")
         return None
 
 def add_version(work_env_id):

@@ -55,6 +55,27 @@ def round_image(label, image_bytes, radius):
         painter.drawPixmap(0, 0, pixmap)
         label.setPixmap(label.target)
 
+def round_corners_image(label, image_bytes, size_tuple, radius):
+        label.Antialiasing = True
+        label.radius = radius
+        label.target = QtGui.QPixmap(label.size())
+        label.target.fill(QtCore.Qt.transparent)
+        pixmap = QtGui.QPixmap()
+        pixmap.loadFromData(image_bytes, 'png')
+        pixmap = pixmap.scaled(
+            size_tuple[0], size_tuple[1], QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
+        painter = QtGui.QPainter(label.target)
+        if label.Antialiasing:
+            painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
+            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
+        path = QtGui.QPainterPath()
+        path.addRoundedRect(
+            0, 0, size_tuple[0], size_tuple[1], label.radius, label.radius)
+        painter.setClipPath(path)
+        painter.drawPixmap(0, 0, pixmap)
+        label.setPixmap(label.target)
+
 class ElidedLabel(QtWidgets.QLabel):
     _width = _text = _elided = None
 

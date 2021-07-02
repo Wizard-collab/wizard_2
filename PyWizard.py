@@ -84,3 +84,5 @@ while not user.get_project():
 		user.log_project(project_name, project_password)
 
 db_server.project_name = environment.get_project_name()
+softwares_server = communicate.communicate_server()
+softwares_server.start()
