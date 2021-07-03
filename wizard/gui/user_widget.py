@@ -21,6 +21,8 @@ class user_widget(QtWidgets.QFrame):
         self.refresh()
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setMinimumWidth(300)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(12)
         self.setLayout(self.main_layout)

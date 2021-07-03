@@ -95,6 +95,37 @@ QCheckBox::indicator:checked {
     image: url(ressources/icons/checkBox.png);
 }
 
+QListView {
+	background-color:#24242b;
+	show-decoration-selected: 0;
+	outline:none;
+	padding:10px;
+}
+ 
+QListView::item {
+	padding:5px;
+	border-radius:5px;
+	margin: 1px;
+	margin-right: 10px;
+}
+ 
+QListView::item:hover {
+	background-color:rgba(255,255,255,10);
+}
+ 
+QListView::item:selected {
+	background-color:rgba(255,255,255,30);
+}
+ 
+QListView::item:selected:active{
+	background-color:rgba(255,255,255,30);
+}
+ 
+QListView::item:selected:!active {
+background-color:rgba(255,255,255,30);
+	color:white;
+}
+
 QTreeView {
 	background-color:#24242b;
 	show-decoration-selected: 0;
@@ -240,6 +271,36 @@ QProgressBar {
 QProgressBar::chunk {
     background-color: #7785de;
 	border-radius:3px;
+}
+
+QHeaderView::section {
+    background-color: #24242b;
+    color: gray;
+    padding-left: 8px;
+    border: none;
+    font: bold;
+}
+
+#transparent_widget{
+	background: transparent;
+}
+
+#list_widget_frame{
+	background-color: #24242b;
+}
+
+#list_tree_view{
+	padding: 0px;
+	alternate-background-color: rgba(255,255,255,8);
+}
+
+#list_tree_view::item{
+	margin: 0px;
+	border-radius: 0px;
+}
+
+#main_widget{
+	background-color: #19191f;
 }
 
 #wall_scroll_area, #tickets_scroll_area {

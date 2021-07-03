@@ -24,6 +24,7 @@ class wall_widget(QtWidgets.QWidget):
         self.refresh()
 
     def build_ui(self):
+        self.setMaximumWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
         self.main_layout.setContentsMargins(0,0,0,0)

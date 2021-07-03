@@ -24,7 +24,7 @@ class custom_handler(QtCore.QObject, logging.Handler):
     def emit(self, record):
         self.log_record.emit((record.levelname, self.format(record)))
 
-class logging_widget(QtWidgets.QWidget):
+class logging_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(logging_widget, self).__init__(parent)
         self.custom_handler = custom_handler(self)
@@ -34,7 +34,7 @@ class logging_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(2,2,2,2)
+        self.main_layout.setContentsMargins(6,6,6,6)
         self.setLayout(self.main_layout)
         self.log_label = gui_utils.ElidedLabel()
         self.main_layout.addWidget(self.log_label)

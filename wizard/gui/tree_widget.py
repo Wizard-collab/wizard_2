@@ -26,9 +26,9 @@ from wizard.gui import menu_widget
 from wizard.gui import confirm_widget
 from wizard.gui import gui_utils
 
-class tree_widget(QtWidgets.QWidget):
+class tree_widget(QtWidgets.QFrame):
 
-    stage_changed = pyqtSignal(object)
+    stage_changed_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(tree_widget, self).__init__(parent)
@@ -65,6 +65,7 @@ class tree_widget(QtWidgets.QWidget):
         self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_small_)
         self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_small_)
 
+        self.setFixedWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(2)
@@ -117,11 +118,11 @@ class tree_widget(QtWidgets.QWidget):
     def item_changed(self, item):
         if item:
             if item.instance_type == 'stage':
-                self.stage_changed.emit(item.instance_id)
+                self.stage_changed_signal.emit(item.instance_id)
             else:
-                self.stage_changed.emit(None)
+                self.stage_changed_signal.emit(None)
         else:
-            self.stage_changed.emit(None)
+            self.stage_changed_signal.emit(None)
 
     def init_tree(self):
         self.set_context()

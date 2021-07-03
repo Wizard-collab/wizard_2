@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 import os
 
 # Wizard modules
@@ -18,7 +19,10 @@ from wizard.core import launch
 # Wizard gui modules
 from wizard.gui import gui_utils
 
-class launcher_widget(QtWidgets.QWidget):
+class launcher_widget(QtWidgets.QFrame):
+
+    work_env_changed_signal = pyqtSignal(object)
+
     def __init__(self, parent = None):
         super(launcher_widget, self).__init__(parent)
         
@@ -35,6 +39,7 @@ class launcher_widget(QtWidgets.QWidget):
 
         self.build_ui()
         self.connect_functions()
+        self.change_stage(None)
 
     def change_stage(self, stage_id):
         self.stage_id = stage_id
@@ -112,7 +117,7 @@ class launcher_widget(QtWidgets.QWidget):
                 if by_user:
                     if self.work_env_row is not None:
                         project.set_variant_data(self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
-
+                
         self.refresh_versions_hard()
 
     def refresh_versions_hard(self):
@@ -120,6 +125,7 @@ class launcher_widget(QtWidgets.QWidget):
         self.refresh_version_changed = None
 
         if self.work_env_row is not None:
+            self.work_env_changed_signal.emit(self.work_env_row['id'])
             version_rows = project.get_work_versions(self.work_env_row['id'])
             for version_row in version_rows:
                 self.version_comboBox.addItem(version_row['name'])
@@ -128,6 +134,7 @@ class launcher_widget(QtWidgets.QWidget):
 
         elif self.work_env_row == None and self.variant_row is not None:
             self.version_comboBox.addItem('0001')
+            self.work_env_changed_signal.emit(None)
 
         self.refresh_version_changed = 1
         self.version_changed()
@@ -256,6 +263,7 @@ class launcher_widget(QtWidgets.QWidget):
         self.add_variant_button.clicked.connect(self.create_variant)
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
@@ -301,7 +309,7 @@ class launcher_widget(QtWidgets.QWidget):
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
-        self.comment_label = QtWidgets.QLabel("Retake mdr lol prout proueozj foezifj eoifjzef")
+        self.comment_label = QtWidgets.QLabel()
         self.comment_label.setWordWrap(True)
         self.main_layout.addWidget(self.comment_label)
 
@@ -312,11 +320,11 @@ class launcher_widget(QtWidgets.QWidget):
         self.version_infos_widget.setLayout(self.version_infos_layout)
         self.main_layout.addWidget(self.version_infos_widget)
 
-        self.date_label = QtWidgets.QLabel('23/06/1995 - 23:15')
+        self.date_label = QtWidgets.QLabel()
         self.date_label.setObjectName('gray_label')
         self.version_infos_layout.addWidget(self.date_label)
 
-        self.user_label = QtWidgets.QLabel('j.smith')
+        self.user_label = QtWidgets.QLabel()
         self.version_infos_layout.addWidget(self.user_label)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)

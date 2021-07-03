@@ -166,6 +166,7 @@ class ticket_widget(QtWidgets.QWidget):
         self.date_label = QtWidgets.QLabel()
         self.date_label.setObjectName('gray_label')
         self.user_infos_layout.addWidget(self.date_label)
+        self.user_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed))
 
         self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
