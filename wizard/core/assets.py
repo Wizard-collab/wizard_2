@@ -498,6 +498,10 @@ def close_ticket(ticket_id):
 	if project.change_ticket_state(ticket_id, 0):
 		events.add_ticket_closed_event(ticket_id)
 
+def open_ticket(ticket_id):
+	if project.change_ticket_state(ticket_id, 1):
+		events.add_ticket_openned_event(ticket_id)
+
 def get_domain_path(domain_id):
 	dir_name = None
 	domain_name = project.get_domain_data(domain_id, 'name')

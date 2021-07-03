@@ -17,19 +17,19 @@ QLabel{
 	background-color: transparent;
 }
 
-QPushButton, #classic_button{
+QPushButton, QToolButton, #classic_button{
 	border: 2px solid #42424d;
 	background-color: #42424d;
 	padding: 12px;
 	border-radius: 5px;
 }
 
-QPushButton::hover, #classic_button::hover{
+QPushButton::hover, QToolButton::hover, #classic_button::hover{
 	border: 2px solid #4b4b57;
 	background-color: #4b4b57;
 }
 
-QPushButton::pressed, #classic_button::pressed{
+QPushButton::pressed, QToolButton::pressed, #classic_button::pressed{
 	border: 2px solid #1d1d21;
 	background-color: #1d1d21;
 }
@@ -231,10 +231,6 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 	background: none;
 }
 
-
-
-
-
 QProgressBar {
     height:6px;
 	background-color: rgba(0,0,0,50);
@@ -244,6 +240,10 @@ QProgressBar {
 QProgressBar::chunk {
     background-color: #7785de;
 	border-radius:3px;
+}
+
+#wall_scroll_area, #tickets_scroll_area {
+	background-color: #24242b;
 }
 
 #gray_label{
@@ -411,9 +411,6 @@ QProgressBar::chunk {
 	border-radius: 5px;
 }
 
-#wall_scrollArea_widget{
-	background-color: #24242b;
-}
 
 #wall_event_frame{
 	border-radius: 10px;
@@ -440,6 +437,22 @@ QProgressBar::chunk {
 	border-radius: 3px;
 }
 
+#file_button{
+	padding: 2px;
+	border-radius: 3px;
+}
+
 #ticket_header_frame{
-	background-color: #313139;
+	border-bottom: 1px solid #33333b;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+#ticket_content_widget{
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+#ticket_widget{
+	border-radius: 10px;
 }

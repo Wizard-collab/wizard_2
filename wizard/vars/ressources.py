@@ -30,6 +30,7 @@ _admin_badge_ = os.path.join(_icons_path_, 'admin_badge.png')
 _rigth_arrow_icon_ = os.path.join(_icons_path_, 'right_arrow.png')
 _no_screenshot_ = os.path.join(_icons_path_, 'no_screenshot.png')
 _dragdrop_ = os.path.join(_icons_path_, 'dragdrop.png')
+_file_icon_ = os.path.join(_icons_path_, 'file.png')
 
 # Lock icons
 _lock_icons_ = dict()

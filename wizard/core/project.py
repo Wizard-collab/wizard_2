@@ -1019,6 +1019,12 @@ def get_all_openned_tickets(column='*'):
                                                         column)
     return tickets_rows
 
+def get_all_tickets(column='*'):
+    tickets_rows = db_utils.get_rows('project',
+                                        'tickets',
+                                        column)
+    return tickets_rows
+
 def remove_ticket(ticket_id):
     success = None
     if site.is_admin():

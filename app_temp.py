@@ -12,7 +12,7 @@ from wizard.gui import logging_widget
 from wizard.gui import launcher_widget
 from wizard.gui import create_ticket_widget
 from wizard.gui import script_editor_widget
-from wizard.gui import ticket_widget
+from wizard.gui import tickets_widget
 
 import sys
 import time
@@ -105,13 +105,16 @@ class app():
 				sys.exit()
 
 		db_utils.modify_db_name('project', environment.get_project_name())
+		'''
 		self.my_tree_widget = tree_widget.tree_widget()
 		self.my_user_widget = user_widget.user_widget()
 		self.my_quotes_widget = quotes_widget.quotes_widget()
 		self.my_user_widget.show()
 		self.my_quotes_widget.show()
+		'''
 		self.my_wall_widget = wall_widget.wall_widget()
 		self.my_wall_widget.show()
+		'''
 		self.my_logging_widget = logging_widget.logging_widget()
 		self.my_logging_widget.show()
 		self.my_launcher_widget = launcher_widget.launcher_widget()
@@ -119,14 +122,17 @@ class app():
 		self.my_tree_widget.show()
 		self.my_launcher_widget.show()
 		self.my_tree_widget.get_context()
+		'''
 		self.my_create_ticket_widget = create_ticket_widget.create_ticket_widget()
 		self.my_create_ticket_widget.show()
+		'''
 		self.script_editor_widget = script_editor_widget.script_editor_widget()
 		self.script_editor_widget.show()
 		self.softwares_server = communicate.communicate_server()
 		self.softwares_server.start()
-		self.ticket_widget = ticket_widget.ticket_widget(1)
-		self.ticket_widget.show()
+		'''
+		self.tickets_widget = tickets_widget.tickets_widget()
+		self.tickets_widget.show()
 
 
 		sys.exit(self.app.exec_())

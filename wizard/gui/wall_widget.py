@@ -32,7 +32,7 @@ class wall_widget(QtWidgets.QWidget):
         self.wall_scrollArea = QtWidgets.QScrollArea()
 
         self.wall_scrollArea_widget = QtWidgets.QWidget()
-        self.wall_scrollArea_widget.setObjectName('wall_scrollArea_widget')
+        self.wall_scrollArea_widget.setObjectName('wall_scroll_area')
         self.wall_scrollArea_layout = QtWidgets.QVBoxLayout()
         self.wall_scrollArea_layout.setSpacing(6)
         self.wall_scrollArea_widget.setLayout(self.wall_scrollArea_layout)
