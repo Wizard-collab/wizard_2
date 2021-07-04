@@ -95,6 +95,25 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_row = event_row
         self.build_ui()
         self.fill_ui()
+    
+    def fill_ui(self):
+        profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
+        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_image), 40)
+        self.user_name_label.setText(self.event_row['creation_user'])
+        self.event_title_label.setText(self.event_row['title'])
+        self.event_content_label.setText(self.event_row['message'])
+        self.action_button_button.setText('View')
+        
+        if self.event_row['type'] == 'creation':
+            profile_color = '#77c5f2'
+        elif self.event_row['type'] == 'export':
+            profile_color = '#9cf277'
+        elif 'ticket' in self.event_row['type']:
+            profile_color = '#f79360'
+        elif self.event_row['type'] == 'archive':
+            profile_color = '#f0605b'
+
+        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -160,24 +179,3 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.action_button_button.setObjectName('blue_text_button')
         self.buttons_layout.addWidget(self.action_button_button)
-
-    def fill_ui(self):
-        profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
-        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_image), 40)
-        self.user_name_label.setText(self.event_row['creation_user'])
-        self.event_title_label.setText(self.event_row['title'])
-        self.event_content_label.setText(self.event_row['message'])
-        self.action_button_button.setText('View')
-        
-        if self.event_row['type'] == 'creation':
-            profile_color = '#77c5f2'
-        elif self.event_row['type'] == 'export':
-            profile_color = '#9cf277'
-        elif 'ticket' in self.event_row['type']:
-            profile_color = '#f79360'
-        elif self.event_row['type'] == 'archive':
-            profile_color = '#f0605b'
-
-        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
-
-

@@ -40,6 +40,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.build_ui()
         self.connect_functions()
         self.change_stage(None)
+        self.update_state_comboBox_style()
 
     def change_stage(self, stage_id):
         self.stage_id = stage_id
