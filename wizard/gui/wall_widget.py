@@ -19,9 +19,14 @@ from wizard.gui import gui_utils
 class wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(wall_widget, self).__init__(parent)
+        self.last_time = 0
         self.ticket_ids = []
         self.build_ui()
+        self.connect_functions()
         self.refresh()
+
+    def connect_functions(self):
+        self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
 
     def build_ui(self):
         self.setMaximumWidth(300)
@@ -31,6 +36,7 @@ class wall_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.wall_scrollArea = QtWidgets.QScrollArea()
+        self.wall_scrollBar = self.wall_scrollArea.verticalScrollBar()
 
         self.wall_scrollArea_widget = QtWidgets.QWidget()
         self.wall_scrollArea_widget.setObjectName('wall_scroll_area')
@@ -46,9 +52,6 @@ class wall_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.wall_scrollArea)
 
     def refresh(self):
-
-        self.last_time = 0
-
         for event_row in project.get_all_events():
             if event_row['id'] not in self.ticket_ids:
                 if event_row['creation_time']-self.last_time > 350:

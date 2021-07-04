@@ -28,13 +28,13 @@ class user_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.profile_picture = QtWidgets.QLabel()
-        self.profile_picture.setFixedSize(70,70)
+        self.profile_picture.setFixedSize(50,50)
         self.main_layout.addWidget(self.profile_picture)
 
         self.infos_frame = QtWidgets.QFrame()
         self.infos_layout = QtWidgets.QVBoxLayout()
         self.infos_layout.setContentsMargins(0,0,0,0)
-        self.infos_layout.setSpacing(10)
+        self.infos_layout.setSpacing(4)
         self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.infos_layout.addWidget(QtWidgets.QLabel(environment.get_user()))
@@ -88,6 +88,6 @@ class user_widget(QtWidgets.QFrame):
         self.admin_badge_label.setVisible(user_row['administrator'])
         gui_utils.round_image(self.profile_picture,
                                 image.convert_str_data_to_image_bytes(user_row['profile_picture']),
-                                70)
+                                50)
 
     

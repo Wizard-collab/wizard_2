@@ -4,6 +4,11 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import time
+
+# Wizard modules
+from wizard.core import custom_logger
+logger = custom_logger.get_logger()
 
 # Wizard gui modules
 from wizard.gui import tree_widget
@@ -28,12 +33,21 @@ class main_widget(QtWidgets.QWidget):
 	def connect_functions(self):
 		self.tree_widget.stage_changed_signal.connect(self.stage_changed)
 		self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
+		self.refresh_button.clicked.connect(self.refresh)
 
 	def stage_changed(self, stage_id):
 		self.launcher_widget.change_stage(stage_id)
 
 	def work_env_changed(self, work_env_id):
 		pass
+
+	def refresh(self):
+		start_time = time.time()
+		self.tree_widget.refresh()
+		self.launcher_widget.refresh()
+		self.user_widget.refresh()
+		self.wall_widget.refresh()
+		logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
 	def build_ui(self):
 		self.setObjectName('main_widget')
@@ -85,4 +99,7 @@ class main_widget(QtWidgets.QWidget):
 		self.contents_layout.addWidget(self.wall_widget)
 
 		self.main_layout.addWidget(self.logging_widget)
+
+		self.refresh_button = QtWidgets.QPushButton('REFRESH')
+		self.main_layout.addWidget(self.refresh_button)
 
