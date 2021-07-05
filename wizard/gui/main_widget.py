@@ -18,6 +18,7 @@ from wizard.gui import launcher_widget
 from wizard.gui import wall_widget
 from wizard.gui import user_widget
 from wizard.gui import quotes_widget
+from wizard.gui import shelf_widget
 from wizard.gui import logging_widget
 
 class main_widget(QtWidgets.QWidget):
@@ -28,6 +29,7 @@ class main_widget(QtWidgets.QWidget):
 		self.wall_widget = wall_widget.wall_widget(self)
 		self.user_widget = user_widget.user_widget(self)
 		self.quotes_widget = quotes_widget.quotes_widget(self)
+		self.shelf_widget = shelf_widget.shelf_widget(self)
 		self.logging_widget = logging_widget.logging_widget(self)
 		self.build_ui()
 		self.init_gui_server()
@@ -59,10 +61,18 @@ class main_widget(QtWidgets.QWidget):
 
 	def refresh(self):
 		start_time = time.time()
+		start_tree = time.time()
 		self.tree_widget.refresh()
+		logger.info(f"Refresh tree : {str(time.time()-start_tree)}")
+		start_launcher = time.time()
 		self.launcher_widget.refresh()
+		logger.info(f"Refresh launcher : {str(time.time()-start_launcher)}")
+		start_user = time.time()
 		self.user_widget.refresh()
+		logger.info(f"Refresh user : {str(time.time()-start_user)}")
+		start_wall = time.time()
 		self.wall_widget.refresh()
+		logger.info(f"Refresh wall : {str(time.time()-start_wall)}")
 		logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
 	def build_ui(self):
@@ -97,9 +107,11 @@ class main_widget(QtWidgets.QWidget):
 		self.header_layout.setContentsMargins(0,0,0,0)
 		self.header_widget.setLayout(self.header_layout)
 		self.contents_1_layout.addWidget(self.header_widget)
+		self.contents_1_layout.addWidget(self.shelf_widget)
 
 		self.header_layout.addWidget(self.user_widget)
-		self.header_layout.addWidget(self.quotes_widget)
+		self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+		#self.header_layout.addWidget(self.quotes_widget)
 
 		self.contents_2_widget = QtWidgets.QWidget()
 		self.contents_2_widget.setObjectName('main_widget')

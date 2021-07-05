@@ -146,6 +146,7 @@ class launcher_widget(QtWidgets.QFrame):
                 for version_row in version_rows:
                     if version_row['name'] not in all_items:
                         self.version_comboBox.addItem(version_row['name'])
+                self.version_comboBox.setCurrentText(version_rows[-1]['name'])
 
     def refresh_versions_hard(self):
         self.version_comboBox.clear()

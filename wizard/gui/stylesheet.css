@@ -518,3 +518,19 @@ QHeaderView::section {
 #ticket_widget{
 	border-radius: 10px;
 }
+
+#shelf_script_button{
+	padding: 2px;
+	background-color: transparent;
+	border: none;
+	font-size: 10px;
+	color: gray;
+}
+
+#shelf_script_button::hover{
+	color: white;
+}
+
+#shelf_script_button::pressed{
+	color: #1d1d21;
+}

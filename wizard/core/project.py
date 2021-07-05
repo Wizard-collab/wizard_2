@@ -1081,9 +1081,13 @@ def add_shelf_script(name,
                         py_file,
                         only_subprocess=0,
                         icon=ressources._default_script_shelf_icon_):
+    if only_subprocess == 0:
+        only_subprocess = False
+    else:
+        only_subprocess = True
     shelf_script_id = None
     if not db_utils.check_existence('project', 'shelf_scripts', 'name', name):
-        if os.path.isfile(icon):
+        if not os.path.isfile(icon):
             icon = ressources._default_script_shelf_icon_
 
         shelf_script_id = db_utils.create_row('project',
@@ -1106,16 +1110,22 @@ def add_shelf_script(name,
         logger.warning(f"{name} already exists")
     return shelf_script_id
 
-def get_shelf_script_data(name, column='*'):
+def get_shelf_script_data(script_id, column='*'):
     shelf_scripts_rows = db_utils.get_row_by_column_data('project',
                                                         'shelf_scripts',
-                                                        ('name', name),
+                                                        ('id', script_id),
                                                         column)
     if shelf_scripts_rows and len(shelf_scripts_rows) >= 1:
         return shelf_scripts_rows[0]
     else:
         logger.error("Shelf script not found")
         return None
+
+def get_all_shelf_scripts(column='*'):
+    shelf_scripts_rows = db_utils.get_rows('project',
+                                            'shelf_scripts',
+                                            column)
+    return shelf_scripts_rows
 
 def get_database_file(project_path):
     if project_path:

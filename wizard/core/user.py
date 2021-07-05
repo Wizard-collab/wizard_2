@@ -84,58 +84,6 @@ class user:
             logger.info("No postgreSQL DNS set")
             return None
 
-    def add_shelf_script(self,
-                            name,
-                            py_file,
-                            only_subprocess=0,
-                            icon=ressources._default_script_shelf_icon_):
-        # This function store a new shelf script in user context
-        # it adds a dictionnary key in user preferences.yaml
-        # The icon is stored as file in ~/Documents/wizard/icons
-        # The script ( .py ) is stored as file in ~/Documents/wizard/scripts
-        if name not in self.prefs_dic[user_vars._scripts_].keys():
-            if not os.path.isfile(icon):
-                logger.warning(f"{icon} doesn't exists, assigning default icon")
-                icon = ressources._default_script_shelf_icon_
-            icon_name = os.path.basename(icon)
-            destination_icon = os.path.join(user_vars._icons_path_, icon_name)
-            icon_file = os.path.normpath(tools.get_filename_without_override(destination_icon))
-            with open(icon_file, 'wb') as f:
-                f.write(image.convert_image_to_bytes(icon))
-            self.prefs_dic[user_vars._scripts_][name]=dict()
-            self.prefs_dic[user_vars._scripts_][name]['name'] = name
-            self.prefs_dic[user_vars._scripts_][name]['py_file'] = py_file
-            self.prefs_dic[user_vars._scripts_][name]['only_subprocess'] = only_subprocess
-            self.prefs_dic[user_vars._scripts_][name]['icon'] = icon_file
-            self.write_prefs_dic()
-            logger.info("Shelf script created")
-            return 1
-        else:
-            logger.warning(f"{name} already exists")
-            return 0
-
-    def get_shelf_script_data(self, name, column=None):
-        # Return the data of the given shelf script name
-        # To match the 'project' database system, the icon
-        # stored as file is readen and returned as bytes
-        if name in self.prefs_dic[user_vars._scripts_].keys():
-            script_dic = self.prefs_dic[user_vars._scripts_][name]
-            icon = self.prefs_dic[user_vars._scripts_][name]['icon']
-            if not os.path.isfile(icon):
-                icon = ressources._default_script_shelf_icon_
-            image_bytes = image.convert_image_to_bytes(icon)
-            self.prefs_dic[user_vars._scripts_][name]['icon'] = image_bytes
-            if column:
-                if column in self.prefs_dic[user_vars._scripts_][name].keys():
-                    return self.prefs_dic[user_vars._scripts_][name][column]
-                else:
-                    logger.warning(f"{data} column doesn't seems to exists")
-            else:
-                return self.prefs_dic[user_vars._scripts_][name]
-        else:
-            logger.warning(f"Script {name} not found")
-            return None
-
     def add_context(self, context_dic):
         self.prefs_dic[user_vars._tree_context_][environment.get_project_name()] = context_dic
         self.write_prefs_dic()
@@ -156,7 +104,6 @@ class user:
         if not os.path.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
-            self.prefs_dic[user_vars._scripts_] = dict()
             self.prefs_dic[user_vars._tree_context_] = dict()
             self.write_prefs_dic()
         else:
