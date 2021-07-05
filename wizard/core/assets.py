@@ -42,6 +42,9 @@ from wizard.core import game
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
+# Wizard gui modules
+from wizard.gui import gui_server
+
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -55,6 +58,8 @@ def create_domain(name):
 			if not tools.create_folder(dir_name):
 				project.remove_domain(domain_id)
 				domain_id = None
+			else:
+				gui_server.refresh_ui()
 	else:
 		logger.warning(f"{name} contains illegal characters")
 	return domain_id
@@ -68,6 +73,7 @@ def archive_domain(domain_id):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_domain(domain_id)
@@ -90,6 +96,7 @@ def create_category(name, domain_id):
 				else:
 					events.add_creation_event('category', category_id)
 					game.add_xps(2)
+					gui_server.refresh_ui()
 		else:
 			logger.error("Can't create category")
 	else:
@@ -108,6 +115,7 @@ def archive_category(category_id):
 					logger.info(f"{dir_name} deleted")
 					events.add_archive_event(f"Archived category : {category_row['name']}",
 												archive_file)
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_category(category_id)
@@ -130,6 +138,7 @@ def create_asset(name, category_id, inframe=100, outframe=220):
 				else:
 					events.add_creation_event('asset', asset_id)
 					game.add_xps(2)
+					gui_server.refresh_ui()
 		else:
 			logger.error("Can't create asset")
 	else:
@@ -148,6 +157,7 @@ def archive_asset(asset_id):
 					logger.info(f"{dir_name} deleted")
 					events.add_archive_event(f"Archived asset : {asset_row['name']}",
 												archive_file)
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_asset(asset_id)
@@ -210,6 +220,7 @@ def archive_stage(stage_id):
 					logger.info(f"{dir_name} deleted")
 					events.add_archive_event(f"Archived stage : {stage_row['name']}",
 												archive_file)
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_stage(stage_id)
@@ -235,6 +246,7 @@ def create_variant(name, stage_id, comment=''):
 					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
 					events.add_creation_event('variant', variant_id)
 					game.add_xps(2)
+					gui_server.refresh_ui()
 		else:
 			logger.error("Can't create variant")
 	else:
@@ -253,6 +265,7 @@ def archive_variant(variant_id):
 					logger.info(f"{dir_name} deleted")
 					events.add_archive_event(f"Archived variant : {variant_row['name']}",
 												archive_file)
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_variant(variant_id)
@@ -304,6 +317,7 @@ def archive_work_env(work_env_id):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_work_env(work_env_id)
@@ -326,8 +340,6 @@ def add_export_version(export_name, files, version_id, comment=''):
 		stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
 		extension_errors = []
 		for file in files:
-			print(os.path.splitext(file)[-1].replace('.', ''))
-			print(assets_vars._export_ext_dic_[stage_name])
 			if os.path.splitext(file)[-1].replace('.', '') not in assets_vars._export_ext_dic_[stage_name]:
 				extension_errors.append(file)
 		if extension_errors == []:
@@ -361,6 +373,7 @@ def add_export_version(export_name, files, version_id, comment=''):
 								events.add_export_event(export_version_id)
 								game.add_xps(3)
 								game.analyse_comment(comment, 10)
+								gui_server.refresh_ui()
 					return export_version_id
 				else:
 					return None
@@ -392,7 +405,8 @@ def archive_export(export_id):
 			dir_name = get_export_path(export_id)
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
-					tools.remove_tree(dir_name)	
+					tools.remove_tree(dir_name)
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_export(export_id)
@@ -434,6 +448,7 @@ def archive_export_version(export_version_id):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_export_version(export_version_id)
@@ -465,6 +480,7 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 												work_env_id,
 												comment,
 												screenshot_file)
+	gui_server.refresh_ui()
 	if not fresh:
 		game.add_xps(1)
 		game.analyse_comment(comment, 2)
@@ -480,6 +496,7 @@ def archive_version(version_id):
 				if tools.zip_files([version_row['file_path']], zip_file):
 					os.remove(version_row['file_path'])
 					logger.info(f"{version_row['file_path']} deleted")
+					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{version_row['file_path']} not found")
 			return project.remove_version(version_row['id'])
@@ -492,15 +509,18 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
 	ticket_id = project.create_ticket(title, message, export_version_id, destination_user, files)
 	if ticket_id:
 		events.add_ticket_openned_event(ticket_id)
+		gui_server.refresh_ui()
 	return ticket_id
 
 def close_ticket(ticket_id):
 	if project.change_ticket_state(ticket_id, 0):
 		events.add_ticket_closed_event(ticket_id)
+		gui_server.refresh_ui()
 
 def open_ticket(ticket_id):
 	if project.change_ticket_state(ticket_id, 1):
 		events.add_ticket_openned_event(ticket_id)
+		gui_server.refresh_ui()
 
 def get_domain_path(domain_id):
 	dir_name = None

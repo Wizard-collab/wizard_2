@@ -18,21 +18,18 @@ import traceback
 import json
 
 # Wizard modules
+from wizard.core import socket_utils
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
+_DNS_ = ('localhost', 11111)
+
 class communicate_server(Thread):
     def __init__(self):
         super(communicate_server, self).__init__()
-        hostname = 'localhost'
-        port = 11111
-        self.server_address = socket.gethostbyname(hostname)
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server.bind((hostname, port))
-        self.server.listen(100) 
+        self.server, self.server_address = socket_utils.get_server(_DNS_)
         self.running = True
 
     def run(self):
@@ -87,5 +84,3 @@ def add_export_version(export_name, files, version_id, comment):
     # of the new export version
     export_version_id = assets.add_export_version(export_name, files, version_id, comment)
     return export_version_id
-
-

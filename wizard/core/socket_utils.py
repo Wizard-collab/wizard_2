@@ -30,23 +30,45 @@ def get_server(DNS):
     server.listen(100)
     return server, server_address
 
-def send_signal(DNS, msg_raw):
+def send_bottle(DNS, msg_raw, timeout=0.05):
     server = None
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.settimeout(timeout)
         server.connect(DNS)
-        server.settimeout(5.0)
+        server.send(json.dumps(msg_raw).encode('utf8'))
+    except ConnectionRefusedError:
+        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        return None
+    except socket.timeout:
+        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        return None
+    except:
+        logger.debug(str(traceback.format_exc()))
+        return None
+    finally:
+        if server is not None:
+            server.close()
+
+def send_signal(DNS, msg_raw, timeout=5.0):
+    server = None
+    try:
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.settimeout(timeout)
+        server.connect(DNS)
         server.send(json.dumps(msg_raw).encode('utf8'))
         returned = recvall(server).decode('utf8')
         return json.loads(returned)
     except ConnectionRefusedError:
-        logger.error(f"Socket connection refused : host={host}, port={port}")
+        logger.error(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return None
     except socket.timeout:
-        logger.error(f"Socket timeout (5s) : host={host}, port={port}")
+        logger.error(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
         return None
     except:
         logger.error(str(traceback.format_exc()))
+        return None
     finally:
         if server is not None:
             server.close()
+

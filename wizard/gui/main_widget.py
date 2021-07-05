@@ -11,6 +11,7 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
+from wizard.gui import gui_server
 from wizard.gui import tree_widget
 from wizard.gui import launcher_widget
 from wizard.gui import wall_widget
@@ -28,12 +29,21 @@ class main_widget(QtWidgets.QWidget):
 		self.quotes_widget = quotes_widget.quotes_widget(self)
 		self.logging_widget = logging_widget.logging_widget(self)
 		self.build_ui()
+		self.init_gui_server()
 		self.connect_functions()
+		self.init_contexts()
+
+	def init_gui_server(self):
+		self.gui_server = gui_server.gui_server()
+		self.gui_server.start()
+
+	def init_contexts(self):
+		self.tree_widget.get_context()
 
 	def connect_functions(self):
 		self.tree_widget.stage_changed_signal.connect(self.stage_changed)
 		self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
-		self.refresh_button.clicked.connect(self.refresh)
+		self.gui_server.refresh_signal.connect(self.refresh)
 
 	def stage_changed(self, stage_id):
 		self.launcher_widget.change_stage(stage_id)
@@ -99,7 +109,3 @@ class main_widget(QtWidgets.QWidget):
 		self.contents_layout.addWidget(self.wall_widget)
 
 		self.main_layout.addWidget(self.logging_widget)
-
-		self.refresh_button = QtWidgets.QPushButton('REFRESH')
-		self.main_layout.addWidget(self.refresh_button)
-

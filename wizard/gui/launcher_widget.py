@@ -222,7 +222,7 @@ class launcher_widget(QtWidgets.QFrame):
                 software_id = project.get_software_data_by_name(software_name, 'id')
                 work_env_id = assets.create_work_env(software_id, self.variant_row['id'])
                 project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
-                self.refresh()
+                self.refresh_work_envs_hard()
                 self.launch()
 
     def state_changed(self, state):
@@ -257,7 +257,6 @@ class launcher_widget(QtWidgets.QFrame):
                 variant_name = self.variant_creation_widget.name_field.text()
                 new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
                 project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
-                self.refresh_variants_hard()
 
     def connect_functions(self):
         self.state_comboBox.currentTextChanged.connect(self.state_changed)
