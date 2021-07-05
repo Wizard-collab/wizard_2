@@ -24,6 +24,9 @@ from wizard.core import project
 from wizard.core import environment
 from wizard.vars import softwares_vars
 
+# Wizard gui modules
+from wizard.gui import gui_server
+
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -45,6 +48,7 @@ def launch_work_version(version_id):
 												software_row['name'],
 												work_env_id)
 					thread.start()
+					gui_server.refresh_ui()
 					logger.info(f"{software_row['name']} launched")
 		else:
 			logger.warning(f"You are already running a work instance of this asset")
@@ -111,4 +115,6 @@ class software_thread(Thread):
 		self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
 		self.process.wait()
 		environment.remove_running_work_env(self.work_env_id)
+		project.set_work_env_lock(self.work_env_id, 0)
+		gui_server.refresh_ui()
 		logger.info(f"{self.software} closed")

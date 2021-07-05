@@ -10,6 +10,7 @@ import os
 # Wizard modules
 from wizard.vars import assets_vars
 from wizard.vars import ressources
+from wizard.core import environment
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import image
@@ -181,12 +182,23 @@ class launcher_widget(QtWidgets.QFrame):
             self.date_label.setText(f"{day} - {hour}")
             self.refresh_screenshot(self.version_row['screenshot_path'])
             self.refresh_lock_button()
+            self.refresh_launch_button()
         else:
             self.user_label.setText('')
             self.comment_label.setText('')
             self.date_label.setText('')
             self.refresh_screenshot('')
             self.refresh_lock_button()
+            self.refresh_launch_button()
+
+    def refresh_launch_button(self):
+        if self.work_env_row is not None:
+            if self.work_env_row['id'] in environment.get_running_work_envs():
+                self.launch_button.start_animation()
+            else:
+                self.launch_button.stop_animation()
+        else:
+            self.launch_button.stop_animation()
 
     def refresh_screenshot(self, screenshot_path):
         if not os.path.isfile(screenshot_path):
@@ -216,7 +228,6 @@ class launcher_widget(QtWidgets.QFrame):
         if self.variant_row is not None:
             if self.work_env_row is not None:
                 launch.launch_work_version(self.version_row['id'])
-                self.refresh()
             else:
                 software_name = self.work_env_comboBox.currentText()
                 software_id = project.get_software_data_by_name(software_name, 'id')
@@ -346,7 +357,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.lock_button.setFixedSize(60,60)
         self.buttons_layout.addWidget(self.lock_button)
 
-        self.launch_button = QtWidgets.QPushButton('Launch')
+        self.launch_button = custom_launchButton('Launch')
         self.launch_button.setMinimumHeight(60)
         self.launch_button.setObjectName('blue_button')
         self.launch_button.setStyleSheet('font:bold')
@@ -411,3 +422,24 @@ class variant_creation_widget(QtWidgets.QDialog):
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
         self.close_pushButton.clicked.connect(self.reject)
+
+class custom_launchButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None):
+        super(custom_launchButton, self).__init__(parent)
+        #'hide' the icon on the pushButton
+        self.setIcon(QtGui.QIcon())
+        self.setIconSize(QtCore.QSize(25,25))
+        self.animated_spinner = QtGui.QMovie("running.gif")
+        self.animated_spinner.frameChanged.connect(self.updateSpinnerAnimation)           
+
+    def updateSpinnerAnimation(self):
+        self.setIcon(QtGui.QIcon(self.animated_spinner.currentPixmap()))
+
+    def start_animation(self):
+        self.setText('    Running')
+        self.animated_spinner.start()
+
+    def stop_animation(self):
+        self.setText('Launch')
+        self.animated_spinner.stop()
+        self.setIcon(QtGui.QIcon())

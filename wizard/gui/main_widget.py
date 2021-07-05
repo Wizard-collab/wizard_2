@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import time
 
 # Wizard modules
+from wizard.core import communicate
 from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
@@ -30,12 +31,17 @@ class main_widget(QtWidgets.QWidget):
 		self.logging_widget = logging_widget.logging_widget(self)
 		self.build_ui()
 		self.init_gui_server()
+		self.init_communicate_server()
 		self.connect_functions()
 		self.init_contexts()
 
 	def init_gui_server(self):
 		self.gui_server = gui_server.gui_server()
 		self.gui_server.start()
+
+	def init_communicate_server(self):
+		self.communicate_server = communicate.communicate_server()
+		self.communicate_server.start()
 
 	def init_contexts(self):
 		self.tree_widget.get_context()
