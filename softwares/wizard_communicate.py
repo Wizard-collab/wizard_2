@@ -23,8 +23,8 @@ def send_signal(signal_as_str):
     try:
         host_name = 'localhost'
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.connect((host_name, 11111))
         server.settimeout(5.0)
+        server.connect((host_name, 11111))
         server.send(signal_as_str.encode('utf8'))
         returned = server.recv(2048).decode('utf8')
         server.close()
