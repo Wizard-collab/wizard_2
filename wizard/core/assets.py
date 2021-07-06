@@ -496,10 +496,10 @@ def archive_version(version_id):
 				if tools.zip_files([version_row['file_path']], zip_file):
 					os.remove(version_row['file_path'])
 					logger.info(f"{version_row['file_path']} deleted")
-					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{version_row['file_path']} not found")
 			return project.remove_version(version_row['id'])
+			gui_server.refresh_ui()
 		else:
 			return None		
 	else:

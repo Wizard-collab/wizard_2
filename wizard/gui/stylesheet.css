@@ -282,6 +282,45 @@ QHeaderView::section {
     font: bold;
 }
 
+QTabBar {
+	margin-top: 5px;
+	background-color: transparent;
+	qproperty-drawBase:0;
+}
+
+QTabWidget::tab-bar {
+	background-color: red;
+    left: 5px; /* move to the right by 5px */
+    top: 5px; /* move to the right by 5px */
+}
+
+QTabWidget::pane{
+    border-top: 40px solid #2c2c33;
+	background-color: #2c2c33;
+    position: absolute;
+    top: -35px;
+}
+
+QTabBar::tab {
+	background-color: #2c2c33;
+	border: none; 
+	padding: 10px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+} 
+
+QTabBar::tab:selected { 
+	background-color: #24242b;
+}
+
+QTabBar::tab:hover { 
+	background-color: #24242b;
+}
+
+#dark_widget{
+	background-color:#24242b;
+}
+
 #transparent_widget{
 	background: transparent;
 }
@@ -290,12 +329,12 @@ QHeaderView::section {
 	background-color: #24242b;
 }
 
-#list_tree_view{
+#tree_as_list_widget{
 	padding: 0px;
 	alternate-background-color: rgba(255,255,255,8);
 }
 
-#list_tree_view::item{
+#tree_as_list_widget::item{
 	margin: 0px;
 	border-radius: 0px;
 }

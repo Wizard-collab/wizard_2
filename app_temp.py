@@ -14,6 +14,8 @@ from wizard.gui import create_ticket_widget
 from wizard.gui import script_editor_widget
 from wizard.gui import tickets_widget
 from wizard.gui import main_widget
+from wizard.gui import tabs_widget
+from wizard.gui import versions_widget
 
 import sys
 import time
@@ -132,6 +134,10 @@ class app():
 		'''
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
+		'''
+		self.versions_widget = versions_widget.versions_widget()
+		self.versions_widget.show()
+		'''
 
 		sys.exit(self.app.exec_())
 

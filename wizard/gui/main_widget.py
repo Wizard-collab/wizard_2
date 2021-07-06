@@ -14,6 +14,9 @@ logger = custom_logger.get_logger()
 # Wizard gui modules
 from wizard.gui import gui_server
 from wizard.gui import tree_widget
+from wizard.gui import versions_widget
+from wizard.gui import exports_widget
+from wizard.gui import tabs_widget
 from wizard.gui import launcher_widget
 from wizard.gui import wall_widget
 from wizard.gui import user_widget
@@ -26,6 +29,9 @@ class main_widget(QtWidgets.QWidget):
 		super(main_widget, self).__init__(parent)
 		self.tree_widget = tree_widget.tree_widget(self)
 		self.launcher_widget = launcher_widget.launcher_widget(self)
+		self.versions_widget = versions_widget.versions_widget(self)
+		self.exports_widget = exports_widget.exports_widget(self)
+		self.tabs_widget = tabs_widget.tabs_widget(self)
 		self.wall_widget = wall_widget.wall_widget(self)
 		self.user_widget = user_widget.user_widget(self)
 		self.quotes_widget = quotes_widget.quotes_widget(self)
@@ -51,13 +57,18 @@ class main_widget(QtWidgets.QWidget):
 	def connect_functions(self):
 		self.tree_widget.stage_changed_signal.connect(self.stage_changed)
 		self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
+		self.launcher_widget.variant_changed_signal.connect(self.variant_changed)
 		self.gui_server.refresh_signal.connect(self.refresh)
+		self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
 
 	def stage_changed(self, stage_id):
 		self.launcher_widget.change_stage(stage_id)
 
+	def variant_changed(self, variant_id):
+		self.exports_widget.change_variant(variant_id)
+
 	def work_env_changed(self, work_env_id):
-		pass
+		self.versions_widget.change_work_env(work_env_id)
 
 	def refresh(self):
 		start_time = time.time()
@@ -73,6 +84,12 @@ class main_widget(QtWidgets.QWidget):
 		start_wall = time.time()
 		self.wall_widget.refresh()
 		logger.info(f"Refresh wall : {str(time.time()-start_wall)}")
+		start_versions = time.time()
+		self.versions_widget.refresh()
+		logger.info(f"Refresh versions : {str(time.time()-start_versions)}")
+		start_exports = time.time()
+		self.exports_widget.refresh()
+		logger.info(f"Refresh exports : {str(time.time()-start_exports)}")
 		logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
 	def build_ui(self):
@@ -121,9 +138,12 @@ class main_widget(QtWidgets.QWidget):
 		self.contents_2_widget.setLayout(self.contents_2_layout)
 		self.contents_1_layout.addWidget(self.contents_2_widget)
 
-		self.contents_2_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+		#self.contents_2_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+		self.contents_2_layout.addWidget(self.tabs_widget)
+		self.tabs_widget.addTab(self.versions_widget, 'Work versions')
+		self.tabs_widget.addTab(self.exports_widget, 'Exports')
 		self.contents_2_layout.addWidget(self.launcher_widget)
 		
-		self.contents_layout.addWidget(self.wall_widget)
+		#self.contents_layout.addWidget(self.wall_widget)
 
 		self.main_layout.addWidget(self.logging_widget)

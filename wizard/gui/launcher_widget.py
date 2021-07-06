@@ -23,6 +23,7 @@ from wizard.gui import gui_utils
 class launcher_widget(QtWidgets.QFrame):
 
     work_env_changed_signal = pyqtSignal(object)
+    variant_changed_signal = pyqtSignal(object)
 
     def __init__(self, parent = None):
         super(launcher_widget, self).__init__(parent)
@@ -52,6 +53,11 @@ class launcher_widget(QtWidgets.QFrame):
         self.refresh_state()
         self.refresh_versions()
         self.refresh_infos()
+
+    def focus_version(self, version_name):
+        all_items = [self.version_comboBox.itemText(i) for i in range(self.version_comboBox.count())]
+        if version_name in all_items:
+            self.version_comboBox.setCurrentText(version_name)
 
     def refresh_variants(self):
         if self.stage_id is not None:
@@ -121,6 +127,9 @@ class launcher_widget(QtWidgets.QFrame):
             if self.variant_row['default_work_env_id'] is not None:
                 default_work_env_name = project.get_work_env_data(self.variant_row['default_work_env_id'], 'name')
                 self.work_env_comboBox.setCurrentText(default_work_env_name)
+            self.variant_changed_signal.emit(self.variant_row['id'])
+        else:
+            self.variant_changed_signal.emit(None)
 
         self.refresh_work_env_changed = 1
         self.work_env_changed(by_user=None)
@@ -143,10 +152,13 @@ class launcher_widget(QtWidgets.QFrame):
             version_rows = project.get_work_versions(self.work_env_row['id'])
             if version_rows is not None:
                 all_items = [self.version_comboBox.itemText(i) for i in range(self.version_comboBox.count())]
+                new=0
                 for version_row in version_rows:
                     if version_row['name'] not in all_items:
                         self.version_comboBox.addItem(version_row['name'])
-                self.version_comboBox.setCurrentText(version_rows[-1]['name'])
+                        new=1
+                if new:
+                    self.version_comboBox.setCurrentText(version_rows[-1]['name'])
 
     def refresh_versions_hard(self):
         self.version_comboBox.clear()
@@ -162,6 +174,8 @@ class launcher_widget(QtWidgets.QFrame):
 
         elif self.work_env_row == None and self.variant_row is not None:
             self.version_comboBox.addItem('0001')
+            self.work_env_changed_signal.emit(None)
+        else:
             self.work_env_changed_signal.emit(None)
 
         self.refresh_version_changed = 1
