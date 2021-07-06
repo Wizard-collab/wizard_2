@@ -477,17 +477,14 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 	file_name_ext = os.path.splitext(file_name)[-1]
 
 	basename = os.path.basename(file_name)
-	image_file = os.path.join(screenshot_dir_name, 
+	screenshot_file = os.path.join(screenshot_dir_name, 
 					basename.replace(file_name_ext, '.jpg'))
 	thumbnail_file = os.path.join(screenshot_dir_name, 
 					basename.replace(file_name_ext, '.thumbnail.jpg'))
 
 
 	if do_screenshot:
-		screenshot_file, thumbnail_file = image.screenshot(image_file, thumbnail_file)
-	else:
-		screenshot_file = None
-		thumbnail_file = None
+		screenshot_file, thumbnail_file = image.screenshot(screenshot_file, thumbnail_file)
 	version_id = project.add_version(new_version,
 												file_name,
 												work_env_id,
@@ -499,6 +496,33 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 		game.add_xps(1)
 		game.analyse_comment(comment, 2)
 	return version_id
+
+def merge_file(file, work_env_id, comment="", do_screenshot=1):
+	if os.path.isfile(file):
+		version_id = add_version(work_env_id, comment, do_screenshot)
+		version_row = project.get_version_data(version_id)
+		shutil.copyfile(file, version_row['file_path'])
+		logger.info(f"{file} merged in new version {version_row['name']}")
+		return version_id
+	else:
+		logger.warning(f"{file} doesn't exists")
+		return None
+
+def duplicate_version(version_id, comment=None):
+	new_version_id = None
+	version_row = project.get_version_data(version_id)
+	if version_row is not None:
+		if comment is None:
+			comment = version_row['comment']
+		new_version_id = merge_file(version_row['file_path'],
+									version_row['work_env_id'],
+									comment, 0)
+		new_version_row = project.get_version_data(new_version_id)
+		if os.path.isfile(version_row['screenshot_path']):
+			shutil.copyfile(version_row['screenshot_path'], new_version_row['screenshot_path'])
+		if os.path.isfile(version_row['thumbnail_path']):
+			shutil.copyfile(version_row['thumbnail_path'], new_version_row['thumbnail_path'])
+	return new_version_id
 
 def archive_version(version_id):
 	if site.is_admin():

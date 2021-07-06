@@ -317,6 +317,15 @@ QTabBar::tab:hover {
 	background-color: #24242b;
 }
 
+
+#icon_view{
+	padding: 6px;
+}
+
+#icon_view::item{
+	padding: 2px;
+}
+
 #dark_widget{
 	background-color:#24242b;
 }

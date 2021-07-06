@@ -167,10 +167,12 @@ class launcher_widget(QtWidgets.QFrame):
         if self.work_env_row is not None:
             self.work_env_changed_signal.emit(self.work_env_row['id'])
             version_rows = project.get_work_versions(self.work_env_row['id'])
-            for version_row in version_rows:
-                self.version_comboBox.addItem(version_row['name'])
+            
+            if (version_rows is not None) and (version_rows != []):
+                for version_row in version_rows:
+                    self.version_comboBox.addItem(version_row['name'])
 
-            self.version_comboBox.setCurrentText(version_rows[-1]['name'])
+                self.version_comboBox.setCurrentText(version_rows[-1]['name'])
 
         elif self.work_env_row == None and self.variant_row is not None:
             self.version_comboBox.addItem('0001')
