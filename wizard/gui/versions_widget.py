@@ -176,8 +176,9 @@ class versions_widget(QtWidgets.QWidget):
         self.toggle_view_button.clicked.connect(self.toggle_view)
 
     def version_changed(self, item):
-        if item is not None:
-            self.version_changed_signal.emit(item.version_row['name'])
+        if len(self.get_selection()) == 1:
+            if item is not None:
+                self.version_changed_signal.emit(item.version_row['name'])
 
     def toggle_view(self):
         vis = self.icon_view.isVisible()
@@ -278,11 +279,11 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
         self.fill_ui()
 
     def fill_ui(self):
-        icon_path = self.version_row['thumbnail_path']
-        if not os.path.isfile(icon_path):
-            icon_path = ressources._no_screenshot_small_
         icon = QtGui.QIcon()
-        pixmap = QtGui.QPixmap(icon_path)
+        pixmap = QtGui.QPixmap(ressources._no_screenshot_small_)
+        icon.addPixmap(pixmap, QtGui.QIcon.Normal)
+        icon.addPixmap(pixmap, QtGui.QIcon.Selected)
+        pixmap = QtGui.QPixmap(self.version_row['thumbnail_path'])
         icon.addPixmap(pixmap, QtGui.QIcon.Normal)
         icon.addPixmap(pixmap, QtGui.QIcon.Selected)
         self.setIcon(icon)
