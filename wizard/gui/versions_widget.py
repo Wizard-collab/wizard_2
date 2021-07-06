@@ -5,12 +5,14 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+import os
 
 # Wizard modules
 from wizard.core import launch
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import tools
+from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import confirm_widget
@@ -53,12 +55,20 @@ class versions_widget(QtWidgets.QWidget):
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
+        self.new_version_button = QtWidgets.QPushButton()
+        self.new_version_button.setFixedSize(35,35)
+        self.new_version_button.setIconSize(QtCore.QSize(16,16))
+        self.new_version_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.buttons_layout.addWidget(self.new_version_button)
+
         self.folder_button = QtWidgets.QPushButton()
-        self.folder_button.setFixedSize(25,25)
+        self.folder_button.setFixedSize(35,35)
+        self.folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
         self.buttons_layout.addWidget(self.folder_button)
 
         self.archive_button = QtWidgets.QPushButton()
-        self.archive_button.setFixedSize(25,25)
+        self.archive_button.setFixedSize(35,35)
+        self.archive_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
         self.buttons_layout.addWidget(self.archive_button)
 
         self.infos_widget = QtWidgets.QWidget()
@@ -84,6 +94,8 @@ class versions_widget(QtWidgets.QWidget):
         self.tree_widget.itemDoubleClicked.connect(self.launch)
         self.tree_widget.itemSelectionChanged.connect(self.refresh_infos)
         self.archive_button.clicked.connect(self.archive)
+        self.new_version_button.clicked.connect(self.add_empty_version)
+        self.folder_button.clicked.connect(self.open_folder)
 
     def version_changed(self, item):
         if item is not None:
@@ -105,17 +117,37 @@ class versions_widget(QtWidgets.QWidget):
 
     def refresh(self):
         versions_rows = project.get_work_versions(self.work_env_id)
+        project_versions_id = []
         if versions_rows is not None:
             for version_row in versions_rows:
+                project_versions_id.append(version_row['id'])
                 if version_row['id'] not in self.version_ids.keys():
                     version_item = custom_version_tree_item(version_row, self.tree_widget.invisibleRootItem())
                     self.version_ids[version_row['id']] = version_item
+        version_ids = list(self.version_ids.keys())
+        for version_id in version_ids:
+            if version_id not in project_versions_id:
+                self.remove_version(version_id)
         self.refresh_infos()
 
     def refresh_infos(self):
         self.versions_count_label.setText(f"{len(self.version_ids.keys())} versions -")
         selection = self.tree_widget.selectedItems()
         self.selection_count_label.setText(f"{len(selection)} selected")
+
+    def remove_version(self, version_id):
+        if version_id in self.version_ids.keys():
+            item = self.version_ids[version_id]
+            self.tree_widget.invisibleRootItem().removeChild(item)
+            del self.version_ids[version_id]
+
+    def add_empty_version(self):
+        if self.work_env_id is not None:
+            assets.add_version(self.work_env_id, 'Empty version')
+
+    def open_folder(self):
+        if self.work_env_id is not None:
+            os.startfile(assets.get_work_env_path(self.work_env_id))
 
     def change_work_env(self, work_env_id):
         self.version_ids = dict()
@@ -138,4 +170,5 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.version_row['creation_user'])
         day, hour = tools.convert_time(self.version_row['creation_time'])
         self.setText(2, f"{day} - {hour}")
+        self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
         self.setText(3, self.version_row['comment'])

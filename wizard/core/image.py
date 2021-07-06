@@ -14,14 +14,20 @@ import json
 # Wizard modules
 from wizard.core import tools
 
-def screenshot(file):
+def screenshot(file, thumbnail_file):
     # Capture the screen
     # Divide the image size by ≈3
-    image = pyautogui.screenshot()
-    image = resize_image(image, 500)
+    base_image = pyautogui.screenshot()
+    image = resize_image(base_image, 1000)
+
+    thumbnail = resize_image(base_image, 100)
+
     save_file = tools.get_filename_without_override(file)
-    image.save(save_file, format="JPEG")
-    return save_file
+    save_thumbnail_file = tools.get_filename_without_override(thumbnail_file)
+
+    image.save(save_file, format="PNG")
+    thumbnail.save(save_thumbnail_file, format="JPEG")
+    return save_file, save_thumbnail_file
 
 def convert_image_to_bytes(image_file, resize=100):
     # Resize the given file to 100*100

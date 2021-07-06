@@ -281,11 +281,12 @@ def create_work_env(software_id, variant_id):
 		variant_path = get_variant_path(variant_id)
 		if variant_path:
 			dir_name = os.path.normpath(os.path.join(variant_path, name))
+			screenshots_dir_name = os.path.normpath(os.path.join(dir_name, 'screenshots'))
 			work_env_id = project.add_work_env(name,
 														software_id,
 														variant_id)
 			if work_env_id:
-				if not tools.create_folder(dir_name):
+				if (not tools.create_folder(dir_name)) or (not tools.create_folder(screenshots_dir_name)) :
 					project.remove_work_env(work_env_id)
 					work_env_id = None
 				else:
@@ -467,19 +468,32 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 			new_version =  str(int(last_version)+1).zfill(4)
 		else:
 			new_version = '0001'
-	file_name = os.path.normpath(os.path.join(get_work_env_path(work_env_id), 
+
+	dirname = get_work_env_path(work_env_id)
+	screenshot_dir_name = os.path.join(dirname, 'screenshots')
+
+	file_name = os.path.normpath(os.path.join(dirname, 
 							build_version_file_name(work_env_id, new_version)))
 	file_name_ext = os.path.splitext(file_name)[-1]
-	image_file = file_name.replace(file_name_ext, '.jpg')
+
+	basename = os.path.basename(file_name)
+	image_file = os.path.join(screenshot_dir_name, 
+					basename.replace(file_name_ext, '.jpg'))
+	thumbnail_file = os.path.join(screenshot_dir_name, 
+					basename.replace(file_name_ext, '.thumbnail.jpg'))
+
+
 	if do_screenshot:
-		screenshot_file = image.screenshot(image_file)
+		screenshot_file, thumbnail_file = image.screenshot(image_file, thumbnail_file)
 	else:
 		screenshot_file = None
+		thumbnail_file = None
 	version_id = project.add_version(new_version,
 												file_name,
 												work_env_id,
 												comment,
-												screenshot_file)
+												screenshot_file,
+												thumbnail_file)
 	gui_server.refresh_ui()
 	if not fresh:
 		game.add_xps(1)
@@ -498,8 +512,9 @@ def archive_version(version_id):
 					logger.info(f"{version_row['file_path']} deleted")
 			else:
 				logger.warning(f"{version_row['file_path']} not found")
-			return project.remove_version(version_row['id'])
+			sucess = project.remove_version(version_row['id'])
 			gui_server.refresh_ui()
+			return sucess
 		else:
 			return None		
 	else:

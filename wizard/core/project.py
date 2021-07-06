@@ -689,7 +689,7 @@ def toggle_lock(work_env_id):
         lock_user_name = site.get_user_data(lock_id, 'user_name')
         logger.warning(f"Work env locked by {lock_user_name}")
 
-def add_version(name, file_path, work_env_id, comment='', screenshot_path=None):
+def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     version_id = db_utils.create_row('project',
                         'versions', 
                         ('name',
@@ -698,6 +698,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None):
                             'comment',
                             'file_path',
                             'screenshot_path',
+                            'thumbnail_path',
                             'work_env_id'), 
                         (name,
                             time.time(),
@@ -705,6 +706,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None):
                             comment,
                             file_path,
                             screenshot_path,
+                            thumbnail_path,
                             work_env_id))
     if version_id:
         logger.info(f"Version {name} added to project")
@@ -1309,6 +1311,7 @@ def create_versions_table(database):
                                         comment text,
                                         file_path text NOT NULL,
                                         screenshot_path text,
+                                        thumbnail_path text,
                                         work_env_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
