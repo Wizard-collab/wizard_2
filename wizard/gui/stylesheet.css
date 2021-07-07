@@ -289,7 +289,6 @@ QTabBar {
 }
 
 QTabWidget::tab-bar {
-	background-color: red;
     left: 5px; /* move to the right by 5px */
     top: 5px; /* move to the right by 5px */
 }
@@ -317,6 +316,14 @@ QTabBar::tab:hover {
 	background-color: #24242b;
 }
 
+QToolTip
+{
+    background-clip: border;
+    color: white;
+    background: #2c2c33;
+    padding: 8px;
+    border: none;
+}
 
 #icon_view{
 	padding: 6px;
@@ -324,6 +331,12 @@ QTabBar::tab:hover {
 
 #icon_view::item{
 	padding: 2px;
+	border: 2px solid transparent;
+}
+
+#icon_view::item:selected{
+	padding: 2px;
+	border: 2px solid gray;
 }
 
 #dark_widget{
