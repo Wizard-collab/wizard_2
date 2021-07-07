@@ -24,13 +24,13 @@ class versions_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(versions_widget, self).__init__(parent)
         self.work_env_id = None
-        self.version_tree_ids = dict()
+        self.version_list_ids = dict()
         self.version_icon_ids = dict()
         self.build_ui()
         self.connect_functions()
 
     def change_work_env(self, work_env_id):
-        self.version_tree_ids = dict()
+        self.version_list_ids = dict()
         self.version_icon_ids = dict()
         self.list_view.clear()
         self.icon_view.clear()
@@ -48,11 +48,11 @@ class versions_widget(QtWidgets.QWidget):
             if versions_rows is not None:
                 for version_row in versions_rows:
                     project_versions_id.append(version_row['id'])
-                    if version_row['id'] not in self.version_tree_ids.keys():
+                    if version_row['id'] not in self.version_list_ids.keys():
                         version_item = custom_version_tree_item(version_row, self.list_view.invisibleRootItem())
-                        self.version_tree_ids[version_row['id']] = version_item
-            version_tree_ids = list(self.version_tree_ids.keys())
-            for version_id in version_tree_ids:
+                        self.version_list_ids[version_row['id']] = version_item
+            version_list_ids = list(self.version_list_ids.keys())
+            for version_id in version_list_ids:
                 if version_id not in project_versions_id:
                     self.remove_tree_version(version_id)
             self.refresh_infos()
@@ -181,6 +181,7 @@ class versions_widget(QtWidgets.QWidget):
                 self.version_changed_signal.emit(item.version_row['name'])
 
     def toggle_view(self):
+        selection = self.get_selection()
         vis = self.icon_view.isVisible()
         self.icon_view.setVisible(1-vis)
         self.list_view.setVisible(vis)
@@ -189,13 +190,14 @@ class versions_widget(QtWidgets.QWidget):
         else:
             self.toggle_view_button.setIcon(QtGui.QIcon(ressources._icon_view_icon_))
         self.refresh()
+        self.set_selection(selection)
 
     def get_number(self):
         number = 0
         if self.icon_view.isVisible() == True:
             number = len(self.version_icon_ids)
         elif self.list_view.isVisible() == True:
-            number = len(self.version_tree_ids)
+            number = len(self.version_list_ids)
         return number
 
     def get_selection(self):
@@ -205,6 +207,21 @@ class versions_widget(QtWidgets.QWidget):
         elif self.list_view.isVisible() == True:
             selection = self.list_view.selectedItems()
         return selection
+
+    def set_selection(self, selection):
+        self.clear_selection()
+        if selection is not None:
+            for item in selection:
+                if self.icon_view.isVisible() == True:
+                    self.version_icon_ids[item.version_row['id']].setSelected(True)
+                elif self.list_view.isVisible() == True:
+                    self.version_list_ids[item.version_row['id']].setSelected(True)
+
+    def clear_selection(self):
+        for version_id in self.version_icon_ids.keys():
+            self.version_icon_ids[version_id].setSelected(False)
+        for version_id in self.version_list_ids.keys():
+            self.version_list_ids[version_id].setSelected(False)
 
     def duplicate_version(self):
         selection = self.get_selection()
@@ -236,10 +253,10 @@ class versions_widget(QtWidgets.QWidget):
         self.selection_count_label.setText(f"{number} selected")
 
     def remove_tree_version(self, version_id):
-        if version_id in self.version_tree_ids.keys():
-            item = self.version_tree_ids[version_id]
+        if version_id in self.version_list_ids.keys():
+            item = self.version_list_ids[version_id]
             self.list_view.invisibleRootItem().removeChild(item)
-            del self.version_tree_ids[version_id]
+            del self.version_list_ids[version_id]
 
     def remove_icon_version(self, version_id):
         if version_id in self.version_icon_ids.keys():
