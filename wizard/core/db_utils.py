@@ -38,7 +38,7 @@ def create_row(level, table, columns, datas):
     return execute_sql(sql_cmd, level, 0, datas, 1)
 
 def get_rows(level, table, column='*'):
-    sql_cmd = f''' SELECT {column} FROM {table}'''
+    sql_cmd = f''' SELECT {column} FROM {table} ORDER BY id'''
     if column != '*':
         as_dict=0
     else:
@@ -50,9 +50,9 @@ def get_row_by_column_data(level,
                             column_tuple,
                             column='*'):
     if type(column)==list:
-        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=%s"
+        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY id"
     else:
-        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s"
+        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY id"
     if column != '*':
         as_dict=0
     else:
@@ -64,7 +64,7 @@ def get_row_by_column_part_data(level,
                             column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s ORDER BY id"
     if column != '*':
         as_dict=0
     else:
@@ -77,7 +77,7 @@ def get_row_by_column_part_data_and_data(level,
                             second_column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s AND {second_column_tuple[0]}=%s;"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s AND {second_column_tuple[0]}=%s ORDER BY id;"
     if column != '*':
         as_dict=0
     else:
@@ -101,7 +101,7 @@ def check_existence_by_multiple_data(level,
                     columns_tuple,
                     data_tuple):
 
-    sql_cmd = f"SELECT id FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s;"
+    sql_cmd = f"SELECT id FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s ORDER BY id;"
     return execute_sql(sql_cmd, level, 0, data_tuple)
 
 def check_existence(level,
@@ -109,7 +109,7 @@ def check_existence(level,
                     column,
                     data):
 
-    sql_cmd = f"SELECT id FROM {table} WHERE {column}=%s;"
+    sql_cmd = f"SELECT id FROM {table} WHERE {column}=%s ORDER BY id;"
     return execute_sql(sql_cmd, level, 0, (data,))
 
 def get_row_by_multiple_data(level,
@@ -118,7 +118,7 @@ def get_row_by_multiple_data(level,
                     data_tuple,
                     column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s;"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {columns_tuple[0]}=%s AND {columns_tuple[1]}=%s ORDER BY id;"
     if column != '*':
         as_dict=0
     else:
