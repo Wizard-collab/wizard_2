@@ -73,21 +73,14 @@ class tree_widget(QtWidgets.QFrame):
 
         self.search_frame = QtWidgets.QFrame()
         self.search_layout = QtWidgets.QHBoxLayout()
-        self.search_layout.setContentsMargins(6,6,6,6)
+        self.search_layout.setContentsMargins(0,0,8,0)
         self.search_layout.setSpacing(4)
         self.search_frame.setLayout(self.search_layout)
-        self.search_icon_label = QtWidgets.QLabel()
-        self.search_icon_label.setPixmap(QtGui.QPixmap(ressources._search_icon_).scaled(
-            18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
-        self.search_layout.addWidget(self.search_icon_label)
-        self.search_bar = QtWidgets.QLineEdit()
-        self.search_bar.setObjectName("tree_search_lineEdit")
+
+        self.search_bar = gui_utils.search_bar()
         self.search_bar.setPlaceholderText('characters:Lola*grooming')
         self.search_layout.addWidget(self.search_bar)
-        self.clear_search_button = QtWidgets.QPushButton()
-        self.clear_search_button.setFixedSize(16,16)
-        self.clear_search_button.setObjectName('tree_clear_pushButton')
-        self.search_layout.addWidget(self.clear_search_button)
+
         self.refresh_tree_button = QtWidgets.QPushButton()
         self.refresh_tree_button.setObjectName('tree_refresh_pushButton')
         self.refresh_tree_button.setFixedSize(16,16)
@@ -113,7 +106,6 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.currentItemChanged.connect(self.item_changed)
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
         self.refresh_tree_button.clicked.connect(self.refresh)
-        self.clear_search_button.clicked.connect(self.search_bar.clear)
 
     def item_changed(self, item):
         if item:
@@ -353,10 +345,6 @@ class tree_widget(QtWidgets.QFrame):
         self.search_asset(search)
 
     def search_asset(self, search):
-        if search != '':
-            self.clear_search_button.setVisible(1)
-        else:
-            self.clear_search_button.setVisible(0)
         stage_filter = None
         if '*' in search:
             stage_filter = search.split('*')[-1]

@@ -323,6 +323,10 @@ QToolTip
     border: none;
 }
 
+#search_bar_frame{
+	border-radius: 5px;
+}
+
 #icon_view{
 	padding: 6px;
 }
@@ -453,11 +457,11 @@ QToolTip
 	background-color: transparent;
 }
 
-#tree_search_lineEdit{
+#search_lineEdit{
 	background: transparent;
 }
 
-#tree_clear_pushButton, #tree_refresh_pushButton{
+#clear_search_button, #tree_refresh_pushButton{
 	background: transparent;
 	border: none;
 }
@@ -469,10 +473,10 @@ QToolTip
 	background-image: url(ressources/icons/tree_refresh_hover.png);
 }
 
-#tree_clear_pushButton{
+#clear_search_button{
 	background-image: url(ressources/icons/close.png);
 }
-#tree_clear_pushButton::hover{
+#clear_search_button::hover{
 	background-image: url(ressources/icons/close_hover.png);
 }
 

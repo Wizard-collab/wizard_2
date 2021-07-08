@@ -17,6 +17,7 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
+from wizard.gui import gui_utils
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
 
@@ -30,6 +31,7 @@ class versions_widget(QtWidgets.QWidget):
         self.version_list_ids = dict()
         self.version_icon_ids = dict()
         self.check_existence_thread = check_existence_thread()
+        self.search_thread = search_thread()
         self.build_ui()
         self.connect_functions()
 
@@ -45,6 +47,7 @@ class versions_widget(QtWidgets.QWidget):
     def refresh(self):
         self.refresh_list_view()
         self.refresh_icons_view()
+        self.update_search()
 
     def refresh_list_view(self):
         if self.list_view.isVisible() == True:
@@ -102,6 +105,46 @@ class versions_widget(QtWidgets.QWidget):
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].set_not_missing()
 
+    def hide_all(self):
+        if self.list_view.isVisible():
+            for version_id in self.version_list_ids.keys():
+                self.version_list_ids[version_id].setHidden(True)
+        elif self.icon_view.isVisible():
+            for version_id in self.version_icon_ids.keys():
+                self.version_icon_ids[version_id].setHidden(True)
+
+    def show_all(self):
+        if self.list_view.isVisible():
+            for version_id in self.version_list_ids.keys():
+                self.version_list_ids[version_id].setHidden(False)
+        elif self.icon_view.isVisible():
+            for version_id in self.version_icon_ids.keys():
+                self.version_icon_ids[version_id].setHidden(False)
+
+    def update_search(self):
+        search_data = self.search_bar.text()
+        if search_data != '':
+            self.hide_all()
+            search_column = 'name'
+            if ':' in search_data:
+                if search_data.split(':')[0] == 'comment':
+                    search_column = 'comment'
+                    search_data = search_data.split(':')[-1]
+                elif search_data.split(':')[0] == 'user':
+                    search_column = 'creation_user'
+                    search_data = search_data.split(':')[-1]
+            self.search_thread.update_search(self.work_env_id, search_data, search_column)
+        else:
+            self.show_all()
+
+    def add_search_version(self, version_id):
+        if self.list_view.isVisible():
+            if version_id in self.version_list_ids.keys():
+                self.version_list_ids[version_id].setHidden(False)
+        elif self.icon_view.isVisible():
+            if version_id in self.version_icon_ids.keys():
+                self.version_icon_ids[version_id].setHidden(False)
+
     def connect_functions(self):
         self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
         self.icon_view_scrollBar.rangeChanged.connect(lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))
@@ -124,6 +167,9 @@ class versions_widget(QtWidgets.QWidget):
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
+
+        self.search_bar.textChanged.connect(self.update_search)
+        self.search_thread.id_signal.connect(self.add_search_version)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -166,6 +212,10 @@ class versions_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.buttons_widget)
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        
+        self.search_bar = gui_utils.search_bar()
+        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye"')
+        self.buttons_layout.addWidget(self.search_bar)
 
         self.toggle_view_button = QtWidgets.QPushButton()
         self.toggle_view_button.setToolTip("Switch to list view")
@@ -418,3 +468,29 @@ class check_existence_thread(QtCore.QThread):
         self.versions_rows = versions_rows
         self.running = True
         self.start()
+
+class search_thread(QtCore.QThread):
+
+    id_signal = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def update_search(self, work_env_id, search_data, search_column):
+        self.running = False
+        self.work_env_id = work_env_id
+        self.search_data = search_data
+        self.search_column = search_column
+        self.running = True
+        self.start()
+
+    def run(self):
+        versions_ids = project.search_version(self.search_data, 
+                                                self.work_env_id, 
+                                                column_to_search=self.search_column,
+                                                column='id')
+        for version_id in versions_ids:
+            if not self.running:
+                break
+            self.id_signal.emit(version_id)

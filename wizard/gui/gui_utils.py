@@ -4,6 +4,10 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
+
+# Wizard modules
+from wizard.vars import ressources
 
 def move_ui(widget):
     desktop = QtWidgets.QApplication.desktop()
@@ -162,3 +166,51 @@ class password_lineEdit(QtWidgets.QFrame):
 
     def setPlaceholderText(self, placeholderText):
         self.password_lineEdit.setPlaceholderText(placeholderText)
+
+class search_bar(QtWidgets.QFrame):
+
+    textChanged = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(search_bar, self).__init__(parent)
+        self.build_ui()
+        self.connect_functions()
+
+    def build_ui(self):
+        self.setObjectName('search_bar_frame')
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(8,4,8,4)
+        self.main_layout.setSpacing(4)
+        self.setLayout(self.main_layout)
+        self.search_icon_label = QtWidgets.QLabel()
+        self.search_icon_label.setPixmap(QtGui.QPixmap(ressources._search_icon_).scaled(
+            18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.main_layout.addWidget(self.search_icon_label)
+        self.search_bar = QtWidgets.QLineEdit()
+        self.search_bar.setObjectName("search_lineEdit")
+        self.main_layout.addWidget(self.search_bar)
+        self.clear_search_button = QtWidgets.QPushButton()
+        self.clear_search_button.setFixedSize(16,16)
+        self.clear_search_button.setObjectName('clear_search_button')
+        self.clear_search_button.setVisible(0)
+        self.main_layout.addWidget(self.clear_search_button)
+
+    def setPlaceholderText(self, placeholderText):
+        self.search_bar.setPlaceholderText(placeholderText)
+
+    def text(self):
+        return self.search_bar.text()
+
+    def setText(self, text):
+        self.search_bar.setText(text)
+
+    def connect_functions(self):
+        self.search_bar.textChanged.connect(self.textChanged.emit)
+        self.search_bar.textChanged.connect(self.update_clear_button)
+        self.clear_search_button.clicked.connect(self.search_bar.clear)
+
+    def update_clear_button(self, text):
+        if text == '':
+            self.clear_search_button.setVisible(False)
+        else:
+            self.clear_search_button.setVisible(True)

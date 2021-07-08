@@ -731,6 +731,20 @@ def remove_version(version_id):
             logger.info(f"Version removed from project")
     return success
 
+def search_version(data_to_search, work_env_id=None, column_to_search='name', column='*'):
+    if work_env_id:
+        versions_rows = db_utils.get_row_by_column_part_data_and_data('project',
+                                                        'versions',
+                                                        (column_to_search, data_to_search),
+                                                        ('work_env_id', work_env_id),
+                                                        column)
+    else:
+        versions_rows = db_utils.get_row_by_column_part_data('project',
+                                                            'versions',
+                                                            (column_to_search, data_to_search),
+                                                            column)
+    return versions_rows
+
 def add_software(name, extension, file_command, no_file_command):
     if name in softwares_vars._softwares_list_:
         if name not in get_softwares_names_list():
