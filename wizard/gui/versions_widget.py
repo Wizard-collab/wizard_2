@@ -94,6 +94,14 @@ class versions_widget(QtWidgets.QWidget):
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].set_missing()
 
+    def not_missing_file(self, version_id):
+        if self.list_view.isVisible():
+            if version_id in self.version_list_ids.keys():
+                self.version_list_ids[version_id].set_not_missing()
+        elif self.icon_view.isVisible():
+            if version_id in self.version_icon_ids.keys():
+                self.version_icon_ids[version_id].set_not_missing()
+
     def connect_functions(self):
         self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
         self.icon_view_scrollBar.rangeChanged.connect(lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))
@@ -115,6 +123,7 @@ class versions_widget(QtWidgets.QWidget):
         self.toggle_view_button.clicked.connect(self.toggle_view)
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
+        self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -357,6 +366,9 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
     def set_missing(self):
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('#f79360')))
 
+    def set_not_missing(self):
+        self.setForeground(5, QtGui.QBrush(QtGui.QColor('white')))
+
 class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, version_row, parent=None):
         super(custom_version_icon_item, self).__init__(parent)
@@ -378,9 +390,13 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def set_missing(self):
         self.setForeground(QtGui.QColor('#f79360'))
 
+    def set_not_missing(self):
+        self.setForeground(QtGui.QColor('white'))
+
 class check_existence_thread(QtCore.QThread):
 
     missing_file_signal = pyqtSignal(int)
+    not_missing_file_signal = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(check_existence_thread, self).__init__(parent)
@@ -392,6 +408,8 @@ class check_existence_thread(QtCore.QThread):
             for version_row in self.versions_rows:
                 if not os.path.isfile(version_row['file_path']):
                     self.missing_file_signal.emit(version_row['id'])
+                else:
+                    self.not_missing_file_signal.emit(version_row['id'])
                 if not self.running:
                     break
 
