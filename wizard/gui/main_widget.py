@@ -22,7 +22,7 @@ from wizard.gui import wall_widget
 from wizard.gui import user_widget
 from wizard.gui import quotes_widget
 from wizard.gui import shelf_widget
-from wizard.gui import logging_widget
+from wizard.gui import footer_widget
 
 class main_widget(QtWidgets.QWidget):
 	def __init__(self, parent=None):
@@ -36,7 +36,7 @@ class main_widget(QtWidgets.QWidget):
 		self.user_widget = user_widget.user_widget(self)
 		self.quotes_widget = quotes_widget.quotes_widget(self)
 		self.shelf_widget = shelf_widget.shelf_widget(self)
-		self.logging_widget = logging_widget.logging_widget(self)
+		self.footer_widget = footer_widget.footer_widget(self)
 		self.build_ui()
 		self.init_gui_server()
 		self.init_communicate_server()
@@ -132,8 +132,8 @@ class main_widget(QtWidgets.QWidget):
 		self.contents_1_layout.addWidget(self.shelf_widget)
 
 		self.header_layout.addWidget(self.user_widget)
-		self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-		#self.header_layout.addWidget(self.quotes_widget)
+		#self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+		self.header_layout.addWidget(self.quotes_widget)
 
 		self.contents_2_widget = QtWidgets.QWidget()
 		self.contents_2_widget.setObjectName('main_widget')
@@ -151,4 +151,4 @@ class main_widget(QtWidgets.QWidget):
 		
 		#self.contents_layout.addWidget(self.wall_widget)
 
-		self.main_layout.addWidget(self.logging_widget)
+		self.main_layout.addWidget(self.footer_widget)

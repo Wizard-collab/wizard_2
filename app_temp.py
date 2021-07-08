@@ -16,6 +16,8 @@ from wizard.gui import tickets_widget
 from wizard.gui import main_widget
 from wizard.gui import tabs_widget
 from wizard.gui import versions_widget
+from wizard.gui import gui_server
+from wizard.gui import footer_widget
 
 import sys
 import time
@@ -110,6 +112,7 @@ class app():
 		db_utils.modify_db_name('project', environment.get_project_name())
 		'''
 		self.my_tree_widget = tree_widget.tree_widget()
+		self.my_tree_widget.show()
 		self.my_user_widget = user_widget.user_widget()
 		self.my_quotes_widget = quotes_widget.quotes_widget()
 		self.my_user_widget.show()
@@ -119,10 +122,7 @@ class app():
 		self.my_logging_widget = logging_widget.logging_widget()
 		self.my_logging_widget.show()
 		self.my_launcher_widget = launcher_widget.launcher_widget()
-		self.my_tree_widget.stage_changed.connect(self.my_launcher_widget.change_stage)
-		self.my_tree_widget.show()
 		self.my_launcher_widget.show()
-		self.my_tree_widget.get_context()
 		self.my_create_ticket_widget = create_ticket_widget.create_ticket_widget()
 		self.my_create_ticket_widget.show()
 		self.script_editor_widget = script_editor_widget.script_editor_widget()
@@ -138,6 +138,12 @@ class app():
 		'''
 		self.versions_widget = versions_widget.versions_widget()
 		self.versions_widget.show()
+		
+		self.footer_widget = footer_widget.footer_widget()
+		self.footer_widget.show()
+		
+		self.gui_server = gui_server.gui_server()
+		self.gui_server.start()
 		'''
 
 		sys.exit(self.app.exec_())

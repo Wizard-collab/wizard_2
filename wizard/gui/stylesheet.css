@@ -323,6 +323,11 @@ QToolTip
     border: none;
 }
 
+#transparent_button{
+	background: none;
+	border: none;
+}
+
 #search_bar_frame{
 	border-radius: 5px;
 }

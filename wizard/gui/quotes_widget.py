@@ -19,9 +19,12 @@ class quotes_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(4,4,4,4)
+        self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
         self.quote_label = QtWidgets.QLabel()
+        self.quote_label.setAlignment(QtCore.Qt.AlignCenter)
         self.quote_label.setWordWrap(True)
         self.quote_label.setObjectName('quote_label')
         self.quote_label.setMinimumHeight(0)
@@ -35,15 +38,15 @@ class quotes_widget(QtWidgets.QFrame):
         self.buttons_layout.addSpacerItem(self.spaceItem)
         
         self.new_quote_button = QtWidgets.QPushButton()
-        self.new_quote_button.setFixedSize(25,25)
+        self.new_quote_button.setFixedSize(18,18)
         self.buttons_layout.addWidget(self.new_quote_button)
 
         self.my_quotes_button = QtWidgets.QPushButton()
-        self.my_quotes_button.setFixedSize(25,25)
+        self.my_quotes_button.setFixedSize(18,18)
         self.buttons_layout.addWidget(self.my_quotes_button)
 
         self.random_button = QtWidgets.QPushButton()
-        self.random_button.setFixedSize(25,25)
+        self.random_button.setFixedSize(18,18)
         self.buttons_layout.addWidget(self.random_button)
 
         self.main_layout.addWidget(self.buttons_frame)

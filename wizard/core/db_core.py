@@ -6,6 +6,7 @@
 import threading
 import traceback
 import json
+import time
 
 # PostgreSQL python modules
 import psycopg2

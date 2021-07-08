@@ -36,6 +36,7 @@ _archive_icon_ = os.path.join(_icons_path_, 'archive.png')
 _list_view_icon_ = os.path.join(_icons_path_, 'list_view_icon.png')
 _icon_view_icon_ = os.path.join(_icons_path_, 'icon_view_icon.png')
 _duplicate_icon_ = os.path.join(_icons_path_, 'duplicate.png')
+_random_icon_ = os.path.join(_icons_path_, 'random.png')
 
 # Lock icons
 _lock_icons_ = dict()
