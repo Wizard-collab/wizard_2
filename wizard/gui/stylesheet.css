@@ -123,7 +123,7 @@ QListView::item:selected:active{
 }
  
 QListView::item:selected:!active {
-background-color:rgba(255,255,255,30);
+	background-color:rgba(255,255,255,30);
 	color:white;
 }
 
@@ -153,8 +153,8 @@ QTreeView::item:selected:active{
 	background-color:rgba(255,255,255,30);
 }
  
-	QTreeView::item:selected:!active {
-background-color:rgba(255,255,255,30);
+QTreeView::item:selected:!active {
+	background-color:rgba(255,255,255,30);
 	color:white;
 }
 
@@ -227,8 +227,6 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 	background: none;
 }
-
-
 
 QScrollBar:horizontal{
 	height:6px;
@@ -492,6 +490,7 @@ QToolTip
 }
 
 #menu_widget_button{
+	text-align:left;
 	border-radius: 0px;
 }
 

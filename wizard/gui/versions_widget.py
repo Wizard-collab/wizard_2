@@ -13,6 +13,8 @@ from wizard.core import assets
 from wizard.core import project
 from wizard.core import tools
 from wizard.vars import ressources
+from wizard.core import custom_logger
+logger = custom_logger.get_logger()
 
 # Wizard gui modules
 from wizard.gui import confirm_widget
@@ -27,10 +29,12 @@ class versions_widget(QtWidgets.QWidget):
         self.work_env_id = None
         self.version_list_ids = dict()
         self.version_icon_ids = dict()
+        self.check_existence_thread = check_existence_thread()
         self.build_ui()
         self.connect_functions()
 
     def change_work_env(self, work_env_id):
+        self.check_existence_thread.running = False
         self.version_list_ids = dict()
         self.version_icon_ids = dict()
         self.list_view.clear()
@@ -39,23 +43,29 @@ class versions_widget(QtWidgets.QWidget):
         self.refresh()
 
     def refresh(self):
-        self.refresh_tree()
+        self.refresh_list_view()
         self.refresh_icons_view()
 
-    def refresh_tree(self):
+    def refresh_list_view(self):
         if self.list_view.isVisible() == True:
-            versions_rows = project.get_work_versions(self.work_env_id)
-            project_versions_id = []
-            if versions_rows is not None:
-                for version_row in versions_rows:
-                    project_versions_id.append(version_row['id'])
-                    if version_row['id'] not in self.version_list_ids.keys():
-                        version_item = custom_version_tree_item(version_row, self.list_view.invisibleRootItem())
-                        self.version_list_ids[version_row['id']] = version_item
-            version_list_ids = list(self.version_list_ids.keys())
-            for version_id in version_list_ids:
-                if version_id not in project_versions_id:
-                    self.remove_tree_version(version_id)
+
+            if self.work_env_id is not None:
+                software_name = project.get_work_env_data(self.work_env_id, 'name')
+                software_icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
+
+                versions_rows = project.get_work_versions(self.work_env_id)
+                project_versions_id = []
+                if versions_rows is not None:
+                    for version_row in versions_rows:
+                        project_versions_id.append(version_row['id'])
+                        if version_row['id'] not in self.version_list_ids.keys():
+                            version_item = custom_version_tree_item(version_row, software_icon, self.list_view.invisibleRootItem())
+                            self.version_list_ids[version_row['id']] = version_item
+                version_list_ids = list(self.version_list_ids.keys())
+                for version_id in version_list_ids:
+                    if version_id not in project_versions_id:
+                        self.remove_tree_version(version_id)
+                self.check_existence_thread.update_versions_rows(versions_rows)
             self.refresh_infos()
 
     def refresh_icons_view(self):
@@ -73,7 +83,38 @@ class versions_widget(QtWidgets.QWidget):
             for version_id in version_icon_ids:
                 if version_id not in project_versions_id:
                     self.remove_icon_version(version_id)
+            self.check_existence_thread.update_versions_rows(versions_rows)
             self.refresh_infos()
+
+    def missing_file(self, version_id):
+        if self.list_view.isVisible():
+            if version_id in self.version_list_ids.keys():
+                self.version_list_ids[version_id].set_missing()
+        elif self.icon_view.isVisible():
+            if version_id in self.version_icon_ids.keys():
+                self.version_icon_ids[version_id].set_missing()
+
+    def connect_functions(self):
+        self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
+        self.icon_view_scrollBar.rangeChanged.connect(lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))
+
+        self.list_view.itemSelectionChanged.connect(self.version_changed)
+        self.list_view.itemDoubleClicked.connect(self.launch)
+        self.list_view.itemSelectionChanged.connect(self.refresh_infos)
+        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
+
+        self.icon_view.itemSelectionChanged.connect(self.version_changed)
+        self.icon_view.itemDoubleClicked.connect(self.launch)
+        self.icon_view.itemSelectionChanged.connect(self.refresh_infos)
+        self.icon_view.customContextMenuRequested.connect(self.context_menu_requested)
+
+        self.archive_button.clicked.connect(self.archive)
+        self.duplicate_button.clicked.connect(self.duplicate_version)
+        self.new_version_button.clicked.connect(self.add_empty_version)
+        self.folder_button.clicked.connect(self.open_folder)
+        self.toggle_view_button.clicked.connect(self.toggle_view)
+
+        self.check_existence_thread.missing_file_signal.connect(self.missing_file)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -85,12 +126,12 @@ class versions_widget(QtWidgets.QWidget):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(4)
+        self.list_view.setColumnCount(6)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.list_view.setHeaderLabels(['Version', 'User', 'Date', 'Comment'])
+        self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File'])
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
         self.list_view.setVisible(0)
@@ -166,37 +207,16 @@ class versions_widget(QtWidgets.QWidget):
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
 
-    def connect_functions(self):
-        self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
-        self.icon_view_scrollBar.rangeChanged.connect(lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))
-
-        self.list_view.itemSelectionChanged.connect(self.version_changed)
-        self.list_view.itemDoubleClicked.connect(self.launch)
-        self.list_view.itemSelectionChanged.connect(self.refresh_infos)
-        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
-
-
-        self.icon_view.itemSelectionChanged.connect(self.version_changed)
-        self.icon_view.itemDoubleClicked.connect(self.launch)
-        self.icon_view.itemSelectionChanged.connect(self.refresh_infos)
-        self.icon_view.customContextMenuRequested.connect(self.context_menu_requested)
-
-        self.archive_button.clicked.connect(self.archive)
-        self.duplicate_button.clicked.connect(self.duplicate_version)
-        self.new_version_button.clicked.connect(self.add_empty_version)
-        self.folder_button.clicked.connect(self.open_folder)
-        self.toggle_view_button.clicked.connect(self.toggle_view)
-
     def context_menu_requested(self):
         selection = self.get_selection()
         self.menu_widget = menu_widget.menu_widget(self)
-        folder_action = self.menu_widget.add_action(f'Open folder')
-        empty_version_action = self.menu_widget.add_action(f'Create new empty version')
+        folder_action = self.menu_widget.add_action(f'Open folder', ressources._folder_icon_)
+        empty_version_action = self.menu_widget.add_action(f'Create new empty version', ressources._add_icon_)
         duplicate_action = None
         archive_action = None
         if len(selection)>=1:
-            duplicate_action = self.menu_widget.add_action(f'Duplicate version(s)')
-            archive_action = self.menu_widget.add_action(f'Archive version(s)')
+            duplicate_action = self.menu_widget.add_action(f'Duplicate version(s)', ressources._duplicate_icon_)
+            archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._archive_icon_)
         launch_action = None
         if len(selection)==1:
             launch_action = self.menu_widget.add_action(f'Launch version')
@@ -315,8 +335,9 @@ class versions_widget(QtWidgets.QWidget):
             os.startfile(assets.get_work_env_path(self.work_env_id))
 
 class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
-    def __init__(self, version_row, parent=None):
+    def __init__(self, version_row, software_icon, parent=None):
         super(custom_version_tree_item, self).__init__(parent)
+        self.software_icon = software_icon
         self.version_row = version_row
         self.fill_ui()
 
@@ -325,11 +346,16 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(0, bold_font)
-        self.setText(1, self.version_row['creation_user'])
+        self.setIcon(1, self.software_icon)
+        self.setText(2, self.version_row['creation_user'])
         day, hour = tools.convert_time(self.version_row['creation_time'])
-        self.setText(2, f"{day} - {hour}")
-        self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
-        self.setText(3, self.version_row['comment'])
+        self.setText(3, f"{day} - {hour}")
+        self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setText(4, self.version_row['comment'])
+        self.setText(5, os.path.basename(self.version_row['file_path']))
+
+    def set_missing(self):
+        self.setForeground(5, QtGui.QBrush(QtGui.QColor('#f79360')))
 
 class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, version_row, parent=None):
@@ -348,3 +374,29 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
         self.setIcon(icon)
         self.setText(f"{self.version_row['name']} - {self.version_row['creation_user']}")
         self.setTextAlignment(QtCore.Qt.AlignLeft)
+
+    def set_missing(self):
+        self.setForeground(QtGui.QColor('#f79360'))
+
+class check_existence_thread(QtCore.QThread):
+
+    missing_file_signal = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(check_existence_thread, self).__init__(parent)
+        self.versions_rows = None
+        self.running = True
+
+    def run(self):
+        if self.versions_rows is not None:
+            for version_row in self.versions_rows:
+                if not os.path.isfile(version_row['file_path']):
+                    self.missing_file_signal.emit(version_row['id'])
+                if not self.running:
+                    break
+
+    def update_versions_rows(self, versions_rows):
+        self.running = False
+        self.versions_rows = versions_rows
+        self.running = True
+        self.start()

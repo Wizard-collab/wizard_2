@@ -134,6 +134,7 @@ class app():
 		'''
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
+		self.main_widget.refresh()
 		'''
 		self.versions_widget = versions_widget.versions_widget()
 		self.versions_widget.show()

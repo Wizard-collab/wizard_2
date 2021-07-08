@@ -60,6 +60,7 @@ class main_widget(QtWidgets.QWidget):
 		self.launcher_widget.variant_changed_signal.connect(self.variant_changed)
 		self.gui_server.refresh_signal.connect(self.refresh)
 		self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
+		self.tabs_widget.currentChanged.connect(self.tab_changed)
 
 	def stage_changed(self, stage_id):
 		self.launcher_widget.change_stage(stage_id)
@@ -69,6 +70,10 @@ class main_widget(QtWidgets.QWidget):
 
 	def work_env_changed(self, work_env_id):
 		self.versions_widget.change_work_env(work_env_id)
+
+	def tab_changed(self):
+		self.versions_widget.refresh()
+		self.exports_widget.refresh()
 
 	def refresh(self):
 		start_time = time.time()

@@ -76,9 +76,12 @@ class menu_widget(QtWidgets.QDialog):
         self.function_name = function_name
         self.accept()
 
-    def add_action(self, function_name):
+    def add_action(self, function_name, icon=None):
         pushButton = QtWidgets.QPushButton(function_name)
         pushButton.setObjectName('menu_widget_button')
+        if icon is not None:
+            pushButton.setIcon(QtGui.QIcon(icon))
+            pushButton.setIconSize(QtCore.QSize(16,16))
         self.buttons.append(pushButton)
         self.frame_layout.addWidget(pushButton)
         pushButton.clicked.connect(self.close)
