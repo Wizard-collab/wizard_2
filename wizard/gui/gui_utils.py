@@ -9,6 +9,9 @@ from PyQt5.QtCore import pyqtSignal
 # Wizard modules
 from wizard.vars import ressources
 
+# Wizard gui modules
+from wizard.gui import gui_server
+
 def move_ui(widget):
     desktop = QtWidgets.QApplication.desktop()
     screenRect = desktop.screenGeometry()
@@ -214,3 +217,14 @@ class search_bar(QtWidgets.QFrame):
             self.clear_search_button.setVisible(False)
         else:
             self.clear_search_button.setVisible(True)
+
+def enterEvent(self, tooltip):
+    gui_server.tooltip(tooltip)
+
+def leaveEvent(self):
+    gui_server.tooltip('')
+
+def application_tooltip(widget, custom_tooltip):
+    widget.enterEvent = lambda tooltip:enterEvent(widget, custom_tooltip)
+    widget.leaveEvent = leaveEvent
+

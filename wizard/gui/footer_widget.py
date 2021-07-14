@@ -22,6 +22,7 @@ class footer_widget(QtWidgets.QFrame):
         super(footer_widget, self).__init__(parent)
         self.logging_widget = logging_widget.logging_widget()
         self.hardware_infos_widget = hardware_infos_widget()
+        self.tooltip_widget = tooltip_widget()
         self.build_ui()
 
     def build_ui(self):
@@ -30,9 +31,19 @@ class footer_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
+        self.main_layout.addWidget(self.tooltip_widget)
         self.main_layout.addWidget(self.logging_widget)
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         self.main_layout.addWidget(self.hardware_infos_widget)
+
+    def update_tooltip(self, tooltip):
+        self.tooltip_widget.setText(tooltip)
+
+class tooltip_widget(gui_utils.ElidedLabel):
+    def __init__(self, parent=None):
+        super(tooltip_widget, self).__init__(parent)
+        self.setObjectName('gray_label')
+        self.setFixedWidth(200)
 
 class hardware_infos_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):

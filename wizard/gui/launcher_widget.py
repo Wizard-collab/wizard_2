@@ -226,10 +226,12 @@ class launcher_widget(QtWidgets.QFrame):
 
     def refresh_lock_button(self):
         self.lock_button.setStyleSheet('')
+        gui_utils.application_tooltip(self.lock_button, "Lock work env")
         self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
         if self.work_env_row is not None:
             lock_id = project.get_work_env_data(self.work_env_row['id'], 'lock_id')
             if lock_id is not None:
+                gui_utils.application_tooltip(self.lock_button, "Unlock work env")
                 css = "QPushButton{border: 2px solid #f0605b;background-color: #f0605b;}"
                 css += "QPushButton::hover{border: 2px solid #ff817d;background-color: #ff817d;}"
                 css += "QPushButton::pressed{border: 2px solid #ab4946;background-color: #ab4946;}"
@@ -302,6 +304,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.screenshot_label = QtWidgets.QLabel()
+        gui_utils.application_tooltip(self.screenshot_label, "Version screenshot")
         self.screenshot_label.setFixedWidth(300)
         self.main_layout.addWidget(self.screenshot_label)
 
@@ -313,10 +316,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.variant_widget)
 
         self.variant_comboBox = QtWidgets.QComboBox()
+        gui_utils.application_tooltip(self.variant_comboBox, "Change variant")
         self.variant_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.variant_layout.addWidget(self.variant_comboBox)
 
         self.state_comboBox = QtWidgets.QComboBox()
+        gui_utils.application_tooltip(self.state_comboBox, "Change variant state")
         self.state_comboBox.setFixedWidth(80)
         self.state_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.state_comboBox.addItem('todo')
@@ -326,16 +331,19 @@ class launcher_widget(QtWidgets.QFrame):
         self.variant_layout.addWidget(self.state_comboBox)
 
         self.add_variant_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.add_variant_button, "Create variant")
         self.add_variant_button.setFixedSize(29,29)
         self.add_variant_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.add_variant_button.setIconSize(QtCore.QSize(14,14))
         self.variant_layout.addWidget(self.add_variant_button)
 
         self.work_env_comboBox = QtWidgets.QComboBox()
+        gui_utils.application_tooltip(self.work_env_comboBox, "Change work environment")
         self.work_env_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.work_env_comboBox)
 
         self.version_comboBox = QtWidgets.QComboBox()
+        gui_utils.application_tooltip(self.version_comboBox, "Change version")
         self.version_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.version_comboBox)
 
@@ -343,6 +351,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.comment_label = QtWidgets.QLabel()
+        gui_utils.application_tooltip(self.comment_label, "Version comment")
         self.comment_label.setWordWrap(True)
         self.main_layout.addWidget(self.comment_label)
 
@@ -354,10 +363,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.version_infos_widget)
 
         self.date_label = QtWidgets.QLabel()
+        gui_utils.application_tooltip(self.date_label, "Version date")
         self.date_label.setObjectName('gray_label')
         self.version_infos_layout.addWidget(self.date_label)
 
         self.user_label = QtWidgets.QLabel()
+        gui_utils.application_tooltip(self.user_label, "Version user")
         self.version_infos_layout.addWidget(self.user_label)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -375,6 +386,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.buttons_layout.addWidget(self.lock_button)
 
         self.launch_button = custom_launchButton('Launch')
+        gui_utils.application_tooltip(self.launch_button, "Launch work version")
         self.launch_button.setMinimumHeight(60)
         self.launch_button.setObjectName('blue_button')
         self.launch_button.setStyleSheet('font:bold')

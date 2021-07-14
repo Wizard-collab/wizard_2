@@ -27,6 +27,7 @@ _DNS_ = ('localhost', 11113)
 class gui_server(QThread):
 
     refresh_signal = pyqtSignal(int)
+    tooltip_signal = pyqtSignal(str)
 
     def __init__(self):
         super(gui_server, self).__init__()
@@ -56,8 +57,16 @@ class gui_server(QThread):
 
         if signal_dic['function'] == 'refresh':
             self.refresh_signal.emit(1)
+        if signal_dic['function'] == 'tooltip':
+            self.tooltip_signal.emit(signal_dic['tooltip'])
 
 def refresh_ui():
 	signal_dic = dict()
 	signal_dic['function'] = 'refresh'
 	socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
+
+def tooltip(tooltip):
+    signal_dic = dict()
+    signal_dic['function'] = 'tooltip'
+    signal_dic['tooltip'] = tooltip
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
