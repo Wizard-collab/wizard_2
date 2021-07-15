@@ -10,6 +10,7 @@
 # It roughly is a lan access to the wizard core functions
 
 # Python modules
+from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, pyqtSignal
 import socket
 import sys
@@ -24,15 +25,35 @@ logger = custom_logger.get_logger(__name__)
 
 _DNS_ = ('localhost', 11113)
 
+class streamHandler(QtCore.QObject):
+
+    stream = pyqtSignal(tuple)
+
+    def __init__(self, parent=None):
+        super(streamHandler, self).__init__(parent)
+
+    def write(self, stream):
+        self.stream.emit(('STDOUT', str(stream)))
+        real_write = type(sys.__stdout__).write
+        real_write(sys.__stdout__, stream)
+
 class gui_server(QThread):
 
     refresh_signal = pyqtSignal(int)
     tooltip_signal = pyqtSignal(str)
+    stdout_signal = pyqtSignal(tuple)
 
     def __init__(self):
         super(gui_server, self).__init__()
+
+        self.streamHandler = streamHandler()
+        sys.stdout = self.streamHandler
+        sys.stderr = self.streamHandler
+
         self.server, self.server_address = socket_utils.get_server(_DNS_)
         self.running = True
+
+        self.connect_functions()
 
     def run(self):
         while self.running:
@@ -59,6 +80,9 @@ class gui_server(QThread):
             self.refresh_signal.emit(1)
         if signal_dic['function'] == 'tooltip':
             self.tooltip_signal.emit(signal_dic['tooltip'])
+
+    def connect_functions(self):
+        self.streamHandler.stream.connect(self.stdout_signal.emit)
 
 def refresh_ui():
 	signal_dic = dict()

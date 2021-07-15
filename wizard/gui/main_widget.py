@@ -23,11 +23,14 @@ from wizard.gui import user_widget
 from wizard.gui import quotes_widget
 from wizard.gui import shelf_widget
 from wizard.gui import footer_widget
+from wizard.gui import console_widget
 
 class main_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(main_widget, self).__init__(parent)
         self.tree_widget = tree_widget.tree_widget(self)
+        self.console_widget = console_widget.console_widget()
+        self.console_widget.show()
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
@@ -63,6 +66,11 @@ class main_widget(QtWidgets.QWidget):
 
         self.gui_server.refresh_signal.connect(self.refresh)
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
+        self.gui_server.stdout_signal.connect(self.update_stdout)
+
+    def update_stdout(self, tuple):
+        self.footer_widget.handle_record(tuple)
+        self.console_widget.handle_record(tuple)
 
     def stage_changed(self, stage_id):
         self.launcher_widget.change_stage(stage_id)

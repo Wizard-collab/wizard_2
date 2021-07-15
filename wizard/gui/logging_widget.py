@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import logging
+import sys
 
 # Wizard modules
 from wizard.core import custom_logger
@@ -27,8 +28,10 @@ class custom_handler(QtCore.QObject, logging.Handler):
 class logging_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(logging_widget, self).__init__(parent)
+
         self.custom_handler = custom_handler(self)
         logger.addHandler(self.custom_handler)
+
         self.build_ui()
         self.connect_functions()
 
@@ -42,15 +45,16 @@ class logging_widget(QtWidgets.QFrame):
     def handle_record(self, record_tuple):
         level = record_tuple[0]
         record_msg = record_tuple[1]
-        if level == 'INFO':
-            self.log_label.setStyleSheet('color:white;')
-        elif level == 'WARNING':
-            self.log_label.setStyleSheet('color:#f79360;')
-        elif level == 'ERROR':
-            self.log_label.setStyleSheet('color:#f0605b;')
-        record_msg = record_msg.replace('\n', ' ')
-        record_msg = record_msg.replace('\r', ' ')
-        self.log_label.setText(record_msg)
+        if record_msg != '\r\n' and record_msg != '\r' and record_msg != '\n':
+            if level == 'INFO' or level == 'STDOUT':
+                self.log_label.setStyleSheet('color:white;')
+            elif level == 'WARNING':
+                self.log_label.setStyleSheet('color:#f79360;')
+            elif level == 'ERROR':
+                self.log_label.setStyleSheet('color:#f0605b;')
+            record_msg = record_msg.replace('\n', ' ')
+            record_msg = record_msg.replace('\r', ' ')
+            self.log_label.setText(record_msg)
 
     def connect_functions(self):
         self.custom_handler.log_record.connect(self.handle_record)

@@ -51,6 +51,9 @@ class footer_widget(QtWidgets.QFrame):
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)
 
+    def handle_record(self, record_tuple):
+        self.logging_widget.handle_record(record_tuple)
+
 class tooltip_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(tooltip_widget, self).__init__(parent)

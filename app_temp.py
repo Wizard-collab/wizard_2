@@ -18,7 +18,6 @@ from wizard.gui import tabs_widget
 from wizard.gui import versions_widget
 from wizard.gui import gui_server
 from wizard.gui import footer_widget
-from wizard.gui import console_widget
 
 import sys
 import time
@@ -136,9 +135,7 @@ class app():
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
 		self.main_widget.refresh()
-
-		self.console_widget = console_widget.console_widget()
-		self.console_widget.show()
+		
 		'''
 		self.versions_widget = versions_widget.versions_widget()
 		self.versions_widget.show()
