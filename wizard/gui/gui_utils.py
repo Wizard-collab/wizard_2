@@ -222,7 +222,7 @@ def enterEvent(self, tooltip):
     gui_server.tooltip(tooltip)
 
 def leaveEvent(self):
-    gui_server.tooltip('')
+    gui_server.tooltip('Tooltips')
 
 def application_tooltip(widget, custom_tooltip):
     widget.enterEvent = lambda tooltip:enterEvent(widget, custom_tooltip)

@@ -122,7 +122,10 @@ class user:
         # and reload the "session" module
         with open(user_vars._session_file_, 'w') as f:
                 f.write(script)
-        importlib.reload(session)
+        try:
+            importlib.reload(session)
+        except:
+            logger.error(sys.exc_info()[1])
 
     def execute_py(self, file):
         # Read a .py file and execute the data

@@ -48,6 +48,8 @@ class logging_widget(QtWidgets.QFrame):
             self.log_label.setStyleSheet('color:#f79360;')
         elif level == 'ERROR':
             self.log_label.setStyleSheet('color:#f0605b;')
+        record_msg = record_msg.replace('\n', ' ')
+        record_msg = record_msg.replace('\r', ' ')
         self.log_label.setText(record_msg)
 
     def connect_functions(self):

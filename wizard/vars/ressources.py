@@ -37,6 +37,10 @@ _list_view_icon_ = os.path.join(_icons_path_, 'list_view_icon.png')
 _icon_view_icon_ = os.path.join(_icons_path_, 'icon_view_icon.png')
 _duplicate_icon_ = os.path.join(_icons_path_, 'duplicate.png')
 _random_icon_ = os.path.join(_icons_path_, 'random.png')
+_bulb_icon_ = os.path.join(_icons_path_, 'bulb.png')
+_info_icon_ = os.path.join(_icons_path_, 'info.png')
+_python_icon_ = os.path.join(_icons_path_, 'python.png')
+
 
 # Lock icons
 _lock_icons_ = dict()

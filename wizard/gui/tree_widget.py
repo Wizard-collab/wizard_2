@@ -78,10 +78,12 @@ class tree_widget(QtWidgets.QFrame):
         self.search_frame.setLayout(self.search_layout)
 
         self.search_bar = gui_utils.search_bar()
+        gui_utils.application_tooltip(self.search_bar, "Search for a specific item")
         self.search_bar.setPlaceholderText('characters:Lola*grooming')
         self.search_layout.addWidget(self.search_bar)
 
         self.refresh_tree_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.refresh_tree_button, "Manually refresh the project tree")
         self.refresh_tree_button.setObjectName('tree_refresh_pushButton')
         self.refresh_tree_button.setFixedSize(16,16)
         self.search_layout.addWidget(self.refresh_tree_button)

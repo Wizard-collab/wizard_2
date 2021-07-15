@@ -323,6 +323,17 @@ QToolTip
     border: none;
 }
 
+#log_button{
+	background-color: none;
+	border: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+#log_button::hover{
+	text-decoration: underline;
+}
+
 #transparent_button{
 	background: none;
 	border: none;

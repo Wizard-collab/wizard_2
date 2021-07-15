@@ -10,6 +10,8 @@ import time
 import psutil
 
 # Wizard modules
+from wizard.core import user
+from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -23,6 +25,7 @@ class footer_widget(QtWidgets.QFrame):
         self.logging_widget = logging_widget.logging_widget()
         self.hardware_infos_widget = hardware_infos_widget()
         self.tooltip_widget = tooltip_widget()
+        self.script_bar = script_bar()
         self.build_ui()
 
     def build_ui(self):
@@ -31,7 +34,16 @@ class footer_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
+        self.main_layout.addWidget(self.script_bar)
+
         self.main_layout.addWidget(self.tooltip_widget)
+
+        self.icon_label = QtWidgets.QLabel()
+        self.icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.icon_label.setPixmap(QtGui.QPixmap(ressources._info_icon_).scaled(
+            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.main_layout.addWidget(self.icon_label)
+
         self.main_layout.addWidget(self.logging_widget)
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         self.main_layout.addWidget(self.hardware_infos_widget)
@@ -39,11 +51,64 @@ class footer_widget(QtWidgets.QFrame):
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)
 
-class tooltip_widget(gui_utils.ElidedLabel):
+class tooltip_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(tooltip_widget, self).__init__(parent)
-        self.setObjectName('gray_label')
+        self.build_ui()
+
+    def build_ui(self):
         self.setFixedWidth(200)
+
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.icon_label = QtWidgets.QLabel()
+        self.icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.icon_label.setPixmap(QtGui.QPixmap(ressources._bulb_icon_).scaled(
+            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.main_layout.addWidget(self.icon_label)
+
+        self.main_label = gui_utils.ElidedLabel('Tooltips')
+        self.main_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.main_label)
+
+    def setText(self, text):
+        self.main_label.setText(text)
+
+class script_bar(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(script_bar, self).__init__(parent)
+        self.build_ui()
+        self.connect_functions()
+
+    def build_ui(self):
+        self.setFixedWidth(300)
+
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.icon_label = QtWidgets.QLabel()
+        self.icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.icon_label.setPixmap(QtGui.QPixmap(ressources._python_icon_).scaled(
+            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.main_layout.addWidget(self.icon_label)
+
+        self.script_lineEdit = QtWidgets.QLineEdit()
+        self.script_lineEdit.setPlaceholderText('Python commands')
+        self.main_layout.addWidget(self.script_lineEdit)
+
+    def connect_functions(self):
+        self.script_lineEdit.returnPressed.connect(self.execute)
+
+    def execute(self):
+        data = self.script_lineEdit.selectedText()
+        if data == '':
+            data = self.script_lineEdit.text()
+        user.user().execute_session(data)
 
 class hardware_infos_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):

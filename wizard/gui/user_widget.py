@@ -47,12 +47,14 @@ class user_widget(QtWidgets.QFrame):
         self.infos_layout.addWidget(self.progress_bars_widget)
 
         self.xp_progress_bar = gui_utils.QProgressBar()
+        gui_utils.application_tooltip(self.xp_progress_bar, "User experience")
         self.xp_progress_bar.setObjectName('user_xp_progressBar')
         self.xp_progress_bar.setFixedHeight(6)
         self.xp_progress_bar.setTextVisible(0)
         self.progress_bars_layout.addWidget(self.xp_progress_bar)
         
         self.life_progress_bar = gui_utils.QProgressBar()
+        gui_utils.application_tooltip(self.life_progress_bar, "User life")
         self.life_progress_bar.setObjectName('user_life_progressBar')
         self.life_progress_bar.setFixedHeight(6)
         self.life_progress_bar.setTextVisible(0)
@@ -63,15 +65,18 @@ class user_widget(QtWidgets.QFrame):
         self.badges_layout.setContentsMargins(0,0,0,0)
         self.badges_frame.setLayout(self.badges_layout)
         self.admin_badge_label = QtWidgets.QLabel()
+        gui_utils.application_tooltip(self.admin_badge_label, "Admin badge")
         self.admin_badge_label.setPixmap(QtGui.QPixmap(ressources._admin_badge_).scaled(
             18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
         self.badges_layout.addWidget(self.admin_badge_label)
         self.badges_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding))
 
         self.info_level_label = QtWidgets.QLabel('Level ')
+        gui_utils.application_tooltip(self.info_level_label, "User level")
         self.info_level_label.setObjectName('gray_label')
         self.badges_layout.addWidget(self.info_level_label)
         self.level_label = QtWidgets.QLabel('23')
+        gui_utils.application_tooltip(self.level_label, "User level")
         self.badges_layout.addWidget(self.level_label)
 
         self.infos_layout.addWidget(self.badges_frame)
