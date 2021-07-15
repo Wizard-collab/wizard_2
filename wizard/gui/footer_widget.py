@@ -20,6 +20,9 @@ from wizard.gui import gui_utils
 from wizard.gui import logging_widget
 
 class footer_widget(QtWidgets.QFrame):
+
+    show_console = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super(footer_widget, self).__init__(parent)
         self.logging_widget = logging_widget.logging_widget()
@@ -27,6 +30,7 @@ class footer_widget(QtWidgets.QFrame):
         self.tooltip_widget = tooltip_widget()
         self.script_bar = script_bar()
         self.build_ui()
+        self.connect_functions()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
@@ -47,6 +51,22 @@ class footer_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.logging_widget)
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         self.main_layout.addWidget(self.hardware_infos_widget)
+
+        self.buttons_widget = QtWidgets.QWidget()
+        self.buttons_layout = QtWidgets.QHBoxLayout()
+        self.buttons_layout.setContentsMargins(50,0,0,0)
+        self.buttons_layout.setSpacing(6)
+        self.buttons_widget.setLayout(self.buttons_layout)
+        self.main_layout.addWidget(self.buttons_widget)
+
+        self.console_button = QtWidgets.QPushButton()
+        self.console_button.setFixedSize(QtCore.QSize(25, 25))
+        gui_utils.application_tooltip(self.console_button, "Show console")
+        self.console_button.setIcon(QtGui.QIcon(ressources._console_icon_))
+        self.buttons_layout.addWidget(self.console_button)
+
+    def connect_functions(self):
+        self.console_button.clicked.connect(self.show_console.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)
@@ -129,30 +149,15 @@ class hardware_infos_widget(QtWidgets.QFrame):
 
         self.cpu_label = QtWidgets.QLabel('Cpu')
         self.main_layout.addWidget(self.cpu_label)
-
-        '''
-        self.cpu_progressBar = QtWidgets.QProgressBar()
-        self.cpu_progressBar.setTextVisible(0)
-        '''
         
-        self.cpu_progressBar = QRoundProgressBar()
-        self.cpu_progressBar.setBarStyle(QRoundProgressBar.BarStyle.LINE)
-
+        self.cpu_progressBar = gui_utils.RoundProgress()
         self.cpu_progressBar.setFixedSize(QtCore.QSize(25,25))
-        self.cpu_progressBar.setDataPenWidth(4)
         self.main_layout.addWidget(self.cpu_progressBar)
 
         self.ram_label = QtWidgets.QLabel('Ram')
         self.main_layout.addWidget(self.ram_label)
 
-        '''
-        self.ram_progressBar = QtWidgets.QProgressBar()
-        self.ram_progressBar.setTextVisible(0)
-        '''
-
-        self.ram_progressBar = QRoundProgressBar()
-        self.ram_progressBar.setBarStyle(QRoundProgressBar.BarStyle.LINE)
-        self.ram_progressBar.setDataPenWidth(4)
+        self.ram_progressBar = gui_utils.RoundProgress()
         self.ram_progressBar.setFixedSize(QtCore.QSize(25,25))
         self.main_layout.addWidget(self.ram_progressBar)
 
@@ -163,22 +168,22 @@ class hardware_infos_widget(QtWidgets.QFrame):
     def update_progress(self, infos_tuple):
         cpu = infos_tuple[-1]
         ram = infos_tuple[0]
-        if 0<int(cpu)<33:
+        if 0<=int(cpu)<=33:
             color = '#98d47f'
         elif 33<int(cpu)<66:
             color = '#f79360'
         else:
             color = '#f0605b' 
-        self.cpu_progressBar.setStyleSheet('QProgressBar::chunk{background-color:%s;}'%color)
+        self.cpu_progressBar.setChunckColor(color)
         self.cpu_progressBar.setValue(cpu)
 
-        if 0<=int(ram)<33:
+        if 0<=int(ram)<=33:
             color = '#98d47f'
         elif 33<int(ram)<66:
             color = '#f79360'
         else:
             color = '#f0605b' 
-        self.ram_progressBar.setStyleSheet('QProgressBar::chunk{background-color:%s;}'%color)
+        self.ram_progressBar.setChunckColor(color)
         self.ram_progressBar.setValue(ram)
 
 class hardware_thread(QtCore.QThread):
@@ -193,7 +198,7 @@ class hardware_thread(QtCore.QThread):
         while self.running:
             ram = dict(psutil.virtual_memory()._asdict())['percent']
             self.hardware_infos.emit((float(ram), psutil.cpu_percent()))
-            time.sleep(0.5)
+            time.sleep(3)
 
     def stop(self):
         self.running = False

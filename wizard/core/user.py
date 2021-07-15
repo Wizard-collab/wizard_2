@@ -124,6 +124,8 @@ class user:
                 f.write(script)
         try:
             importlib.reload(session)
+        except KeyboardInterrupt:
+            logger.warning("Execution manually stopped")
         except:
             logger.error(sys.exc_info()[1])
 

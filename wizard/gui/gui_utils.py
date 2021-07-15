@@ -218,6 +218,52 @@ class search_bar(QtWidgets.QFrame):
         else:
             self.clear_search_button.setVisible(True)
 
+class RoundProgress(QtWidgets.QWidget):
+    def __init__(self, parent = None):
+        super(RoundProgress, self).__init__(parent)
+        self.chunck_color = '#7785de'
+        self.bg_color = '#24242b'
+        self.angle=90
+        self.drawAngle=self.angle
+        self.lineWidth=18
+        self.timeLine=QtCore.QTimeLine(2000,self)
+        self.timeLine.frameChanged.connect(self.updateTimeline)
+ 
+    def setValue(self, percent):
+        #self.drawAngle = percent*3.6
+        #self.update()
+
+        self.angle=percent*3.6
+        self.timeLine.setFrameRange(self.drawAngle,self.angle)
+        self.timeLine.start()
+
+    def updateTimeline(self,frame):
+        self.drawAngle=frame
+        self.update()
+
+    def setChunckColor(self, color):
+        self.chunck_color = color
+
+    def paintEvent(self,event):
+        the_rect=QtCore.QRectF(0,0,self.width(),self.height())
+        if the_rect.isNull():
+            return
+        painter=QtGui.QPainter(self)
+        painter.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.SmoothPixmapTransform,on=True)
+        painter.setViewport(self.width(),0,-self.width(),self.height())
+        the_path=QtGui.QPainterPath()
+        the_path.addEllipse(the_rect.adjusted(1,1,-1,-1))
+        the_path.addEllipse(the_rect.adjusted(
+            1+self.lineWidth,1+self.lineWidth,-1-self.lineWidth,-1-self.lineWidth))
+        painter.fillPath(the_path,QtGui.QColor(6,79,103))
+        the_gradient=QtGui.QConicalGradient(the_rect.center(),90)
+        the_angle=self.drawAngle/360
+        the_gradient.setColorAt(0,QtGui.QColor(self.chunck_color))
+        the_gradient.setColorAt(the_angle,QtGui.QColor(self.chunck_color))
+        if the_angle+0.001<1:
+            the_gradient.setColorAt(the_angle+0.001,QtGui.QColor(self.bg_color))
+        painter.fillPath(the_path,the_gradient)
+
 def enterEvent(self, tooltip):
     gui_server.tooltip(tooltip)
 

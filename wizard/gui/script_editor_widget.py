@@ -76,10 +76,10 @@ class script_editor_widget(QsciScintilla):
         self.setMinimumSize(0, 200)
 
     def text(self):
-        return str(super(script_editor_widget, self).text()).encode('UTF-8')
+        return str(super(script_editor_widget, self).text())
 
     def selectedText(self):
-        return str(super(script_editor_widget, self).selectedText()).encode('UTF-8')
+        return str(super(script_editor_widget, self).selectedText())
 
     def on_margin_clicked(self, nmargin, nline, modifiers):
         if self.markersAtLine(nline) != 0:

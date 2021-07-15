@@ -30,7 +30,6 @@ class main_widget(QtWidgets.QWidget):
         super(main_widget, self).__init__(parent)
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
-        self.console_widget.show()
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
@@ -63,6 +62,7 @@ class main_widget(QtWidgets.QWidget):
         self.launcher_widget.variant_changed_signal.connect(self.variant_changed)
         self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
         self.tabs_widget.currentChanged.connect(self.tab_changed)
+        self.footer_widget.show_console.connect(self.console_widget.toggle)
 
         self.gui_server.refresh_signal.connect(self.refresh)
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
@@ -87,24 +87,12 @@ class main_widget(QtWidgets.QWidget):
 
     def refresh(self):
         start_time = time.time()
-        start_tree = time.time()
         self.tree_widget.refresh()
-        logger.info(f"Refresh tree : {str(time.time()-start_tree)}")
-        start_launcher = time.time()
         self.launcher_widget.refresh()
-        logger.info(f"Refresh launcher : {str(time.time()-start_launcher)}")
-        start_user = time.time()
         self.user_widget.refresh()
-        logger.info(f"Refresh user : {str(time.time()-start_user)}")
-        start_wall = time.time()
         self.wall_widget.refresh()
-        logger.info(f"Refresh wall : {str(time.time()-start_wall)}")
-        start_versions = time.time()
         self.versions_widget.refresh()
-        logger.info(f"Refresh versions : {str(time.time()-start_versions)}")
-        start_exports = time.time()
         self.exports_widget.refresh()
-        logger.info(f"Refresh exports : {str(time.time()-start_exports)}")
         logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):

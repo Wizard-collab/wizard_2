@@ -323,15 +323,53 @@ QToolTip
     border: none;
 }
 
-#log_button{
-	background-color: none;
-	border: none;
-	padding: 0px;
-	margin: 0px;
+QMenuBar {
+    padding: 3px;
 }
 
-#log_button::hover{
-	text-decoration: underline;
+QMenuBar::item {
+    padding: 6px;
+    border-radius: 4px;
+}
+
+QMenuBar::item:selected {
+	background-color: #4b4b57;
+}
+
+QMenu {
+	background-color: #24242b;
+}
+
+QMenu::item {
+    padding: 6px;
+    border-radius: 4px;
+    min-width: 100px;
+    margin: 4px;
+}
+
+QMenu::item:selected {
+	background-color: #4b4b57;
+}
+
+QMenu::icon:checked { /* appearance of a 'checked' icon */
+    background: gray;
+    border: 1px inset gray;
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    left: 1px;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: rgba(255,255,255,10);
+}
+
+#console_textEdit{
+	background-color: #1d1d23;
+	border-radius: 0px;
+	font-family: Consolas;
 }
 
 #transparent_button{

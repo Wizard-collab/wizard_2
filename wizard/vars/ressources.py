@@ -40,6 +40,7 @@ _random_icon_ = os.path.join(_icons_path_, 'random.png')
 _bulb_icon_ = os.path.join(_icons_path_, 'bulb.png')
 _info_icon_ = os.path.join(_icons_path_, 'info.png')
 _python_icon_ = os.path.join(_icons_path_, 'python.png')
+_console_icon_ = os.path.join(_icons_path_, 'console.png')
 
 
 # Lock icons
