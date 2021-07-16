@@ -338,13 +338,12 @@ QMenuBar::item:selected {
 
 QMenu {
 	background-color: #24242b;
+    border-radius: 10px;
 }
 
 QMenu::item {
     padding: 6px;
-    border-radius: 4px;
     min-width: 100px;
-    margin: 4px;
 }
 
 QMenu::item:selected {

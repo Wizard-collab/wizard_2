@@ -49,6 +49,7 @@ _console_error_icon_ = os.path.join(_icons_path_, 'console_error.png')
 _console_info_icon_ = os.path.join(_icons_path_, 'console_info.png')
 _wall_icon_ = os.path.join(_icons_path_, 'wall.png')
 _wall_notification_icon_ = os.path.join(_icons_path_, 'wall_notification.png')
+_wizard_icon_small_ = os.path.join(_icons_path_, 'wizard_icon_small.png')
 
 
 # Lock icons
