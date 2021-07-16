@@ -264,13 +264,21 @@ class RoundProgress(QtWidgets.QWidget):
             the_gradient.setColorAt(the_angle+0.001,QtGui.QColor(self.bg_color))
         painter.fillPath(the_path,the_gradient)
 
-def enterEvent(self, tooltip):
-    gui_server.tooltip(tooltip)
 
-def leaveEvent(self):
+def enterEvent(self, event=None):
+    gui_server.tooltip(self.application_tooltip)
+    self.legacy_enterEvent(event)
+
+def leaveEvent(self, event=None):
     gui_server.tooltip('Tooltips')
+    self.legacy_leaveEvent(event)
 
 def application_tooltip(widget, custom_tooltip):
-    widget.enterEvent = lambda tooltip:enterEvent(widget, custom_tooltip)
-    widget.leaveEvent = leaveEvent
+    widget.legacy_enterEvent = widget.enterEvent
+    widget.application_tooltip = custom_tooltip
+    widget.enterEvent = lambda self: enterEvent(widget)
+    widget.legacy_leaveEvent = widget.leaveEvent
+    widget.leaveEvent = lambda self: leaveEvent(widget)
 
+def modify_application_tooltip(widget, custom_tooltip):
+    widget.application_tooltip = custom_tooltip

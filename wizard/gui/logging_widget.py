@@ -36,6 +36,7 @@ class logging_widget(QtWidgets.QFrame):
         self.connect_functions()
 
     def build_ui(self):
+        gui_utils.application_tooltip(self, "See logs here")
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(6,6,6,6)
         self.setLayout(self.main_layout)
@@ -46,7 +47,9 @@ class logging_widget(QtWidgets.QFrame):
         level = record_tuple[0]
         record_msg = record_tuple[1]
         if record_msg != '\r\n' and record_msg != '\r' and record_msg != '\n':
-            if level == 'INFO' or level == 'STDOUT':
+            if level == 'INFO':
+                self.log_label.setStyleSheet('color:#90d1f0;')
+            elif level == 'STDOUT':
                 self.log_label.setStyleSheet('color:white;')
             elif level == 'WARNING':
                 self.log_label.setStyleSheet('color:#f79360;')

@@ -64,7 +64,7 @@ def get_row_by_column_part_data(level,
                             column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s ORDER BY id"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} ILIKE %s ORDER BY id"
     if column != '*':
         as_dict=0
     else:
@@ -77,7 +77,7 @@ def get_row_by_column_part_data_and_data(level,
                             second_column_tuple,
                             column='*'):
 
-    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} LIKE %s AND {second_column_tuple[0]}=%s ORDER BY id;"
+    sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]} ILIKE %s AND {second_column_tuple[0]}=%s ORDER BY id;"
     if column != '*':
         as_dict=0
     else:

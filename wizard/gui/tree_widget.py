@@ -342,6 +342,23 @@ class tree_widget(QtWidgets.QFrame):
             item.setExpanded(expand)
         self.item_changed(item)
 
+    def focus_instance(self, instance_tuple):
+        instance_type = instance_tuple[0]
+        instance_id = instance_tuple[1]
+        if instance_type == 'category':
+            if instance_id in self.category_ids.keys():
+                self.focus_on_item(self.category_ids[instance_id])
+        if instance_type == 'asset':
+            if instance_id in self.asset_ids.keys():
+                self.focus_on_item(self.asset_ids[instance_id])
+        if instance_type == 'stage':
+            if instance_id in self.stage_ids.keys():
+                self.focus_on_item(self.stage_ids[instance_id])
+        if instance_type == 'variant':
+            stage_id = project.get_variant_data(instance_id, 'stage_id')
+            if stage_id in self.stage_ids.keys():
+                self.focus_on_item(self.stage_ids[stage_id])
+
     def apply_search(self):
         search = self.search_bar.text()
         self.search_asset(search)

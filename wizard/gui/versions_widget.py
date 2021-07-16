@@ -221,33 +221,36 @@ class versions_widget(QtWidgets.QWidget):
         self.toggle_view_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.toggle_view_button, "Switch to list view")
         self.toggle_view_button.setFixedSize(35,35)
-        self.toggle_view_button.setIconSize(QtCore.QSize(27,27))
-        self.toggle_view_button.setIcon(QtGui.QIcon(ressources._list_view_icon_))
+        self.toggle_view_button.setIconSize(QtCore.QSize(30,30))
+        self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_list_view_))
         self.buttons_layout.addWidget(self.toggle_view_button)
 
         self.duplicate_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.duplicate_button, "Duplicate selection")
         self.duplicate_button.setFixedSize(35,35)
-        self.duplicate_button.setIcon(QtGui.QIcon(ressources._duplicate_icon_))
+        self.duplicate_button.setIconSize(QtCore.QSize(30,30))
+        self.duplicate_button.setIcon(QtGui.QIcon(ressources._tool_duplicate_))
         self.buttons_layout.addWidget(self.duplicate_button)
 
         self.new_version_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.new_version_button, "Create empty version")
         self.new_version_button.setFixedSize(35,35)
-        self.new_version_button.setIconSize(QtCore.QSize(16,16))
-        self.new_version_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.new_version_button.setIconSize(QtCore.QSize(30,30))
+        self.new_version_button.setIcon(QtGui.QIcon(ressources._tool_add_))
         self.buttons_layout.addWidget(self.new_version_button)
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open versions folder")
         self.folder_button.setFixedSize(35,35)
-        self.folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
+        self.folder_button.setIconSize(QtCore.QSize(30,30))
+        self.folder_button.setIcon(QtGui.QIcon(ressources._tool_folder_))
         self.buttons_layout.addWidget(self.folder_button)
 
         self.archive_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.archive_button, "Archive selection")
         self.archive_button.setFixedSize(35,35)
-        self.archive_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
+        self.archive_button.setIconSize(QtCore.QSize(30,30))
+        self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
         self.infos_widget = QtWidgets.QWidget()
@@ -270,13 +273,13 @@ class versions_widget(QtWidgets.QWidget):
     def context_menu_requested(self):
         selection = self.get_selection()
         self.menu_widget = menu_widget.menu_widget(self)
-        folder_action = self.menu_widget.add_action(f'Open folder', ressources._folder_icon_)
-        empty_version_action = self.menu_widget.add_action(f'Create new empty version', ressources._add_icon_)
+        folder_action = self.menu_widget.add_action(f'Open folder', ressources._tool_folder_)
+        empty_version_action = self.menu_widget.add_action(f'Create new empty version', ressources._tool_add_)
         duplicate_action = None
         archive_action = None
         if len(selection)>=1:
-            duplicate_action = self.menu_widget.add_action(f'Duplicate version(s)', ressources._duplicate_icon_)
-            archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._archive_icon_)
+            duplicate_action = self.menu_widget.add_action(f'Duplicate version(s)', ressources._tool_duplicate_)
+            archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
         launch_action = None
         if len(selection)==1:
             launch_action = self.menu_widget.add_action(f'Launch version')
@@ -305,11 +308,11 @@ class versions_widget(QtWidgets.QWidget):
         self.icon_view.setVisible(1-vis)
         self.list_view.setVisible(vis)
         if not vis:
-            self.toggle_view_button.setIcon(QtGui.QIcon(ressources._list_view_icon_))
-            self.toggle_view_button.setToolTip("Switch to list view")
+            self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_list_view_))
+            gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to list view")
         else:
-            self.toggle_view_button.setIcon(QtGui.QIcon(ressources._icon_view_icon_))
-            self.toggle_view_button.setToolTip("Switch to icon view")
+            self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
+            gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to icon view")
         self.refresh()
         self.set_selection(selection)
 

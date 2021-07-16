@@ -1085,6 +1085,13 @@ def add_event(event_type, title, message, data):
         logger.debug("Event added")
     return event_id
 
+def search_event(data_to_search, column_to_search='title', column='*'):
+    events_rows = db_utils.get_row_by_column_part_data('project',
+                                                    'events',
+                                                    (column_to_search, data_to_search),
+                                                    column)
+    return events_rows
+
 def get_event_data(event_id, column='*'):
     events_rows = db_utils.get_row_by_column_data('project',
                                                         'events',

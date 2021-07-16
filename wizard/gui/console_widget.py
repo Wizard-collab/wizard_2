@@ -17,6 +17,9 @@ from wizard.gui import script_editor_widget
 from wizard.gui import logging_widget
 
 class console_widget(QtWidgets.QWidget):
+
+    notification = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super(console_widget, self).__init__(parent)
         self.custom_handler = logging_widget.custom_handler(self)
@@ -27,13 +30,23 @@ class console_widget(QtWidgets.QWidget):
 
     def toggle(self):
         if self.isVisible():
-            self.hide()
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+            else:
+                self.hide()
         else:
             self.show()
+            self.raise_()
+
+    def changeEvent(self, event):
+        if self.isActiveWindow():
+            self.notification.emit('')
+        event.accept()
 
     def closeEvent(self, event):
         event.ignore()
-        self.toggle()
+        self.hide()
 
     def build_ui(self):
         self.resize(800,600)
@@ -80,11 +93,19 @@ class console_widget(QtWidgets.QWidget):
         level = record_tuple[0]
         record_msg = record_tuple[1]
         if record_msg is not None and record_msg!='\n' and record_msg != '\r' and record_msg != '\r\n':
-            if level == 'INFO' or level == 'STDOUT':
+            if level == 'INFO':
                 record_msg = f'<span style="color:#90d1f0;">{record_msg}'
-            if level == 'WARNING':
+                if not self.isActiveWindow():
+                    self.notification.emit('info')
+            elif level == 'STDOUT':
+                record_msg = f'<span style="color:#ffffff;">{record_msg}'
+            elif level == 'WARNING':
                 record_msg = f'<strong><span style="color:#f79360;">{record_msg}</strong>'
+                if not self.isActiveWindow():
+                    self.notification.emit('warning')
             elif level == 'ERROR':
                 record_msg = f'<strong><span style="color:#f0605b;">{record_msg}</strong>'
+                if not self.isActiveWindow():
+                    self.notification.emit('error')
             self.console_viewer.insertHtml(record_msg)
             self.console_viewer.insertHtml('<br>')

@@ -22,6 +22,7 @@ from wizard.gui import logging_widget
 class footer_widget(QtWidgets.QFrame):
 
     show_console = pyqtSignal(int)
+    show_wall = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(footer_widget, self).__init__(parent)
@@ -55,24 +56,47 @@ class footer_widget(QtWidgets.QFrame):
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(50,0,0,0)
-        self.buttons_layout.setSpacing(6)
+        self.buttons_layout.setSpacing(2)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
         self.console_button = QtWidgets.QPushButton()
-        self.console_button.setFixedSize(QtCore.QSize(25, 25))
+        self.console_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.console_button, "Show console")
         self.console_button.setIcon(QtGui.QIcon(ressources._console_icon_))
         self.buttons_layout.addWidget(self.console_button)
 
+        self.wall_button = QtWidgets.QPushButton()
+        self.wall_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.wall_button, "Show notification wall")
+        self.wall_button.setIcon(QtGui.QIcon(ressources._wall_icon_))
+        self.buttons_layout.addWidget(self.wall_button)
+
     def connect_functions(self):
         self.console_button.clicked.connect(self.show_console.emit)
+        self.wall_button.clicked.connect(self.show_wall.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)
 
     def handle_record(self, record_tuple):
         self.logging_widget.handle_record(record_tuple)
+
+    def update_console_button(self, notification):
+        if notification == 'warning':
+            self.console_button.setIcon(QtGui.QIcon(ressources._console_warning_icon_))
+        elif notification == 'error':
+            self.console_button.setIcon(QtGui.QIcon(ressources._console_error_icon_))
+        elif notification == 'info':
+            self.console_button.setIcon(QtGui.QIcon(ressources._console_info_icon_))
+        else:
+            self.console_button.setIcon(QtGui.QIcon(ressources._console_icon_))
+
+    def update_wall_button(self, notification):
+        if notification:
+            self.wall_button.setIcon(QtGui.QIcon(ressources._wall_notification_icon_))
+        else:
+            self.wall_button.setIcon(QtGui.QIcon(ressources._wall_icon_))
 
 class tooltip_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -94,7 +118,7 @@ class tooltip_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.icon_label)
 
         self.main_label = gui_utils.ElidedLabel('Tooltips')
-        self.main_label.setObjectName('gray_label')
+        gui_utils.application_tooltip(self.main_label, "Come here if you're lost")
         self.main_layout.addWidget(self.main_label)
 
     def setText(self, text):
@@ -108,6 +132,7 @@ class script_bar(QtWidgets.QFrame):
 
     def build_ui(self):
         self.setFixedWidth(300)
+        gui_utils.application_tooltip(self, "Python command line")
 
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -141,6 +166,7 @@ class hardware_infos_widget(QtWidgets.QFrame):
         self.connect_functions()
 
     def build_ui(self):
+        gui_utils.application_tooltip(self, "Computer hardware informations")
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)

@@ -226,12 +226,12 @@ class launcher_widget(QtWidgets.QFrame):
 
     def refresh_lock_button(self):
         self.lock_button.setStyleSheet('')
-        gui_utils.application_tooltip(self.lock_button, "Lock work env")
+        gui_utils.modify_application_tooltip(self.lock_button, "Lock work environment")
         self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
         if self.work_env_row is not None:
             lock_id = project.get_work_env_data(self.work_env_row['id'], 'lock_id')
             if lock_id is not None:
-                gui_utils.application_tooltip(self.lock_button, "Unlock work env")
+                gui_utils.modify_application_tooltip(self.lock_button, "Unlock work environment")
                 css = "QPushButton{border: 2px solid #f0605b;background-color: #f0605b;}"
                 css += "QPushButton::hover{border: 2px solid #ff817d;background-color: #ff817d;}"
                 css += "QPushButton::pressed{border: 2px solid #ab4946;background-color: #ab4946;}"
@@ -382,6 +382,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.buttons_widget)
 
         self.lock_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.lock_button, "Lock work environment")
         self.lock_button.setFixedSize(60,60)
         self.buttons_layout.addWidget(self.lock_button)
 

@@ -81,7 +81,7 @@ class menu_widget(QtWidgets.QDialog):
         pushButton.setObjectName('menu_widget_button')
         if icon is not None:
             pushButton.setIcon(QtGui.QIcon(icon))
-            pushButton.setIconSize(QtCore.QSize(16,16))
+            pushButton.setIconSize(QtCore.QSize(22,22))
         self.buttons.append(pushButton)
         self.frame_layout.addWidget(pushButton)
         pushButton.clicked.connect(self.close)

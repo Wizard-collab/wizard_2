@@ -63,10 +63,14 @@ class main_widget(QtWidgets.QWidget):
         self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
         self.tabs_widget.currentChanged.connect(self.tab_changed)
         self.footer_widget.show_console.connect(self.console_widget.toggle)
+        self.footer_widget.show_wall.connect(self.wall_widget.toggle)
+        self.console_widget.notification.connect(self.footer_widget.update_console_button)
+        self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
 
         self.gui_server.refresh_signal.connect(self.refresh)
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
         self.gui_server.stdout_signal.connect(self.update_stdout)
+        self.gui_server.tree_focus_signal.connect(self.tree_widget.focus_instance)
 
     def update_stdout(self, tuple):
         self.footer_widget.handle_record(tuple)
@@ -147,6 +151,6 @@ class main_widget(QtWidgets.QWidget):
         self.tabs_widget.addTab(self.exports_widget, 'Exports')
         self.contents_2_layout.addWidget(self.launcher_widget)
         
-        #self.contents_layout.addWidget(self.wall_widget)
+        self.contents_layout.addWidget(self.wall_widget)
 
         self.main_layout.addWidget(self.footer_widget)

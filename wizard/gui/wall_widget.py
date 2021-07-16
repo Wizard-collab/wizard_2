@@ -4,7 +4,10 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 import time
+import os
+import json
 
 # Wizard modules
 from wizard.core import site
@@ -15,25 +18,43 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 class wall_widget(QtWidgets.QWidget):
+
+    notification = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super(wall_widget, self).__init__(parent)
         self.last_time = 0
-        self.ticket_ids = []
+        self.ticket_ids = dict()
+        self.time_widgets = []
+        self.search_thread = search_thread()
         self.build_ui()
         self.connect_functions()
         self.refresh()
 
     def connect_functions(self):
         self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
+        self.search_bar.textChanged.connect(self.update_search)
+        self.search_thread.id_signal.connect(self.add_search_event)
 
     def build_ui(self):
         self.setMaximumWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(4)
+        self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
+
+        self.header_frame = QtWidgets.QFrame()
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_frame.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_frame)
+
+        self.search_bar = gui_utils.search_bar()
+        self.search_bar.setPlaceholderText('"playblast", "user:j.smith", "content:shot_0021"')
+        self.header_layout.addWidget(self.search_bar)
 
         self.wall_scrollArea = QtWidgets.QScrollArea()
         self.wall_scrollBar = self.wall_scrollArea.verticalScrollBar()
@@ -49,20 +70,65 @@ class wall_widget(QtWidgets.QWidget):
         self.wall_scrollArea.setWidgetResizable(True)
         self.wall_scrollArea.setWidget(self.wall_scrollArea_widget)
 
+        self.wall_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
         self.main_layout.addWidget(self.wall_scrollArea)
+
+    def toggle(self):
+        if self.isVisible():
+            self.setVisible(0)
+        else:
+            self.setVisible(1)
+            self.notification.emit(0)
+
+    def hide_all(self):
+        for ticket_id in self.ticket_ids.keys():
+            self.ticket_ids[ticket_id].setVisible(0)
+        for time_widget in self.time_widgets:
+            time_widget.setVisible(0)
+
+    def show_all(self):
+        for ticket_id in self.ticket_ids.keys():
+            self.ticket_ids[ticket_id].setVisible(1)
+        for time_widget in self.time_widgets:
+            time_widget.setVisible(1)
+
+    def update_search(self):
+        search_data = self.search_bar.text()
+        if search_data != '':
+            self.hide_all()
+            search_column = 'title'
+            if ':' in search_data:
+                if search_data.split(':')[0] == 'content':
+                    search_column = 'message'
+                    search_data = search_data.split(':')[-1]
+                elif search_data.split(':')[0] == 'user':
+                    search_column = 'creation_user'
+                    search_data = search_data.split(':')[-1]
+            self.search_thread.update_search(search_data, search_column)
+        else:
+            self.show_all()
+
+    def add_search_event(self, event_id):
+        if event_id in self.ticket_ids.keys():
+            self.ticket_ids[event_id].setVisible(True)
 
     def refresh(self):
         event_rows = project.get_all_events()
         if event_rows is not None:
             for event_row in event_rows[-10:]:
-                if event_row['id'] not in self.ticket_ids:
+                if event_row['id'] not in self.ticket_ids.keys():
                     if event_row['creation_time']-self.last_time > 350:
                         time_widget = wall_time_widget(event_row['creation_time'])
                         self.wall_scrollArea_layout.addWidget(time_widget)
+                        self.time_widgets.append(time_widget)
                     event_widget = wall_event_widget(event_row)
                     self.wall_scrollArea_layout.addWidget(event_widget)
-                    self.ticket_ids.append(event_row['id'])
+                    self.ticket_ids[event_row['id']] = event_widget
                     self.last_time = event_row['creation_time']
+                    self.notification.emit(1)
+        self.update_search()
+
 
 class wall_time_widget(QtWidgets.QWidget):
     def __init__(self, time_float, parent = None):
@@ -97,6 +163,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_row = event_row
         self.build_ui()
         self.fill_ui()
+        self.connect_functions()
     
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
@@ -117,12 +184,25 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
 
+    def connect_functions(self):
+        self.action_button_button.clicked.connect(self.action)
+
+    def action(self):
+        if self.event_row['type'] == 'archive':
+            path = os.path.normpath(json.loads(self.event_row['data']))
+            if os.path.isfile(path):
+                os.startfile(path)
+        elif self.event_row['type'] == 'creation':
+            data = json.loads(self.event_row['data'])
+            gui_server.tree_focus_instance(data)
+
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(12)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(0,0,0,0)
         self.header_layout.setSpacing(12)
@@ -142,13 +222,12 @@ class wall_event_widget(QtWidgets.QFrame):
         self.profile_layout.addWidget(self.profile_picture)
 
         self.title_widget = QtWidgets.QWidget()
+        self.title_widget.setObjectName('transparent_widget')
         self.title_layout = QtWidgets.QVBoxLayout()
         self.title_layout.setContentsMargins(0,0,0,0)
         self.title_layout.setSpacing(2)
         self.title_widget.setLayout(self.title_layout)
         self.header_layout.addWidget(self.title_widget)
-
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.user_name_label = QtWidgets.QLabel()
         self.user_name_label.setObjectName('title_label')
@@ -159,13 +238,12 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_title_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.event_title_label)
 
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
-        
         self.event_content_label = QtWidgets.QLabel()
         self.event_content_label.setWordWrap(True)
         self.main_layout.addWidget(self.event_content_label)
 
         self.buttons_widget = QtWidgets.QWidget()
+        self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(4)
@@ -181,3 +259,27 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.action_button_button.setObjectName('blue_text_button')
         self.buttons_layout.addWidget(self.action_button_button)
+
+class search_thread(QtCore.QThread):
+
+    id_signal = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def update_search(self, search_data, search_column):
+        self.running = False
+        self.search_data = search_data
+        self.search_column = search_column
+        self.running = True
+        self.start()
+
+    def run(self):
+        events_ids = project.search_event(self.search_data, 
+                                                column_to_search=self.search_column,
+                                                column='id')
+        for event_id in events_ids:
+            if not self.running:
+                break
+            self.id_signal.emit(event_id)
