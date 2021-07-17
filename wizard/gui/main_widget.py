@@ -36,9 +36,6 @@ class main_widget(QtWidgets.QWidget):
         self.exports_widget = exports_widget.exports_widget(self)
         self.tabs_widget = tabs_widget.tabs_widget(self)
         self.wall_widget = wall_widget.wall_widget(self)
-        #self.user_widget = user_widget.user_widget(self)
-        #self.quotes_widget = quotes_widget.quotes_widget(self)
-        #self.shelf_widget = shelf_widget.shelf_widget(self)
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
         self.build_ui()
@@ -108,14 +105,6 @@ class main_widget(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 
-        '''
-        self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('main_widget')
-        self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setSpacing(2)
-        self.header_layout.setContentsMargins(0,0,0,0)
-        self.header_widget.setLayout(self.header_layout)
-        '''
         self.main_layout.addWidget(self.header_widget)
 
         self.contents_widget = QtWidgets.QWidget()
@@ -136,14 +125,6 @@ class main_widget(QtWidgets.QWidget):
         self.contents_1_widget.setLayout(self.contents_1_layout)
         self.contents_layout.addWidget(self.contents_1_widget)
 
-        
-        #self.contents_1_layout.addWidget(self.header_widget)
-        #self.contents_1_layout.addWidget(self.shelf_widget)
-
-        #self.header_layout.addWidget(self.user_widget)
-        #self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-        #self.header_layout.addWidget(self.quotes_widget)
-
         self.contents_2_widget = QtWidgets.QWidget()
         self.contents_2_widget.setObjectName('main_widget')
         self.contents_2_layout = QtWidgets.QHBoxLayout()
@@ -152,12 +133,12 @@ class main_widget(QtWidgets.QWidget):
         self.contents_2_widget.setLayout(self.contents_2_layout)
         self.contents_1_layout.addWidget(self.contents_2_widget)
 
-        #self.contents_2_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
         self.contents_2_layout.addWidget(self.tabs_widget)
         self.tabs_widget.addTab(self.versions_widget, 'Work versions')
         self.tabs_widget.addTab(self.exports_widget, 'Exports')
         self.contents_2_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)
+        self.wall_widget.setVisible(0)
 
         self.main_layout.addWidget(self.footer_widget)

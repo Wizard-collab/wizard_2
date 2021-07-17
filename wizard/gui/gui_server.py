@@ -48,8 +48,8 @@ class gui_server(QThread):
         super(gui_server, self).__init__()
 
         self.streamHandler = streamHandler()
-        sys.stdout = self.streamHandler
-        sys.stderr = self.streamHandler
+        #sys.stdout = self.streamHandler
+        #sys.stderr = self.streamHandler
 
         self.server, self.server_address = socket_utils.get_server(_DNS_)
         self.running = True

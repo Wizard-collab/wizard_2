@@ -282,3 +282,12 @@ def application_tooltip(widget, custom_tooltip):
 
 def modify_application_tooltip(widget, custom_tooltip):
     widget.application_tooltip = custom_tooltip
+
+def add_menu_to_menu_bar(menu_bar, title, icon=None):
+    if icon is not None:
+        menu = menu_bar.addMenu(icon, title)
+    else:
+        menu = menu_bar.addMenu(title)
+    menu.setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
+    menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+    return menu
