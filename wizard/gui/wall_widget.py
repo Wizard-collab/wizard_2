@@ -78,7 +78,6 @@ class wall_widget(QtWidgets.QWidget):
     def toggle(self):
         if self.isVisible():
             self.animate_hide()
-            #self.setVisible(0)
         else:
             self.setVisible(1)
             self.notification.emit(0)

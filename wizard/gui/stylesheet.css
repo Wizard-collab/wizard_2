@@ -324,11 +324,13 @@ QToolTip
 }
 
 QMenuBar {
-    padding: 3px;
+    padding: 0px;
 }
 
 QMenuBar::item {
-    padding: 6px;
+    padding: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
     border-radius: 4px;
 }
 
@@ -390,6 +392,20 @@ QDockWidget::close-button:hover, QDockWidget::float-button:hover {
 
 QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
     padding: 1px -1px -1px 1px;
+}
+
+QSlider::groove:horizontal {
+    height: 4px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: #24242b;
+    border-radius: 2px;
+}
+
+QSlider::handle:horizontal {
+    background: url(ressources/icons/note_slider.png);
+    width: 20px;
+    height: 20px;
+    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 3px;
 }
 
 #console_textEdit{

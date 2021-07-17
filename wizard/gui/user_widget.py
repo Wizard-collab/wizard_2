@@ -65,11 +65,11 @@ class user_widget(QtWidgets.QFrame):
 
         self.level_label = QtWidgets.QLabel('23')
         gui_utils.application_tooltip(self.level_label, "User level")
-        self.infos_layout.addWidget(self.level_label)
+        #self.infos_layout.addWidget(self.level_label)
         self.info_level_label = QtWidgets.QLabel('Level ')
         gui_utils.application_tooltip(self.info_level_label, "User level")
         self.info_level_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.info_level_label)
+        #self.infos_layout.addWidget(self.info_level_label)
 
         self.admin_badge_label = QtWidgets.QLabel()
         gui_utils.application_tooltip(self.admin_badge_label, "Admin badge")
