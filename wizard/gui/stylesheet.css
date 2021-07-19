@@ -293,7 +293,6 @@ QTabWidget::tab-bar {
 
 QTabWidget::pane{
     border-top: 40px solid #2c2c33;
-	background-color: #2c2c33;
     position: absolute;
     top: -35px;
 }
@@ -588,6 +587,13 @@ QSlider::handle:horizontal {
 	font: bold large;
 	font-size: 18px;
 }
+
+#title_label_gray{
+	color: gray;
+	font: bold large;
+	font-size: 18px;
+}
+
 
 #menu_widget_button{
 	text-align:left;

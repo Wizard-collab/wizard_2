@@ -10,6 +10,9 @@ from wizard.core import project
 from wizard.core import tools
 from wizard.vars import ressources
 
+# Wizard gui modules
+from wizard.gui import gui_utils
+
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(exports_widget, self).__init__(parent)
@@ -39,6 +42,10 @@ class exports_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
+        self.info_widget = gui_utils.info_widget()
+        self.info_widget.setVisible(0)
+        self.main_layout.addWidget(self.info_widget)
+
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(5)
@@ -55,22 +62,40 @@ class exports_widget(QtWidgets.QWidget):
     def refresh(self):
         if self.isVisible():
             if self.variant_id is not None:
+                print('loool')
+                self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
                 stage_id = project.get_variant_data(self.variant_id, 'stage_id')
                 stage_name = project.get_stage_data(stage_id, 'name')
                 stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
                 exports_rows = project.get_variant_export_childs(self.variant_id)
                 if exports_rows is not None:
-                    for export_row in exports_rows:
-                        if export_row['id'] not in self.export_ids.keys():
-                            export_item = custom_export_tree_item(export_row, stage_icon, self.list_view.invisibleRootItem())
-                            self.export_ids[export_row['id']] = export_item
-                export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
-                if export_versions_rows is not None:
-                    for export_version_row in export_versions_rows:
-                        if export_version_row['id'] not in self.export_versions_ids.keys():
-                            if export_version_row['export_id'] in self.export_ids.keys():
-                                export_version_item = custom_export_version_tree_item(export_version_row, self.export_ids[export_version_row['export_id']])
-                                self.export_versions_ids[export_version_row['id']] = export_version_item
+                    if exports_rows != []:
+                        self.hide_info_mode()
+                        for export_row in exports_rows:
+                            if export_row['id'] not in self.export_ids.keys():
+                                export_item = custom_export_tree_item(export_row, stage_icon, self.list_view.invisibleRootItem())
+                                self.export_ids[export_row['id']] = export_item
+                    export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
+                    if export_versions_rows is not None:
+                        if export_versions_rows != []:
+                            for export_version_row in export_versions_rows:
+                                if export_version_row['id'] not in self.export_versions_ids.keys():
+                                    if export_version_row['export_id'] in self.export_ids.keys():
+                                        export_version_item = custom_export_version_tree_item(export_version_row, self.export_ids[export_version_row['export_id']])
+                                    self.export_versions_ids[export_version_row['id']] = export_version_item
+            else:
+                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+
+
+    def show_info_mode(self, text, image):
+        self.info_widget.setVisible(1)
+        self.info_widget.setText(text)
+        self.info_widget.setImage(image)
+        self.list_view.setVisible(0)
+
+    def hide_info_mode(self):
+        self.info_widget.setVisible(0)
+        self.list_view.setVisible(1)
 
     def change_variant(self, variant_id):
         self.export_ids = dict()

@@ -50,6 +50,9 @@ _console_info_icon_ = os.path.join(_icons_path_, 'console_info.png')
 _wall_icon_ = os.path.join(_icons_path_, 'wall.png')
 _wall_notification_icon_ = os.path.join(_icons_path_, 'wall_notification.png')
 _wizard_icon_small_ = os.path.join(_icons_path_, 'wizard_icon_small.png')
+_launch_info_image_ = os.path.join(_icons_path_, 'launch_info.png')
+_select_stage_info_image_ = os.path.join(_icons_path_, 'select_stage_info.png')
+_empty_info_image_ = os.path.join(_icons_path_, 'info_empty.png')
 
 
 # Lock icons

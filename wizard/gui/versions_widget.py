@@ -32,6 +32,10 @@ class versions_widget(QtWidgets.QWidget):
         self.version_icon_ids = dict()
         self.check_existence_thread = check_existence_thread()
         self.search_thread = search_thread()
+
+        self.icon_mode = 0
+        self.list_mode = 1
+
         self.build_ui()
         self.connect_functions()
 
@@ -44,21 +48,32 @@ class versions_widget(QtWidgets.QWidget):
         self.work_env_id = work_env_id
         self.refresh()
 
+    def show_info_mode(self, text, image):
+        self.info_widget.setVisible(1)
+        self.info_widget.setText(text)
+        self.info_widget.setImage(image)
+        self.views_widget.setVisible(0)
+
+    def hide_info_mode(self):
+        self.info_widget.setVisible(0)
+        self.views_widget.setVisible(1)
+
     def refresh(self):
-        self.refresh_list_view()
-        self.refresh_icons_view()
-        self.update_search()
+        if self.isVisible():
+            self.refresh_list_view()
+            self.refresh_icons_view()
+            self.update_search()
 
     def refresh_list_view(self):
-        if self.list_view.isVisible() == True:
-
-            if self.work_env_id is not None:
+        if self.list_mode:
+            if self.work_env_id is not None and self.work_env_id != 0:
                 software_name = project.get_work_env_data(self.work_env_id, 'name')
                 software_icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
 
                 versions_rows = project.get_work_versions(self.work_env_id)
                 project_versions_id = []
                 if versions_rows is not None:
+                    self.hide_info_mode()
                     for version_row in versions_rows:
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_list_ids.keys():
@@ -69,55 +84,65 @@ class versions_widget(QtWidgets.QWidget):
                     if version_id not in project_versions_id:
                         self.remove_tree_version(version_id)
                 self.check_existence_thread.update_versions_rows(versions_rows)
+            elif self.work_env_id is None:
+                self.show_info_mode("No version, launch this asset\nto create the first version !", ressources._launch_info_image_)
+            else:
+                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
 
     def refresh_icons_view(self):
-        if self.icon_view.isVisible() == True:
-            versions_rows = project.get_work_versions(self.work_env_id)
-            project_versions_id = []
-            if versions_rows is not None:
-                for version_row in versions_rows:
-                    project_versions_id.append(version_row['id'])
-                    if version_row['id'] not in self.version_icon_ids.keys():
-                        version_item = custom_version_icon_item(version_row)
-                        self.icon_view.addItem(version_item)
-                        self.version_icon_ids[version_row['id']] = version_item
-            version_icon_ids = list(self.version_icon_ids.keys())
-            for version_id in version_icon_ids:
-                if version_id not in project_versions_id:
-                    self.remove_icon_version(version_id)
-            self.check_existence_thread.update_versions_rows(versions_rows)
+        if self.icon_mode:
+            if self.work_env_id is not None and self.work_env_id != 0:
+                versions_rows = project.get_work_versions(self.work_env_id)
+                project_versions_id = []
+                if versions_rows is not None:
+                    self.hide_info_mode()
+                    for version_row in versions_rows:
+                        project_versions_id.append(version_row['id'])
+                        if version_row['id'] not in self.version_icon_ids.keys():
+                            version_item = custom_version_icon_item(version_row)
+                            self.icon_view.addItem(version_item)
+                            self.version_icon_ids[version_row['id']] = version_item
+                version_icon_ids = list(self.version_icon_ids.keys())
+                for version_id in version_icon_ids:
+                    if version_id not in project_versions_id:
+                        self.remove_icon_version(version_id)
+                self.check_existence_thread.update_versions_rows(versions_rows)
+            elif self.work_env_id is None:
+                self.show_info_mode("No version, launch this asset\nto create the first version !", ressources._launch_info_image_)
+            else:
+                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
 
     def missing_file(self, version_id):
-        if self.list_view.isVisible():
+        if self.list_mode:
             if version_id in self.version_list_ids.keys():
                 self.version_list_ids[version_id].set_missing()
-        elif self.icon_view.isVisible():
+        elif self.icon_mode:
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].set_missing()
 
     def not_missing_file(self, version_id):
-        if self.list_view.isVisible():
+        if self.list_mode:
             if version_id in self.version_list_ids.keys():
                 self.version_list_ids[version_id].set_not_missing()
-        elif self.icon_view.isVisible():
+        elif self.icon_mode:
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].set_not_missing()
 
     def hide_all(self):
-        if self.list_view.isVisible():
+        if self.list_mode:
             for version_id in self.version_list_ids.keys():
                 self.version_list_ids[version_id].setHidden(True)
-        elif self.icon_view.isVisible():
+        elif self.icon_mode:
             for version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].setHidden(True)
 
     def show_all(self):
-        if self.list_view.isVisible():
+        if self.list_mode:
             for version_id in self.version_list_ids.keys():
                 self.version_list_ids[version_id].setHidden(False)
-        elif self.icon_view.isVisible():
+        elif self.icon_mode:
             for version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].setHidden(False)
 
@@ -138,10 +163,10 @@ class versions_widget(QtWidgets.QWidget):
             self.show_all()
 
     def add_search_version(self, version_id):
-        if self.list_view.isVisible():
+        if self.list_mode:
             if version_id in self.version_list_ids.keys():
                 self.version_list_ids[version_id].setHidden(False)
-        elif self.icon_view.isVisible():
+        elif self.icon_mode:
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].setHidden(False)
 
@@ -178,6 +203,17 @@ class versions_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
+        self.info_widget = gui_utils.info_widget()
+        self.info_widget.setVisible(0)
+        self.main_layout.addWidget(self.info_widget)
+
+        self.views_widget = QtWidgets.QWidget()
+        self.views_layout = QtWidgets.QHBoxLayout()
+        self.views_layout.setContentsMargins(0,0,0,0)
+        self.views_layout.setSpacing(0)
+        self.views_widget.setLayout(self.views_layout)
+        self.main_layout.addWidget(self.views_widget)
+
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
@@ -188,8 +224,7 @@ class versions_widget(QtWidgets.QWidget):
 
         self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File'])
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
-        self.main_layout.addWidget(self.list_view)
-        self.list_view.setVisible(0)
+        self.views_layout.addWidget(self.list_view)
 
         self.icon_view = QtWidgets.QListWidget()
         self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -201,7 +236,8 @@ class versions_widget(QtWidgets.QWidget):
         self.icon_view.setViewMode(QtWidgets.QListView.IconMode)
         self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
-        self.main_layout.addWidget(self.icon_view)
+        self.views_layout.addWidget(self.icon_view)
+        self.icon_view.setVisible(0)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
@@ -222,7 +258,7 @@ class versions_widget(QtWidgets.QWidget):
         gui_utils.application_tooltip(self.toggle_view_button, "Switch to list view")
         self.toggle_view_button.setFixedSize(35,35)
         self.toggle_view_button.setIconSize(QtCore.QSize(30,30))
-        self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_list_view_))
+        self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
         self.buttons_layout.addWidget(self.toggle_view_button)
 
         self.duplicate_button = QtWidgets.QPushButton()
@@ -304,13 +340,20 @@ class versions_widget(QtWidgets.QWidget):
 
     def toggle_view(self):
         selection = self.get_selection()
-        vis = self.icon_view.isVisible()
-        self.icon_view.setVisible(1-vis)
-        self.list_view.setVisible(vis)
-        if not vis:
+        if self.icon_mode:
+            self.icon_view.setVisible(0)
+            self.list_view.setVisible(1)
+            self.list_mode = 1
+            self.icon_mode = 0
+        elif self.list_mode:
+            self.icon_view.setVisible(1)
+            self.list_view.setVisible(0)
+            self.list_mode = 0
+            self.icon_mode = 1
+        if self.icon_mode:
             self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_list_view_))
             gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to list view")
-        else:
+        elif self.list_mode:
             self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
             gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to icon view")
         self.refresh()
@@ -318,17 +361,17 @@ class versions_widget(QtWidgets.QWidget):
 
     def get_number(self):
         number = 0
-        if self.icon_view.isVisible() == True:
+        if self.icon_mode:
             number = len(self.version_icon_ids)
-        elif self.list_view.isVisible() == True:
+        elif self.list_mode:
             number = len(self.version_list_ids)
         return number
 
     def get_selection(self):
         selection = None
-        if self.icon_view.isVisible() == True:
+        if self.icon_mode:
             selection = self.icon_view.selectedItems()
-        elif self.list_view.isVisible() == True:
+        elif self.list_mode:
             selection = self.list_view.selectedItems()
         return selection
 
@@ -336,9 +379,9 @@ class versions_widget(QtWidgets.QWidget):
         self.clear_selection()
         if selection is not None:
             for item in selection:
-                if self.icon_view.isVisible() == True:
+                if self.icon_mode:
                     self.version_icon_ids[item.version_row['id']].setSelected(True)
-                elif self.list_view.isVisible() == True:
+                elif self.list_mode:
                     self.version_list_ids[item.version_row['id']].setSelected(True)
 
     def clear_selection(self):

@@ -178,7 +178,7 @@ class launcher_widget(QtWidgets.QFrame):
             self.version_comboBox.addItem('0001')
             self.work_env_changed_signal.emit(None)
         else:
-            self.work_env_changed_signal.emit(None)
+            self.work_env_changed_signal.emit(0)
 
         self.refresh_version_changed = 1
         self.version_changed()
