@@ -295,6 +295,7 @@ def add_menu_to_menu_bar(menu_bar, title, icon=None):
 class info_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(info_widget, self).__init__(parent)
+        self.old_image = None
         self.build_ui()
 
     def build_ui(self):
@@ -305,15 +306,36 @@ class info_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.main_layout.setAlignment(QtCore.Qt.AlignCenter)
         self.setLayout(self.main_layout)
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+
+        self.animation_widget = QtWidgets.QWidget()
+        self.animation_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.animation_widget.setObjectName('dark_widget')
+        self.animation_layout = QtWidgets.QVBoxLayout()
+        self.animation_layout.setContentsMargins(0,0,0,0)
+        self.animation_layout.setSpacing(6)
+        self.animation_widget.setLayout(self.animation_layout)
+        self.main_layout.addWidget(self.animation_widget)
+
+        self.animation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
         self.image = QtWidgets.QLabel()
         self.image.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_layout.addWidget(self.image)
+        self.animation_layout.addWidget(self.image)
         self.text = QtWidgets.QLabel()
         self.text.setAlignment(QtCore.Qt.AlignCenter)
         self.text.setObjectName('title_label_gray')
-        self.main_layout.addWidget(self.text)
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.animation_layout.addWidget(self.text)
+
+        self.animation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+    def pop(self):
+        self.animation = QtCore.QPropertyAnimation(self.animation_widget, b"geometry")
+        self.animation.setDuration(300)
+        self.animation.setStartValue(QtCore.QRect(self.geometry().x(), self.geometry().y()-30, self.geometry().width(), self.geometry().height()))
+        self.animation.setEndValue(self.geometry())
+        self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
+        self.animation.start()
 
     def setImage(self, image):
         self.image.setPixmap(QtGui.QPixmap(image).scaled(

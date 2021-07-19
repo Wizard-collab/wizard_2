@@ -39,6 +39,8 @@ _tool_duplicate_ = os.path.join(_icons_path_, 'tool_duplicate.png')
 _tool_add_ = os.path.join(_icons_path_, 'tool_add.png')
 _tool_folder_ = os.path.join(_icons_path_, 'tool_folder.png')
 _tool_archive_ = os.path.join(_icons_path_, 'tool_archive.png')
+_tool_manually_publish_ = os.path.join(_icons_path_, 'tool_manually_publish.png')
+_tool_batch_publish_ = os.path.join(_icons_path_, 'tool_batch_publish.png')
 _random_icon_ = os.path.join(_icons_path_, 'random.png')
 _bulb_icon_ = os.path.join(_icons_path_, 'bulb.png')
 _info_icon_ = os.path.join(_icons_path_, 'info.png')
@@ -53,6 +55,7 @@ _wizard_icon_small_ = os.path.join(_icons_path_, 'wizard_icon_small.png')
 _launch_info_image_ = os.path.join(_icons_path_, 'launch_info.png')
 _select_stage_info_image_ = os.path.join(_icons_path_, 'select_stage_info.png')
 _empty_info_image_ = os.path.join(_icons_path_, 'info_empty.png')
+_tickets_info_image_ = os.path.join(_icons_path_, 'info_tickets.png')
 
 
 # Lock icons

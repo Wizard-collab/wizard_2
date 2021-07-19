@@ -1050,6 +1050,13 @@ def get_all_tickets(column='*'):
                                         column)
     return tickets_rows
 
+def get_tickets_by_stage(stage_id, column='*'):
+    tickets_rows = db_utils.get_row_by_column_data('project',
+                                                        'tickets',
+                                                        ('stage_id', stage_id),
+                                                        column)
+    return tickets_rows
+
 def remove_ticket(ticket_id):
     success = None
     if site.is_admin():

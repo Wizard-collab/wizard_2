@@ -73,12 +73,12 @@ class launcher_widget(QtWidgets.QFrame):
                         self.variant_comboBox.addItem(variant_row['name'])
 
     def refresh_variants_hard(self):
+        self.refresh_variant_changed = None
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
         else:
             self.stage_row = None
         self.variant_comboBox.clear()
-        self.refresh_variant_changed = None
 
         if self.stage_row is not None:
             variant_rows = project.get_stage_childs(self.stage_row['id'])
@@ -102,8 +102,8 @@ class launcher_widget(QtWidgets.QFrame):
                     if self.variant_row is not None:
                         project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
 
-        self.refresh_state()
-        self.refresh_work_envs_hard()
+            self.refresh_work_envs_hard()
+            self.refresh_state()
 
     def refresh_state(self):
         self.update_state = None
@@ -145,7 +145,7 @@ class launcher_widget(QtWidgets.QFrame):
                     if self.work_env_row is not None:
                         project.set_variant_data(self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
                 
-        self.refresh_versions_hard()
+            self.refresh_versions_hard()
 
     def refresh_versions(self):
         if self.work_env_row is not None:
@@ -189,7 +189,7 @@ class launcher_widget(QtWidgets.QFrame):
             if self.work_env_row is not None:
                 self.version_row = project.get_work_version_by_name(self.work_env_row['id'], 
                                                                     self.version_comboBox.currentText())
-        self.refresh_infos()
+            self.refresh_infos()
 
     def refresh_infos(self):
         if self.version_row:

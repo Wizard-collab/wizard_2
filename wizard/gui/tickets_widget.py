@@ -21,92 +21,239 @@ from wizard.gui import gui_utils
 class tickets_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(tickets_widget, self).__init__(parent)
+        self.stage_id = None
+        self.ticket_ids = dict()
         self.build_ui()
+        self.connect_functions()
         self.refresh()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(4)
+        self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
+
+        self.info_widget = gui_utils.info_widget()
+        self.info_widget.setVisible(0)
+        self.main_layout.addWidget(self.info_widget)
 
         self.tickets_scrollArea = QtWidgets.QScrollArea()
 
         self.tickets_scrollArea_widget = QtWidgets.QWidget()
         self.tickets_scrollArea_widget.setObjectName('tickets_scroll_area')
         self.tickets_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.tickets_scrollArea_layout.setSpacing(6)
+        self.tickets_scrollArea_layout.setSpacing(0)
         self.tickets_scrollArea_widget.setLayout(self.tickets_scrollArea_layout)
 
-        self.tickets_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.tickets_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.tickets_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tickets_scrollArea.setWidgetResizable(True)
         self.tickets_scrollArea.setWidget(self.tickets_scrollArea_widget)
 
+        self.tickets_widget = QtWidgets.QWidget()
+        self.tickets_widget.setObjectName('transparent_widget')
+        self.tickets_layout = QtWidgets.QVBoxLayout()
+        self.tickets_layout.setSpacing(6)
+        self.tickets_layout.setContentsMargins(11,11,11,11)
+        self.tickets_widget.setLayout(self.tickets_layout)
+        self.tickets_scrollArea_layout.addWidget(self.tickets_widget)
+
+        self.tickets_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
         self.main_layout.addWidget(self.tickets_scrollArea)
 
+        self.buttons_widget = QtWidgets.QWidget()
+        self.buttons_widget.setObjectName('dark_widget')
+        self.buttons_layout = QtWidgets.QHBoxLayout()
+        self.buttons_layout.setContentsMargins(8,8,8,0)
+        self.buttons_layout.setSpacing(4)
+        self.buttons_widget.setLayout(self.buttons_layout)
+        self.main_layout.addWidget(self.buttons_widget)
+
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        
+        self.search_bar = gui_utils.search_bar()
+        gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
+        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye"')
+        self.buttons_layout.addWidget(self.search_bar)
+
+        self.toggle_visibility_checkBox = QtWidgets.QCheckBox('Only openned tickets')
+        self.toggle_visibility_checkBox.setObjectName('transparent_widget')
+        self.toggle_visibility_checkBox.setChecked(1)
+        self.buttons_layout.addWidget(self.toggle_visibility_checkBox)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('dark_widget')
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(8,8,8,8)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.versions_count_label = QtWidgets.QLabel()
+        self.versions_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.versions_count_label)
+
+        self.selection_count_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selection_count_label)
+
+    def connect_functions(self):
+        self.toggle_visibility_checkBox.stateChanged.connect(self.update_visibility)
+
+    def show_info_mode(self, text, image):
+        self.tickets_scrollArea.setVisible(0)
+        self.info_widget.setVisible(1)
+        self.info_widget.setText(text)
+        self.info_widget.setImage(image)
+
+    def hide_info_mode(self):
+        self.info_widget.setVisible(0)
+        self.tickets_scrollArea.setVisible(1)
+
     def refresh(self):
-        self.all_tickets_ids = project.get_all_tickets('id')
-        for ticket_id in self.all_tickets_ids:
-            new_ticket_widget = ticket_widget(ticket_id)
-            self.tickets_scrollArea_layout.addWidget(new_ticket_widget)
+        if self.stage_id is not None:
+            tickets_rows = project.get_tickets_by_stage(self.stage_id)
+            if tickets_rows is not None:
+                if tickets_rows != []:
+                    for ticket_row in tickets_rows:
+                        if ticket_row['id'] not in self.ticket_ids.keys():
+                            new_ticket_widget = ticket_widget(ticket_row)
+                            self.ticket_ids[ticket_row['id']] = new_ticket_widget
+                            self.tickets_layout.addWidget(new_ticket_widget)
+                        else:
+                            self.ticket_ids[ticket_row['id']].update(ticket_row)
+            self.update_visibility()
+        else:
+            self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+
+    def update_visibility(self):
+        if self.toggle_visibility_checkBox.isChecked():
+            for ticket_id in self.ticket_ids.keys():
+                if self.ticket_ids[ticket_id].ticket_row['state'] == 1:
+                    self.ticket_ids[ticket_id].setVisible(1)
+                else:
+                    self.ticket_ids[ticket_id].setVisible(0)
+        else:
+            self.show_all()
+        self.update_info_mode()
+
+    def update_info_mode(self):
+        self.hide_info_mode()
+        visible_tickets = []
+        for ticket_id in self.ticket_ids.keys():
+            if self.ticket_ids[ticket_id].isVisible():
+                visible_tickets.append(ticket_id)
+
+        if visible_tickets == []:
+            self.show_info_mode("No tickets openned,\nyou're doing it great !", ressources._tickets_info_image_)
+
+    def show_all(self):
+        for ticket_id in self.ticket_ids.keys():
+            self.ticket_ids[ticket_id].setVisible(1)
+
+    def clear(self):
+        self.ticket_ids = dict()
+        for i in reversed(range(self.tickets_layout.count())): 
+            self.tickets_layout.itemAt(i).widget().setParent(None)
+
+    def change_stage(self, stage_id):
+        self.stage_id = stage_id
+        self.clear()
+        self.refresh()
+        self.info_widget.pop()
 
 class ticket_widget(QtWidgets.QWidget):
-    def __init__(self, ticket_id, parent = None):
+    def __init__(self, ticket_row, parent = None):
         super(ticket_widget, self).__init__(parent)
-        self.ticket_id = ticket_id
+        self.ticket_row = ticket_row
         self.build_ui()
         self.connect_functions()
         self.fill_ui()
 
-    def fill_ui(self):
-        ticket_row = project.get_ticket_data(self.ticket_id)
-        self.title_label.setText(ticket_row['title'])
-        self.user_name_label.setText(ticket_row['creation_user'])
-        if ticket_row['destination_user'] is None:
-            destination_user = 'everybody'
-        else:
-            destination_user = ticket_row['destination_user']
-        self.destination_label.setText(destination_user)
-        day, hour = tools.convert_time(ticket_row['creation_time'])
-        self.date_label.setText(f"{day} - {hour}")
-        profile_picture = site.get_user_row_by_name(ticket_row['creation_user'], 'profile_picture')
-        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_picture), 50)
-        self.content_label.setText(ticket_row['message'])
+    def update(self, ticket_row):
+        self.ticket_row = ticket_row
+        self.refresh()
 
-        if ticket_row['state'] == 1:
+    def refresh(self):
+        if self.ticket_row['state'] == 1:
             state = 'Open'
             color = '#edaa6b'
+            self.close_ticket_button.setObjectName('red_button')
+            self.close_ticket_button.setStyleSheet('''
+                                                    #red_button{
+                                                        border: 2px solid #f0605b;
+                                                    }
+
+                                                    #red_button::hover{
+                                                        background-color: #ff817d;
+                                                        border: 2px solid #ff817d;
+                                                    }
+
+                                                    #red_button::pressed{
+                                                        background-color: #ab4946;
+                                                        border: 2px solid #ab4946;
+                                                    }''')
+            self.close_ticket_button.setText('Close')
         else:
             state = 'Closed'
             color = '#8fcc70'
             self.close_ticket_button.setObjectName('blue_button')
+            self.close_ticket_button.setStyleSheet('''
+                                                    #blue_button{
+                                                        background-color: transparent;
+                                                        border: 2px solid #7785de;
+                                                    }
+
+                                                    #blue_button::hover{
+                                                        background-color: #8e9dfa;
+                                                        border: 2px solid #8e9dfa;
+                                                    }
+
+                                                    #blue_button::pressed{
+                                                        background-color: #6772b5;
+                                                        border: 2px solid #6772b5;
+                                                    }''')
             self.close_ticket_button.setText('Open')
-            self.close_ticket_button.clicked.disconnect(self.close_ticket)
-            self.close_ticket_button.clicked.connect(self.open_ticket)
 
         self.state_label.setStyleSheet('color:%s'%color)
         self.state_label.setText(state)
 
-        files_list = json.loads(ticket_row['files'])
+    def fill_ui(self):
+        self.title_label.setText(self.ticket_row['title'])
+        self.user_name_label.setText(self.ticket_row['creation_user'])
+        if self.ticket_row['destination_user'] is None:
+            destination_user = 'everybody'
+        else:
+            destination_user = self.ticket_row['destination_user']
+        self.destination_label.setText(destination_user)
+        day, hour = tools.convert_time(self.ticket_row['creation_time'])
+        self.date_label.setText(f"{day} - {hour}")
+        profile_picture = site.get_user_row_by_name(self.ticket_row['creation_user'], 'profile_picture')
+        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_picture), 50)
+        self.content_label.setText(self.ticket_row['message'])
+
+        files_list = json.loads(self.ticket_row['files'])
         for file in files_list:
             new_file_button = file_button(file)
-            new_file_button.clicked.connect(lambda: self.open_file(new_file_button.file))
+            #new_file_button.clicked.connect(lambda: self.open_file(new_file_button.file))
             self.files_scrollArea_layout.insertWidget(0,new_file_button)
         if len(files_list)>=1:
             self.files_scrollArea.setVisible(True)
+        self.refresh()
 
     def open_file(self, file):
         os.startfile(file)
 
-    def close_ticket(self):
-        assets.close_ticket(self.ticket_id)
-
-    def open_ticket(self):
-        assets.open_ticket(self.ticket_id)
+    def toggle_ticket(self):
+        if self.ticket_row['state'] == 1:
+            assets.close_ticket(self.ticket_row['id'])
+        else:
+            assets.open_ticket(self.ticket_row['id'])
 
     def connect_functions(self):
-        self.close_ticket_button.clicked.connect(self.close_ticket)
+        self.close_ticket_button.clicked.connect(self.toggle_ticket)
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -173,7 +320,6 @@ class ticket_widget(QtWidgets.QWidget):
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed))
 
         self.close_ticket_button = QtWidgets.QPushButton('Close')
-        self.close_ticket_button.setObjectName('red_button')
         self.header_layout.addWidget(self.close_ticket_button)
 
         self.content_widget = QtWidgets.QWidget()
@@ -230,3 +376,7 @@ class file_button(QtWidgets.QPushButton):
         self.setObjectName('file_button')
         self.setIcon(QtGui.QIcon(ressources._file_icon_))
         self.setText(os.path.basename(self.file))
+        self.clicked.connect(self.open)
+
+    def open(self):
+        os.startfile(self.file)

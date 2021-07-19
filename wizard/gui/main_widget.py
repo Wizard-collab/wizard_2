@@ -25,6 +25,7 @@ from wizard.gui import shelf_widget
 from wizard.gui import footer_widget
 from wizard.gui import console_widget
 from wizard.gui import header_widget
+from wizard.gui import tickets_widget
 
 class main_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -38,6 +39,7 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget = wall_widget.wall_widget(self)
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
+        self.tickets_widget = tickets_widget.tickets_widget(self)
         self.build_ui()
         self.init_gui_server()
         self.init_communicate_server()
@@ -77,6 +79,7 @@ class main_widget(QtWidgets.QWidget):
 
     def stage_changed(self, stage_id):
         self.launcher_widget.change_stage(stage_id)
+        self.tickets_widget.change_stage(stage_id)
 
     def variant_changed(self, variant_id):
         self.exports_widget.change_variant(variant_id)
@@ -87,6 +90,7 @@ class main_widget(QtWidgets.QWidget):
     def tab_changed(self):
         self.versions_widget.refresh()
         self.exports_widget.refresh()
+        self.tickets_widget.refresh()
 
     def refresh(self):
         start_time = time.time()
@@ -96,6 +100,7 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
+        self.tickets_widget.refresh()
         logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):
@@ -136,6 +141,7 @@ class main_widget(QtWidgets.QWidget):
         self.contents_2_layout.addWidget(self.tabs_widget)
         self.tabs_widget.addTab(self.versions_widget, 'Work versions')
         self.tabs_widget.addTab(self.exports_widget, 'Exports')
+        self.tabs_widget.addTab(self.tickets_widget, 'Tickets')
         self.contents_2_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)

@@ -47,12 +47,13 @@ class versions_widget(QtWidgets.QWidget):
         self.icon_view.clear()
         self.work_env_id = work_env_id
         self.refresh()
+        self.info_widget.pop()
 
     def show_info_mode(self, text, image):
+        self.views_widget.setVisible(0)
         self.info_widget.setVisible(1)
         self.info_widget.setText(text)
         self.info_widget.setImage(image)
-        self.views_widget.setVisible(0)
 
     def hide_info_mode(self):
         self.info_widget.setVisible(0)

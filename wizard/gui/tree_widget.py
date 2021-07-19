@@ -90,6 +90,7 @@ class tree_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.search_frame)
 
         self.tree = QtWidgets.QTreeWidget()
+        self.tree.setAnimated(1)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setHeaderHidden(True)

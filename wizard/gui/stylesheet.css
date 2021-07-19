@@ -88,7 +88,7 @@ QComboBox::down-arrow {
 QCheckBox::indicator {
     width: 20px;
     height: 20px;
-    background-color:#24242b;
+    background-color:#18181c;
     border-radius: 5px;
 }
 
