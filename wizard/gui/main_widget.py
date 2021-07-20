@@ -105,7 +105,7 @@ class main_widget(QtWidgets.QWidget):
         start_time = time.time()
         self.tree_widget.refresh()
         self.launcher_widget.refresh()
-        #self.user_widget.refresh()
+        self.header_widget.refresh()
         self.wall_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()

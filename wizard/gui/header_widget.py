@@ -21,6 +21,9 @@ class header_widget(QtWidgets.QFrame):
         self.quotes_widget = quotes_widget.quotes_widget()
         self.build_ui()
 
+    def refresh(self):
+        self.user_widget.refresh()
+
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(2,2,8,2)

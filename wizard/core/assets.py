@@ -405,13 +405,16 @@ def archive_export(export_id):
 		if export_row:
 			dir_name = get_export_path(export_id)
 			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
+				archive_file = tools.make_archive(dir_name)
+				if archive_file:
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
 			else:
 				logger.warning(f"{dir_name} not found")
 			success = project.remove_export(export_id)
 			if success:
+				events.add_archive_event(f"Archived export : {export_row['name']}",
+												archive_file)
 				gui_server.refresh_ui()
 			return success
 		else:
@@ -449,13 +452,16 @@ def archive_export_version(export_version_id):
 		if export_version_row:
 			dir_name = get_export_version_path(export_version_id)
 			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
+				archive_file = tools.make_archive(dir_name)
+				if archive_file:
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
 			else:
 				logger.warning(f"{dir_name} not found")
 			success = project.remove_export_version(export_version_id)
 			if success:
+				events.add_archive_event(f"Archived export version: {export_version_row['name']}",
+												archive_file)
 				gui_server.refresh_ui()
 			return success
 		else:
