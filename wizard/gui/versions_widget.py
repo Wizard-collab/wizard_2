@@ -190,6 +190,7 @@ class versions_widget(QtWidgets.QWidget):
         self.new_version_button.clicked.connect(self.add_empty_version)
         self.folder_button.clicked.connect(self.open_folder)
         self.toggle_view_button.clicked.connect(self.toggle_view)
+        self.launch_button.clicked.connect(self.launch)
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
@@ -262,6 +263,13 @@ class versions_widget(QtWidgets.QWidget):
         self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
         self.buttons_layout.addWidget(self.toggle_view_button)
 
+        self.launch_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.launch_button, "Launch selection")
+        self.launch_button.setFixedSize(35,35)
+        self.launch_button.setIconSize(QtCore.QSize(30,30))
+        self.launch_button.setIcon(QtGui.QIcon(ressources._tool_launch_))
+        self.buttons_layout.addWidget(self.launch_button)
+
         self.duplicate_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.duplicate_button, "Duplicate selection")
         self.duplicate_button.setFixedSize(35,35)
@@ -319,7 +327,7 @@ class versions_widget(QtWidgets.QWidget):
             archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
         launch_action = None
         if len(selection)==1:
-            launch_action = self.menu_widget.add_action(f'Launch version')
+            launch_action = self.menu_widget.add_action(f'Launch version', ressources._tool_launch_)
         if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
             if self.menu_widget.function_name is not None:
                 if self.menu_widget.function_name == folder_action:
@@ -465,7 +473,7 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('#f79360')))
 
     def set_not_missing(self):
-        self.setForeground(5, QtGui.QBrush(QtGui.QColor('white')))
+        self.setForeground(5, QtGui.QBrush(QtGui.QColor('#9ce87b')))
 
 class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, version_row, parent=None):
@@ -489,7 +497,7 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
         self.setForeground(QtGui.QColor('#f79360'))
 
     def set_not_missing(self):
-        self.setForeground(QtGui.QColor('white'))
+        self.setForeground(QtGui.QColor('#9ce87b'))
 
 class check_existence_thread(QtCore.QThread):
 

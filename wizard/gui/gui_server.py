@@ -43,6 +43,7 @@ class gui_server(QThread):
     tooltip_signal = pyqtSignal(str)
     stdout_signal = pyqtSignal(tuple)
     tree_focus_signal = pyqtSignal(object)
+    export_version_focus_signal = pyqtSignal(object)
 
     def __init__(self):
         super(gui_server, self).__init__()
@@ -83,6 +84,8 @@ class gui_server(QThread):
             self.tooltip_signal.emit(signal_dic['tooltip'])
         elif signal_dic['function'] == 'tree_focus':
             self.tree_focus_signal.emit(signal_dic['instance_tuple'])
+        elif signal_dic['function'] == 'export_version_focus':
+            self.export_version_focus_signal.emit(signal_dic['export_version_id'])
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
@@ -102,4 +105,10 @@ def tree_focus_instance(instance_tuple):
     signal_dic = dict()
     signal_dic['function'] = 'tree_focus'
     signal_dic['instance_tuple'] = instance_tuple
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
+
+def focus_export_version(export_version_id):
+    signal_dic = dict()
+    signal_dic['function'] = 'export_version_focus'
+    signal_dic['export_version_id'] = export_version_id
     socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)

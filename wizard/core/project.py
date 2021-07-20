@@ -456,8 +456,16 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                     'export_versions',
                                     ('name', 'export_id'),
                                     (name, export_id))):
+
         variant_id = get_export_data(export_id, 'variant_id')
         stage_id = get_variant_data(variant_id, 'stage_id')
+        if work_version_id is not None:
+            work_env_id = get_version_data(work_version_id, 'work_env_id')
+            software_id = get_work_env_data(work_env_id, 'software_id')
+            software = get_software_data(software_id, 'name')
+        else:
+            software = None
+
         export_version_id = db_utils.create_row('project',
                             'export_versions', 
                             ('name',
@@ -468,6 +476,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 'variant_id',
                                 'stage_id',
                                 'work_version_id',
+                                'software',
                                 'export_id'), 
                             (name,
                                 time.time(),
@@ -477,6 +486,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 variant_id,
                                 stage_id,
                                 work_version_id,
+                                software,
                                 export_id))
         if export_version_id:
             logger.info(f"Export version {name} added to project")
@@ -509,6 +519,20 @@ def remove_export_version(export_version_id):
         if success:
             logger.info("Export version removed from project")
     return success
+
+def search_export_version(data_to_search, variant_id=None, column_to_search='name', column='*'):
+    if variant_id:
+        export_versions_rows = db_utils.get_row_by_column_part_data_and_data('project',
+                                                        'export_versions',
+                                                        (column_to_search, data_to_search),
+                                                        ('variant_id', variant_id),
+                                                        column)
+    else:
+        export_versions_rows = db_utils.get_row_by_column_part_data('project',
+                                                            'export_versions',
+                                                            (column_to_search, data_to_search),
+                                                            column)
+    return export_versions_rows
 
 def get_export_version_tickets(export_version_id, column='*'):
     tickets_rows = db_utils.get_row_by_column_data('project',
@@ -699,7 +723,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
                             'file_path',
                             'screenshot_path',
                             'thumbnail_path',
-                            'work_env_id'), 
+                            'work_env_id'),
                         (name,
                             time.time(),
                             environment.get_user(),
@@ -1357,6 +1381,7 @@ def create_export_versions_table(database):
                                         variant_id integer NOT NULL,
                                         stage_id integer NOT NULL,
                                         work_version_id integer,
+                                        software text,
                                         export_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (stage_id) REFERENCES stages (id),

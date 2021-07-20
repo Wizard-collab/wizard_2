@@ -9,16 +9,23 @@ import json
 import os
 
 # Wizard modules
+from wizard.core import launch
+from wizard.core import assets
 from wizard.core import project
 from wizard.core import tools
 from wizard.vars import ressources
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import confirm_widget
+from wizard.gui import menu_widget
 
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(exports_widget, self).__init__(parent)
+        self.search_thread = search_thread()
 
         self.icons_dic = dict()
         self.icons_dic['modeling'] = QtGui.QIcon(ressources._modeling_icon_small_)
@@ -51,12 +58,15 @@ class exports_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.info_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
+        self.list_view.setAnimated(1)
+        self.list_view.setExpandsOnDoubleClick(0)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(6)
+        self.list_view.setColumnCount(7)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'Infos'])
+        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Infos'])
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
@@ -76,18 +86,25 @@ class exports_widget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.search_bar)
 
         self.manual_publish_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.manual_publish_button, "Publish a file manually")
+        gui_utils.application_tooltip(self.manual_publish_button, "Manually add a file")
         self.manual_publish_button.setFixedSize(35,35)
         self.manual_publish_button.setIconSize(QtCore.QSize(30,30))
         self.manual_publish_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_publish_button)
 
         self.batch_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.batch_button, "Batch publish")
+        gui_utils.application_tooltip(self.batch_button, "Batch export")
         self.batch_button.setFixedSize(35,35)
         self.batch_button.setIconSize(QtCore.QSize(30,30))
         self.batch_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
         self.buttons_layout.addWidget(self.batch_button)
+
+        self.launch_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.launch_button, "Launch related work version")
+        self.launch_button.setFixedSize(35,35)
+        self.launch_button.setIconSize(QtCore.QSize(30,30))
+        self.launch_button.setIcon(QtGui.QIcon(ressources._tool_launch_))
+        self.buttons_layout.addWidget(self.launch_button)
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open export folder")
@@ -120,48 +137,205 @@ class exports_widget(QtWidgets.QWidget):
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
 
+    def archive(self):
+        selection = self.list_view.selectedItems()
+        if selection is not None:
+            if selection != []:
+                self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+                if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    for item in selection:
+                        if item.type == 'export_version':
+                            export_version_id = item.export_version_row['id']
+                            assets.archive_export_version(export_version_id)
+                        elif item.type == 'export':
+                            export_id = item.export_row['id']
+                            assets.archive_export(export_id)
+
+    def open_folder(self):
+        if self.variant_id is not None:
+            folder = assets.get_variant_export_path(self.variant_id)
+            selection = self.list_view.selectedItems()
+            if selection is not None:
+                if len(selection)==1:
+                    if selection[0].type == 'export_version':
+                        files = json.loads(selection[0].export_version_row['files'])
+                        if files != [] and files != None:
+                            file = files[0]
+                            folder = os.path.dirname(file)
+                    elif selection[0].type == 'export':
+                        export_id = selection[0].export_row['id']
+                        folder = assets.get_export_path(export_id)
+            if os.path.isdir(folder):
+                os.startfile(folder)
+            else:
+                logger.warning(f"{folder} not found")
+
+    def update_search(self):
+        search_data = self.search_bar.text()
+        if search_data != '':
+            self.hide_all()
+            search_column = 'name'
+            if ':' in search_data:
+                if search_data.split(':')[0] == 'comment':
+                    search_column = 'comment'
+                    search_data = search_data.split(':')[-1]
+                elif search_data.split(':')[0] == 'user':
+                    search_column = 'creation_user'
+                    search_data = search_data.split(':')[-1]
+            self.search_thread.update_search(self.variant_id, search_data, search_column)
+        else:
+            self.show_all()
+
+    def hide_all(self):
+        for export_id in self.export_ids.keys():
+            self.export_ids[export_id].setHidden(1)
+        for export_version_id in self.export_versions_ids.keys():
+            self.export_versions_ids[export_version_id].setHidden(1)
+
+    def show_all(self):
+        for export_id in self.export_ids.keys():
+            self.export_ids[export_id].setHidden(0)
+        for export_version_id in self.export_versions_ids.keys():
+            self.export_versions_ids[export_version_id].setHidden(0)
+
+    def add_search_version(self, export_version_id):
+        if export_version_id in self.export_versions_ids.keys():
+            export_id = self.export_versions_ids[export_version_id].export_version_row['export_id']
+            if export_id in self.export_ids.keys():
+                self.export_ids[export_id].setHidden(0)
+            self.export_versions_ids[export_version_id].setHidden(0)
+
     def connect_functions(self):
         self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
+        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.list_view.itemDoubleClicked.connect(self.open_folder)
+        self.list_view.itemSelectionChanged.connect(self.refresh_infos)
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
 
+        self.search_bar.textChanged.connect(self.update_search)
+        self.search_thread.id_signal.connect(self.add_search_version)
+
+        self.archive_button.clicked.connect(self.archive)
+        self.folder_button.clicked.connect(self.open_folder)
+        self.launch_button.clicked.connect(self.launch_work_version)
+
+    def refresh_infos(self):
+        self.versions_count_label.setText(f"{len(self.export_ids)} exports / {len(self.export_versions_ids)} export versions -")
+        selection = self.list_view.selectedItems()
+        if selection is not None:
+            number = len(selection)
+        else:
+            number = 0
+        self.selection_count_label.setText(f"{number} selected")
+
     def refresh(self):
         if self.isVisible():
-            print(self.variant_id)
             if self.variant_id is not None:
                 self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
                 stage_id = project.get_variant_data(self.variant_id, 'stage_id')
                 stage_name = project.get_stage_data(stage_id, 'name')
                 stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
                 exports_rows = project.get_variant_export_childs(self.variant_id)
+                project_export_id = []
                 if exports_rows is not None:
                     if exports_rows != []:
                         self.hide_info_mode()
                         for export_row in exports_rows:
+                            project_export_id.append(export_row['id'])
                             if export_row['id'] not in self.export_ids.keys():
                                 export_item = custom_export_tree_item(export_row, stage_icon, self.list_view.invisibleRootItem())
                                 export_item.setExpanded(1)
                                 self.export_ids[export_row['id']] = export_item
+                    project_export_versions_id = []
                     export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
                     if export_versions_rows is not None:
                         if export_versions_rows != []:
                             for export_version_row in export_versions_rows:
+                                project_export_versions_id.append(export_version_row['id'])
                                 if export_version_row['id'] not in self.export_versions_ids.keys():
                                     if export_version_row['export_id'] in self.export_ids.keys():
                                         export_version_item = custom_export_version_tree_item(export_version_row, self.export_ids[export_version_row['export_id']])
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
                             self.check_existence_thread.update_versions_rows(export_versions_rows)
+
+                export_list_ids = list(self.export_ids.keys())
+                for export_id in export_list_ids:
+                    if export_id not in project_export_id:
+                        self.remove_export(export_id)
+                export_version_list_ids = list(self.export_versions_ids.keys())
+                for export_version_id in export_version_list_ids:
+                    if export_version_id not in project_export_versions_id:
+                        self.remove_export_version(export_version_id)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+        self.refresh_infos()
 
-    def missing_file(self, export_version_id):
+    def missing_file(self, tuple_signal):
+        export_version_id = tuple_signal[0]
+        number = tuple_signal[-1]
         if export_version_id in self.export_versions_ids.keys():
-            self.export_versions_ids[export_version_id].set_missing()
+            self.export_versions_ids[export_version_id].set_missing(number)
 
-    def not_missing_file(self, export_version_id):
+    def not_missing_file(self, tuple_signal):
+        export_version_id = tuple_signal[0]
+        number = tuple_signal[-1]
         if export_version_id in self.export_versions_ids.keys():
-            self.export_versions_ids[export_version_id].set_not_missing()
+            self.export_versions_ids[export_version_id].set_not_missing(number)
+
+    def remove_export_version(self, export_version_id):
+        if export_version_id in self.export_versions_ids.keys():
+            item = self.export_versions_ids[export_version_id]
+            try:
+                item.parent().removeChild(item)
+            except RuntimeError:
+                pass
+            del self.export_versions_ids[export_version_id]
+
+    def remove_export(self, export_id):
+        if export_id in self.export_ids.keys():
+            item = self.export_ids[export_id]
+            self.list_view.invisibleRootItem().removeChild(item)
+            del self.export_ids[export_id]
+
+    def context_menu_requested(self):
+        selection = self.list_view.selectedItems()
+        self.menu_widget = menu_widget.menu_widget(self)
+        folder_action = self.menu_widget.add_action(f'Open folder', ressources._tool_folder_)
+        batch_action = self.menu_widget.add_action(f'Batch export', ressources._tool_batch_publish_)
+        manual_action = self.menu_widget.add_action(f'Manually add a file', ressources._tool_manually_publish_)
+        archive_action = None
+        if len(selection)>=1:
+            archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
+        launch_action = None
+        if len(selection)==1:
+            launch_action = self.menu_widget.add_action(f'Launch related work version', ressources._tool_launch_)
+        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.menu_widget.function_name is not None:
+                if self.menu_widget.function_name == folder_action:
+                    self.open_folder()
+                elif self.menu_widget.function_name == archive_action:
+                    self.archive()
+                elif self.menu_widget.function_name == launch_action:
+                    self.launch_work_version()
+
+    def launch_work_version(self):
+        selection = self.list_view.selectedItems()
+        if selection is not None:
+            if len(selection) == 1:
+                item = selection[0]
+                if item.type == 'export_version':
+                    work_version_id = item.export_version_row['work_version_id']
+                    if work_version_id is not None:
+                        launch.launch_work_version(work_version_id)
+
+    def focus_export_version(self, export_version_id):
+        if export_version_id in self.export_versions_ids.keys():
+            item = self.export_versions_ids[export_version_id]
+            item.parent().setExpanded(1)
+            self.list_view.scrollToItem(item)
+            self.list_view.setCurrentItem(item)
 
     def show_info_mode(self, text, image):
         self.list_view.setVisible(0)
@@ -187,6 +361,7 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         super(custom_export_tree_item, self).__init__(parent)
         self.export_row = export_row
         self.stage_icon = stage_icon
+        self.type = 'export'
         self.fill_ui()
 
     def fill_ui(self):
@@ -204,6 +379,7 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, export_version_row, parent=None):
         super(custom_export_version_tree_item, self).__init__(parent)
         self.export_version_row = export_version_row
+        self.type = 'export_version'
         self.fill_ui()
 
     def fill_ui(self):
@@ -216,20 +392,22 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.setText(4, self.export_version_row['comment'])
-        self.setText(5, 'ok')
+        if self.export_version_row['software'] is not None:
+            self.setIcon(5, QtGui.QIcon(ressources._sofwares_icons_dic_[self.export_version_row['software']]))
+        self.setText(6, 'ok')
 
-    def set_missing(self):
-        self.setText(5, 'missing files')
-        self.setForeground(5, QtGui.QBrush(QtGui.QColor('#f79360')))
+    def set_missing(self, number):
+        self.setText(6, f'missing {number} files')
+        self.setForeground(6, QtGui.QBrush(QtGui.QColor('#f79360')))
 
-    def set_not_missing(self):
-        self.setText(5, 'ok')
-        self.setForeground(5, QtGui.QBrush(QtGui.QColor('white')))
+    def set_not_missing(self, number):
+        self.setText(6, f'{number} files')
+        self.setForeground(6, QtGui.QBrush(QtGui.QColor('#9ce87b')))
 
 class check_existence_thread(QtCore.QThread):
 
-    missing_file_signal = pyqtSignal(int)
-    not_missing_file_signal = pyqtSignal(int)
+    missing_file_signal = pyqtSignal(tuple)
+    not_missing_file_signal = pyqtSignal(tuple)
 
     def __init__(self, parent=None):
         super(check_existence_thread, self).__init__(parent)
@@ -240,18 +418,17 @@ class check_existence_thread(QtCore.QThread):
         if self.export_versions_rows is not None:
             for export_version_row in self.export_versions_rows:
                 files_list = json.loads(export_version_row['files'])
-                missing_file = 0
+                missing_files = 0
                 for file in files_list:
                     if not os.path.isfile(file):
-                        missing_file = 1
-                        break
+                        missing_files += 1
                     if not self.running:
                         break
 
-                if missing_file:
-                    self.missing_file_signal.emit(export_version_row['id'])
+                if missing_files:
+                    self.missing_file_signal.emit((export_version_row['id'], missing_files))
                 else:
-                    self.not_missing_file_signal.emit(export_version_row['id'])
+                    self.not_missing_file_signal.emit((export_version_row['id'], len(files_list)))
                 if not self.running:
                     break
 
@@ -260,3 +437,29 @@ class check_existence_thread(QtCore.QThread):
         self.export_versions_rows = export_versions_rows
         self.running = True
         self.start()
+
+class search_thread(QtCore.QThread):
+
+    id_signal = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def update_search(self, variant_id, search_data, search_column):
+        self.running = False
+        self.variant_id = variant_id
+        self.search_data = search_data
+        self.search_column = search_column
+        self.running = True
+        self.start()
+
+    def run(self):
+        versions_ids = project.search_export_version(self.search_data, 
+                                                self.variant_id, 
+                                                column_to_search=self.search_column,
+                                                column='id')
+        for version_id in versions_ids:
+            if not self.running:
+                break
+            self.id_signal.emit(version_id)

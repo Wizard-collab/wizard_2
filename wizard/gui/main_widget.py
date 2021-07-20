@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import time
 
 # Wizard modules
+from wizard.core import project
 from wizard.core import communicate
 from wizard.core import custom_logger
 logger = custom_logger.get_logger()
@@ -72,6 +73,14 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
         self.gui_server.stdout_signal.connect(self.update_stdout)
         self.gui_server.tree_focus_signal.connect(self.tree_widget.focus_instance)
+        self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
+
+    def focus_export_version(self, export_version_id):
+        export_version_row = project.get_export_version_data(export_version_id)
+        if export_version_row is not None:
+            self.tabs_widget.setCurrentIndex(self.exports_tab_index)
+            self.tree_widget.focus_instance(('stage', export_version_row['stage_id']))
+            self.exports_widget.focus_export_version(export_version_id)
 
     def update_stdout(self, tuple):
         self.footer_widget.handle_record(tuple)
@@ -139,9 +148,9 @@ class main_widget(QtWidgets.QWidget):
         self.contents_1_layout.addWidget(self.contents_2_widget)
 
         self.contents_2_layout.addWidget(self.tabs_widget)
-        self.tabs_widget.addTab(self.versions_widget, 'Work versions')
-        self.tabs_widget.addTab(self.exports_widget, 'Exports')
-        self.tabs_widget.addTab(self.tickets_widget, 'Tickets')
+        self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, 'Work versions')
+        self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, 'Exports')
+        self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, 'Tickets')
         self.contents_2_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)

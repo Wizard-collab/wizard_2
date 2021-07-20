@@ -217,6 +217,9 @@ class wall_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'creation':
             data = json.loads(self.event_row['data'])
             gui_server.tree_focus_instance(data)
+        elif self.event_row['type'] == 'export':
+            data = json.loads(self.event_row['data'])
+            gui_server.focus_export_version(data)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

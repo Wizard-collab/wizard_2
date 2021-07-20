@@ -406,11 +406,14 @@ def archive_export(export_id):
 			dir_name = get_export_path(export_id)
 			if os.path.isdir(dir_name):
 				if tools.make_archive(dir_name):
-					tools.remove_tree(dir_name)
-					gui_server.refresh_ui()
+					shutil.rmtree(dir_name)
+					logger.info(f"{dir_name} deleted")
 			else:
 				logger.warning(f"{dir_name} not found")
-			return project.remove_export(export_id)
+			success = project.remove_export(export_id)
+			if success:
+				gui_server.refresh_ui()
+			return success
 		else:
 			return None
 	else:
@@ -449,10 +452,12 @@ def archive_export_version(export_version_id):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
-					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
-			return project.remove_export_version(export_version_id)
+			success = project.remove_export_version(export_version_id)
+			if success:
+				gui_server.refresh_ui()
+			return success
 		else:
 			return None
 	else:
@@ -606,6 +611,16 @@ def get_variant_path(variant_id):
 		stage_path = get_stage_path(variant_row['stage_id'])
 		if variant_name and stage_path:
 			dir_name = os.path.join(stage_path, variant_name)
+	return dir_name
+
+def get_variant_export_path(variant_id):
+	dir_name = None
+	variant_row = project.get_variant_data(variant_id)
+	if variant_row:
+		variant_name = variant_row['name']
+		stage_path = get_stage_path(variant_row['stage_id'])
+		if variant_name and stage_path:
+			dir_name = os.path.join(stage_path, variant_name, '_EXPORTS')
 	return dir_name
 
 def get_work_env_path(work_env_id):
