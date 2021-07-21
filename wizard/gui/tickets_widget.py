@@ -121,7 +121,7 @@ class tickets_widget(QtWidgets.QWidget):
                         if ticket_row['id'] not in self.ticket_ids.keys():
                             new_ticket_widget = ticket_widget(ticket_row)
                             self.ticket_ids[ticket_row['id']] = new_ticket_widget
-                            self.tickets_layout.addWidget(new_ticket_widget)
+                            self.tickets_layout.insertWidget(0,new_ticket_widget)
                         else:
                             self.ticket_ids[ticket_row['id']].update(ticket_row)
             self.update_visibility()
@@ -196,6 +196,8 @@ class ticket_widget(QtWidgets.QWidget):
                                                         border: 2px solid #ab4946;
                                                     }''')
             self.close_ticket_button.setText('Close')
+            self.header_frame.setStyleSheet('background-color:#724041;')
+
         else:
             state = 'Closed'
             color = '#8fcc70'
@@ -216,6 +218,7 @@ class ticket_widget(QtWidgets.QWidget):
                                                         border: 2px solid #6772b5;
                                                     }''')
             self.close_ticket_button.setText('Open')
+            self.header_frame.setStyleSheet('')
 
         self.state_label.setStyleSheet('color:%s'%color)
         self.state_label.setText(state)
@@ -300,18 +303,15 @@ class ticket_widget(QtWidgets.QWidget):
         self.user_infos_layout.addWidget(self.user_name_label)
 
         self.arrow_label = QtWidgets.QLabel('>')
-        self.arrow_label.setObjectName('gray_label')
         self.user_infos_layout.addWidget(self.arrow_label)
 
         self.destination_label = QtWidgets.QLabel()
         self.user_infos_layout.addWidget(self.destination_label)
 
         self.edge_label = QtWidgets.QLabel('-')
-        self.edge_label.setObjectName('gray_label')
         self.user_infos_layout.addWidget(self.edge_label)
 
         self.date_label = QtWidgets.QLabel()
-        self.date_label.setObjectName('gray_label')
         self.user_infos_layout.addWidget(self.date_label)
         self.user_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed))
 
@@ -371,11 +371,22 @@ class file_button(QtWidgets.QPushButton):
         super(file_button, self).__init__(parent)
         self.file = file
         self.build_ui()
+        self.fill_ui()
+        self.connect_functions()
 
     def build_ui(self):
         self.setObjectName('file_button')
-        self.setIcon(QtGui.QIcon(ressources._file_icon_))
-        self.setText(os.path.basename(self.file))
+
+    def fill_ui(self):
+        lowered_file = self.file.lower()
+        if lowered_file.endswith('.png') or lowered_file.endswith('.jpg'):
+            self.setIcon(QtGui.QIcon(self.file))
+            self.setIconSize(QtCore.QSize(100,100))
+        else:
+            self.setIcon(QtGui.QIcon(ressources._file_icon_))
+            self.setText(os.path.basename(self.file))
+
+    def connect_functions(self):
         self.clicked.connect(self.open)
 
     def open(self):

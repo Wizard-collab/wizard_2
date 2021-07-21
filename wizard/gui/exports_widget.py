@@ -21,6 +21,7 @@ logger = custom_logger.get_logger(__name__)
 from wizard.gui import gui_utils
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
+from wizard.gui import create_ticket_widget
 
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -113,6 +114,13 @@ class exports_widget(QtWidgets.QWidget):
         self.folder_button.setIcon(QtGui.QIcon(ressources._tool_folder_))
         self.buttons_layout.addWidget(self.folder_button)
 
+        self.ticket_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.ticket_button, "Open a ticket")
+        self.ticket_button.setFixedSize(35,35)
+        self.ticket_button.setIconSize(QtCore.QSize(30,30))
+        self.ticket_button.setIcon(QtGui.QIcon(ressources._tool_ticket_))
+        self.buttons_layout.addWidget(self.ticket_button)
+
         self.archive_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.archive_button, "Archive selection")
         self.archive_button.setFixedSize(35,35)
@@ -170,6 +178,16 @@ class exports_widget(QtWidgets.QWidget):
             else:
                 logger.warning(f"{folder} not found")
 
+    def open_ticket(self):
+        selection = self.list_view.selectedItems()
+        if selection is not None:
+            if len(selection) == 1:
+                export_version_id = selection[0].export_version_row['id']
+                self.create_ticket_widget = create_ticket_widget.create_ticket_widget(export_version_id)
+                self.create_ticket_widget.show()
+            else:
+                logger.warning('Please select one version to open a ticket')
+
     def update_search(self):
         search_data = self.search_bar.text()
         if search_data != '':
@@ -220,6 +238,7 @@ class exports_widget(QtWidgets.QWidget):
         self.archive_button.clicked.connect(self.archive)
         self.folder_button.clicked.connect(self.open_folder)
         self.launch_button.clicked.connect(self.launch_work_version)
+        self.ticket_button.clicked.connect(self.open_ticket)
 
     def refresh_infos(self):
         self.versions_count_label.setText(f"{len(self.export_ids)} exports / {len(self.export_versions_ids)} export versions -")
@@ -306,11 +325,13 @@ class exports_widget(QtWidgets.QWidget):
         batch_action = self.menu_widget.add_action(f'Batch export', ressources._tool_batch_publish_)
         manual_action = self.menu_widget.add_action(f'Manually add a file', ressources._tool_manually_publish_)
         archive_action = None
+        ticket_action = None
         if len(selection)>=1:
             archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
         launch_action = None
         if len(selection)==1:
             launch_action = self.menu_widget.add_action(f'Launch related work version', ressources._tool_launch_)
+            ticket_action = self.menu_widget.add_action(f'Open a ticket', ressources._tool_ticket_)
         if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
             if self.menu_widget.function_name is not None:
                 if self.menu_widget.function_name == folder_action:
@@ -319,6 +340,8 @@ class exports_widget(QtWidgets.QWidget):
                     self.archive()
                 elif self.menu_widget.function_name == launch_action:
                     self.launch_work_version()
+                elif self.menu_widget.function_name == ticket_action:
+                    self.open_ticket()
 
     def launch_work_version(self):
         selection = self.list_view.selectedItems()

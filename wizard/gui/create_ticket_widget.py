@@ -14,8 +14,9 @@ from wizard.core import site
 from wizard.gui import drop_files_widget
 
 class create_ticket_widget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, export_version_id, parent=None):
         super(create_ticket_widget, self).__init__(parent)
+        self.export_version_id = export_version_id
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
@@ -27,7 +28,7 @@ class create_ticket_widget(QtWidgets.QWidget):
             destination_user = None
         content = self.content_textEdit.toPlainText()
         files = self.drop_files_widget.files()
-        if assets.create_ticket(title, content, 1, destination_user, files):
+        if assets.create_ticket(title, content, self.export_version_id, destination_user, files):
             self.close()
 
     def connect_functions(self):
@@ -39,6 +40,20 @@ class create_ticket_widget(QtWidgets.QWidget):
         for user_id in project.get_users_ids_list():
             user_name = site.get_user_data(user_id, 'user_name')
             self.destination_comboBox.addItem(user_name)
+        export_version_row = project.get_export_version_data(self.export_version_id)
+        export_row = project.get_export_data(export_version_row['export_id'])
+        variant_row = project.get_variant_data(export_row['variant_id'])
+        stage_row = project.get_stage_data(variant_row['stage_id'])
+        asset_row = project.get_asset_data(stage_row['asset_id'])
+        category_row = project.get_category_data(asset_row['category_id'])
+        info = f"This ticket is about "
+        info += f"{category_row['name']} |"
+        info += f"{asset_row['name']} |"
+        info += f"{stage_row['name']} |"
+        info += f"{variant_row['name']} |"
+        info += f"{export_row['name']} |"
+        info += f"{export_version_row['name']}"
+        self.infos_label.setText(info)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -49,7 +64,7 @@ class create_ticket_widget(QtWidgets.QWidget):
         self.title_label.setObjectName('title_label')
         self.main_layout.addWidget(self.title_label)
 
-        self.infos_label = QtWidgets.QLabel('This ticket is about characters | Joe | modeling | main | main | 0002')
+        self.infos_label = QtWidgets.QLabel()
         self.infos_label.setWordWrap(True)
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)

@@ -196,12 +196,16 @@ class wall_event_widget(QtWidgets.QFrame):
         
         if self.event_row['type'] == 'creation':
             profile_color = '#77c5f2'
+            gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
+            gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
         elif 'ticket' in self.event_row['type']:
             profile_color = '#f79360'
+            gui_utils.application_tooltip(self.action_button_button, "View ticket")
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
+            gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
 
