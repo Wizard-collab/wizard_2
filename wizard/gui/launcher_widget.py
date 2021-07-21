@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import os
+import time #temp
 
 # Wizard modules
 from wizard.vars import assets_vars
@@ -59,45 +60,36 @@ class launcher_widget(QtWidgets.QFrame):
         if version_name in all_items:
             self.version_comboBox.setCurrentText(version_name)
 
-    def refresh_variants(self):
-        if self.stage_id is not None:
-            self.stage_row = project.get_stage_data(self.stage_id)
-        else:
-            self.stage_row = None
-        if self.stage_row is not None:
-            variant_rows = project.get_stage_childs(self.stage_row['id'])
-            if variant_rows is not None:
-                all_items = [self.variant_comboBox.itemText(i) for i in range(self.variant_comboBox.count())]
-                for variant_row in variant_rows:
-                    if variant_row['name'] not in all_items:
-                        self.variant_comboBox.addItem(variant_row['name'])
-
-    def refresh_variants_hard(self):
+    def refresh_variants(self, apply_default=None):
         self.refresh_variant_changed = None
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
         else:
             self.stage_row = None
-        self.variant_comboBox.clear()
-
         if self.stage_row is not None:
             variant_rows = project.get_stage_childs(self.stage_row['id'])
             if variant_rows is not None:
                 for variant_row in variant_rows:
-                    self.variant_comboBox.addItem(variant_row['name'])
+                    if variant_row['name'] not in self.variants.keys():
+                        self.variant_comboBox.addItem(variant_row['name'])
+                        self.variants[variant_row['name']] = variant_row['id']
+            if apply_default:
                 default_variant_name = project.get_variant_data(self.stage_row['default_variant_id'], 'name')
                 self.variant_comboBox.setCurrentText(default_variant_name)
-        
         self.refresh_variant_changed = 1
+
+    def refresh_variants_hard(self):
+        self.refresh_variant_changed = None
+        self.variants = dict()
+        self.variant_comboBox.clear()
+        self.refresh_variants(apply_default=1)
         self.variant_changed(by_user=None)
 
     def variant_changed(self, by_user=1):
         if self.refresh_variant_changed:
             self.variant_row = None
             if self.stage_row is not None:
-                self.variant_row = project.get_variant_by_name(self.stage_row['id'],
-                                                                self.variant_comboBox.currentText())
-
+                self.variant_row = project.get_variant_by_name(self.stage_id, self.variant_comboBox.currentText())
                 if by_user:
                     if self.variant_row is not None:
                         project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
@@ -115,8 +107,8 @@ class launcher_widget(QtWidgets.QFrame):
         self.update_state = 1
 
     def refresh_work_envs_hard(self):
-        self.work_env_comboBox.clear()
         self.refresh_work_env_changed = None
+        self.work_env_comboBox.clear()
 
         if self.variant_row is not None:
             self.variant_row = project.get_variant_data(self.variant_row['id'])
@@ -147,32 +139,20 @@ class launcher_widget(QtWidgets.QFrame):
                 
             self.refresh_versions_hard()
 
-    def refresh_versions(self):
-        if self.work_env_row is not None:
-            version_rows = project.get_work_versions(self.work_env_row['id'])
-            if version_rows is not None:
-                all_items = [self.version_comboBox.itemText(i) for i in range(self.version_comboBox.count())]
-                new=0
-                for version_row in version_rows:
-                    if version_row['name'] not in all_items:
-                        self.version_comboBox.addItem(version_row['name'])
-                        new=1
-                if new:
-                    self.version_comboBox.setCurrentText(version_rows[-1]['name'])
-
-    def refresh_versions_hard(self):
-        self.version_comboBox.clear()
+    def refresh_versions(self, set_last=None):
         self.refresh_version_changed = None
-
-        if self.work_env_row is not None:
+        if self.work_env_row is not None and self.variant_row is not None:
             self.work_env_changed_signal.emit(self.work_env_row['id'])
             version_rows = project.get_work_versions(self.work_env_row['id'])
-            
             if (version_rows is not None) and (version_rows != []):
+                new=0
                 for version_row in version_rows:
-                    self.version_comboBox.addItem(version_row['name'])
-
-                self.version_comboBox.setCurrentText(version_rows[-1]['name'])
+                    if version_row['name'] not in self.versions.keys():
+                        self.version_comboBox.addItem(version_row['name'])
+                        self.versions[version_row['name']] = version_row['id']
+                        new=1
+                if new or set_last:
+                    self.version_comboBox.setCurrentText(version_rows[-1]['name'])
 
         elif self.work_env_row == None and self.variant_row is not None:
             self.version_comboBox.addItem('0001')
@@ -181,6 +161,12 @@ class launcher_widget(QtWidgets.QFrame):
             self.work_env_changed_signal.emit(0)
 
         self.refresh_version_changed = 1
+
+    def refresh_versions_hard(self):
+        self.refresh_version_changed = None
+        self.versions = dict()
+        self.version_comboBox.clear()
+        self.refresh_versions()
         self.version_changed()
 
     def version_changed(self):
