@@ -83,7 +83,7 @@ class exports_widget(QtWidgets.QWidget):
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
-        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye"')
+        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye", "from:houdini"')
         self.buttons_layout.addWidget(self.search_bar)
 
         self.manual_publish_button = QtWidgets.QPushButton()
@@ -199,6 +199,9 @@ class exports_widget(QtWidgets.QWidget):
                     search_data = search_data.split(':')[-1]
                 elif search_data.split(':')[0] == 'user':
                     search_column = 'creation_user'
+                    search_data = search_data.split(':')[-1]
+                elif search_data.split(':')[0] == 'from':
+                    search_column = 'software'
                     search_data = search_data.split(':')[-1]
             self.search_thread.update_search(self.variant_id, search_data, search_column)
         else:

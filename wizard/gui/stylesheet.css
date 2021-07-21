@@ -292,25 +292,26 @@ QTabWidget::tab-bar {
 }
 
 QTabWidget::pane{
-    border-top: 40px solid #2c2c33;
+    border-top: 44px solid #2c2c33;
     position: absolute;
-    top: -35px;
+    top: -39px;
 }
 
 QTabBar::tab {
-	background-color: #2c2c33;
+	background-color: #24242b;
 	border: none; 
 	padding: 10px;
+	margin: 2px;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 } 
 
 QTabBar::tab:selected { 
-	background-color: #24242b;
+	background-color: #33333d;
 }
 
 QTabBar::tab:hover { 
-	background-color: #24242b;
+	background-color: #33333d;
 }
 
 QToolTip

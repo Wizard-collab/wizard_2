@@ -196,7 +196,8 @@ class ticket_widget(QtWidgets.QWidget):
                                                         border: 2px solid #ab4946;
                                                     }''')
             self.close_ticket_button.setText('Close')
-            self.header_frame.setStyleSheet('background-color:#724041;')
+            self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:#f0605b;border-radius:27px;}')
+            self.title_label.setStyleSheet('color:#f0605b;')
 
         else:
             state = 'Closed'
@@ -218,7 +219,8 @@ class ticket_widget(QtWidgets.QWidget):
                                                         border: 2px solid #6772b5;
                                                     }''')
             self.close_ticket_button.setText('Open')
-            self.header_frame.setStyleSheet('')
+            self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:#9cf277;border-radius:27px;}')
+            self.title_label.setStyleSheet('color:#9cf277;')
 
         self.state_label.setStyleSheet('color:%s'%color)
         self.state_label.setText(state)
@@ -275,9 +277,17 @@ class ticket_widget(QtWidgets.QWidget):
         self.header_frame.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_frame)
 
+        self.profile_frame = QtWidgets.QFrame()
+        self.profile_frame.setObjectName('wall_profile_frame')
+        self.profile_layout = QtWidgets.QHBoxLayout()
+        self.profile_layout.setContentsMargins(0,0,0,0)
+        self.profile_frame.setLayout(self.profile_layout)
+        self.profile_frame.setFixedSize(54,54)
+        self.header_layout.addWidget(self.profile_frame)
+
         self.profile_picture = QtWidgets.QLabel()
         self.profile_picture.setFixedSize(50,50)
-        self.header_layout.addWidget(self.profile_picture)
+        self.profile_layout.addWidget(self.profile_picture)
 
         self.title_widget = QtWidgets.QFrame()
         self.title_layout = QtWidgets.QVBoxLayout()
