@@ -138,7 +138,7 @@ class wall_widget(QtWidgets.QWidget):
     def refresh(self):
         event_rows = project.get_all_events()
         if event_rows is not None:
-            for event_row in event_rows[-10:]:
+            for event_row in event_rows[-200:]:
                 if event_row['id'] not in self.ticket_ids.keys():
                     if event_row['creation_time']-self.last_time > 350:
                         time_widget = wall_time_widget(event_row['creation_time'])
@@ -150,7 +150,6 @@ class wall_widget(QtWidgets.QWidget):
                     self.last_time = event_row['creation_time']
                     self.notification.emit(1)
         self.update_search()
-
 
 class wall_time_widget(QtWidgets.QWidget):
     def __init__(self, time_float, parent = None):
@@ -216,10 +215,10 @@ class wall_event_widget(QtWidgets.QFrame):
                 os.startfile(path)
         elif self.event_row['type'] == 'creation':
             data = json.loads(self.event_row['data'])
-            gui_server.tree_focus_instance(data)
+            gui_server.focus_instance(data)
         elif self.event_row['type'] == 'export':
-            data = json.loads(self.event_row['data'])
-            gui_server.focus_export_version(data)
+            export_version_id = json.loads(self.event_row['data'])
+            gui_server.focus_export_version(export_version_id)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

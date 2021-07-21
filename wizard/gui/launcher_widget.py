@@ -56,9 +56,17 @@ class launcher_widget(QtWidgets.QFrame):
         self.refresh_infos()
 
     def focus_version(self, version_name):
-        all_items = [self.version_comboBox.itemText(i) for i in range(self.version_comboBox.count())]
-        if version_name in all_items:
+        if version_name in self.versions.keys():
             self.version_comboBox.setCurrentText(version_name)
+
+    def focus_variant(self, variant_id):
+        self.refresh_variant_changed = None
+        variant_row = project.get_variant_data(variant_id)
+        if variant_row is not None:
+            if variant_row['name'] in self.variants.keys():
+                self.variant_comboBox.setCurrentText(variant_row['name'])
+        self.refresh_variant_changed = 1
+        self.variant_changed(by_user=None)
 
     def refresh_variants(self, apply_default=None):
         self.refresh_variant_changed = None

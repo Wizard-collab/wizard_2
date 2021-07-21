@@ -72,15 +72,45 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.refresh_signal.connect(self.refresh)
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
         self.gui_server.stdout_signal.connect(self.update_stdout)
-        self.gui_server.tree_focus_signal.connect(self.tree_widget.focus_instance)
+        self.gui_server.focus_instance_signal.connect(self.focus_instance)
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
 
     def focus_export_version(self, export_version_id):
         export_version_row = project.get_export_version_data(export_version_id)
         if export_version_row is not None:
-            self.tabs_widget.setCurrentIndex(self.exports_tab_index)
             self.tree_widget.focus_instance(('stage', export_version_row['stage_id']))
+            self.tabs_widget.setCurrentIndex(self.exports_tab_index)
             self.exports_widget.focus_export_version(export_version_id)
+
+    def focus_instance(self, instance_tuple):
+        instance_type = instance_tuple[0]
+        instance_id = instance_tuple[-1]
+        if instance_type == 'domain':
+            self.focus_domain(instance_id)
+        elif instance_type == 'category':
+            self.focus_category(instance_id)
+        elif instance_type == 'asset':
+            self.focus_asset(instance_id)
+        elif instance_type == 'stage':
+            self.focus_stage(instance_id)
+        elif instance_type == 'variant':
+            self.focus_variant(instance_id)
+
+    def focus_domain(self, domain_id):
+        self.tree_widget.focus_instance(('domain', domain_id))
+
+    def focus_category(self, category_id):
+        self.tree_widget.focus_instance(('category', category_id))
+
+    def focus_asset(self, asset_id):
+        self.tree_widget.focus_instance(('asset', asset_id))
+
+    def focus_stage(self, stage_id):
+        self.tree_widget.focus_instance(('stage', stage_id))
+
+    def focus_variant(self, variant_id):
+        self.tree_widget.focus_instance(('variant', variant_id))
+        self.launcher_widget.focus_variant(variant_id)
 
     def update_stdout(self, tuple):
         self.footer_widget.handle_record(tuple)
