@@ -302,6 +302,8 @@ QTabBar::tab {
 	border: none; 
 	padding: 10px;
 	margin: 2px;
+	margin-left: 1px;
+	margin-right: 1px;
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 } 
@@ -671,19 +673,21 @@ QSlider::handle:horizontal {
 	border-radius: 3px;
 }
 
-#ticket_header_frame{
-	border-bottom: 1px solid #33333b;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
+#ticket_message_header_frame{
+	background-color: transparent;
 }
 
-#ticket_content_widget{
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
+#ticket_message_content_widget{
+	background-color: transparent;
 }
 
-#ticket_widget{
-	border-radius: 10px;
+#ticket_message_widget{
+	background-color: #28282f;
+}
+
+#ticket_messages_header{
+	background-color: #28282f;
+	border-bottom: 2px solid #24242b;
 }
 
 #shelf_script_button{

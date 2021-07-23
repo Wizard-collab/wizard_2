@@ -64,7 +64,6 @@ def add_ticket_openned_event(ticket_id):
 		destination_user = 'everybody'
 	title = f"Adressed a ticket to {destination_user}"
 	message = f"{ticket_row['title']}"
-	message += f"\n{ticket_row['message']}"
 	project.add_event('ticket_openned', title, message, data)
 
 def add_ticket_closed_event(ticket_id):

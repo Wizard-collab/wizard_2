@@ -225,6 +225,7 @@ class versions_widget(QtWidgets.QWidget):
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File'])
+        self.list_view.header().resizeSection(3, 150)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.views_layout.addWidget(self.list_view)
 

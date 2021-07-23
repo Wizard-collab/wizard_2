@@ -51,6 +51,12 @@ class drop_files_widget(QtWidgets.QWidget):
             files_list.append(file_widget.file)
         return files_list
 
+    def clear(self):
+        self.files_widgets = []
+        for i in reversed(range(self.files_scrollArea_layout.count())): 
+            self.files_scrollArea_layout.itemAt(i).widget().setParent(None)
+        self.update_files_visibility()
+
     def connect_functions(self):
         self.drop_files_button.new_file.connect(self.add_file)
         self.drop_files_button.clicked.connect(self.open_files)

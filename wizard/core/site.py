@@ -308,18 +308,21 @@ def is_admin():
 def add_quote(content):
     quote_id = None
     if content and content != '':
-        quote_id = db_utils.create_row('site',
-                                'quotes', 
-                                ('creation_user',
-                                    'content',
-                                    'score',
-                                    'voters'), 
-                                (environment.get_user(),
-                                    content,
-                                    json.dumps([]),
-                                    json.dumps([])))
-        if quote_id:
-            logger.info("Quote added")
+        if len(content)<=100:
+            quote_id = db_utils.create_row('site',
+                                    'quotes', 
+                                    ('creation_user',
+                                        'content',
+                                        'score',
+                                        'voters'), 
+                                    (environment.get_user(),
+                                        content,
+                                        json.dumps([]),
+                                        json.dumps([])))
+            if quote_id:
+                logger.info("Quote added")
+        else:
+            logger.warning("Your quote needs to be under 100 characters")
     else:
         logger.warning("Please enter quote content")
     return quote_id

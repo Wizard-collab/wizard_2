@@ -42,26 +42,48 @@ def move_ui(widget):
     return f"{angley}-{anglex}"
 
 def round_image(label, image_bytes, radius):
-        label.Antialiasing = True
-        label.radius = radius/2
-        label.target = QtGui.QPixmap(label.size())
-        label.target.fill(QtCore.Qt.transparent)
-        pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(image_bytes, 'png')
-        pixmap = pixmap.scaled(
-            radius, radius, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-        painter = QtGui.QPainter(label.target)
-        if label.Antialiasing:
-            painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
-            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
-            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-        path = QtGui.QPainterPath()
-        path.addRoundedRect(
-            0, 0, label.width(), label.height(), label.radius, label.radius)
-        painter.setClipPath(path)
-        painter.drawPixmap(0, 0, pixmap)
-        label.setPixmap(label.target)
+    label.Antialiasing = True
+    label.radius = radius/2
+    label.target = QtGui.QPixmap(label.size())
+    label.target.fill(QtCore.Qt.transparent)
+    pixmap = QtGui.QPixmap()
+    pixmap.loadFromData(image_bytes, 'png')
+    pixmap = pixmap.scaled(
+        radius, radius, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
+    painter = QtGui.QPainter(label.target)
+    if label.Antialiasing:
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
+        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
+    path = QtGui.QPainterPath()
+    path.addRoundedRect(
+        0, 0, label.width(), label.height(), label.radius, label.radius)
+    painter.setClipPath(path)
+    painter.drawPixmap(0, 0, pixmap)
+    label.setPixmap(label.target)
 
+def round_icon(icon, image_bytes, radius):
+    icon.Antialiasing = True
+    icon.radius = radius/2
+    icon.target = QtGui.QPixmap(QtCore.QSize(radius, radius))
+    icon.target.fill(QtCore.Qt.transparent)
+    pixmap = QtGui.QPixmap()
+    pixmap.loadFromData(image_bytes, 'png')
+    pixmap = pixmap.scaled(
+        radius, radius, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
+    painter = QtGui.QPainter(icon.target)
+    if icon.Antialiasing:
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
+        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
+    path = QtGui.QPainterPath()
+    path.addRoundedRect(
+        0, 0, radius, radius, icon.radius, icon.radius)
+    painter.setClipPath(path)
+    painter.drawPixmap(0, 0, pixmap)
+    icon.addPixmap(icon.target, QtGui.QIcon.Normal)
+    icon.addPixmap(icon.target, QtGui.QIcon.Selected)
+    
 def round_corners_image(label, image_bytes, size_tuple, radius):
         label.Antialiasing = True
         label.radius = radius

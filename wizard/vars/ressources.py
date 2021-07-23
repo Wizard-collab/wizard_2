@@ -58,6 +58,8 @@ _launch_info_image_ = os.path.join(_icons_path_, 'launch_info.png')
 _select_stage_info_image_ = os.path.join(_icons_path_, 'select_stage_info.png')
 _empty_info_image_ = os.path.join(_icons_path_, 'info_empty.png')
 _tickets_info_image_ = os.path.join(_icons_path_, 'info_tickets.png')
+_handshake_icon_ = os.path.join(_icons_path_, 'handshake.png')
+_messages_icon_ = os.path.join(_icons_path_, 'messages.png')
 
 
 # Lock icons

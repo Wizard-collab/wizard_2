@@ -976,16 +976,13 @@ def update_users_list(users_ids_list):
     else:
         return None
 
-def create_ticket(title, message, export_version_id, destination_user=None, files=[]):
+def create_ticket(title, export_version_id, message, files=[], destination_user=None):
     ticket_id = None
 
     do_creation = 1
 
     if title == '':
         logger.warning("Please enter a title")
-        do_creation = None
-    if message == '':
-        logger.warning("Please enter a message")
         do_creation = None
 
     if do_creation:
@@ -999,39 +996,60 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
             if site.get_user_row_by_name(destination_user):
                 is_user=1
 
-        copied_files = tools.copy_files(files, get_shared_files_folder())
-
         if is_user:
-            if copied_files is not None:
-                if export_id:
-                    variant_id = get_export_data(export_id, 'variant_id')
-                    stage_id = get_variant_data(variant_id, 'stage_id')
-                    if variant_id:
-                        ticket_id = db_utils.create_row('project',
-                                                            'tickets',
-                                                            ('creation_user',
-                                                                'creation_time',
-                                                                'title',
-                                                                'message',
-                                                                'state',
-                                                                'stage_id',
-                                                                'variant_id',
-                                                                'export_version_id',
-                                                                'destination_user', 
-                                                                'files'),
-                                                            (environment.get_user(),
-                                                                time.time(),
-                                                                title,
-                                                                message,
-                                                                True,
-                                                                stage_id,
-                                                                variant_id,
-                                                                export_version_id,
-                                                                destination_user,
-                                                                json.dumps(copied_files)))
-                        if ticket_id:
-                            logger.info("Ticket created")
+            if export_id:
+                variant_id = get_export_data(export_id, 'variant_id')
+                stage_id = get_variant_data(variant_id, 'stage_id')
+                if variant_id:
+                    ticket_id = db_utils.create_row('project',
+                                                        'tickets',
+                                                        ('creation_user',
+                                                            'creation_time',
+                                                            'title',
+                                                            'state',
+                                                            'stage_id',
+                                                            'variant_id',
+                                                            'export_version_id',
+                                                            'destination_user'),
+                                                        (environment.get_user(),
+                                                            time.time(),
+                                                            title,
+                                                            True,
+                                                            stage_id,
+                                                            variant_id,
+                                                            export_version_id,
+                                                            destination_user))
+                    if ticket_id:
+                        logger.info("Ticket created")
+                        add_ticket_message(ticket_id, message, files)
     return ticket_id
+
+def add_ticket_message(ticket_id, message, files=[]):
+    ticket_message_id = None
+    copied_files = tools.copy_files(files, get_shared_files_folder())
+    if copied_files is not None:
+        ticket_message_id = db_utils.create_row('project',
+                                        'ticket_messages',
+                                        ('creation_user',
+                                            'creation_time',
+                                            'message',
+                                            'files',
+                                            'ticket_id'),
+                                        (environment.get_user(),
+                                            time.time(),
+                                            message,
+                                            json.dumps(copied_files),
+                                            ticket_id))
+        if ticket_message_id:
+            logger.info("Ticket message added")
+    return ticket_message_id
+
+def get_ticket_messages(ticket_id, column='*'):
+    ticket_messages_rows = db_utils.get_row_by_column_data('project',
+                                                        'ticket_messages',
+                                                        ('ticket_id', ticket_id),
+                                                        column)
+    return ticket_messages_rows
 
 def get_ticket_data(ticket_id, column='*'):
     tickets_rows = db_utils.get_row_by_column_data('project',
@@ -1242,6 +1260,7 @@ def init_project(project_path, project_name):
             create_references_table(project_name)
             create_extensions_table(project_name)
             create_tickets_table(project_name)
+            create_ticket_messages_table(project_name)
             create_events_table(project_name)
             create_shelf_scripts_table(project_name)
             return project_name
@@ -1431,19 +1450,30 @@ def create_tickets_table(database):
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL,
                                         title text NOT NULL,
-                                        message text NOT NULL,
                                         state bool,
                                         stage_id integer NOT NULL,
                                         variant_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         destination_user text,
-                                        files text,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id),
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Tickets table created")
+
+def create_ticket_messages_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS ticket_messages (
+                                        id serial PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        message text NOT NULL,
+                                        files text,
+                                        ticket_id integer NOT NULL,
+                                        FOREIGN KEY (ticket_id) REFERENCES tickets (id)
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Tickets messages table created")
 
 def create_events_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS events (

@@ -14,6 +14,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import create_quote_widget
 
 class quotes_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -58,6 +59,12 @@ class quotes_widget(QtWidgets.QFrame):
         self.random_button.setFixedSize(20,20)
         self.animation_handler_layout.addWidget(self.random_button)
 
+        self.add_button = QtWidgets.QPushButton()
+        self.add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.add_button.setIconSize(QtCore.QSize(14,14))
+        self.add_button.setFixedSize(20,20)
+        self.animation_handler_layout.addWidget(self.add_button)
+
         self.animation_handler_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
     def connect_functions(self):
@@ -65,6 +72,11 @@ class quotes_widget(QtWidgets.QFrame):
         self.random_button.clicked.connect(self.clear_anim)
         self.random_button.clicked.connect(self.timer.stop)
         self.score_slider.sliderReleased.connect(self.vote)
+        self.add_button.clicked.connect(self.add_quote)
+
+    def add_quote(self):
+        self.create_quote_widget = create_quote_widget.create_quote_widget(self)
+        self.create_quote_widget.exec_()
 
     def vote(self):
         score = self.score_slider.value()
@@ -77,7 +89,11 @@ class quotes_widget(QtWidgets.QFrame):
             self.random_index = random.randint(0, len(quotes_ids)-1)
         self.previous_quote_id = self.random_index
         self.quote_row = site.get_quote_data(quotes_ids[self.random_index])
-        self.quote_label.setText(self.quote_row['content'])
+        content = self.quote_row['content']
+        content = content.replace('\n', ' ')
+        content = content.replace('\r\n', ' ')
+        content = content.replace('\r', ' ')
+        self.quote_label.setText(content)
         self.update_score_slider()
         if not without_anim:
             self.new_anim()
@@ -107,6 +123,6 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation.start()
 
     def start_timer(self):
-        self.timer.start(3000)
+        self.timer.start(30000)
 
 

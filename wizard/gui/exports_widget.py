@@ -66,6 +66,7 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Infos'])
+        self.list_view.header().resizeSection(3, 150)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
