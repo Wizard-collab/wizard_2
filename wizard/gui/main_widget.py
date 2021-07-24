@@ -13,6 +13,7 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
+from wizard.gui import custom_window
 from wizard.gui import gui_server
 from wizard.gui import tree_widget
 from wizard.gui import versions_widget
@@ -28,7 +29,7 @@ from wizard.gui import console_widget
 from wizard.gui import header_widget
 from wizard.gui import tickets_widget
 
-class main_widget(QtWidgets.QWidget):
+class main_widget(custom_window.custom_window):
     def __init__(self, parent=None):
         super(main_widget, self).__init__(parent)
         self.tree_widget = tree_widget.tree_widget(self)
@@ -143,13 +144,15 @@ class main_widget(QtWidgets.QWidget):
         logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):
-        self.setObjectName('main_widget')
+        self.main_widget = QtWidgets.QWidget()
+        self.main_widget.setObjectName('main_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
-        self.setLayout(self.main_layout)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
-        self.main_layout.addWidget(self.header_widget)
+        self.add_header_widget(self.header_widget)
 
         self.contents_widget = QtWidgets.QWidget()
         self.contents_widget.setObjectName('main_widget')

@@ -102,7 +102,6 @@ class wall_widget(QtWidgets.QWidget):
         self.anim.finished.connect(lambda:self.setVisible(0))
         self.anim.start()
 
-
     def hide_all(self):
         for ticket_id in self.ticket_ids.keys():
             self.ticket_ids[ticket_id].setVisible(0)

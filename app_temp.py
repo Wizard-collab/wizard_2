@@ -18,6 +18,7 @@ from wizard.gui import tabs_widget
 from wizard.gui import versions_widget
 from wizard.gui import gui_server
 from wizard.gui import footer_widget
+from wizard.gui import custom_window
 
 import sys
 import time
@@ -131,20 +132,23 @@ class app():
 		self.softwares_server.start()
 		self.tickets_widget = tickets_widget.tickets_widget()
 		self.tickets_widget.show()
+		self.versions_widget = versions_widget.versions_widget()
+		self.versions_widget.show()
+		self.footer_widget = footer_widget.footer_widget()
+		self.footer_widget.show()
+		self.gui_server = gui_server.gui_server()
+		self.gui_server.start()
 		'''
+
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
 		self.main_widget.refresh()
 		
+		
 		'''
-		self.versions_widget = versions_widget.versions_widget()
-		self.versions_widget.show()
-		
-		self.footer_widget = footer_widget.footer_widget()
-		self.footer_widget.show()
-		
-		self.gui_server = gui_server.gui_server()
-		self.gui_server.start()
+
+		self.custom_window = custom_window.custom_window()
+		self.custom_window.show()
 		'''
 
 		sys.exit(self.app.exec_())

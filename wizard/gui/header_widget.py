@@ -25,8 +25,9 @@ class header_widget(QtWidgets.QFrame):
         self.user_widget.refresh()
 
     def build_ui(self):
+        self.setObjectName('transparent_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(2,2,8,2)
+        self.main_layout.setContentsMargins(2,2,2,2)
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 
