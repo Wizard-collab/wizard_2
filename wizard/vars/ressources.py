@@ -60,6 +60,9 @@ _empty_info_image_ = os.path.join(_icons_path_, 'info_empty.png')
 _tickets_info_image_ = os.path.join(_icons_path_, 'info_tickets.png')
 _handshake_icon_ = os.path.join(_icons_path_, 'handshake.png')
 _messages_icon_ = os.path.join(_icons_path_, 'messages.png')
+_quit_decoration_ = os.path.join(_icons_path_, 'quit_decoration.png')
+_resize_decoration_ = os.path.join(_icons_path_, 'resize_decoration.png')
+_minimize_decoration_ = os.path.join(_icons_path_, 'minimize_decoration.png')
 
 
 # Lock icons

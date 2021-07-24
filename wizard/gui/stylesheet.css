@@ -326,7 +326,10 @@ QToolTip
 }
 
 QMenuBar {
+	background-color: transparent;
     padding: 0px;
+    margin: 0px;
+    margin-left: 8px;
 }
 
 QMenuBar::item {
@@ -396,9 +399,13 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
     padding: 1px -1px -1px 1px;
 }
 
+QSlider {
+	background-color: transparent;
+}
+
 QSlider::groove:horizontal {
     height: 4px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: #24242b;
+    background: #19191f;
     border-radius: 2px;
 }
 
@@ -408,6 +415,15 @@ QSlider::handle:horizontal {
     height: 20px;
     margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
     border-radius: 3px;
+}
+
+#custom_title_bar{
+	background-color: #26262c;
+}
+
+#window_decoration_button{
+	border-radius: 8px;
+	border: none;
 }
 
 #console_textEdit{

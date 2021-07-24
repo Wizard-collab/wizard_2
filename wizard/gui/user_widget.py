@@ -21,6 +21,7 @@ class user_widget(QtWidgets.QFrame):
         self.refresh()
 
     def build_ui(self):
+        self.setObjectName('transparent_widget')
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -28,6 +29,7 @@ class user_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.progress_bars_widget = QtWidgets.QWidget()
+        self.progress_bars_widget.setObjectName('transparent_widget')
         self.progress_bars_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.progress_bars_layout = QtWidgets.QVBoxLayout()
         self.progress_bars_layout.setContentsMargins(0,0,0,0)
@@ -54,6 +56,7 @@ class user_widget(QtWidgets.QFrame):
         self.progress_bars_layout.addWidget(self.life_progress_bar)
 
         self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('transparent_widget')
         self.infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.infos_widget.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.infos_layout = QtWidgets.QHBoxLayout()

@@ -27,12 +27,14 @@ class quotes_widget(QtWidgets.QFrame):
         self.start_timer()
 
     def build_ui(self):
+        self.setObjectName('transparent_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.animation_handler_widget = QtWidgets.QWidget()
+        self.animation_handler_widget.setObjectName('transparent_widget')
         self.animation_handler_widget.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
         self.animation_handler_layout = QtWidgets.QHBoxLayout()
         self.animation_handler_layout.setContentsMargins(0,0,0,0)
@@ -119,7 +121,7 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation.setDuration(400)
         self.animation.setStartValue(QtCore.QRect(self.geometry().x()-150, -50, self.geometry().width(), self.geometry().height()))
         self.animation.setEndValue(QtCore.QRect(self.geometry().x()-150, self.geometry().y(), self.geometry().width(), self.geometry().height()))
-        self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
+        #self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
         self.animation.start()
 
     def start_timer(self):

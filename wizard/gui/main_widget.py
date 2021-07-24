@@ -13,6 +13,7 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
+from wizard.gui import custom_window
 from wizard.gui import gui_server
 from wizard.gui import tree_widget
 from wizard.gui import versions_widget
@@ -28,19 +29,9 @@ from wizard.gui import console_widget
 from wizard.gui import header_widget
 from wizard.gui import tickets_widget
 
-class main_widget(QtWidgets.QMainWindow):
+class main_widget(custom_window.custom_window):
     def __init__(self, parent=None):
         super(main_widget, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(12)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
-
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
         self.launcher_widget = launcher_widget.launcher_widget(self)
@@ -153,25 +144,15 @@ class main_widget(QtWidgets.QMainWindow):
         logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):
-        self.handler_widget = QtWidgets.QWidget()
-        self.handler_widget.setObjectName('transparent_widget')
-        self.handler_layout = QtWidgets.QHBoxLayout()
-        self.handler_layout.setContentsMargins(12,12,12,12)
-        self.handler_widget.setLayout(self.handler_layout)
-        self.setCentralWidget(self.handler_widget)
-
         self.main_widget = QtWidgets.QWidget()
         self.main_widget.setObjectName('main_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_widget.setLayout(self.main_layout)
-        self.handler_layout.addWidget(self.main_widget)
+        self.setCentralWidget(self.main_widget)
 
-        self.test_header = header(self)
-        self.main_layout.addWidget(self.test_header)
-
-        self.main_layout.addWidget(self.header_widget)
+        self.add_header_widget(self.header_widget)
 
         self.contents_widget = QtWidgets.QWidget()
         self.contents_widget.setObjectName('main_widget')
@@ -209,26 +190,3 @@ class main_widget(QtWidgets.QMainWindow):
         self.wall_widget.setVisible(0)
 
         self.main_layout.addWidget(self.footer_widget)
-
-class header(QtWidgets.QFrame):
-    def __init__(self, parent=None):
-        super(header, self).__init__(parent)
-        self.parent = parent
-        self.setMinimumHeight(40)
-
-    def mousePressEvent(self, event):
-        window = self.parent.windowHandle()
-        window.startSystemMove()
-        #window.startSystemResize(QtCore.Qt.TopEdge)
-
-    def mouseDoubleClickEvent(self, event):
-        window = self.parent.windowHandle()
-
-        state = window.windowState()
-
-        if state == QtCore.Qt.WindowNoState:
-            window.setWindowStates(QtCore.Qt.WindowMaximized)
-        else:
-            window.setWindowStates(QtCore.Qt.WindowNoState)
-
-
