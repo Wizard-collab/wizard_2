@@ -85,6 +85,8 @@ class quotes_widget(QtWidgets.QFrame):
         site.add_quote_score(self.quote_row['id'], score)
 
     def get_new_random_quote(self, without_anim=0):
+        self.animation_handler_widget.setVisible(0)
+        QtWidgets.QApplication.processEvents()
         quotes_ids = site.get_all_quotes('id')
         self.random_index = random.randint(0, len(quotes_ids)-1)
         while self.random_index == self.previous_quote_id:
@@ -99,6 +101,8 @@ class quotes_widget(QtWidgets.QFrame):
         self.update_score_slider()
         if not without_anim:
             self.new_anim()
+        QtWidgets.QApplication.processEvents()
+        self.animation_handler_widget.setVisible(1)
         self.start_timer()
 
     def update_score_slider(self):
@@ -121,7 +125,7 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation.setDuration(400)
         self.animation.setStartValue(QtCore.QRect(self.geometry().x()-150, -50, self.geometry().width(), self.geometry().height()))
         self.animation.setEndValue(QtCore.QRect(self.geometry().x()-150, self.geometry().y(), self.geometry().width(), self.geometry().height()))
-        #self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
         self.animation.start()
 
     def start_timer(self):

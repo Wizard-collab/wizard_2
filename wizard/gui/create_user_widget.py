@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 # Wizard gui modules
 from wizard.gui import logging_widget
 from wizard.gui import gui_utils
+from wizard.gui import custom_window
 
 # Wizard modules
 from wizard.core import site
@@ -15,21 +16,21 @@ from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class create_user_widget(QtWidgets.QDialog):
+class create_user_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
-        super(create_user_widget, self).__init__(parent)
+        super(create_user_widget, self).__init__()
         self.image_file = None
         self.build_ui()
         self.connect_functions()
+        self.add_title("Sign up")
 
     def build_ui(self):
+        self.setMinimumWidth(350)
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.setLayout(self.main_layout)
-
-        self.title_label = QtWidgets.QLabel("Sign up")
-        self.title_label.setObjectName('title_label')
-        self.main_layout.addWidget(self.title_label)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
                                                     QtWidgets.QSizePolicy.MinimumExpanding)

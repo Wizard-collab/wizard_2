@@ -13,22 +13,23 @@ from wizard.core import user
 from wizard.gui import logging_widget
 from wizard.gui import create_project_widget
 from wizard.gui import gui_utils
+from wizard.gui import custom_window
 
-class project_log_widget(QtWidgets.QDialog):
+class project_log_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
-        super(project_log_widget, self).__init__(parent)
+        super(project_log_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
         self.fill_ui()
+        self.add_title("Connect to a project")
 
     def build_ui(self):
+        self.setMinimumWidth(350)
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.setLayout(self.main_layout)
-
-        self.title_label = QtWidgets.QLabel("Connect to a project")
-        self.title_label.setObjectName('title_label')
-        self.main_layout.addWidget(self.title_label)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)

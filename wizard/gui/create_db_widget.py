@@ -15,22 +15,21 @@ logger = custom_logger.get_logger(__name__)
 from wizard.gui import message_widget
 from wizard.gui import logging_widget
 from wizard.gui import gui_utils
+from wizard.gui import custom_window
 
-
-class create_db_widget(QtWidgets.QDialog):
+class create_db_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
-        super(create_db_widget, self).__init__(parent)
+        super(create_db_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
+        self.add_title('Database init')
 
     def build_ui(self):
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.setLayout(self.main_layout)
-
-        self.title_label = QtWidgets.QLabel('Database init')
-        self.title_label.setObjectName('title_label')
-        self.main_layout.addWidget(self.title_label)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
         self.infos_label = QtWidgets.QLabel('You need to init the database')
         self.infos_label.setObjectName('gray_label')

@@ -249,7 +249,7 @@ class ticket_message_widget(QtWidgets.QFrame):
         self.infos_widget.setObjectName('transparent_widget')
         self.infos_layout = QtWidgets.QVBoxLayout()
         self.infos_layout.setContentsMargins(0,0,0,0)
-        self.infos_layout.setSpacing(3)
+        self.infos_layout.setSpacing(8)
         self.infos_widget.setLayout(self.infos_layout)
         self.header_layout.addWidget(self.infos_widget)
 
@@ -265,7 +265,7 @@ class ticket_message_widget(QtWidgets.QFrame):
         self.infos_layout.addWidget(self.message_label)
 
         self.files_scrollArea = QtWidgets.QScrollArea()
-        self.files_scrollArea.setObjectName('transparent_widget')
+        self.files_scrollArea.setObjectName('ticket_message_widget')
         self.files_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.files_scrollArea.setVisible(False)
         self.files_scrollArea_widget = QtWidgets.QWidget()

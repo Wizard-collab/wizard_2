@@ -12,14 +12,16 @@ from wizard.core import site
 
 # Wizard gui modules
 from wizard.gui import drop_files_widget
+from wizard.gui import custom_window
 
-class create_ticket_widget(QtWidgets.QWidget):
+class create_ticket_widget(custom_window.custom_dialog):
     def __init__(self, export_version_id, parent=None):
-        super(create_ticket_widget, self).__init__(parent)
+        super(create_ticket_widget, self).__init__()
         self.export_version_id = export_version_id
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
+        self.add_title('New ticket')
 
     def submit(self):
         title = self.title_lineEdit.text()
@@ -56,13 +58,12 @@ class create_ticket_widget(QtWidgets.QWidget):
         self.infos_label.setText(info)
 
     def build_ui(self):
+        self.setMinimumWidth(350)
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.setLayout(self.main_layout)
-
-        self.title_label = QtWidgets.QLabel('New ticket')
-        self.title_label.setObjectName('title_label')
-        self.main_layout.addWidget(self.title_label)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
         self.infos_label = QtWidgets.QLabel()
         self.infos_label.setWordWrap(True)
