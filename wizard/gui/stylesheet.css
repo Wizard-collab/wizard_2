@@ -281,7 +281,8 @@ QHeaderView::section {
 }
 
 QTabBar {
-	background-color: transparent;
+	background-color: #2c2c33;
+	padding: 1px;
 }
 
 QTabWidget::tab-bar {
@@ -293,8 +294,8 @@ QTabWidget::pane{
 }
 
 QTabBar::tab {
-	background-color: rgba(36, 36, 43, 100);
-	padding: 10px;
+	background-color: rgba(36, 36, 43, 170);
+	padding: 9px;
 	padding-left: 14px;
 	padding-right: 14px;
 	margin: 2px;
@@ -309,7 +310,6 @@ QTabBar::tab:selected {
 	margin-bottom: 0px;
 	padding-bottom: 12px;
 	font: bold;
-
 }
 
 QTabBar::tab:selected:hover { 
@@ -317,7 +317,7 @@ QTabBar::tab:selected:hover {
 }
 
 QTabBar::tab:hover { 
-	background-color: rgba(36, 36, 43, 180);
+	background-color: rgba(36, 36, 43, 210);
 }
 
 QToolTip

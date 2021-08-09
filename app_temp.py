@@ -19,6 +19,7 @@ from wizard.gui import versions_widget
 from wizard.gui import gui_server
 from wizard.gui import footer_widget
 from wizard.gui import custom_window
+from wizard.gui import search_reference_widget
 
 import sys
 import time
@@ -145,11 +146,10 @@ class app():
 		self.main_widget.refresh()
 		
 		
-		'''
+		
 
-		self.custom_window = custom_window.custom_window()
-		self.custom_window.show()
-		'''
+		self.search_reference_widget = search_reference_widget.search_reference_widget()
+		self.search_reference_widget.show()
 
 		sys.exit(self.app.exec_())
 
