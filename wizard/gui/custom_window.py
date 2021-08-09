@@ -9,9 +9,9 @@ from PyQt5.QtCore import pyqtSignal
 # Wizard modules
 from wizard.vars import ressources
 
-class custom_window(QtWidgets.QWidget):
+class custom_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
-        super(custom_window, self).__init__(parent)
+        super(custom_widget, self).__init__(parent)
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
@@ -24,6 +24,9 @@ class custom_window(QtWidgets.QWidget):
         self.setGraphicsEffect(self.shadow)
 
         self.build_main_ui()
+
+    def add_title(self, title):
+        self.header.add_title(title)
 
     def setCentralWidget(self, widget):
         self.main_container_layout.addWidget(widget)
@@ -83,12 +86,19 @@ class custom_window(QtWidgets.QWidget):
         self.top_frame.setFixedHeight(12)
         self.central_resize_layout.addWidget(self.top_frame)
 
+        self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setObjectName('custom_content_widget')
+        self.content_layout = QtWidgets.QVBoxLayout()
+        self.content_layout.setContentsMargins(1,1,1,1)
+        self.content_layout.setSpacing(1)
+        self.content_widget.setLayout(self.content_layout)
+        self.central_resize_layout.addWidget(self.content_widget)
+
         self.header = header()
         self.header.start_move.connect(self.start_move)
         self.header.toggle_size.connect(self.toggle_size)
         self.header.minimize.connect(self.minimize)
-        self.header.quit.connect(self.close)
-        self.central_resize_layout.addWidget(self.header)
+        self.content_layout.addWidget(self.header)
 
         self.main_container_widget = QtWidgets.QWidget()
         self.main_container_widget.setObjectName('dark_widget')
@@ -96,7 +106,7 @@ class custom_window(QtWidgets.QWidget):
         self.main_container_layout.setContentsMargins(0,0,0,0)
         self.main_container_layout.setSpacing(0)
         self.main_container_widget.setLayout(self.main_container_layout)
-        self.central_resize_layout.addWidget(self.main_container_widget)
+        self.content_layout.addWidget(self.main_container_widget)
 
         self.bottom_frame = resize_frame()
         self.bottom_frame.setObjectName('transparent_widget')
@@ -215,7 +225,7 @@ class header(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(header, self).__init__(parent)
         self.parent = parent
-        self.setMinimumHeight(30)
+        self.setMinimumHeight(40)
         self.build_ui()
         self.connect_functions()
 
@@ -227,6 +237,11 @@ class header(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
+        self.title_label = QtWidgets.QLabel('')
+        self.title_label.setVisible(0)
+        self.title_label.setObjectName('window_title_label')
+        self.main_layout.addWidget(self.title_label)
+
         self.custom_widgets_container = QtWidgets.QWidget()
         self.custom_widgets_container.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.custom_widgets_container.setObjectName('transparent_widget')
@@ -236,13 +251,23 @@ class header(QtWidgets.QFrame):
         self.custom_widgets_container.setLayout(self.custom_widgets_layout)
         self.main_layout.addWidget(self.custom_widgets_container)
 
+        self.decoration_content = QtWidgets.QWidget()
+        self.decoration_content.setObjectName('transparent_widget')
+        self.decoration_content_layout = QtWidgets.QVBoxLayout()
+        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setSpacing(0)
+        self.decoration_content.setLayout(self.decoration_content_layout)
+        self.main_layout.addWidget(self.decoration_content)
+
         self.decoration_widget = QtWidgets.QWidget()
         self.decoration_widget.setObjectName('transparent_widget')
         self.decoration_layout = QtWidgets.QHBoxLayout()
         self.decoration_layout.setContentsMargins(6,6,6,6)
         self.decoration_layout.setSpacing(6)
         self.decoration_widget.setLayout(self.decoration_layout)
-        self.main_layout.addWidget(self.decoration_widget)
+        self.decoration_content_layout.addWidget(self.decoration_widget)
+
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.minimize_button = QtWidgets.QPushButton()
         self.minimize_button.setIcon(QtGui.QIcon(ressources._minimize_decoration_))
@@ -278,3 +303,22 @@ class header(QtWidgets.QFrame):
 
     def add_header_widget(self, widget):
         self.custom_widgets_layout.addWidget(widget)
+
+    def add_title(self, title):
+        self.title_label.setVisible(1)
+        self.title_label.setText(title)
+
+class custom_dialog(QtWidgets.QDialog, custom_widget):
+    def __init__(self, parent=None):
+        super(custom_dialog, self).__init__()
+        self.header.quit.connect(self.reject)
+        self.header.minimize_button.setVisible(0)
+        self.header.resize_button.setVisible(0)
+
+    def toggle_size(self):
+        pass
+
+class custom_window(custom_widget):
+    def __init__(self, parent=None):
+        super(custom_window, self).__init__()
+        self.header.quit.connect(self.close)
