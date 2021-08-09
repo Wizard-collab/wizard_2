@@ -281,39 +281,43 @@ QHeaderView::section {
 }
 
 QTabBar {
-	margin-top: 5px;
 	background-color: transparent;
-	qproperty-drawBase:0;
 }
 
 QTabWidget::tab-bar {
-    left: 5px; /* move to the right by 5px */
-    top: 5px; /* move to the right by 5px */
+
 }
 
 QTabWidget::pane{
-    border-top: 44px solid #2c2c33;
-    position: absolute;
-    top: -39px;
+
 }
 
 QTabBar::tab {
-	background-color: #24242b;
-	border: none; 
+	background-color: rgba(36, 36, 43, 100);
 	padding: 10px;
+	padding-left: 14px;
+	padding-right: 14px;
 	margin: 2px;
-	margin-left: 1px;
 	margin-right: 1px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
+	border-radius: 8px;
 } 
 
 QTabBar::tab:selected { 
-	background-color: #33333d;
+	background-color: rgb(36, 36, 43);
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+	margin-bottom: 0px;
+	padding-bottom: 12px;
+	font: bold;
+
+}
+
+QTabBar::tab:selected:hover { 
+	background-color: rgb(36, 36, 43);
 }
 
 QTabBar::tab:hover { 
-	background-color: #33333d;
+	background-color: rgba(36, 36, 43, 180);
 }
 
 QToolTip

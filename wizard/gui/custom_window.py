@@ -90,7 +90,7 @@ class custom_widget(QtWidgets.QWidget):
         self.content_widget.setObjectName('custom_content_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
         self.content_layout.setContentsMargins(1,1,1,1)
-        self.content_layout.setSpacing(2)
+        self.content_layout.setSpacing(1)
         self.content_widget.setLayout(self.content_layout)
         self.central_resize_layout.addWidget(self.content_widget)
 
