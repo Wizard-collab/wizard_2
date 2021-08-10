@@ -128,8 +128,10 @@ class main_widget(custom_window.custom_window):
 
     def work_env_changed(self, work_env_id):
         self.versions_widget.change_work_env(work_env_id)
+        self.references_widget.change_work_env(work_env_id)
 
     def tab_changed(self):
+        self.references_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
@@ -140,6 +142,7 @@ class main_widget(custom_window.custom_window):
         self.launcher_widget.refresh()
         self.header_widget.refresh()
         self.wall_widget.refresh()
+        self.references_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
         self.tickets_widget.refresh()

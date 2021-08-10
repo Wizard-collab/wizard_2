@@ -580,6 +580,10 @@ def add_work_env(name, software_id, variant_id):
 
 def create_reference(work_env_id, export_version_id, namespace):
     reference_id = None
+
+    export_id = get_export_version_data(export_version_id, 'export_id')
+    stage_name = get_stage_data(get_variant_data(get_export_data(export_id, 'variant_id'), 'stage_id'), 'name')
+
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'references_data',
                                     ('namespace', 'work_env_id'),
@@ -589,11 +593,13 @@ def create_reference(work_env_id, export_version_id, namespace):
                                 ('creation_time',
                                     'creation_user',
                                     'namespace',
+                                    'stage',
                                     'work_env_id',
                                     'export_version_id'),
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
+                                    stage_name,
                                     work_env_id,
                                     export_version_id))
         if work_env_id:
@@ -1353,6 +1359,7 @@ def create_references_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
+                                        stage text NOT NULL,
                                         work_env_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id),

@@ -297,7 +297,16 @@ def create_work_env(software_id, variant_id):
 		logger.warning(f"{name} is not a valid work environment ( software not handled )")
 	return work_env_id
 
-def create_reference(work_env_id, export_version_id):
+def create_references_from_variant_id(work_env_id, variant_id):
+	export_rows = project.get_variant_export_childs(variant_id)
+	if export_rows is not None:
+		for export_row in export_rows:
+			export_version_id = project.get_last_export_version(export_row['id'], 'id')
+			if export_version_id is not None and len(export_version_id)>=1:
+				create_reference(work_env_id, export_version_id[0], refresh=0)
+		gui_server.refresh_ui()
+
+def create_reference(work_env_id, export_version_id, refresh=1):
 	namespaces_list = project.get_references(work_env_id, 'namespace')
 	count = 0
 	namespace_raw = build_namespace(export_version_id)
@@ -308,6 +317,8 @@ def create_reference(work_env_id, export_version_id):
 	project.create_reference(work_env_id,
 											export_version_id,
 											namespace)
+	if refresh:
+		gui_server.refresh_ui()
 
 def archive_work_env(work_env_id):
 	if site.is_admin():
