@@ -90,6 +90,20 @@ _lighting_icon_small_ = os.path.join(_icons_path_, 'lighting_small.png')
 _compositing_icon_small_ = os.path.join(_icons_path_, 'compositing_small.png')
 _camera_icon_small_ = os.path.join(_icons_path_, 'camera_small.png')
 
+_stage_icons_dic_ = dict()
+_stage_icons_dic_['modeling'] = _modeling_icon_small_
+_stage_icons_dic_['rigging'] = _rigging_icon_small_
+_stage_icons_dic_['grooming'] = _grooming_icon_small_
+_stage_icons_dic_['texturing'] = _texturing_icon_small_
+_stage_icons_dic_['shading'] = _shading_icon_small_
+_stage_icons_dic_['layout'] = _layout_icon_small_
+_stage_icons_dic_['animation'] = _animation_icon_small_
+_stage_icons_dic_['cfx'] = _cfx_icon_small_
+_stage_icons_dic_['fx'] = _fx_icon_small_
+_stage_icons_dic_['lighting'] = _lighting_icon_small_
+_stage_icons_dic_['compositing'] = _compositing_icon_small_
+_stage_icons_dic_['camera'] = _camera_icon_small_
+
 # Softwares icons
 _sofwares_icons_dic_ = dict()
 _sofwares_icons_dic_[_maya_] = os.path.join(_icons_path_, 'maya.png')

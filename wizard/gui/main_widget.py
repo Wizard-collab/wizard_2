@@ -16,6 +16,7 @@ logger = custom_logger.get_logger()
 from wizard.gui import custom_window
 from wizard.gui import gui_server
 from wizard.gui import tree_widget
+from wizard.gui import references_widget
 from wizard.gui import versions_widget
 from wizard.gui import exports_widget
 from wizard.gui import tabs_widget
@@ -35,6 +36,7 @@ class main_widget(custom_window.custom_window):
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
         self.launcher_widget = launcher_widget.launcher_widget(self)
+        self.references_widget = references_widget.references_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
         self.tabs_widget = tabs_widget.tabs_widget(self)
@@ -181,6 +183,7 @@ class main_widget(custom_window.custom_window):
         self.contents_1_layout.addWidget(self.contents_2_widget)
 
         self.contents_2_layout.addWidget(self.tabs_widget)
+        self.references_tab_index = self.tabs_widget.addTab(self.references_widget, 'References')
         self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, 'Work versions')
         self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, 'Exports')
         self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, 'Tickets')

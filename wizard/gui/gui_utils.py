@@ -234,6 +234,12 @@ class search_bar(QtWidgets.QFrame):
         self.search_bar.textChanged.connect(self.update_clear_button)
         self.clear_search_button.clicked.connect(self.search_bar.clear)
 
+    def keyPressEvent(self, event):
+        self.search_bar.keyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        self.search_bar.keyReleaseEvent(event)
+
     def update_clear_button(self, text):
         if text == '':
             self.clear_search_button.setVisible(False)

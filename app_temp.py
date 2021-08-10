@@ -139,17 +139,13 @@ class app():
 		self.footer_widget.show()
 		self.gui_server = gui_server.gui_server()
 		self.gui_server.start()
+		self.search_reference_widget = search_reference_widget.search_reference_widget()
+		self.search_reference_widget.show()
 		'''
 
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
 		self.main_widget.refresh()
-		
-		
-		
-
-		self.search_reference_widget = search_reference_widget.search_reference_widget()
-		self.search_reference_widget.show()
 
 		sys.exit(self.app.exec_())
 
