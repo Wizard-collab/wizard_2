@@ -240,6 +240,9 @@ class search_bar(QtWidgets.QFrame):
     def keyReleaseEvent(self, event):
         self.search_bar.keyReleaseEvent(event)
 
+    def setFocus(self, value):
+        self.search_bar.setFocus(value)
+
     def update_clear_button(self, text):
         if text == '':
             self.clear_search_button.setVisible(False)
