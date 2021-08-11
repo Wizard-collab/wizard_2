@@ -147,6 +147,7 @@ class main_widget(custom_window.custom_window):
         self.versions_widget.refresh()
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
+        QtWidgets.QApplication.processEvents()
         logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):

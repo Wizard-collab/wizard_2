@@ -33,10 +33,12 @@ class references_widget(QtWidgets.QWidget):
         self.search_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Tab'), self)
         self.search_sc.activated.connect(self.search_reference)
         self.reference_infos_thread.reference_infos_signal.connect(self.update_item_infos)
+        self.list_view.itemSelectionChanged.connect(self.refresh_infos)
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
         self.update_button.clicked.connect(self.update_selection)
         self.create_ticket_button.clicked.connect(self.create_ticket)
+        self.add_reference_button.clicked.connect(self.search_reference)
 
     def update_item_infos(self, infos_list):
         reference_id = infos_list[0]
@@ -88,6 +90,7 @@ class references_widget(QtWidgets.QWidget):
                             self.remove_reference_item(reference_id)
                     self.reference_infos_thread.update_references_rows(reference_rows)
                     self.update_stages_items()
+                    self.refresh_infos()
 
     def remove_selection(self):
         selected_items = self.list_view.selectedItems()
@@ -126,6 +129,12 @@ class references_widget(QtWidgets.QWidget):
             else:
                 self.list_view.invisibleRootItem().removeChild(item)
                 del self.stage_dic[stage]
+
+    def refresh_infos(self):
+        references_count = len(self.reference_ids.keys())
+        selection_count = len(self.list_view.selectedItems())
+        self.references_count_label.setText(f"{references_count} references -")
+        self.selection_count_label.setText(f"{selection_count} selected")
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -175,6 +184,13 @@ class references_widget(QtWidgets.QWidget):
         self.remove_selection_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.remove_selection_button)
 
+        self.add_reference_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.add_reference_button, "Add references (Tab)")
+        self.add_reference_button.setFixedSize(35,35)
+        self.add_reference_button.setIconSize(QtCore.QSize(30,30))
+        self.add_reference_button.setIcon(QtGui.QIcon(ressources._tool_add_))
+        self.buttons_layout.addWidget(self.add_reference_button)
+
         self.create_ticket_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.create_ticket_button, "Open a ticket")
         self.create_ticket_button.setFixedSize(35,35)
@@ -199,9 +215,9 @@ class references_widget(QtWidgets.QWidget):
 
         self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.versions_count_label = QtWidgets.QLabel()
-        self.versions_count_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.versions_count_label)
+        self.references_count_label = QtWidgets.QLabel()
+        self.references_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.references_count_label)
 
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
@@ -211,6 +227,7 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
         super(custom_stage_tree_item, self).__init__(parent)
         self.stage = stage
         self.setFlags(QtCore.Qt.ItemIsEnabled)
+        self.setExpanded(1)
         self.fill_ui()
 
     def fill_ui(self):
