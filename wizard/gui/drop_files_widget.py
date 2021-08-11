@@ -59,15 +59,6 @@ class drop_files_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.drop_files_button.new_file.connect(self.add_file)
-        self.drop_files_button.clicked.connect(self.open_files)
-
-    def open_files(self):
-        options = QtWidgets.QFileDialog.Options()
-        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
-                                                  "All Files (*);", options=options)
-        if fileList:
-            for file in fileList:
-                self.add_file(file)
 
     def add_file(self, file):
         new_file_widget = file_widget(file)
@@ -131,6 +122,10 @@ class drop_files_button(QtWidgets.QPushButton):
         self.setIconSize(QtCore.QSize(40,40))
         self.setMinimumHeight(50)
         self.setText('Drop files here or click to attach files')
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.clicked.connect(self.open_files)
 
     def dragEnterEvent(self, event):
         self.setStyleSheet('background-color: #4b4b57;')
@@ -157,3 +152,11 @@ class drop_files_button(QtWidgets.QPushButton):
             if url and url.scheme() == 'file':
                 path = str(url.path())[1:]
                 self.new_file.emit(path)
+
+    def open_files(self):
+        options = QtWidgets.QFileDialog.Options()
+        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+                                                  "All Files (*);", options=options)
+        if fileList:
+            for file in fileList:
+                self.new_file.emit(file)

@@ -142,7 +142,6 @@ class app():
 		self.gui_server.start()
 		self.search_reference_widget = search_reference_widget.search_reference_widget()
 		self.search_reference_widget.show()
-		'''
 
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
@@ -151,7 +150,6 @@ class app():
 
 		self.manual_export_widget = manual_export_widget.manual_export_widget()
 		self.manual_export_widget.show()
-		'''
 
 		sys.exit(self.app.exec_())
 

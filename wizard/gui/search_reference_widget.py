@@ -16,7 +16,7 @@ from wizard.gui import gui_utils
 
 class search_reference_widget(QtWidgets.QWidget):
 
-    stage_ids_signal = pyqtSignal(list)
+    variant_ids_signal = pyqtSignal(list)
 
     def __init__(self, parent = None):
         super(search_reference_widget, self).__init__(parent)
@@ -93,11 +93,12 @@ class search_reference_widget(QtWidgets.QWidget):
     def return_references(self):
         selected_items = self.list_view.selectedItems()
         if selected_items is not None and len(selected_items)>=1:
-            stage_ids = []
+            variant_ids = []
             for selected_item in selected_items:
-                stage_ids.append(selected_item.stage_row['id'])
-            if stage_ids != []:
-                self.stage_ids_signal.emit(stage_ids)
+                variant_ids.append(selected_item.variant_row['id'])
+            if variant_ids != []:
+                self.variant_ids_signal.emit(variant_ids)
+                print(variant_ids)
             self.close()
 
     def build_ui(self):
@@ -148,7 +149,7 @@ class search_thread(QtCore.QThread):
 
     def update_search(self, category=None, asset=None, stage_filter=None):
         self.running = False
-        self.all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
+        self.all_export_versions_variant_ids = project.get_all_export_versions('variant_id')
         self.category = category
         self.asset = asset
         self.stage_filter = stage_filter
@@ -178,10 +179,10 @@ class search_thread(QtCore.QThread):
                     for variant_row in variant_rows:
                         if not self.running:
                             break
-                        #if stage_row['id'] in self.all_export_versions_stage_ids:
-                        if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
-                            if self.running:
-                                self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+                        if variant_row['id'] in self.all_export_versions_variant_ids:
+                            if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
+                                if self.running:
+                                    self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
 
 class custom_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, category_row, asset_row, stage_row, variant_row, parent=None):

@@ -22,6 +22,7 @@ from wizard.gui import gui_utils
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
 from wizard.gui import create_ticket_widget
+from wizard.gui import manual_export_widget
 
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -240,6 +241,7 @@ class exports_widget(QtWidgets.QWidget):
         self.search_thread.id_signal.connect(self.add_search_version)
 
         self.archive_button.clicked.connect(self.archive)
+        self.manual_publish_button.clicked.connect(lambda:self.merge_files())
         self.folder_button.clicked.connect(self.open_folder)
         self.launch_button.clicked.connect(self.launch_work_version)
         self.ticket_button.clicked.connect(self.open_ticket)
@@ -346,6 +348,8 @@ class exports_widget(QtWidgets.QWidget):
                     self.launch_work_version()
                 elif self.menu_widget.function_name == ticket_action:
                     self.open_ticket()
+                elif self.menu_widget.function_name == manual_action:
+                    self.merge_files()
 
     def launch_work_version(self):
         selection = self.list_view.selectedItems()
@@ -356,6 +360,22 @@ class exports_widget(QtWidgets.QWidget):
                     work_version_id = item.export_version_row['work_version_id']
                     if work_version_id is not None:
                         launch.launch_work_version(work_version_id)
+
+    def merge_files(self, files=[]):
+        if self.variant_id is not None:
+            self.manual_export_widget = manual_export_widget.manual_export_widget()
+            self.manual_export_widget.add_files(files)
+
+            variant_row = project.get_variant_data(self.variant_id)
+            stage_row = project.get_stage_data(variant_row['stage_id'])
+            asset_row = project.get_asset_data(stage_row['asset_id'])
+
+            self.manual_export_widget.set_export_name(f"{asset_row['name']}_{stage_row['name']}_{variant_row['name']}")
+
+            if self.manual_export_widget.exec_() == QtWidgets.QDialog.Accepted:
+                files = self.manual_export_widget.files
+                export_name = self.manual_export_widget.export_name
+                assets.merge_file_as_export_version(export_name, files, self.variant_id)
 
     def focus_export_version(self, export_version_id):
         if export_version_id in self.export_versions_ids.keys():
@@ -421,6 +441,8 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(4, self.export_version_row['comment'])
         if self.export_version_row['software'] is not None:
             self.setIcon(5, QtGui.QIcon(ressources._sofwares_icons_dic_[self.export_version_row['software']]))
+        else:
+            self.setIcon(5, QtGui.QIcon(ressources._manual_export_))
         self.setText(6, 'ok')
 
     def set_missing(self, number):

@@ -37,7 +37,7 @@ class references_widget(QtWidgets.QWidget):
 
     def search_reference(self):
         self.search_reference_widget = search_reference_widget.search_reference_widget()
-        self.search_reference_widget.stage_ids_signal.connect(self.create_references_from_stage_ids)
+        self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
         self.search_reference_widget.show()
         
         if self.work_env_id is not None:
@@ -47,7 +47,7 @@ class references_widget(QtWidgets.QWidget):
             category_row = project.get_category_data(asset_row['category_id'])
             self.search_reference_widget.search_asset(f"{category_row['name']}:{asset_row['name']}")
 
-    def create_references_from_stage_ids(self, variant_ids):
+    def create_references_from_variant_ids(self, variant_ids):
         if self.work_env_id is not None:
             for variant_id in variant_ids:
                 assets.create_references_from_variant_id(self.work_env_id, variant_id)

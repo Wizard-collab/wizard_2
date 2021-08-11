@@ -338,64 +338,66 @@ def archive_work_env(work_env_id):
 	else:
 		return None
 
-def add_export_version(export_name, files, version_id, comment=''):
+def merge_file_as_export_version(export_name, files, variant_id, comment=''):
+	add_export_version(export_name, files, variant_id, None, comment)
+
+def add_export_version_from_version_id(export_name, files, version_id, comment=''):
+	work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))
+	if work_env_row is not None:
+		variant_id = work_env_row['variant_id']
+		add_export_version(export_name, files, variant_id, version_id, comment)
+
+def add_export_version(export_name, files, variant_id, version_id, comment=''):
 	# For adding an export version, wizard need an existing files list
 	# it will just create the new version in the database
 	# and copy the files in the corresponding directory
 
-	work_env_id = project.get_version_data(version_id, 'work_env_id')
-	if work_env_id:
-		work_env_row = project.get_work_env_data(work_env_id)
-		variant_id = work_env_row['variant_id']
-		variant_row = project.get_variant_data(variant_id)
-
-		stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
-		extension_errors = []
-		for file in files:
-			if os.path.splitext(file)[-1].replace('.', '') not in assets_vars._export_ext_dic_[stage_name]:
-				extension_errors.append(file)
-		if extension_errors == []:
-			if variant_row:
-				export_id = get_or_add_export(export_name, variant_id)
-				if export_id:
-					last_version_list = project.get_last_export_version(export_id, 'name')
-					if last_version_list is not None and len(last_version_list) == 1:
-						last_version = last_version_list[0]
-						new_version =  str(int(last_version)+1).zfill(4)
+	variant_row = project.get_variant_data(variant_id)
+	stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
+	extension_errors = []
+	for file in files:
+		if os.path.splitext(file)[-1].replace('.', '') not in assets_vars._export_ext_dic_[stage_name]:
+			extension_errors.append(file)
+	if extension_errors == []:
+		if variant_row:
+			export_id = get_or_add_export(export_name, variant_id)
+			if export_id:
+				last_version_list = project.get_last_export_version(export_id, 'name')
+				if last_version_list is not None and len(last_version_list) == 1:
+					last_version = last_version_list[0]
+					new_version =  str(int(last_version)+1).zfill(4)
+				else:
+					new_version = '0001'
+				export_path = get_export_path(export_id)
+				if export_path:
+					dir_name = os.path.normpath(os.path.join(export_path, new_version))
+					if not tools.create_folder(dir_name):
+						project.remove_export_version(export_version_id)
+						export_version_id = None
 					else:
-						new_version = '0001'
-					export_path = get_export_path(export_id)
-					if export_path:
-						dir_name = os.path.normpath(os.path.join(export_path, new_version))
-						if not tools.create_folder(dir_name):
-							project.remove_export_version(export_version_id)
+						copied_files = tools.copy_files(files, dir_name)
+						if not copied_files:
+							if not tools.remove_folder(dir_name):
+								logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
 							export_version_id = None
 						else:
-							copied_files = tools.copy_files(files, dir_name)
-							if not copied_files:
-								if not tools.remove_folder(dir_name):
-									logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
-								export_version_id = None
-							else:
-								export_version_id = project.add_export_version(new_version,
-																				copied_files,
-																				export_id,
-																				version_id,
-																				comment)
-								events.add_export_event(export_version_id)
-								game.add_xps(3)
-								game.analyse_comment(comment, 10)
-								gui_server.refresh_ui()
-					return export_version_id
-				else:
-					return None
+							export_version_id = project.add_export_version(new_version,
+																			copied_files,
+																			export_id,
+																			version_id,
+																			comment)
+							events.add_export_event(export_version_id)
+							game.add_xps(3)
+							game.analyse_comment(comment, 10)
+							gui_server.refresh_ui()
+				return export_version_id
 			else:
 				return None
 		else:
-			for file in extension_errors:
-				logger.warning(f"{file} format doesn't math the stage export rules ( {os.path.splitext(file)[-1]} )")
+			return None
 	else:
-		return None
+		for file in extension_errors:
+			logger.warning(f"{file} format doesn't math the stage export rules ( {os.path.splitext(file)[-1]} )")
 
 def request_export(work_env_id, export_name, multiple=None, only_dir=None):
 	# Gives a temporary ( and local ) export file name
