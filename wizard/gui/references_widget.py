@@ -22,6 +22,7 @@ class references_widget(QtWidgets.QWidget):
         self.reference_infos_thread = reference_infos_thread()
         self.work_env_id = None
         self.reference_ids = dict()
+        self.stage_dic = dict()
         self.build_ui()
         self.connect_functions()
 
@@ -54,6 +55,7 @@ class references_widget(QtWidgets.QWidget):
 
     def change_work_env(self, work_env_id):
         self.reference_ids = dict()
+        self.stage_dic = dict()
         self.list_view.clear()
         self.work_env_id = work_env_id
         self.refresh()
@@ -65,9 +67,15 @@ class references_widget(QtWidgets.QWidget):
                 if reference_rows is not None:
                     for reference_row in reference_rows:
                         if reference_row['id'] not in self.reference_ids.keys():
-                            reference_item = custom_reference_tree_item(reference_row, self.list_view.invisibleRootItem())
+                            stage = reference_row['stage']
+                            if stage not in self.stage_dic.keys():
+                                stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
+                                self.stage_dic[stage] = stage_item
+                            reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
                             self.reference_ids[reference_row['id']] = reference_item
                     self.reference_infos_thread.update_references_rows(reference_rows)
+                    for item in self.stage_dic.keys():
+                        self.stage_dic[item].update_infos()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -81,13 +89,15 @@ class references_widget(QtWidgets.QWidget):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setAnimated(1)
-        self.list_view.setExpandsOnDoubleClick(0)
+        self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(5)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Export version'])
-        self.list_view.header().resizeSection(3, 150)
+        self.list_view.header().resizeSection(0, 200)
+        self.list_view.header().resizeSection(1, 250)
+        self.list_view.header().resizeSection(3, 250)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -166,6 +176,19 @@ class references_widget(QtWidgets.QWidget):
 
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
+
+class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, stage, parent=None):
+        super(custom_stage_tree_item, self).__init__(parent)
+        self.stage = stage
+        self.fill_ui()
+
+    def fill_ui(self):
+        self.setText(0, self.stage)
+        self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.stage]))
+
+    def update_infos(self):
+        self.setText(0, f"{self.stage} ({self.childCount()})")
 
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, parent=None):
