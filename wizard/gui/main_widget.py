@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import time
 
 # Wizard modules
+from wizard.vars import ressources
 from wizard.core import project
 from wizard.core import communicate
 from wizard.core import custom_logger
@@ -186,10 +187,10 @@ class main_widget(custom_window.custom_window):
         self.contents_1_layout.addWidget(self.contents_2_widget)
 
         self.contents_2_layout.addWidget(self.tabs_widget)
-        self.references_tab_index = self.tabs_widget.addTab(self.references_widget, 'References')
-        self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, 'Work versions')
-        self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, 'Exports')
-        self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, 'Tickets')
+        self.references_tab_index = self.tabs_widget.addTab(self.references_widget, QtGui.QIcon(ressources._references_icon_), 'References')
+        self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, QtGui.QIcon(ressources._work_icon_), 'Work versions')
+        self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
+        self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, QtGui.QIcon(ressources._tickets_icon_), 'Tickets')
         self.contents_2_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)

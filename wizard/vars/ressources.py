@@ -65,6 +65,11 @@ _resize_decoration_ = os.path.join(_icons_path_, 'resize_decoration.png')
 _minimize_decoration_ = os.path.join(_icons_path_, 'minimize_decoration.png')
 _manual_export_ = os.path.join(_icons_path_, 'manual_export.png')
 
+_references_icon_ = os.path.join(_icons_path_, 'reference_icon.png')
+_work_icon_ = os.path.join(_icons_path_, 'work_icon.png')
+_exports_icon_ = os.path.join(_icons_path_, 'export_icon.png')
+_tickets_icon_ = os.path.join(_icons_path_, 'tickets_icon.png')
+
 
 # Lock icons
 _lock_icons_ = dict()

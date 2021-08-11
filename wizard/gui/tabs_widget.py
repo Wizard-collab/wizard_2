@@ -24,8 +24,8 @@ class tabs_widget(QtWidgets.QFrame):
 		self.tabs_widget = QtWidgets.QTabWidget()
 		self.main_layout.addWidget(self.tabs_widget)
 
-	def addTab(self, widget, title):
-		return self.tabs_widget.addTab(widget, title)
+	def addTab(self, widget, icon, title):
+		return self.tabs_widget.addTab(widget, icon, title)
 
 	def connect_functions(self):
 		self.tabs_widget.currentChanged.connect(self.currentChanged.emit)
