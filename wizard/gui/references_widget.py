@@ -9,11 +9,14 @@ from PyQt5.QtCore import pyqtSignal
 # Wizard gui modules
 from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
+from wizard.gui import create_ticket_widget
 
 # Wizard modules
 from wizard.core import assets
 from wizard.core import project
 from wizard.vars import ressources
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 class references_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -30,6 +33,10 @@ class references_widget(QtWidgets.QWidget):
         self.search_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Tab'), self)
         self.search_sc.activated.connect(self.search_reference)
         self.reference_infos_thread.reference_infos_signal.connect(self.update_item_infos)
+
+        self.remove_selection_button.clicked.connect(self.remove_selection)
+        self.update_button.clicked.connect(self.update_selection)
+        self.create_ticket_button.clicked.connect(self.create_ticket)
 
     def update_item_infos(self, infos_list):
         reference_id = infos_list[0]
@@ -64,8 +71,10 @@ class references_widget(QtWidgets.QWidget):
         if self.isVisible():
             if self.work_env_id is not None:
                 reference_rows = project.get_references(self.work_env_id)
+                project_references_id = []
                 if reference_rows is not None:
                     for reference_row in reference_rows:
+                        project_references_id.append(reference_row['id'])
                         if reference_row['id'] not in self.reference_ids.keys():
                             stage = reference_row['stage']
                             if stage not in self.stage_dic.keys():
@@ -73,9 +82,50 @@ class references_widget(QtWidgets.QWidget):
                                 self.stage_dic[stage] = stage_item
                             reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
                             self.reference_ids[reference_row['id']] = reference_item
+                    references_list_ids = list(self.reference_ids.keys())
+                    for reference_id in references_list_ids:
+                        if reference_id not in project_references_id:
+                            self.remove_reference_item(reference_id)
                     self.reference_infos_thread.update_references_rows(reference_rows)
-                    for item in self.stage_dic.keys():
-                        self.stage_dic[item].update_infos()
+                    self.update_stages_items()
+
+    def remove_selection(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            reference_id = selected_item.reference_row['id']
+            assets.remove_reference(reference_id)
+
+    def create_ticket(self):
+        selected_items = self.list_view.selectedItems()
+        if len(selected_items) == 1:
+            export_version_id = selected_items[0].reference_row['export_version_id']
+            self.create_ticket_widget = create_ticket_widget.create_ticket_widget(export_version_id)
+            self.create_ticket_widget.show()
+        else:
+            logger.warning('Please select one reference')
+
+    def update_selection(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            reference_id = selected_item.reference_row['id']
+            assets.set_reference_last_version(reference_id)
+
+    def remove_reference_item(self, reference_id):
+        if reference_id in self.reference_ids.keys():
+            item = self.reference_ids[reference_id]
+            item.parent().removeChild(item)
+            del self.reference_ids[reference_id]
+
+    def update_stages_items(self):
+        stages_list = list(self.stage_dic.keys())
+        for stage in stages_list:
+            item = self.stage_dic[stage]
+            childs = item.childCount()
+            if childs >= 1:
+                item.update_infos(childs)
+            else:
+                self.list_view.invisibleRootItem().removeChild(item)
+                del self.stage_dic[stage]
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -118,47 +168,26 @@ class references_widget(QtWidgets.QWidget):
         self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye", "from:houdini"')
         self.buttons_layout.addWidget(self.search_bar)
 
-        self.manual_publish_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.manual_publish_button, "Manually add a file")
-        self.manual_publish_button.setFixedSize(35,35)
-        self.manual_publish_button.setIconSize(QtCore.QSize(30,30))
-        self.manual_publish_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
-        self.buttons_layout.addWidget(self.manual_publish_button)
+        self.remove_selection_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.remove_selection_button, "Remove selected references")
+        self.remove_selection_button.setFixedSize(35,35)
+        self.remove_selection_button.setIconSize(QtCore.QSize(30,30))
+        self.remove_selection_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
+        self.buttons_layout.addWidget(self.remove_selection_button)
 
-        self.batch_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.batch_button, "Batch export")
-        self.batch_button.setFixedSize(35,35)
-        self.batch_button.setIconSize(QtCore.QSize(30,30))
-        self.batch_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
-        self.buttons_layout.addWidget(self.batch_button)
+        self.create_ticket_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.create_ticket_button, "Open a ticket")
+        self.create_ticket_button.setFixedSize(35,35)
+        self.create_ticket_button.setIconSize(QtCore.QSize(30,30))
+        self.create_ticket_button.setIcon(QtGui.QIcon(ressources._tool_ticket_))
+        self.buttons_layout.addWidget(self.create_ticket_button)     
 
-        self.launch_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.launch_button, "Launch related work version")
-        self.launch_button.setFixedSize(35,35)
-        self.launch_button.setIconSize(QtCore.QSize(30,30))
-        self.launch_button.setIcon(QtGui.QIcon(ressources._tool_launch_))
-        self.buttons_layout.addWidget(self.launch_button)
-
-        self.folder_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.folder_button, "Open export folder")
-        self.folder_button.setFixedSize(35,35)
-        self.folder_button.setIconSize(QtCore.QSize(30,30))
-        self.folder_button.setIcon(QtGui.QIcon(ressources._tool_folder_))
-        self.buttons_layout.addWidget(self.folder_button)
-
-        self.ticket_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.ticket_button, "Open a ticket")
-        self.ticket_button.setFixedSize(35,35)
-        self.ticket_button.setIconSize(QtCore.QSize(30,30))
-        self.ticket_button.setIcon(QtGui.QIcon(ressources._tool_ticket_))
-        self.buttons_layout.addWidget(self.ticket_button)
-
-        self.archive_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.archive_button, "Archive selection")
-        self.archive_button.setFixedSize(35,35)
-        self.archive_button.setIconSize(QtCore.QSize(30,30))
-        self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
-        self.buttons_layout.addWidget(self.archive_button)
+        self.update_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.update_button, "Update selected references")
+        self.update_button.setFixedSize(35,35)
+        self.update_button.setIconSize(QtCore.QSize(30,30))
+        self.update_button.setIcon(QtGui.QIcon(ressources._tool_update_))
+        self.buttons_layout.addWidget(self.update_button)     
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('dark_widget')
@@ -181,14 +210,15 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, stage, parent=None):
         super(custom_stage_tree_item, self).__init__(parent)
         self.stage = stage
+        self.setFlags(QtCore.Qt.ItemIsEnabled)
         self.fill_ui()
 
     def fill_ui(self):
         self.setText(0, self.stage)
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.stage]))
 
-    def update_infos(self):
-        self.setText(0, f"{self.stage} ({self.childCount()})")
+    def update_infos(self, childs):
+        self.setText(0, f"{self.stage} ({childs})")
 
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, parent=None):

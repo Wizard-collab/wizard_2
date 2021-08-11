@@ -43,6 +43,7 @@ _tool_manually_publish_ = os.path.join(_icons_path_, 'tool_manually_publish.png'
 _tool_batch_publish_ = os.path.join(_icons_path_, 'tool_batch_publish.png')
 _tool_launch_ = os.path.join(_icons_path_, 'tool_launch.png')
 _tool_ticket_ = os.path.join(_icons_path_, 'tool_ticket.png')
+_tool_update_ = os.path.join(_icons_path_, 'tool_update.png')
 _random_icon_ = os.path.join(_icons_path_, 'random.png')
 _bulb_icon_ = os.path.join(_icons_path_, 'bulb.png')
 _info_icon_ = os.path.join(_icons_path_, 'info.png')

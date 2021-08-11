@@ -621,6 +621,24 @@ def get_references(work_env_id, column='*'):
                                                         column)
     return references_rows
 
+def get_reference_data(reference_id, column='*'):
+    reference_rows = db_utils.get_row_by_column_data('project',
+                                                        'references_data',
+                                                        ('id', reference_id),
+                                                        column)
+    if reference_rows and len(reference_rows) >= 1:
+        return reference_rows[0]
+    else:
+        logger.error("Reference not found")
+        return None
+
+def update_reference(reference_id, export_version_id):
+    if db_utils.update_data('project',
+                        'references_data',
+                        ('export_version_id', export_version_id),
+                        ('id', reference_id)):
+        logger.info('Reference modified')
+
 def remove_work_env(work_env_id):
     success = None
     if site.is_admin():

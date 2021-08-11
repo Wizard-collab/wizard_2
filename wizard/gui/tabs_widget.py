@@ -22,6 +22,7 @@ class tabs_widget(QtWidgets.QFrame):
 		self.setLayout(self.main_layout)
 
 		self.tabs_widget = QtWidgets.QTabWidget()
+		self.tabs_widget.setIconSize(QtCore.QSize(16,16))
 		self.main_layout.addWidget(self.tabs_widget)
 
 	def addTab(self, widget, icon, title):

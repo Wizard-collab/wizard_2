@@ -320,6 +320,23 @@ def create_reference(work_env_id, export_version_id, refresh=1):
 	if refresh:
 		gui_server.refresh_ui()
 
+def remove_reference(reference_id):
+	project.remove_reference(reference_id)
+	gui_server.refresh_ui()
+
+def set_reference_last_version(reference_id):
+	export_version_id = project.get_reference_data(reference_id, 'export_version_id')
+	if export_version_id is not None:
+		export_version_row = project.get_export_version_data(export_version_id)
+		export_row = project.get_export_data(export_version_row['export_id'])
+		last_export_version_id = project.get_last_export_version(export_row['id'], 'id')
+		if last_export_version_id is not None and len(last_export_version_id)==1:
+			if last_export_version_id[0] != export_version_id:
+				project.update_reference(reference_id, last_export_version_id[0])
+				gui_server.refresh_ui()
+			else:
+				logger.info("Reference is up to date")
+
 def archive_work_env(work_env_id):
 	if site.is_admin():
 		work_env_row = project.get_work_env_data(work_env_id)
