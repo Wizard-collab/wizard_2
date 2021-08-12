@@ -498,6 +498,14 @@ QSlider::handle:horizontal {
 	color: gray;
 }
 
+#red_label{
+	color: #f0605b;
+}
+
+#orange_label{
+	color: #f79360;
+}
+
 #bold_label{
 	font: bold;
 }

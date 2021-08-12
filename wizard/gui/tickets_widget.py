@@ -63,10 +63,27 @@ class tickets_widget(QtWidgets.QWidget):
         self.ticket_history_widget.setVisible(0)
         self.tickets_area_layout.addWidget(self.ticket_history_widget)
 
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('dark_widget')
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(8,8,8,0)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.versions_count_label = QtWidgets.QLabel()
+        self.versions_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.versions_count_label)
+
+        self.selection_count_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selection_count_label)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(8,8,8,0)
+        self.buttons_layout.setContentsMargins(8,8,8,8)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -82,23 +99,6 @@ class tickets_widget(QtWidgets.QWidget):
         self.toggle_visibility_checkBox.setObjectName('transparent_widget')
         self.toggle_visibility_checkBox.setChecked(1)
         self.buttons_layout.addWidget(self.toggle_visibility_checkBox)
-
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('dark_widget')
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(8,8,8,8)
-        self.infos_layout.setSpacing(4)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
-
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.versions_count_label = QtWidgets.QLabel()
-        self.versions_count_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.versions_count_label)
-
-        self.selection_count_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.selection_count_label)
 
     def connect_functions(self):
         self.toggle_visibility_checkBox.stateChanged.connect(self.update_visibility)

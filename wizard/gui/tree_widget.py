@@ -457,6 +457,18 @@ class tree_widget(QtWidgets.QFrame):
 
     def archive_instance(self, item):
         self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+
+        if item.instance_type == 'category':
+            security_sentence = f"{environment.get_project_name()}/{item.instance_name}"
+        elif item.instance_type == 'asset':
+            category_name = project.get_category_data(project.get_asset_data(item.instance_id, 'category_id'), 'name')
+            security_sentence = f"{environment.get_project_name()}/{category_name}/{item.instance_name}"
+        elif item.instance_type== 'stage':
+            asset_row = project.get_asset_data(project.get_stage_data(item.instance_id, 'asset_id'))
+            category_name = project.get_category_data(asset_row['category_id'], 'name')
+            security_sentence = f"{environment.get_project_name()}/{category_name}/{asset_row['name']}/{item.instance_name}"
+
+        self.confirm_widget.set_security_sentence(security_sentence)
         if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
             if item.instance_type == 'category':
                 assets.archive_category(item.instance_id)

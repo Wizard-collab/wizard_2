@@ -56,11 +56,11 @@ class references_widget(QtWidgets.QWidget):
             self.reference_ids[reference_id].update_item_infos(infos_list)
 
     def search_reference(self):
-        self.search_reference_widget = search_reference_widget.search_reference_widget()
-        self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
-        self.search_reference_widget.show()
-        
-        if self.work_env_id is not None:
+        if self.work_env_id is not None and self.work_env_id != 0:
+            self.search_reference_widget = search_reference_widget.search_reference_widget()
+            self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
+            self.search_reference_widget.show()
+
             variant_row = project.get_variant_data(project.get_work_env_data(self.work_env_id, 'variant_id'))
             stage_row = project.get_stage_data(variant_row['stage_id'])
             asset_row = project.get_asset_data(stage_row['asset_id'])
@@ -102,13 +102,13 @@ class references_widget(QtWidgets.QWidget):
                                 self.remove_reference_item(reference_id)
                         self.reference_infos_thread.update_references_rows(reference_rows)
                         self.update_stages_items()
-                        self.refresh_infos()
                     else:
                         self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
             elif self.work_env_id is None:
                 self.show_info_mode("You need at least one work version\nto create references...", ressources._launch_info_image_)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+            self.refresh_infos()
 
     def remove_selection(self):
         selected_items = self.list_view.selectedItems()
@@ -180,10 +180,27 @@ class references_widget(QtWidgets.QWidget):
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('dark_widget')
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(8,8,8,0)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.references_count_label = QtWidgets.QLabel()
+        self.references_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.references_count_label)
+
+        self.selection_count_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selection_count_label)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(8,8,8,0)
+        self.buttons_layout.setContentsMargins(8,8,8,8)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -222,23 +239,6 @@ class references_widget(QtWidgets.QWidget):
         self.update_button.setIconSize(QtCore.QSize(30,30))
         self.update_button.setIcon(QtGui.QIcon(ressources._tool_update_))
         self.buttons_layout.addWidget(self.update_button)     
-
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('dark_widget')
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(8,8,8,8)
-        self.infos_layout.setSpacing(4)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
-
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.references_count_label = QtWidgets.QLabel()
-        self.references_count_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.references_count_label)
-
-        self.selection_count_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.selection_count_label)
 
 class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, stage, parent=None):

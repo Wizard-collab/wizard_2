@@ -75,10 +75,27 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('dark_widget')
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(8,8,8,0)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.versions_count_label = QtWidgets.QLabel()
+        self.versions_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.versions_count_label)
+
+        self.selection_count_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selection_count_label)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(8,8,8,0)
+        self.buttons_layout.setContentsMargins(8,8,8,8)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -132,28 +149,43 @@ class exports_widget(QtWidgets.QWidget):
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('dark_widget')
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(8,8,8,8)
-        self.infos_layout.setSpacing(4)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
-
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.versions_count_label = QtWidgets.QLabel()
-        self.versions_count_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.versions_count_label)
-
-        self.selection_count_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.selection_count_label)
+    def check_if_export_is_referenced(self, export_version_row):
+        string = None
+        if len(project.get_references_by_export_version(export_version_row['id'], 'id'))!=0:
+            export_row = project.get_export_data(export_version_row['export_id'])
+            variant_row = project.get_variant_data(export_version_row['variant_id'])
+            stage_row = project.get_stage_data(export_version_row['stage_id'])
+            asset_row = project.get_asset_data(stage_row['asset_id'])
+            string = f"{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{export_row['name']}/{export_version_row['name']}"
+        return string
 
     def archive(self):
         selection = self.list_view.selectedItems()
         if selection is not None:
             if selection != []:
+
+                # Check if exports are referenced somewhere
+                referenced_items = []
+                for item in selection:
+                    if item.type == 'export_version':
+                        string = self.check_if_export_is_referenced(item.export_version_row)
+                        if string is not None and string not in referenced_items:
+                            referenced_items.append(string)
+                    elif item.type == 'export':
+                        childs_ids = project.get_export_versions(item.export_row['id'], 'id')
+                        for export_version_id in childs_ids:
+                            export_version_row = project.get_export_version_data(export_version_id)
+                            string = self.check_if_export_is_referenced(export_version_row)
+                            if string is not None and string not in referenced_items:
+                                referenced_items.append(string)
+
                 self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+                if len(referenced_items)!=0:
+                    message = 'The following export versions are referenced in some scenes,\ndo you REALLY want to continue ?\n\n-'
+                    message += ('\n-').join(referenced_items)
+                    self.confirm_widget.set_important_message(message)
+                    self.confirm_widget.set_security_sentence('I understand the risks')
+
                 if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
                     for item in selection:
                         if item.type == 'export_version':

@@ -438,6 +438,13 @@ def get_export_versions(export_id, column='*'):
                                                         column)
     return export_versions_rows
 
+def get_export_versions_by_work_version_id(work_version_id, column='*'):
+    export_versions_rows = db_utils.get_row_by_column_data('project',
+                                                        'export_versions',
+                                                        ('work_version_id', work_version_id),
+                                                        column)
+    return export_versions_rows
+
 def get_all_export_versions(column='*'):
     export_versions_rows = db_utils.get_rows('project',
                                                 'export_versions',
@@ -552,6 +559,15 @@ def get_export_version_data(export_version_id, column='*'):
         logger.error("Export version not found")
         return None
 
+def update_export_version_data(export_version_id, data_tuple):
+    if db_utils.update_data('project',
+        'export_versions',
+        data_tuple,
+        ('id', export_version_id)):
+        return 1
+    else:
+        return None
+
 def add_work_env(name, software_id, variant_id):
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'work_envs',
@@ -618,6 +634,13 @@ def get_references(work_env_id, column='*'):
     references_rows = db_utils.get_row_by_column_data('project',
                                                         'references_data',
                                                         ('work_env_id', work_env_id),
+                                                        column)
+    return references_rows
+
+def get_references_by_export_version(export_version_id, column='*'):
+    references_rows = db_utils.get_row_by_column_data('project',
+                                                        'references_data',
+                                                        ('export_version_id', export_version_id),
                                                         column)
     return references_rows
 
@@ -774,6 +797,9 @@ def get_version_data(version_id, column='*'):
 def remove_version(version_id):
     success = None
     if site.is_admin():
+        for export_version_id in get_export_versions_by_work_version_id(version_id, 'id'):
+            update_export_version_data(export_version_id, ('work_version_id', None))
+            update_export_version_data(export_version_id, ('software', None))
         success = db_utils.delete_row('project', 'versions', version_id)
         if success :
             logger.info(f"Version removed from project")
@@ -1075,6 +1101,14 @@ def get_ticket_messages(ticket_id, column='*'):
                                                         column)
     return ticket_messages_rows
 
+def remove_ticket_message(ticket_message_id):
+    success = None
+    if site.is_admin():
+        success = db_utils.delete_row('project', 'ticket_messages', ticket_message_id)
+        if success :
+            logger.info(f"Ticket message removed from project")
+    return success
+
 def get_ticket_data(ticket_id, column='*'):
     tickets_rows = db_utils.get_row_by_column_data('project',
                                                         'tickets',
@@ -1126,6 +1160,10 @@ def get_tickets_by_stage(stage_id, column='*'):
 def remove_ticket(ticket_id):
     success = None
     if site.is_admin():
+
+        for ticket_message_id in get_ticket_messages(ticket_id, 'id'):
+            remove_ticket_message(ticket_message_id)
+
         success = db_utils.delete_row('project', 'tickets', ticket_id)
         if success :
             logger.info(f"Ticket removed from project")

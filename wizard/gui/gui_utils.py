@@ -26,17 +26,17 @@ def move_ui(widget):
     win_width = widget.frameSize().width()
     win_heigth = widget.frameSize().height()
 
-    if (cursor_y - 20 - win_heigth) <= screen_minY:
-        posy = cursor_y - 10
+    if (cursor_y - 30 - win_heigth) <= screen_minY:
+        posy = cursor_y - 15
         angley = 'top'
     else:
-        posy = cursor_y - win_heigth + 10
+        posy = cursor_y - win_heigth + 15
         angley = 'bottom'
-    if (cursor_x + 20 + win_width) >= screen_maxX:
-        posx = cursor_x - win_width + 10
+    if (cursor_x + 30 + win_width) >= screen_maxX:
+        posx = cursor_x - win_width + 15
         anglex = 'right'
     else:
-        posx = cursor_x - 10
+        posx = cursor_x - 15
         anglex = 'left'
 
     widget.move(posx, posy)

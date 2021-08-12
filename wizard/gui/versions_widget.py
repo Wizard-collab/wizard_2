@@ -241,10 +241,27 @@ class versions_widget(QtWidgets.QWidget):
         self.views_layout.addWidget(self.icon_view)
         self.icon_view.setVisible(0)
 
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('dark_widget')
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(8,8,8,0)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.versions_count_label = QtWidgets.QLabel()
+        self.versions_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.versions_count_label)
+
+        self.selection_count_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selection_count_label)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(8,8,8,0)
+        self.buttons_layout.setContentsMargins(8,8,8,8)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -297,23 +314,6 @@ class versions_widget(QtWidgets.QWidget):
         self.archive_button.setIconSize(QtCore.QSize(30,30))
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
-
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('dark_widget')
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(8,8,8,8)
-        self.infos_layout.setSpacing(4)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
-
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.versions_count_label = QtWidgets.QLabel()
-        self.versions_count_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.versions_count_label)
-
-        self.selection_count_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.selection_count_label)
 
     def context_menu_requested(self):
         selection = self.get_selection()

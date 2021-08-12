@@ -113,12 +113,15 @@ def archive_category(category_id):
 				if archive_file:
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
-					events.add_archive_event(f"Archived category : {category_row['name']}",
-												archive_file)
-					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
-			return project.remove_category(category_id)
+				archive_file = ''
+			success = project.remove_category(category_id)
+			if success:
+				events.add_archive_event(f"Archived category : {category_row['name']}",
+												archive_file)
+				gui_server.refresh_ui()
+			return success
 		else:
 			return None
 	else:
@@ -155,12 +158,16 @@ def archive_asset(asset_id):
 				if archive_file:
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
-					events.add_archive_event(f"Archived asset : {asset_row['name']}",
-												archive_file)
-					gui_server.refresh_ui()
+					
 			else:
 				logger.warning(f"{dir_name} not found")
-			return project.remove_asset(asset_id)
+				archive_file = ''
+			success = project.remove_asset(asset_id)
+			if success:
+				events.add_archive_event(f"Archived asset : {asset_row['name']}",
+												archive_file)
+				gui_server.refresh_ui()
+			return success
 		else:
 			return None
 	else:
@@ -223,7 +230,13 @@ def archive_stage(stage_id):
 					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
-			return project.remove_stage(stage_id)
+				archive_file = ''
+			success = project.remove_stage(stage_id)
+			if success:
+				events.add_archive_event(f"Archived stage : {stage_row['name']}",
+												archive_file)
+				gui_server.refresh_ui()
+			return success
 		else:
 			return None
 	else:
@@ -263,12 +276,15 @@ def archive_variant(variant_id):
 				if archive_file:
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
-					events.add_archive_event(f"Archived variant : {variant_row['name']}",
-												archive_file)
-					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
-			return project.remove_variant(variant_id)
+				archive_file=''
+			success = project.remove_variant(variant_id)
+			if success:
+				events.add_archive_event(f"Archived variant : {variant_row['name']}",
+												archive_file)
+				gui_server.refresh_ui()
+			return success
 		else:
 			return None
 	else:
@@ -336,24 +352,6 @@ def set_reference_last_version(reference_id):
 				gui_server.refresh_ui()
 			else:
 				logger.info("Reference is up to date")
-
-def archive_work_env(work_env_id):
-	if site.is_admin():
-		work_env_row = project.get_work_env_data(work_env_id)
-		if work_env_row:
-			dir_name = get_work_env_path(work_env_id)
-			if os.path.isdir(dir_name):
-				if tools.make_archive(dir_name):
-					shutil.rmtree(dir_name)
-					logger.info(f"{dir_name} deleted")
-					gui_server.refresh_ui()
-			else:
-				logger.warning(f"{dir_name} not found")
-			return project.remove_work_env(work_env_id)
-		else:
-			return None
-	else:
-		return None
 
 def merge_file_as_export_version(export_name, files, variant_id, comment=''):
 	add_export_version(export_name, files, variant_id, None, comment)
@@ -441,6 +439,7 @@ def archive_export(export_id):
 					logger.info(f"{dir_name} deleted")
 			else:
 				logger.warning(f"{dir_name} not found")
+				archive_file = ''
 			success = project.remove_export(export_id)
 			if success:
 				events.add_archive_event(f"Archived export : {export_row['name']}",
@@ -488,6 +487,7 @@ def archive_export_version(export_version_id):
 					logger.info(f"{dir_name} deleted")
 			else:
 				logger.warning(f"{dir_name} not found")
+				archive_file = ''
 			success = project.remove_export_version(export_version_id)
 			if success:
 				events.add_archive_event(f"Archived export version: {export_version_row['name']}",
@@ -568,20 +568,24 @@ def duplicate_version(version_id, comment=None):
 def archive_version(version_id):
 	if site.is_admin():
 		version_row = project.get_version_data(version_id)
-		if version_row:
-			if os.path.isfile(version_row['file_path']):
-				zip_file = os.path.join(os.path.split(version_row['file_path'])[0], 
-							'archives.zip')
-				if tools.zip_files([version_row['file_path']], zip_file):
-					os.remove(version_row['file_path'])
-					logger.info(f"{version_row['file_path']} deleted")
+		if version_row['name'] != '0001':
+			if version_row:
+				if os.path.isfile(version_row['file_path']):
+					zip_file = os.path.join(os.path.split(version_row['file_path'])[0], 
+								'archives.zip')
+					if tools.zip_files([version_row['file_path']], zip_file):
+						os.remove(version_row['file_path'])
+						logger.info(f"{version_row['file_path']} deleted")
+				else:
+					logger.warning(f"{version_row['file_path']} not found")
+				success = project.remove_version(version_row['id'])
+				gui_server.refresh_ui()
+				return success
 			else:
-				logger.warning(f"{version_row['file_path']} not found")
-			sucess = project.remove_version(version_row['id'])
-			gui_server.refresh_ui()
-			return sucess
+				return None	
 		else:
-			return None		
+			logger.warning("You can't archive the default version (0001)")
+			return None	
 	else:
 		return None
 
