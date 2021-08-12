@@ -27,6 +27,7 @@ class versions_widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(versions_widget, self).__init__(parent)
+
         self.work_env_id = None
         self.version_list_ids = dict()
         self.version_icon_ids = dict()
@@ -38,6 +39,17 @@ class versions_widget(QtWidgets.QWidget):
 
         self.build_ui()
         self.connect_functions()
+
+    def dragEnterEvent(self, event):
+        self.drop_widget.setVisible(1)
+        event.accept()
+
+    def dragLeaveEvent(self, event):
+        self.drop_widget.setVisible(0)
+        event.accept()
+
+    def dropEvent(self, event):
+        self.drop_widget.setVisible(0)
 
     def change_work_env(self, work_env_id):
         self.check_existence_thread.running = False
@@ -53,10 +65,12 @@ class versions_widget(QtWidgets.QWidget):
         self.info_widget.setVisible(1)
         self.info_widget.setText(text)
         self.info_widget.setImage(image)
+        self.setAcceptDrops(False)
 
     def hide_info_mode(self):
         self.info_widget.setVisible(0)
         self.views_widget.setVisible(1)
+        self.setAcceptDrops(True)
 
     def refresh(self):
         if self.isVisible():
@@ -314,6 +328,10 @@ class versions_widget(QtWidgets.QWidget):
         self.archive_button.setIconSize(QtCore.QSize(30,30))
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
+
+        self.drop_widget = gui_utils.drop_widget(self)
+        self.drop_widget.setText('Merge file as new version')
+        self.drop_widget.setVisible(0)
 
     def context_menu_requested(self):
         selection = self.get_selection()

@@ -27,6 +27,8 @@ from wizard.gui import manual_export_widget
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(exports_widget, self).__init__(parent)
+
+
         self.search_thread = search_thread()
 
         self.icons_dic = dict()
@@ -49,6 +51,17 @@ class exports_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.build_ui()
         self.connect_functions()
+
+    def dragEnterEvent(self, event):
+        self.drop_widget.setVisible(1)
+        event.accept()
+
+    def dragLeaveEvent(self, event):
+        self.drop_widget.setVisible(0)
+        event.accept()
+
+    def dropEvent(self, event):
+        self.drop_widget.setVisible(0)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -148,6 +161,10 @@ class exports_widget(QtWidgets.QWidget):
         self.archive_button.setIconSize(QtCore.QSize(30,30))
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
+
+        self.drop_widget = gui_utils.drop_widget(self)
+        self.drop_widget.setText('Merge file as new export version')
+        self.drop_widget.setVisible(0)
 
     def check_if_export_is_referenced(self, export_version_row):
         string = None
@@ -292,7 +309,7 @@ class exports_widget(QtWidgets.QWidget):
     def refresh(self):
         if self.isVisible():
             if self.variant_id is not None:
-                #self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
+                self.setAcceptDrops(True)
                 stage_id = project.get_variant_data(self.variant_id, 'stage_id')
                 stage_name = project.get_stage_data(stage_id, 'name')
                 stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
@@ -336,6 +353,7 @@ class exports_widget(QtWidgets.QWidget):
 
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+                self.setAcceptDrops(False)
         self.refresh_infos()
 
     def missing_file(self, tuple_signal):
@@ -416,7 +434,8 @@ class exports_widget(QtWidgets.QWidget):
             if self.manual_export_widget.exec_() == QtWidgets.QDialog.Accepted:
                 files = self.manual_export_widget.files
                 export_name = self.manual_export_widget.export_name
-                assets.merge_file_as_export_version(export_name, files, self.variant_id)
+                comment = self.manual_export_widget.comment
+                assets.merge_file_as_export_version(export_name, files, self.variant_id, comment)
 
     def focus_export_version(self, export_version_id):
         if export_version_id in self.export_versions_ids.keys():

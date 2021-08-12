@@ -31,6 +31,7 @@ class manual_export_widget(custom_window.custom_dialog):
     def merge(self):
         self.get_files_list()
         self.export_name = self.export_name_lineEdit.text()
+        self.comment = self.comment_textEdit.toPlainText()
         process = 1
         if self.export_name == '':
             logger.warning('Please enter an export name')
@@ -52,7 +53,8 @@ class manual_export_widget(custom_window.custom_dialog):
             self.remove_selection()
 
     def add_file(self, file):
- 	    self.files_list.addItem(file)
+        self.files_list.addItem(file)
+        QtWidgets.QApplication.processEvents()
 
     def add_files(self, files):
         for file in files:
@@ -91,6 +93,11 @@ class manual_export_widget(custom_window.custom_dialog):
         self.export_name_lineEdit = QtWidgets.QLineEdit()
         self.export_name_lineEdit.setPlaceholderText('The asset exported, Ex: {asset_name}_{stage}')
         self.header_layout.addWidget(self.export_name_lineEdit)
+
+        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit.setPlaceholderText('Your comment here')
+        self.comment_textEdit.setMaximumHeight(100)
+        self.main_layout.addWidget(self.comment_textEdit)
 
         self.files_list = QtWidgets.QListWidget()
         self.files_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
