@@ -74,7 +74,7 @@ class tree_widget(QtWidgets.QFrame):
         self.search_frame = QtWidgets.QFrame()
         self.search_layout = QtWidgets.QHBoxLayout()
         self.search_layout.setContentsMargins(0,0,8,0)
-        self.search_layout.setSpacing(4)
+        self.search_layout.setSpacing(8)
         self.search_frame.setLayout(self.search_layout)
 
         self.search_bar = gui_utils.search_bar()

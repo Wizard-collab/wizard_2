@@ -50,6 +50,12 @@ class search_reference_widget(QtWidgets.QWidget):
     def leaveEvent(self, event):
         self.close()
 
+    def search_ended(self):
+        if self.list_view.invisibleRootItem().childCount() == 0:
+            self.show_info_mode('No export found...', ressources._lost_info_image_)
+        else:
+            self.hide_info_mode()
+
     def search_asset(self, search):
         self.accept_item_from_thread = False
         self.list_view.clear()
@@ -70,6 +76,7 @@ class search_reference_widget(QtWidgets.QWidget):
             self.search_thread.update_search(category_string, asset_string, stage_filter)
         else:
             self.search_thread.running=False
+            self.search_ended()
 
     def add_item(self, item_list):
         if self.accept_item_from_thread:
@@ -80,6 +87,7 @@ class search_reference_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
         self.search_thread.item_signal.connect(self.add_item)
+        self.search_thread.search_ended.connect(self.search_ended)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Down:
@@ -101,6 +109,16 @@ class search_reference_widget(QtWidgets.QWidget):
                 print(variant_ids)
             self.close()
 
+    def show_info_mode(self, text, image):
+        self.list_view.setVisible(0)
+        self.info_widget.setVisible(1)
+        self.info_widget.setText(text)
+        self.info_widget.setImage(image)
+
+    def hide_info_mode(self):
+        self.info_widget.setVisible(0)
+        self.list_view.setVisible(1)
+
     def build_ui(self):
         self.setMinimumWidth(500)
         self.setMinimumHeight(500)
@@ -112,7 +130,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.main_widget = QtWidgets.QWidget()
-        self.main_widget.setStyleSheet('border-radius:12px;')
+        self.main_widget.setStyleSheet('border-radius:5px;')
         self.main_widget_layout = QtWidgets.QVBoxLayout()
         self.main_widget_layout.setContentsMargins(0,0,0,0)
         self.main_widget_layout.setSpacing(0)
@@ -120,9 +138,13 @@ class search_reference_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.main_widget)
 
         self.search_bar = gui_utils.search_bar()
-        self.search_bar.setObjectName('transparent_widget')
+        #self.search_bar.setObjectName('transparent_widget')
         self.search_bar.setPlaceholderText('"asset", "category:asset"')
         self.main_widget_layout.addWidget(self.search_bar)
+
+        self.info_widget = gui_utils.info_widget()
+        self.info_widget.setVisible(0)
+        self.main_widget_layout.addWidget(self.info_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setObjectName('tree_as_list_widget')
@@ -135,10 +157,12 @@ class search_reference_widget(QtWidgets.QWidget):
         self.list_view.header().resizeSection(1, 110)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.main_widget_layout.addWidget(self.list_view)
+        self.show_info_mode('No export found...', ressources._lost_info_image_)
 
 class search_thread(QtCore.QThread):
 
     item_signal = pyqtSignal(list)
+    search_ended = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -183,6 +207,7 @@ class search_thread(QtCore.QThread):
                             if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
                                 if self.running:
                                     self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+        self.search_ended.emit(1)
 
 class custom_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, category_row, asset_row, stage_row, variant_row, parent=None):

@@ -149,8 +149,8 @@ class launcher_widget(QtWidgets.QFrame):
                     self.work_env_changed_signal.emit(self.work_env_row['id'])
                 elif self.work_env_row == None and self.variant_row is not None:
                     self.work_env_changed_signal.emit(None)
-                else:
-                    self.work_env_changed_signal.emit(0)
+            else:
+                self.work_env_changed_signal.emit(0)
                 
             self.refresh_versions_hard()
 

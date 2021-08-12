@@ -180,7 +180,6 @@ class tickets_widget(QtWidgets.QWidget):
         self.stage_id = stage_id
         self.clear()
         self.refresh()
-        self.info_widget.pop()
 
 class custom_ticket_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, ticket_row, parent=None):

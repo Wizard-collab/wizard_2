@@ -29,6 +29,16 @@ class references_widget(QtWidgets.QWidget):
         self.build_ui()
         self.connect_functions()
 
+    def show_info_mode(self, text, image):
+        self.list_view.setVisible(0)
+        self.info_widget.setVisible(1)
+        self.info_widget.setText(text)
+        self.info_widget.setImage(image)
+
+    def hide_info_mode(self):
+        self.info_widget.setVisible(0)
+        self.list_view.setVisible(1)
+
     def connect_functions(self):
         self.search_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Tab'), self)
         self.search_sc.activated.connect(self.search_reference)
@@ -71,26 +81,34 @@ class references_widget(QtWidgets.QWidget):
 
     def refresh(self):
         if self.isVisible():
-            if self.work_env_id is not None:
+            if self.work_env_id is not None and self.work_env_id != 0:
                 reference_rows = project.get_references(self.work_env_id)
                 project_references_id = []
                 if reference_rows is not None:
-                    for reference_row in reference_rows:
-                        project_references_id.append(reference_row['id'])
-                        if reference_row['id'] not in self.reference_ids.keys():
-                            stage = reference_row['stage']
-                            if stage not in self.stage_dic.keys():
-                                stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
-                                self.stage_dic[stage] = stage_item
-                            reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
-                            self.reference_ids[reference_row['id']] = reference_item
-                    references_list_ids = list(self.reference_ids.keys())
-                    for reference_id in references_list_ids:
-                        if reference_id not in project_references_id:
-                            self.remove_reference_item(reference_id)
-                    self.reference_infos_thread.update_references_rows(reference_rows)
-                    self.update_stages_items()
-                    self.refresh_infos()
+                    self.hide_info_mode()
+                    if len(reference_rows) >=1:
+                        for reference_row in reference_rows:
+                            project_references_id.append(reference_row['id'])
+                            if reference_row['id'] not in self.reference_ids.keys():
+                                stage = reference_row['stage']
+                                if stage not in self.stage_dic.keys():
+                                    stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
+                                    self.stage_dic[stage] = stage_item
+                                reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
+                                self.reference_ids[reference_row['id']] = reference_item
+                        references_list_ids = list(self.reference_ids.keys())
+                        for reference_id in references_list_ids:
+                            if reference_id not in project_references_id:
+                                self.remove_reference_item(reference_id)
+                        self.reference_infos_thread.update_references_rows(reference_rows)
+                        self.update_stages_items()
+                        self.refresh_infos()
+                    else:
+                        self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
+            elif self.work_env_id is None:
+                self.show_info_mode("You need at least one work version\nto create references...", ressources._launch_info_image_)
+            else:
+                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
 
     def remove_selection(self):
         selected_items = self.list_view.selectedItems()

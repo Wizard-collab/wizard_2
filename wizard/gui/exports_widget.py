@@ -43,6 +43,7 @@ class exports_widget(QtWidgets.QWidget):
         self.icons_dic['camera'] = QtGui.QIcon(ressources._camera_icon_small_)
         self.icons_dic['compositing'] = QtGui.QIcon(ressources._compositing_icon_small_)
 
+        self.variant_id = None
         self.export_ids = dict()
         self.export_versions_ids = dict()
         self.check_existence_thread = check_existence_thread()
@@ -259,7 +260,7 @@ class exports_widget(QtWidgets.QWidget):
     def refresh(self):
         if self.isVisible():
             if self.variant_id is not None:
-                self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
+                #self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
                 stage_id = project.get_variant_data(self.variant_id, 'stage_id')
                 stage_name = project.get_stage_data(stage_id, 'name')
                 stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
@@ -274,6 +275,9 @@ class exports_widget(QtWidgets.QWidget):
                                 export_item = custom_export_tree_item(export_row, stage_icon, self.list_view.invisibleRootItem())
                                 export_item.setExpanded(1)
                                 self.export_ids[export_row['id']] = export_item
+                    else:
+                        self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
+
                     project_export_versions_id = []
                     export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
                     if export_versions_rows is not None:
@@ -286,14 +290,18 @@ class exports_widget(QtWidgets.QWidget):
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
                             self.check_existence_thread.update_versions_rows(export_versions_rows)
 
-                export_list_ids = list(self.export_ids.keys())
-                for export_id in export_list_ids:
-                    if export_id not in project_export_id:
-                        self.remove_export(export_id)
-                export_version_list_ids = list(self.export_versions_ids.keys())
-                for export_version_id in export_version_list_ids:
-                    if export_version_id not in project_export_versions_id:
-                        self.remove_export_version(export_version_id)
+
+                    export_list_ids = list(self.export_ids.keys())
+                    for export_id in export_list_ids:
+                        if export_id not in project_export_id:
+                            self.remove_export(export_id)
+                    export_version_list_ids = list(self.export_versions_ids.keys())
+                    for export_version_id in export_version_list_ids:
+                        if export_version_id not in project_export_versions_id:
+                            self.remove_export_version(export_version_id)
+                else:
+                    self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
+
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
         self.refresh_infos()
@@ -392,8 +400,8 @@ class exports_widget(QtWidgets.QWidget):
         self.info_widget.setImage(image)
 
     def hide_info_mode(self):
-        self.list_view.setVisible(1)
         self.info_widget.setVisible(0)
+        self.list_view.setVisible(1)
 
     def change_variant(self, variant_id):
         self.check_existence_thread.running = False
@@ -402,7 +410,6 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.clear()
         self.variant_id = variant_id
         self.refresh()
-        self.info_widget.pop()
         
 class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, export_row, stage_icon, parent=None):

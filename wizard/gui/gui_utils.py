@@ -5,6 +5,7 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtProperty
 
 # Wizard modules
 from wizard.vars import ressources
@@ -200,6 +201,7 @@ class search_bar(QtWidgets.QFrame):
         super(search_bar, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
+        self.old_text=''
 
     def build_ui(self):
         self.setObjectName('search_bar_frame')
@@ -231,7 +233,7 @@ class search_bar(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.textChanged.emit)
-        self.search_bar.textChanged.connect(self.update_clear_button)
+        self.search_bar.textChanged.connect(self.text_changed)
         self.clear_search_button.clicked.connect(self.search_bar.clear)
 
     def keyPressEvent(self, event):
@@ -243,11 +245,44 @@ class search_bar(QtWidgets.QFrame):
     def setFocus(self, value):
         self.search_bar.setFocus(value)
 
+    def text_changed(self, text):
+        self.update_clear_button(text)
+        self.update_bg(text)
+
+    def _set_color(self, color):
+        self.setStyleSheet('#search_bar_frame{background-color:rgba(%s, %s, %s, %s);}' % (color.red() ,
+                                                                                                color.green(),
+                                                                                                color.blue(), 
+                                                                                                color.alpha()))
+        '''
+        palette = self.palette()
+        palette.setColor(self.backgroundRole(), color)
+        self.setAutoFillBackground(True)
+        self.setPalette(palette)
+        '''
+
+    def update_bg(self, text):
+        if text == '' and self.old_text!='':
+            self.anim = QtCore.QPropertyAnimation(self, b"color")
+            self.anim.setDuration(200)
+            self.anim.setStartValue(QtGui.QColor(119, 133, 222, 255))
+            self.anim.setEndValue(QtGui.QColor(44, 44, 51, 255))
+            self.anim.start()
+        elif text != '' and self.old_text == '':
+            self.anim = QtCore.QPropertyAnimation(self, b"color")
+            self.anim.setDuration(200)
+            self.anim.setStartValue(QtGui.QColor(44, 44, 51, 255))
+            self.anim.setEndValue(QtGui.QColor(119, 133, 222, 255))
+            self.anim.start()
+        self.old_text = text
+
     def update_clear_button(self, text):
         if text == '':
             self.clear_search_button.setVisible(False)
         else:
             self.clear_search_button.setVisible(True)
+
+    color = pyqtProperty(QtGui.QColor, fset=_set_color)
 
 class RoundProgress(QtWidgets.QWidget):
     def __init__(self, parent = None):
@@ -326,7 +361,6 @@ def add_menu_to_menu_bar(menu_bar, title, icon=None):
 class info_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(info_widget, self).__init__(parent)
-        self.old_image = None
         self.build_ui()
 
     def build_ui(self):
@@ -338,35 +372,17 @@ class info_widget(QtWidgets.QFrame):
         self.main_layout.setAlignment(QtCore.Qt.AlignCenter)
         self.setLayout(self.main_layout)
 
-
-        self.animation_widget = QtWidgets.QWidget()
-        self.animation_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.animation_widget.setObjectName('dark_widget')
-        self.animation_layout = QtWidgets.QVBoxLayout()
-        self.animation_layout.setContentsMargins(0,0,0,0)
-        self.animation_layout.setSpacing(6)
-        self.animation_widget.setLayout(self.animation_layout)
-        self.main_layout.addWidget(self.animation_widget)
-
-        self.animation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.image = QtWidgets.QLabel()
         self.image.setAlignment(QtCore.Qt.AlignCenter)
-        self.animation_layout.addWidget(self.image)
+        self.main_layout.addWidget(self.image)
         self.text = QtWidgets.QLabel()
         self.text.setAlignment(QtCore.Qt.AlignCenter)
         self.text.setObjectName('title_label_gray')
-        self.animation_layout.addWidget(self.text)
+        self.main_layout.addWidget(self.text)
 
-        self.animation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
-
-    def pop(self):
-        self.animation = QtCore.QPropertyAnimation(self.animation_widget, b"geometry")
-        self.animation.setDuration(300)
-        self.animation.setStartValue(QtCore.QRect(self.geometry().x(), self.geometry().y()-30, self.geometry().width(), self.geometry().height()))
-        self.animation.setEndValue(self.geometry())
-        self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
-        self.animation.start()
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
     def setImage(self, image):
         self.image.setPixmap(QtGui.QPixmap(image).scaled(

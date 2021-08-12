@@ -28,5 +28,8 @@ class tabs_widget(QtWidgets.QFrame):
 	def addTab(self, widget, icon, title):
 		return self.tabs_widget.addTab(widget, icon, title)
 
+	def setCurrentIndex(self, index):
+		return self.tabs_widget.setCurrentIndex(index)
+
 	def connect_functions(self):
 		self.tabs_widget.currentChanged.connect(self.currentChanged.emit)
