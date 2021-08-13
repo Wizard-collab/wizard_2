@@ -726,13 +726,12 @@ QSlider::handle:horizontal {
 	background-color: transparent;
 }
 
-#ticket_message_widget{
-	background-color: #28282f;
+#ticket_messages_widget{
+	border-radius: 12px;
 }
 
-#ticket_messages_header{
+#ticket_message_widget{
 	background-color: #28282f;
-	border-bottom: 2px solid #24242b;
 }
 
 #shelf_script_button{

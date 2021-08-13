@@ -26,50 +26,51 @@ class ticket_history_widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(ticket_history_widget, self).__init__(parent)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(12)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.setGraphicsEffect(self.shadow)
+
+        self.parent = parent
         self.ticket_id = None
         self.ticket_messages_ids = dict()
         self.build_ui()
         self.connect_functions()
 
-    def display(self):
-        if not self.isVisible():
-            self.setVisible(1)
-            self.animate_show()
+    def showEvent(self, event):
+        self.set_geometry()
+        event.accept()
 
-    def not_display(self):
-        if self.isVisible():
-            self.animate_hide()
-
-    def animate_show(self):
-        self.setMaximumWidth(500)
-        self.setMinimumWidth(0)
-        self.anim = QtCore.QPropertyAnimation(self, b"maximumWidth")
-        self.anim.setDuration(100)
-        self.anim.setStartValue(0)
-        self.anim.setEndValue(500)
-        self.anim.start()
-
-    def animate_hide(self):
-        self.setMaximumWidth(500)
-        self.setMinimumWidth(0)
-        self.anim = QtCore.QPropertyAnimation(self, b"maximumWidth")
-        self.anim.setDuration(100)
-        self.anim.setStartValue(500)
-        self.anim.setEndValue(0)
-        self.anim.finished.connect(lambda:self.setVisible(0))
-        self.anim.start()
+    def set_geometry(self):
+        parent_x = self.parent.x()
+        parent_y = self.parent.y()
+        parent_width = self.parent.width()
+        parent_height = self.parent.height()
+        pos_x = (parent_x + parent_width)-self.width()
+        pos_y = (parent_y)
+        self.setGeometry(pos_x, pos_y, self.width(), parent_height)
 
     def build_ui(self):
-        self.setObjectName('dark_widget')
+        self.main_widget_layout = QtWidgets.QHBoxLayout()
+        self.main_widget_layout.setContentsMargins(12,12,12,12)
+        self.setLayout(self.main_widget_layout)
+
+        self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setMinimumWidth(500)
+        self.main_widget.setObjectName('ticket_messages_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(0)
-        self.setLayout(self.main_layout)
+        self.main_layout.setContentsMargins(12,12,12,12)
+        self.main_layout.setSpacing(12)
+        self.main_widget.setLayout(self.main_layout)
+        self.main_widget_layout.addWidget(self.main_widget)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('ticket_messages_header')
+        self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(6,6,6,6)
+        self.header_layout.setContentsMargins(0,0,0,0)
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
@@ -101,7 +102,7 @@ class ticket_history_widget(QtWidgets.QWidget):
         self.ticket_messages_scrollArea_widget = QtWidgets.QWidget()
         self.ticket_messages_scrollArea_widget.setObjectName('wall_scroll_area')
         self.ticket_messages_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.ticket_messages_scrollArea_layout.setContentsMargins(0,0,0,0)
+        self.ticket_messages_scrollArea_layout.setContentsMargins(2,2,2,2)
         self.ticket_messages_scrollArea_layout.setSpacing(2)
         self.ticket_messages_scrollArea_widget.setLayout(self.ticket_messages_scrollArea_layout)
 
@@ -110,6 +111,7 @@ class ticket_history_widget(QtWidgets.QWidget):
         self.ticket_messages_scrollArea.setWidgetResizable(True)
         self.ticket_messages_scrollArea.setWidget(self.ticket_messages_scrollArea_widget)
         self.ticket_messages_scrollBar = self.ticket_messages_scrollArea.verticalScrollBar()
+        self.ticket_messages_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.messages_widget = QtWidgets.QWidget()
         self.messages_widget.setObjectName('transparent_widget')
@@ -121,7 +123,6 @@ class ticket_history_widget(QtWidgets.QWidget):
         self.ticket_messages_scrollArea_layout.addWidget(self.messages_widget)
         self.post_widget = post_widget()
         self.ticket_messages_scrollArea_layout.addWidget(self.post_widget)
-        self.ticket_messages_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.main_layout.addWidget(self.ticket_messages_scrollArea)
 
@@ -138,6 +139,10 @@ class ticket_history_widget(QtWidgets.QWidget):
         self.post_widget.clear()
         self.ticket_id = ticket_id
         self.refresh()
+        if self.ticket_id is None:
+            self.hide()
+        else:
+            self.setVisible(1)
 
     def clear(self):
         self.ticket_messages_ids = dict()

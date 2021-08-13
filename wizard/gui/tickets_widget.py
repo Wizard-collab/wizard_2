@@ -59,9 +59,8 @@ class tickets_widget(QtWidgets.QWidget):
         self.tickets_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.tickets_area_layout.addWidget(self.tickets_list)
 
-        self.ticket_history_widget = ticket_history_widget.ticket_history_widget()
-        self.ticket_history_widget.setVisible(0)
-        self.tickets_area_layout.addWidget(self.ticket_history_widget)
+        self.ticket_history_widget = ticket_history_widget.ticket_history_widget(self.tickets_list)
+        self.ticket_history_widget.show()
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('dark_widget')
@@ -73,12 +72,17 @@ class tickets_widget(QtWidgets.QWidget):
 
         self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.versions_count_label = QtWidgets.QLabel()
-        self.versions_count_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.versions_count_label)
+        self.toggle_visibility_checkBox = QtWidgets.QCheckBox('Show only openned tickets')
+        self.toggle_visibility_checkBox.setObjectName('transparent_widget')
+        self.toggle_visibility_checkBox.setChecked(1)
+        self.infos_layout.addWidget(self.toggle_visibility_checkBox)
 
-        self.selection_count_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.selection_count_label)
+        self.tickets_count_label = QtWidgets.QLabel()
+        self.tickets_count_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.tickets_count_label)
+
+        self.openned_count_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.openned_count_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
@@ -95,10 +99,12 @@ class tickets_widget(QtWidgets.QWidget):
         self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye"')
         self.buttons_layout.addWidget(self.search_bar)
 
-        self.toggle_visibility_checkBox = QtWidgets.QCheckBox('Only openned tickets')
-        self.toggle_visibility_checkBox.setObjectName('transparent_widget')
-        self.toggle_visibility_checkBox.setChecked(1)
-        self.buttons_layout.addWidget(self.toggle_visibility_checkBox)
+        self.close_ticket_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.close_ticket_button, "Close ticket(s)")
+        self.close_ticket_button.setFixedSize(35,35)
+        self.close_ticket_button.setIconSize(QtCore.QSize(30,30))
+        self.close_ticket_button.setIcon(QtGui.QIcon(ressources._tool_validate_))
+        self.buttons_layout.addWidget(self.close_ticket_button)
 
     def connect_functions(self):
         self.toggle_visibility_checkBox.stateChanged.connect(self.update_visibility)
@@ -108,10 +114,12 @@ class tickets_widget(QtWidgets.QWidget):
     def selection_changed(self):
         selection = self.tickets_list.selectedItems()
         if len(selection) == 1:
-            self.ticket_history_widget.display()
             self.ticket_history_widget.change_ticket(selection[0].ticket_row['id'])
         else:
-            self.ticket_history_widget.not_display()
+            self.ticket_history_widget.change_ticket(None)
+
+    def resizeEvent(self, event):
+        self.ticket_history_widget.set_geometry()
 
     def toggle_ticket(self):
         selection = self.tickets_list.selectedItems()
@@ -120,16 +128,25 @@ class tickets_widget(QtWidgets.QWidget):
             assets.toggle_ticket(ticket_id)
 
     def show_info_mode(self, text, image):
-        self.ticket_history_widget.not_display()
+        self.ticket_history_widget.setVisible(0)
         self.tickets_list.setVisible(0)
         self.info_widget.setVisible(1)
         self.info_widget.setText(text)
         self.info_widget.setImage(image)
 
     def hide_info_mode(self):
+        self.ticket_history_widget.setVisible(1)
         self.info_widget.setVisible(0)
         self.tickets_list.setVisible(1)
         self.selection_changed()
+
+    def refresh_infos(self):
+        self.tickets_count_label.setText(f" - {len(self.ticket_ids.keys())} tickets -")
+        openned_count = 0
+        for ticket_id in self.ticket_ids.keys():
+            if self.ticket_ids[ticket_id].ticket_row['state'] == 1:
+                openned_count +=1
+        self.openned_count_label.setText(f"{openned_count} tickets openned")
 
     def refresh(self):
         if self.stage_id is not None:
@@ -146,6 +163,7 @@ class tickets_widget(QtWidgets.QWidget):
         else:
             self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
         self.ticket_history_widget.refresh()
+        self.refresh_infos()
 
     def update_visibility(self):
         if self.toggle_visibility_checkBox.isChecked():

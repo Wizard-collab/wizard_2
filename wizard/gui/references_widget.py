@@ -10,6 +10,7 @@ from PyQt5.QtCore import pyqtSignal
 from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import create_ticket_widget
+from wizard.gui import menu_widget
 
 # Wizard modules
 from wizard.core import assets
@@ -44,6 +45,7 @@ class references_widget(QtWidgets.QWidget):
         self.search_sc.activated.connect(self.search_reference)
         self.reference_infos_thread.reference_infos_signal.connect(self.update_item_infos)
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
+        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
         self.update_button.clicked.connect(self.update_selection)
@@ -131,6 +133,10 @@ class references_widget(QtWidgets.QWidget):
             reference_id = selected_item.reference_row['id']
             assets.set_reference_last_version(reference_id)
 
+    def update_all(self):
+        for reference_id in self.reference_ids.keys():
+            assets.set_reference_last_version(reference_id)
+
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():
             item = self.reference_ids[reference_id]
@@ -153,6 +159,32 @@ class references_widget(QtWidgets.QWidget):
         selection_count = len(self.list_view.selectedItems())
         self.references_count_label.setText(f"{references_count} references -")
         self.selection_count_label.setText(f"{selection_count} selected")
+
+    def context_menu_requested(self):
+        selection = self.list_view.selectedItems()
+        self.menu_widget = menu_widget.menu_widget(self)
+        remove_action = None
+        update_action = None
+        ticket_action = None
+        add_action = self.menu_widget.add_action(f'Add references (Tab)', ressources._tool_add_)
+        update_all_action = self.menu_widget.add_action(f'Update all references', ressources._tool_update_)
+        if len(selection)>=1:
+            update_action = self.menu_widget.add_action(f'Update reference(s)', ressources._tool_update_)
+            remove_action = self.menu_widget.add_action(f'Remove reference(s)', ressources._tool_archive_)
+        if len(selection)==1:
+            ticket_action = self.menu_widget.add_action(f'Open a ticket', ressources._tool_ticket_)
+        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.menu_widget.function_name is not None:
+                if self.menu_widget.function_name == remove_action:
+                    self.remove_selection()
+                elif self.menu_widget.function_name == update_action:
+                    self.update_selection()
+                elif self.menu_widget.function_name == ticket_action:
+                    self.create_ticket()
+                elif self.menu_widget.function_name == add_action:
+                    self.search_reference()
+                elif self.menu_widget.function_name == update_all_action:
+                    self.update_all()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
