@@ -160,3 +160,38 @@ class drop_files_button(QtWidgets.QPushButton):
         if fileList:
             for file in fileList:
                 self.new_file.emit(file)
+
+class drop_widget(QtWidgets.QFrame):
+    def __init__(self, parent = None):
+        super(drop_widget, self).__init__(parent)
+        self.setObjectName('drop_widget')
+        self.parent = parent
+        self.build_ui()
+
+    def showEvent(self, event):
+        self.setGeometry(self.parent.geometry())
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setAlignment(QtCore.Qt.AlignCenter)
+        self.setLayout(self.main_layout)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+        self.image = QtWidgets.QLabel()
+        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.addWidget(self.image)
+        self.text = QtWidgets.QLabel()
+        self.text.setAlignment(QtCore.Qt.AlignCenter)
+        self.text.setObjectName('title_label')
+        self.main_layout.addWidget(self.text)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.setImage(ressources._merge_info_image_)
+
+    def setImage(self, image):
+        self.image.setPixmap(QtGui.QPixmap(image).scaled(
+            150, 150, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+
+    def setText(self, text):
+        self.text.setText(text)

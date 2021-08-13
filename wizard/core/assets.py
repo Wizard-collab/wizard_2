@@ -412,7 +412,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment=''):
 			return None
 	else:
 		for file in extension_errors:
-			logger.warning(f"{file} format doesn't math the stage export rules ( {os.path.splitext(file)[-1]} )")
+			logger.warning(f"{file} format doesn't math the stage export rules ( {(', ').join(assets_vars._export_ext_dic_[stage_name])} )")
 
 def request_export(work_env_id, export_name, multiple=None, only_dir=None):
 	# Gives a temporary ( and local ) export file name
@@ -540,11 +540,17 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 
 def merge_file(file, work_env_id, comment="", do_screenshot=1):
 	if os.path.isfile(file):
-		version_id = add_version(work_env_id, comment, do_screenshot)
-		version_row = project.get_version_data(version_id)
-		shutil.copyfile(file, version_row['file_path'])
-		logger.info(f"{file} merged in new version {version_row['name']}")
-		return version_id
+		software_extension = project.get_software_data(project.get_work_env_data(work_env_id, 'software_id'), 'extension')
+		file_extension = os.path.splitext(file)[-1].replace('.', '')
+		if software_extension == file_extension:
+			version_id = add_version(work_env_id, comment, do_screenshot)
+			version_row = project.get_version_data(version_id)
+			shutil.copyfile(file, version_row['file_path'])
+			logger.info(f"{file} merged in new version {version_row['name']}")
+			return version_id
+		else:
+			logger.warning(f"{file} doesn't match the work environment extension rules ( .ma )")
+			return None
 	else:
 		logger.warning(f"{file} doesn't exists")
 		return None

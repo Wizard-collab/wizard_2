@@ -20,6 +20,7 @@ logger = custom_logger.get_logger()
 from wizard.gui import gui_utils
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
+from wizard.gui import drop_files_widget
 
 class versions_widget(QtWidgets.QWidget):
 
@@ -50,6 +51,26 @@ class versions_widget(QtWidgets.QWidget):
 
     def dropEvent(self, event):
         self.drop_widget.setVisible(0)
+        data = event.mimeData()
+        urls = data.urls()
+        files = []
+        for url in urls:
+            if url and url.scheme() == 'file':
+                path = str(url.path())[1:]
+                files.append(path)
+        if len(files) != 0:
+            self.merge_files(files)
+
+    def open_files(self):
+        options = QtWidgets.QFileDialog.Options()
+        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+                                                  "All Files (*);", options=options)
+        if fileList:
+            self.merge_files(fileList)
+
+    def merge_files(self, files=[]):
+        for file in files:
+            assets.merge_file(file, self.work_env_id, "Manually merged file", 0)
 
     def change_work_env(self, work_env_id):
         self.check_existence_thread.running = False
@@ -199,6 +220,7 @@ class versions_widget(QtWidgets.QWidget):
         self.icon_view.customContextMenuRequested.connect(self.context_menu_requested)
 
         self.archive_button.clicked.connect(self.archive)
+        self.manual_merge_button.clicked.connect(self.open_files)
         self.duplicate_button.clicked.connect(self.duplicate_version)
         self.new_version_button.clicked.connect(self.add_empty_version)
         self.folder_button.clicked.connect(self.open_folder)
@@ -294,6 +316,13 @@ class versions_widget(QtWidgets.QWidget):
         self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
         self.buttons_layout.addWidget(self.toggle_view_button)
 
+        self.manual_merge_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.manual_merge_button, "Manually merge a file")
+        self.manual_merge_button.setFixedSize(35,35)
+        self.manual_merge_button.setIconSize(QtCore.QSize(30,30))
+        self.manual_merge_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
+        self.buttons_layout.addWidget(self.manual_merge_button)
+
         self.launch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.launch_button, "Launch selection")
         self.launch_button.setFixedSize(35,35)
@@ -329,7 +358,7 @@ class versions_widget(QtWidgets.QWidget):
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
-        self.drop_widget = gui_utils.drop_widget(self)
+        self.drop_widget = drop_files_widget.drop_widget(self)
         self.drop_widget.setText('Merge file as new version')
         self.drop_widget.setVisible(0)
 

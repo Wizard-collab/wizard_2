@@ -23,6 +23,7 @@ from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
 from wizard.gui import create_ticket_widget
 from wizard.gui import manual_export_widget
+from wizard.gui import drop_files_widget
 
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -62,6 +63,15 @@ class exports_widget(QtWidgets.QWidget):
 
     def dropEvent(self, event):
         self.drop_widget.setVisible(0)
+        data = event.mimeData()
+        urls = data.urls()
+        files = []
+        for url in urls:
+            if url and url.scheme() == 'file':
+                path = str(url.path())[1:]
+                files.append(path)
+        if len(files) != 0:
+            self.merge_files(files)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -162,7 +172,7 @@ class exports_widget(QtWidgets.QWidget):
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
-        self.drop_widget = gui_utils.drop_widget(self)
+        self.drop_widget = drop_files_widget.drop_widget(self)
         self.drop_widget.setText('Merge file as new export version')
         self.drop_widget.setVisible(0)
 
