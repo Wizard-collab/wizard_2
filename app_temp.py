@@ -21,6 +21,7 @@ from wizard.gui import footer_widget
 from wizard.gui import custom_window
 from wizard.gui import search_reference_widget
 from wizard.gui import manual_export_widget
+from wizard.gui import all_users_widget
 
 import sys
 import time
@@ -149,8 +150,9 @@ class app():
 		self.main_widget.refresh()
 		'''
 
-		self.manual_export_widget = manual_export_widget.manual_export_widget()
-		self.manual_export_widget.show()
+		self.all_users_widget = all_users_widget.all_users_widget()
+		self.all_users_widget.show()
+		self.all_users_widget.refresh()
 		'''
 
 		sys.exit(self.app.exec_())

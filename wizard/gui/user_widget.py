@@ -28,6 +28,37 @@ class user_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
+        self.items_widget = QtWidgets.QWidget()
+        self.items_widget.setObjectName('transparent_widget')
+        self.items_layout = QtWidgets.QHBoxLayout()
+        self.items_layout.setContentsMargins(0,0,0,0)
+        self.items_layout.setSpacing(6)
+        self.items_widget.setLayout(self.items_layout)
+        self.main_layout.addWidget(self.items_widget)
+
+        self.crown_label = QtWidgets.QLabel()
+        self.crown_label.setPixmap(QtGui.QPixmap(ressources._crown_icon_).scaled(28,28,
+                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.items_layout.addWidget(self.crown_label)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('transparent_widget')
+        self.infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.infos_widget.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setSpacing(0)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.level_label = QtWidgets.QLabel('23')
+        gui_utils.application_tooltip(self.level_label, "User level")
+        self.infos_layout.addWidget(self.level_label)
+        self.info_level_label = QtWidgets.QLabel('L.')
+        gui_utils.application_tooltip(self.info_level_label, "User level")
+        self.info_level_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.info_level_label)
+
         self.progress_bars_widget = QtWidgets.QWidget()
         self.progress_bars_widget.setObjectName('transparent_widget')
         self.progress_bars_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -55,25 +86,6 @@ class user_widget(QtWidgets.QFrame):
         self.life_progress_bar.setTextVisible(0)
         self.progress_bars_layout.addWidget(self.life_progress_bar)
 
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('transparent_widget')
-        self.infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.infos_widget.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
-        self.infos_layout.setSpacing(2)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.progress_bars_layout.addWidget(self.infos_widget)
-
-
-        self.level_label = QtWidgets.QLabel('23')
-        gui_utils.application_tooltip(self.level_label, "User level")
-        #self.infos_layout.addWidget(self.level_label)
-        self.info_level_label = QtWidgets.QLabel('Level ')
-        gui_utils.application_tooltip(self.info_level_label, "User level")
-        self.info_level_label.setObjectName('gray_label')
-        #self.infos_layout.addWidget(self.info_level_label)
-
         self.admin_badge_label = QtWidgets.QLabel()
         gui_utils.application_tooltip(self.admin_badge_label, "Admin badge")
         self.admin_badge_label.setPixmap(QtGui.QPixmap(ressources._admin_badge_).scaled(
@@ -93,5 +105,20 @@ class user_widget(QtWidgets.QFrame):
         gui_utils.round_image(self.profile_picture,
                                 image.convert_str_data_to_image_bytes(user_row['profile_picture']),
                                 28)
+        self.crown_check(user_row)
 
+    def crown_check(self, user_row):
+        user_rows = site.get_users_list()
+        is_master = 1
+        for other_user in user_rows:
+            if other_user['id'] == user_row['id']:
+                pass
+            else:
+                if other_user['level'] > user_row['level']:
+                    is_master = 0
+                    break
+        if is_master:
+            self.crown_label.setVisible(1)
+        else:
+            self.crown_label.setVisible(0)
     

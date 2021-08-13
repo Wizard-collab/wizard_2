@@ -69,6 +69,7 @@ _quit_decoration_ = os.path.join(_icons_path_, 'quit_decoration.png')
 _resize_decoration_ = os.path.join(_icons_path_, 'resize_decoration.png')
 _minimize_decoration_ = os.path.join(_icons_path_, 'minimize_decoration.png')
 _manual_export_ = os.path.join(_icons_path_, 'manual_export.png')
+_crown_icon_ = os.path.join(_icons_path_, 'crown.png')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.png')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.png')
