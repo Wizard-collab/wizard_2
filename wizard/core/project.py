@@ -1177,7 +1177,7 @@ def get_scripts_folder():
     shared_files_folder = os.path.join(environment.get_project_path(), project_vars._scripts_folder_)
     return shared_files_folder
 
-def add_event(event_type, title, message, data):
+def add_event(event_type, title, message, data, additional_message=None):
     event_id = db_utils.create_row('project',
                                             'events',
                                             ('creation_user',
@@ -1185,13 +1185,15 @@ def add_event(event_type, title, message, data):
                                                 'type',
                                                 'title',
                                                 'message',
-                                                'data'),
+                                                'data',
+                                                'additional_message'),
                                             (environment.get_user(),
                                                 time.time(),
                                                 event_type,
                                                 title,
                                                 message,
-                                                json.dumps(data)))
+                                                json.dumps(data),
+                                                additional_message))
     if event_id:
         logger.debug("Event added")
     return event_id
@@ -1546,7 +1548,8 @@ def create_events_table(database):
                                         type text NOT NULL,
                                         title text NOT NULL,
                                         message text NOT NULL,
-                                        data text
+                                        data text,
+                                        additional_message text
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Events table created")

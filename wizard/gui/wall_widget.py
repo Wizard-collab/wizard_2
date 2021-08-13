@@ -191,6 +191,10 @@ class wall_event_widget(QtWidgets.QFrame):
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         self.event_content_label.setText(self.event_row['message'])
+        if self.event_row['additional_message'] is not None:
+            self.event_additional_content_label.setText(self.event_row['additional_message'])
+        else:
+            self.event_additional_content_label.setVisible(0)
         self.action_button_button.setText('View')
         
         if self.event_row['type'] == 'creation':
@@ -256,18 +260,23 @@ class wall_event_widget(QtWidgets.QFrame):
         self.title_widget.setLayout(self.title_layout)
         self.header_layout.addWidget(self.title_widget)
 
-        self.user_name_label = QtWidgets.QLabel()
-        self.user_name_label.setObjectName('title_label')
-        self.title_layout.addWidget(self.user_name_label)
-
         self.event_title_label = QtWidgets.QLabel()
         self.event_title_label.setWordWrap(True)
-        self.event_title_label.setObjectName('gray_label')
+        self.event_title_label.setObjectName('title_label')
         self.title_layout.addWidget(self.event_title_label)
+
+        self.user_name_label = QtWidgets.QLabel()
+        self.user_name_label.setObjectName('gray_label')
+        self.title_layout.addWidget(self.user_name_label)
 
         self.event_content_label = QtWidgets.QLabel()
         self.event_content_label.setWordWrap(True)
         self.main_layout.addWidget(self.event_content_label)
+
+        self.event_additional_content_label = QtWidgets.QLabel()
+        self.event_additional_content_label.setObjectName('gray_label')
+        self.event_additional_content_label.setWordWrap(True)
+        self.main_layout.addWidget(self.event_additional_content_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
