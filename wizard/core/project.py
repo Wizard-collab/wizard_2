@@ -99,6 +99,7 @@ def add_category(name, domain_id):
         return category_id
     else:
         logger.warning(f"{name} already exists")
+        return None
 
 def remove_category(category_id):
     success = None
@@ -163,6 +164,7 @@ def add_asset(name, category_id, inframe=100, outframe=220):
         return asset_id
     else:
         logger.warning(f"{name} already exists")
+        return None
 
 def get_all_assets(column='*'):
     assets_rows = db_utils.get_rows('project',
@@ -232,6 +234,7 @@ def add_stage(name, asset_id):
         return stage_id
     else:
         logger.warning(f"{name} already exists")
+        return None
 
 def get_all_stages(column='*'):
     stages_rows = db_utils.get_rows('project',
@@ -250,11 +253,13 @@ def remove_stage(stage_id):
     return success
 
 def set_stage_default_variant(stage_id, variant_id):
-    if db_utils.update_data('project',
+    success = db_utils.update_data('project',
                         'stages',
                         ('default_variant_id', variant_id),
-                        ('id', stage_id)):
+                        ('id', stage_id))
+    if success:
         logger.debug('Default variant modified')
+    return success
 
 def get_stage_data(stage_id, column='*'):
     stages_rows = db_utils.get_row_by_column_data('project',
@@ -300,6 +305,7 @@ def add_variant(name, stage_id, comment):
         return variant_id
     else:
         logger.warning(f"{name} already exists")
+        return None
 
 def get_variant_by_name(stage_id, name, column='*'):
     variant_row = db_utils.get_row_by_multiple_data('project', 
@@ -420,6 +426,7 @@ def add_export(name, variant_id):
         return export_id
     else:
         logger.warning(f"{name} already exists")
+        return None
 
 def remove_export(export_id):
     success = None
@@ -500,6 +507,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
         return export_version_id
     else:
         logger.warning(f"{name} already exists")
+        return None
 
 def get_export_version_destinations(export_version_id, column='*'):
     references_rows = db_utils.get_row_by_column_data('project',
@@ -656,11 +664,13 @@ def get_reference_data(reference_id, column='*'):
         return None
 
 def update_reference(reference_id, export_version_id):
-    if db_utils.update_data('project',
+    success = db_utils.update_data('project',
                         'references_data',
                         ('export_version_id', export_version_id),
-                        ('id', reference_id)):
+                        ('id', reference_id))
+    if success:
         logger.info('Reference modified')
+    return success
 
 def remove_work_env(work_env_id):
     success = None
@@ -748,17 +758,20 @@ def set_work_env_lock(work_env_id, lock=1):
             return 1
         else:
             return None
+    else:
+        return None
 
 def toggle_lock(work_env_id):
     current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
     lock_id = get_work_env_data(work_env_id, 'lock_id')
     if lock_id == None:
-        set_work_env_lock(work_env_id)
+        return set_work_env_lock(work_env_id)
     elif lock_id == current_user_id:
-        set_work_env_lock(work_env_id, 0)
+        return set_work_env_lock(work_env_id, 0)
     else:
         lock_user_name = site.get_user_data(lock_id, 'user_name')
         logger.warning(f"Work env locked by {lock_user_name}")
+        return None
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     version_id = db_utils.create_row('project',
@@ -1008,13 +1021,17 @@ def add_user(user_id):
     users_ids_list = get_users_ids_list()
     if user_id not in users_ids_list:
         users_ids_list.append(user_id)
-        update_users_list(users_ids_list)
+        return update_users_list(users_ids_list)
+    else:
+        return None
 
 def remove_user(user_id):
     users_ids_list = get_users_ids_list()
     if user_id in users_ids_list:
         users_ids_list.remove(user_id)
-        update_users_list(users_ids_list)
+        return update_users_list(users_ids_list)
+    else:
+        return None
 
 def update_users_list(users_ids_list):
     if db_utils.update_data('project',

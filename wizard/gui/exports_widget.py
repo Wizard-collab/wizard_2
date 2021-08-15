@@ -19,6 +19,7 @@ logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
 from wizard.gui import create_ticket_widget
@@ -221,6 +222,7 @@ class exports_widget(QtWidgets.QWidget):
                         elif item.type == 'export':
                             export_id = item.export_row['id']
                             assets.archive_export(export_id)
+                    gui_server.refresh_ui()
 
     def open_folder(self):
         if self.variant_id is not None:
@@ -445,7 +447,8 @@ class exports_widget(QtWidgets.QWidget):
                 files = self.manual_export_widget.files
                 export_name = self.manual_export_widget.export_name
                 comment = self.manual_export_widget.comment
-                assets.merge_file_as_export_version(export_name, files, self.variant_id, comment)
+                if assets.merge_file_as_export_version(export_name, files, self.variant_id, comment):
+                    gui_server.refresh_ui()
 
     def focus_export_version(self, export_version_id):
         if export_version_id in self.export_versions_ids.keys():

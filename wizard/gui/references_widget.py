@@ -9,6 +9,7 @@ from PyQt5.QtCore import pyqtSignal
 # Wizard gui modules
 from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui import create_ticket_widget
 from wizard.gui import menu_widget
 
@@ -72,7 +73,8 @@ class references_widget(QtWidgets.QWidget):
     def create_references_from_variant_ids(self, variant_ids):
         if self.work_env_id is not None:
             for variant_id in variant_ids:
-                assets.create_references_from_variant_id(self.work_env_id, variant_id)
+                if assets.create_references_from_variant_id(self.work_env_id, variant_id):
+                    gui_server.refresh_ui()
 
     def change_work_env(self, work_env_id):
         self.reference_ids = dict()
@@ -117,6 +119,7 @@ class references_widget(QtWidgets.QWidget):
         for selected_item in selected_items:
             reference_id = selected_item.reference_row['id']
             assets.remove_reference(reference_id)
+        gui_server.refresh_ui()
 
     def create_ticket(self):
         selected_items = self.list_view.selectedItems()
@@ -135,7 +138,8 @@ class references_widget(QtWidgets.QWidget):
 
     def update_all(self):
         for reference_id in self.reference_ids.keys():
-            assets.set_reference_last_version(reference_id)
+            if assets.set_reference_last_version(reference_id):
+                gui_server.refresh_ui()
 
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():

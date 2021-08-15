@@ -13,6 +13,7 @@ from wizard.core import site
 # Wizard gui modules
 from wizard.gui import drop_files_widget
 from wizard.gui import custom_window
+from wizard.gui import gui_server
 
 class create_ticket_widget(custom_window.custom_dialog):
     def __init__(self, export_version_id, parent=None):
@@ -31,6 +32,7 @@ class create_ticket_widget(custom_window.custom_dialog):
         content = self.content_textEdit.toPlainText()
         files = self.drop_files_widget.files()
         if assets.create_ticket(title, content, self.export_version_id, destination_user, files):
+            gui_server.refresh_ui()
             self.close()
 
     def connect_functions(self):

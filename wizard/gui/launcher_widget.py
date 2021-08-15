@@ -6,7 +6,6 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import os
-import time #temp
 
 # Wizard modules
 from wizard.vars import assets_vars
@@ -20,6 +19,7 @@ from wizard.core import launch
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 class launcher_widget(QtWidgets.QFrame):
 
@@ -249,6 +249,7 @@ class launcher_widget(QtWidgets.QFrame):
                 project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
                 self.refresh_work_envs_hard()
                 self.launch()
+            gui_server.refresh_ui()
 
     def state_changed(self, state):
         if self.update_state:
@@ -282,6 +283,7 @@ class launcher_widget(QtWidgets.QFrame):
                 variant_name = self.variant_creation_widget.name_field.text()
                 new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
                 project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
+                gui_server.refresh_ui()
 
     def connect_functions(self):
         self.state_comboBox.currentTextChanged.connect(self.state_changed)

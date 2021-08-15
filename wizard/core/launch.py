@@ -48,7 +48,6 @@ def launch_work_version(version_id):
 												software_row['name'],
 												work_env_id)
 					thread.start()
-					gui_server.refresh_ui()
 					logger.info(f"{software_row['name']} launched")
 		else:
 			logger.warning(f"You are already running a work instance of this asset")

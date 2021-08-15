@@ -19,6 +19,7 @@ class all_users_widget(custom_window.custom_window):
         super(all_users_widget, self).__init__(parent)
         self.user_ids = dict()
         self.build_ui()
+        self.refresh()
 
     def build_ui(self):
         self.main_widget = QtWidgets.QFrame()
@@ -31,15 +32,13 @@ class all_users_widget(custom_window.custom_window):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(6)
+        self.list_view.setColumnCount(5)
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Life', 'Experience', 'Administrator'])
-        #self.list_view.header().resizeSection(3, 150)
-        #self.list_view_scrollBar = self.list_view.verticalScrollBar()
+        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Administrator'])
         self.main_layout.addWidget(self.list_view)
 
     def refresh(self):
@@ -53,8 +52,11 @@ class all_users_widget(custom_window.custom_window):
                     item = self.user_ids[user_row['id']]
                     item.user_row = user_row
                     item.fill_ui()
-            master_id = all_user_rows[0]['id']
-            self.user_ids[master_id].set_crown()
+            self.user_ids[all_user_rows[0]['id']].set_crown(1)
+            if len(all_user_rows)>=2:
+                self.user_ids[all_user_rows[1]['id']].set_crown(2)
+            if len(all_user_rows)>=3:
+                self.user_ids[all_user_rows[2]['id']].set_crown(3)
 
 class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, user_row, parent=None):
@@ -64,14 +66,18 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.fill_ui()
 
     def setup_ui(self):
-        self.setForeground(3, QtGui.QBrush(QtGui.QColor('#f0605b')))
-        self.setForeground(4, QtGui.QBrush(QtGui.QColor('#f79360')))
+        self.setForeground(3, QtGui.QBrush(QtGui.QColor('#f79360')))
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
 
-    def set_crown(self):
-        self.setIcon(2, QtGui.QIcon(ressources._crown_icon_))
+    def set_crown(self, crown):
+        if crown == 1:
+            self.setIcon(2, QtGui.QIcon(ressources._gold_icon_))
+        elif crown == 2:
+            self.setIcon(2, QtGui.QIcon(ressources._silver_icon_))
+        elif crown == 3:
+            self.setIcon(2, QtGui.QIcon(ressources._bronze_icon_))
 
     def fill_ui(self):
         user_icon = QtGui.QIcon()
@@ -80,9 +86,8 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.user_row['user_name'])
         self.setIcon(2, QtGui.QIcon())
         self.setText(2, str(self.user_row['level']))
-        self.setText(3, f"{str(self.user_row['life'])}%")
-        self.setText(4, f"{str(self.user_row['xp'])}%")
+        self.setText(3, f"{str(self.user_row['total_xp'])}")
         if self.user_row['administrator']:
-            self.setIcon(5, QtGui.QIcon(ressources._admin_badge_))
+            self.setIcon(4, QtGui.QIcon(ressources._admin_badge_))
         else:
-            self.setIcon(5, QtGui.QIcon())
+            self.setIcon(4, QtGui.QIcon())

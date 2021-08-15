@@ -42,9 +42,6 @@ from wizard.core import game
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
-# Wizard gui modules
-from wizard.gui import gui_server
-
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -58,8 +55,6 @@ def create_domain(name):
 			if not tools.create_folder(dir_name):
 				project.remove_domain(domain_id)
 				domain_id = None
-			else:
-				gui_server.refresh_ui()
 	else:
 		logger.warning(f"{name} contains illegal characters")
 	return domain_id
@@ -73,7 +68,6 @@ def archive_domain(domain_id):
 				if tools.make_archive(dir_name):
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
-					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 			return project.remove_domain(domain_id)
@@ -96,7 +90,6 @@ def create_category(name, domain_id):
 				else:
 					events.add_creation_event('category', category_id)
 					game.add_xps(2)
-					gui_server.refresh_ui()
 		else:
 			logger.error("Can't create category")
 	else:
@@ -120,7 +113,6 @@ def archive_category(category_id):
 			if success:
 				events.add_archive_event("Archived category", f"{instance_to_string(('domain', category_row['domain_id']))}/{category_row['name']}",
 												archive_file)
-				gui_server.refresh_ui()
 			return success
 		else:
 			return None
@@ -141,7 +133,6 @@ def create_asset(name, category_id, inframe=100, outframe=220):
 				else:
 					events.add_creation_event('asset', asset_id)
 					game.add_xps(2)
-					gui_server.refresh_ui()
 		else:
 			logger.error("Can't create asset")
 	else:
@@ -166,7 +157,6 @@ def archive_asset(asset_id):
 			if success:
 				events.add_archive_event("Archived asset", f"{instance_to_string(('category', asset_row['category_id']))}/{asset_row['name']}",
 												archive_file)
-				gui_server.refresh_ui()
 			return success
 		else:
 			return None
@@ -227,7 +217,6 @@ def archive_stage(stage_id):
 					logger.info(f"{dir_name} deleted")
 					events.add_archive_event(f"Archived stage : {stage_row['name']}",
 												archive_file)
-					gui_server.refresh_ui()
 			else:
 				logger.warning(f"{dir_name} not found")
 				archive_file = ''
@@ -235,7 +224,6 @@ def archive_stage(stage_id):
 			if success:
 				events.add_archive_event("Archived stage", f"{instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}",
 												archive_file)
-				gui_server.refresh_ui()
 			return success
 		else:
 			return None
@@ -259,7 +247,6 @@ def create_variant(name, stage_id, comment=''):
 					tools.create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
 					events.add_creation_event('variant', variant_id)
 					game.add_xps(2)
-					gui_server.refresh_ui()
 		else:
 			logger.error("Can't create variant")
 	else:
@@ -283,7 +270,6 @@ def archive_variant(variant_id):
 			if success:
 				events.add_archive_event("Archived variant", f"{instance_to_string(('stage', variant_row['stage_id']))}/{variant_row['name']}",
 												archive_file)
-				gui_server.refresh_ui()
 			return success
 		else:
 			return None
@@ -319,10 +305,9 @@ def create_references_from_variant_id(work_env_id, variant_id):
 		for export_row in export_rows:
 			export_version_id = project.get_last_export_version(export_row['id'], 'id')
 			if export_version_id is not None and len(export_version_id)>=1:
-				create_reference(work_env_id, export_version_id[0], refresh=0)
-		gui_server.refresh_ui()
+				return create_reference(work_env_id, export_version_id[0])
 
-def create_reference(work_env_id, export_version_id, refresh=1):
+def create_reference(work_env_id, export_version_id):
 	namespaces_list = project.get_references(work_env_id, 'namespace')
 	count = 0
 	namespace_raw = build_namespace(export_version_id)
@@ -330,15 +315,12 @@ def create_reference(work_env_id, export_version_id, refresh=1):
 	while namespace in namespaces_list:
 		count+=1
 		namespace = f"{namespace_raw}_{str(count).zfill(4)}"
-	project.create_reference(work_env_id,
+	return project.create_reference(work_env_id,
 											export_version_id,
 											namespace)
-	if refresh:
-		gui_server.refresh_ui()
 
 def remove_reference(reference_id):
-	project.remove_reference(reference_id)
-	gui_server.refresh_ui()
+	return project.remove_reference(reference_id)
 
 def set_reference_last_version(reference_id):
 	export_version_id = project.get_reference_data(reference_id, 'export_version_id')
@@ -349,18 +331,19 @@ def set_reference_last_version(reference_id):
 		if last_export_version_id is not None and len(last_export_version_id)==1:
 			if last_export_version_id[0] != export_version_id:
 				project.update_reference(reference_id, last_export_version_id[0])
-				gui_server.refresh_ui()
+				return 1
 			else:
 				logger.info("Reference is up to date")
+				return None
 
 def merge_file_as_export_version(export_name, files, variant_id, comment=''):
-	add_export_version(export_name, files, variant_id, None, comment)
+	return add_export_version(export_name, files, variant_id, None, comment)
 
 def add_export_version_from_version_id(export_name, files, version_id, comment=''):
 	work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))
 	if work_env_row is not None:
 		variant_id = work_env_row['variant_id']
-		add_export_version(export_name, files, variant_id, version_id, comment)
+		return add_export_version(export_name, files, variant_id, version_id, comment)
 
 def add_export_version(export_name, files, variant_id, version_id, comment=''):
 	# For adding an export version, wizard need an existing files list
@@ -404,7 +387,6 @@ def add_export_version(export_name, files, variant_id, version_id, comment=''):
 							events.add_export_event(export_version_id)
 							game.add_xps(3)
 							game.analyse_comment(comment, 10)
-							gui_server.refresh_ui()
 				return export_version_id
 			else:
 				return None
@@ -444,7 +426,6 @@ def archive_export(export_id):
 			if success:
 				events.add_archive_event("Archived export", f"{instance_to_string(('variant', export_row['variant_id']))}/{export_row['name']}",
 												archive_file)
-				gui_server.refresh_ui()
 			return success
 		else:
 			return None
@@ -492,7 +473,6 @@ def archive_export_version(export_version_id):
 			if success:
 				events.add_archive_event(f"Archived export version:\n{instance_to_string(('export', export_version_row['export_id']))}/{export_version_row['name']}",
 												archive_file)
-				gui_server.refresh_ui()
 			return success
 		else:
 			return None
@@ -532,7 +512,6 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 												comment,
 												screenshot_file,
 												thumbnail_file)
-	gui_server.refresh_ui()
 	if not fresh:
 		game.add_xps(1)
 		game.analyse_comment(comment, 2)
@@ -585,7 +564,6 @@ def archive_version(version_id):
 				else:
 					logger.warning(f"{version_row['file_path']} not found")
 				success = project.remove_version(version_row['id'])
-				gui_server.refresh_ui()
 				return success
 			else:
 				return None	
@@ -599,32 +577,33 @@ def create_ticket(title, message, export_version_id, destination_user=None, file
 	ticket_id = project.create_ticket(title, export_version_id, message, files, destination_user)
 	if ticket_id:
 		events.add_ticket_openned_event(ticket_id, message)
-		gui_server.refresh_ui()
 	return ticket_id
 
 def add_ticket_message(ticket_id, message, files=[]):
 	ticket_message_id = project.add_ticket_message(ticket_id, message, files)
 	if ticket_message_id:
+		pass
 		#events.add_ticket_openned_event(ticket_id)
-		gui_server.refresh_ui()
 	return ticket_message_id
 
 def close_ticket(ticket_id):
-	if project.change_ticket_state(ticket_id, 0):
+	success = project.change_ticket_state(ticket_id, 0)
+	if success:
 		events.add_ticket_closed_event(ticket_id)
-		gui_server.refresh_ui()
+	return success
 
 def open_ticket(ticket_id):
-	if project.change_ticket_state(ticket_id, 1):
+	success = project.change_ticket_state(ticket_id, 1)
+	if success:
 		events.add_ticket_openned_event(ticket_id)
-		gui_server.refresh_ui()
+	return success
 
 def toggle_ticket(ticket_id):
 	state = project.get_ticket_data(ticket_id, 'state')
 	if  state == 1:
-		close_ticket(ticket_id)
+		return close_ticket(ticket_id)
 	elif state == 0:
-		open_ticket(ticket_id)
+		return open_ticket(ticket_id)
 
 def get_domain_path(domain_id):
 	dir_name = None

@@ -382,5 +382,6 @@ class post_widget(QtWidgets.QFrame):
         if ticket_id is not None:
             message = self.content_textEdit.toPlainText()
             files = self.drop_files_widget.files()
-            assets.add_ticket_message(ticket_id, message, files)
+            if assets.add_ticket_message(ticket_id, message, files):
+                gui_server.refresh_ui()
             self.clear()

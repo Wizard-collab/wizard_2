@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import all_users_widget
 
 # Wizard modules
 from wizard.core import environment
@@ -18,6 +19,7 @@ class user_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(user_widget, self).__init__(parent)
         self.build_ui()
+        self.connect_functions()
         self.refresh()
 
     def build_ui(self):
@@ -37,9 +39,12 @@ class user_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.items_widget)
 
         self.crown_label = QtWidgets.QLabel()
-        self.crown_label.setPixmap(QtGui.QPixmap(ressources._crown_icon_).scaled(28,28,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
         self.items_layout.addWidget(self.crown_label)
+
+        self.ranking_button = QtWidgets.QPushButton()
+        self.ranking_button.setFixedSize(28,28)
+        self.ranking_button.setIcon(QtGui.QIcon(ressources._ranking_icon_))
+        self.items_layout.addWidget(self.ranking_button)
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('transparent_widget')
@@ -89,7 +94,7 @@ class user_widget(QtWidgets.QFrame):
         self.admin_badge_label = QtWidgets.QLabel()
         gui_utils.application_tooltip(self.admin_badge_label, "Admin badge")
         self.admin_badge_label.setPixmap(QtGui.QPixmap(ressources._admin_badge_).scaled(
-            18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
         self.main_layout.addWidget(self.admin_badge_label)
 
         self.profile_picture = QtWidgets.QLabel()
@@ -107,18 +112,28 @@ class user_widget(QtWidgets.QFrame):
                                 28)
         self.crown_check(user_row)
 
+    def connect_functions(self):
+        self.ranking_button.clicked.connect(self.show_all_user_widget)
+
+    def show_all_user_widget(self):
+        self.all_users_widget = all_users_widget.all_users_widget()
+        self.all_users_widget.show()
+
     def crown_check(self, user_row):
         user_rows = site.get_users_list()
-        is_master = 1
-        for other_user in user_rows:
-            if other_user['id'] == user_row['id']:
-                pass
-            else:
-                if other_user['level'] > user_row['level']:
-                    is_master = 0
-                    break
-        if is_master:
+        icon = None
+        if user_row['id'] == user_rows[0]['id']:
+            icon = ressources._gold_icon_
+        if len(user_rows)>=2:
+            if (user_row['id'] ==  user_rows[1]['id']):
+                icon = ressources._silver_icon_
+        if len(user_rows)>=3:
+            if (user_row['id'] == user_rows[2]['id']):
+                icon = ressources._bronze_icon_
+        if icon is not None:
             self.crown_label.setVisible(1)
+            self.crown_label.setPixmap(QtGui.QPixmap(icon).scaled(28,28,
+                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
         else:
             self.crown_label.setVisible(0)
     

@@ -25,6 +25,7 @@ logger = custom_logger.get_logger(__name__)
 from wizard.gui import menu_widget
 from wizard.gui import confirm_widget
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 class tree_widget(QtWidgets.QFrame):
 
@@ -393,6 +394,8 @@ class tree_widget(QtWidgets.QFrame):
             stage_name = item.instance_name
             parent_id = item.instance_parent_id
             new_stage_id = assets.create_stage(stage_name, parent_id)
+            if new_stage_id:
+                gui_server.refresh_ui()
         elif item.instance_type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
@@ -401,12 +404,16 @@ class tree_widget(QtWidgets.QFrame):
                 outframe = self.instance_creation_widget.outframe
                 parent_id = item.instance_parent_id
                 new_asset_id = assets.create_asset(asset_name, parent_id, inframe, outframe)
+                if new_asset_id is not None:
+                    gui_server.refresh_ui()
         elif item.instance_type == 'category_creation':
             self.instance_creation_widget = instance_creation_widget(self, request_frames=None)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.instance_parent_id
                 new_category_id = assets.create_category(category_name, parent_id)
+                if new_category_id is not None:
+                    gui_server.refresh_ui()
 
         if new_stage_id:
             if new_stage_id in self.stage_ids.keys():
@@ -470,12 +477,15 @@ class tree_widget(QtWidgets.QFrame):
 
         self.confirm_widget.set_security_sentence(security_sentence)
         if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            success = None
             if item.instance_type == 'category':
-                assets.archive_category(item.instance_id)
+                success = assets.archive_category(item.instance_id)
             elif item.instance_type == 'asset':
-                assets.archive_asset(item.instance_id)
+                success = assets.archive_asset(item.instance_id)
             elif item.instance_type== 'stage':
-                assets.archive_stage(item.instance_id)
+                success = assets.archive_stage(item.instance_id)
+            if success:
+                gui_server.refresh_ui()
 
     def remove_category(self, id):
         item = self.category_ids[id]

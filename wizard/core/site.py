@@ -157,6 +157,7 @@ def create_user(user_name,
                             'email',
                             'profile_picture',
                             'xp',
+                            'total_xp',
                             'level',
                             'life',
                             'administrator'), 
@@ -164,6 +165,7 @@ def create_user(user_name,
                             tools.encrypt_string(password),
                             email,
                             profile_picture_ascii,
+                            0,
                             0,
                             0,
                             100,
@@ -275,6 +277,15 @@ def modify_user_xp(user_name, xp):
                                 ('xp', xp),
                                 ('user_name', user_name)):
         logger.debug(f'{user_name} won some xps')
+        return 1
+    else:
+        return None
+
+def modify_user_total_xp(user_name, total_xp):
+    if db_utils.update_data('site',
+                                'users',
+                                ('total_xp', total_xp),
+                                ('user_name', user_name)):
         return 1
     else:
         return None
@@ -450,6 +461,7 @@ def create_admin_user(admin_password, admin_email):
                                 'email', 
                                 'profile_picture',
                                 'xp',
+                                'total_xp',
                                 'level',
                                 'life', 
                                 'administrator'), 
@@ -457,6 +469,7 @@ def create_admin_user(admin_password, admin_email):
                                 tools.encrypt_string(admin_password),
                                 admin_email,
                                 profile_picture,
+                                0,
                                 0,
                                 0,
                                 100,
@@ -471,6 +484,7 @@ def create_users_table():
                                         email text NOT NULL,
                                         profile_picture text NOT NULL,
                                         xp integer NOT NULL,
+                                        total_xp integer NOT NULL,
                                         level integer NOT NULL,
                                         life integer NOT NULL,
                                         administrator integer NOT NULL

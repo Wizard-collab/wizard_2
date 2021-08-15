@@ -137,7 +137,7 @@ class wall_widget(QtWidgets.QWidget):
     def refresh(self):
         event_rows = project.get_all_events()
         if event_rows is not None:
-            for event_row in event_rows[-200:]:
+            for event_row in event_rows[-10:]:
                 if event_row['id'] not in self.ticket_ids.keys():
                     if event_row['creation_time']-self.last_time > 350:
                         time_widget = wall_time_widget(event_row['creation_time'])

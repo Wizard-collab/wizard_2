@@ -21,11 +21,13 @@ def add_xps(amount):
 	# the user win 1 level and the xps
 	# get back to 0
 	user_row = site.get_user_row_by_name(environment.get_user())
+	new_total_xp = user_row['total_xp'] + amount
 	new_xp = user_row['xp'] + amount
 	if new_xp >= 100:
 		new_xp -= 100
 		add_levels(1)
 	site.modify_user_xp(user_row['user_name'], new_xp)
+	site.modify_user_total_xp(user_row['user_name'], new_total_xp)
 
 def add_levels(amount):
 	user_row = site.get_user_row_by_name(environment.get_user())

@@ -125,7 +125,8 @@ class tickets_widget(QtWidgets.QWidget):
         selection = self.tickets_list.selectedItems()
         if len(selection) == 1:
             ticket_id = selection[0].ticket_row['id']
-            assets.toggle_ticket(ticket_id)
+            if assets.toggle_ticket(ticket_id):
+                gui_server.refresh_ui()
 
     def show_info_mode(self, text, image):
         self.ticket_history_widget.setVisible(0)

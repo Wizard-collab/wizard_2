@@ -18,6 +18,7 @@ logger = custom_logger.get_logger()
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
 from wizard.gui import drop_files_widget
@@ -451,6 +452,7 @@ class versions_widget(QtWidgets.QWidget):
         if selection is not None:
             for item in selection:
                 assets.duplicate_version(item.version_row['id'], f"Duplicate from version {item.version_row['name']}")
+            gui_server.refresh_ui()
 
     def launch(self):
         items = self.get_selection()
@@ -466,6 +468,7 @@ class versions_widget(QtWidgets.QWidget):
                 if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
                     for item in items:
                         assets.archive_version(item.version_row['id'])
+                    gui_server.refresh_ui()
 
     def refresh_infos(self):
         self.versions_count_label.setText(f"{self.get_number()} versions -")
@@ -490,7 +493,8 @@ class versions_widget(QtWidgets.QWidget):
 
     def add_empty_version(self):
         if self.work_env_id is not None:
-            assets.add_version(self.work_env_id, 'Empty version')
+            if assets.add_version(self.work_env_id, 'Empty version'):
+                gui_server.refresh_ui()
 
     def open_folder(self):
         if self.work_env_id is not None:
