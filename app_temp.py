@@ -22,6 +22,7 @@ from wizard.gui import custom_window
 from wizard.gui import search_reference_widget
 from wizard.gui import manual_export_widget
 from wizard.gui import all_users_widget
+from wizard.gui import subtask_manager
 
 import sys
 import time
@@ -143,16 +144,15 @@ class app():
 		self.gui_server.start()
 		self.search_reference_widget = search_reference_widget.search_reference_widget()
 		self.search_reference_widget.show()
-		'''
 
+		'''
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
 		self.main_widget.refresh()
 		'''
 
-		self.all_users_widget = all_users_widget.all_users_widget()
-		self.all_users_widget.show()
-		self.all_users_widget.refresh()
+		self.subtask_manager = subtask_manager.subtask_manager()
+		self.subtask_manager.show()
 		'''
 
 		sys.exit(self.app.exec_())

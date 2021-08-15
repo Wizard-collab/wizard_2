@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import os
+import time
 
 # Wizard modules
 from wizard.core import launch
@@ -95,10 +96,16 @@ class versions_widget(QtWidgets.QWidget):
         self.setAcceptDrops(True)
 
     def refresh(self):
+        start_time = time.time()
         if self.isVisible():
             self.refresh_list_view()
             self.refresh_icons_view()
             self.update_search()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_list_view(self):
         if self.list_mode:
@@ -294,6 +301,10 @@ class versions_widget(QtWidgets.QWidget):
 
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.refresh_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')

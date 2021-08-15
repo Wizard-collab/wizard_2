@@ -21,6 +21,12 @@ def convert_time(time_float):
     hour = time.strftime('%H:%M', time.localtime(time_float))
     return day, hour
 
+def convert_seconds(time_float):
+    hours = time.strftime("%H", time.gmtime(time_float))
+    minutes = time.strftime("%M", time.gmtime(time_float))
+    seconds = time.strftime("%S", time.gmtime(time_float))
+    return hours, minutes, seconds
+
 def encrypt_string(string):
     # Hash a string for storing.
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')

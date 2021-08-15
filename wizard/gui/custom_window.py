@@ -238,8 +238,8 @@ class header(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.title_label = QtWidgets.QLabel('')
+        self.title_label.setContentsMargins(8,0,0,0)
         self.title_label.setVisible(0)
-        #self.title_label.setObjectName('window_title_label')
         self.main_layout.addWidget(self.title_label)
 
         self.custom_widgets_container = QtWidgets.QWidget()

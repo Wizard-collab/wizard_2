@@ -98,6 +98,10 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setIndentation(20)
         self.main_layout.addWidget(self.tree)
 
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('tree_datas_label')
+        self.main_layout.addWidget(self.refresh_label)
+
         self.data_label = QtWidgets.QLabel()
         self.data_label.setObjectName('tree_datas_label')
         self.main_layout.addWidget(self.data_label)
@@ -180,6 +184,7 @@ class tree_widget(QtWidgets.QFrame):
             self.apply_search()
 
     def refresh(self, hard=None):
+        start_time = time.time()
         if hard:
             self.init_tree()
 
@@ -217,6 +222,11 @@ class tree_widget(QtWidgets.QFrame):
         self.refresh_datas()
         if hard:
             self.get_context()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_datas(self):
         text = f"{len(self.category_ids.keys())} categories, {len(self.asset_ids.keys())} assets, {len(self.stage_ids.keys())} stages"
