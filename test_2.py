@@ -1,7 +1,14 @@
-from wizard.core import assets
-from wizard.gui import gui_server
+import time
 import random
 
-for a in range(0,10):
-	assets.create_asset(str(a)+str(random.randint(0,1000))+'zekfja', 1)
-gui_server.refresh_ui()
+percent_step = 100.0/200.0
+percent = 0.0
+
+print("wizard_task_name:Exporting asset")
+
+for a in range(0,201):
+	#print(a)
+	print("wizard_task_percent:"+str(percent))
+	percent+=percent_step
+	time.sleep(0.1)
+	print(random.randint(0,10000))

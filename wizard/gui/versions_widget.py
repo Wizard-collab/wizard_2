@@ -73,6 +73,7 @@ class versions_widget(QtWidgets.QWidget):
     def merge_files(self, files=[]):
         for file in files:
             assets.merge_file(file, self.work_env_id, "Manually merged file", 0)
+        gui_server.refresh_ui()
 
     def change_work_env(self, work_env_id):
         self.check_existence_thread.running = False
@@ -105,7 +106,7 @@ class versions_widget(QtWidgets.QWidget):
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
-        self.refresh_label.setText(f"refresh : {refresh_time}s")
+        self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def refresh_list_view(self):
         if self.list_mode:

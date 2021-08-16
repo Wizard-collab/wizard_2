@@ -75,6 +75,16 @@ class wall_widget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.wall_scrollArea)
 
+        self.infos_frame = QtWidgets.QFrame()
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_frame.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_frame)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('tree_datas_label')
+        self.infos_layout.addWidget(self.refresh_label)
+
     def toggle(self):
         if self.isVisible():
             self.animate_hide()
@@ -135,6 +145,7 @@ class wall_widget(QtWidgets.QWidget):
             self.ticket_ids[event_id].setVisible(True)
 
     def refresh(self):
+        start_time = time.time()
         event_rows = project.get_all_events()
         if event_rows is not None:
             for event_row in event_rows[-10:]:
@@ -149,6 +160,11 @@ class wall_widget(QtWidgets.QWidget):
                     self.last_time = event_row['creation_time']
                     self.notification.emit(1)
         self.update_search()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"refresh : {refresh_time}s")
 
 class wall_time_widget(QtWidgets.QWidget):
     def __init__(self, time_float, parent = None):

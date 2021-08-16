@@ -5,7 +5,7 @@
 # This module manage substasks
 
 # Python modules
-from PyQt5.QtCore import QThread, pyqtSignal
+from threading import Thread
 import subprocess
 import time
 import shlex
@@ -13,30 +13,28 @@ import os
 import traceback
 
 # Wizard modules
+from wizard.core import socket_utils
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class subtask_thread(QThread):
+_DNS_ = ('localhost', 10231)
 
-    stdout_signal = pyqtSignal(str)
-    status_signal = pyqtSignal(str)
-    current_task_signal = pyqtSignal(str)
-    time_signal = pyqtSignal(float)
-    percent_signal = pyqtSignal(float)
-    stats_signal = pyqtSignal(object)
+class subtask_thread(Thread):
 
-    def __init__(self):
+    def __init__(self, cmd=None, env=None, cwd=None):
         super(subtask_thread, self).__init__()
-        self.process = None
-        self.clock_thread = clock_thread()
-        self.command = None
-        self.env = os.environ.copy()
-        self.cwd = None
-        self.running = True
-        self.connect_functions()
 
-    def connect_functions(self):
-        self.clock_thread.time_signal.connect(self.time_signal.emit)
+        self.process_id = str(time.time())
+
+        self.process = None
+        self.clock_thread = clock_thread(self.process_id)
+        self.command = cmd
+        if env is None:
+            self.env = os.environ.copy()
+        else:
+            self.env = env
+        self.cwd = cwd
+        self.running = False
 
     def set_command(self, command):
         self.command = command
@@ -56,7 +54,7 @@ class subtask_thread(QThread):
         while self.running:
             output = self.process.stdout.readline()
             if self.process.poll() is not None:
-                self.status_signal.emit('Done')
+                send_signal([self.process_id, 'status', 'Done'])
                 self.running = False
                 break
             if output:
@@ -66,12 +64,20 @@ class subtask_thread(QThread):
     def analyse_signal(self, out):
         if 'wizard_task_percent:' in out:
             percent = float(out.split(':')[-1])
-            self.percent_signal.emit(percent)
+            send_signal([self.process_id, 'percent', percent])
         elif 'wizard_task_name:' in out:
             task = out.split(':')[-1]
-            self.current_task_signal.emit(task)
+            send_signal([self.process_id, 'current_task', task])
         else:
-            self.stdout_signal.emit(out)
+            send_signal([self.process_id, 'stdout', out])
+
+    def write(self, stdin):
+        try:
+            stdin = (stdin+'\n').encode('utf-8')
+            self.process.stdin.write(stdin)
+            self.process.stdin.flush()
+        except:
+            send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
 
     def kill(self):
         self.clock_thread.stop()
@@ -79,30 +85,27 @@ class subtask_thread(QThread):
             self.running = False
         if self.process is not None:
             self.process.kill()
-            self.status_signal.emit('Killed')
+            send_signal([self.process_id, 'status', 'Killed'])
 
     def run(self):
         try:
             self.running = True
-            self.status_signal.emit('Running')
+            send_signal([self.process_id, 'status', 'Running'])
             self.add_python_buffer_env()
-            start_time = time.time()
             self.clock_thread.start()
             self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=self.cwd,
-                                            stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+                                            stdout = subprocess.PIPE, stderr = subprocess.STDOUT, stdin = subprocess.PIPE)
             self.check_output()
+            self.running = False
             self.clock_thread.stop()
-            process_time = (time.time()-start_time)
-            self.time_signal.emit(process_time)
         except:
-            self.stdout_signal.emit(str(traceback.format_exc()))
+            send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
 
-class clock_thread(QThread):
+class clock_thread(Thread):
 
-    time_signal = pyqtSignal(object)
-
-    def __init__(self):
+    def __init__(self, process_id):
         super(clock_thread, self).__init__()
+        self.process_id = process_id
         self.running = True
 
     def stop(self):
@@ -111,8 +114,11 @@ class clock_thread(QThread):
     def run(self):
         self.running = True
         time_count = 0
-        self.time_signal.emit(time_count)
+        send_signal([self.process_id, 'time', time_count])
         while self.running:
             time.sleep(1)
             time_count += 1
-            self.time_signal.emit(time_count)
+            send_signal([self.process_id, 'time', time_count])
+
+def send_signal(signal_list):
+    socket_utils.send_bottle(_DNS_, signal_list)

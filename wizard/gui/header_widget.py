@@ -15,11 +15,16 @@ from wizard.gui import user_widget
 from wizard.gui import quotes_widget
 
 class header_widget(QtWidgets.QFrame):
+
+    show_subtask_manager = pyqtSignal(object)
+    show_console = pyqtSignal(object)
+
     def __init__(self, parent=None):
         super(header_widget, self).__init__(parent)
         self.user_widget = user_widget.user_widget()
         self.quotes_widget = quotes_widget.quotes_widget()
         self.build_ui()
+        self.connect_functions()
 
     def refresh(self):
         self.user_widget.refresh()
@@ -43,10 +48,15 @@ class header_widget(QtWidgets.QFrame):
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
         self.console_action = self.window_action.addAction("Console")
+        self.subtask_manager_action = self.window_action.addAction("Subtask manager")
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Help')
         self.documentation_action = self.window_action.addAction("Documentation")
 
         self.main_layout.addWidget(self.quotes_widget)
         self.main_layout.addWidget(self.user_widget)
+
+    def connect_functions(self):
+        self.subtask_manager_action.triggered.connect(self.show_subtask_manager.emit)
+        self.console_action.triggered.connect(self.show_console.emit)
 

@@ -16,6 +16,12 @@ import time
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
+def flushed_input(placeholder):
+    print(placeholder+'\r')
+    user_input = input()
+    print(f'\r>>>{user_input}')
+    return user_input
+
 def convert_time(time_float):
     day = time.strftime('%Y-%m-%d', time.localtime(time_float))
     hour = time.strftime('%H:%M', time.localtime(time_float))

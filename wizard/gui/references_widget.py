@@ -5,6 +5,7 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+import time
 
 # Wizard gui modules
 from wizard.gui import search_reference_widget
@@ -84,6 +85,7 @@ class references_widget(QtWidgets.QWidget):
         self.refresh()
 
     def refresh(self):
+        start_time = time.time()
         if self.isVisible():
             if self.work_env_id is not None and self.work_env_id != 0:
                 reference_rows = project.get_references(self.work_env_id)
@@ -113,6 +115,11 @@ class references_widget(QtWidgets.QWidget):
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def remove_selection(self):
         selected_items = self.list_view.selectedItems()
@@ -232,6 +239,10 @@ class references_widget(QtWidgets.QWidget):
 
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.refresh_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')

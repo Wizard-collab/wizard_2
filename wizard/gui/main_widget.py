@@ -63,6 +63,8 @@ class main_widget(custom_window.custom_window):
         self.tree_widget.get_context()
 
     def connect_functions(self):
+        self.header_widget.show_console.connect(self.console_widget.toggle)
+
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
         self.launcher_widget.variant_changed_signal.connect(self.variant_changed)

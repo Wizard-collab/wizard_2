@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import os   
 import json 
+import time
 
 # Wizard modules
 from wizard.core import site
@@ -17,6 +18,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui import ticket_history_widget
 
 class tickets_widget(QtWidgets.QWidget):
@@ -84,6 +86,10 @@ class tickets_widget(QtWidgets.QWidget):
         self.openned_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.openned_count_label)
 
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.refresh_label)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -150,6 +156,7 @@ class tickets_widget(QtWidgets.QWidget):
         self.openned_count_label.setText(f"{openned_count} tickets openned")
 
     def refresh(self):
+        start_time = time.time()
         if self.stage_id is not None:
             tickets_rows = project.get_tickets_by_stage(self.stage_id)
             if tickets_rows is not None:
@@ -165,6 +172,11 @@ class tickets_widget(QtWidgets.QWidget):
             self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
         self.ticket_history_widget.refresh()
         self.refresh_infos()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def update_visibility(self):
         if self.toggle_visibility_checkBox.isChecked():

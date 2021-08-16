@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import os
+import time
 
 # Wizard modules
 from wizard.vars import assets_vars
@@ -46,14 +47,22 @@ class launcher_widget(QtWidgets.QFrame):
         self.update_state_comboBox_style()
 
     def change_stage(self, stage_id):
+        start_time = time.time()
         self.stage_id = stage_id
         self.refresh_variants_hard()
+        self.update_refresh_time(start_time)
 
     def refresh(self):
+        start_time = time.time()
         self.refresh_variants()
         self.refresh_state()
         self.refresh_versions()
         self.refresh_infos()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def focus_version(self, version_name):
         if version_name in self.versions.keys():
@@ -389,6 +398,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.launch_button.setObjectName('blue_button')
         self.launch_button.setStyleSheet('font:bold')
         self.buttons_layout.addWidget(self.launch_button)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setAlignment(QtCore.Qt.AlignRight)
+        self.refresh_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.refresh_label)
+
 
 class variant_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):

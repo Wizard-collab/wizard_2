@@ -81,9 +81,10 @@ class app():
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Cabin-Italic-VariableFont_wdth,wght.ttf")
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Cabin-VariableFont_wdth,wght.ttf")
 
+
 		with open('wizard/gui/stylesheet.css', 'r') as f:
 			self.app.setStyleSheet(f.read())
-		
+			
 		if not user.user().get_psql_dns():
 			my_psql_widget = psql_widget.psql_widget()
 			if my_psql_widget.exec_() != QtWidgets.QDialog.Accepted:
@@ -115,6 +116,8 @@ class app():
 				sys.exit()
 
 		db_utils.modify_db_name('project', environment.get_project_name())
+
+
 		'''
 		self.my_tree_widget = tree_widget.tree_widget()
 		self.my_tree_widget.show()
@@ -144,16 +147,14 @@ class app():
 		self.gui_server.start()
 		self.search_reference_widget = search_reference_widget.search_reference_widget()
 		self.search_reference_widget.show()
-
 		'''
+
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
 		self.main_widget.refresh()
-		'''
 
 		self.subtask_manager = subtask_manager.subtask_manager()
 		self.subtask_manager.show()
-		'''
 
 		sys.exit(self.app.exec_())
 

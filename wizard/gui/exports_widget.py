@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import json
+import time
 import os
 
 # Wizard modules
@@ -115,6 +116,10 @@ class exports_widget(QtWidgets.QWidget):
 
         self.selection_count_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selection_count_label)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.refresh_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
@@ -319,6 +324,7 @@ class exports_widget(QtWidgets.QWidget):
         self.selection_count_label.setText(f"{number} selected")
 
     def refresh(self):
+        start_time = time.time()
         if self.isVisible():
             if self.variant_id is not None:
                 self.setAcceptDrops(True)
@@ -367,6 +373,11 @@ class exports_widget(QtWidgets.QWidget):
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
                 self.setAcceptDrops(False)
         self.refresh_infos()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def missing_file(self, tuple_signal):
         export_version_id = tuple_signal[0]

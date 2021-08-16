@@ -18,6 +18,7 @@ from wizard.core import project
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui import drop_files_widget
 
 class ticket_history_widget(QtWidgets.QWidget):
