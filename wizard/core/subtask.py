@@ -35,6 +35,7 @@ class subtask_thread(Thread):
             self.env = env
         self.cwd = cwd
         self.running = False
+        self.out = ''
 
     def set_command(self, command):
         self.command = command
@@ -55,6 +56,7 @@ class subtask_thread(Thread):
             output = self.process.stdout.readline()
             if self.process.poll() is not None:
                 send_signal([self.process_id, 'status', 'Done'])
+                send_signal([self.process_id, 'percent', 100])
                 self.running = False
                 break
             if output:
@@ -69,6 +71,7 @@ class subtask_thread(Thread):
             task = out.split(':')[-1]
             send_signal([self.process_id, 'current_task', task])
         else:
+            self.out+='\n'+out
             send_signal([self.process_id, 'stdout', out])
 
     def write(self, stdin):
@@ -98,6 +101,7 @@ class subtask_thread(Thread):
             self.check_output()
             self.running = False
             self.clock_thread.stop()
+            print(self.out)
         except:
             send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
 
@@ -121,4 +125,4 @@ class clock_thread(Thread):
             send_signal([self.process_id, 'time', time_count])
 
 def send_signal(signal_list):
-    socket_utils.send_bottle(_DNS_, signal_list)
+    socket_utils.send_bottle(_DNS_, signal_list, 0.001)

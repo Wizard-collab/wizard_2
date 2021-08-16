@@ -30,7 +30,7 @@ def get_server(DNS):
     server.listen(100)
     return server, server_address
 
-def send_bottle(DNS, msg_raw, timeout=0.05):
+def send_bottle(DNS, msg_raw, timeout=0.01):
     server = None
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
