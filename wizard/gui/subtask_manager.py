@@ -8,6 +8,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 import time
 import json
 import os
+import traceback
 
 # Wizard gui modules
 from wizard.gui import custom_window
@@ -36,7 +37,7 @@ class subtask_manager(custom_window.custom_window):
         self.connect_functions()
 
     def connect_functions(self):
-        self.tasks_server.signal.connect(self.analyse_signal)
+        self.tasks_server.new_process.connect(self.add_task)
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()
@@ -65,32 +66,27 @@ class subtask_manager(custom_window.custom_window):
 
         self.main_layout.addWidget(self.tasks_scrollArea)
 
-    def analyse_signal(self, signal_list):
-        process_id = signal_list[0]
-        data_type = signal_list[1]
-        data = signal_list[2]
-
+    def add_task(self, data_tuple):
+        conn = data_tuple[0]
+        process_id = data_tuple[1]
         if process_id not in self.tasks_ids.keys():
-            task_widget = subtask_widget()
+            task_widget = subtask_widget(conn, process_id)
             self.tasks_ids[process_id] = task_widget
             self.tasks_scrollArea_layout.addWidget(task_widget)
 
-        if data_type == 'time':
-            self.tasks_ids[process_id].update_time(data)
-        elif data_type == 'percent':
-            self.tasks_ids[process_id].update_progress(data)
-        elif data_type == 'stdout':
-            self.tasks_ids[process_id].analyse_stdout(data)
-        elif data_type == 'current_task':
-            self.tasks_ids[process_id].update_current_task(data)
-        elif data_type == 'status':
-            self.tasks_ids[process_id].update_status(data)
-
 class subtask_widget(QtWidgets.QFrame):
-    def __init__(self, parent=None):
-        
+    def __init__(self, conn, process_id, parent=None):
         super(subtask_widget, self).__init__(parent)
+
+        self.conn = conn
+        self.process_id = process_id
+
         self.build_ui()
+        self.update_thread_status(self.process_id)
+
+        self.task_thread = task_thread(self.conn)
+        self.task_thread.start()
+
         self.connect_functions()
 
     def build_ui(self):
@@ -99,18 +95,34 @@ class subtask_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(2)
         self.setLayout(self.main_layout)
 
+        self.header_widget = QtWidgets.QWidget()
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(2)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.thread_status_label = QtWidgets.QLabel()
+        self.thread_status_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.thread_status_label.setObjectName('gray_label')
+        self.header_layout.addWidget(self.thread_status_label)
+
         self.current_task_data_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.current_task_data_label)
+        self.header_layout.addWidget(self.current_task_data_label)
+
+        self.delete_task_button = QtWidgets.QPushButton()
+        self.delete_task_button.setFixedSize(16, 16)
+        self.delete_task_button.setIconSize(QtCore.QSize(10,10))
+        self.delete_task_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
+        self.header_layout.addWidget(self.delete_task_button)
 
         self.stdout_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.stdout_label)
 
         self.progress = QtWidgets.QProgressBar()
-        #self.progress.setTextVisible(0)
         self.progress.setMaximumHeight(6)
         self.progress.setObjectName('task_progressBar')
         self.progress.setStyleSheet('#task_progressBar{color:transparent;}')
-        #self.progress.setAlignment(QtCore.Qt.AlignRight)
         self.main_layout.addWidget(self.progress)
 
         self.infos_widget = QtWidgets.QWidget()
@@ -138,12 +150,6 @@ class subtask_widget(QtWidgets.QFrame):
         self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
         self.infos_layout.addWidget(self.kill_button)
 
-        self.restart_button = QtWidgets.QPushButton()
-        self.restart_button.setFixedSize(16,16)
-        self.restart_button.setIconSize(QtCore.QSize(14,14))
-        self.restart_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
-        self.infos_layout.addWidget(self.restart_button)
-
     def update_current_task(self, task):
         self.current_task_data_label.setText(task)
 
@@ -165,10 +171,21 @@ class subtask_widget(QtWidgets.QFrame):
     def update_progress(self, percent):
         self.progress.setValue(percent)
 
+    def update_thread_status(self, status):
+        self.thread_status_label.setText(f"{status} - ")
+
     def connect_functions(self):
-        pass
-        #self.kill_button.clicked.connect(self.subtask_thread.kill)
-        #self.restart_button.clicked.connect(self.restart)
+        self.task_thread.signal.connect(self.analyse_signal)
+        self.task_thread.connection_dead.connect(lambda:self.update_thread_status('Task closed'))
+        self.kill_button.clicked.connect(self.task_thread.kill)
+        self.delete_task_button.clicked.connect(self.delete_task)
+
+    def delete_task(self):
+        if self.task_thread.conn is not None:
+            logger.warning('You need to kill the task before removing it')
+        else:
+            self.setParent(None)
+            self.deleteLater()
 
     def analyse_stdout(self, stdout):
         color = "gray"
@@ -181,9 +198,25 @@ class subtask_widget(QtWidgets.QFrame):
         self.stdout_label.setStyleSheet(f"color:{color};")
         self.stdout_label.setText(stdout)
 
+    def analyse_signal(self, signal_list):
+        process_id = signal_list[0]
+        data_type = signal_list[1]
+        data = signal_list[2]
+
+        if data_type == 'time':
+            self.update_time(data)
+        elif data_type == 'percent':
+            self.update_progress(data)
+        elif data_type == 'stdout':
+            self.analyse_stdout(data)
+        elif data_type == 'current_task':
+            self.update_current_task(data)
+        elif data_type == 'status':
+            self.update_status(data)
+
 class tasks_server(QThread):
 
-    signal = pyqtSignal(object)
+    new_process = pyqtSignal(object)
 
     def __init__(self):
         super(tasks_server, self).__init__()
@@ -195,9 +228,8 @@ class tasks_server(QThread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = conn.recv(2048).decode('utf8')
-                    if signal_as_str:
-                        self.analyse_signal(signal_as_str, conn)
+                    process_id = json.loads(socket_utils.recvall(conn))
+                    self.new_process.emit((conn, process_id))
             except:
                 logger.error(str(traceback.format_exc()))
                 continue
@@ -205,6 +237,49 @@ class tasks_server(QThread):
     def stop(self):
         self.running = False
 
-    def analyse_signal(self, signal_as_str, conn):
-        signal_list = json.loads(signal_as_str)
-        self.signal.emit(signal_list)
+class task_thread(QThread):
+
+    signal = pyqtSignal(object)
+    connection_dead = pyqtSignal(int)
+
+    def __init__(self, conn):
+        super(task_thread, self).__init__()
+        self.conn = conn
+        self.running = True
+
+    def run(self):
+        while self.running and self.conn is not None:
+            try:
+                raw_data = socket_utils.recvall(self.conn)
+                if raw_data is not None:
+                    self.analyse_signal(raw_data)
+                else:
+                    if self.conn is not None:
+                        self.conn.close()
+                        self.conn = None
+                        self.connection_dead.emit(1)
+            except:
+                logger.error(str(traceback.format_exc()))
+                continue
+
+    def kill(self):
+        if self.conn is not None:
+            if not socket_utils.send_signal_with_conn(self.conn, 'kill'):
+                if self.conn is not None:
+                    self.conn.close()
+                    self.conn = None
+                    self.connection_dead.emit(1)
+
+    def stop(self):
+        self.running = False
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None
+            self.connection_dead.emit(1)
+
+    def analyse_signal(self, raw_data):
+        try:
+            data = json.loads(raw_data)
+            self.signal.emit(data)
+        except json.decoder.JSONDecodeError:
+            logger.debug("cannot read json data")

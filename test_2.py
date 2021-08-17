@@ -1,4 +1,3 @@
-'''
 import time
 import random
 
@@ -11,8 +10,5 @@ for a in range(0,101):
 	print(a)
 	print("wizard_task_percent:"+str(percent))
 	percent+=percent_step
-	time.sleep(0.001)
+	time.sleep(0.05)
 	#print(random.randint(0,10000))
-'''
-import PyWizard
-import speed_test
