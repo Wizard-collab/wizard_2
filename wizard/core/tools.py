@@ -207,3 +207,12 @@ def remove_tree(dir_name):
     except PermissionError:
         logger.error(f"{dir_name} access denied")
     return success
+
+def temp_file_from_pycmd(pycmd):
+    # return a .py temporary file 
+    # from given script ( as string )
+    tempdir = os.path.normpath(tempfile.mkdtemp())
+    temporary_python_file = os.path.join(tempdir, 'wizard_temp_script.py')
+    with open(temporary_python_file, 'w') as f:
+        f.write(pycmd)
+    return os.path.normpath(temporary_python_file)

@@ -23,11 +23,12 @@ logger = custom_logger.get_logger(__name__)
 _DNS_ = ('localhost', 10231)
 
 class subtask(Thread):
-    def __init__(self, cmd=None, env=None, cwd=None, print_stdout=False):
+    def __init__(self, cmd=None, pycmd=None, env=None, cwd=None, print_stdout=False):
         super(subtask, self).__init__()
         self.process_id = str(time.time())
         self.process = None
         self.command = cmd
+        self.pycmd = pycmd
         if env is None:
             self.env = os.environ.copy()
         else:
@@ -42,6 +43,9 @@ class subtask(Thread):
 
     def set_command(self, command):
         self.command = command
+
+    def set_pycmd(self, pycmd):
+        self.pycmd = pycmd
 
     def set_env(self, env):
         if env is not None:
@@ -149,6 +153,11 @@ class subtask(Thread):
             f.write(self.out)
         self.communicate_thread.send_signal([self.process_id, 'log_file', log_file])
 
+    def build_pycmd(self):
+        if self.pycmd is not None:
+            py_file = tools.temp_file_from_pycmd(self.pycmd)
+            self.command = f'python "{py_file}"'
+
     def run(self):
         try:
             self.running = True
@@ -158,6 +167,10 @@ class subtask(Thread):
 
             self.communicate_thread.send_signal([self.process_id, 'status', 'Running'])
             self.add_python_buffer_env()
+
+            self.build_pycmd()
+
+            print(self.command)
 
             self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=self.cwd,
                                             stdout = subprocess.PIPE, stderr = subprocess.STDOUT, stdin = subprocess.PIPE)

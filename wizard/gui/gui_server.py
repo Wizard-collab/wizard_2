@@ -62,7 +62,7 @@ class gui_server(QThread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = conn.recv(2048).decode('utf8')
+                    signal_as_str = socket_utils.recvall(conn)
                     if signal_as_str:
                         self.analyse_signal(signal_as_str, conn)
             except:
@@ -93,22 +93,22 @@ class gui_server(QThread):
 def refresh_ui():
 	signal_dic = dict()
 	signal_dic['function'] = 'refresh'
-	socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
+	socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
 
 def tooltip(tooltip):
     signal_dic = dict()
     signal_dic['function'] = 'tooltip'
     signal_dic['tooltip'] = tooltip
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
 
 def focus_instance(instance_tuple):
     signal_dic = dict()
     signal_dic['function'] = 'focus_instance'
     signal_dic['instance_tuple'] = instance_tuple
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
 
 def focus_export_version(export_version_id):
     signal_dic = dict()
     signal_dic['function'] = 'export_version_focus'
     signal_dic['export_version_id'] = export_version_id
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.01)
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)

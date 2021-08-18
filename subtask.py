@@ -14,6 +14,7 @@ logger = custom_logger.get_logger(__name__)
 args = sys.argv
 
 command = None
+pycmd = None
 env = None
 cwd = None
 print_stdout = False
@@ -32,11 +33,13 @@ while len(args) >=1:
 			env = args.pop(0)
 		elif argument == '-cwd':
 			cwd = args.pop(0)
+		elif argument == '-pycmd':
+			pycmd = args.pop(0)
 		elif argument == '-print_stdout':
 			print_stdout = True
 
-if command == None:
+if (command == None and pycmd == None):
 	logger.error('''Please provide a command with the argument -cmd "your command"''')
 else:
-	task = subtask.subtask(command, env, cwd, print_stdout)
+	task = subtask.subtask(command, pycmd, env, cwd, print_stdout)
 	task.start()
