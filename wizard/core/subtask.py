@@ -96,10 +96,6 @@ class subtask(Thread):
             self.communicate_thread.send_percent([self.process_id, 'percent', last_percent])
         if last_task is not None:
             self.communicate_thread.send_signal([self.process_id, 'current_task', last_task])
-        if last_stdout_line !='':
-            self.communicate_thread.send_signal([self.process_id, 'stdout', last_stdout_line])
-
-        self.communicate_thread.send_signal([self.process_id, 'buffered_stdout', buffered_stdout])
 
         if self.print_stdout:
             print(buffered_stdout)
@@ -116,7 +112,7 @@ class subtask(Thread):
                 percent = round(float(out.split(':')[-1]), 0)
                 self.communicate_thread.send_percent([self.process_id, 'percent', percent])
             except:
-                self.communicate_thread.send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
+                logger.error(str(traceback.format_exc()))
         elif 'wizard_task_name:' in out:
             task = out.split(':')[-1]
             self.communicate_thread.send_signal([self.process_id, 'current_task', task])
@@ -127,7 +123,6 @@ class subtask(Thread):
                 self.set_done()
         else:
             self.out+='\n'+out
-            self.communicate_thread.send_signal([self.process_id, 'stdout', out])
             if self.print_stdout:
                 print(out)
 
@@ -137,7 +132,7 @@ class subtask(Thread):
             self.process.stdin.write(stdin)
             self.process.stdin.flush()
         except:
-            self.communicate_thread.send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
+            logger.error(str(traceback.format_exc()))
 
     def kill(self):
         if self.running == True:
@@ -152,6 +147,7 @@ class subtask(Thread):
         tools.create_folder_if_not_exist(user_vars._subtasks_logs_)
         with open(log_file, 'w') as f:
             f.write(self.out)
+        self.communicate_thread.send_signal([self.process_id, 'log_file', log_file])
 
     def run(self):
         try:
@@ -160,7 +156,6 @@ class subtask(Thread):
             self.communicate_thread = communicate_thread(self)
             self.communicate_thread.start()
 
-            self.communicate_thread.send_signal([self.process_id, 'cmd', self.command])
             self.communicate_thread.send_signal([self.process_id, 'status', 'Running'])
             self.add_python_buffer_env()
 
@@ -170,11 +165,11 @@ class subtask(Thread):
             self.check_realtime_output()
             self.analyse_missed_stdout()
             self.running = False
+            self.write_log()
             self.communicate_thread.send_signal([self.process_id, 'end', 1])
             self.communicate_thread.stop()
-            self.write_log()
         except:
-            self.communicate_thread.send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
+            logger.error(str(traceback.format_exc()))
 
 def send_signal(signal_list):
     socket_utils.send_bottle(_DNS_, signal_list, 0.001)
@@ -183,7 +178,7 @@ class communicate_thread(Thread):
     def __init__(self, parent = None):
         super(communicate_thread, self).__init__()
         self.parent = parent
-        self.percent = None
+        self.percent = 0
         self.running = True
         self.conn = socket_utils.get_connection(_DNS_)
         if self.conn is not None:
@@ -211,8 +206,9 @@ class communicate_thread(Thread):
     def send_percent(self, signal_list):
         percent = signal_list[-1]
         if percent != self.percent:
-            self.send_signal(signal_list)
-            self.percent = percent
+            if percent >= self.percent+5 or int(percent) == 100:
+                self.send_signal(signal_list)
+                self.percent = percent
 
     def send_signal(self, signal_list):
         if self.conn is not None:

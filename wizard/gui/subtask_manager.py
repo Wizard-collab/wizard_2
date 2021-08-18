@@ -13,6 +13,7 @@ import traceback
 # Wizard gui modules
 from wizard.gui import custom_window
 from wizard.gui import logging_widget
+from wizard.gui import log_viewer
 
 # Wizard modules
 from wizard.core import socket_utils
@@ -80,15 +81,7 @@ class subtask_widget(QtWidgets.QFrame):
 
         self.conn = conn
         self.process_id = process_id
-
-        self.stdout = ''
-        self.percent = 0
-        self.current_task = None
-        self.status = None
-        self.command = None
-        self.last_time = 0
-
-        self.subtask_viewer = None
+        self.log_file = None
 
         self.build_ui()
         self.update_thread_status(self.process_id)
@@ -97,7 +90,6 @@ class subtask_widget(QtWidgets.QFrame):
         self.task_thread.start()
 
         self.start_clock()
-
         self.connect_functions()
 
     def build_ui(self):
@@ -121,20 +113,17 @@ class subtask_widget(QtWidgets.QFrame):
         self.current_task_data_label = QtWidgets.QLabel()
         self.header_layout.addWidget(self.current_task_data_label)
 
-        self.show_subtask_viewer_button = QtWidgets.QPushButton()
-        self.show_subtask_viewer_button.setFixedSize(16, 16)
-        self.show_subtask_viewer_button.setIconSize(QtCore.QSize(10,10))
-        self.show_subtask_viewer_button.setIcon(QtGui.QIcon(ressources._console_icon_))
-        self.header_layout.addWidget(self.show_subtask_viewer_button)
+        self.show_log_viewer_button = QtWidgets.QPushButton()
+        self.show_log_viewer_button.setFixedSize(16, 16)
+        self.show_log_viewer_button.setIconSize(QtCore.QSize(10,10))
+        self.show_log_viewer_button.setIcon(QtGui.QIcon(ressources._console_icon_))
+        self.header_layout.addWidget(self.show_log_viewer_button)
 
         self.delete_task_button = QtWidgets.QPushButton()
         self.delete_task_button.setFixedSize(16, 16)
         self.delete_task_button.setIconSize(QtCore.QSize(10,10))
         self.delete_task_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
         self.header_layout.addWidget(self.delete_task_button)
-
-        self.stdout_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.stdout_label)
 
         self.progress = QtWidgets.QProgressBar()
         self.progress.setMaximumHeight(6)
@@ -172,28 +161,15 @@ class subtask_widget(QtWidgets.QFrame):
         self.clock_thread.time_signal.connect(self.update_time)
         self.clock_thread.start()
 
-    def show_subtask_viewer(self):
-        self.subtask_viewer = subtask_viewer(self)
-        self.subtask_viewer.set_command(self.command)
-        self.subtask_viewer.update_status(self.status)
-        self.subtask_viewer.update_current_task(self.current_task)
-        self.subtask_viewer.update_progress(self.percent)
-        self.subtask_viewer.update_time(self.last_time)
-        self.subtask_viewer.set_buffered_stdout(self.stdout)
-        self.subtask_viewer.kill.connect(self.task_thread.kill)
-        self.subtask_viewer.show()
+    def show_log_viewer(self):
+        self.log_viewer = log_viewer.log_viewer(self.log_file, parent = self)
+        self.log_viewer.show()
 
     def update_current_task(self, task):
         self.current_task_data_label.setText(task)
         self.current_task = task
-        if self.subtask_viewer is not None:
-            self.subtask_viewer.update_current_task(task)
 
     def update_time(self, seconds):
-        self.last_time = seconds
-        if self.subtask_viewer is not None:
-            self.subtask_viewer.update_time(seconds)
-
         hours, minutes, seconds = tools.convert_seconds(seconds)
         self.time_data_label.setText(f"{hours}:{minutes}:{seconds}")
 
@@ -207,15 +183,9 @@ class subtask_widget(QtWidgets.QFrame):
         self.status_data_label.setText(status)
         self.status_data_label.setStyleSheet(f"color:{color};")
         self.progress.setStyleSheet('#task_progressBar{color:transparent;}\n#task_progressBar::chunk{background-color:%s;}'%color)
-        self.status = status
-        if self.subtask_viewer is not None:
-            self.subtask_viewer.update_status(status)
 
     def update_progress(self, percent):
         self.progress.setValue(percent)
-        self.percent = percent
-        if self.subtask_viewer is not None:
-            self.subtask_viewer.update_progress(percent)
 
     def update_thread_status(self, status):
         self.thread_status_label.setText(f"{status} - ")
@@ -226,7 +196,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.task_thread.connection_dead.connect(self.clock_thread.stop)
         self.kill_button.clicked.connect(self.task_thread.kill)
         self.delete_task_button.clicked.connect(self.delete_task)
-        self.show_subtask_viewer_button.clicked.connect(self.show_subtask_viewer)
+        self.show_log_viewer_button.clicked.connect(self.show_log_viewer)
 
     def delete_task(self):
         if self.task_thread.conn is not None:
@@ -235,45 +205,19 @@ class subtask_widget(QtWidgets.QFrame):
             self.setParent(None)
             self.deleteLater()
 
-    def unbuffer_stdout(self, out):
-        for line in out.split('\n'):
-            self.stdout += f"{line}\n"
-            if self.subtask_viewer is not None:
-                self.subtask_viewer.analyse_stdout(line)
-
-    def analyse_stdout(self, stdout):
-        color = "gray"
-        if 'INFO' in stdout:
-            color = "#90d1f0"
-        elif 'WARNI' in stdout:
-            color = "#f79360"
-        elif 'CRITI' in stdout or 'ERRO' in stdout:
-            color = "#f0605b"
-        self.stdout_label.setStyleSheet(f"color:{color};")
-        self.stdout_label.setText(stdout)
-        self.stdout += f"{stdout}\n"
-        if self.subtask_viewer is not None:
-            self.subtask_viewer.analyse_stdout(stdout)
-
     def analyse_signal(self, signal_list):
         process_id = signal_list[0]
         data_type = signal_list[1]
         data = signal_list[2]
 
-        if data_type == 'time':
-            self.update_time(data)
-        elif data_type == 'percent':
+        if data_type == 'percent':
             self.update_progress(data)
-        elif data_type == 'stdout':
-            self.analyse_stdout(data)
         elif data_type == 'current_task':
             self.update_current_task(data)
         elif data_type == 'status':
             self.update_status(data)
-        elif data_type == 'cmd':
-            self.command = data
-        elif data_type == 'buffered_stdout':
-            self.unbuffer_stdout(data)
+        elif data_type == 'log_file':
+            self.log_file = data
         elif data_type == 'end':
             self.task_thread.stop()
 
@@ -294,114 +238,6 @@ class clock_thread(QThread):
             time.sleep(1)
             self.time_signal.emit(time.time()-start_time)
 
-class subtask_viewer(custom_window.custom_window):
-
-    kill = pyqtSignal(int)
-
-    def __init__(self, parent=None):
-        super(subtask_viewer, self).__init__(parent)
-
-        self.add_title('Subtask viewer')
-        self.build_ui()
-        self.connect_functions()
-
-    def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
-        self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(12, 12, 12, 12)
-        self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
-
-        self.command_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.command_label)
-
-        self.stdout_textEdit = QtWidgets.QTextEdit()
-        self.stdout_textEdit.setObjectName('console_textEdit')
-        self.stdout_textEdit.setReadOnly(True)
-        self.stdout_textEdit_scrollBar = self.stdout_textEdit.verticalScrollBar()
-        self.main_layout.addWidget(self.stdout_textEdit)
-
-        self.progress = QtWidgets.QProgressBar()
-        self.progress.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_layout.addWidget(self.progress)
-
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('transparent_widget')
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
-        self.infos_layout.setSpacing(6)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
-
-        self.time_label = QtWidgets.QLabel('Duration :')
-        self.time_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.time_label)
-        self.time_data_label = QtWidgets.QLabel('00:00:00')
-        self.infos_layout.addWidget(self.time_data_label)
-
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(60, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.current_task_label = QtWidgets.QLabel('Current task :')
-        self.current_task_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.current_task_label)
-        self.current_task_data_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.current_task_data_label)
-
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(60, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.status_label = QtWidgets.QLabel('Status :')
-        self.status_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.status_label)
-        self.status_data_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.status_data_label)
-
-        self.kill_button = QtWidgets.QPushButton()
-        self.kill_button.setFixedSize(20,20)
-        self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
-        self.infos_layout.addWidget(self.kill_button)
-        
-    def update_time(self, seconds):
-        hours, minutes, seconds = tools.convert_seconds(seconds)
-        self.time_data_label.setText(f"{hours}:{minutes}:{seconds}")
-
-    def update_current_task(self, task):
-        self.current_task_data_label.setText(task)
-
-    def update_status(self, status):
-        if status == 'Running':
-            color = '#f79360'
-        elif status == 'Killed':
-            color = '#f0605b'
-        elif status == 'Done':
-            color = '#9cf277'
-        self.status_data_label.setText(status)
-        self.status_data_label.setStyleSheet(f"color:{color};")
-
-    def update_progress(self, percent):
-        self.progress.setValue(percent)
-
-    def connect_functions(self):
-        self.stdout_textEdit_scrollBar.rangeChanged.connect(lambda: self.stdout_textEdit_scrollBar.setValue(self.stdout_textEdit_scrollBar.maximum()))
-        self.kill_button.clicked.connect(self.kill.emit)
-
-    def set_buffered_stdout(self, out):
-        for line in out.split('\n'):
-            self.analyse_stdout(line+'\n')
-            print(line)
-
-    def analyse_stdout(self, stdout):
-        if 'INFO' in stdout:
-            stdout = f'<span style="color:#90d1f0;">{stdout}'
-        elif 'WARNI' in stdout:
-            stdout = f'<strong><span style="color:#f79360;">{stdout}</strong>'
-        elif 'CRITI' in stdout or 'ERRO' in stdout:
-            stdout = f'<strong><span style="color:#f0605b;">{stdout}</strong>'
-        self.stdout_textEdit.insertHtml(stdout)
-        self.stdout_textEdit.insertHtml('<br>')
-
-    def set_command(self, command):
-        self.command_label.setText(command)
 
 class tasks_server(QThread):
 
