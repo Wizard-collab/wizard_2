@@ -37,7 +37,7 @@ class communicate_server(Thread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = conn.recv(2048).decode('utf8')
+                    signal_as_str = socket_utils.recvall(conn).decode('utf8')
                     if signal_as_str:
                         self.analyse_signal(signal_as_str, conn)
             except:
@@ -64,7 +64,8 @@ class communicate_server(Thread):
                                         signal_dic['version_id'], 
                                         signal_dic['comment'])
 
-        conn.send(json.dumps(returned).encode('utf8'))
+        #conn.send(json.dumps(returned).encode('utf8'))
+        socket_utils.send_signal_with_conn(conn, returned)
 
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 

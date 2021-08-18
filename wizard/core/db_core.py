@@ -38,7 +38,8 @@ class db_server(threading.Thread):
                     signal_as_str = socket_utils.recvall(conn).decode('utf8')
                     if signal_as_str:
                         returned = self.execute_signal(signal_as_str)
-                        conn.send(json.dumps(returned).encode('utf-8'))
+                        socket_utils.send_signal_with_conn(conn, returned)
+                        #conn.send(json.dumps(returned).encode('utf-8'))
                         conn.close()
             except:
                 logger.error(str(traceback.format_exc()))

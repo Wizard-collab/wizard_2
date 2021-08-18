@@ -160,6 +160,24 @@ def create_folder(dir_name):
         logger.error(f"{dir_name} access denied")
     return success
 
+def create_folder_if_not_exist(dir_name):
+    # Tries to create a folder
+    # If not possible return None and
+    # log the corresponding error
+    success = None
+    try:
+        if not os.path.isdir(dir_name):
+            os.mkdir(dir_name)
+            logger.debug(f'{dir_name} created')
+            success = 1
+    except FileNotFoundError:
+        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
+    except FileExistsError:
+        logger.error(f"{dir_name} already exists on filesystem")
+    except PermissionError:
+        logger.error(f"{dir_name} access denied")
+    return success
+
 def remove_folder(dir_name):
     # Tries to remove a folder
     # If not possible return None and

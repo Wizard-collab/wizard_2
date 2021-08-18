@@ -6,11 +6,13 @@
 import socket
 import json
 import traceback
+import struct
 
 # Wizard modules
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
+'''
 def recvall(sock):
     data = None
     try:
@@ -32,6 +34,7 @@ def recvall(sock):
         logger.debug(str(traceback.format_exc()))
         return None
     return data
+'''
 
 def get_connection(DNS, timeout=5.0):
     connection = None
@@ -75,7 +78,10 @@ def send_bottle(DNS, msg_raw, timeout=0.01):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.settimeout(timeout)
         server.connect(DNS)
-        server.send(json.dumps(msg_raw).encode('utf8'))
+        sg = json.dumps(msg_raw).encode('utf8')
+        msg = struct.pack('>I', len(msg)) + msg
+        server.sendall(msg)
+        #server.send(json.dumps(msg_raw).encode('utf8'))
         return 1
     except ConnectionRefusedError:
         logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
@@ -96,7 +102,10 @@ def send_signal(DNS, msg_raw, timeout=5.0):
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.settimeout(timeout)
         server.connect(DNS)
-        server.send(json.dumps(msg_raw).encode('utf8'))
+        msg = json.dumps(msg_raw).encode('utf8')
+        msg = struct.pack('>I', len(msg)) + msg
+        server.sendall(msg)
+        #server.send(json.dumps(msg_raw).encode('utf8'))
         returned = recvall(server).decode('utf8')
         return json.loads(returned)
     except ConnectionRefusedError:
@@ -114,7 +123,10 @@ def send_signal(DNS, msg_raw, timeout=5.0):
 
 def send_signal_with_conn(conn, msg_raw, only_debug = False):
     try:
-        conn.send(json.dumps(msg_raw).encode('utf8'))
+        msg = json.dumps(msg_raw).encode('utf8')
+        msg = struct.pack('>I', len(msg)) + msg
+        conn.sendall(msg)
+        #conn.sendall(json.dumps(msg_raw).encode('utf8'))
         return 1
     except ConnectionRefusedError:
         if only_debug:
@@ -134,3 +146,41 @@ def send_signal_with_conn(conn, msg_raw, only_debug = False):
         else:
             logger.error(str(traceback.format_exc()))
         return None
+
+def recvall(sock):
+    try:
+        raw_msglen = recvall_with_given_len(sock, 4)
+        if not raw_msglen:
+            return None
+        msglen = struct.unpack('>I', raw_msglen)[0]
+        # Read the message data
+        return recvall_with_given_len(sock, msglen)
+    except ConnectionRefusedError:
+        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        return None
+    except socket.timeout:
+        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        return None
+    except:
+        logger.debug(str(traceback.format_exc()))
+        return None
+
+def recvall_with_given_len(sock, n):
+    try:
+        data = bytearray()
+        while len(data) < n:
+            packet = sock.recv(n - len(data))
+            if not packet:
+                return None
+            data.extend(packet)
+        return data
+    except ConnectionRefusedError:
+        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        return None
+    except socket.timeout:
+        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        return None
+    except:
+        logger.debug(str(traceback.format_exc()))
+        return None
+    return data
