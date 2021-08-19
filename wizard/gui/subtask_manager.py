@@ -14,6 +14,7 @@ import traceback
 from wizard.gui import custom_window
 from wizard.gui import logging_widget
 from wizard.gui import log_viewer
+from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.core import socket_utils
@@ -36,17 +37,25 @@ class subtask_manager(custom_window.custom_window):
         self.tasks_server.start()
 
         self.connect_functions()
+        self.refresh()
 
     def connect_functions(self):
         self.tasks_server.new_process.connect(self.add_task)
 
     def build_ui(self):
+        self.setMinimumWidth(500)
+        self.setMinimumHeight(600)
+
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(1)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.main_widget)
+
+        self.info_widget = gui_utils.info_widget()
+        self.info_widget.setVisible(0)
+        self.main_layout.addWidget(self.info_widget)
 
         self.tasks_scrollArea = QtWidgets.QScrollArea()
         self.tasks_scrollBar = self.tasks_scrollArea.verticalScrollBar()
@@ -67,15 +76,48 @@ class subtask_manager(custom_window.custom_window):
 
         self.main_layout.addWidget(self.tasks_scrollArea)
 
+    def toggle(self):
+        if self.isVisible():
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+                gui_utils.move_ui(self)
+            else:
+                self.hide()
+        else:
+            self.show()
+            self.raise_()
+            gui_utils.move_ui(self)
+
     def add_task(self, data_tuple):
         conn = data_tuple[0]
         process_id = data_tuple[1]
         if process_id not in self.tasks_ids.keys():
             task_widget = subtask_widget(conn, process_id)
             self.tasks_ids[process_id] = task_widget
+            self.tasks_ids[process_id].remove_task_signal.connect(self.remove_task)
             self.tasks_scrollArea_layout.addWidget(task_widget)
+            self.refresh()
+
+    def remove_task(self, process_id):
+        if process_id in self.tasks_ids.keys():
+            del self.tasks_ids[process_id]
+            self.refresh()
+
+    def refresh(self):
+        if len(self.tasks_ids) == 0:
+            self.tasks_scrollArea.setVisible(0)
+            self.info_widget.setVisible(1)
+            self.info_widget.setText("No current subtask...")
+            self.info_widget.setImage(ressources._chill_info_image_)
+        else:
+            self.info_widget.setVisible(0)
+            self.tasks_scrollArea.setVisible(1)
 
 class subtask_widget(QtWidgets.QFrame):
+
+    remove_task_signal = pyqtSignal(str)
+
     def __init__(self, conn, process_id, parent=None):
         super(subtask_widget, self).__init__(parent)
 
@@ -202,6 +244,7 @@ class subtask_widget(QtWidgets.QFrame):
         if self.task_thread.conn is not None:
             logger.warning('You need to kill the task before removing it')
         else:
+            self.remove_task_signal.emit(self.process_id)
             self.setParent(None)
             self.deleteLater()
 

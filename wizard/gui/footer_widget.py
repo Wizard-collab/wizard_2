@@ -23,6 +23,7 @@ class footer_widget(QtWidgets.QFrame):
 
     show_console = pyqtSignal(int)
     show_wall = pyqtSignal(int)
+    show_subtask_manager = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(footer_widget, self).__init__(parent)
@@ -60,6 +61,12 @@ class footer_widget(QtWidgets.QFrame):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
+        self.task_manager_button = QtWidgets.QPushButton()
+        self.task_manager_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.task_manager_button, "Show task manager")
+        self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_icon_))
+        self.buttons_layout.addWidget(self.task_manager_button)
+
         self.console_button = QtWidgets.QPushButton()
         self.console_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.console_button, "Show console")
@@ -75,6 +82,7 @@ class footer_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.console_button.clicked.connect(self.show_console.emit)
         self.wall_button.clicked.connect(self.show_wall.emit)
+        self.task_manager_button.clicked.connect(self.show_subtask_manager.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)

@@ -30,6 +30,7 @@ from wizard.gui import footer_widget
 from wizard.gui import console_widget
 from wizard.gui import header_widget
 from wizard.gui import tickets_widget
+from wizard.gui import subtask_manager
 
 class main_widget(custom_window.custom_window):
     def __init__(self, parent=None):
@@ -45,6 +46,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
         self.tickets_widget = tickets_widget.tickets_widget(self)
+        self.subtask_manager = subtask_manager.subtask_manager(self)
         self.build_ui()
         self.init_gui_server()
         self.init_communicate_server()
@@ -64,6 +66,7 @@ class main_widget(custom_window.custom_window):
 
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
+        self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
@@ -72,6 +75,7 @@ class main_widget(custom_window.custom_window):
         self.tabs_widget.currentChanged.connect(self.tab_changed)
         self.footer_widget.show_console.connect(self.console_widget.toggle)
         self.footer_widget.show_wall.connect(self.wall_widget.toggle)
+        self.footer_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
 

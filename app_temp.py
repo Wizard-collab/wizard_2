@@ -153,9 +153,6 @@ class app():
 		self.main_widget.show()
 		self.main_widget.refresh()
 
-		self.subtask_manager = subtask_manager.subtask_manager()
-		self.subtask_manager.show()
-
 		sys.exit(self.app.exec_())
 
 app()
