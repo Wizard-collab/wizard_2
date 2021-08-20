@@ -56,12 +56,14 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation_handler_layout.addWidget(self.score_slider)
         
         self.random_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.random_button, "Show new random quote")
         self.random_button.setIcon(QtGui.QIcon(ressources._random_icon_))
         self.random_button.setIconSize(QtCore.QSize(16,16))
         self.random_button.setFixedSize(20,20)
         self.animation_handler_layout.addWidget(self.random_button)
 
         self.add_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.add_button, "Create new quote")
         self.add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.add_button.setIconSize(QtCore.QSize(14,14))
         self.add_button.setFixedSize(20,20)

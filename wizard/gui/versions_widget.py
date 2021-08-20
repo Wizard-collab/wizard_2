@@ -505,7 +505,7 @@ class versions_widget(QtWidgets.QWidget):
 
     def add_empty_version(self):
         if self.work_env_id is not None:
-            if assets.add_version(self.work_env_id, 'Empty version'):
+            if assets.add_version(self.work_env_id, 'Empty version', 0):
                 gui_server.refresh_ui()
 
     def open_folder(self):

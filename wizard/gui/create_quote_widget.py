@@ -49,14 +49,14 @@ class create_quote_widget(custom_window.custom_dialog):
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding,
                                                     QtWidgets.QSizePolicy.MinimumExpanding))
 
         self.count_label = QtWidgets.QLabel('0/100 characters')
-        self.count_label.setAlignment(QtCore.Qt.AlignRight)
         self.main_layout.addWidget(self.count_label)
 
         self.quote_field = QtWidgets.QTextEdit()
+        self.quote_field.setMaximumHeight(200)
         self.quote_field.setPlaceholderText("Your quote here...")
         self.main_layout.addWidget(self.quote_field)
 
@@ -72,6 +72,7 @@ class create_quote_widget(custom_window.custom_dialog):
         self.warning_icon.setAlignment(QtCore.Qt.AlignTop)
         self.warning_icon.setPixmap(QtGui.QPixmap(ressources._handshake_icon_).scaled(30,30,
                 QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.warning_icon.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.warning_layout.addWidget(self.warning_icon)
 
         warning_text = "Please ensure that you're respectful, everybody has access to your publication.\n"
@@ -81,7 +82,7 @@ class create_quote_widget(custom_window.custom_dialog):
         self.warning_label = QtWidgets.QLabel(warning_text)
         self.warning_layout.addWidget(self.warning_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding,
                                                     QtWidgets.QSizePolicy.MinimumExpanding))
 
         self.buttons_widget = QtWidgets.QWidget()

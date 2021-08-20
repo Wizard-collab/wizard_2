@@ -148,7 +148,7 @@ class wall_widget(QtWidgets.QWidget):
         start_time = time.time()
         event_rows = project.get_all_events()
         if event_rows is not None:
-            for event_row in event_rows[-10:]:
+            for event_row in event_rows:
                 if event_row['id'] not in self.ticket_ids.keys():
                     if event_row['creation_time']-self.last_time > 350:
                         time_widget = wall_time_widget(event_row['creation_time'])
@@ -175,7 +175,7 @@ class wall_time_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(4,4,4,4)
-        self.main_layout.setSpacing(4)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         day, hour = tools.convert_time(self.time_float)
@@ -207,7 +207,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         self.event_content_label.setText(self.event_row['message'])
-        if self.event_row['additional_message'] is not None:
+        if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
             self.event_additional_content_label.setText(self.event_row['additional_message'])
         else:
             self.event_additional_content_label.setVisible(0)
@@ -245,14 +245,14 @@ class wall_event_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(12)
+        self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(0,0,0,0)
-        self.header_layout.setSpacing(12)
+        self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
@@ -284,6 +284,8 @@ class wall_event_widget(QtWidgets.QFrame):
         self.user_name_label = QtWidgets.QLabel()
         self.user_name_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.user_name_label)
+
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.event_content_label = QtWidgets.QLabel()
         self.event_content_label.setWordWrap(True)

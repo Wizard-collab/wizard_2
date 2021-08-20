@@ -462,6 +462,7 @@ QSlider::handle:horizontal {
 
 #icon_view::item{
 	padding: 2px;
+	background-color: rgba(255,255,255,8);
 	border: 2px solid transparent;
 }
 

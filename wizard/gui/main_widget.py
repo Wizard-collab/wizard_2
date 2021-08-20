@@ -144,7 +144,7 @@ class main_widget(custom_window.custom_window):
         self.tickets_widget.refresh()
 
     def refresh(self):
-        start_time = time.time()
+        #start_time = time.time()
         self.tree_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
@@ -154,7 +154,7 @@ class main_widget(custom_window.custom_window):
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
         QtWidgets.QApplication.processEvents()
-        logger.info(f"Refresh time : {str(time.time()-start_time)}")
+        #logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()

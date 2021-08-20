@@ -23,6 +23,10 @@ class all_users_widget(custom_window.custom_window):
         self.refresh()
 
     def build_ui(self):
+
+        self.setMinimumWidth(700)
+        self.setMinimumHeight(500)
+
         self.main_widget = QtWidgets.QFrame()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -41,6 +45,21 @@ class all_users_widget(custom_window.custom_window):
 
         self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Administrator'])
         self.main_layout.addWidget(self.list_view)
+
+    def toggle(self):
+        if self.isVisible():
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+                self.refresh()
+                gui_utils.move_ui(self)
+            else:
+                self.hide()
+        else:
+            self.show()
+            self.raise_()
+            self.refresh()
+            gui_utils.move_ui(self)
 
     def refresh(self):
         all_user_rows = site.get_users_list()

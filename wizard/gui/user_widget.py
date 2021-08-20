@@ -42,6 +42,7 @@ class user_widget(QtWidgets.QFrame):
         self.items_layout.addWidget(self.crown_label)
 
         self.ranking_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.ranking_button, "Wizard cup")
         self.ranking_button.setFixedSize(28,28)
         self.ranking_button.setIcon(QtGui.QIcon(ressources._ranking_icon_))
         self.items_layout.addWidget(self.ranking_button)
@@ -117,7 +118,7 @@ class user_widget(QtWidgets.QFrame):
 
     def show_all_user_widget(self):
         self.all_users_widget = all_users_widget.all_users_widget()
-        self.all_users_widget.show()
+        self.all_users_widget.toggle()
 
     def crown_check(self, user_row):
         user_rows = site.get_users_list()

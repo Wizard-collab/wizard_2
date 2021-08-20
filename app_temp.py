@@ -151,6 +151,7 @@ class app():
 
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.show()
+		self.main_widget.toggle_size()
 		self.main_widget.refresh()
 
 		sys.exit(self.app.exec_())
