@@ -31,6 +31,7 @@ class references_widget(QtWidgets.QWidget):
         self.stage_dic = dict()
         self.build_ui()
         self.connect_functions()
+        self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
 
     def show_info_mode(self, text, image):
         self.list_view.setVisible(0)

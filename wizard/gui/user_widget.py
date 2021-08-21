@@ -20,7 +20,6 @@ class user_widget(QtWidgets.QFrame):
         super(user_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
-        self.refresh()
 
     def build_ui(self):
         self.setObjectName('transparent_widget')

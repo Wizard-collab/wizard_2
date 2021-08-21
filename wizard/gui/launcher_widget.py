@@ -468,10 +468,9 @@ class variant_creation_widget(QtWidgets.QDialog):
 class custom_launchButton(QtWidgets.QPushButton):
     def __init__(self, parent=None):
         super(custom_launchButton, self).__init__(parent)
-        #'hide' the icon on the pushButton
         self.setIcon(QtGui.QIcon())
         self.setIconSize(QtCore.QSize(25,25))
-        self.animated_spinner = QtGui.QMovie("running.gif")
+        self.animated_spinner = QtGui.QMovie(ressources._running_gif_)
         self.animated_spinner.frameChanged.connect(self.updateSpinnerAnimation)           
 
     def updateSpinnerAnimation(self):

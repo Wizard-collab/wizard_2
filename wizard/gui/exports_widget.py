@@ -54,6 +54,7 @@ class exports_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.build_ui()
         self.connect_functions()
+        self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
 
     def dragEnterEvent(self, event):
         self.drop_widget.setVisible(1)

@@ -28,7 +28,7 @@ class tickets_widget(QtWidgets.QWidget):
         self.ticket_ids = dict()
         self.build_ui()
         self.connect_functions()
-        self.refresh()
+        self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

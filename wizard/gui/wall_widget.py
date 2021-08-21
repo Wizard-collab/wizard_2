@@ -32,7 +32,6 @@ class wall_widget(QtWidgets.QWidget):
         self.search_thread = search_thread()
         self.build_ui()
         self.connect_functions()
-        self.refresh()
 
     def connect_functions(self):
         self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))

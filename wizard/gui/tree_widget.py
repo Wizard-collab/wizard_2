@@ -42,7 +42,6 @@ class tree_widget(QtWidgets.QFrame):
 
         self.build_ui()
         self.connect_functions()
-        self.refresh()
 
     def build_ui(self):
         self.icons_dic = dict()
