@@ -9,9 +9,12 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from wizard.gui import logging_widget
 from wizard.gui import gui_utils
 from wizard.gui import custom_window
+from wizard.gui import gui_server
 
 # Wizard modules
+from wizard.core import user
 from wizard.core import project
+from wizard.core import environment
 from wizard.core import create_project
 from wizard.core import db_utils
 from wizard.vars import ressources
@@ -164,6 +167,9 @@ class create_project_widget(custom_window.custom_dialog):
         self.project_name_lineEdit.setText(project_name.lower())
 
     def apply(self):
+
+        old_project_name = environment.get_project_name()
+
         project_name = self.project_name_lineEdit.text()
         project_path = self.project_path_lineEdit.text()
         password = self.password_lineEdit.text()
@@ -172,6 +178,8 @@ class create_project_widget(custom_window.custom_dialog):
             if project.create_project(project_name, project_path, password):
                 db_utils.modify_db_name('project', project_name)
                 create_project.create_project(project_name, project_path, password)
+                if old_project_name is not None:
+                    user.log_project_without_cred(old_project_name)
                 self.accept()
         else:
             logger.warning("Project passwords doesn't matches")

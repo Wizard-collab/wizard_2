@@ -14,6 +14,7 @@ from wizard.gui import logging_widget
 from wizard.gui import create_project_widget
 from wizard.gui import gui_utils
 from wizard.gui import custom_window
+from wizard.gui import gui_server
 
 class project_log_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
@@ -97,4 +98,5 @@ class project_log_widget(custom_window.custom_dialog):
         project_name = self.projects_comboBox.currentText()
         project_password = self.password_lineEdit.text()
         if user.log_project(project_name, project_password):
+            gui_server.restart_ui()
             self.accept()

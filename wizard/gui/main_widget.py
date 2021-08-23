@@ -6,6 +6,8 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import time
+import os
+import subprocess
 
 # Wizard modules
 from wizard.vars import ressources
@@ -70,12 +72,16 @@ class main_widget(custom_window.custom_window):
         self.tabs_widget.get_context()
         self.versions_widget.get_context()
         self.wall_widget.get_context()
+        self.console_widget.get_context()
+        self.tickets_widget.get_context()
 
     def save_contexts(self):
         self.tree_widget.set_context()
         self.tabs_widget.set_context()
         self.versions_widget.set_context()
         self.wall_widget.set_context()
+        self.console_widget.set_context()
+        self.tickets_widget.set_context()
 
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
@@ -93,10 +99,16 @@ class main_widget(custom_window.custom_window):
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
 
         self.gui_server.refresh_signal.connect(self.refresh)
+        self.gui_server.restart_signal.connect(self.restart)
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
         self.gui_server.stdout_signal.connect(self.update_stdout)
         self.gui_server.focus_instance_signal.connect(self.focus_instance)
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
+
+    def restart(self):
+        self.quit_threads()
+        subprocess.Popen(['python', 'app.py'], shell=True)
+        self.close()
 
     def focus_export_version(self, export_version_id):
         export_version_row = project.get_export_version_data(export_version_id)
@@ -156,17 +168,21 @@ class main_widget(custom_window.custom_window):
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
 
-    def closeEvent(self, event):
+    def quit_threads(self):
         self.stop_threads.emit(1)
         self.gui_server.stop()
         self.header_widget.quotes_widget.timer.stop()
         self.footer_widget.hardware_infos_widget.timer.stop()
         self.communicate_server.stop()
         self.subtask_manager.tasks_server.stop()
+        self.console_widget.close()
+        self.subtask_manager.close()
         self.save_contexts()
 
+    def closeEvent(self, event):
+        self.quit_threads()
+
     def refresh(self):
-        #start_time = time.time()
         self.tree_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
@@ -175,8 +191,6 @@ class main_widget(custom_window.custom_window):
         self.versions_widget.refresh()
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
-        QtWidgets.QApplication.processEvents()
-        #logger.info(f"Refresh time : {str(time.time()-start_time)}")
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()

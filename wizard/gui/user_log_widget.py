@@ -13,6 +13,7 @@ from wizard.gui import logging_widget
 from wizard.gui import create_user_widget
 from wizard.gui import gui_utils
 from wizard.gui import custom_window
+from wizard.gui import gui_server
 
 class user_log_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
@@ -84,6 +85,7 @@ class user_log_widget(custom_window.custom_dialog):
         user_name = self.user_name_lineEdit.text()
         password = self.password_lineEdit.text()
         if user.log_user(user_name, password):
+            gui_server.refresh_ui()
             self.accept()
 
     def create_user(self):

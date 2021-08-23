@@ -10,6 +10,7 @@ import os
 import json
 
 # Wizard modules
+from wizard.core import environment
 from wizard.core import site
 from wizard.core import user
 from wizard.core import project
@@ -29,7 +30,7 @@ class wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(wall_widget, self).__init__(parent)
         self.last_time = 0
-        self.ticket_ids = dict()
+        self.event_ids = dict()
         self.time_widgets = []
         self.search_thread = search_thread()
         self.build_ui()
@@ -139,14 +140,14 @@ class wall_widget(QtWidgets.QWidget):
         self.anim.start()
 
     def hide_all(self):
-        for ticket_id in self.ticket_ids.keys():
-            self.ticket_ids[ticket_id].setVisible(0)
+        for event_id in self.event_ids.keys():
+            self.event_ids[event_id].setVisible(0)
         for time_widget in self.time_widgets:
             time_widget.setVisible(0)
 
     def show_all(self):
-        for ticket_id in self.ticket_ids.keys():
-            self.ticket_ids[ticket_id].setVisible(1)
+        for event_id in self.event_ids.keys():
+            self.event_ids[event_id].setVisible(1)
         for time_widget in self.time_widgets:
             time_widget.setVisible(1)
 
@@ -167,24 +168,25 @@ class wall_widget(QtWidgets.QWidget):
             self.show_all()
 
     def add_search_event(self, event_id):
-        if event_id in self.ticket_ids.keys():
-            self.ticket_ids[event_id].setVisible(True)
+        if event_id in self.event_ids.keys():
+            self.event_ids[event_id].setVisible(True)
 
     def refresh(self):
         start_time = time.time()
         event_rows = project.get_all_events()
         if event_rows is not None:
             for event_row in event_rows:
-                if event_row['id'] not in self.ticket_ids.keys():
+                if event_row['id'] not in self.event_ids.keys():
                     if event_row['creation_time']-self.last_time > 350:
                         time_widget = wall_time_widget(event_row['creation_time'])
                         self.wall_scrollArea_layout.addWidget(time_widget)
                         self.time_widgets.append(time_widget)
                     event_widget = wall_event_widget(event_row)
                     self.wall_scrollArea_layout.addWidget(event_widget)
-                    self.ticket_ids[event_row['id']] = event_widget
+                    self.event_ids[event_row['id']] = event_widget
                     self.last_time = event_row['creation_time']
                     self.notification.emit(1)
+            self.old_project = environment.get_project_name()
         self.update_search()
         self.update_refresh_time(start_time)
 

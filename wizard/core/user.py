@@ -108,6 +108,8 @@ class user:
             self.prefs_dic[user_vars._tabs_context_] = dict()
             self.prefs_dic[user_vars._versions_context_] = dict()
             self.prefs_dic[user_vars._wall_context_] = dict()
+            self.prefs_dic[user_vars._console_context_] = dict()
+            self.prefs_dic[user_vars._tickets_context_] = dict()
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:
@@ -189,6 +191,21 @@ def log_project(project_name, password):
     else:
         logger.error(f"{project_name} doesn't exists")
         return None
+
+def log_project_without_cred(project_name):
+    if project_name in site.get_projects_names_list():
+        project_row = site.get_project_row_by_name(project_name)
+        site.update_current_ip_data('project_id', project_row['id'])
+        environment.build_project_env(project_name, project_row['project_path'])
+        db_utils.modify_db_name('project', project_name)
+        logger.info(f'Successfully signed in {project_name} project')
+        project.add_user(site.get_user_row_by_name(environment.get_user(),
+                                                            'id'))
+        return 1
+    else:
+        logger.error(f"{project_name} doesn't exists")
+        return None
+
 
 def disconnect_project():
     site.update_current_ip_data('project_id', None)

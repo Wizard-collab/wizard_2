@@ -9,6 +9,7 @@ import sys
 
 # Wizard modules
 from wizard.core import user
+from wizard.vars import user_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
@@ -100,6 +101,18 @@ class console_widget(custom_window.custom_window):
         if data == '':
             data = self.script_editor_widget.text()
         user.user().execute_session(data)
+
+    def set_context(self):
+        data = self.script_editor_widget.text()
+        context_dic = dict()
+        context_dic['content'] = data
+        user.user().add_context(user_vars._console_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._console_context_)
+        if context_dic is not None and context_dic != dict():
+            data = context_dic['content']
+            self.script_editor_widget.setText(data)
 
     def handle_record(self, record_tuple):
         level = record_tuple[0]

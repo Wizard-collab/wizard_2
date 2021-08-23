@@ -9,12 +9,14 @@ import json
 import time
 
 # Wizard modules
+from wizard.core import user
 from wizard.core import site
 from wizard.core import project
 from wizard.core import assets
 from wizard.core import image
 from wizard.core import tools
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -116,6 +118,18 @@ class tickets_widget(QtWidgets.QWidget):
         self.toggle_visibility_checkBox.stateChanged.connect(self.update_visibility)
         self.tickets_list.itemSelectionChanged.connect(self.selection_changed)
         self.ticket_history_widget.toggle_ticket_signal.connect(self.toggle_ticket)
+
+    def set_context(self):
+        show_only_openned = self.toggle_visibility_checkBox.isChecked()
+        context_dic = dict()
+        context_dic['show_only_openned'] = show_only_openned
+        user.user().add_context(user_vars._tickets_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._tickets_context_)
+        if context_dic is not None and context_dic != dict():
+            show_only_openned = context_dic['show_only_openned']
+            self.toggle_visibility_checkBox.setChecked(show_only_openned)
 
     def selection_changed(self):
         selection = self.tickets_list.selectedItems()

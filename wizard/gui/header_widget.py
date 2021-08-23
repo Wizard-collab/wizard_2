@@ -13,6 +13,10 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui import user_widget
 from wizard.gui import quotes_widget
+from wizard.gui import user_log_widget
+from wizard.gui import project_log_widget
+from wizard.gui import create_user_widget
+from wizard.gui import create_project_widget
 
 class header_widget(QtWidgets.QFrame):
 
@@ -40,8 +44,8 @@ class header_widget(QtWidgets.QFrame):
         self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         self.main_layout.addWidget(self.menu_bar)
+        
         self.wizard_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='', icon=QtGui.QIcon(ressources._wizard_icon_small_))
-
         self.license_action = self.wizard_action.addAction("License")
         self.about_action = self.wizard_action.addAction("About")
         self.quit_action = self.wizard_action.addAction("Quit")
@@ -50,8 +54,16 @@ class header_widget(QtWidgets.QFrame):
         self.console_action = self.window_action.addAction("Console")
         self.subtask_manager_action = self.window_action.addAction("Subtask manager")
 
-        self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Help')
-        self.documentation_action = self.window_action.addAction("Documentation")
+        self.user_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='User')
+        self.user_log_action = self.user_action.addAction("Change user")
+        self.user_create_action = self.user_action.addAction("Create user")
+
+        self.project_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Project')
+        self.project_log_action = self.project_action.addAction("Change project")
+        self.project_create_action = self.project_action.addAction("Create project")
+
+        self.help_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Help')
+        self.documentation_action = self.help_action.addAction("Documentation")
 
         self.main_layout.addWidget(self.quotes_widget)
         self.main_layout.addWidget(self.user_widget)
@@ -59,4 +71,24 @@ class header_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.subtask_manager_action.triggered.connect(self.show_subtask_manager.emit)
         self.console_action.triggered.connect(self.show_console.emit)
+        self.user_log_action.triggered.connect(self.change_user)
+        self.user_create_action.triggered.connect(self.create_user)
+        self.project_log_action.triggered.connect(self.change_project)
+        self.project_create_action.triggered.connect(self.create_project)
+
+    def change_user(self):
+        self.user_log_widget = user_log_widget.user_log_widget()
+        self.user_log_widget.exec_()
+
+    def change_project(self):
+        self.project_log_widget = project_log_widget.project_log_widget()
+        self.project_log_widget.exec_()
+
+    def create_user(self):
+        self.create_user_widget = create_user_widget.create_user_widget()
+        self.create_user_widget.exec_()
+
+    def create_project(self):
+        self.create_project_widget = create_project_widget.create_project_widget()
+        self.create_project_widget.exec_()
 

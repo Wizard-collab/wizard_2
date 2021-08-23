@@ -40,6 +40,7 @@ class streamHandler(QtCore.QObject):
 class gui_server(QThread):
 
     refresh_signal = pyqtSignal(int)
+    restart_signal = pyqtSignal(int)
     tooltip_signal = pyqtSignal(str)
     stdout_signal = pyqtSignal(tuple)
     export_version_focus_signal = pyqtSignal(object)
@@ -83,6 +84,8 @@ class gui_server(QThread):
 
         if signal_dic['function'] == 'refresh':
             self.refresh_signal.emit(1)
+        if signal_dic['function'] == 'restart':
+            self.restart_signal.emit(1)
         elif signal_dic['function'] == 'tooltip':
             self.tooltip_signal.emit(signal_dic['tooltip'])
         elif signal_dic['function'] == 'focus_instance':
@@ -97,6 +100,11 @@ def refresh_ui():
 	signal_dic = dict()
 	signal_dic['function'] = 'refresh'
 	socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+
+def restart_ui():
+    signal_dic = dict()
+    signal_dic['function'] = 'restart'
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
 
 def tooltip(tooltip):
     signal_dic = dict()

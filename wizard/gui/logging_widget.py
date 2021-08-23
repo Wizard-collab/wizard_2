@@ -23,7 +23,10 @@ class custom_handler(QtCore.QObject, logging.Handler):
         super(custom_handler, self).__init__(parent)
 
     def emit(self, record):
-        self.log_record.emit((record.levelname, self.format(record)))
+        try:
+            self.log_record.emit((record.levelname, self.format(record)))
+        except RuntimeError:
+            pass
 
 class logging_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
