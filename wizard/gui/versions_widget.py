@@ -11,9 +11,11 @@ import time
 # Wizard modules
 from wizard.core import launch
 from wizard.core import assets
+from wizard.core import user
 from wizard.core import project
 from wizard.core import tools
 from wizard.vars import ressources
+from wizard.vars import user_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
@@ -428,6 +430,35 @@ class versions_widget(QtWidgets.QWidget):
             gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to icon view")
         self.refresh()
         self.set_selection(selection)
+
+    def set_view_as_icon_mode(self):
+        if self.icon_mode == 1:
+            pass
+        else:
+            self.toggle_view()
+
+    def set_view_as_list_mode(self):
+        if self.list_mode == 1:
+            pass
+        else:
+            self.toggle_view()
+
+    def set_context(self):
+        if self.icon_mode == 1:
+            current_mode = 'icon'
+        else:
+            current_mode = 'list'
+        context_dic = dict()
+        context_dic['view_mode'] = current_mode
+        user.user().add_context(user_vars._versions_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._versions_context_)
+        if context_dic is not None and context_dic != dict():
+            if context_dic['view_mode'] == 'icon':
+                self.set_view_as_icon_mode()
+            elif context_dic['view_mode'] == 'list':
+                self.set_view_as_list_mode()
 
     def get_number(self):
         number = 0

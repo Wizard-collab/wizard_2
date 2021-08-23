@@ -40,11 +40,14 @@ class communicate_server(Thread):
                     signal_as_str = socket_utils.recvall(conn).decode('utf8')
                     if signal_as_str:
                         self.analyse_signal(signal_as_str, conn)
+            except OSError:
+                pass
             except:
                 logger.error(str(traceback.format_exc()))
                 continue
 
     def stop(self):
+        self.server.close()
         self.running = False
 
     def analyse_signal(self, signal_as_str, conn):

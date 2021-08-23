@@ -298,11 +298,14 @@ class tasks_server(QThread):
                 if addr[0] == self.server_address:
                     process_id = json.loads(socket_utils.recvall(conn))
                     self.new_process.emit((conn, process_id))
+            except OSError:
+                pass
             except:
                 logger.error(str(traceback.format_exc()))
                 continue
 
     def stop(self):
+        self.server.close()
         self.running = False
 
 class task_thread(QThread):

@@ -170,7 +170,9 @@ class hardware_infos_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(hardware_infos_widget, self).__init__(parent)
         self.build_ui()
-        self.hardware_thread = hardware_thread(self)
+        self.timer=QtCore.QTimer(self)
+        self.timer.start(3000)
+        #self.hardware_thread = hardware_thread(self)
         self.connect_functions()
 
     def build_ui(self):
@@ -196,12 +198,11 @@ class hardware_infos_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.ram_progressBar)
 
     def connect_functions(self):
-        self.hardware_thread.start()
-        self.hardware_thread.hardware_infos.connect(self.update_progress)
+        self.timer.timeout.connect(self.update_progress)
 
-    def update_progress(self, infos_tuple):
-        cpu = infos_tuple[-1]
-        ram = infos_tuple[0]
+    def update_progress(self):
+        ram = dict(psutil.virtual_memory()._asdict())['percent']
+        cpu = psutil.cpu_percent()
         if 0<=int(cpu)<=33:
             color = '#98d47f'
         elif 33<int(cpu)<66:
@@ -219,20 +220,3 @@ class hardware_infos_widget(QtWidgets.QFrame):
             color = '#f0605b' 
         self.ram_progressBar.setChunckColor(color)
         self.ram_progressBar.setValue(ram)
-
-class hardware_thread(QtCore.QThread):
-
-    hardware_infos = pyqtSignal(tuple)
-
-    def __init__(self, parent=None):
-        super(hardware_thread, self).__init__(parent)
-        self.running = True
-
-    def run(self):
-        while self.running:
-            ram = dict(psutil.virtual_memory()._asdict())['percent']
-            self.hardware_infos.emit((float(ram), psutil.cpu_percent()))
-            time.sleep(3)
-
-    def stop(self):
-        self.running = False

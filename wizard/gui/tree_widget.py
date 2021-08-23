@@ -14,6 +14,7 @@ from wizard.core import project
 from wizard.core import assets
 from wizard.core import environment
 from wizard.core import user
+from wizard.vars import user_vars
 from wizard.vars import assets_vars
 from wizard.vars import ressources
 
@@ -152,11 +153,11 @@ class tree_widget(QtWidgets.QFrame):
             if 'creation' not in selected_item.instance_type:
                 context_dic['selected_instance'] = (selected_item.instance_type,
                                                             selected_item.instance_id)
-        user.user().add_context(context_dic)
+        user.user().add_context(user_vars._tree_context_, context_dic)
 
     def get_context(self):
-        context_dic = user.user().get_context()
-        if context_dic is not None:
+        context_dic = user.user().get_context(user_vars._tree_context_)
+        if context_dic is not None and context_dic != dict():
             for id in context_dic['expanded_domains']:
                 if id in self.domain_ids.keys():
                     self.domain_ids[id].setExpanded(1)

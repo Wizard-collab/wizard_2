@@ -41,15 +41,19 @@ class db_server(threading.Thread):
                         socket_utils.send_signal_with_conn(conn, returned)
                         #conn.send(json.dumps(returned).encode('utf-8'))
                         conn.close()
+            except OSError:
+                pass
             except:
                 logger.error(str(traceback.format_exc()))
                 continue
+                
         if self.site_conn is not None:
             self.site_conn.close()
         if self.project_conn is not None:
             self.project_conn.close()
 
     def stop(self):
+        self.server.close()
         self.running = False
 
     def execute_signal(self, signal_as_str):

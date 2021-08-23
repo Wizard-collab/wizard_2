@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 import time
 
 # Wizard modules
@@ -33,6 +34,9 @@ from wizard.gui import tickets_widget
 from wizard.gui import subtask_manager
 
 class main_widget(custom_window.custom_window):
+
+    stop_threads = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super(main_widget, self).__init__(parent)
         self.tree_widget = tree_widget.tree_widget(self)
@@ -63,6 +67,15 @@ class main_widget(custom_window.custom_window):
 
     def init_contexts(self):
         self.tree_widget.get_context()
+        self.tabs_widget.get_context()
+        self.versions_widget.get_context()
+        self.wall_widget.get_context()
+
+    def save_contexts(self):
+        self.tree_widget.set_context()
+        self.tabs_widget.set_context()
+        self.versions_widget.set_context()
+        self.wall_widget.set_context()
 
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
@@ -142,6 +155,15 @@ class main_widget(custom_window.custom_window):
         self.versions_widget.refresh()
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
+
+    def closeEvent(self, event):
+        self.stop_threads.emit(1)
+        self.gui_server.stop()
+        self.header_widget.quotes_widget.timer.stop()
+        self.footer_widget.hardware_infos_widget.timer.stop()
+        self.communicate_server.stop()
+        self.subtask_manager.tasks_server.stop()
+        self.save_contexts()
 
     def refresh(self):
         #start_time = time.time()

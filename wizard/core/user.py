@@ -84,13 +84,13 @@ class user:
             logger.info("No postgreSQL DNS set")
             return None
 
-    def add_context(self, context_dic):
-        self.prefs_dic[user_vars._tree_context_][environment.get_project_name()] = context_dic
+    def add_context(self, type, context_dic):
+        self.prefs_dic[type][environment.get_project_name()] = context_dic
         self.write_prefs_dic()
 
-    def get_context(self):
-        if environment.get_project_name() in self.prefs_dic[user_vars._tree_context_].keys():
-            return self.prefs_dic[user_vars._tree_context_][environment.get_project_name()]
+    def get_context(self, type):
+        if environment.get_project_name() in self.prefs_dic[type].keys():
+            return self.prefs_dic[type][environment.get_project_name()]
         else:
             return None
 
@@ -105,6 +105,9 @@ class user:
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
             self.prefs_dic[user_vars._tree_context_] = dict()
+            self.prefs_dic[user_vars._tabs_context_] = dict()
+            self.prefs_dic[user_vars._versions_context_] = dict()
+            self.prefs_dic[user_vars._wall_context_] = dict()
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:

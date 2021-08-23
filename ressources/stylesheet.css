@@ -421,6 +421,10 @@ QSlider::handle:horizontal {
     border-radius: 3px;
 }
 
+#loading_widget_frame{
+	border-radius: 5px;
+}
+
 #drop_widget{
 	background-color: rgba(0,0,0,120);
 	border: 2px solid gray;

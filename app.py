@@ -4,39 +4,20 @@ import time
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
-from wizard.gui import tree_widget
-from wizard.gui import user_widget
-from wizard.gui import quotes_widget
 from wizard.gui import psql_widget
 from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
 from wizard.gui import project_log_widget
 from wizard.gui import create_project_widget
-from wizard.gui import wall_widget
-from wizard.gui import logging_widget
-from wizard.gui import launcher_widget
-from wizard.gui import create_ticket_widget
-from wizard.gui import script_editor_widget
-from wizard.gui import tickets_widget
+from wizard.gui import loading_widget
 from wizard.gui import main_widget
-from wizard.gui import tabs_widget
-from wizard.gui import versions_widget
-from wizard.gui import gui_server
-from wizard.gui import footer_widget
-from wizard.gui import custom_window
-from wizard.gui import search_reference_widget
-from wizard.gui import manual_export_widget
-from wizard.gui import all_users_widget
-from wizard.gui import subtask_manager
 
 # Wizard modules
 from wizard.core import user
 from wizard.core import environment
 from wizard.core import site
-from wizard.core import project
 from wizard.core import db_core
 from wizard.core import db_utils
-from wizard.core import communicate
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -89,11 +70,17 @@ class app():
 
 		db_utils.modify_db_name('project', environment.get_project_name())
 
+		self.loading_widget = loading_widget.loading_widget()
+		self.loading_widget.show()
+		QtWidgets.QApplication.processEvents()
+
 		self.main_widget = main_widget.main_widget()
+		self.main_widget.refresh()
 		self.main_widget.show()
 		self.main_widget.toggle_size()
-		QtWidgets.QApplication.processEvents()
-		self.main_widget.refresh()
+		self.main_widget.init_contexts()
+		self.main_widget.stop_threads.connect(self.db_server.stop)
+		self.loading_widget.close()
 
 		sys.exit(self.app.exec_())
 

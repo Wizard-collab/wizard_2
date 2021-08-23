@@ -11,10 +11,12 @@ import json
 
 # Wizard modules
 from wizard.core import site
+from wizard.core import user
 from wizard.core import project
 from wizard.core import image
 from wizard.core import tools
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -83,6 +85,31 @@ class wall_widget(QtWidgets.QWidget):
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('tree_datas_label')
         self.infos_layout.addWidget(self.refresh_label)
+
+    def set_context(self):
+        if self.isVisible():
+            visible = 1
+        else:
+            visible = 0
+        context_dic = dict()
+        context_dic['visibility'] = visible
+        user.user().add_context(user_vars._wall_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._wall_context_)
+        if context_dic is not None and context_dic != dict():
+            if context_dic['visibility'] == 1:
+                self.set_visible()
+            elif context_dic['visibility'] == 0:
+                self.set_hidden()
+
+    def set_visible(self):
+        if not self.isVisible():
+            self.toggle()
+
+    def set_hidden(self):
+        if self.isVisible():
+            self.toggle()
 
     def toggle(self):
         if self.isVisible():
