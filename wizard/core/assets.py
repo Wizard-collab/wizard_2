@@ -292,7 +292,7 @@ def create_work_env(software_id, variant_id):
 					project.remove_work_env(work_env_id)
 					work_env_id = None
 				else:
-					add_version(work_env_id, fresh=1)
+					add_version(work_env_id, do_screenshot=0, fresh=1)
 		else:
 			logger.error("Can't create work env")
 	else:

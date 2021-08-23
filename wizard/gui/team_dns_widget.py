@@ -13,12 +13,15 @@ from wizard.gui import gui_utils
 from wizard.gui import logging_widget
 from wizard.gui import custom_window
 
-class psql_widget(custom_window.custom_dialog):
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
+
+class team_dns_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
-        super(psql_widget, self).__init__()
+        super(team_dns_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
-        self.add_title('PostgreSQL Setup')
+        self.add_title('Team DNS Setup')
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()
@@ -39,16 +42,8 @@ class psql_widget(custom_window.custom_dialog):
         self.main_layout.addWidget(self.host_lineEdit)
 
         self.port_lineEdit = QtWidgets.QLineEdit()
-        self.port_lineEdit.setPlaceholderText('Port ( default: 5432 )')
+        self.port_lineEdit.setPlaceholderText('Port ( ex: 11111 )')
         self.main_layout.addWidget(self.port_lineEdit)
-
-        self.user_lineEdit = QtWidgets.QLineEdit()
-        self.user_lineEdit.setPlaceholderText('User')
-        self.main_layout.addWidget(self.user_lineEdit)
-
-        self.password_lineEdit = gui_utils.password_lineEdit()
-        self.password_lineEdit.setPlaceholderText('Password')
-        self.main_layout.addWidget(self.password_lineEdit)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
@@ -63,7 +58,7 @@ class psql_widget(custom_window.custom_dialog):
         self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
-        self.quit_button = QtWidgets.QPushButton('Quit')
+        self.quit_button = QtWidgets.QPushButton('Continue without setting team DNS')
         self.buttons_layout.addWidget(self.quit_button)
 
         self.continue_button = QtWidgets.QPushButton('Continue')
@@ -78,14 +73,16 @@ class psql_widget(custom_window.custom_dialog):
         self.quit_button.clicked.connect(self.close)
 
     def apply(self):
-        psql_host = self.host_lineEdit.text()
-        psql_port = self.port_lineEdit.text()
-        psql_user = self.user_lineEdit.text()
-        psql_password = self.password_lineEdit.text()
-        if user.user().set_psql_dns(
-                            psql_host,
-                            psql_port,
-                            psql_user,
-                            psql_password
-                            ):
-            self.accept()
+        team_host = self.host_lineEdit.text()
+        team_port = self.port_lineEdit.text()
+        try:
+            team_port = int(team_port)
+        except:
+            team_port = None
+            logger.info('The port needs to be an int')
+        if team_port is not None:
+            if user.user().set_team_dns(
+                                team_host,
+                                team_port
+                                ):
+                self.accept()

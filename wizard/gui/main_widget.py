@@ -8,11 +8,13 @@ from PyQt5.QtCore import pyqtSignal
 import time
 import os
 import subprocess
+import sys
 
 # Wizard modules
 from wizard.vars import ressources
 from wizard.core import project
 from wizard.core import communicate
+from wizard.core import team_client
 from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
@@ -56,6 +58,7 @@ class main_widget(custom_window.custom_window):
         self.build_ui()
         self.init_gui_server()
         self.init_communicate_server()
+        self.init_team_client()
         self.connect_functions()
         #self.init_contexts()
 
@@ -66,6 +69,10 @@ class main_widget(custom_window.custom_window):
     def init_communicate_server(self):
         self.communicate_server = communicate.communicate_server()
         self.communicate_server.start()
+
+    def init_team_client(self):
+        self.team_client = team_client.team_client()
+        self.team_client.start()
 
     def init_contexts(self):
         self.tree_widget.get_context()
@@ -99,6 +106,7 @@ class main_widget(custom_window.custom_window):
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
 
         self.gui_server.refresh_signal.connect(self.refresh)
+        self.gui_server.refresh_team_signal.connect(self.team_client.refresh_team)
         self.gui_server.restart_signal.connect(self.restart)
         self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
         self.gui_server.stdout_signal.connect(self.update_stdout)
@@ -107,7 +115,10 @@ class main_widget(custom_window.custom_window):
 
     def restart(self):
         self.quit_threads()
-        subprocess.Popen(['python', 'app.py'], shell=True)
+        command = 'wizard.exe'
+        if sys.argv[0].endswith('.py'):
+            command = 'python app.py'
+        subprocess.Popen(command, shell=True)
         self.close()
 
     def focus_export_version(self, export_version_id):

@@ -30,11 +30,23 @@ def set_psql_dns(DNS):
 	os.environ[env_vars._psql_dns_] = DNS
 	return 1
 
+
 def get_psql_dns():
 	if env_vars._psql_dns_ in os.environ.keys():
 		return os.environ[env_vars._psql_dns_]
 	else:
 		logger.error('No PostgreSQL DNS defined')
+		return None
+
+def set_team_dns(DNS):
+	os.environ[env_vars._team_dns_] = json.dumps(DNS)
+	return 1
+
+def get_team_dns():
+	if env_vars._team_dns_ in os.environ.keys():
+		return json.loads(os.environ[env_vars._team_dns_])
+	else:
+		logger.error('No team DNS defined')
 		return None
 
 def add_running_work_env(work_env_id):

@@ -40,6 +40,7 @@ class streamHandler(QtCore.QObject):
 class gui_server(QThread):
 
     refresh_signal = pyqtSignal(int)
+    refresh_team_signal = pyqtSignal(int)
     restart_signal = pyqtSignal(int)
     tooltip_signal = pyqtSignal(str)
     stdout_signal = pyqtSignal(tuple)
@@ -92,14 +93,22 @@ class gui_server(QThread):
             self.focus_instance_signal.emit(signal_dic['instance_tuple'])
         elif signal_dic['function'] == 'export_version_focus':
             self.export_version_focus_signal.emit(signal_dic['export_version_id'])
+        elif signal_dic['function'] == 'refresh_team':
+            self.refresh_team_signal.emit(1)
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
 
 def refresh_ui():
-	signal_dic = dict()
-	signal_dic['function'] = 'refresh'
-	socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    signal_dic = dict()
+    signal_dic['function'] = 'refresh'
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    refresh_team_ui()
+
+def refresh_team_ui():
+    signal_dic = dict()
+    signal_dic['function'] = 'refresh_team'
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
 
 def restart_ui():
     signal_dic = dict()

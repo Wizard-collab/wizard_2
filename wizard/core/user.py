@@ -30,6 +30,7 @@ from wizard.core import project
 from wizard.core import site
 from wizard.core import db_core
 from wizard.core import db_utils
+from wizard.core import team_client
 
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
@@ -84,6 +85,29 @@ class user:
             logger.info("No postgreSQL DNS set")
             return None
 
+    def set_team_dns(self, host, port):
+        DNS = (host, port)
+        if team_client.try_connection(DNS):
+            self.prefs_dic[user_vars._team_dns_] = DNS
+            self.write_prefs_dic()
+            environment.set_team_dns(DNS)
+            return 1
+        else:
+            return None
+
+    def get_team_dns(self):
+        if self.prefs_dic[user_vars._team_dns_]:
+            if team_client.try_connection(self.prefs_dic[user_vars._team_dns_]):
+                environment.set_team_dns(self.prefs_dic[user_vars._team_dns_])
+                return 1
+            else:
+                self.prefs_dic[user_vars._team_dns_] = None
+                self.write_prefs_dic()
+                return None
+        else:
+            logger.info("No team DNS set")
+            return None
+
     def add_context(self, type, context_dic):
         self.prefs_dic[type][environment.get_project_name()] = context_dic
         self.write_prefs_dic()
@@ -104,6 +128,7 @@ class user:
         if not os.path.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
+            self.prefs_dic[user_vars._team_dns_] = None
             self.prefs_dic[user_vars._tree_context_] = dict()
             self.prefs_dic[user_vars._tabs_context_] = dict()
             self.prefs_dic[user_vars._versions_context_] = dict()
