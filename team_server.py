@@ -172,6 +172,9 @@ class server(Thread):
                 if raw_data is not None:
                     data = json.loads(raw_data)
                     print(data)
+                    print(user_name)
+                    print(conn)
+                    print(addr)
                 else:
                     if conn is not None:
                         self.remove_client(conn, user_name, addr)
@@ -180,7 +183,7 @@ class server(Thread):
                 logger.error(str(traceback.format_exc()))
                 continue           
 
-    def broadcast(self, message, conn): 
+    def broadcast(self, message, conn):
         logger.debug("Broadcasting : " + str(message))
         for client in self.list_of_clients: 
             try: 

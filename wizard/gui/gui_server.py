@@ -100,10 +100,10 @@ class gui_server(QThread):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
 
 def refresh_ui():
+    refresh_team_ui()
     signal_dic = dict()
     signal_dic['function'] = 'refresh'
     socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
-    refresh_team_ui()
 
 def refresh_team_ui():
     signal_dic = dict()

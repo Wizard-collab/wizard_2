@@ -182,6 +182,7 @@ class main_widget(custom_window.custom_window):
     def quit_threads(self):
         self.stop_threads.emit(1)
         self.gui_server.stop()
+        self.team_client.stop()
         self.header_widget.quotes_widget.timer.stop()
         self.footer_widget.hardware_infos_widget.timer.stop()
         self.communicate_server.stop()

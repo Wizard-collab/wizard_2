@@ -24,6 +24,8 @@ class team_client(Thread):
         socket_utils.send_signal_with_conn(self.conn, signal_dic)
 
     def stop(self):
+        if self.conn is not None:
+            self.conn.close()
         self.running = False
 
     def refresh_team(self):
