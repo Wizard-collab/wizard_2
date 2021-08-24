@@ -489,7 +489,7 @@ QSlider::handle:horizontal {
 
 #tree_as_list_widget{
 	padding: 0px;
-	alternate-background-color: rgba(255,255,255,8);
+	alternate-background-color: rgba(0,0,0,30);
 }
 
 #tree_as_list_widget::item{
@@ -624,6 +624,15 @@ QSlider::handle:horizontal {
 
 #menu_widget_frame{
 	border-radius: 10px;
+}
+
+#round_frame{
+	border-radius: 10px;
+}
+
+#item_widget_frame{
+	border-radius: 8px;
+	background-color: #393942;
 }
 
 #instance_creation_frame{

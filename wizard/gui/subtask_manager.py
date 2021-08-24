@@ -43,7 +43,7 @@ class subtask_manager(custom_window.custom_window):
         self.tasks_server.new_process.connect(self.add_task)
 
     def build_ui(self):
-        self.setMinimumWidth(500)
+        self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
         self.main_widget = QtWidgets.QWidget()
@@ -53,7 +53,7 @@ class subtask_manager(custom_window.custom_window):
         self.main_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.main_widget)
 
-        self.info_widget = gui_utils.info_widget()
+        self.info_widget = gui_utils.info_widget(transparent=1)
         self.info_widget.setVisible(0)
         self.main_layout.addWidget(self.info_widget)
 
@@ -61,9 +61,9 @@ class subtask_manager(custom_window.custom_window):
         self.tasks_scrollBar = self.tasks_scrollArea.verticalScrollBar()
 
         self.tasks_scrollArea_widget = QtWidgets.QWidget()
-        self.tasks_scrollArea_widget.setObjectName('wall_scroll_area')
+        self.tasks_scrollArea_widget.setObjectName('transparent_widget')
         self.tasks_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.tasks_scrollArea_layout.setContentsMargins(3,3,3,3)
+        self.tasks_scrollArea_layout.setContentsMargins(10,10,10,10)
         self.tasks_scrollArea_layout.setSpacing(3)
         self.tasks_scrollArea_widget.setLayout(self.tasks_scrollArea_layout)
 
@@ -81,13 +81,11 @@ class subtask_manager(custom_window.custom_window):
             if not self.isActiveWindow():
                 self.show()
                 self.raise_()
-                gui_utils.move_ui(self)
             else:
                 self.hide()
         else:
             self.show()
             self.raise_()
-            gui_utils.move_ui(self)
 
     def add_task(self, data_tuple):
         conn = data_tuple[0]
@@ -135,12 +133,14 @@ class subtask_widget(QtWidgets.QFrame):
         self.connect_functions()
 
     def build_ui(self):
+        self.setObjectName('item_widget_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(6, 6, 6, 6)
+        self.main_layout.setContentsMargins(10, 10, 10, 10)
         self.main_layout.setSpacing(2)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(0,0,0,0)
         self.header_layout.setSpacing(2)

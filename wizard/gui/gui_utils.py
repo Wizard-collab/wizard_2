@@ -353,12 +353,15 @@ def add_menu_to_menu_bar(menu_bar, title, icon=None):
     return menu
 
 class info_widget(QtWidgets.QFrame):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, transparent = None):
         super(info_widget, self).__init__(parent)
+        self.transparent = transparent
         self.build_ui()
 
     def build_ui(self):
         self.setObjectName('dark_widget')
+        if self.transparent:
+            self.setObjectName('transparent_widget')
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
