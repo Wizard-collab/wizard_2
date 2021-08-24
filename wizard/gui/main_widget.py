@@ -55,23 +55,24 @@ class main_widget(custom_window.custom_window):
         self.header_widget = header_widget.header_widget(self)
         self.tickets_widget = tickets_widget.tickets_widget(self)
         self.subtask_manager = subtask_manager.subtask_manager(self)
+        self.team_client = team_client.team_client()
+        self.gui_server = gui_server.gui_server()
+        self.communicate_server = communicate.communicate_server()
         self.build_ui()
+        self.connect_functions()
         self.init_gui_server()
         self.init_communicate_server()
         self.init_team_client()
-        self.connect_functions()
         #self.init_contexts()
 
     def init_gui_server(self):
-        self.gui_server = gui_server.gui_server()
         self.gui_server.start()
 
     def init_communicate_server(self):
-        self.communicate_server = communicate.communicate_server()
         self.communicate_server.start()
 
     def init_team_client(self):
-        self.team_client = team_client.team_client()
+        print('lol')
         self.team_client.start()
 
     def init_contexts(self):
@@ -102,8 +103,12 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.show_console.connect(self.console_widget.toggle)
         self.footer_widget.show_wall.connect(self.wall_widget.toggle)
         self.footer_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
+        self.footer_widget.connect_team.connect(self.init_team_client)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
+
+        self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
+        self.team_client.refresh_signal.connect(self.refresh)
 
         self.gui_server.refresh_signal.connect(self.refresh)
         self.gui_server.refresh_team_signal.connect(self.team_client.refresh_team)

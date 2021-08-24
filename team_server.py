@@ -18,27 +18,20 @@ import struct
 logger = logging.getLogger('WIZARD-SERVER')
 logger.setLevel(logging.DEBUG)
 
-
 log_file = "wizard_server.log"
-
 # create file handler and set level to debug
 file_handler = RotatingFileHandler(log_file, mode='a', maxBytes=1000000, backupCount=1000, encoding=None, delay=False)
-
 # create console handler and set level to debug
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
-
 # create formatter
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 # add formatter to handlers
 stream_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
-
 # add handlers to logger
 logger.addHandler(stream_handler)
 logger.addHandler(file_handler)
-
 logger.info("Python : " + str(sys.version))
 
 def get_server(DNS):
@@ -125,20 +118,14 @@ def recvall_with_given_len(sock, n):
 
 class server(Thread):
     def __init__(self):
-
         super(server, self).__init__()
-
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
         port = 50333
-
         logger.info("Starting server on : '" + str(ip_address) + "'")
         logger.info("Default port : '" + str(port) + "'")
-
         self.server, self.server_adress = get_server((ip_address, port))
-
         logger.info("Server started")
-
         self.client_ids = dict()
 
     def run(self):
@@ -160,43 +147,45 @@ class server(Thread):
             self.add_client(data['user_name'], conn, addr)
 
     def add_client(self, user_name, conn, addr):
-        self.client_ids[user_name] = user_name
-        Thread(target=self.clientThread, args=(conn, user_name, addr)).start()
+        self.client_ids[user_name]=dict()
+        self.client_ids[user_name]['user_name'] = user_name
+        self.client_ids[user_name]['conn'] = conn
+        self.client_ids[user_name]['addr'] = addr
+        Thread(target=self.clientThread, args=(user_name, conn, addr)).start()
         logger.info("New client : {}, {}".format(user_name, addr))
 
-    def clientThread(self, conn, user_name, addr):
+    def clientThread(self, user_name, conn, addr):
+        client_dic = dict()
+        client_dic['user_name'] = user_name
+        client_dic['conn'] = conn
+        client_dic['addr'] = addr
         running = True
         while running:
             try:
-                raw_data = recvall(conn)
+                raw_data = recvall(client_dic['conn'])
                 if raw_data is not None:
                     data = json.loads(raw_data)
-                    print(data)
-                    print(user_name)
-                    print(conn)
-                    print(addr)
+                    self.broadcast(data, client_dic)
                 else:
                     if conn is not None:
-                        self.remove_client(conn, user_name, addr)
+                        self.remove_client(client_dic)
                         running = False
             except:
                 logger.error(str(traceback.format_exc()))
                 continue           
 
-    def broadcast(self, message, conn):
-        logger.debug("Broadcasting : " + str(message))
-        for client in self.list_of_clients: 
-            try: 
-                client[0].send(message)
-            except:
-                client[0].close() 
-                self.remove(client)
+    def broadcast(self, data, client_dic):
+        logger.debug("Broadcasting : " + str(data))
+        for client in self.client_ids.keys(): 
+            if client != client_dic['user_name']:
+                if not send_signal_with_conn(self.client_ids[client]['conn'], data):
+                    self.remove_client(self.client_ids[client])
 
-    def remove_client(self, conn, user_name, addr): 
-        if user_name in self.client_ids.keys(): 
-            logger.info("Removing client : {}, {}".format(user_name, addr))
-            del self.client_ids[user_name]
-            conn.close()
+    def remove_client(self, client_dic): 
+        if client_dic['user_name'] in self.client_ids.keys(): 
+            logger.info("Removing client : {}, {}".format(client_dic['user_name'], client_dic['addr']))
+            del self.client_ids[client_dic['user_name']]
+            client_dic['conn'].close()
 
 if __name__ == "__main__":
     try:

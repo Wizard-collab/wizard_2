@@ -101,8 +101,7 @@ class user:
                 environment.set_team_dns(self.prefs_dic[user_vars._team_dns_])
                 return 1
             else:
-                self.prefs_dic[user_vars._team_dns_] = None
-                self.write_prefs_dic()
+                environment.set_team_dns(self.prefs_dic[user_vars._team_dns_])
                 return None
         else:
             logger.info("No team DNS set")

@@ -24,6 +24,7 @@ class footer_widget(QtWidgets.QFrame):
     show_console = pyqtSignal(int)
     show_wall = pyqtSignal(int)
     show_subtask_manager = pyqtSignal(int)
+    connect_team = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(footer_widget, self).__init__(parent)
@@ -61,6 +62,12 @@ class footer_widget(QtWidgets.QFrame):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
+        self.team_connection_button = QtWidgets.QPushButton()
+        self.team_connection_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.team_connection_button, "Team connection status")
+        self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_off_))
+        self.buttons_layout.addWidget(self.team_connection_button)
+
         self.task_manager_button = QtWidgets.QPushButton()
         self.task_manager_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.task_manager_button, "Show task manager")
@@ -79,10 +86,17 @@ class footer_widget(QtWidgets.QFrame):
         self.wall_button.setIcon(QtGui.QIcon(ressources._wall_icon_))
         self.buttons_layout.addWidget(self.wall_button)
 
+    def set_team_connection(self, team_connection):
+        if team_connection:
+            self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_on_))
+        else:
+            self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_off_))
+
     def connect_functions(self):
         self.console_button.clicked.connect(self.show_console.emit)
         self.wall_button.clicked.connect(self.show_wall.emit)
         self.task_manager_button.clicked.connect(self.show_subtask_manager.emit)
+        self.team_connection_button.clicked.connect(self.connect_team.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)

@@ -79,6 +79,8 @@ _ranking_icon_ = os.path.join(_icons_path_, 'ranking_icon.png')
 _kill_task_icon_ = os.path.join(_icons_path_, 'kill_task.png')
 _refresh_icon_ = os.path.join(_icons_path_, 'refresh_icon.png')
 _play_icon_ = os.path.join(_icons_path_, 'play.png')
+_team_connection_on_ = os.path.join(_icons_path_, 'team_connection_on.png')
+_team_connection_off_ = os.path.join(_icons_path_, 'team_connection_off.png')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.png')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.png')
