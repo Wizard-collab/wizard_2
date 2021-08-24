@@ -15,7 +15,7 @@ class custom_widget(QtWidgets.QWidget):
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
+        
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
         self.shadow.setBlurRadius(12)
         self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
@@ -24,6 +24,11 @@ class custom_widget(QtWidgets.QWidget):
         self.setGraphicsEffect(self.shadow)
 
         self.build_main_ui()
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setCompositionMode(QtGui.QPainter.CompositionMode_Clear)
+        painter.fillRect(0,0,self.width(), self.height(), QtCore.Qt.BrushStyle.SolidPattern)
 
     def add_title(self, title):
         self.header.add_title(title)
