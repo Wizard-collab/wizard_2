@@ -7,14 +7,15 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.core import user
+from wizard.core import environment
+
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import logging_widget
 from wizard.gui import custom_window
-
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
 
 class team_dns_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
@@ -22,6 +23,14 @@ class team_dns_widget(custom_window.custom_dialog):
         self.build_ui()
         self.connect_functions()
         self.add_title('Team DNS Setup')
+        self.fill_ui()
+
+    def fill_ui(self):
+        team_dns = environment.get_team_dns()
+        if team_dns is not None:
+            self.host_lineEdit.setText(team_dns[0])
+            self.port_lineEdit.setText(str(team_dns[1]))
+            logger.warning("Can't reach server with this DNS")
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()

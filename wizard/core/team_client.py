@@ -10,6 +10,9 @@ import json
 from wizard.core import socket_utils
 from wizard.core import environment
 
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
+
 class team_client(QThread):
 
     team_connection_status_signal = pyqtSignal(bool)
@@ -60,6 +63,9 @@ class team_client(QThread):
                     self.analyse_signal(data)
                 except json.decoder.JSONDecodeError:
                     logger.debug("cannot read json data")
+            else:
+                logger.warning('Team connection lost')
+                self.stop()
         self.team_connection_status_signal.emit(False)
 
     def analyse_signal(self, data):

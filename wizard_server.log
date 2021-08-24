@@ -3393,3 +3393,130 @@ ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée 
 ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
 
 2021-08-24 12:53:11,163 - WIZARD-SERVER - INFO - Removing client : p.renard, ('192.168.1.55', 64028)
+2021-08-24 13:59:04,888 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 13:59:04,896 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 13:59:04,897 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 13:59:04,897 - WIZARD-SERVER - INFO - Server started
+2021-08-24 13:59:07,445 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 13:59:45,466 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:01:00,512 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 53854)
+2021-08-24 14:01:00,690 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 53854)
+2021-08-24 14:01:00,690 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 53856)
+2021-08-24 14:01:13,915 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:01:26,615 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:01:29,064 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 53986)
+2021-08-24 14:01:29,236 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 53986)
+2021-08-24 14:01:29,237 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 53988)
+2021-08-24 14:01:31,356 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 53988)
+2021-08-24 14:02:54,389 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:02:56,816 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 54050)
+2021-08-24 14:02:56,993 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 54050)
+2021-08-24 14:02:56,994 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 54052)
+2021-08-24 14:03:19,854 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:03:20,997 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 49815)
+2021-08-24 14:03:21,047 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 49815)
+2021-08-24 14:03:21,048 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 49817)
+2021-08-24 14:03:35,562 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:03:45,441 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:03:47,057 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:03:57,949 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:04:04,108 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:04:05,688 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:04:07,419 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:06:24,442 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:06:26,915 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 54238)
+2021-08-24 14:06:27,092 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 54238)
+2021-08-24 14:06:27,093 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 54240)
+2021-08-24 14:06:55,016 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:06:57,281 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:06:58,945 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:29,154 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:30,717 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:32,034 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:34,580 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:35,553 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:36,177 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:36,884 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:37,569 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:38,235 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:38,956 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:39,615 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:43,990 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:44,734 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:45,369 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:46,090 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:46,839 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:47,445 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:07:48,078 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:26,198 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:08:26,208 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:08:26,208 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:08:26,208 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:08:39,885 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 54906)
+2021-08-24 14:08:43,291 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:45,083 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:46,128 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:53,652 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 50488)
+2021-08-24 14:08:56,097 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:56,924 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:57,625 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:08:58,279 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:09,530 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:10,575 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:11,292 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:11,881 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:12,612 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:13,968 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:14,761 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:15,304 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:16,270 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:17,066 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:18,155 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:18,788 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:19,359 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:19,954 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:20,709 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:21,255 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:21,810 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:22,759 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:23,399 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:09:24,180 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:10:41,165 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:10:41,166 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 50488)
+2021-08-24 14:10:46,870 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:10:47,998 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 50889)
+2021-08-24 14:10:48,050 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 50889)
+2021-08-24 14:10:48,052 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 50891)
+2021-08-24 14:11:04,950 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:11:04,958 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:11:04,959 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:11:04,959 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:11:07,366 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51041)
+2021-08-24 14:11:57,362 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:11:57,369 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:11:57,370 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:11:57,370 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:11:59,663 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51218)
+2021-08-24 14:12:23,646 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:12:23,654 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:12:23,655 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:12:23,655 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:12:25,863 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51255)
+2021-08-24 14:16:02,165 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:16:02,166 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 51255)
+2021-08-24 14:17:22,175 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:17:22,184 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:17:22,185 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:17:22,186 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:17:24,964 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:17:25,796 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51474)
+2021-08-24 14:17:25,849 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 51474)
+2021-08-24 14:17:25,851 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51475)
