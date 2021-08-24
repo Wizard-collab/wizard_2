@@ -67,7 +67,7 @@ class subtask_manager(custom_window.custom_window):
         self.tasks_scrollArea_layout.setSpacing(3)
         self.tasks_scrollArea_widget.setLayout(self.tasks_scrollArea_layout)
 
-        self.tasks_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        #self.tasks_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.tasks_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tasks_scrollArea.setWidgetResizable(True)
         self.tasks_scrollArea.setWidget(self.tasks_scrollArea_widget)

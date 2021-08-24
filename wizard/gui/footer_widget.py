@@ -25,6 +25,7 @@ class footer_widget(QtWidgets.QFrame):
     show_wall = pyqtSignal(int)
     show_subtask_manager = pyqtSignal(int)
     connect_team = pyqtSignal(int)
+    show_team_widget = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(footer_widget, self).__init__(parent)
@@ -97,6 +98,7 @@ class footer_widget(QtWidgets.QFrame):
         self.wall_button.clicked.connect(self.show_wall.emit)
         self.task_manager_button.clicked.connect(self.show_subtask_manager.emit)
         self.team_connection_button.clicked.connect(self.connect_team.emit)
+        self.team_connection_button.clicked.connect(self.show_team_widget.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)

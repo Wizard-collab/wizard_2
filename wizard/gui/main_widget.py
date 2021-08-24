@@ -36,6 +36,7 @@ from wizard.gui import console_widget
 from wizard.gui import header_widget
 from wizard.gui import tickets_widget
 from wizard.gui import subtask_manager
+from wizard.gui import team_widget
 
 class main_widget(custom_window.custom_window):
 
@@ -55,6 +56,7 @@ class main_widget(custom_window.custom_window):
         self.header_widget = header_widget.header_widget(self)
         self.tickets_widget = tickets_widget.tickets_widget(self)
         self.subtask_manager = subtask_manager.subtask_manager(self)
+        self.team_widget = team_widget.team_widget(self)
         self.team_client = team_client.team_client()
         self.gui_server = gui_server.gui_server()
         self.communicate_server = communicate.communicate_server()
@@ -104,11 +106,15 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.show_wall.connect(self.wall_widget.toggle)
         self.footer_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.footer_widget.connect_team.connect(self.init_team_client)
+        self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
 
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
+        self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
         self.team_client.refresh_signal.connect(self.refresh)
+        self.team_client.new_user_signal.connect(self.team_widget.add_user)
+        self.team_client.remove_user_signal.connect(self.team_widget.remove_user)
 
         self.gui_server.refresh_signal.connect(self.refresh)
         self.gui_server.refresh_team_signal.connect(self.team_client.refresh_team)

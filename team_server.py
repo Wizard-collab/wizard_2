@@ -147,12 +147,31 @@ class server(Thread):
             self.add_client(data['user_name'], conn, addr)
 
     def add_client(self, user_name, conn, addr):
-        self.client_ids[user_name]=dict()
-        self.client_ids[user_name]['user_name'] = user_name
-        self.client_ids[user_name]['conn'] = conn
-        self.client_ids[user_name]['addr'] = addr
-        Thread(target=self.clientThread, args=(user_name, conn, addr)).start()
-        logger.info("New client : {}, {}".format(user_name, addr))
+        if user_name not in self.client_ids.keys():
+            client_dic = dict()
+            client_dic['user_name'] = user_name
+            client_dic['conn'] = conn
+            client_dic['addr'] = addr
+            self.client_ids[user_name]=client_dic
+
+            Thread(target=self.clientThread, args=(user_name, conn, addr)).start()
+            logger.info("New client : {}, {}".format(user_name, addr))
+            signal_dic = dict()
+            signal_dic['type'] = 'new_user'
+            signal_dic['user_name'] = user_name
+            self.broadcast(signal_dic, self.client_ids[user_name])
+            self.send_users_to_new_client(client_dic)
+        else:
+            conn.close()
+            logger.info("Client already exists : {}, {}".format(user_name, addr))
+
+    def send_users_to_new_client(self, client_dic):
+        for client in self.client_ids.keys():
+            if self.client_ids[client]['user_name'] != client_dic['user_name']:
+                signal_dic = dict()
+                signal_dic['type'] = 'new_user'
+                signal_dic['user_name'] = self.client_ids[client]['user_name']
+                send_signal_with_conn(client_dic['conn'], signal_dic)
 
     def clientThread(self, user_name, conn, addr):
         client_dic = dict()
@@ -186,6 +205,10 @@ class server(Thread):
             logger.info("Removing client : {}, {}".format(client_dic['user_name'], client_dic['addr']))
             del self.client_ids[client_dic['user_name']]
             client_dic['conn'].close()
+            signal_dic = dict()
+            signal_dic['type'] = 'remove_user'
+            signal_dic['user_name'] = client_dic['user_name']
+            self.broadcast(signal_dic, client_dic)
 
 if __name__ == "__main__":
     try:

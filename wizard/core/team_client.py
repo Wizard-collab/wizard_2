@@ -17,10 +17,11 @@ class team_client(QThread):
 
     team_connection_status_signal = pyqtSignal(bool)
     refresh_signal = pyqtSignal(int)
+    new_user_signal = pyqtSignal(str)
+    remove_user_signal = pyqtSignal(str)
 
     def __init__(self):
         super(team_client, self).__init__()
-        self.create_conn()
 
     def create_conn(self):
         self.running = True
@@ -37,6 +38,7 @@ class team_client(QThread):
         signal_dic['type'] = 'new_client'
         signal_dic['user_name'] = environment.get_user()
         socket_utils.send_signal_with_conn(self.conn, signal_dic)
+        logger.info("Wizard is connected to the team server")
 
     def stop(self):
         if self.conn is not None:
@@ -71,6 +73,10 @@ class team_client(QThread):
     def analyse_signal(self, data):
         if data['type'] == 'refresh_team':
             self.refresh_signal.emit(1)
+        elif data['type'] == 'new_user':
+            self.new_user_signal.emit(data['user_name'])
+        elif data['type'] == 'remove_user':
+            self.remove_user_signal.emit(data['user_name'])
 
 def try_connection(DNS):
     signal_dic = dict()

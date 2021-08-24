@@ -3520,3 +3520,430 @@ ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée 
 2021-08-24 14:17:25,796 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51474)
 2021-08-24 14:17:25,849 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 51474)
 2021-08-24 14:17:25,851 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51475)
+2021-08-24 14:21:20,695 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:21:23,649 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 55982)
+2021-08-24 14:21:23,819 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 55982)
+2021-08-24 14:21:23,821 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 55984)
+2021-08-24 14:21:51,686 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:21:51,696 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:21:51,696 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:21:51,697 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:21:54,062 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56066)
+2021-08-24 14:22:39,559 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51670)
+2021-08-24 14:22:41,349 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:22:41,349 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 51670)
+2021-08-24 14:22:45,989 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:22:47,146 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51689)
+2021-08-24 14:22:47,210 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 51689)
+2021-08-24 14:22:47,212 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51691)
+2021-08-24 14:23:10,178 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:23:10,179 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 51691)
+2021-08-24 14:23:14,041 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:23:15,194 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 51838)
+2021-08-24 14:23:22,693 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:23:24,037 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:23:25,022 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:23:39,200 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:23:39,207 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:23:39,208 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:23:39,208 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:23:41,278 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 52050)
+2021-08-24 14:23:58,371 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:23:58,371 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 52050)
+2021-08-24 14:25:03,284 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:25:03,293 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:25:03,294 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:25:03,294 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:25:07,779 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:25:08,625 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 52107)
+2021-08-24 14:25:15,622 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:25:16,869 - WIZARD-SERVER - INFO - Client already exists : l.brunel, ('192.168.1.82', 52246)
+2021-08-24 14:25:42,225 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:26:23,404 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:26:23,404 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 52107)
+2021-08-24 14:26:29,195 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:26:30,436 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 52446)
+2021-08-24 14:26:37,206 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:26:37,216 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:26:37,217 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:26:37,219 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:26:38,803 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 52579)
+2021-08-24 14:26:41,948 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:26:43,125 - WIZARD-SERVER - INFO - Client already exists : l.brunel, ('192.168.1.82', 52602)
+2021-08-24 14:26:53,175 - WIZARD-SERVER - INFO - Client already exists : l.brunel, ('192.168.1.82', 52737)
+2021-08-24 14:26:54,983 - WIZARD-SERVER - INFO - Client already exists : l.brunel, ('192.168.1.82', 52744)
+2021-08-24 14:27:23,701 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-24 14:28:04,290 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:28:04,291 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 52579)
+2021-08-24 14:38:16,732 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:38:17,935 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 52875)
+2021-08-24 14:38:34,203 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:38:34,203 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 52875)
+2021-08-24 14:39:53,597 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:39:54,829 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53039)
+2021-08-24 14:40:16,926 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:40:16,926 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 53039)
+2021-08-24 14:49:19,521 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:49:19,530 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:49:19,530 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:49:19,531 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:49:22,041 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:49:23,235 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53224)
+2021-08-24 14:49:23,235 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:49:38,494 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56416)
+2021-08-24 14:49:38,494 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:49:39,539 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:49:39,540 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 53224)
+2021-08-24 14:49:57,761 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:49:58,966 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53363)
+2021-08-24 14:49:58,967 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:50:05,539 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56416)
+2021-08-24 14:50:07,923 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:50:10,297 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56460)
+2021-08-24 14:50:10,297 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:50:10,468 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56460)
+2021-08-24 14:50:10,471 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56462)
+2021-08-24 14:50:10,472 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:50:11,330 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:50:11,331 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 53363)
+2021-08-24 14:50:37,008 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:50:38,257 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53494)
+2021-08-24 14:50:38,257 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:50:46,721 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56462)
+2021-08-24 14:50:48,843 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:50:51,211 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56566)
+2021-08-24 14:50:51,211 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:50:51,381 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56566)
+2021-08-24 14:50:51,385 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56568)
+2021-08-24 14:50:51,385 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:50:52,249 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:50:52,250 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 53494)
+2021-08-24 14:51:07,254 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56568)
+2021-08-24 14:51:10,074 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:51:11,259 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53624)
+2021-08-24 14:51:11,260 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:51:18,155 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:51:20,525 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56672)
+2021-08-24 14:51:20,525 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:51:20,695 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56672)
+2021-08-24 14:51:20,698 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56674)
+2021-08-24 14:51:20,698 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:51:21,507 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:51:21,508 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 53624)
+2021-08-24 14:51:34,204 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56674)
+2021-08-24 14:51:37,262 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:51:38,442 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53757)
+2021-08-24 14:51:38,442 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:51:45,979 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:51:48,345 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56778)
+2021-08-24 14:51:48,345 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:51:48,533 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56778)
+2021-08-24 14:51:48,537 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56780)
+2021-08-24 14:51:48,537 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:51:49,425 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:51:49,425 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 53757)
+2021-08-24 14:52:12,784 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56780)
+2021-08-24 14:52:14,875 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:52:16,021 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 53889)
+2021-08-24 14:52:16,022 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:52:27,268 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:52:29,644 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56888)
+2021-08-24 14:52:29,644 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:52:29,818 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 56888)
+2021-08-24 14:52:29,821 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56890)
+2021-08-24 14:52:29,822 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:53:48,897 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:53:48,905 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:53:48,906 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:53:48,907 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:53:52,077 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 56984)
+2021-08-24 14:53:52,078 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:53:56,537 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54045)
+2021-08-24 14:53:56,537 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:54:37,604 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:54:37,605 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 54045)
+2021-08-24 14:54:37,607 - WIZARD-SERVER - ERROR - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 179, in clientThread
+    self.remove_client(client_dic)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 199, in remove_client
+    signal_dic['user_name'] = user_name
+NameError: name 'user_name' is not defined
+
+2021-08-24 14:54:37,610 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+OSError: [WinError 10038] Une opération a été tentée sur autre chose qu’un socket
+
+2021-08-24 14:54:53,877 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:54:53,886 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:54:53,887 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:54:53,888 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:54:58,463 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:55:00,879 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57034)
+2021-08-24 14:55:00,880 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:55:01,050 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57034)
+2021-08-24 14:55:01,050 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:55:01,054 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57036)
+2021-08-24 14:55:01,055 - WIZARD-SERVER - ERROR - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 179, in clientThread
+    self.remove_client(client_dic)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 200, in remove_client
+    self.broadcast(signal_dic, client_dic['user_name'])
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 188, in broadcast
+    if client != client_dic['user_name']:
+TypeError: string indices must be integers
+
+2021-08-24 14:55:01,055 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:55:01,056 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+OSError: [WinError 10038] Une opération a été tentée sur autre chose qu’un socket
+
+2021-08-24 14:55:01,057 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57034)
+2021-08-24 14:55:01,058 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:56:07,802 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:56:07,810 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:56:07,811 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:56:07,812 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:56:12,501 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:56:14,880 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57148)
+2021-08-24 14:56:14,880 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:56:15,057 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57148)
+2021-08-24 14:56:15,058 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:56:15,062 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57150)
+2021-08-24 14:56:15,062 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:56:53,877 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:56:55,164 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54096)
+2021-08-24 14:56:55,164 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:56:55,168 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:56:55,168 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57150)
+2021-08-24 14:56:55,169 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:57:11,705 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 14:57:11,714 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 14:57:11,715 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 14:57:11,715 - WIZARD-SERVER - INFO - Server started
+2021-08-24 14:57:13,262 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54221)
+2021-08-24 14:57:13,262 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:57:20,185 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 14:57:20,186 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 54221)
+2021-08-24 14:57:20,192 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel'}
+2021-08-24 14:58:20,652 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:58:21,966 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54245)
+2021-08-24 14:58:21,966 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 14:58:32,637 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:58:35,017 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57250)
+2021-08-24 14:58:35,017 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:58:35,189 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57250)
+2021-08-24 14:58:35,190 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:58:35,191 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57252)
+2021-08-24 14:58:35,193 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:58:42,623 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57252)
+2021-08-24 14:58:42,623 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:59:19,298 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 14:59:21,664 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57370)
+2021-08-24 14:59:21,665 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:59:21,836 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57370)
+2021-08-24 14:59:21,837 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:59:21,841 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57372)
+2021-08-24 14:59:21,841 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:59:28,687 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57372)
+2021-08-24 14:59:28,687 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:59:53,322 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57484)
+2021-08-24 14:59:53,322 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 14:59:53,496 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57484)
+2021-08-24 14:59:53,496 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 14:59:53,498 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57486)
+2021-08-24 14:59:53,500 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:00:01,988 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57486)
+2021-08-24 15:00:01,988 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 15:00:55,878 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 15:00:55,878 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 54245)
+2021-08-24 15:00:55,881 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel'}
+2021-08-24 15:01:00,795 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:01:02,290 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54435)
+2021-08-24 15:01:02,291 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:01:19,322 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:01:21,692 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57604)
+2021-08-24 15:01:21,692 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:01:21,865 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57604)
+2021-08-24 15:01:21,865 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 15:01:21,866 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57606)
+2021-08-24 15:01:21,867 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:01:37,192 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57606)
+2021-08-24 15:01:37,192 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 15:01:42,669 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 15:01:42,670 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 54435)
+2021-08-24 15:01:42,671 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel'}
+2021-08-24 15:03:30,544 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:03:31,773 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54602)
+2021-08-24 15:03:31,774 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:03:42,021 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:03:44,406 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57710)
+2021-08-24 15:03:44,407 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:03:44,577 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57710)
+2021-08-24 15:03:44,578 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 15:03:44,579 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57712)
+2021-08-24 15:03:44,580 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:05:37,287 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:05:37,295 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:05:37,296 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:05:37,296 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:05:40,521 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:05:41,715 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54775)
+2021-08-24 15:05:41,715 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:05:50,354 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57808)
+2021-08-24 15:05:50,354 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:06:36,306 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:06:36,315 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:06:36,315 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:06:36,316 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:06:38,961 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:06:39,875 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 54927)
+2021-08-24 15:06:39,876 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:06:44,956 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57830)
+2021-08-24 15:06:44,956 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:07:03,695 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:07:03,706 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:07:03,706 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:07:03,707 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:07:07,274 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 55055)
+2021-08-24 15:07:07,275 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:07:10,522 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57844)
+2021-08-24 15:07:10,523 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:08:00,645 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57844)
+2021-08-24 15:08:00,645 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 15:08:16,068 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:08:16,076 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:08:16,077 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:08:16,078 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:08:17,954 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 55091)
+2021-08-24 15:08:17,954 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:08:23,819 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:08:26,191 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57900)
+2021-08-24 15:08:26,191 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:08:26,362 - WIZARD-SERVER - INFO - Removing client : admin, ('192.168.1.21', 57900)
+2021-08-24 15:08:26,362 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin'}
+2021-08-24 15:08:26,365 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 57902)
+2021-08-24 15:08:26,366 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:11:51,066 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-24 15:11:51,068 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.82', 55091)
+2021-08-24 15:11:51,073 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel'}
+2021-08-24 15:11:54,157 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:11:54,165 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:11:54,166 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:11:54,167 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:11:58,696 - WIZARD-SERVER - ERROR - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 136, in run
+    self.analyse_signal(entry_message, conn, addr)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 147, in analyse_signal
+    self.add_client(data['user_name'], conn, addr)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 153, in add_client
+    client_dic[user_name]['conn'] = conn
+KeyError: 'admin'
+
+2021-08-24 15:12:40,546 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:12:40,556 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:12:40,557 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:12:40,558 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:12:44,121 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 58040)
+2021-08-24 15:12:44,121 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:12:44,124 - WIZARD-SERVER - ERROR - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 136, in run
+    self.analyse_signal(entry_message, conn, addr)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 147, in analyse_signal
+    self.add_client(data['user_name'], conn, addr)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 163, in add_client
+    self.send_users_to_new_client(client_dic)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 172, in send_users_to_new_client
+    signal_dic['user_name'] = client['user_name']
+TypeError: string indices must be integers
+
+2021-08-24 15:13:20,416 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:13:20,423 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:13:20,424 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:13:20,425 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:13:23,734 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 58054)
+2021-08-24 15:13:23,735 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:13:29,438 - WIZARD-SERVER - INFO - test_conn
+2021-08-24 15:13:30,756 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 55154)
+2021-08-24 15:13:30,756 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-24 15:15:01,384 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-24 15:15:01,394 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-08-24 15:15:01,394 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-24 15:15:01,395 - WIZARD-SERVER - INFO - Server started
+2021-08-24 15:15:04,245 - WIZARD-SERVER - INFO - New client : admin, ('192.168.1.21', 58090)
+2021-08-24 15:15:04,245 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin'}
+2021-08-24 15:15:09,002 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.82', 55302)
+2021-08-24 15:15:09,003 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
