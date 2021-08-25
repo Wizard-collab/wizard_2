@@ -211,6 +211,7 @@ class server(Thread):
             signal_dic = dict()
             signal_dic['type'] = 'remove_user'
             signal_dic['user_name'] = client_dic['user_name']
+            signal_dic['project'] = client_dic['project']
             self.broadcast(signal_dic, client_dic)
 
 if __name__ == "__main__":
