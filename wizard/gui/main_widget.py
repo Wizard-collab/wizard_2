@@ -37,6 +37,7 @@ from wizard.gui import header_widget
 from wizard.gui import tickets_widget
 from wizard.gui import subtask_manager
 from wizard.gui import team_widget
+from wizard.gui import popup_wall_widget
 
 class main_widget(custom_window.custom_window):
 
@@ -52,6 +53,7 @@ class main_widget(custom_window.custom_window):
         self.exports_widget = exports_widget.exports_widget(self)
         self.tabs_widget = tabs_widget.tabs_widget(self)
         self.wall_widget = wall_widget.wall_widget(self)
+        self.popup_wall_widget = popup_wall_widget.popup_wall_widget()
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
         self.tickets_widget = tickets_widget.tickets_widget(self)
@@ -65,6 +67,10 @@ class main_widget(custom_window.custom_window):
         self.init_gui_server()
         self.init_communicate_server()
         self.init_team_client()
+        self.init_popup_wall_widget()
+
+    def init_popup_wall_widget(self):
+        self.popup_wall_widget.show()
 
     def init_gui_server(self):
         self.gui_server.start()
@@ -108,6 +114,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
+        self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
 
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
         self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
@@ -208,11 +215,11 @@ class main_widget(custom_window.custom_window):
         self.tree_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
-        self.wall_widget.refresh()
         self.references_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
+        self.wall_widget.refresh()
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()

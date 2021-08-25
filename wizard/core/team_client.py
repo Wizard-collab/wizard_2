@@ -53,13 +53,6 @@ class team_client(QThread):
         signal_dic['project'] = environment.get_project_name()
         self.send_signal(signal_dic)
 
-    def send_notification(self, event_id):
-        signal_dic = dict()
-        signal_dic['type'] = 'notification'
-        signal_dic['project'] = environment.get_project_name()
-        signal_dic['event_id'] = event_id
-        self.send_signal(signal_dic)
-
     def send_signal(self, signal_dic):
         if self.conn is not None:
             if not socket_utils.send_signal_with_conn(self.conn, signal_dic, only_debug=True):
@@ -85,8 +78,6 @@ class team_client(QThread):
         if data['project'] == environment.get_project_name():
             if data['type'] == 'refresh_team':
                 self.refresh_signal.emit(1)
-            elif data['type'] == 'notification':
-                self.notification_signal.emit(signal_dic['event_id'])
             elif data['type'] == 'new_user':
                 self.new_user_signal.emit(data['user_name'])
             elif data['type'] == 'remove_user':

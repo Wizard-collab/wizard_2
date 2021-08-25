@@ -26,12 +26,14 @@ from wizard.gui import gui_server
 class wall_widget(QtWidgets.QWidget):
 
     notification = pyqtSignal(int)
+    popup = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(wall_widget, self).__init__(parent)
         self.last_time = 0
         self.event_ids = dict()
         self.time_widgets = []
+        self.first_refresh = 1
         self.search_thread = search_thread()
         self.build_ui()
         self.connect_functions()
@@ -185,10 +187,13 @@ class wall_widget(QtWidgets.QWidget):
                     self.wall_scrollArea_layout.addWidget(event_widget)
                     self.event_ids[event_row['id']] = event_widget
                     self.last_time = event_row['creation_time']
-                    self.notification.emit(1)
+                    if not self.isVisible() and self.first_refresh != 1:
+                        self.notification.emit(1)
+                        self.popup.emit(event_row)
             self.old_project = environment.get_project_name()
         self.update_search()
         self.update_refresh_time(start_time)
+        self.first_refresh = 0
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
@@ -272,6 +277,7 @@ class wall_event_widget(QtWidgets.QFrame):
             gui_server.focus_export_version(export_version_id)
 
     def build_ui(self):
+        #self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)

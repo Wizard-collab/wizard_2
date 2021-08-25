@@ -173,6 +173,7 @@ class server(Thread):
                 signal_dic = dict()
                 signal_dic['type'] = 'new_user'
                 signal_dic['user_name'] = self.client_ids[client]['user_name']
+                signal_dic['project'] = self.client_ids[client]['project']
                 send_signal_with_conn(client_dic['conn'], signal_dic)
 
     def clientThread(self, user_name, conn, addr, project):
