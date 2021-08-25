@@ -60,7 +60,7 @@ class create_ticket_widget(custom_window.custom_dialog):
         self.infos_label.setText(info)
 
     def build_ui(self):
-        self.setMinimumWidth(350)
+        self.resize(350, 500)
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)

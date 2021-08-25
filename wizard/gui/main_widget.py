@@ -65,7 +65,6 @@ class main_widget(custom_window.custom_window):
         self.init_gui_server()
         self.init_communicate_server()
         self.init_team_client()
-        #self.init_contexts()
 
     def init_gui_server(self):
         self.gui_server.start()

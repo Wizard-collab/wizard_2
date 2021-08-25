@@ -36,7 +36,7 @@ class console_widget(custom_window.custom_window):
                 self.show()
                 self.raise_()
             else:
-                self.hide()
+                self.close()
         else:
             self.show()
             self.raise_()
@@ -46,9 +46,11 @@ class console_widget(custom_window.custom_window):
             self.notification.emit('')
         event.accept()
 
+    '''
     def closeEvent(self, event):
         event.ignore()
         self.hide()
+    '''
 
     def build_ui(self):
         self.resize(800,600)

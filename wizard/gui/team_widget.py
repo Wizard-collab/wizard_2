@@ -15,42 +15,36 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui import custom_window
 
-class team_widget(QtWidgets.QFrame):
+class team_widget(custom_window.custom_window):
     def __init__(self, parent=None):
         super(team_widget, self).__init__(parent)
         self.user_ids = dict()
-
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
-
         self.build_ui()
 
-    def leaveEvent(self, event):
-        self.hide()
-
     def build_ui(self):
-        self.setObjectName('transparent_widget')
         self.setMinimumWidth(400)
         self.setMinimumHeight(500)
 
-        self.main_widget_layout = QtWidgets.QHBoxLayout()
-        self.main_widget_layout.setContentsMargins(8,8,8,8)
-        self.setLayout(self.main_widget_layout)
-
-        self.main_widget = QtWidgets.QFrame()
-        self.main_widget.setObjectName('round_frame')
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(6,6,6,6)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
-        self.main_widget_layout.addWidget(self.main_widget)
+        self.setCentralWidget(self.main_widget)
+
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(11,11,11,11)
+        self.header_layout.setSpacing(6)
+        self.header_widget.setLayout(self.header_layout)
+
+        self.connection_status_frame = QtWidgets.QFrame()
+        self.connection_status_frame.setFixedSize(8, 8)
+        self.header_layout.addWidget(self.connection_status_frame)
+        self.header_layout.addWidget(QtWidgets.QLabel('Team server'))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.add_header_widget(self.header_widget)
 
         self.info_widget = gui_utils.info_widget(transparent=1)
         self.info_widget.setVisible(0)
@@ -66,7 +60,6 @@ class team_widget(QtWidgets.QFrame):
         self.users_scrollArea_layout.setSpacing(3)
         self.users_scrollArea_widget.setLayout(self.users_scrollArea_layout)
 
-        #self.users_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.users_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.users_scrollArea.setWidgetResizable(True)
         self.users_scrollArea.setWidget(self.users_scrollArea_widget)
@@ -99,6 +92,7 @@ class team_widget(QtWidgets.QFrame):
 
     def refresh(self):
         if self.connection_status:
+            self.connection_status_frame.setStyleSheet('border-radius:4px;background-color:#9cf277;')
             if len(self.user_ids) == 0:
                 self.users_scrollArea.setVisible(0)
                 self.info_widget.setVisible(1)
@@ -108,6 +102,7 @@ class team_widget(QtWidgets.QFrame):
                 self.info_widget.setVisible(0)
                 self.users_scrollArea.setVisible(1)
         else:
+            self.connection_status_frame.setStyleSheet('border-radius:4px;background-color:#f0605b;')
             self.users_scrollArea.setVisible(0)
             self.info_widget.setVisible(1)
             self.info_widget.setText("Not connected to any server...")

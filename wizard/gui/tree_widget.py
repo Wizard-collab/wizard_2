@@ -567,8 +567,10 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.outframe = 220
         self.build_ui()
         self.connect_functions()
+        
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
         self.shadow.setBlurRadius(8)
         self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))

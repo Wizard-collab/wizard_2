@@ -29,7 +29,7 @@ class all_users_widget(custom_window.custom_window):
 
         self.main_widget = QtWidgets.QFrame()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.main_widget)

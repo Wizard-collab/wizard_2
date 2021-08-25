@@ -95,3 +95,5 @@ class team_dns_widget(custom_window.custom_dialog):
                                 team_port
                                 ):
                 self.accept()
+            else:
+                logger.warning("Can't reach server with this DNS")

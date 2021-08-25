@@ -483,6 +483,38 @@ QSlider::handle:horizontal {
 	background: transparent;
 }
 
+#semi_right_transparent_widget{
+	background: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_left_transparent_widget{
+	background: qlineargradient( x1:1 y1:0, x2:0 y2:0, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_top_transparent_widget{
+	background: qlineargradient( x1:0 y1:1, x2:0 y2:0, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_bottom_transparent_widget{
+	background: qlineargradient( x1:0 y1:0, x2:0 y2:1, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_top_left_transparent_widget{
+	background: qradialgradient( cx:1 cy:1, radius: 1, fx:1, fy:1, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_top_right_transparent_widget{
+	background: qradialgradient( cx:0 cy:1, radius: 1, fx:0, fy:1, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_bottom_right_transparent_widget{
+	background: qradialgradient( cx:0 cy:0, radius: 1, fx:0, fy:0, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
+#semi_bottom_left_transparent_widget{
+	background: qradialgradient( cx:1 cy:0, radius: 1, fx:1, fy:0, stop:0 rgba(0,0,0,40), stop:1 transparent)
+}
+
 #list_widget_frame{
 	background-color: #24242b;
 }

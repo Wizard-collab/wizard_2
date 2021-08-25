@@ -61,11 +61,12 @@ class drop_files_widget(QtWidgets.QWidget):
         self.drop_files_button.new_file.connect(self.add_file)
 
     def add_file(self, file):
+        self.files_scrollArea.setVisible(1)
         new_file_widget = file_widget(file)
         new_file_widget.remove_file.connect(self.remove_file)
         self.files_widgets.append(new_file_widget)
         self.files_scrollArea_layout.addWidget(new_file_widget)
-        self.update_files_visibility()
+        #self.update_files_visibility()
 
     def remove_file(self, file_widget):
         if file_widget in self.files_widgets:

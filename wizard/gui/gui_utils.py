@@ -42,6 +42,13 @@ def move_ui(widget):
     widget.move(posx, posy)
     return f"{angley}-{anglex}"
 
+def move_ui_bottom_right(widget, width, height):
+    cursor_x = QtGui.QCursor.pos().x()
+    cursor_y = QtGui.QCursor.pos().y()
+    posx = cursor_x - width + 15
+    posy = cursor_y - height + 15
+    widget.move(posx, posy)
+
 def round_image(label, image_bytes, radius):
     label.Antialiasing = True
     label.radius = radius/2
