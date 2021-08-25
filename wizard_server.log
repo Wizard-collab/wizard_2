@@ -6329,3 +6329,41 @@ ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée 
 2021-08-25 14:53:15,175 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
 2021-08-25 14:53:15,874 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
 2021-08-25 14:53:16,857 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-25 15:10:53,060 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-25 15:10:53,069 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.25'
+2021-08-25 15:10:53,069 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-25 15:10:53,070 - WIZARD-SERVER - INFO - Server started
+2021-08-25 15:10:56,345 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 58903)
+2021-08-25 15:10:56,346 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel'}
+2021-08-25 17:27:53,790 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-25 17:27:55,482 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-25 17:27:56,775 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-25 17:27:58,290 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team'}
+2021-08-25 17:42:20,248 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-08-25 17:42:20,249 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 58903)
+2021-08-25 17:42:20,250 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel'}
+2021-08-25 17:42:23,590 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-25 17:42:23,601 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.25'
+2021-08-25 17:42:23,601 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-25 17:42:23,602 - WIZARD-SERVER - INFO - Server started
+2021-08-25 17:42:28,695 - WIZARD-SERVER - INFO - test_conn
+2021-08-25 17:42:29,912 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 60716), test
+2021-08-25 17:42:29,913 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-08-25 17:43:24,933 - WIZARD-SERVER - INFO - test_conn
+2021-08-25 17:43:28,202 - WIZARD-SERVER - ERROR - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 136, in run
+    self.analyse_signal(entry_message, conn, addr)
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 147, in analyse_signal
+    self.add_client(data['user_name'], conn, addr, data['project'])
+KeyError: 'project'
+
+2021-08-25 17:43:36,473 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-08-25 17:43:36,482 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.25'
+2021-08-25 17:43:36,482 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-08-25 17:43:36,483 - WIZARD-SERVER - INFO - Server started
+2021-08-25 17:43:37,878 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 60821), test
+2021-08-25 17:43:37,879 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}

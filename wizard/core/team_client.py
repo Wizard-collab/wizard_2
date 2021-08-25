@@ -37,22 +37,33 @@ class team_client(QThread):
         signal_dic = dict()
         signal_dic['type'] = 'new_client'
         signal_dic['user_name'] = environment.get_user()
+        signal_dic['project'] = environment.get_project_name()
         socket_utils.send_signal_with_conn(self.conn, signal_dic)
         logger.info("Wizard is connected to the team server")
 
     def stop(self):
         if self.conn is not None:
             self.conn.close()
+            self.conn = None
         self.running = False
 
     def refresh_team(self):
+        signal_dic = dict()
+        signal_dic['type'] = 'refresh_team'
+        signal_dic['project'] = environment.get_project_name()
+        self.send_signal(signal_dic)
+
+    def send_notification(self, event_id):
+        signal_dic = dict()
+        signal_dic['type'] = 'notification'
+        signal_dic['project'] = environment.get_project_name()
+        signal_dic['event_id'] = event_id
+        self.send_signal(signal_dic)
+
+    def send_signal(self, signal_dic):
         if self.conn is not None:
-            signal_dic = dict()
-            signal_dic['type'] = 'refresh_team'
             if not socket_utils.send_signal_with_conn(self.conn, signal_dic, only_debug=True):
-                self.conn.close()
-                self.conn = None
-                self.running = False
+                    self.stop()
 
     def run(self):
         self.create_conn()
@@ -73,6 +84,8 @@ class team_client(QThread):
     def analyse_signal(self, data):
         if data['type'] == 'refresh_team':
             self.refresh_signal.emit(1)
+        elif data['type'] == 'notification':
+            self.notification_signal.emit(signal_dic['event_id'])
         elif data['type'] == 'new_user':
             self.new_user_signal.emit(data['user_name'])
         elif data['type'] == 'remove_user':
