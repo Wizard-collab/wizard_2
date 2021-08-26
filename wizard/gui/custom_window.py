@@ -16,16 +16,8 @@ class custom_widget(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         
-        '''
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(4)
-        self.shadow.setColor(QtGui.QColor('red'))
-        #self.shadow.setXOffset(1)
-        #self.shadow.setYOffset(1)
-        self.setGraphicsEffect(self.shadow)
-        '''
-
         self.build_main_ui()
+        self.apply_shadow(1)
 
     def add_title(self, title):
         self.header.add_title(title)
@@ -53,21 +45,21 @@ class custom_widget(QtWidgets.QWidget):
         self.handle_layout.addWidget(self.left_resize_widget)
 
         self.top_left_frame = resize_frame()
-        self.top_left_frame.setObjectName('semi_top_left_transparent_widget')
+        self.top_left_frame.setObjectName('transparent_widget')
         self.top_left_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeFDiagCursor))
         self.top_left_frame.mouse_press.connect(self.start_top_left_resize)
         self.top_left_frame.setFixedSize(12, 12)
         self.left_resize_layout.addWidget(self.top_left_frame)
 
         self.left_frame = resize_frame()
-        self.left_frame.setObjectName('semi_left_transparent_widget')
+        self.left_frame.setObjectName('transparent_widget')
         self.left_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeHorCursor))
         self.left_frame.mouse_press.connect(self.start_left_resize)
         self.left_frame.setFixedWidth(12)
         self.left_resize_layout.addWidget(self.left_frame)
 
         self.bottom_left_frame = resize_frame()
-        self.bottom_left_frame.setObjectName('semi_bottom_left_transparent_widget')
+        self.bottom_left_frame.setObjectName('transparent_widget')
         self.bottom_left_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeBDiagCursor))
         self.bottom_left_frame.mouse_press.connect(self.start_bottom_left_resize)
         self.bottom_left_frame.setFixedSize(12, 12)
@@ -80,9 +72,9 @@ class custom_widget(QtWidgets.QWidget):
         self.central_resize_layout.setSpacing(0)
         self.central_resize_widget.setLayout(self.central_resize_layout)
         self.handle_layout.addWidget(self.central_resize_widget)
-
+        
         self.top_frame = resize_frame()
-        self.top_frame.setObjectName('semi_top_transparent_widget')
+        self.top_frame.setObjectName('transparent_widget')
         self.top_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeVerCursor))
         self.top_frame.mouse_press.connect(self.start_top_resize)
         self.top_frame.setFixedHeight(12)
@@ -111,7 +103,7 @@ class custom_widget(QtWidgets.QWidget):
         self.content_layout.addWidget(self.main_container_widget)
 
         self.bottom_frame = resize_frame()
-        self.bottom_frame.setObjectName('semi_bottom_transparent_widget')
+        self.bottom_frame.setObjectName('transparent_widget')
         self.bottom_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeVerCursor))
         self.bottom_frame.mouse_press.connect(self.start_bottom_resize)
         self.bottom_frame.setFixedHeight(12)
@@ -126,21 +118,21 @@ class custom_widget(QtWidgets.QWidget):
         self.handle_layout.addWidget(self.right_resize_widget)        
 
         self.top_right_frame = resize_frame()
-        self.top_right_frame.setObjectName('semi_top_right_transparent_widget')
+        self.top_right_frame.setObjectName('transparent_widget')
         self.top_right_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeBDiagCursor))
         self.top_right_frame.mouse_press.connect(self.start_top_right_resize)
         self.top_right_frame.setFixedSize(12, 12)
         self.right_resize_layout.addWidget(self.top_right_frame)
 
         self.right_frame = resize_frame()
-        self.right_frame.setObjectName('semi_right_transparent_widget')
+        self.right_frame.setObjectName('transparent_widget')
         self.right_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeHorCursor))
         self.right_frame.mouse_press.connect(self.start_right_resize)
         self.right_frame.setFixedWidth(12)
         self.right_resize_layout.addWidget(self.right_frame)
 
         self.bottom_right_frame = resize_frame()
-        self.bottom_right_frame.setObjectName('semi_bottom_right_transparent_widget')
+        self.bottom_right_frame.setObjectName('transparent_widget')
         self.bottom_right_frame.setCursor(QtGui.QCursor(QtCore.Qt.SizeFDiagCursor))
         self.bottom_right_frame.mouse_press.connect(self.start_bottom_right_resize)
         self.bottom_right_frame.setFixedSize(12, 12)
@@ -184,6 +176,7 @@ class custom_widget(QtWidgets.QWidget):
                 self.left_resize_widget.setVisible(1)
                 self.bottom_frame.setVisible(1)
                 self.top_frame.setVisible(1)
+                self.apply_shadow(1)
 
     def toggle_size(self):
         window = self.windowHandle()
@@ -194,12 +187,25 @@ class custom_widget(QtWidgets.QWidget):
             self.left_resize_widget.setVisible(0)
             self.bottom_frame.setVisible(0)
             self.top_frame.setVisible(0)
+            self.apply_shadow(0)
         else:
             window.setWindowStates(QtCore.Qt.WindowNoState)
             self.right_resize_widget.setVisible(1)
             self.left_resize_widget.setVisible(1)
             self.bottom_frame.setVisible(1)
             self.top_frame.setVisible(1)
+            self.apply_shadow(1)
+
+    def apply_shadow(self, enable):
+        if enable:
+            self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+            self.shadow.setBlurRadius(12)
+            self.shadow.setColor(QtGui.QColor(0, 0, 0, 190))
+            self.shadow.setXOffset(0)
+            self.shadow.setYOffset(0)
+            self.central_resize_widget.setGraphicsEffect(self.shadow)
+        else:
+            self.central_resize_widget.setGraphicsEffect(None)
 
 class resize_frame(QtWidgets.QFrame):
 

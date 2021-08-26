@@ -14,12 +14,7 @@ class loading_widget(QtWidgets.QWidget):
 
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
+        
 
         self.build_ui()
 
@@ -32,6 +27,14 @@ class loading_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.main_frame = QtWidgets.QFrame()
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.main_frame.setGraphicsEffect(self.shadow)
+
         self.main_frame.setObjectName('loading_widget_frame')
         self.frame_layout = QtWidgets.QVBoxLayout()
         self.frame_layout.setContentsMargins(10,10,10,10)

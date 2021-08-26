@@ -14,15 +14,14 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 class popup_wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(popup_wall_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.ToolTip)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-
 
         self.popup_ids = dict()
 
@@ -72,7 +71,7 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.move(posx, posy)
 
     def add_popup(self, event_row):
-        widget = wall_event_widget(event_row)
+        widget = popup_event_widget(event_row)
         self.popup_ids[event_row['id']] = widget
         self.popups_scrollArea_layout.addWidget(widget)
         self.popup_ids[event_row['id']].time_out.connect(self.remove_popup)
@@ -80,17 +79,17 @@ class popup_wall_widget(QtWidgets.QWidget):
     def remove_popup(self, popup_id):
         if popup_id in self.popup_ids.keys():
             widget = self.popup_ids[popup_id]
+            del self.popup_ids[popup_id]
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
-            del self.popup_ids[popup_id]
 
-class wall_event_widget(QtWidgets.QFrame):
+class popup_event_widget(QtWidgets.QFrame):
 
     time_out = pyqtSignal(int)
 
     def __init__(self, event_row, parent=None):
-        super(wall_event_widget, self).__init__(parent)
+        super(popup_event_widget, self).__init__(parent)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
         self.shadow.setBlurRadius(8)
@@ -99,12 +98,18 @@ class wall_event_widget(QtWidgets.QFrame):
         self.shadow.setYOffset(0)
         self.setGraphicsEffect(self.shadow)
 
-        self.setObjectName('wall_event_frame')
+        self.setObjectName('popup_event_frame')
         self.event_row = event_row
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
         self.start_clock()
+
+    def enterEvent(self, event):
+        self.timer.stop()
+
+    def leaveEvent(self, event):
+        self.timer.start(3000)
 
     def start_clock(self):
         self.timer = QtCore.QTimer(self)
@@ -140,6 +145,7 @@ class wall_event_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.action_button_button.clicked.connect(self.action)
+        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
 
     def action(self):
         if self.event_row['type'] == 'archive':
@@ -157,14 +163,16 @@ class wall_event_widget(QtWidgets.QFrame):
         self.setMinimumWidth(320)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(3)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('transparent_widget')
+        self.header_widget.setObjectName('dark_widget')
+        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
-        self.header_layout.setSpacing(6)
+        #self.header_layout.setContentsMargins(11,0,0,0)
+        self.header_layout.setSpacing(12)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
@@ -199,14 +207,39 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
+        self.decoration_content = QtWidgets.QWidget()
+        self.decoration_content.setObjectName('transparent_widget')
+        self.decoration_content_layout = QtWidgets.QVBoxLayout()
+        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setSpacing(0)
+        self.decoration_content.setLayout(self.decoration_content_layout)
+        self.header_layout.addWidget(self.decoration_content)
+
+        self.quit_button = QtWidgets.QPushButton()
+        self.quit_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
+        self.quit_button.setIconSize(QtCore.QSize(12,12))
+        self.quit_button.setObjectName('window_decoration_button')
+        self.quit_button.setFixedSize(16, 16)
+        self.decoration_content_layout.addWidget(self.quit_button)
+        
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+        self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setObjectName('transparent_widget')
+        self.content_layout = QtWidgets.QVBoxLayout()
+        #self.header_layout.setContentsMargins(,0,0,0)
+        self.content_layout.setSpacing(12)
+        self.content_widget.setLayout(self.content_layout)
+        self.main_layout.addWidget(self.content_widget)
+
         self.event_content_label = QtWidgets.QLabel()
         self.event_content_label.setWordWrap(True)
-        self.main_layout.addWidget(self.event_content_label)
+        self.content_layout.addWidget(self.event_content_label)
 
         self.event_additional_content_label = QtWidgets.QLabel()
         self.event_additional_content_label.setObjectName('gray_label')
         self.event_additional_content_label.setWordWrap(True)
-        self.main_layout.addWidget(self.event_additional_content_label)
+        self.content_layout.addWidget(self.event_additional_content_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
@@ -214,7 +247,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.buttons_widget)
+        self.content_layout.addWidget(self.buttons_widget)
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         
@@ -225,4 +258,3 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.action_button_button.setObjectName('blue_text_button')
         self.buttons_layout.addWidget(self.action_button_button)
-

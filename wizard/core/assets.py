@@ -215,15 +215,12 @@ def archive_stage(stage_id):
 				if archive_file:
 					shutil.rmtree(dir_name)
 					logger.info(f"{dir_name} deleted")
-					events.add_archive_event(f"Archived stage : {stage_row['name']}",
-												archive_file)
 			else:
 				logger.warning(f"{dir_name} not found")
 				archive_file = ''
 			success = project.remove_stage(stage_id)
 			if success:
-				events.add_archive_event("Archived stage", f"{instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}",
-												archive_file)
+				events.add_archive_event("Archived stage", f"{instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}", archive_file)
 			return success
 		else:
 			return None

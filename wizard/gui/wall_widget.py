@@ -206,6 +206,7 @@ class wall_time_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(4,4,4,4)
         self.main_layout.setSpacing(0)
@@ -226,9 +227,20 @@ class wall_time_widget(QtWidgets.QWidget):
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
 class wall_event_widget(QtWidgets.QFrame):
+
+    time_out = pyqtSignal(int)
+
     def __init__(self, event_row, parent=None):
         super(wall_event_widget, self).__init__(parent)
-        self.setObjectName('wall_event_frame')
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.setGraphicsEffect(self.shadow)
+
+        self.setObjectName('popup_event_frame')
         self.event_row = event_row
         self.build_ui()
         self.fill_ui()
@@ -277,16 +289,18 @@ class wall_event_widget(QtWidgets.QFrame):
             gui_server.focus_export_version(export_version_id)
 
     def build_ui(self):
-        #self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(3)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('transparent_widget')
+        self.header_widget.setObjectName('dark_widget')
+        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
-        self.header_layout.setSpacing(6)
+        #self.header_layout.setContentsMargins(11,0,0,0)
+        self.header_layout.setSpacing(12)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
@@ -321,14 +335,22 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
+        self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setObjectName('transparent_widget')
+        self.content_layout = QtWidgets.QVBoxLayout()
+        #self.header_layout.setContentsMargins(,0,0,0)
+        self.content_layout.setSpacing(12)
+        self.content_widget.setLayout(self.content_layout)
+        self.main_layout.addWidget(self.content_widget)
+
         self.event_content_label = QtWidgets.QLabel()
         self.event_content_label.setWordWrap(True)
-        self.main_layout.addWidget(self.event_content_label)
+        self.content_layout.addWidget(self.event_content_label)
 
         self.event_additional_content_label = QtWidgets.QLabel()
         self.event_additional_content_label.setObjectName('gray_label')
         self.event_additional_content_label.setWordWrap(True)
-        self.main_layout.addWidget(self.event_additional_content_label)
+        self.content_layout.addWidget(self.event_additional_content_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
@@ -336,7 +358,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.buttons_widget)
+        self.content_layout.addWidget(self.buttons_widget)
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         

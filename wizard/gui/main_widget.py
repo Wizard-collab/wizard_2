@@ -58,7 +58,7 @@ class main_widget(custom_window.custom_window):
         self.header_widget = header_widget.header_widget(self)
         self.tickets_widget = tickets_widget.tickets_widget(self)
         self.subtask_manager = subtask_manager.subtask_manager(self)
-        self.team_widget = team_widget.team_widget(self)
+        self.team_widget = team_widget.team_widget()
         self.team_client = team_client.team_client()
         self.gui_server = gui_server.gui_server()
         self.communicate_server = communicate.communicate_server()

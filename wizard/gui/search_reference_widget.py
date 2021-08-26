@@ -26,12 +26,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(12)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
+        
 
         self.search_thread = search_thread()
         self.variant_ids = dict()
@@ -136,6 +131,13 @@ class search_reference_widget(QtWidgets.QWidget):
         self.main_widget_layout.setSpacing(0)
         self.main_widget.setLayout(self.main_widget_layout)
         self.main_layout.addWidget(self.main_widget)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(12)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.main_widget.setGraphicsEffect(self.shadow)
 
         self.search_bar = gui_utils.search_bar()
         #self.search_bar.setObjectName('transparent_widget')

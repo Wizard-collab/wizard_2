@@ -412,12 +412,7 @@ class variant_creation_widget(QtWidgets.QDialog):
         self.connect_functions()
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
+        
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -432,12 +427,20 @@ class variant_creation_widget(QtWidgets.QDialog):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)
         self.setLayout(self.main_layout)
+
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('instance_creation_frame')
         self.frame_layout = QtWidgets.QVBoxLayout()
         self.frame_layout.setSpacing(6)
         self.main_frame.setLayout(self.frame_layout)
         self.main_layout.addWidget(self.main_frame)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.main_frame.setGraphicsEffect(self.shadow)
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()

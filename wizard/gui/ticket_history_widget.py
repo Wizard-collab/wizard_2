@@ -28,12 +28,7 @@ class ticket_history_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(ticket_history_widget, self).__init__(parent)
 
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(12)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
+        
 
         self.parent = parent
         self.ticket_id = None
@@ -67,6 +62,13 @@ class ticket_history_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(12)
         self.main_widget.setLayout(self.main_layout)
         self.main_widget_layout.addWidget(self.main_widget)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(12)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.main_widget.setGraphicsEffect(self.shadow)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')

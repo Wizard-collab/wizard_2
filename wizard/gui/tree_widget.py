@@ -571,13 +571,6 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
-
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
         self.apply_round_corners(corner)
@@ -598,6 +591,13 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.main_frame.setLayout(self.frame_layout)
         self.main_layout.addWidget(self.main_frame)
 
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.main_frame.setGraphicsEffect(self.shadow)
+
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
         self.close_layout.setContentsMargins(2,2,2,2)
@@ -606,7 +606,7 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = QtWidgets.QPushButton()
-        self.close_pushButton.setObjectName('close_button')
+        self.close_pushButton.setObjectName('window_decoration_button')
         self.close_pushButton.setIcon(QtGui.QIcon(ressources._close_icon_))
         self.close_pushButton.setFixedSize(16,16)
         self.close_pushButton.setIconSize(QtCore.QSize(12,12))
