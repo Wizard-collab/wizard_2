@@ -83,6 +83,7 @@ _refresh_icon_ = os.path.join(_icons_path_, 'refresh_icon.png')
 _play_icon_ = os.path.join(_icons_path_, 'play.png')
 _team_connection_on_ = os.path.join(_icons_path_, 'team_connection_on.png')
 _team_connection_off_ = os.path.join(_icons_path_, 'team_connection_off.png')
+_settings_icon_ = os.path.join(_icons_path_, 'settings.png')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.png')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.png')

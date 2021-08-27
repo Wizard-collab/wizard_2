@@ -69,6 +69,12 @@ class footer_widget(QtWidgets.QFrame):
         self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_off_))
         self.buttons_layout.addWidget(self.team_connection_button)
 
+        self.settings_button = QtWidgets.QPushButton()
+        self.settings_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.settings_button, "Settings")
+        self.settings_button.setIcon(QtGui.QIcon(ressources._settings_icon_))
+        self.buttons_layout.addWidget(self.settings_button)
+
         self.task_manager_button = QtWidgets.QPushButton()
         self.task_manager_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.task_manager_button, "Show task manager")
