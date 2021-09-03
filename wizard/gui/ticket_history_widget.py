@@ -27,9 +27,6 @@ class ticket_history_widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(ticket_history_widget, self).__init__(parent)
-
-        
-
         self.parent = parent
         self.ticket_id = None
         self.ticket_messages_ids = dict()
@@ -56,7 +53,7 @@ class ticket_history_widget(QtWidgets.QWidget):
 
         self.main_widget = QtWidgets.QFrame()
         self.main_widget.setMinimumWidth(500)
-        self.main_widget.setObjectName('ticket_messages_widget')
+        self.main_widget.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(12,12,12,12)
         self.main_layout.setSpacing(12)

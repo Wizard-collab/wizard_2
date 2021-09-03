@@ -421,6 +421,20 @@ QSlider::handle:horizontal {
     border-radius: 3px;
 }
 
+#android_checkbox::indicator {
+    width: 40px;
+    height: 26px;
+    background-color:#18181c;
+    border-radius: 13px;
+    image: url(ressources/icons/android_cb_off.png);
+}
+
+#android_checkbox::indicator:checked {
+    background-color:#7785de;
+    image: url(ressources/icons/android_cb_on.png);
+}
+
+
 #loading_widget_frame{
 	border-radius: 5px;
 }
@@ -760,10 +774,6 @@ QSlider::handle:horizontal {
 
 #ticket_message_content_widget{
 	background-color: transparent;
-}
-
-#ticket_messages_widget{
-	border-radius: 12px;
 }
 
 #ticket_message_widget{

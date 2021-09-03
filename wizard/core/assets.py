@@ -592,7 +592,7 @@ def close_ticket(ticket_id):
 def open_ticket(ticket_id):
 	success = project.change_ticket_state(ticket_id, 1)
 	if success:
-		events.add_ticket_openned_event(ticket_id)
+		events.add_ticket_openned_event(ticket_id, 'Reopen')
 	return success
 
 def toggle_ticket(ticket_id):

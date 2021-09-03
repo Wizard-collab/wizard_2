@@ -184,6 +184,22 @@ def create_user(user_name,
             logger.warning(f'User {user_name} already exists')
             return None
 
+def modify_user_profile_picture(user_name, profile_picture):
+    if profile_picture:
+        if not os.path.isfile(profile_picture):
+            profile_picture = ressources._default_profile_
+        profile_picture_ascii = image.convert_image_to_str_data(profile_picture)
+        if db_utils.update_data('site',
+                                'users',
+                                ('profile_picture', profile_picture_ascii),
+                                ('user_name', user_name)):
+            logger.info(f'{user_name} profile picture modified')
+            return 1
+        else:
+            return None
+    else:
+        return None
+
 def upgrade_user_privilege(user_name, administrator_pass):
     if user_name in get_user_names_list():
         user_row = get_user_row_by_name(user_name)
@@ -308,6 +324,19 @@ def modify_user_life(user_name, life):
         logger.debug(f'{user_name} life is {life}%')
         return 1
     else:
+        return None
+
+def modify_user_email(user_name, email):
+    if email != '':
+        if db_utils.update_data('site',
+                                        'users',
+                                        ('email', email),
+                                        ('user_name', user_name)):
+            return 1
+        else:
+            return None
+    else:
+        logger.warning('Please enter a valid email')
         return None
 
 def is_admin():

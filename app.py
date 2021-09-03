@@ -13,6 +13,8 @@ from wizard.gui import create_project_widget
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
 
+from wizard.gui import user_preferences_widget
+
 # Wizard modules
 from wizard.core import user
 from wizard.core import environment
@@ -87,6 +89,9 @@ class app():
 		self.main_widget.init_contexts()
 		self.main_widget.stop_threads.connect(self.db_server.stop)
 		self.loading_widget.close()
+
+		self.user_account_widget = user_preferences_widget.user_account_widget()
+		self.user_account_widget.show()
 
 		sys.exit(self.app.exec_())
 

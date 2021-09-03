@@ -197,6 +197,9 @@ class password_lineEdit(QtWidgets.QFrame):
     def text(self):
         return self.password_lineEdit.text()
 
+    def clear(self):
+        self.password_lineEdit.clear()
+
     def setPlaceholderText(self, placeholderText):
         self.password_lineEdit.setPlaceholderText(placeholderText)
 
