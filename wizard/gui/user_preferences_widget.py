@@ -25,6 +25,8 @@ class user_preferences_widget(custom_window.custom_window):
         self.general_widget = general_widget()
         self.user_account_widget = user_account_widget()
 
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.ToolTip)
+
         self.add_title('User preferences')
 
         self.build_ui()
