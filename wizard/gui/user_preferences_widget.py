@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import custom_window
+from wizard.gui import logging_widget
 
 # Wizard modules
 from wizard.vars import ressources
@@ -23,9 +24,30 @@ class user_preferences_widget(custom_window.custom_window):
         super(user_preferences_widget, self).__init__()
         self.general_widget = general_widget()
         self.user_account_widget = user_account_widget()
+
+        self.add_title('User preferences')
+
         self.build_ui()
 
+    def toggle(self):
+        if self.isVisible():
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+                self.refresh()
+            else:
+                self.close()
+        else:
+            self.show()
+            self.raise_()
+            self.refresh()
+
+    def refresh(self):
+        self.general_widget.refresh()
+        self.user_account_widget.refresh()
+
     def build_ui(self):
+        self.resize(600,800)
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
@@ -39,6 +61,9 @@ class user_preferences_widget(custom_window.custom_window):
 
         self.general_tab_index = self.tabs_widget.addTab(self.general_widget, QtGui.QIcon(ressources._settings_icon_), 'General')
         self.account_tab_index = self.tabs_widget.addTab(self.user_account_widget, QtGui.QIcon(ressources._user_icon_), 'Account')
+
+        self.logging_widget = logging_widget.logging_widget(self)
+        self.main_layout.addWidget(self.logging_widget)
 
 class general_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

@@ -38,6 +38,7 @@ from wizard.gui import tickets_widget
 from wizard.gui import subtask_manager
 from wizard.gui import team_widget
 from wizard.gui import popup_wall_widget
+from wizard.gui import user_preferences_widget
 
 class main_widget(custom_window.custom_window):
 
@@ -47,6 +48,7 @@ class main_widget(custom_window.custom_window):
         super(main_widget, self).__init__(parent)
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
+        self.user_preferences_widget = user_preferences_widget.user_preferences_widget()
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.references_widget = references_widget.references_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
@@ -101,6 +103,7 @@ class main_widget(custom_window.custom_window):
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
         self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
+        self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
@@ -112,6 +115,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.footer_widget.connect_team.connect(self.init_team_client)
         self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
+        self.footer_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)

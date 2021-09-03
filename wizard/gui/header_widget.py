@@ -22,6 +22,7 @@ class header_widget(QtWidgets.QFrame):
 
     show_subtask_manager = pyqtSignal(object)
     show_console = pyqtSignal(object)
+    show_user_preferences = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(header_widget, self).__init__(parent)
@@ -57,6 +58,7 @@ class header_widget(QtWidgets.QFrame):
         self.user_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='User')
         self.user_log_action = self.user_action.addAction("Change user")
         self.user_create_action = self.user_action.addAction("Create user")
+        self.user_preferences_action = self.user_action.addAction("Preferences")
 
         self.project_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Project')
         self.project_log_action = self.project_action.addAction("Change project")
@@ -73,6 +75,7 @@ class header_widget(QtWidgets.QFrame):
         self.console_action.triggered.connect(self.show_console.emit)
         self.user_log_action.triggered.connect(self.change_user)
         self.user_create_action.triggered.connect(self.create_user)
+        self.user_preferences_action.triggered.connect(self.show_user_preferences.emit)
         self.project_log_action.triggered.connect(self.change_project)
         self.project_create_action.triggered.connect(self.create_project)
 
