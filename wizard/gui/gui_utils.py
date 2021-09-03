@@ -113,6 +113,13 @@ def round_corners_image(label, image_bytes, size_tuple, radius):
         painter.drawPixmap(0, 0, pixmap)
         label.setPixmap(label.target)
 
+class separator(QtWidgets.QFrame):
+    def __init__(self, parent = None):
+        super(separator, self).__init__(parent)
+        self.setMinimumHeight(2)
+        self.setMaximumHeight(2)
+        self.setObjectName('separator')
+
 class ElidedLabel(QtWidgets.QLabel):
     _width = _text = _elided = None
 

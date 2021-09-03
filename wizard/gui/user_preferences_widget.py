@@ -11,63 +11,126 @@ from wizard.gui import custom_window
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.core import user
 from wizard.core import site
 from wizard.core import environment
 from wizard.core import image
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class general_widget(custom_window.custom_window):
+class user_preferences_widget(custom_window.custom_window):
     def __init__(self, parent=None):
-        super(general_widget, self).__init__(parent)
-        self.ignore_admin_toggle = 0
+        super(user_preferences_widget, self).__init__()
+        self.general_widget = general_widget()
+        self.user_account_widget = user_account_widget()
         self.build_ui()
-        #self.refresh()
-        #self.connect_functions()
-
-    def refresh(self):
-        self.ignore_admin_toggle = 1
-        user_name = environment.get_user()
-        user_row = site.get_user_row_by_name(user_name)
-        self.user_name_label.setText(user_name)
-        self.user_email_label.setText(user_row['email'])
-
-        self.admin_checkBox.setCheckState(user_row['administrator'])
-        self.admin_checkBox.setChecked(user_row['administrator'])
-
-        profile_image = image.convert_str_data_to_image_bytes(user_row['profile_picture'])
-        pm = QtGui.QPixmap()
-        pm.loadFromData(profile_image, 'png')
-        self.profile_picture_button.setIcon(QtGui.QIcon(pm))
-
-        self.email_lineEdit.clear()
-        self.old_pwd_lineEdit.clear()
-        self.new_pwd_lineEdit.clear()
-        self.confirm_pwd_lineEdit.clear()
-        self.admin_password_lineEdit.clear()
-        self.ignore_admin_toggle = 0
-
-    def connect_functions(self):
-        self.email_accept_button.clicked.connect(self.apply_new_email)
-        self.pwd_accept_button.clicked.connect(self.change_password)
-        self.admin_checkBox.stateChanged.connect(self.modify_user_privileges)
-        self.profile_picture_button.clicked.connect(self.update_profile_picture)
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(0)
+        self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.main_widget)
+
+        self.tabs_widget = QtWidgets.QTabWidget()
+        self.tabBar = self.tabs_widget.tabBar()
+        self.tabBar.setObjectName('settings_tab_bar')
+        self.main_layout.addWidget(self.tabs_widget)
+
+        self.general_tab_index = self.tabs_widget.addTab(self.general_widget, QtGui.QIcon(ressources._settings_icon_), 'General')
+        self.account_tab_index = self.tabs_widget.addTab(self.user_account_widget, QtGui.QIcon(ressources._user_icon_), 'Account')
+
+class general_widget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(general_widget, self).__init__(parent)
+        self.ignore_admin_toggle = 0
+        self.build_ui()
+        self.refresh()
+        self.connect_functions()
+
+    def refresh(self):
+        team_dns = environment.get_team_dns()
+        if team_dns is not None:
+            self.team_host_lineEdit.setText(team_dns[0])
+            self.team_port_lineEdit.setText(str(team_dns[1]))
+        else:
+            self.team_host_lineEdit.clear()
+            self.team_port_lineEdit.clear()
+
+        local_path = user.user().get_local_path()
+        if local_path:
+            self.local_path_lineEdit.setText(local_path)
+        else:
+            self.local_path_lineEdit.clear()
+
+        popups_enabled = user.user().get_popups_enabled()
+        popups_sound_enabled = user.user().get_popups_sound_enabled()
+        popups_duration = user.user().get_popups_duration()
+        self.enable_popups_checkbox.setCheckState(popups_enabled)
+        self.enable_popups_checkbox.setChecked(popups_enabled)
+        self.enable_popups_sounds_checkbox.setCheckState(popups_sound_enabled)
+        self.enable_popups_sounds_checkbox.setChecked(popups_sound_enabled)
+        self.popups_duration_spinBox.setValue(popups_duration)
+
+    def apply_popups_settings(self):
+        popups_enabled = self.enable_popups_checkbox.isChecked()
+        popups_sound_enabled = self.enable_popups_sounds_checkbox.isChecked()
+        popups_duration = self.popups_duration_spinBox.value()
+        user.user().set_popups_settings(popups_enabled, popups_sound_enabled, popups_duration)
+
+    def apply_local_path(self):
+        local_path = self.local_path_lineEdit.text()
+        if user.user().set_local_path(local_path):
+            self.refresh()
+
+    def apply_team_dns(self):
+        host = self.team_host_lineEdit.text()
+        port = self.team_port_lineEdit.text()
+        process = 1
+        try:
+            port = int(port)
+        except:
+            logger.warning('Please enter a valid port')
+            process = 0
+        if port == '':
+            logger.warning('Please enter a valid port')
+            process = 0
+        if host == '':
+            logger.warning('Please enter a valid host')
+            process = 0
+        if process:
+            if user.user().set_team_dns(host, port):
+                self.refresh()
+
+    def connect_functions(self):
+        self.team_ip_accept_button.clicked.connect(self.apply_team_dns)
+        self.local_path_accept_button.clicked.connect(self.apply_local_path)
+        self.folder_button.clicked.connect(self.open_explorer)
+        self.enable_popups_checkbox.stateChanged.connect(self.apply_popups_settings)
+        self.enable_popups_sounds_checkbox.stateChanged.connect(self.apply_popups_settings)
+        self.popups_duration_spinBox.valueChanged.connect(self.apply_popups_settings)
+
+    def open_explorer(self):
+        project_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Open local project directory",
+                                       "",
+                                       QtWidgets.QFileDialog.ShowDirsOnly
+                                       | QtWidgets.QFileDialog.DontResolveSymlinks)
+        if project_path:
+            self.local_path_lineEdit.setText(project_path)
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(0)
+        self.setLayout(self.main_layout)
 
         self.scrollArea = QtWidgets.QScrollArea()
         self.scrollBar = self.scrollArea.verticalScrollBar()
 
         self.scrollArea_widget = QtWidgets.QWidget()
-        self.scrollArea_widget.setObjectName('wall_scroll_area')
+        self.scrollArea_widget.setObjectName('transparent_widget')
         self.scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.scrollArea_layout.setSpacing(6)
+        self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
         self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -80,11 +143,12 @@ class general_widget(custom_window.custom_window):
         self.general_settings_title.setObjectName('title_label')
         self.scrollArea_layout.addWidget(self.general_settings_title)
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
         self.popups_frame = QtWidgets.QFrame()
         self.popups_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.popups_frame.setObjectName('round_frame')
         self.popups_layout = QtWidgets.QVBoxLayout()
-        self.popups_layout.setContentsMargins(8,8,8,8)
+        self.popups_layout.setContentsMargins(0,0,0,0)
         self.popups_layout.setSpacing(6)
         self.popups_frame.setLayout(self.popups_layout)
         self.scrollArea_layout.addWidget(self.popups_frame)
@@ -110,13 +174,14 @@ class general_widget(custom_window.custom_window):
 
         self.popups_duration_spinBox = QtWidgets.QSpinBox()
         self.popups_duration_spinBox.setButtonSymbols(2)
-        self.popups_sublayout.addRow(QtWidgets.QLabel('Duration'), self.popups_duration_spinBox)
+        self.popups_sublayout.addRow(QtWidgets.QLabel('Duration ( seconds )'), self.popups_duration_spinBox)
+
+        self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.local_path_frame = QtWidgets.QFrame()
         self.local_path_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.local_path_frame.setObjectName('round_frame')
         self.local_path_layout = QtWidgets.QVBoxLayout()
-        self.local_path_layout.setContentsMargins(8,8,8,8)
+        self.local_path_layout.setContentsMargins(0,0,0,0)
         self.local_path_layout.setSpacing(6)
         self.local_path_frame.setLayout(self.local_path_layout)
         self.scrollArea_layout.addWidget(self.local_path_frame)
@@ -155,11 +220,12 @@ class general_widget(custom_window.custom_window):
         self.local_path_accept_button.setObjectName('blue_button')
         self.local_path_buttons_layout.addWidget(self.local_path_accept_button)
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
         self.team_ip_frame = QtWidgets.QFrame()
         self.team_ip_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.team_ip_frame.setObjectName('round_frame')
         self.team_ip_layout = QtWidgets.QVBoxLayout()
-        self.team_ip_layout.setContentsMargins(8,8,8,8)
+        self.team_ip_layout.setContentsMargins(0,0,0,0)
         self.team_ip_layout.setSpacing(6)
         self.team_ip_frame.setLayout(self.team_ip_layout)
         self.scrollArea_layout.addWidget(self.team_ip_frame)
@@ -191,7 +257,7 @@ class general_widget(custom_window.custom_window):
 
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
-class user_account_widget(custom_window.custom_window):
+class user_account_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(user_account_widget, self).__init__(parent)
         self.ignore_admin_toggle = 0
@@ -271,20 +337,18 @@ class user_account_widget(custom_window.custom_window):
                 logger.warning('{} is not a valid image file...'.format(image_file))
 
     def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.scrollArea = QtWidgets.QScrollArea()
         self.scrollBar = self.scrollArea.verticalScrollBar()
 
         self.scrollArea_widget = QtWidgets.QWidget()
-        self.scrollArea_widget.setObjectName('wall_scroll_area')
+        self.scrollArea_widget.setObjectName('transparent_widget')
         self.scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.scrollArea_layout.setSpacing(6)
+        self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
         self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -297,11 +361,12 @@ class user_account_widget(custom_window.custom_window):
         self.account_settings_title.setObjectName('title_label')
         self.scrollArea_layout.addWidget(self.account_settings_title)
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
         self.profile_frame = QtWidgets.QFrame()
         self.profile_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.profile_frame.setObjectName('round_frame')
         self.profile_layout = QtWidgets.QVBoxLayout()
-        self.profile_layout.setContentsMargins(8,8,8,8)
+        self.profile_layout.setContentsMargins(0,0,0,0)
         self.profile_layout.setSpacing(6)
         self.profile_frame.setLayout(self.profile_layout)
         self.scrollArea_layout.addWidget(self.profile_frame)
@@ -339,11 +404,12 @@ class user_account_widget(custom_window.custom_window):
 
         self.profile_sub_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
         self.email_frame = QtWidgets.QFrame()
         self.email_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.email_frame.setObjectName('round_frame')
         self.email_layout = QtWidgets.QVBoxLayout()
-        self.email_layout.setContentsMargins(8,8,8,8)
+        self.email_layout.setContentsMargins(0,0,0,0)
         self.email_layout.setSpacing(6)
         self.email_frame.setLayout(self.email_layout)
         self.scrollArea_layout.addWidget(self.email_frame)
@@ -369,11 +435,12 @@ class user_account_widget(custom_window.custom_window):
         self.email_accept_button.setObjectName('blue_button')
         self.email_buttons_layout.addWidget(self.email_accept_button)
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
         self.pwd_frame = QtWidgets.QFrame()
         self.pwd_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.pwd_frame.setObjectName('round_frame')
         self.pwd_layout = QtWidgets.QVBoxLayout()
-        self.pwd_layout.setContentsMargins(8,8,8,8)
+        self.pwd_layout.setContentsMargins(0,0,0,0)
         self.pwd_layout.setSpacing(6)
         self.pwd_frame.setLayout(self.pwd_layout)
         self.scrollArea_layout.addWidget(self.pwd_frame)
@@ -407,11 +474,12 @@ class user_account_widget(custom_window.custom_window):
         self.pwd_accept_button.setObjectName('blue_button')
         self.pwd_buttons_layout.addWidget(self.pwd_accept_button)
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
         self.admin_frame = QtWidgets.QFrame()
         self.admin_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.admin_frame.setObjectName('round_frame')
         self.admin_layout = QtWidgets.QVBoxLayout()
-        self.admin_layout.setContentsMargins(8,8,8,8)
+        self.admin_layout.setContentsMargins(0,0,0,0)
         self.admin_layout.setSpacing(6)
         self.admin_frame.setLayout(self.admin_layout)
         self.scrollArea_layout.addWidget(self.admin_frame)

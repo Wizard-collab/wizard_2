@@ -91,8 +91,10 @@ class user:
             self.prefs_dic[user_vars._team_dns_] = DNS
             self.write_prefs_dic()
             environment.set_team_dns(DNS)
+            logger.info("Team DNS modified")
             return 1
         else:
+            logger.warning("Can't reach server with this DNS")
             return None
 
     def get_team_dns(self):
@@ -117,6 +119,36 @@ class user:
         else:
             return None
 
+    def set_local_path(self, path):
+        if path != '' and os.path.isdir(path):
+            self.prefs_dic[user_vars._local_path_] = path
+            self.write_prefs_dic()
+            logger.info("Local path modified")
+            return 1
+        else:
+            logger.warning('Please enter a valid local path')
+            return None
+
+    def set_popups_settings(self, enabled=1, sound_enabled=1, duration=3):
+        popups_settings_dic = dict()
+        popups_settings_dic['enabled'] = enabled
+        popups_settings_dic['sound_enabled'] = sound_enabled
+        popups_settings_dic['duration'] = duration
+        self.prefs_dic[user_vars._popups_settings_] = popups_settings_dic
+        self.write_prefs_dic()
+
+    def get_popups_enabled(self):
+        return self.prefs_dic[user_vars._popups_settings_]['enabled']
+
+    def get_popups_sound_enabled(self):
+        return self.prefs_dic[user_vars._popups_settings_]['sound_enabled']
+
+    def get_popups_duration(self):
+        return self.prefs_dic[user_vars._popups_settings_]['duration']
+
+    def get_local_path(self):
+        return self.prefs_dic[user_vars._local_path_]
+
     def get_user_prefs_dic(self):
         # Read ~/Documents/wizard/prefences.yaml
         # or init it if not found
@@ -134,6 +166,11 @@ class user:
             self.prefs_dic[user_vars._wall_context_] = dict()
             self.prefs_dic[user_vars._console_context_] = dict()
             self.prefs_dic[user_vars._tickets_context_] = dict()
+            self.prefs_dic[user_vars._local_path_] = None
+            self.prefs_dic[user_vars._popups_settings_] = dict()
+            self.prefs_dic[user_vars._popups_settings_]['enabled'] = 1
+            self.prefs_dic[user_vars._popups_settings_]['sound_enabled'] = 1
+            self.prefs_dic[user_vars._popups_settings_]['duration'] = 3
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:

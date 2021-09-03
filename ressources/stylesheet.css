@@ -421,6 +421,33 @@ QSlider::handle:horizontal {
     border-radius: 3px;
 }
 
+#settings_tab_bar::tab {
+	background-color: rgba(36, 36, 43, 170);
+	padding: 9px;
+	padding-left: 14px;
+	padding-right: 14px;
+	margin: 2px;
+	margin-right: 1px;
+	border-radius: 8px;
+} 
+
+#settings_tab_bar::tab:selected { 
+	background-color: #7785de;
+	font: bold;
+}
+
+#settings_tab_bar::tab:selected:hover { 
+	background-color: #8e9dfa;
+}
+
+#settings_tab_bar::tab:hover { 
+	background-color: rgba(36, 36, 43, 210);
+}
+
+#separator{
+	background-color: #35353d;
+}
+
 #android_checkbox::indicator {
     width: 40px;
     height: 26px;

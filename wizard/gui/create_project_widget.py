@@ -156,7 +156,7 @@ class create_project_widget(custom_window.custom_dialog):
 
     def open_explorer(self):
         project_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Open project directory",
-                                       "/home",
+                                       "",
                                        QtWidgets.QFileDialog.ShowDirsOnly
                                        | QtWidgets.QFileDialog.DontResolveSymlinks)
         if project_path:
