@@ -30,6 +30,8 @@ class subtask_manager(custom_window.custom_window):
         super(subtask_manager, self).__init__(parent)
         self.tasks_ids = dict()
 
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.ToolTip)
+
         self.add_title('Subtasks manager')
         self.build_ui()
 

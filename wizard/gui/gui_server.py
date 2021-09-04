@@ -99,6 +99,14 @@ class gui_server(QThread):
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
 
+def try_connection():
+    conn = socket_utils.get_connection(_DNS_, timeout=0.1)
+    if conn:
+        conn.close()
+        return 1
+    else:
+        return None
+
 def refresh_ui():
     refresh_team_ui()
     signal_dic = dict()

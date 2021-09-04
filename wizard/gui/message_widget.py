@@ -5,34 +5,29 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-class message_widget(QtWidgets.QDialog):
+# Wizard gui modules
+from wizard.gui import custom_window
+
+class message_widget(custom_window.custom_dialog):
     def __init__(self, title, message, parent=None):
         super(message_widget, self).__init__(parent)
         self.title = title
+        self.add_title(self.title)
         self.message = message
         self.build_ui()
         self.connect_functions()
 
     def build_ui(self):
-        self.setMinimumSize(350, 120)
-        self.resize(350, 120)
+        self.setMinimumWidth(450)
+
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.setLayout(self.main_layout)
-
-        self.title_label = QtWidgets.QLabel(self.title)
-        self.title_label.setObjectName('title_label')
-        self.main_layout.addWidget(self.title_label)
-
-        self.infos_widget = QtWidgets.QWidget()
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
-        self.infos_layout.setSpacing(6)
-        self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
         self.message_label = QtWidgets.QLabel(self.message)
         self.message_label.setObjectName('gray_label')
-        self.infos_layout.addWidget(self.message_label)
+        self.main_layout.addWidget(self.message_label)
 
         self.spaceItem = QtWidgets.QSpacerItem(10,100,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.main_layout.addSpacerItem(self.spaceItem)
@@ -48,6 +43,8 @@ class message_widget(QtWidgets.QDialog):
         self.ok_button.setObjectName("red_button")
         self.buttons_layout.addWidget(self.ok_button)
         self.main_layout.addWidget(self.buttons_widget)
+
+        self.resize(self.minimumSizeHint())
 
     def connect_functions(self):
         self.ok_button.clicked.connect(self.accept)

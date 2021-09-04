@@ -4,6 +4,8 @@ import time
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
+from wizard.gui import gui_server
+from wizard.gui import message_widget
 from wizard.gui import psql_widget
 from wizard.gui import team_dns_widget
 from wizard.gui import create_db_widget
@@ -38,6 +40,12 @@ class app():
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-ThinItalic.ttf")
 		with open('ressources/stylesheet.css', 'r') as f:
 			self.app.setStyleSheet(f.read())
+
+		if gui_server.try_connection():
+			self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
+																"You're already running an instance of Wizard.")
+			self.instance_running_info_widget.exec_()
+			sys.exit()
 			
 		if not user.user().get_psql_dns():
 			self.psql_widget = psql_widget.psql_widget()

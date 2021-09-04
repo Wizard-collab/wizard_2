@@ -24,6 +24,9 @@ class console_widget(custom_window.custom_window):
 
     def __init__(self, parent=None):
         super(console_widget, self).__init__(parent)
+
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.ToolTip)
+
         self.custom_handler = logging_widget.custom_handler(self)
         logger.addHandler(self.custom_handler)
         self.script_editor_widget = script_editor_widget.script_editor_widget()

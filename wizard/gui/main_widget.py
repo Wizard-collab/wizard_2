@@ -81,7 +81,6 @@ class main_widget(custom_window.custom_window):
         self.communicate_server.start()
 
     def init_team_client(self):
-        print('lol')
         self.team_client.start()
 
     def init_contexts(self):
@@ -208,8 +207,6 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.hardware_infos_widget.timer.stop()
         self.communicate_server.stop()
         self.subtask_manager.tasks_server.stop()
-        self.console_widget.close()
-        self.subtask_manager.close()
         self.save_contexts()
 
     def closeEvent(self, event):
