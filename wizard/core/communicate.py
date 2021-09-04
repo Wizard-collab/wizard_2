@@ -54,7 +54,10 @@ class communicate_server(Thread):
         # The signal_as_str is already decoded ( from utf8 )
         # The incoming signal needs to be a json string
         returned = None
+        print(signal_as_str)
         signal_dic = json.loads(signal_as_str)
+        print(signal_dic)
+        print(type(signal_dic))
 
         if signal_dic['function'] == 'add_version':
             returned = add_version(signal_dic['work_env_id'])
