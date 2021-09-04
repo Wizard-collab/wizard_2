@@ -5,12 +5,18 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+
 import json
+import traceback
+import os
 
 # Wizard modules
+from wizard.core import user
 from wizard.core import site
 from wizard.core import image
 from wizard.vars import ressources
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -71,10 +77,11 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.move(posx, posy)
 
     def add_popup(self, event_row):
-        widget = popup_event_widget(event_row)
-        self.popup_ids[event_row['id']] = widget
-        self.popups_scrollArea_layout.addWidget(widget)
-        self.popup_ids[event_row['id']].time_out.connect(self.remove_popup)
+        if user.user().get_popups_enabled():
+            widget = popup_event_widget(event_row)
+            self.popup_ids[event_row['id']] = widget
+            self.popups_scrollArea_layout.addWidget(widget)
+            self.popup_ids[event_row['id']].time_out.connect(self.remove_popup)
 
     def remove_popup(self, popup_id):
         if popup_id in self.popup_ids.keys():
@@ -103,19 +110,28 @@ class popup_event_widget(QtWidgets.QFrame):
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
+        self.init_clock()
+        self.play_sound()
         self.start_clock()
+
+    def play_sound(self):
+        if user.user().get_popups_sound_enabled():
+            pass
 
     def enterEvent(self, event):
         self.timer.stop()
 
     def leaveEvent(self, event):
-        self.timer.start(3000)
+        self.start_clock()
 
-    def start_clock(self):
+    def init_clock(self):
         self.timer = QtCore.QTimer(self)
-        self.timer.start(3000)
         self.timer.timeout.connect(lambda: self.time_out.emit(self.event_row['id']))
     
+    def start_clock(self):
+        duration = user.user().get_popups_duration()
+        self.timer.start(duration*1000)
+
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
         gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_image), 40)
@@ -171,7 +187,6 @@ class popup_event_widget(QtWidgets.QFrame):
         self.header_widget.setObjectName('dark_widget')
         self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
-        #self.header_layout.setContentsMargins(11,0,0,0)
         self.header_layout.setSpacing(12)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)

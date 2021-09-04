@@ -103,6 +103,7 @@ class main_widget(custom_window.custom_window):
         self.header_widget.show_console.connect(self.console_widget.toggle)
         self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
+        self.header_widget.close_signal.connect(self.close)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)

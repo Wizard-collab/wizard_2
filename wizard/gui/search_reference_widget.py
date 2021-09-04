@@ -21,12 +21,10 @@ class search_reference_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(search_reference_widget, self).__init__(parent)
 
-        self.accept_item_from_thread = True
+        self.accept_item_from_thread = True      
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-        
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)       
 
         self.search_thread = search_thread()
         self.variant_ids = dict()

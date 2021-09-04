@@ -23,6 +23,7 @@ class header_widget(QtWidgets.QFrame):
     show_subtask_manager = pyqtSignal(object)
     show_console = pyqtSignal(object)
     show_user_preferences = pyqtSignal(object)
+    close_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(header_widget, self).__init__(parent)
@@ -71,6 +72,7 @@ class header_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.user_widget)
 
     def connect_functions(self):
+        self.quit_action.triggered.connect(self.close_signal.emit)
         self.subtask_manager_action.triggered.connect(self.show_subtask_manager.emit)
         self.console_action.triggered.connect(self.show_console.emit)
         self.user_log_action.triggered.connect(self.change_user)

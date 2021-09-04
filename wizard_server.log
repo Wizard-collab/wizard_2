@@ -8449,3 +8449,366 @@ ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée 
 
 2021-09-03 23:12:31,455 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 49637), test
 2021-09-03 23:12:31,457 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:35:01,986 - WIZARD-SERVER - INFO - Python : 3.9.5 (tags/v3.9.5:0a7dcbd, May  3 2021, 17:27:52) [MSC v.1928 64 bit (AMD64)]
+2021-09-04 11:35:01,995 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.25'
+2021-09-04 11:35:01,995 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-09-04 11:35:01,996 - WIZARD-SERVER - INFO - Server started
+2021-09-04 11:35:04,690 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:35:05,663 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 52813), test
+2021-09-04 11:35:05,663 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:40:11,157 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:42:39,456 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:42:39,457 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 52813), test
+2021-09-04 11:42:39,457 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:44:20,250 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:44:21,447 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 53513), test
+2021-09-04 11:44:21,447 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:44:31,808 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:44:31,809 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 53513), test
+2021-09-04 11:44:31,810 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:44:35,960 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:44:37,267 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 54055), test
+2021-09-04 11:44:37,267 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:45:05,462 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:45:05,463 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 54055), test
+2021-09-04 11:45:05,463 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:47:25,208 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:47:26,401 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 54633), test
+2021-09-04 11:47:26,402 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:47:39,422 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:47:39,423 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 54633), test
+2021-09-04 11:47:39,425 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:47:43,570 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:47:44,774 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 55184), test
+2021-09-04 11:47:44,774 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:49:15,303 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:49:15,303 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 55184), test
+2021-09-04 11:49:15,305 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:49:21,407 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:49:22,719 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 55742), test
+2021-09-04 11:49:22,719 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:50:38,495 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:50:38,496 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 55742), test
+2021-09-04 11:50:38,497 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:50:42,528 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:50:43,729 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 56403), test
+2021-09-04 11:50:43,729 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:51:08,675 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:51:13,588 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:51:14,521 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:00,617 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:02,148 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:03,223 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:55:03,223 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 56403), test
+2021-09-04 11:55:03,226 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:55:08,599 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:55:09,890 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 57223), test
+2021-09-04 11:55:09,891 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:55:22,947 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:31,768 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:37,364 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:40,090 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:41,212 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:43,943 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:55:45,479 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:57:34,646 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:57:34,647 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 57223), test
+2021-09-04 11:57:34,649 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:57:42,251 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:57:43,466 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 58034), test
+2021-09-04 11:57:43,467 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:58:00,522 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:58:04,913 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:58:12,539 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:58:18,234 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:58:48,423 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 11:58:48,423 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 58034), test
+2021-09-04 11:58:48,426 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:58:53,752 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 11:58:54,957 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 58736), test
+2021-09-04 11:58:54,958 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 11:59:16,255 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:34,095 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:40,813 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:44,727 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:46,835 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:48,755 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:50,833 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 11:59:54,164 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:00:16,202 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:00:18,907 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:00:19,984 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:00:24,861 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:00:26,283 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:05:55,871 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:05:55,871 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 58736), test
+2021-09-04 12:05:55,875 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:06:00,940 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:06:02,160 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 59899), test
+2021-09-04 12:06:02,160 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:06:11,214 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:06:11,214 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 59899), test
+2021-09-04 12:06:11,217 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:06:16,988 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:06:18,186 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 60433), test
+2021-09-04 12:06:18,187 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:06:35,993 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:06:41,570 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:06:48,577 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:06:51,881 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:06:53,310 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:06:54,766 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:07:04,410 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:07:50,310 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:07:50,311 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 60433), test
+2021-09-04 12:07:50,313 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:07:56,845 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:07:57,997 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 61270), test
+2021-09-04 12:07:57,997 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:08:11,615 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:08:18,939 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:08:20,767 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:08:21,984 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:08:29,712 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:08:31,349 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:23:52,598 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:23:52,598 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 61270), test
+2021-09-04 12:23:52,601 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:23:58,403 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:23:59,698 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 62352), test
+2021-09-04 12:23:59,698 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:24:19,251 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:24:20,512 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:24:20,513 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 62352), test
+2021-09-04 12:24:20,532 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:24:44,827 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:24:46,105 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 62946), test
+2021-09-04 12:24:46,106 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:24:59,283 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:25:01,829 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:25:07,837 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:25:54,853 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:25:54,854 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 62946), test
+2021-09-04 12:25:54,856 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:25:59,952 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:26:01,184 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 63680), test
+2021-09-04 12:26:01,185 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:26:13,999 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:26:18,142 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:26:19,191 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:26:20,295 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:26:36,597 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:26:36,598 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 63680), test
+2021-09-04 12:26:36,600 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:26:41,376 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:26:42,580 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 64389), test
+2021-09-04 12:26:42,581 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:26:55,778 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:26:57,650 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:27:00,680 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:27:33,189 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:27:33,190 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 64389), test
+2021-09-04 12:27:33,192 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:27:39,711 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:27:40,903 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 65082), test
+2021-09-04 12:27:40,904 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:28:12,815 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:28:18,468 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:28:23,171 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:28:32,125 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:28:33,313 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:29:10,638 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:29:10,638 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 65082), test
+2021-09-04 12:29:10,640 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:29:16,233 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:29:17,446 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 49483), test
+2021-09-04 12:29:17,446 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:29:29,828 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:29:31,747 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:29:44,937 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:29:44,937 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 49483), test
+2021-09-04 12:29:44,939 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:29:58,623 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:29:59,807 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 50162), test
+2021-09-04 12:29:59,808 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:30:15,533 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:34:51,430 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:34:51,431 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 50162), test
+2021-09-04 12:34:51,432 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:35:05,593 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:35:06,884 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 50899), test
+2021-09-04 12:35:06,885 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:35:21,550 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:35:22,797 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:35:22,798 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 50899), test
+2021-09-04 12:35:22,801 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:36:17,434 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:36:18,825 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 51523), test
+2021-09-04 12:36:18,825 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:36:31,764 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:36:32,969 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:36:32,969 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 51523), test
+2021-09-04 12:36:32,988 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:36:48,688 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:36:49,902 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 52144), test
+2021-09-04 12:36:49,902 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:37:16,859 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:37:23,786 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:37:45,734 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:37:45,734 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 52144), test
+2021-09-04 12:37:45,736 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:37:50,718 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:37:51,998 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 52835), test
+2021-09-04 12:37:51,999 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:38:02,930 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:38:07,820 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:38:10,362 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:38:49,029 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:38:49,030 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 52835), test
+2021-09-04 12:38:49,032 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:38:54,047 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:38:55,320 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 53549), test
+2021-09-04 12:38:55,320 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:39:09,702 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:39:38,246 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:39:38,246 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 53549), test
+2021-09-04 12:39:38,249 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:39:42,796 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:39:43,982 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 54192), test
+2021-09-04 12:39:43,982 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:40:01,248 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:40:44,950 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:40:47,859 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:41:03,050 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:41:09,664 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:41:13,668 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:41:17,299 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:48:51,709 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:48:51,710 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 54192), test
+2021-09-04 12:48:51,713 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:49:00,049 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:49:01,489 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 55667), test
+2021-09-04 12:49:01,489 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:49:10,504 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:49:12,425 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'test'}
+2021-09-04 12:54:50,892 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:54:50,893 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 55667), test
+2021-09-04 12:54:50,895 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:54:57,784 - WIZARD-SERVER - INFO - test_conn
+2021-09-04 12:54:58,925 - WIZARD-SERVER - INFO - New client : l.brunel, ('192.168.1.25', 56764), test
+2021-09-04 12:54:58,926 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'test'}
+2021-09-04 12:56:31,773 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\team_server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-09-04 12:56:31,773 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('192.168.1.25', 56764), test
+2021-09-04 12:56:31,777 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'test'}
