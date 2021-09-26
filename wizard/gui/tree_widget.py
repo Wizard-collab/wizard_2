@@ -412,8 +412,10 @@ class tree_widget(QtWidgets.QFrame):
                 asset_name = self.instance_creation_widget.name_field.text()
                 inframe = self.instance_creation_widget.inframe
                 outframe = self.instance_creation_widget.outframe
+                preroll = self.instance_creation_widget.preroll
+                postroll = self.instance_creation_widget.postroll
                 parent_id = item.instance_parent_id
-                new_asset_id = assets.create_asset(asset_name, parent_id, inframe, outframe)
+                new_asset_id = assets.create_asset(asset_name, parent_id, inframe, outframe, preroll, postroll)
                 if new_asset_id is not None:
                     gui_server.refresh_ui()
         elif item.instance_type == 'category_creation':
@@ -565,6 +567,8 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.request_frames = request_frames
         self.inframe = 100
         self.outframe = 220
+        self.preroll = 100
+        self.postroll = 0
         self.build_ui()
         self.connect_functions()
         
@@ -625,16 +629,32 @@ class instance_creation_widget(QtWidgets.QDialog):
         frange_label = QtWidgets.QLabel("Frame range")
         frange_label.setStyleSheet('color:gray;')
         self.frange_layout.addWidget(frange_label)
+
+        self.preroll_spinBox = QtWidgets.QSpinBox()
+        self.preroll_spinBox.setObjectName('gray_label')
+        self.preroll_spinBox.setRange(0, 1000000)
+        self.preroll_spinBox.setValue(100)
+        self.preroll_spinBox.setButtonSymbols(2)
+        self.frange_layout.addWidget(self.preroll_spinBox)
+
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-100000, 219)
         self.inframe_spinBox.setValue(100)
         self.inframe_spinBox.setButtonSymbols(2)
         self.frange_layout.addWidget(self.inframe_spinBox)
+
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(101, 100000)
         self.outframe_spinBox.setValue(220)
         self.outframe_spinBox.setButtonSymbols(2)
         self.frange_layout.addWidget(self.outframe_spinBox)
+
+        self.postroll_spinBox = QtWidgets.QSpinBox()
+        self.postroll_spinBox.setObjectName('gray_label')
+        self.postroll_spinBox.setRange(0, 1000000)
+        self.postroll_spinBox.setValue(0)
+        self.postroll_spinBox.setButtonSymbols(2)
+        self.frange_layout.addWidget(self.postroll_spinBox)
 
         self.frame_layout.addWidget(self.frange_frame)
 
@@ -648,6 +668,8 @@ class instance_creation_widget(QtWidgets.QDialog):
     def update_range(self):
         self.inframe = self.inframe_spinBox.value()
         self.outframe = self.outframe_spinBox.value()
+        self.preroll = self.preroll_spinBox.value()
+        self.postroll = self.postroll_spinBox.value()
         self.inframe_spinBox.setRange(-100000, self.outframe-1)
         self.outframe_spinBox.setRange(self.inframe+1, 100000)
 
@@ -655,6 +677,8 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.accept_button.clicked.connect(self.accept)
         self.inframe_spinBox.valueChanged.connect(self.update_range)
         self.outframe_spinBox.valueChanged.connect(self.update_range)
+        self.preroll_spinBox.valueChanged.connect(self.update_range)
+        self.postroll_spinBox.valueChanged.connect(self.update_range)
         self.close_pushButton.clicked.connect(self.reject)
 
 class search_thread(QtCore.QThread):

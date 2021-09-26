@@ -59,3 +59,20 @@ def get_references(work_env_id):
     signal_dic['work_env_id'] = work_env_id
     references_tuples = socket_utils.send_signal(_DNS_, signal_dic)
     return references_tuples
+
+def get_frame_range(work_env_id):
+    # Request the scene frame range
+    # Return a [inframe, outframe] list
+    signal_dic=dict()
+    signal_dic['function'] = 'get_frame_range'
+    signal_dic['work_env_id'] = work_env_id
+    frame_range = socket_utils.send_signal(_DNS_, signal_dic)
+    return frame_range
+
+def get_image_format():
+    # Request the project image format
+    # Return a [width, height] list
+    signal_dic=dict()
+    signal_dic['function'] = 'get_image_format'
+    image_format = socket_utils.send_signal(_DNS_, signal_dic)
+    return image_format

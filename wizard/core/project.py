@@ -140,7 +140,7 @@ def get_category_data_by_name(name, column='*'):
         logger.error("Category not found")
         return None
 
-def add_asset(name, category_id, inframe=100, outframe=220):
+def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=0):
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'assets',
                                     ('name', 'category_id'),
@@ -152,12 +152,16 @@ def add_asset(name, category_id, inframe=100, outframe=220):
                                 'creation_user',
                                 'inframe',
                                 'outframe',
+                                'preroll',
+                                'postroll',
                                 'category_id'), 
                             (name, 
                                 time.time(), 
                                 environment.get_user(),
                                 inframe,
                                 outframe,
+                                preroll,
+                                postroll,
                                 category_id))
         if asset_id:
             logger.info(f"Asset {name} added to project")
@@ -1379,6 +1383,8 @@ def create_assets_table(database):
                                         creation_user text NOT NULL,
                                         inframe integer NOT NULL,
                                         outframe integer NOT NULL,
+                                        preroll integer NOT NULL,
+                                        postroll integer NOT NULL,
                                         category_id integer NOT NULL,
                                         FOREIGN KEY (category_id) REFERENCES categories (id)
                                     );"""

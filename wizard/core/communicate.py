@@ -54,10 +54,7 @@ class communicate_server(Thread):
         # The signal_as_str is already decoded ( from utf8 )
         # The incoming signal needs to be a json string
         returned = None
-        print(signal_as_str)
         signal_dic = json.loads(signal_as_str)
-        print(signal_dic)
-        print(type(signal_dic))
 
         if signal_dic['function'] == 'add_version':
             returned = add_version(signal_dic['work_env_id'])
@@ -69,8 +66,11 @@ class communicate_server(Thread):
                                         signal_dic['files'],
                                         signal_dic['version_id'], 
                                         signal_dic['comment'])
+        elif signal_dic['function'] == 'get_frame_range':
+            returned = get_frame_range(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'get_image_format':
+            returned = get_image_format()
 
-        #conn.send(json.dumps(returned).encode('utf8'))
         socket_utils.send_signal_with_conn(conn, returned)
 
 def add_version(work_env_id):
@@ -91,3 +91,16 @@ def add_export_version(export_name, files, version_id, comment):
     # of the new export version
     export_version_id = assets.add_export_version(export_name, files, version_id, comment)
     return export_version_id
+
+def get_frame_range(work_env_id):
+    asset_row = assets.get_asset_data_from_work_env_id(work_env_id)
+    if asset_row:
+        return [asset_row['preroll'],
+                asset_row['inframe'],
+                asset_row['outframe'],
+                asset_row['postroll']]
+    else:
+        return None
+
+def get_image_format():
+    return project.get_image_format()

@@ -119,13 +119,13 @@ def archive_category(category_id):
 	else:
 		return None
 
-def create_asset(name, category_id, inframe=100, outframe=220):
+def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=0):
 	asset_id = None
 	if tools.is_safe(name):
 		category_path = get_category_path(category_id)
 		if category_path:
 			dir_name = os.path.normpath(os.path.join(category_path, name))
-			asset_id = project.add_asset(name, category_id, inframe, outframe)
+			asset_id = project.add_asset(name, category_id, inframe, outframe, preroll, postroll)
 			if asset_id:
 				if not tools.create_folder(dir_name):
 					project.remove_asset(asset_id)
@@ -160,6 +160,16 @@ def archive_asset(asset_id):
 			return success
 		else:
 			return None
+	else:
+		return None
+
+def get_asset_data_from_work_env_id(work_env_id):
+	variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+	stage_id = project.get_variant_data(variant_id, 'stage_id')
+	asset_id = project.get_stage_data(stage_id, 'asset_id')
+	if asset_id:
+		asset_row = project.get_asset_data(asset_id)
+		return asset_row
 	else:
 		return None
 
