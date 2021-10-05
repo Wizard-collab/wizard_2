@@ -42,7 +42,7 @@ def launch_work_version(version_id):
 				software_id = project.get_work_env_data(work_env_id, 'software_id')
 				software_row = project.get_software_data(software_id)
 				command = build_command(file_path, software_row, version_id)
-				env = build_env(work_env_id, software_row)
+				env = build_env(work_env_id, software_row, version_id)
 				if command :
 					thread = software_thread(command,
 												env,
@@ -84,10 +84,11 @@ def build_command(file_path, software_row, version_id):
 		logger.warning(f"{software_row['name']} path not defined")
 		return None
 
-def build_env(work_env_id, software_row):
+def build_env(work_env_id, software_row, version_id):
 	# Building the default software environment for wizard workflow
 	env = os.environ.copy()
 	env['wizard_work_env_id'] = str(work_env_id)
+	env['wizard_version_id'] = str(version_id)
 
 	variant_id = project.get_work_env_data(work_env_id, 'variant_id')
 	stage_id = project.get_variant_data(variant_id, 'stage_id')
@@ -95,6 +96,11 @@ def build_env(work_env_id, software_row):
 	env['wizard_stage_name'] = str(stage_name)
 
 	env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
+
+	# Substance Painter specific env
+	if software_row['name'] == softwares_vars._substance_painter_:
+		env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + os.path.join(softwares_vars._main_script_path_,
+																					'substance_painter_wizard')
 	
 	# Getting the project software additionnal environment
 	additionnal_script_paths = []

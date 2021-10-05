@@ -25,7 +25,7 @@ def export_modeling(export_file, export_name):
     if GRP_OBJ:
         if export_file.endswith('.abc'):
             export_abc(GRP_OBJ, export_file)
-        wizard_communicate.add_export_version(export_name, [export_file], 66)
+        wizard_communicate.add_export_version(export_name, [export_file], int(os.environ['wizard_version_id']))
     else:
         logger.warning(f"{GRP_NAME} not found")
 

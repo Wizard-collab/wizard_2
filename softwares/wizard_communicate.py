@@ -27,8 +27,8 @@ def add_version(work_env_id):
     signal_dic=dict()
     signal_dic['function'] = 'add_version'
     signal_dic['work_env_id'] = work_env_id
-    file_path = socket_utils.send_signal(_DNS_, signal_dic)
-    return file_path
+    file_path, version_id = socket_utils.send_signal(_DNS_, signal_dic)
+    return file_path, version_id
 
 def request_export(work_env_id, export_name):
     # Get a temporary export dir and file from wizard
@@ -55,7 +55,7 @@ def get_references(work_env_id):
     # Request the scene references
     # Wizard return a references dic
     signal_dic=dict()
-    signal_dic['function'] = 'references'
+    signal_dic['function'] = 'get_references'
     signal_dic['work_env_id'] = work_env_id
     references_tuples = socket_utils.send_signal(_DNS_, signal_dic)
     return references_tuples
@@ -76,3 +76,10 @@ def get_image_format():
     signal_dic['function'] = 'get_image_format'
     image_format = socket_utils.send_signal(_DNS_, signal_dic)
     return image_format
+
+def get_user_folder():
+    # Request the user folder ( Documents/Wizard )
+    signal_dic=dict()
+    signal_dic['function'] = 'get_user_folder'
+    user_folder = socket_utils.send_signal(_DNS_, signal_dic)
+    return user_folder

@@ -24,6 +24,7 @@ from wizard.gui import gui_server
 from wizard.core import socket_utils
 from wizard.core import assets
 from wizard.core import project
+from wizard.vars import user_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -73,6 +74,10 @@ class communicate_server(Thread):
             returned = get_frame_range(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'get_image_format':
             returned = get_image_format()
+        elif signal_dic['function'] == 'get_user_folder':
+            returned = get_user_folder()
+        elif signal_dic['function'] == 'get_references':
+            returned = get_references(signal_dic['work_env_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -83,7 +88,7 @@ def add_version(work_env_id):
     version_path = project.get_version_data(version_id,
                                                     'file_path')
     gui_server.refresh_ui()
-    return version_path
+    return (version_path, version_id)
 
 def request_export(work_env_id, export_name):
     # Just return a temporary file name using the 'assets' module
@@ -97,6 +102,10 @@ def add_export_version(export_name, files, version_id, comment):
     gui_server.refresh_ui()
     return export_version_id
 
+def get_references(work_env_id):
+    # Get the scene references
+    return assets.get_references_files(work_env_id)
+
 def get_frame_range(work_env_id):
     asset_row = assets.get_asset_data_from_work_env_id(work_env_id)
     if asset_row:
@@ -109,3 +118,6 @@ def get_frame_range(work_env_id):
 
 def get_image_format():
     return project.get_image_format()
+
+def get_user_folder():
+    return user_vars._user_path_
