@@ -17,6 +17,9 @@ import time
 import traceback
 import json
 
+# Wizard gui modules
+from wizard.gui import gui_server
+
 # Wizard modules
 from wizard.core import socket_utils
 from wizard.core import assets
@@ -79,6 +82,7 @@ def add_version(work_env_id):
     version_id = assets.add_version(work_env_id)
     version_path = project.get_version_data(version_id,
                                                     'file_path')
+    gui_server.refresh_ui()
     return version_path
 
 def request_export(work_env_id, export_name):
@@ -89,7 +93,8 @@ def request_export(work_env_id, export_name):
 def add_export_version(export_name, files, version_id, comment):
     # Add an export version using the 'assets' module and return the export_version_id 
     # of the new export version
-    export_version_id = assets.add_export_version(export_name, files, version_id, comment)
+    export_version_id = assets.add_export_version_from_version_id(export_name, files, version_id, comment)
+    gui_server.refresh_ui()
     return export_version_id
 
 def get_frame_range(work_env_id):

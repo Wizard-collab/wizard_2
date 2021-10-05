@@ -20,6 +20,7 @@ import json
 from threading import Thread
 
 # Wizard modules
+from wizard.core import assets
 from wizard.core import project
 from wizard.core import environment
 from wizard.vars import softwares_vars
@@ -40,7 +41,7 @@ def launch_work_version(version_id):
 				project.set_work_env_lock(work_env_id)
 				software_id = project.get_work_env_data(work_env_id, 'software_id')
 				software_row = project.get_software_data(software_id)
-				command = build_command(file_path, software_row)
+				command = build_command(file_path, software_row, version_id)
 				env = build_env(work_env_id, software_row)
 				if command :
 					thread = software_thread(command,
@@ -52,7 +53,7 @@ def launch_work_version(version_id):
 		else:
 			logger.warning(f"You are already running a work instance of this asset")
 
-def build_command(file_path, software_row):
+def build_command(file_path, software_row, version_id):
 	software_path = software_row['path']
 	if software_path != '':
 		if os.path.isfile(file_path):
@@ -63,11 +64,22 @@ def build_command(file_path, software_row):
 
 		raw_command = raw_command.replace(softwares_vars._executable_key_, software_path)
 		raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
+
+		# Substance Painter specific launch
+		if software_row['name'] == softwares_vars._substance_painter_:
+			work_env_id = project.get_version_data(version_id, 'work_env_id')
+			references_list = assets.get_references_files(work_env_id) 
+			if len(references_list)==1:
+				reference_file = references_list[0][0][0]
+				print(reference_file)
+				raw_command = raw_command.replace(softwares_vars._reference_key_, reference_file)
+			else:
+				logger.warning('Please create ONE reference to launch Substance Painter')
+
 		if software_row['name'] in softwares_vars._scripts_dic_.keys():
 			raw_command = raw_command.replace(softwares_vars._script_key_,
 								softwares_vars._scripts_dic_[software_row['name']])
 		return raw_command
-
 	else:
 		logger.warning(f"{software_row['name']} path not defined")
 		return None
@@ -76,6 +88,12 @@ def build_env(work_env_id, software_row):
 	# Building the default software environment for wizard workflow
 	env = os.environ.copy()
 	env['wizard_work_env_id'] = str(work_env_id)
+
+	variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+	stage_id = project.get_variant_data(variant_id, 'stage_id')
+	stage_name = project.get_stage_data(stage_id, 'name')
+	env['wizard_stage_name'] = str(stage_name)
+
 	env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
 	
 	# Getting the project software additionnal environment

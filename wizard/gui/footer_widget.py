@@ -64,6 +64,12 @@ class footer_widget(QtWidgets.QFrame):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
+        self.refresh_ui_button = QtWidgets.QPushButton()
+        self.refresh_ui_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.refresh_ui_button, "Manually refresh the ui")
+        self.refresh_ui_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
+        self.buttons_layout.addWidget(self.refresh_ui_button)
+
         self.team_connection_button = QtWidgets.QPushButton()
         self.team_connection_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.team_connection_button, "Team connection status")

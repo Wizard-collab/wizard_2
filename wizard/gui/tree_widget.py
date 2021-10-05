@@ -74,7 +74,7 @@ class tree_widget(QtWidgets.QFrame):
 
         self.search_frame = QtWidgets.QFrame()
         self.search_layout = QtWidgets.QHBoxLayout()
-        self.search_layout.setContentsMargins(0,0,8,0)
+        self.search_layout.setContentsMargins(0,0,0,0)
         self.search_layout.setSpacing(8)
         self.search_frame.setLayout(self.search_layout)
 
@@ -83,11 +83,6 @@ class tree_widget(QtWidgets.QFrame):
         self.search_bar.setPlaceholderText('characters:Lola*grooming')
         self.search_layout.addWidget(self.search_bar)
 
-        self.refresh_tree_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.refresh_tree_button, "Manually refresh the project tree")
-        self.refresh_tree_button.setObjectName('tree_refresh_pushButton')
-        self.refresh_tree_button.setFixedSize(16,16)
-        self.search_layout.addWidget(self.refresh_tree_button)
         self.main_layout.addWidget(self.search_frame)
 
         self.tree = QtWidgets.QTreeWidget()
@@ -113,7 +108,6 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.itemDoubleClicked.connect(self.double_click)
         self.tree.currentItemChanged.connect(self.item_changed)
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
-        self.refresh_tree_button.clicked.connect(self.refresh)
 
     def item_changed(self, item):
         if item:

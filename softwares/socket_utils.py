@@ -116,15 +116,15 @@ def send_signal_with_conn(conn, msg_raw, only_debug = False):
         return 1
     except ConnectionRefusedError:
         if only_debug:
-        	logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
+            logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
         else:
-        	logger.error("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
+            logger.error("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except socket.timeout:
         if only_debug:
-        	logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
+            logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
         else:    
-        	logger.error("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
+            logger.error("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except:
         if only_debug:
@@ -141,10 +141,10 @@ def recvall(sock):
         msglen = struct.unpack('>I', raw_msglen)[0]
         return recvall_with_given_len(sock, msglen)
     except ConnectionRefusedError:
-    	logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
+        logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except socket.timeout:
-    	logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
+        logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except:
         logger.debug(str(traceback.format_exc()))
@@ -160,10 +160,10 @@ def recvall_with_given_len(sock, n):
             data.extend(packet)
         return data
     except ConnectionRefusedError:
-    	logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
+        logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except socket.timeout:
-    	logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
+        logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except:
         logger.debug(str(traceback.format_exc()))

@@ -69,6 +69,29 @@ def get_domain_childs(domain_id, column='*'):
                                                     column)
     return categories_rows
 
+def get_domain_child_by_name(domain_id, category_name, column='*'):
+    categories_rows = db_utils.get_row_by_multiple_data('project',
+                                                    'categories',
+                                                    ('domain_id', 'name'),
+                                                    (domain_id, category_name),
+                                                    column)
+    if len(categories_rows) >= 1:
+        return categories_rows[0]
+    else:
+        logger.error("Category not found")
+        return None
+
+def get_domain_by_name(name, column='*'):
+    domain_rows = db_utils.get_row_by_column_data('project',
+                                                    'domains',
+                                                    ('name', name),
+                                                    column)
+    if domain_rows and len(domain_rows) >= 1:
+        return domain_rows[0]
+    else:
+        logger.error("Domain not found")
+        return None
+
 def remove_domain(domain_id):
     success = None
     if site.is_admin():
@@ -117,6 +140,18 @@ def get_category_childs(category_id, column="*"):
                                                     ('category_id', category_id),
                                                     column)
     return assets_rows
+
+def get_category_child_by_name(category_id, asset_name, column='*'):
+    assets_rows = db_utils.get_row_by_multiple_data('project',
+                                                    'assets',
+                                                    ('category_id', 'name'),
+                                                    (category_id, asset_name),
+                                                    column)
+    if len(assets_rows) >= 1:
+        return assets_rows[0]
+    else:
+        logger.error("Asset not found")
+        return None
 
 def get_category_data(category_id, column='*'):
     category_rows = db_utils.get_row_by_column_data('project',
@@ -207,6 +242,18 @@ def get_asset_childs(asset_id, column='*'):
                                                         column)
     return stages_rows
 
+def get_asset_child_by_name(asset_id, stage_name, column='*'):
+    stages_rows = db_utils.get_row_by_multiple_data('project',
+                                                    'stages',
+                                                    ('asset_id', 'name'),
+                                                    (asset_id, stage_name),
+                                                    column)
+    if len(stages_rows) >= 1:
+        return stages_rows[0]
+    else:
+        logger.error("Stage not found")
+        return None
+
 def get_asset_data(asset_id, colmun='*'):
     assets_rows = db_utils.get_row_by_column_data('project',
                                                         'assets',
@@ -282,6 +329,18 @@ def get_stage_childs(stage_id, column='*'):
                                                         ('stage_id', stage_id),
                                                         column)
     return variants_rows
+
+def get_stage_child_by_name(stage_id, variant_name, column='*'):
+    variants_rows = db_utils.get_row_by_multiple_data('project',
+                                                    'variants',
+                                                    ('stage_id', 'name'),
+                                                    (stage_id, variant_name),
+                                                    column)
+    if len(variants_rows) >= 1:
+        return variants_rows[0]
+    else:
+        logger.error("Variant not found")
+        return None
 
 def add_variant(name, stage_id, comment):
     if not (db_utils.check_existence_by_multiple_data('project', 
@@ -367,6 +426,18 @@ def get_variant_work_envs_childs(variant_id, column='*'):
                                                         ('variant_id', variant_id), 
                                                         column)
     return work_envs_rows
+
+def get_work_env_variant_child_by_name(variant_id, work_env_name, column='*'):
+    work_envs_rows = db_utils.get_row_by_multiple_data('project',
+                                                    'work_envs',
+                                                    ('variant_id', 'name'),
+                                                    (variant_id, work_env_name),
+                                                    column)
+    if len(work_envs_rows) >= 1:
+        return work_envs_rows[0]
+    else:
+        logger.error("Work env not found")
+        return None
 
 def get_variant_export_childs(variant_id, column='*'):
     exports_rows = db_utils.get_row_by_column_data('project', 
@@ -655,6 +726,8 @@ def get_references_by_export_version(export_version_id, column='*'):
                                                         ('export_version_id', export_version_id),
                                                         column)
     return references_rows
+
+
 
 def get_reference_data(reference_id, column='*'):
     reference_rows = db_utils.get_row_by_column_data('project',

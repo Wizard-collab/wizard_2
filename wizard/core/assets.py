@@ -30,6 +30,7 @@
 import os
 import time
 import shutil
+import json
 
 # Wizard modules
 from wizard.core import environment
@@ -312,7 +313,10 @@ def create_references_from_variant_id(work_env_id, variant_id):
 		for export_row in export_rows:
 			export_version_id = project.get_last_export_version(export_row['id'], 'id')
 			if export_version_id is not None and len(export_version_id)>=1:
-				return create_reference(work_env_id, export_version_id[0])
+				create_reference(work_env_id, export_version_id[0])
+		return 1
+	else:
+		return None
 
 def create_reference(work_env_id, export_version_id):
 	namespaces_list = project.get_references(work_env_id, 'namespace')
@@ -342,6 +346,15 @@ def set_reference_last_version(reference_id):
 			else:
 				logger.info("Reference is up to date")
 				return None
+
+def get_references_files(work_env_id):
+	references_rows = project.get_references(work_env_id)
+	references_list = []
+	for reference_row in references_rows:
+		reference_files_list = json.loads(project.get_export_version_data(reference_row['export_version_id'], 'files'))
+		reference_tuple = (reference_files_list, reference_row['namespace'])
+		references_list.append(reference_tuple)
+	return references_list
 
 def merge_file_as_export_version(export_name, files, variant_id, comment=''):
 	return add_export_version(export_name, files, variant_id, None, comment)
@@ -391,9 +404,9 @@ def add_export_version(export_name, files, variant_id, version_id, comment=''):
 																			export_id,
 																			version_id,
 																			comment)
-							events.add_export_event(export_version_id)
 							game.add_xps(3)
 							game.analyse_comment(comment, 10)
+							events.add_export_event(export_version_id)
 				return export_version_id
 			else:
 				return None
@@ -721,9 +734,11 @@ def build_export_file_name(work_env_id, export_name, multiple=None):
 	stage_row = project.get_stage_data(variant_row['stage_id'])
 	asset_row = project.get_asset_data(stage_row['asset_id'])
 	category_row = project.get_category_data(asset_row['category_id'])
+	'''
 	extension = work_env_row['export_extension']
 	if not extension:
-		extension = project.get_extension(stage_row['name'], work_env_row['software_id'])
+	'''
+	extension = project.get_extension(stage_row['name'], work_env_row['software_id'])
 	if extension:
 		file_name = f"{category_row['name']}"
 		file_name += f"_{asset_row['name']}"
@@ -820,3 +835,34 @@ def instance_to_string(instance_tuple):
 		domain_row = project.get_domain_data(instance_id)
 		string=f"{domain_row['name']}"
 	return string
+
+def string_to_instance(string):
+	instances_list = string.split('/')
+
+	if len(instances_list) == 1:
+		instance_type = 'domain'
+		instance_id = project.get_domain_by_name(instances_list[0], 'id')
+	elif len(instances_list) ==2:
+		instance_type = 'category'
+		domain_id = project.get_domain_by_name(instances_list[0], 'id')
+		instance_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
+	elif len(instances_list) == 3:
+		instance_type = 'asset'
+		domain_id = project.get_domain_by_name(instances_list[0], 'id')
+		category_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
+		instance_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
+	elif len(instances_list) == 4:
+		instance_type = 'stage'
+		domain_id = project.get_domain_by_name(instances_list[0], 'id')
+		category_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
+		asset_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
+		instance_id = project.get_asset_child_by_name(asset_id, instances_list[3], 'id')
+	elif len(instances_list) == 5:
+		instance_type = 'variant'
+		domain_id = project.get_domain_by_name(instances_list[0], 'id')
+		category_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
+		asset_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
+		stage_id = project.get_asset_child_by_name(asset_id, instances_list[3], 'id')
+		instance_id = project.get_stage_child_by_name(stage_id, instances_list[4], 'id')
+
+	return (instance_type, instance_id)

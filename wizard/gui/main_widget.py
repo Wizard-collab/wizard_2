@@ -193,6 +193,7 @@ class main_widget(custom_window.custom_window):
     def work_env_changed(self, work_env_id):
         self.versions_widget.change_work_env(work_env_id)
         self.references_widget.change_work_env(work_env_id)
+        self.tabs_widget.change_work_env(work_env_id)
 
     def tab_changed(self):
         self.references_widget.refresh()
