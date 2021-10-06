@@ -176,6 +176,7 @@ class launcher_widget(QtWidgets.QFrame):
                         new=1
                 if new or set_last:
                     self.version_comboBox.setCurrentText(version_rows[-1]['name'])
+                    self.version_row = version_rows[-1]
         elif self.work_env_row == None and self.variant_row is not None:
             self.version_comboBox.addItem('0001')
         self.refresh_version_changed = 1

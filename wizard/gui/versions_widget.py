@@ -503,6 +503,7 @@ class versions_widget(QtWidgets.QWidget):
         if items is not None:
             if len(items) == 1:
                 launch.launch_work_version(items[0].version_row['id'])
+                gui_server.refresh_ui()
 
     def archive(self):
         items = self.get_selection()

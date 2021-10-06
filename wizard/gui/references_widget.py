@@ -143,6 +143,7 @@ class references_widget(QtWidgets.QWidget):
         for selected_item in selected_items:
             reference_id = selected_item.reference_row['id']
             assets.set_reference_last_version(reference_id)
+        gui_server.refresh_ui()
 
     def update_all(self):
         for reference_id in self.reference_ids.keys():
