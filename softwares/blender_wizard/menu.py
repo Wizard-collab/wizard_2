@@ -66,6 +66,17 @@ class import_textures(bpy.types.Operator):
         blender_wizard.reference_textures()
         return {'FINISHED'}
 
+class reload_textures(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.reload_textures"
+    bl_label = "Reload textures"
+    bl_description = "Reload existing textures in shaders"
+    
+    def execute(self, context):
+        blender_wizard.reload_textures()
+        return {'FINISHED'}
+
 class set_image_size(bpy.types.Operator):
     '''The set image size operator that call wizard function'''
 
@@ -96,6 +107,13 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
         layout.operator("wizard.import_modeling", icon_value=wizard_icons["import_modeling"].icon_id)
         layout.operator("wizard.import_textures", icon_value=wizard_icons["import_textures"].icon_id)
 
+class TOPBAR_MT_wizard_reload_submenu(bpy.types.Menu):
+    bl_label = "Reload"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("wizard.reload_textures", icon_value=wizard_icons["import_textures"].icon_id)
+
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
 
@@ -107,6 +125,7 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
         layout.operator("wizard.export", icon_value=wizard_icons["export"].icon_id)
         layout.menu("TOPBAR_MT_wizard_import_submenu", icon_value=wizard_icons["import"].icon_id)
+        layout.menu("TOPBAR_MT_wizard_reload_submenu", icon_value=wizard_icons["reload"].icon_id)
 
         layout.separator()
 
@@ -120,9 +139,11 @@ classes = (save_increment,
                 export,
                 import_modeling,
                 import_textures,
+                reload_textures,
                 set_image_size,
                 clear_all_materials,
                 TOPBAR_MT_wizard_import_submenu,
+                TOPBAR_MT_wizard_reload_submenu,
                 TOPBAR_MT_wizard_menu)
 
 def register():
@@ -137,6 +158,7 @@ def register():
     wizard_icons.load("save_increment", 'icons/save_increment.png', 'IMAGE')
     wizard_icons.load("export", 'icons/export.png', 'IMAGE')
     wizard_icons.load("import", 'icons/import.png', 'IMAGE')
+    wizard_icons.load("reload", 'icons/reload.png', 'IMAGE')
     wizard_icons.load("import_modeling", 'icons/import_modeling.png', 'IMAGE')
     wizard_icons.load("import_textures", 'icons/import_textures.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')

@@ -17,6 +17,11 @@ import wizard_communicate
 
 def export_textures(material, size, file_type) :
 
+    if file_type == 'exr':
+        bitdepth = '32f'
+    else:
+        bitdepth = '16'
+
     export_preset = substance_painter.resource.ResourceID(
                         context="starter_assets",
                         name=material )
@@ -39,6 +44,7 @@ def export_textures(material, size, file_type) :
     config["defaultExportPreset"] = export_preset.url()
     config["exportParameters"] = [{"parameters":{"paddingAlgorithm": "infinite",
                                         "fileFormat" : file_type,
+                                        "bitDepth" : bitdepth,
                                         "sizeLog2" : math.log2(int(size))}}]
 
     export_result = substance_painter.export.export_project_textures(config)

@@ -38,6 +38,12 @@ def reference_textures():
 		for texturing_reference in references['texturing']:
 			blender_reference.reference_textures(texturing_reference['namespace'], texturing_reference['files'])
 
+def reload_textures():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'texturing' in references.keys():
+		for texturing_reference in references['texturing']:
+			blender_reference.reload_textures(texturing_reference['namespace'], texturing_reference['files'])
+
 def reference_modeling():
 	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
 	if 'modeling' in references.keys():

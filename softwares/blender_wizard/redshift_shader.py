@@ -27,7 +27,7 @@ def get_redshift_material(mat_name, update):
         # Create material output node
         output_node = nt.nodes.new('RedshiftMaterialOutputNode')
         output_node.name = "Wizard Redshift Material Output"
-        output_node.location = [280.0, 0.0]
+        output_node.location = [900.0000, 0.0000]
         # Link material to output
         nt.links.new(material_node.outputs['outColor'], output_node.inputs['Surface'])
         # Create Diffuse texture node
@@ -58,6 +58,21 @@ def get_redshift_material(mat_name, update):
         normal_map_node.location = [-340.0, -660.0]
         normal_map_node.name = "Wizard Redshift Normal Map"
         nt.links.new(normal_map_node.outputs['outDisplacementVector'], get_input(material_node, "bump_input"))
+        # Create Displacement shader
+        displacement_material_node = nt.nodes.new('rsDisplacementShaderNode')
+        displacement_material_node.name = "Wizard Redshift Displacement Material"
+        displacement_material_node.inputs[3].default_value = '2'
+        displacement_material_node.inputs[11].default_value = 0.5
+        displacement_material_node.location = [600.0000, -60.0000]
+        nt.links.new(get_output(displacement_material_node, 'outDisplacementVector'), output_node.inputs['Displacement'])
+        # Create Height texture node
+        height_texture_node = nt.nodes.new('rsTextureSamplerShaderNode')
+        height_texture_node.inputs[0].default_value = False
+        height_texture_node.inputs[1].default_value = False
+        height_texture_node.location = [280.0000, -60.0000]
+        height_texture_node.name = "Wizard Redshift Height Texture"
+        nt.links.new(height_texture_node.outputs['outColor'], get_input(displacement_material_node, "texMap"))
+
     elif (mat_name in bpy.data.materials) and update:
         material = bpy.data.materials[mat_name]
     else:
@@ -70,22 +85,69 @@ def get_input(node, socket_identifier):
             break
     return input
 
+def get_output(node, socket_identifier):
+    for output in node.outputs:
+        if output.identifier == socket_identifier:
+            break
+    return output
+
 def get_textures_dic(files_list):
     textures_dic = dict()
+
+    diffuse_maps = []
+    roughness_maps = []
+    metalness_maps = []
+    normal_maps = []
+    height_maps = []
+
     for file in files_list:
         file = file.replace('\\', '/')
         if 'COLOR' in file.upper():
-            textures_dic['diffuse'] = bpy.data.images.load(file)
-            textures_dic['diffuse'].source = 'TILED'
+            diffuse_maps.append(file)
         if 'ROUGHNESS' in file.upper():
-            textures_dic['roughness'] = bpy.data.images.load(file)
-            textures_dic['roughness'].source = 'TILED'
+            roughness_maps.append(file)
         if 'METALNESS' in file.upper():
-            textures_dic['metalness'] = bpy.data.images.load(file)
-            textures_dic['metalness'].source = 'TILED'
+            metalness_maps.append(file)
         if 'NORMAL' in file.upper():
-            textures_dic['normal_map'] = bpy.data.images.load(file)
+            normal_maps.append(file)
+        if 'HEIGHT' in file.upper():
+            height_maps.append(file)
+
+    if len(diffuse_maps) >=1:
+        textures_dic['diffuse'] = bpy.data.images.load(diffuse_maps[0])
+        if len(diffuse_maps) >1:
+            textures_dic['diffuse'].source = 'TILED'
+    else:
+        textures_dic['diffuse'] = None
+
+    if len(roughness_maps) >=1:
+        textures_dic['roughness'] = bpy.data.images.load(roughness_maps[0])
+        if len(diffuse_maps) >1:
+            textures_dic['roughness'].source = 'TILED'
+    else:
+        textures_dic['roughness'] = None
+
+    if len(metalness_maps) >=1:
+        textures_dic['metalness'] = bpy.data.images.load(metalness_maps[0])
+        if len(diffuse_maps) >1:
+            textures_dic['metalness'].source = 'TILED'
+    else:
+        textures_dic['metalness'] = None
+
+    if len(normal_maps) >=1:
+        textures_dic['normal_map'] = bpy.data.images.load(normal_maps[0])
+        if len(normal_maps) >1:
             textures_dic['normal_map'].source = 'TILED'
+    else:
+        textures_dic['normal_map'] = None
+
+    if len(height_maps) >=1:
+        textures_dic['height_map'] = bpy.data.images.load(height_maps[0])
+        if len(height_maps) >1:
+            textures_dic['height_map'].source = 'TILED'
+    else:
+        textures_dic['height_map'] = None
+
     return textures_dic
 
 def plug_textures(namespace, files_list, update=None):
@@ -93,14 +155,22 @@ def plug_textures(namespace, files_list, update=None):
     if material:
         textures_dic = get_textures_dic(files_list)
         # Plug diffuse
-        diffuse_texture_node = material.node_tree.nodes['Wizard Redshift Diffuse Texture']
-        diffuse_texture_node.inputs[2].default_value = textures_dic['diffuse']
+        if textures_dic['diffuse']:
+            diffuse_texture_node = material.node_tree.nodes['Wizard Redshift Diffuse Texture']
+            diffuse_texture_node.inputs[2].default_value = textures_dic['diffuse']
         # Plug roughness
-        roughness_texture_node = material.node_tree.nodes['Wizard Redshift Roughness Texture']
-        roughness_texture_node.inputs[2].default_value = textures_dic['roughness']
+        if textures_dic['roughness']:
+            roughness_texture_node = material.node_tree.nodes['Wizard Redshift Roughness Texture']
+            roughness_texture_node.inputs[2].default_value = textures_dic['roughness']
         # Plug metalness
-        metallic_texture_node = material.node_tree.nodes['Wizard Redshift Metallic Texture']
-        metallic_texture_node.inputs[2].default_value = textures_dic['metalness']
+        if textures_dic['metalness']:
+            metallic_texture_node = material.node_tree.nodes['Wizard Redshift Metallic Texture']
+            metallic_texture_node.inputs[2].default_value = textures_dic['metalness']
         # Plug normal
-        normal_map_node = material.node_tree.nodes['Wizard Redshift Normal Map']
-        normal_map_node.inputs[2].default_value = textures_dic['normal_map']
+        if textures_dic['normal_map']:
+            normal_map_node = material.node_tree.nodes['Wizard Redshift Normal Map']
+            normal_map_node.inputs[2].default_value = textures_dic['normal_map']
+        # PLug height
+        if textures_dic['height_map']:
+            height_texture_node = material.node_tree.nodes['Wizard Redshift Height Texture']
+            height_texture_node.inputs[2].default_value = textures_dic['height_map']
