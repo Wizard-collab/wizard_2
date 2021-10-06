@@ -44,6 +44,28 @@ class export(bpy.types.Operator):
         blender_wizard.export()
         return {'FINISHED'}
 
+class import_modeling(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_modeling"
+    bl_label = "Import modeling"
+    bl_description = "Import modleing ( hard )"
+    
+    def execute(self, context):
+        blender_wizard.reference_modeling()
+        return {'FINISHED'}
+
+class import_textures(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_textures"
+    bl_label = "Import textures"
+    bl_description = "Import textures and create shader"
+    
+    def execute(self, context):
+        blender_wizard.reference_textures()
+        return {'FINISHED'}
+
 class set_image_size(bpy.types.Operator):
     '''The set image size operator that call wizard function'''
 
@@ -66,22 +88,42 @@ class clear_all_materials(bpy.types.Operator):
         tools.clear_all_materials_of_selection()
         return {'FINISHED'}
 
-class TOPBAR_MT_wizard_menu(bpy.types.Menu):
-    '''The blender/wizard title bar menu draw'''
+class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
+    bl_label = "Import"
 
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("wizard.import_modeling", icon_value=wizard_icons["import_modeling"].icon_id)
+        layout.operator("wizard.import_textures", icon_value=wizard_icons["import_textures"].icon_id)
+
+class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
 
     def draw(self, context):
         layout = self.layout
         layout.operator("wizard.save_increment", icon_value=wizard_icons["save_increment"].icon_id)
+        
+        layout.separator()
+
         layout.operator("wizard.export", icon_value=wizard_icons["export"].icon_id)
+        layout.menu("TOPBAR_MT_wizard_import_submenu", icon_value=wizard_icons["import"].icon_id)
+
+        layout.separator()
+
         layout.operator("wizard.set_image_size", icon_value=wizard_icons["set_image_size"].icon_id)
         layout.operator("wizard.clear_all_materials", icon_value=wizard_icons["clear_all_materials"].icon_id)
 
     def menu_draw(self, context):
         self.layout.menu("TOPBAR_MT_wizard_menu")
 
-classes = (save_increment, export, set_image_size, clear_all_materials, TOPBAR_MT_wizard_menu)
+classes = (save_increment,
+                export,
+                import_modeling,
+                import_textures,
+                set_image_size,
+                clear_all_materials,
+                TOPBAR_MT_wizard_import_submenu,
+                TOPBAR_MT_wizard_menu)
 
 def register():
     # Register classes
@@ -94,6 +136,9 @@ def register():
     wizard_icons = bpy.utils.previews.new()
     wizard_icons.load("save_increment", 'icons/save_increment.png', 'IMAGE')
     wizard_icons.load("export", 'icons/export.png', 'IMAGE')
+    wizard_icons.load("import", 'icons/import.png', 'IMAGE')
+    wizard_icons.load("import_modeling", 'icons/import_modeling.png', 'IMAGE')
+    wizard_icons.load("import_textures", 'icons/import_textures.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("clear_all_materials", 'icons/remove_all_materials.png', 'IMAGE')
 

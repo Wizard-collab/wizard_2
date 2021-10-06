@@ -349,12 +349,16 @@ def set_reference_last_version(reference_id):
 
 def get_references_files(work_env_id):
 	references_rows = project.get_references(work_env_id)
-	references_list = []
+	references_dic = dict()
 	for reference_row in references_rows:
 		reference_files_list = json.loads(project.get_export_version_data(reference_row['export_version_id'], 'files'))
-		reference_tuple = (reference_files_list, reference_row['namespace'])
-		references_list.append(reference_tuple)
-	return references_list
+		reference_dic = dict()
+		reference_dic['files'] = reference_files_list
+		reference_dic['namespace'] = reference_row['namespace']
+		if reference_row['stage'] not in references_dic.keys():
+			references_dic[reference_row['stage']] = []
+		references_dic[reference_row['stage']].append(reference_dic)
+	return references_dic
 
 def merge_file_as_export_version(export_name, files, variant_id, comment=''):
 	return add_export_version(export_name, files, variant_id, None, comment)

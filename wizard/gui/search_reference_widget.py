@@ -34,10 +34,11 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
+        self.search_bar.search_bar.setFocus()
         event.accept()
 
     def clear(self):
-        self.search_bar.setFocus(1)
+        #self.search_bar.setFocus(1)
         self.search_bar.setText('')
 
     def leaveEvent(self, event):
@@ -141,6 +142,7 @@ class search_reference_widget(QtWidgets.QWidget):
         #self.search_bar.setObjectName('transparent_widget')
         self.search_bar.setPlaceholderText('"asset", "category:asset"')
         self.main_widget_layout.addWidget(self.search_bar)
+
 
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)

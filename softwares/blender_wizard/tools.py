@@ -36,3 +36,6 @@ def clear_all_materials_of_selection():
     selection = bpy.context.selected_objects
     for object in get_all_children(selection):
         object.data.materials.clear()
+
+def import_abc(file_path):
+    bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False)

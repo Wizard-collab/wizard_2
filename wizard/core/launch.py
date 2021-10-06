@@ -68,13 +68,13 @@ def build_command(file_path, software_row, version_id):
 		# Substance Painter specific launch
 		if software_row['name'] == softwares_vars._substance_painter_:
 			work_env_id = project.get_version_data(version_id, 'work_env_id')
-			references_list = assets.get_references_files(work_env_id) 
-			if len(references_list)==1:
-				reference_file = references_list[0][0][0]
-				print(reference_file)
+			references_dic = assets.get_references_files(work_env_id) 
+			print(references_dic)
+			if 'modeling' in references_dic.keys():
+				reference_file = references_dic['modeling'][0]['files'][0]
 				raw_command = raw_command.replace(softwares_vars._reference_key_, reference_file)
 			else:
-				logger.warning('Please create ONE reference to launch Substance Painter')
+				logger.warning('Please create ONE modeling reference to launch Substance Painter')
 
 		if software_row['name'] in softwares_vars._scripts_dic_.keys():
 			raw_command = raw_command.replace(softwares_vars._script_key_,
