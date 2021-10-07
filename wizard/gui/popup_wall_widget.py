@@ -14,6 +14,7 @@ import os
 from wizard.core import user
 from wizard.core import site
 from wizard.core import image
+from wizard.core import project
 from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
@@ -30,6 +31,7 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         self.popup_ids = dict()
+        self.popup_save_ids = dict()
 
         self.build_ui()
         self.move_ui()
@@ -48,6 +50,7 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.popup_scrollBar = self.popups_scrollArea.verticalScrollBar()
 
         self.popups_scrollArea_widget = QtWidgets.QWidget()
+        self.popups_scrollArea_widget.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.popups_scrollArea_widget.setObjectName('transparent_widget')
         self.popups_scrollArea_layout = QtWidgets.QVBoxLayout()
         self.popups_scrollArea_layout.setSpacing(6)
@@ -83,6 +86,13 @@ class popup_wall_widget(QtWidgets.QWidget):
             self.popups_scrollArea_layout.addWidget(widget)
             self.popup_ids[event_row['id']].time_out.connect(self.remove_popup)
 
+    def add_save_popup(self, version_id):
+        if user.user().get_popups_enabled():
+            widget = popup_save_widget(version_id)
+            self.popup_save_ids[version_id] = widget
+            self.popups_scrollArea_layout.addWidget(widget)
+            self.popup_save_ids[version_id].time_out.connect(self.remove_save_popup)
+
     def remove_popup(self, popup_id):
         if popup_id in self.popup_ids.keys():
             widget = self.popup_ids[popup_id]
@@ -90,6 +100,134 @@ class popup_wall_widget(QtWidgets.QWidget):
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
+
+    def remove_save_popup(self, popup_id):
+        if popup_id in self.popup_save_ids.keys():
+            widget = self.popup_save_ids[popup_id]
+            del self.popup_save_ids[popup_id]
+            widget.setVisible(0)
+            widget.setParent(None)
+            widget.deleteLater()
+
+class popup_save_widget(QtWidgets.QFrame):
+
+    time_out = pyqtSignal(int)
+
+    def __init__(self, version_id, parent=None):
+        super(popup_save_widget, self).__init__(parent)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.setGraphicsEffect(self.shadow)
+
+        self.setObjectName('popup_event_frame')
+        self.version_id = version_id
+        self.build_ui()
+        self.fill_ui()
+        self.connect_functions()
+        self.init_clock()
+        self.start_clock()
+
+    def enterEvent(self, event):
+        self.timer.stop()
+
+    def leaveEvent(self, event):
+        self.start_clock()
+
+    def init_clock(self):
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(lambda: self.time_out.emit(self.version_id))
+    
+    def start_clock(self):
+        duration = user.user().get_popups_duration()
+        self.timer.start(duration*1000)
+
+    def fill_ui(self):
+        version_row = project.get_version_data(self.version_id)
+        self.comment_textEdit.setText(version_row['comment'])
+        self.version_name_label.setText(f"Version {version_row['name']}")
+
+    def connect_functions(self):
+        self.update_comment_button.clicked.connect(self.update_comment)
+        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
+
+    def update_comment(self):
+        comment = self.comment_textEdit.toPlainText()
+        project.modify_version_comment(self.version_id, comment)
+        gui_server.refresh_ui()
+        self.time_out.emit(self.version_id)
+
+    def build_ui(self):
+        self.setMinimumWidth(320)
+        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(10,10,10,10)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
+        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(6)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.version_name_label = QtWidgets.QLabel()
+        self.version_name_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.header_layout.addWidget(self.version_name_label)
+
+        self.decoration_content = QtWidgets.QWidget()
+        self.decoration_content.setObjectName('transparent_widget')
+        self.decoration_content_layout = QtWidgets.QVBoxLayout()
+        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setSpacing(0)
+        self.decoration_content.setLayout(self.decoration_content_layout)
+        self.header_layout.addWidget(self.decoration_content)
+
+        self.quit_button = QtWidgets.QPushButton()
+        self.quit_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
+        self.quit_button.setIconSize(QtCore.QSize(12,12))
+        self.quit_button.setObjectName('window_decoration_button')
+        self.quit_button.setFixedSize(16, 16)
+        self.decoration_content_layout.addWidget(self.quit_button)
+        
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+        self.widget_1 = QtWidgets.QWidget()
+        self.widget_1_layout = QtWidgets.QHBoxLayout()
+        self.widget_1_layout.setContentsMargins(0,0,0,0)
+        self.widget_1_layout.setSpacing(6)
+        self.widget_1.setLayout(self.widget_1_layout)
+        self.main_layout.addWidget(self.widget_1)
+
+        self.icon_content = QtWidgets.QWidget()
+        self.icon_content.setObjectName('transparent_widget')
+        self.icon_content_layout = QtWidgets.QVBoxLayout()
+        self.icon_content_layout.setContentsMargins(0,0,0,0)
+        self.icon_content_layout.setSpacing(0)
+        self.icon_content.setLayout(self.icon_content_layout)
+        self.widget_1_layout.addWidget(self.icon_content)
+
+        self.save_image = QtWidgets.QLabel()
+        self.save_image.setPixmap(QtGui.QPixmap(ressources._save_icon_).scaled(30,30,
+                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.icon_content_layout.addWidget(self.save_image)
+
+        self.icon_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit.setPlaceholderText('Your comment')
+        self.comment_textEdit.setMaximumHeight(50)
+        self.widget_1_layout.addWidget(self.comment_textEdit)
+
+        self.update_comment_button = QtWidgets.QPushButton('Comment')
+        self.main_layout.addWidget(self.update_comment_button)
 
 class popup_event_widget(QtWidgets.QFrame):
 
@@ -176,6 +314,7 @@ class popup_event_widget(QtWidgets.QFrame):
             gui_server.focus_export_version(export_version_id)
 
     def build_ui(self):
+        self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setMinimumWidth(320)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()

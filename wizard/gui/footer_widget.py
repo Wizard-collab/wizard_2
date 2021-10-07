@@ -27,6 +27,7 @@ class footer_widget(QtWidgets.QFrame):
     connect_team = pyqtSignal(int)
     show_team_widget = pyqtSignal(int)
     show_user_preferences = pyqtSignal(int)
+    refresh_signal = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(footer_widget, self).__init__(parent)
@@ -107,6 +108,7 @@ class footer_widget(QtWidgets.QFrame):
             self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_off_))
 
     def connect_functions(self):
+        self.refresh_ui_button.clicked.connect(self.refresh_signal.emit)
         self.console_button.clicked.connect(self.show_console.emit)
         self.wall_button.clicked.connect(self.show_wall.emit)
         self.task_manager_button.clicked.connect(self.show_subtask_manager.emit)

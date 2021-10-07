@@ -21,6 +21,7 @@ from wizard.core import launch
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import image_viewer_widget
 
 class launcher_widget(QtWidgets.QFrame):
 
@@ -226,8 +227,8 @@ class launcher_widget(QtWidgets.QFrame):
         if not os.path.isfile(screenshot_path):
             screenshot_path = ressources._no_screenshot_
         image_bytes, width, height = image.convert_screenshot(screenshot_path)
-        self.screenshot_label.setFixedSize(width, height)
-        gui_utils.round_corners_image(self.screenshot_label, image_bytes, (width, height), 10)
+        self.screenshot_button.setFixedSize(width, height)
+        gui_utils.round_corners_image_button(self.screenshot_button, image_bytes, (width, height), 10)
 
     def refresh_lock_button(self):
         self.lock_button.setStyleSheet('')
@@ -303,6 +304,14 @@ class launcher_widget(QtWidgets.QFrame):
         self.launch_button.clicked.connect(self.launch)
         self.lock_button.clicked.connect(self.toggle_lock)
         self.add_variant_button.clicked.connect(self.create_variant)
+        self.screenshot_button.clicked.connect(self.show_screen_shot)
+
+    def show_screen_shot(self):
+        if self.version_row is not None:
+            screenshot_path = self.version_row['screenshot_path']
+            if os.path.isfile(screenshot_path):
+                self.image_viewer_widget = image_viewer_widget.image_viewer_widget(screenshot_path)
+                self.image_viewer_widget.show()
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -310,10 +319,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
-        self.screenshot_label = QtWidgets.QLabel()
-        gui_utils.application_tooltip(self.screenshot_label, "Version screenshot")
-        self.screenshot_label.setFixedWidth(300)
-        self.main_layout.addWidget(self.screenshot_label)
+        self.screenshot_button = QtWidgets.QPushButton()
+        self.screenshot_button.setObjectName('screenshot_button')
+        gui_utils.application_tooltip(self.screenshot_button, "Show version screenshot")
+        self.screenshot_button.setFixedWidth(300)
+        self.screenshot_button.setIconSize(QtCore.QSize(298, 298))
+        self.main_layout.addWidget(self.screenshot_button)
 
         self.variant_widget = QtWidgets.QWidget()
         self.variant_layout = QtWidgets.QHBoxLayout()

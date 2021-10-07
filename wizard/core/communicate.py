@@ -88,6 +88,7 @@ def add_version(work_env_id):
     version_path = project.get_version_data(version_id,
                                                     'file_path')
     gui_server.refresh_ui()
+    gui_server.save_popup(version_id)
     return (version_path, version_id)
 
 def request_export(work_env_id, export_name):

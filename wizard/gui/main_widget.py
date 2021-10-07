@@ -116,6 +116,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.connect_team.connect(self.init_team_client)
         self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
         self.footer_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
+        self.footer_widget.refresh_signal.connect(self.refresh)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
@@ -133,6 +134,7 @@ class main_widget(custom_window.custom_window):
         self.gui_server.stdout_signal.connect(self.update_stdout)
         self.gui_server.focus_instance_signal.connect(self.focus_instance)
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
+        self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
 
     def restart(self):
         self.quit_threads()

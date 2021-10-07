@@ -884,6 +884,15 @@ def get_version_data(version_id, column='*'):
         logger.error("Version not found")
         return None
 
+def modify_version_comment(version_id, comment=''):
+    success = db_utils.update_data('project',
+                        'versions',
+                        ('comment', comment),
+                        ('id', version_id))
+    if success:
+        logger.info('Version comment modified')
+    return success
+
 def remove_version(version_id):
     success = None
     if site.is_admin():

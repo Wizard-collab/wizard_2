@@ -431,6 +431,15 @@ QSlider::handle:horizontal {
 	border-radius: 8px;
 } 
 
+#screenshot_button {
+	border-radius: 10px;
+}
+
+
+#screenshot_button:hover {
+	border: 1px solid gray;
+}
+
 #settings_tab_bar::tab:selected { 
 	background-color: #7785de;
 	font: bold;

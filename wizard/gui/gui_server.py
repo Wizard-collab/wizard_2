@@ -46,6 +46,7 @@ class gui_server(QThread):
     stdout_signal = pyqtSignal(tuple)
     export_version_focus_signal = pyqtSignal(object)
     focus_instance_signal = pyqtSignal(object)
+    save_popup_signal = pyqtSignal(int)
 
     def __init__(self):
         super(gui_server, self).__init__()
@@ -95,6 +96,8 @@ class gui_server(QThread):
             self.export_version_focus_signal.emit(signal_dic['export_version_id'])
         elif signal_dic['function'] == 'refresh_team':
             self.refresh_team_signal.emit(1)
+        elif signal_dic['function'] == 'save_popup':
+            self.save_popup_signal.emit(signal_dic['version_id'])
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
@@ -121,6 +124,12 @@ def refresh_team_ui():
 def restart_ui():
     signal_dic = dict()
     signal_dic['function'] = 'restart'
+    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+
+def save_popup(version_id):
+    signal_dic = dict()
+    signal_dic['function'] = 'save_popup'
+    signal_dic['version_id'] = version_id
     socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
 
 def tooltip(tooltip):
