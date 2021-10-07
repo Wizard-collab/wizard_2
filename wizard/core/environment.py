@@ -30,7 +30,6 @@ def set_psql_dns(DNS):
 	os.environ[env_vars._psql_dns_] = DNS
 	return 1
 
-
 def get_psql_dns():
 	if env_vars._psql_dns_ in os.environ.keys():
 		return os.environ[env_vars._psql_dns_]

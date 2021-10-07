@@ -18,8 +18,6 @@ class all_users_widget(custom_window.custom_window):
     def __init__(self, parent = None):
         super(all_users_widget, self).__init__(parent)
 
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.ToolTip)
-        
         self.user_ids = dict()
         self.add_title('Wizard cup')
         self.build_ui()

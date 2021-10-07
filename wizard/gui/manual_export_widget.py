@@ -18,8 +18,6 @@ class manual_export_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
         super(manual_export_widget, self).__init__()
 
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.ToolTip)
-
         self.files = []
         self.export_name = None
         self.add_title('Manual export files')

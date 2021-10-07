@@ -82,6 +82,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.search_bar.textChanged.connect(self.search_asset)
         self.search_thread.item_signal.connect(self.add_item)
         self.search_thread.search_ended.connect(self.search_ended)
+        self.list_view.itemDoubleClicked.connect(self.return_references)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Down:

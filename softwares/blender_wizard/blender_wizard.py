@@ -17,7 +17,6 @@ def save_increment():
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
     if file_path:
         bpy.ops.wm.save_as_mainfile(filepath=file_path)
-        
     if version_id is not None:
     	os.environ['wizard_version_id'] = str(version_id)
 

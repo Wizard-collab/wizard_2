@@ -178,6 +178,15 @@ class custom_widget(QtWidgets.QWidget):
                 self.top_frame.setVisible(1)
                 self.apply_shadow(1)
 
+    def maximise(self):
+        window = self.windowHandle()
+        window.setWindowStates(QtCore.Qt.WindowMaximized)
+        self.right_resize_widget.setVisible(0)
+        self.left_resize_widget.setVisible(0)
+        self.bottom_frame.setVisible(0)
+        self.top_frame.setVisible(0)
+        self.apply_shadow(0)
+
     def toggle_size(self):
         window = self.windowHandle()
         state = window.windowState()

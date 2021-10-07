@@ -15,6 +15,7 @@ from wizard.core import user
 from wizard.core import site
 from wizard.core import image
 from wizard.core import project
+from wizard.core import environment
 from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
@@ -152,7 +153,7 @@ class popup_save_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.update_comment_button.clicked.connect(self.update_comment)
-        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
+        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.version_id))
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -178,6 +179,11 @@ class popup_save_widget(QtWidgets.QFrame):
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
+        self.save_image = QtWidgets.QLabel()
+        self.save_image.setPixmap(QtGui.QPixmap(ressources._save_icon_).scaled(22,22,
+                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.header_layout.addWidget(self.save_image)
+
         self.version_name_label = QtWidgets.QLabel()
         self.version_name_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.header_layout.addWidget(self.version_name_label)
@@ -199,32 +205,10 @@ class popup_save_widget(QtWidgets.QFrame):
         
         self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
-        self.widget_1 = QtWidgets.QWidget()
-        self.widget_1_layout = QtWidgets.QHBoxLayout()
-        self.widget_1_layout.setContentsMargins(0,0,0,0)
-        self.widget_1_layout.setSpacing(6)
-        self.widget_1.setLayout(self.widget_1_layout)
-        self.main_layout.addWidget(self.widget_1)
-
-        self.icon_content = QtWidgets.QWidget()
-        self.icon_content.setObjectName('transparent_widget')
-        self.icon_content_layout = QtWidgets.QVBoxLayout()
-        self.icon_content_layout.setContentsMargins(0,0,0,0)
-        self.icon_content_layout.setSpacing(0)
-        self.icon_content.setLayout(self.icon_content_layout)
-        self.widget_1_layout.addWidget(self.icon_content)
-
-        self.save_image = QtWidgets.QLabel()
-        self.save_image.setPixmap(QtGui.QPixmap(ressources._save_icon_).scaled(30,30,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
-        self.icon_content_layout.addWidget(self.save_image)
-
-        self.icon_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
-
         self.comment_textEdit = QtWidgets.QTextEdit()
         self.comment_textEdit.setPlaceholderText('Your comment')
         self.comment_textEdit.setMaximumHeight(50)
-        self.widget_1_layout.addWidget(self.comment_textEdit)
+        self.main_layout.addWidget(self.comment_textEdit)
 
         self.update_comment_button = QtWidgets.QPushButton('Comment')
         self.main_layout.addWidget(self.update_comment_button)
@@ -288,6 +272,11 @@ class popup_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
             gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
+
+            # Show comment widget if user is current user
+            if self.event_row['creation_user'] == environment.get_user():
+                self.comment_widget.setVisible(True)
+
         elif 'ticket' in self.event_row['type']:
             profile_color = '#f79360'
             gui_utils.application_tooltip(self.action_button_button, "View ticket")
@@ -299,7 +288,15 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.action_button_button.clicked.connect(self.action)
+        self.comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
+
+    def update_comment(self):
+        comment = self.comment_textEdit.toPlainText()
+        export_version_id = self.event_row['data']
+        project.update_export_version_data(export_version_id, ('comment', comment))
+        gui_server.refresh_ui()
+        self.time_out.emit(self.event_row['id'])
 
     def action(self):
         if self.event_row['type'] == 'archive':
@@ -381,7 +378,6 @@ class popup_event_widget(QtWidgets.QFrame):
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
-        #self.header_layout.setContentsMargins(,0,0,0)
         self.content_layout.setSpacing(12)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -394,6 +390,22 @@ class popup_event_widget(QtWidgets.QFrame):
         self.event_additional_content_label.setObjectName('gray_label')
         self.event_additional_content_label.setWordWrap(True)
         self.content_layout.addWidget(self.event_additional_content_label)
+
+        self.comment_widget = QtWidgets.QWidget()
+        self.comment_widget_layout = QtWidgets.QVBoxLayout()
+        self.comment_widget_layout.setContentsMargins(0,0,0,0)
+        self.comment_widget_layout.setSpacing(4)
+        self.comment_widget.setLayout(self.comment_widget_layout)
+        self.content_layout.addWidget(self.comment_widget)
+        self.comment_widget.setVisible(False)
+
+        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit.setMaximumHeight(50)
+        self.comment_textEdit.setPlaceholderText('Your comment')
+        self.comment_widget_layout.addWidget(self.comment_textEdit)
+
+        self.comment_button = QtWidgets.QPushButton('Comment')
+        self.comment_widget_layout.addWidget(self.comment_button)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')

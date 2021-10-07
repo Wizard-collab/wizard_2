@@ -42,6 +42,7 @@ class app():
 			self.app.setStyleSheet(f.read())
 
 		if gui_server.try_connection():
+			gui_server.raise_ui()
 			self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
 																"You're already running an instance of Wizard.")
 			self.instance_running_info_widget.exec_()

@@ -106,6 +106,7 @@ class main_widget(custom_window.custom_window):
         self.header_widget.close_signal.connect(self.close)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
+        self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
         self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
         self.launcher_widget.variant_changed_signal.connect(self.variant_changed)
         self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
@@ -135,6 +136,7 @@ class main_widget(custom_window.custom_window):
         self.gui_server.focus_instance_signal.connect(self.focus_instance)
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
+        self.gui_server.raise_ui_signal.connect(self.raise_window)
 
     def restart(self):
         self.quit_threads()
@@ -143,6 +145,11 @@ class main_widget(custom_window.custom_window):
             command = 'python app.py'
         subprocess.Popen(command, shell=True)
         self.close()
+
+    def raise_window(self):
+        self.raise_()
+        self.show()
+        self.activateWindow()
 
     def focus_export_version(self, export_version_id):
         export_version_row = project.get_export_version_data(export_version_id)

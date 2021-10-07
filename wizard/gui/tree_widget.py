@@ -31,6 +31,7 @@ from wizard.gui import gui_server
 class tree_widget(QtWidgets.QFrame):
 
     stage_changed_signal = pyqtSignal(object)
+    launch_stage_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(tree_widget, self).__init__(parent)
@@ -420,6 +421,8 @@ class tree_widget(QtWidgets.QFrame):
                 new_category_id = assets.create_category(category_name, parent_id)
                 if new_category_id is not None:
                     gui_server.refresh_ui()
+        elif item.instance_type == 'stage':
+            self.launch_stage_signal.emit(1)
 
         if new_stage_id:
             if new_stage_id in self.stage_ids.keys():

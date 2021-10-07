@@ -18,8 +18,6 @@ class log_viewer(custom_window.custom_window):
     def __init__(self, file=None, parent=None):
         super(log_viewer, self).__init__(parent)
 
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.ToolTip)
-
         self.add_title('Logs viewer')
         self.build_ui()
         self.file = file
