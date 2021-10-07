@@ -1,0 +1,2 @@
+python -m venv python3_wizard_venv
+python3_wizard_venv\Scripts\activate
