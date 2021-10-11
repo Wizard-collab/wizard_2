@@ -14,6 +14,7 @@ from wizard.core import launch
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import tools
+from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
@@ -30,7 +31,6 @@ from wizard.gui import drop_files_widget
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(exports_widget, self).__init__(parent)
-
 
         self.search_thread = search_thread()
 
@@ -221,14 +221,21 @@ class exports_widget(QtWidgets.QWidget):
                     self.confirm_widget.set_security_sentence('I understand the risks')
 
                 if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+
+                    export_ids = []
+                    export_version_ids = []
+
                     for item in selection:
                         if item.type == 'export_version':
-                            export_version_id = item.export_version_row['id']
-                            assets.archive_export_version(export_version_id)
+                            export_version_ids.append(item.export_version_row['id'])
                         elif item.type == 'export':
-                            export_id = item.export_row['id']
-                            assets.archive_export(export_id)
-                    gui_server.refresh_ui()
+                            export_ids.append(item.export_row['id'])
+
+                    if len(export_ids) > 0:
+                        subtasks_library.archive_exports(export_ids)
+                    if len(export_version_ids) > 0:
+                        subtasks_library.archive_export_versions(export_version_ids)
+
 
     def open_folder(self):
         if self.variant_id is not None:

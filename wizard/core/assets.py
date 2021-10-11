@@ -495,7 +495,7 @@ def archive_export_version(export_version_id):
 				archive_file = ''
 			success = project.remove_export_version(export_version_id)
 			if success:
-				events.add_archive_event(f"Archived export version:\n{instance_to_string(('export', export_version_row['export_id']))}/{export_version_row['name']}",
+				events.add_archive_event("Archived export version", f"{instance_to_string(('export', export_version_row['export_id']))}/{export_version_row['name']}",
 												archive_file)
 			return success
 		else:

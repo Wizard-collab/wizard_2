@@ -30,6 +30,42 @@ def archive_versions(version_ids):
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
 
+def archive_export_versions(export_version_ids):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import assets\n"
+	command += "from wizard.gui import gui_server\n"
+	command += "print('wizard_task_name:Export version archiving')\n"
+	command += f"percent_step=100.0/len({export_version_ids})\n"
+	command += "percent=0.0\n"
+	command += "print(f'wizard_task_percent:{percent}')\n"
+	command += f"for export_version_id in {export_version_ids}:\n"
+	command += "	assets.archive_export_version(export_version_id)\n"
+	command += "	percent+=percent_step\n"
+	command += "	print(f'wizard_task_percent:{percent}')\n"
+	command += "gui_server.refresh_ui()\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task.start()
+	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+
+def archive_exports(export_ids):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import assets\n"
+	command += "from wizard.gui import gui_server\n"
+	command += "print('wizard_task_name:Export archiving')\n"
+	command += f"percent_step=100.0/len({export_ids})\n"
+	command += "percent=0.0\n"
+	command += "print(f'wizard_task_percent:{percent}')\n"
+	command += f"for export_id in {export_ids}:\n"
+	command += "	assets.archive_export(export_id)\n"
+	command += "	percent+=percent_step\n"
+	command += "	print(f'wizard_task_percent:{percent}')\n"
+	command += "gui_server.refresh_ui()\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task.start()
+	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+
 def archive_asset(asset_id):
 	command =  "# coding: utf-8\n"
 	command += "from wizard.core import assets\n"
