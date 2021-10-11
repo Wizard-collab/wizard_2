@@ -14,6 +14,7 @@ from wizard.core import project
 from wizard.core import assets
 from wizard.core import environment
 from wizard.core import user
+from wizard.core import subtasks_library
 from wizard.vars import user_vars
 from wizard.vars import assets_vars
 from wizard.vars import ressources
@@ -488,13 +489,11 @@ class tree_widget(QtWidgets.QFrame):
         if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
             success = None
             if item.instance_type == 'category':
-                success = assets.archive_category(item.instance_id)
+                subtasks_library.archive_category(item.instance_id)
             elif item.instance_type == 'asset':
-                success = assets.archive_asset(item.instance_id)
+                subtasks_library.archive_asset(item.instance_id)
             elif item.instance_type== 'stage':
-                success = assets.archive_stage(item.instance_id)
-            if success:
-                gui_server.refresh_ui()
+                subtasks_library.archive_stage(item.instance_id)
 
     def remove_category(self, id):
         item = self.category_ids[id]
