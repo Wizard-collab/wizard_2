@@ -137,6 +137,14 @@ class footer_widget(QtWidgets.QFrame):
         else:
             self.wall_button.setIcon(QtGui.QIcon(ressources._wall_icon_))
 
+    def update_subtask_manager_button(self, status):
+        if status == 'process':
+            self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_process_icon_))
+        elif status == 'done':
+            self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_done_icon_))
+        else:
+            self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_icon_))
+
 class tooltip_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(tooltip_widget, self).__init__(parent)

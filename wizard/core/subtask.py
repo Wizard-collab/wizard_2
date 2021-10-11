@@ -156,7 +156,7 @@ class subtask(Thread):
     def build_pycmd(self):
         if self.pycmd is not None:
             py_file = tools.temp_file_from_pycmd(self.pycmd)
-            self.command = f'python "{py_file}"'
+            self.command = f'python PyWizard.py "{py_file}"'
 
     def run(self):
         try:

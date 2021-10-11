@@ -14,6 +14,7 @@ from wizard.core import assets
 from wizard.core import user
 from wizard.core import project
 from wizard.core import tools
+from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.vars import user_vars
 from wizard.core import custom_logger
@@ -511,9 +512,10 @@ class versions_widget(QtWidgets.QWidget):
             if items!=[]:
                 self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
                 if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    version_ids = []
                     for item in items:
-                        assets.archive_version(item.version_row['id'])
-                    gui_server.refresh_ui()
+                        version_ids.append(item.version_row['id'])
+                    subtasks_library.archive_versions(version_ids)
 
     def refresh_infos(self):
         self.versions_count_label.setText(f"{self.get_number()} versions -")

@@ -26,6 +26,9 @@ logger = custom_logger.get_logger(__name__)
 _DNS_ = ('localhost', 10231)
 
 class subtask_manager(custom_window.custom_window):
+
+    global_status_signal = pyqtSignal(object)
+
     def __init__(self, parent = None):
         super(subtask_manager, self).__init__(parent)
         self.tasks_ids = dict()
@@ -94,13 +97,16 @@ class subtask_manager(custom_window.custom_window):
             task_widget = subtask_widget(conn, process_id)
             self.tasks_ids[process_id] = task_widget
             self.tasks_ids[process_id].remove_task_signal.connect(self.remove_task)
+            self.tasks_ids[process_id].update_status_signal.connect(self.check_global_status)
             self.tasks_scrollArea_layout.addWidget(task_widget)
             self.refresh()
+            self.check_global_status()
 
     def remove_task(self, process_id):
         if process_id in self.tasks_ids.keys():
             del self.tasks_ids[process_id]
             self.refresh()
+            self.check_global_status()
 
     def refresh(self):
         if len(self.tasks_ids) == 0:
@@ -112,9 +118,22 @@ class subtask_manager(custom_window.custom_window):
             self.info_widget.setVisible(0)
             self.tasks_scrollArea.setVisible(1)
 
+    def check_global_status(self):
+        status = None
+        for task_id in self.tasks_ids.keys():
+            print(self.tasks_ids[task_id].task_thread.running)
+            if self.tasks_ids[task_id].task_thread.running:
+                status = 'process'
+                break
+            else:
+                status = 'done'
+        print(status)
+        self.global_status_signal.emit(status)
+
 class subtask_widget(QtWidgets.QFrame):
 
     remove_task_signal = pyqtSignal(str)
+    update_status_signal = pyqtSignal(int)
 
     def __init__(self, conn, process_id, parent=None):
         super(subtask_widget, self).__init__(parent)
@@ -122,6 +141,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.conn = conn
         self.process_id = process_id
         self.log_file = None
+        self.status = None
 
         self.build_ui()
         self.update_thread_status(self.process_id)
@@ -222,6 +242,7 @@ class subtask_widget(QtWidgets.QFrame):
             color = '#f0605b'
         elif status == 'Done':
             color = '#9cf277'
+        self.status = status
         self.status_data_label.setText(status)
         self.status_data_label.setStyleSheet(f"color:{color};")
         self.progress.setStyleSheet('#task_progressBar{color:transparent;}\n#task_progressBar::chunk{background-color:%s;}'%color)
@@ -236,6 +257,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.task_thread.signal.connect(self.analyse_signal)
         self.task_thread.connection_dead.connect(lambda:self.update_thread_status('Task closed'))
         self.task_thread.connection_dead.connect(self.clock_thread.stop)
+        self.task_thread.connection_dead.connect(self.update_status_signal.emit)
         self.kill_button.clicked.connect(self.task_thread.kill)
         self.delete_task_button.clicked.connect(self.delete_task)
         self.show_log_viewer_button.clicked.connect(self.show_log_viewer)
