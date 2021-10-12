@@ -1,15 +1,15 @@
 # Wizard
 
 Wizard is an autonomous software for managing CGI productions.
-http://www.wizard-files.com/
+http://93.19.210.30/
 
 * Installation:
-	* Official builds : [Download wizard](http://www.wizard-files.com/versions/)
 	* This repository :
 		* Clone the repository
 		* Install `python 3.9.5`
-		* Install all dependencies ( with pip )
-		* Launch `wizard_2/python PyWizard.py`
+		* Launch `setup_python3.bat` if you want venv for python and activate it ( with `a.bat` )
+		* Launch `install_python3_modules.bat`
+		* Launch `app.bat` or `python app.py`
 
 * Developed with _python 3.9.5_
 
@@ -19,3 +19,8 @@ http://www.wizard-files.com/
 	* pillow
 	* pyautogui
 	* psycopg2
+	* psutil
+	* QScintilla
+
+* Database dependency:
+	* PostgreSQL
