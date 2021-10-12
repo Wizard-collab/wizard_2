@@ -48,28 +48,6 @@ def get_team_dns():
 		logger.error('No team DNS defined')
 		return None
 
-def add_running_work_env(work_env_id):
-	if env_vars._running_work_envs_ not in os.environ.keys():
-		os.environ[env_vars._running_work_envs_] = json.dumps([work_env_id])
-	else:
-		work_env_list = json.loads(os.environ[env_vars._running_work_envs_])
-		work_env_list.append(work_env_id)
-		os.environ[env_vars._running_work_envs_] = json.dumps(work_env_list)
-
-def remove_running_work_env(work_env_id):
-	if env_vars._running_work_envs_ not in os.environ.keys():
-		os.environ[env_vars._running_work_envs_] = json.dumps([])
-	else:
-		work_env_list = json.loads(os.environ[env_vars._running_work_envs_])
-		work_env_list.remove(work_env_id)
-		os.environ[env_vars._running_work_envs_] = json.dumps(work_env_list)
-
-def get_running_work_envs():
-	work_envs_list = []
-	if env_vars._running_work_envs_ in os.environ.keys():
-		work_envs_list = json.loads(os.environ[env_vars._running_work_envs_])
-	return work_envs_list
-
 def get_user():
 	if env_vars._username_env_ in os.environ.keys():
 		return os.environ[env_vars._username_env_]

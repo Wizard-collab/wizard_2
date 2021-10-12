@@ -216,7 +216,7 @@ class launcher_widget(QtWidgets.QFrame):
 
     def refresh_launch_button(self):
         if self.work_env_row is not None:
-            if self.work_env_row['id'] in environment.get_running_work_envs():
+            if self.work_env_row['id'] in launch.get():
                 self.launch_button.start_animation()
             else:
                 self.launch_button.stop_animation()

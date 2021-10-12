@@ -22,6 +22,7 @@ from wizard.core import tools
 from wizard.core import create_project
 from wizard.core import communicate
 from wizard.core import environment
+from wizard.core import launch
 from wizard.core import db_core
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
@@ -88,6 +89,8 @@ while not user.get_project():
         user.log_project(project_name, project_password)
 
 db_server.project_name = environment.get_project_name()
+softwares_server = launch.softwares_server()
+softwares_server.start()
 
 if len(sys.argv) == 2:
     try:
@@ -96,3 +99,4 @@ if len(sys.argv) == 2:
         print(str(traceback.format_exc()))
     finally:
         db_server.stop()
+        softwares_server.stop()

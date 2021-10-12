@@ -14,6 +14,7 @@ import sys
 from wizard.vars import ressources
 from wizard.core import project
 from wizard.core import communicate
+from wizard.core import launch
 from wizard.core import team_client
 from wizard.core import custom_logger
 logger = custom_logger.get_logger()
@@ -64,12 +65,14 @@ class main_widget(custom_window.custom_window):
         self.team_client = team_client.team_client()
         self.gui_server = gui_server.gui_server()
         self.communicate_server = communicate.communicate_server()
+        self.softwares_server = launch.softwares_server()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
         self.init_communicate_server()
         self.init_team_client()
         self.init_popup_wall_widget()
+        self.init_softwares_server()
 
     def init_popup_wall_widget(self):
         self.popup_wall_widget.show()
@@ -82,6 +85,9 @@ class main_widget(custom_window.custom_window):
 
     def init_team_client(self):
         self.team_client.start()
+
+    def init_softwares_server(self):
+        self.softwares_server.start()
 
     def init_contexts(self):
         self.tree_widget.get_context()
@@ -219,6 +225,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.hardware_infos_widget.timer.stop()
         self.communicate_server.stop()
         self.subtask_manager.tasks_server.stop()
+        self.softwares_server.stop()
         self.save_contexts()
 
     def closeEvent(self, event):

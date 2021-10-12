@@ -68,6 +68,9 @@ class comment_widget(QtWidgets.QDialog):
         self.accept_button.setObjectName("blue_button")
         self.frame_layout.addWidget(self.accept_button)
 
+    def leaveEvent(self, event):
+    	self.reject()
+
     def confirm(self):
     	self.comment = self.comment_field.toPlainText()
     	self.accept()
