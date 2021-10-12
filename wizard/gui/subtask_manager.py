@@ -70,7 +70,6 @@ class subtask_manager(custom_window.custom_window):
         self.tasks_scrollArea_layout.setSpacing(3)
         self.tasks_scrollArea_widget.setLayout(self.tasks_scrollArea_layout)
 
-        #self.tasks_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.tasks_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tasks_scrollArea.setWidgetResizable(True)
         self.tasks_scrollArea.setWidget(self.tasks_scrollArea_widget)
@@ -121,13 +120,11 @@ class subtask_manager(custom_window.custom_window):
     def check_global_status(self):
         status = None
         for task_id in self.tasks_ids.keys():
-            print(self.tasks_ids[task_id].task_thread.running)
             if self.tasks_ids[task_id].task_thread.running:
                 status = 'process'
                 break
             else:
                 status = 'done'
-        print(status)
         self.global_status_signal.emit(status)
 
 class subtask_widget(QtWidgets.QFrame):

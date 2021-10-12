@@ -28,7 +28,7 @@ def archive_versions(version_ids):
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
 def archive_export_versions(export_version_ids):
 	command =  "# coding: utf-8\n"
@@ -46,7 +46,7 @@ def archive_export_versions(export_version_ids):
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
 def archive_exports(export_ids):
 	command =  "# coding: utf-8\n"
@@ -64,7 +64,7 @@ def archive_exports(export_ids):
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
 def archive_asset(asset_id):
 	command =  "# coding: utf-8\n"
@@ -78,7 +78,7 @@ def archive_asset(asset_id):
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
 def archive_category(category_id):
 	command =  "# coding: utf-8\n"
@@ -92,7 +92,7 @@ def archive_category(category_id):
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
 def archive_stage(stage_id):
 	command =  "# coding: utf-8\n"
@@ -106,4 +106,4 @@ def archive_stage(stage_id):
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get mode informations')
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')

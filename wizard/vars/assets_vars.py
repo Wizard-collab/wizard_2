@@ -72,6 +72,20 @@ _sequences_stages_list_ = [_layout_,
 								_compositing_,
 								]
 
+_stages_indexes_ = dict()
+_stages_indexes_[_modeling_] = 0
+_stages_indexes_[_rigging_] = 1
+_stages_indexes_[_grooming_] = 2
+_stages_indexes_[_texturing_] = 3
+_stages_indexes_[_shading_] = 4
+_stages_indexes_[_layout_] = 0
+_stages_indexes_[_animation_] = 1
+_stages_indexes_[_cfx_] = 2
+_stages_indexes_[_fx_] = 3
+_stages_indexes_[_camera_] = 4
+_stages_indexes_[_lighting_] = 5
+_stages_indexes_[_compositing_] = 6
+
 _stages_rules_dic_ = dict()
 _stages_rules_dic_[_assets_] = _assets_stages_list_
 _stages_rules_dic_[_sequences_] = _sequences_stages_list_
