@@ -27,6 +27,7 @@ from wizard.gui import menu_widget
 from wizard.gui import create_ticket_widget
 from wizard.gui import manual_export_widget
 from wizard.gui import drop_files_widget
+from wizard.gui import comment_widget
 
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -363,6 +364,8 @@ class exports_widget(QtWidgets.QWidget):
                                     if export_version_row['export_id'] in self.export_ids.keys():
                                         export_version_item = custom_export_version_tree_item(export_version_row, self.export_ids[export_version_row['export_id']])
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
+                                else:
+                                    self.export_versions_ids[export_version_row['id']].refresh(export_version_row)
                             self.check_existence_thread.update_versions_rows(export_versions_rows)
 
 
@@ -424,6 +427,7 @@ class exports_widget(QtWidgets.QWidget):
         ticket_action = None
         if len(selection)>=1:
             archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
+            comment_action = self.menu_widget.add_action('Modify comment', ressources._tool_comment_)
         launch_action = None
         if len(selection)==1:
             launch_action = self.menu_widget.add_action(f'Launch related work version', ressources._tool_launch_)
@@ -440,6 +444,19 @@ class exports_widget(QtWidgets.QWidget):
                     self.open_ticket()
                 elif self.menu_widget.function_name == manual_action:
                     self.merge_files()
+                elif self.menu_widget.function_name == comment_action:
+                    self.modify_comment()
+
+    def modify_comment(self):
+        selection = self.list_view.selectedItems()
+        if selection is not None:
+            if len(selection) > 0:
+                self.comment_widget = comment_widget.comment_widget()
+                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    comment = self.comment_widget.comment
+                    for item in selection:
+                        project.modify_export_version_comment(item.export_version_row['id'], comment)
+                    gui_server.refresh_ui()
 
     def launch_work_version(self):
         selection = self.list_view.selectedItems()
@@ -535,6 +552,10 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         else:
             self.setIcon(5, QtGui.QIcon(ressources._manual_export_))
         self.setText(6, 'ok')
+
+    def refresh(self, export_version_row):
+        self.export_version_row = export_version_row
+        self.fill_ui()
 
     def set_missing(self, number):
         self.setText(6, f'missing {number} files')

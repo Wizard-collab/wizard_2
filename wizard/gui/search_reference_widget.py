@@ -23,7 +23,7 @@ class search_reference_widget(QtWidgets.QWidget):
 
         self.accept_item_from_thread = True      
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)       
 
         self.search_thread = search_thread()
@@ -33,7 +33,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.connect_functions()
 
     def showEvent(self, event):
-        corner = gui_utils.move_ui(self)
+        #corner = gui_utils.move_ui(self)
         self.search_bar.search_bar.setFocus()
         event.accept()
 

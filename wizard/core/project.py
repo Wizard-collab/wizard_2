@@ -651,6 +651,19 @@ def update_export_version_data(export_version_id, data_tuple):
     else:
         return None
 
+def modify_export_version_comment(export_version_id, comment):
+    success = None
+    if environment.get_user() == get_export_version_data(export_version_id, 'creation_user'):
+        success = db_utils.update_data('project',
+            'export_versions',
+            ('comment', comment),
+            ('id', export_version_id))
+        if success:
+            logger.info('Export version comment modified')
+    else:
+        logger.warning("You did not created this file, modification forbidden")
+    return success
+
 def add_work_env(name, software_id, variant_id):
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'work_envs',
@@ -885,12 +898,16 @@ def get_version_data(version_id, column='*'):
         return None
 
 def modify_version_comment(version_id, comment=''):
-    success = db_utils.update_data('project',
-                        'versions',
-                        ('comment', comment),
-                        ('id', version_id))
-    if success:
-        logger.info('Version comment modified')
+    success = None
+    if environment.get_user() == get_version_data(version_id, 'creation_user'):
+        success = db_utils.update_data('project',
+                            'versions',
+                            ('comment', comment),
+                            ('id', version_id))
+        if success:
+            logger.info('Version comment modified')
+    else:
+        logger.warning("You did not created this file, modification forbidden")
     return success
 
 def remove_version(version_id):

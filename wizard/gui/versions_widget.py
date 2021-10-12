@@ -26,6 +26,7 @@ from wizard.gui import gui_server
 from wizard.gui import confirm_widget
 from wizard.gui import menu_widget
 from wizard.gui import drop_files_widget
+from wizard.gui import comment_widget
 
 class versions_widget(QtWidgets.QWidget):
 
@@ -127,6 +128,9 @@ class versions_widget(QtWidgets.QWidget):
                         if version_row['id'] not in self.version_list_ids.keys():
                             version_item = custom_version_tree_item(version_row, software_icon, self.list_view.invisibleRootItem())
                             self.version_list_ids[version_row['id']] = version_item
+                        else:
+                            self.version_list_ids[version_row['id']].refresh(version_row)
+
                 version_list_ids = list(self.version_list_ids.keys())
                 for version_id in version_list_ids:
                     if version_id not in project_versions_id:
@@ -239,6 +243,7 @@ class versions_widget(QtWidgets.QWidget):
         self.folder_button.clicked.connect(self.open_folder)
         self.toggle_view_button.clicked.connect(self.toggle_view)
         self.launch_button.clicked.connect(self.launch)
+        self.comment_button.clicked.connect(self.modify_comment)
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
@@ -340,6 +345,13 @@ class versions_widget(QtWidgets.QWidget):
         self.manual_merge_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_merge_button)
 
+        self.comment_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.comment_button, "Modify comment")
+        self.comment_button.setFixedSize(35,35)
+        self.comment_button.setIconSize(QtCore.QSize(30,30))
+        self.comment_button.setIcon(QtGui.QIcon(ressources._tool_comment_))
+        self.buttons_layout.addWidget(self.comment_button)
+
         self.launch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.launch_button, "Launch selection")
         self.launch_button.setFixedSize(35,35)
@@ -389,6 +401,7 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection)>=1:
             duplicate_action = self.menu_widget.add_action(f'Duplicate version(s)', ressources._tool_duplicate_)
             archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
+            comment_action = self.menu_widget.add_action('Modify comment', ressources._tool_comment_)
         launch_action = None
         if len(selection)==1:
             launch_action = self.menu_widget.add_action(f'Launch version', ressources._tool_launch_)
@@ -404,6 +417,19 @@ class versions_widget(QtWidgets.QWidget):
                     self.archive()
                 elif self.menu_widget.function_name == launch_action:
                     self.launch()
+                elif self.menu_widget.function_name == comment_action:
+                    self.modify_comment()
+
+    def modify_comment(self):
+        items = self.get_selection()
+        if items is not None:
+            if len(items) > 0:
+                self.comment_widget = comment_widget.comment_widget()
+                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    comment = self.comment_widget.comment
+                    for item in items:
+                        project.modify_version_comment(item.version_row['id'], comment)
+                    gui_server.refresh_ui()
 
     def version_changed(self):
         selection = self.get_selection()
@@ -572,6 +598,10 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
 
     def set_not_missing(self):
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('#9ce87b')))
+
+    def refresh(self, version_row):
+        self.version_row = version_row
+        self.fill_ui()
 
 class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, version_row, parent=None):

@@ -24,7 +24,6 @@ logger = custom_logger.get_logger(__name__)
 class references_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(references_widget, self).__init__(parent)
-        self.search_reference_widget = search_reference_widget.search_reference_widget()
         self.reference_infos_thread = reference_infos_thread()
         self.work_env_id = None
         self.reference_ids = dict()
