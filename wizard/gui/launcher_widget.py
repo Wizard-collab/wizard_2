@@ -57,7 +57,11 @@ class launcher_widget(QtWidgets.QFrame):
         start_time = time.time()
         self.refresh_variants()
         self.refresh_state()
+        if self.work_env_row is not None:
+            self.work_env_row = project.get_work_env_data(self.work_env_row['id'])
         self.refresh_versions()
+        if self.version_row is not None:
+            self.version_row = project.get_version_data(self.version_row['id'])
         self.refresh_infos()
         self.update_refresh_time(start_time)
 
@@ -202,6 +206,8 @@ class launcher_widget(QtWidgets.QFrame):
             self.user_label.setText(self.version_row['creation_user'])
             self.comment_label.setText(self.version_row['comment'])
             day, hour = tools.convert_time(self.version_row['creation_time'])
+            work_hours, work_minutes, work_seconds = tools.convert_seconds(self.work_env_row['work_time'])
+            self.work_time_label.setText(f"{work_hours}h:{work_minutes}m:{work_seconds}s")
             self.date_label.setText(f"{day} - {hour}")
             self.refresh_screenshot(self.version_row['screenshot_path'])
             self.refresh_lock_button()
@@ -209,6 +215,7 @@ class launcher_widget(QtWidgets.QFrame):
         else:
             self.user_label.setText('')
             self.comment_label.setText('')
+            self.work_time_label.setText('')
             self.date_label.setText('')
             self.refresh_screenshot('')
             self.refresh_lock_button()
@@ -218,10 +225,13 @@ class launcher_widget(QtWidgets.QFrame):
         if self.work_env_row is not None:
             if self.work_env_row['id'] in launch.get():
                 self.launch_button.start_animation()
+                self.show_kill_button()
             else:
                 self.launch_button.stop_animation()
+                self.hide_kill_button()
         else:
             self.launch_button.stop_animation()
+            self.hide_kill_button()
 
     def refresh_screenshot(self, screenshot_path):
         if not os.path.isfile(screenshot_path):
@@ -305,6 +315,11 @@ class launcher_widget(QtWidgets.QFrame):
         self.lock_button.clicked.connect(self.toggle_lock)
         self.add_variant_button.clicked.connect(self.create_variant)
         self.screenshot_button.clicked.connect(self.show_screen_shot)
+        self.kill_button.clicked.connect(self.kill)
+
+    def kill(self):
+        if self.work_env_row is not None:
+            launch.kill(self.work_env_row['id'])
 
     def show_screen_shot(self):
         if self.version_row is not None:
@@ -312,6 +327,28 @@ class launcher_widget(QtWidgets.QFrame):
             if os.path.isfile(screenshot_path):
                 self.image_viewer_widget = image_viewer_widget.image_viewer_widget(screenshot_path)
                 self.image_viewer_widget.show()
+
+    def show_kill_button(self):
+        if not self.kill_button.isVisible():
+            self.kill_button.setMaximumWidth(60)
+            self.kill_button.setMinimumWidth(0)
+            self.kill_button.setVisible(1)
+            self.anim = QtCore.QPropertyAnimation(self.kill_button, b"maximumWidth")
+            self.anim.setDuration(100)
+            self.anim.setStartValue(0)
+            self.anim.setEndValue(60)
+            self.anim.start()
+
+    def hide_kill_button(self):
+        if self.kill_button.isVisible():
+            self.kill_button.setMaximumWidth(60)
+            self.kill_button.setMinimumWidth(0)
+            self.anim = QtCore.QPropertyAnimation(self.kill_button, b"maximumWidth")
+            self.anim.setDuration(100)
+            self.anim.setStartValue(60)
+            self.anim.setEndValue(0)
+            self.anim.finished.connect(lambda:self.kill_button.setVisible(0))
+            self.anim.start()
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -368,6 +405,11 @@ class launcher_widget(QtWidgets.QFrame):
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
+        self.work_time_label = QtWidgets.QLabel()
+        gui_utils.application_tooltip(self.work_time_label, "Work environment work time")
+        self.work_time_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.work_time_label)
+
         self.comment_label = QtWidgets.QLabel()
         gui_utils.application_tooltip(self.comment_label, "Version comment")
         self.comment_label.setWordWrap(True)
@@ -410,6 +452,14 @@ class launcher_widget(QtWidgets.QFrame):
         self.launch_button.setObjectName('blue_button')
         self.launch_button.setStyleSheet('font:bold')
         self.buttons_layout.addWidget(self.launch_button)
+
+        self.kill_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.kill_button, "Kill work environment")
+        self.kill_button.setFixedSize(0,60)
+        self.kill_button.setVisible(0)
+        self.kill_button.setIconSize(QtCore.QSize(28,28))
+        self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
+        self.buttons_layout.addWidget(self.kill_button)
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setAlignment(QtCore.Qt.AlignRight)

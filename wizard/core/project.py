@@ -676,12 +676,14 @@ def add_work_env(name, software_id, variant_id):
                                 'creation_user',
                                 'variant_id',
                                 'lock_id',
+                                'work_time',
                                 'software_id'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
                                 variant_id,
                                 None,
+                                0.0,
                                 software_id))
         if work_env_id:
             logger.info(f"Work env {name} added to project")
@@ -862,6 +864,16 @@ def toggle_lock(work_env_id):
         lock_user_name = site.get_user_data(lock_id, 'user_name')
         logger.warning(f"Work env locked by {lock_user_name}")
         return None
+
+def add_work_time(work_env_id, time_to_add):
+    work_env_row = get_work_env_data(work_env_id)
+    work_time = work_env_row['work_time']
+    new_work_time = work_time + time_to_add
+    success = db_utils.update_data('project',
+                            'work_envs',
+                            ('work_time', new_work_time),
+                            ('id', work_env_id))
+    return success
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     version_id = db_utils.create_row('project',
@@ -1526,6 +1538,7 @@ def create_work_envs_table(database):
                                         creation_user text NOT NULL,
                                         variant_id integer NOT NULL,
                                         lock_id integer,
+                                        work_time real NOT NULL,
                                         software_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (software_id) REFERENCES softwares (id)

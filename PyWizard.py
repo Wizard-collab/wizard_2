@@ -10,6 +10,7 @@
 import sys
 import os
 import traceback
+import code
 
 # Append current dir to sys.path
 sys.path.append(os.path.abspath(''))
@@ -100,3 +101,8 @@ if len(sys.argv) == 2:
     finally:
         db_server.stop()
         softwares_server.stop()
+else:
+    console = code.InteractiveConsole()
+    console.interact(banner=None, exitmsg=None)
+    db_server.stop()
+    softwares_server.stop()

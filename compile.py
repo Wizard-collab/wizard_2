@@ -23,7 +23,7 @@ class compile():
 			compil_dir = 'compile'
 			if not os.path.isdir(compil_dir):
 				os.mkdir(compil_dir)
-			compil_data_file = os.path.join(compil_dir, 'compil.yaml')
+			compil_data_file = 'version.yaml'
 			if not os.path.isfile(compil_data_file):
 				compil_data_dic = dict()
 				compil_data_dic['builds'] = 0
@@ -58,7 +58,7 @@ class compile():
 				PATCH = None
 			if (MAJOR and MINOR and PATCH) is not None:
 				release_name = f"{MAJOR}.{MINOR}.{PATCH}"
-				self.build_folder = os.path.join(compil_dir, f"{release_name}_{str(build_no).zfill(6)}")
+				self.build_folder = os.path.join(compil_dir, f"{release_name}_{str(build_no).zfill(4)}")
 				compil_data_dic['MAJOR'] = MAJOR
 				compil_data_dic['MINOR'] = MINOR
 				compil_data_dic['PATCH'] = PATCH
@@ -77,15 +77,35 @@ class compile():
 				shutil.rmtree('dist')
 			if os.path.isdir('build'):
 				shutil.rmtree('build')
-			command_line = "PyInstaller app.spec"
+			command_line = "PyInstaller wizard.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
-			folders_list = ['ressources']
-			dist_folder = 'dist/wizard'
+
+			command_line = "PyInstaller wizard_console.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
+			command_line = "PyInstaller PyWizard.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
+			folders_list = ['ressources', 'softwares']
+			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
 				destination = os.path.join(dist_folder, folder)
 				shutil.copytree(folder, destination)
+
+			files_list = [  'version.yaml',
+							'dist/PyWizard/PyWizard.exe',
+							'dist/PyWizard/PyWizard.exe.manifest',
+							'dist/Wizard console/Wizard console.exe',
+							'dist/Wizard console/Wizard console.exe.manifest']
+			for file in files_list:
+				destination = os.path.join(dist_folder, os.path.basename(file))
+				shutil.copyfile(file, destination)
+
 			shutil.copytree(dist_folder, self.build_folder)
+
 			if os.path.isdir('dist'):
 				shutil.rmtree('dist')
 			if os.path.isdir('build'):

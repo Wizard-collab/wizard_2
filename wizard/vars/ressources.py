@@ -90,6 +90,7 @@ _team_connection_off_ = os.path.join(_icons_path_, 'team_connection_off.png')
 _settings_icon_ = os.path.join(_icons_path_, 'settings.png')
 _user_icon_ = os.path.join(_icons_path_, 'user_icon.png')
 _save_icon_ = os.path.join(_icons_path_, 'save.png')
+_loading_image_ = os.path.join(_icons_path_, 'loading_image.png')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.png')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.png')

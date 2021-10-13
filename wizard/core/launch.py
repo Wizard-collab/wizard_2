@@ -18,6 +18,7 @@ import subprocess
 import shlex
 import json
 import traceback
+import time
 from threading import Thread
 
 # Wizard modules
@@ -166,10 +167,13 @@ class software_thread(Thread):
         self.work_env_id = work_env_id
  
     def run(self):
+        start_time = time.time()
         self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
         self.process.wait()
+        work_time = time.time()-start_time
         died(self.work_env_id)
         project.set_work_env_lock(self.work_env_id, 0)
+        project.add_work_time(self.work_env_id, work_time)
         gui_server.refresh_ui()
         logger.info(f"{self.software} closed")
 
