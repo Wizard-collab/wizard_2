@@ -24,3 +24,11 @@ http://93.19.210.30/
 
 * Database dependency:
 	* PostgreSQL
+
+* Ports used by wizard application:
+	* 11111 - localhost
+	* 11112 - localhost
+	* 11113 - localhost
+	* 11114 - localhost
+	* 10231 - localhost
+	* 50333 - team server ip
