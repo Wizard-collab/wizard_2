@@ -42,10 +42,10 @@ class team_client(QThread):
         logger.info("Wizard is connected to the team server")
 
     def stop(self):
+        self.running = False
         if self.conn is not None:
             self.conn.close()
             self.conn = None
-        self.running = False
 
     def refresh_team(self):
         signal_dic = dict()
@@ -70,8 +70,9 @@ class team_client(QThread):
                 except json.decoder.JSONDecodeError:
                     logger.debug("cannot read json data")
             else:
-                logger.warning('Team connection lost')
-                self.stop()
+                if self.running == True:
+                    logger.warning('Team connection lost')
+                    self.stop()
         self.team_connection_status_signal.emit(False)
 
     def analyse_signal(self, data):

@@ -333,6 +333,7 @@ class RoundProgress(QtWidgets.QWidget):
 
         self.angle=percent*3.6
         self.timeLine.setFrameRange(self.drawAngle,self.angle)
+        self.timeLine.stop()
         self.timeLine.start()
 
     def updateTimeline(self,frame):
