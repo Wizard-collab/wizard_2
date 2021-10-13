@@ -89,6 +89,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller server.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			folders_list = ['ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
@@ -98,8 +102,11 @@ class compile():
 			files_list = [  'version.yaml',
 							'dist/PyWizard/PyWizard.exe',
 							'dist/PyWizard/PyWizard.exe.manifest',
+							'dist/server/server.exe',
+							'dist/server/server.exe.manifest',
 							'dist/Wizard console/Wizard console.exe',
 							'dist/Wizard console/Wizard console.exe.manifest']
+							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))
 				shutil.copyfile(file, destination)
