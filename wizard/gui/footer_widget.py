@@ -26,6 +26,7 @@ class footer_widget(QtWidgets.QFrame):
     connect_team = pyqtSignal(int)
     show_team_widget = pyqtSignal(int)
     show_user_preferences = pyqtSignal(int)
+    show_softwares_widget = pyqtSignal(int)
     refresh_signal = pyqtSignal(int)
 
     def __init__(self, parent=None):
@@ -59,10 +60,18 @@ class footer_widget(QtWidgets.QFrame):
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(50,0,0,0)
+        self.buttons_layout.setContentsMargins(12,0,0,0)
         self.buttons_layout.setSpacing(2)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setFixedWidth(130)
+        self.refresh_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.refresh_label.setObjectName('gray_label')
+        self.buttons_layout.addWidget(self.refresh_label)
+
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.refresh_ui_button = QtWidgets.QPushButton()
         self.refresh_ui_button.setFixedSize(QtCore.QSize(30, 30))
@@ -82,6 +91,12 @@ class footer_widget(QtWidgets.QFrame):
         self.settings_button.setIcon(QtGui.QIcon(ressources._settings_icon_))
         self.buttons_layout.addWidget(self.settings_button)
 
+        self.softwares_button = QtWidgets.QPushButton()
+        self.softwares_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.softwares_button, "Show running work environments")
+        self.softwares_button.setIcon(QtGui.QIcon(ressources._running_softwares_icon_))
+        self.buttons_layout.addWidget(self.softwares_button)
+
         self.task_manager_button = QtWidgets.QPushButton()
         self.task_manager_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.task_manager_button, "Show task manager")
@@ -100,6 +115,10 @@ class footer_widget(QtWidgets.QFrame):
         self.wall_button.setIcon(QtGui.QIcon(ressources._wall_icon_))
         self.buttons_layout.addWidget(self.wall_button)
 
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"global refresh : {refresh_time}s")
+
     def set_team_connection(self, team_connection):
         if team_connection:
             self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_on_))
@@ -114,6 +133,7 @@ class footer_widget(QtWidgets.QFrame):
         self.team_connection_button.clicked.connect(self.connect_team.emit)
         self.team_connection_button.clicked.connect(self.show_team_widget.emit)
         self.settings_button.clicked.connect(self.show_user_preferences.emit)
+        self.softwares_button.clicked.connect(self.show_softwares_widget.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)

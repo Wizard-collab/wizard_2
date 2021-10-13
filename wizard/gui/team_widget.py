@@ -14,7 +14,6 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
-from wizard.gui import custom_window
 
 class team_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

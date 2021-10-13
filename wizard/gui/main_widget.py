@@ -40,6 +40,7 @@ from wizard.gui import subtask_manager
 from wizard.gui import team_widget
 from wizard.gui import popup_wall_widget
 from wizard.gui import user_preferences_widget
+from wizard.gui import softwares_widget
 
 class main_widget(custom_window.custom_window):
 
@@ -66,6 +67,7 @@ class main_widget(custom_window.custom_window):
         self.gui_server = gui_server.gui_server()
         self.communicate_server = communicate.communicate_server()
         self.softwares_server = launch.softwares_server()
+        self.softwares_widget = softwares_widget.softwares_widget()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -124,6 +126,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
         self.footer_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
         self.footer_widget.refresh_signal.connect(self.refresh)
+        self.footer_widget.show_softwares_widget.connect(self.softwares_widget.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
@@ -232,6 +235,7 @@ class main_widget(custom_window.custom_window):
         self.quit_threads()
 
     def refresh(self):
+        start_time = time.time()
         self.tree_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
@@ -240,6 +244,8 @@ class main_widget(custom_window.custom_window):
         self.exports_widget.refresh()
         self.tickets_widget.refresh()
         self.wall_widget.refresh()
+        self.softwares_widget.refresh()
+        self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):
         self.main_widget = QtWidgets.QWidget()

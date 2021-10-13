@@ -227,7 +227,8 @@ class softwares_server(Thread):
         work_env_id = project.get_version_data(version_id, 'work_env_id')
         if work_env_id not in self.software_threads_dic.keys():
             software_thread, work_env_id = core_launch_version(version_id)
-            self.software_threads_dic[work_env_id] = software_thread
+            if software_thread is not None:
+                self.software_threads_dic[work_env_id] = software_thread
             return work_env_id
         else:
             logger.warning(f"You are already running a work instance of this asset")
