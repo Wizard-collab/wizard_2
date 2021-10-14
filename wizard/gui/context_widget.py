@@ -139,6 +139,7 @@ class context_widget(QtWidgets.QFrame):
             else:
                 self.work_env_changed_signal.emit(0)
                 self.hide_init_work_env_button()
+        self.refresh_string_asset_label()
                 
     def connect_functions(self):
         self.variant_comboBox.currentTextChanged.connect(self.variant_changed)
@@ -146,6 +147,13 @@ class context_widget(QtWidgets.QFrame):
         self.add_variant_button.clicked.connect(self.create_variant)
         self.folder_button.clicked.connect(self.open_work_env_folder)
         self.init_work_env_button.clicked.connect(self.init_work_env)
+
+    def refresh_string_asset_label(self):
+        if self.work_env_row is not None and self.variant_row is not None:
+            string_asset = assets.instance_to_string(('work_env', self.work_env_row['id']))
+            self.string_asset_label.setText(string_asset)
+        else:
+            self.string_asset_label.setText('')
 
     def open_work_env_folder(self):
         if self.work_env_id:
@@ -224,9 +232,13 @@ class context_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.init_work_env_button, "Init work environment")
         self.main_layout.addWidget(self.init_work_env_button)
 
-        self.string_asset_lineEdit = QtWidgets.QLineEdit()
-        self.string_asset_lineEdit.setPlaceholderText('...')
-        self.main_layout.addWidget(self.string_asset_lineEdit)
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.string_asset_label = QtWidgets.QLabel()
+        self.string_asset_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.main_layout.addWidget(self.string_asset_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(16,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open work environment folder")
@@ -242,7 +254,6 @@ class variant_creation_widget(QtWidgets.QDialog):
         self.connect_functions()
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)

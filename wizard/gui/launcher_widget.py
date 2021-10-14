@@ -58,7 +58,7 @@ class launcher_widget(QtWidgets.QFrame):
             self.version_comboBox.setCurrentText(version_name)
 
     def refresh_versions(self, set_last=None):
-        if self.work_env_id is not None:
+        if self.work_env_id != None and self.work_env_id != 0:
             self.work_env_row = project.get_work_env_data(self.work_env_id)
 
         if self.work_env_row is not None and self.work_env_id is not None:
@@ -158,14 +158,7 @@ class launcher_widget(QtWidgets.QFrame):
         if self.work_env_id is not None:
             if self.work_env_row is not None:
                 launch.launch_work_version(self.version_row['id'])
-            else:
-                software_name = self.work_env_comboBox.currentText()
-                software_id = project.get_software_data_by_name(software_name, 'id')
-                work_env_id = assets.create_work_env(software_id, self.variant_row['id'])
-                project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
-                self.refresh_work_envs_hard()
-                self.launch()
-            gui_server.refresh_ui()
+                gui_server.refresh_ui()
 
     def connect_functions(self):
         self.version_comboBox.currentTextChanged.connect(self.version_changed)
@@ -283,11 +276,6 @@ class launcher_widget(QtWidgets.QFrame):
         self.kill_button.setIconSize(QtCore.QSize(28,28))
         self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
         self.buttons_layout.addWidget(self.kill_button)
-
-        self.refresh_label = QtWidgets.QLabel()
-        self.refresh_label.setAlignment(QtCore.Qt.AlignRight)
-        self.refresh_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.refresh_label)
 
 class custom_launchButton(QtWidgets.QPushButton):
     def __init__(self, parent=None):
