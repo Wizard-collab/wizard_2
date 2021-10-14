@@ -26,6 +26,7 @@ from wizard.gui import tree_widget
 from wizard.gui import references_widget
 from wizard.gui import versions_widget
 from wizard.gui import exports_widget
+from wizard.gui import context_widget
 from wizard.gui import tabs_widget
 from wizard.gui import launcher_widget
 from wizard.gui import wall_widget
@@ -55,6 +56,7 @@ class main_widget(custom_window.custom_window):
         self.references_widget = references_widget.references_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
+        self.context_widget = context_widget.context_widget(self)
         self.tabs_widget = tabs_widget.tabs_widget(self)
         self.wall_widget = wall_widget.wall_widget(self)
         self.popup_wall_widget = popup_wall_widget.popup_wall_widget()
@@ -115,8 +117,8 @@ class main_widget(custom_window.custom_window):
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
-        self.launcher_widget.work_env_changed_signal.connect(self.work_env_changed)
-        self.launcher_widget.variant_changed_signal.connect(self.variant_changed)
+        self.context_widget.work_env_changed_signal.connect(self.work_env_changed)
+        self.context_widget.variant_changed_signal.connect(self.variant_changed)
         self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
         self.tabs_widget.currentChanged.connect(self.tab_changed)
         self.footer_widget.show_console.connect(self.console_widget.toggle)
@@ -203,7 +205,7 @@ class main_widget(custom_window.custom_window):
         self.console_widget.handle_record(tuple)
 
     def stage_changed(self, stage_id):
-        self.launcher_widget.change_stage(stage_id)
+        self.context_widget.change_stage(stage_id)
         self.tickets_widget.change_stage(stage_id)
 
     def variant_changed(self, variant_id):
@@ -211,8 +213,9 @@ class main_widget(custom_window.custom_window):
 
     def work_env_changed(self, work_env_id):
         self.versions_widget.change_work_env(work_env_id)
+        self.launcher_widget.change_work_env(work_env_id)
         self.references_widget.change_work_env(work_env_id)
-        self.tabs_widget.change_work_env(work_env_id)
+        #self.tabs_widget.change_work_env(work_env_id)
 
     def tab_changed(self):
         self.references_widget.refresh()
@@ -237,6 +240,7 @@ class main_widget(custom_window.custom_window):
     def refresh(self):
         start_time = time.time()
         self.tree_widget.refresh()
+        self.context_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
         self.references_widget.refresh()
@@ -270,7 +274,7 @@ class main_widget(custom_window.custom_window):
 
         self.contents_1_widget = QtWidgets.QWidget()
         self.contents_1_widget.setObjectName('main_widget')
-        self.contents_1_layout = QtWidgets.QVBoxLayout()
+        self.contents_1_layout = QtWidgets.QHBoxLayout()
         self.contents_1_layout.setSpacing(1)
         self.contents_1_layout.setContentsMargins(0,0,0,0)
         self.contents_1_widget.setLayout(self.contents_1_layout)
@@ -278,18 +282,20 @@ class main_widget(custom_window.custom_window):
 
         self.contents_2_widget = QtWidgets.QWidget()
         self.contents_2_widget.setObjectName('main_widget')
-        self.contents_2_layout = QtWidgets.QHBoxLayout()
+        self.contents_2_layout = QtWidgets.QVBoxLayout()
         self.contents_2_layout.setSpacing(1)
         self.contents_2_layout.setContentsMargins(0,0,0,0)
         self.contents_2_widget.setLayout(self.contents_2_layout)
         self.contents_1_layout.addWidget(self.contents_2_widget)
 
+        self.contents_2_layout.addWidget(self.context_widget)
         self.contents_2_layout.addWidget(self.tabs_widget)
         self.references_tab_index = self.tabs_widget.addTab(self.references_widget, QtGui.QIcon(ressources._references_icon_), 'References')
         self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, QtGui.QIcon(ressources._work_icon_), 'Work versions')
         self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
         self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, QtGui.QIcon(ressources._tickets_icon_), 'Tickets')
-        self.contents_2_layout.addWidget(self.launcher_widget)
+        
+        self.contents_1_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)
         self.wall_widget.setVisible(0)
