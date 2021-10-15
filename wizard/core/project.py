@@ -918,6 +918,16 @@ def add_work_time(work_env_id, time_to_add):
                             ('id', work_env_id))
     return success
 
+def add_variant_work_time(variant_id, time_to_add):
+    variant_row = get_variant_data(variant_id)
+    work_time = variant_row['work_time']
+    new_work_time = work_time + time_to_add
+    success = db_utils.update_data('project',
+                            'variants',
+                            ('work_time', new_work_time),
+                            ('id', variant_id))
+    return success
+
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     version_id = db_utils.create_row('project',
                         'versions', 

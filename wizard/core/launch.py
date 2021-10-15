@@ -173,7 +173,7 @@ class software_thread(Thread):
         work_time = time.time()-start_time
         died(self.work_env_id)
         project.set_work_env_lock(self.work_env_id, 0)
-        project.add_work_time(self.work_env_id, work_time)
+        assets.add_work_time(self.work_env_id, work_time)
         gui_server.refresh_ui()
         logger.info(f"{self.software} closed")
 

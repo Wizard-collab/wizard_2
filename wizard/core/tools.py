@@ -33,6 +33,13 @@ def convert_seconds(time_float):
     seconds = time.strftime("%S", time.gmtime(time_float))
     return hours, minutes, seconds
 
+def convert_seconds_with_day(time_float):
+    day = str(int(time.strftime("%d", time.gmtime(time_float)))-1)
+    hours = str(int(time.strftime("%H", time.gmtime(time_float))))
+    minutes = str(int(time.strftime("%M", time.gmtime(time_float))))
+    seconds = str(int(time.strftime("%S", time.gmtime(time_float))))
+    return day, hours, minutes, seconds
+
 def encrypt_string(string):
     # Hash a string for storing.
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
