@@ -146,3 +146,10 @@ _stage_softwares_rules_dic_[_fx_] = [_houdini_, _maya_, _blender_]
 _stage_softwares_rules_dic_[_camera_] = [_maya_, _houdini_, _blender_]
 _stage_softwares_rules_dic_[_lighting_] = [_guerilla_render_, _maya_, _houdini_, _blender_]
 _stage_softwares_rules_dic_[_compositing_] = [_nuke_, _blender_]
+
+# Asset states
+_asset_state_todo_ = 'todo'
+_asset_state_wip_ = 'wip'
+_asset_state_done_ = 'done'
+_asset_state_error_ = 'error'
+_asset_states_list_ = ['todo', 'wip', 'done', 'error']

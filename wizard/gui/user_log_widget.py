@@ -85,7 +85,7 @@ class user_log_widget(custom_window.custom_dialog):
         user_name = self.user_name_lineEdit.text()
         password = self.password_lineEdit.text()
         if user.log_user(user_name, password):
-            gui_server.refresh_ui()
+            gui_server.restart_ui()
             self.accept()
 
     def create_user(self):

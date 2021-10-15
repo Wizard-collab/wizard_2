@@ -42,7 +42,7 @@ from wizard.gui import team_widget
 from wizard.gui import popup_wall_widget
 from wizard.gui import user_preferences_widget
 from wizard.gui import softwares_widget
-from wizard.gui import asset_history_widget
+from wizard.gui import asset_tracking_widget
 
 class main_widget(custom_window.custom_window):
 
@@ -53,7 +53,7 @@ class main_widget(custom_window.custom_window):
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
         self.user_preferences_widget = user_preferences_widget.user_preferences_widget()
-        self.asset_history_widget = asset_history_widget.asset_history_widget(self)
+        self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget(self)
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.references_widget = references_widget.references_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
@@ -212,6 +212,7 @@ class main_widget(custom_window.custom_window):
 
     def variant_changed(self, variant_id):
         self.exports_widget.change_variant(variant_id)
+        self.asset_tracking_widget.change_variant(variant_id)
 
     def work_env_changed(self, work_env_id):
         self.versions_widget.change_work_env(work_env_id)
@@ -243,6 +244,7 @@ class main_widget(custom_window.custom_window):
         start_time = time.time()
         self.tree_widget.refresh()
         self.context_widget.refresh()
+        self.asset_tracking_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
         self.references_widget.refresh()
@@ -305,7 +307,7 @@ class main_widget(custom_window.custom_window):
         self.contents_3_widget.setLayout(self.contents_3_layout)
         self.contents_1_layout.addWidget(self.contents_3_widget)
 
-        self.contents_3_layout.addWidget(self.asset_history_widget)
+        self.contents_3_layout.addWidget(self.asset_tracking_widget)
         self.contents_3_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)

@@ -354,6 +354,9 @@ def add_variant(name, stage_id, comment):
                                 'creation_user',
                                 'comment',
                                 'state',
+                                'assignment',
+                                'work_time',
+                                'estimated_time',
                                 'default_work_env_id',
                                 'stage_id'), 
                             (name,
@@ -361,6 +364,9 @@ def add_variant(name, stage_id, comment):
                                 environment.get_user(),
                                 comment,
                                 'todo',
+                                environment.get_user(),
+                                0.0,
+                                None,
                                 None,
                                 stage_id))
         if variant_id:
@@ -419,6 +425,43 @@ def set_variant_data(variant_id, column, data):
         return 1
     else:
         return None
+
+def add_asset_tracking_event(variant_id, event_type, data, comment=''):
+    asset_tracking_event_id = db_utils.create_row('project',
+                                    'asset_tracking_events',
+                                    ('creation_user',
+                                        'creation_time',
+                                        'event_type',
+                                        'data',
+                                        'comment',
+                                        'variant_id'),
+                                    (environment.get_user(),
+                                        time.time(),
+                                        event_type,
+                                        data,
+                                        comment,
+                                        variant_id))
+    if asset_tracking_event_id:
+        logger.debug("Asset tracking event added")
+    return asset_tracking_event_id
+
+def get_asset_tracking_event_data(asset_tracking_event_id, column='*'):
+    asset_tracking_events_rows = db_utils.get_row_by_column_data('project',
+                                                        'asset_tracking_events',
+                                                        ('id', asset_tracking_event_id),
+                                                        column)
+    if asset_tracking_events_rows and len(asset_tracking_events_rows) >= 1:
+        return asset_tracking_events_rows[0]
+    else:
+        logger.error("Asset tracking event not found")
+        return None
+
+def get_asset_tracking_events(variant_id, column='*'):
+    asset_tracking_events_rows = db_utils.get_row_by_column_data('project', 
+                                                        'asset_tracking_events', 
+                                                        ('variant_id', variant_id), 
+                                                        column)
+    return asset_tracking_events_rows
 
 def get_variant_work_envs_childs(variant_id, column='*'):
     work_envs_rows = db_utils.get_row_by_column_data('project', 
@@ -1449,6 +1492,7 @@ def init_project(project_path, project_name):
             create_assets_table(project_name)
             create_stages_table(project_name)
             create_variants_table(project_name)
+            create_asset_tracking_events_table(project_name)
             create_work_envs_table(project_name)
             create_versions_table(project_name)
             create_exports_table(project_name)
@@ -1523,12 +1567,30 @@ def create_variants_table(database):
                                         creation_user text NOT NULL,
                                         comment text,
                                         state text NOT NULL,
+                                        assignment text,
+                                        work_time real NOT NULL,
+                                        estimated_time real,
                                         default_work_env_id integer,
                                         stage_id integer NOT NULL,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Variants table created")
+
+def create_asset_tracking_events_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS asset_tracking_events (
+                                        id serial PRIMARY KEY,
+                                        creation_time real NOT NULL,
+                                        creation_user text NOT NULL,
+                                        event_type text NOT NULL,
+                                        data text NOT NULL,
+                                        comment text,
+                                        variant_id integer NOT NULL,
+                                        FOREIGN KEY (variant_id) REFERENCES variants (id)
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Asset tracking events table created")
+
 
 def create_work_envs_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS work_envs (

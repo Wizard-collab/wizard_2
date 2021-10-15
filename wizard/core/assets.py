@@ -40,6 +40,7 @@ from wizard.core import site
 from wizard.core import tools
 from wizard.core import image
 from wizard.core import game
+from wizard.core import asset_tracking
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
@@ -283,6 +284,14 @@ def archive_variant(variant_id):
 			return None
 	else:
 		return None
+
+def modify_variant_state(variant_id, state):
+	project.set_variant_data(variant_id, 'state', state)
+	asset_tracking.add_state_switch_event(variant_id, state)
+
+def modify_variant_assignment(variant_id, user_name):
+	project.set_variant_data(variant_id, 'assignment', user_name)
+	asset_tracking.add_assignment_event(variant_id, user_name)
 
 def create_work_env(software_id, variant_id):
 	work_env_id = None

@@ -439,10 +439,16 @@ def add_ip_user():
 
 def update_current_ip_data(column, data):
     ip = socket.gethostbyname(socket.gethostname())
+    
     if db_utils.update_data('site',
+                                'ips_wrap',
+                                (column, data),
+                                ('ip', ip)):
+        if column == 'user_id':
+            db_utils.update_data('site',
                                     'ips_wrap',
-                                    (column, data),
-                                    ('ip', ip)):
+                                    ('project_id', None),
+                                    ('ip', ip))
         logger.debug("Ip wrap data updated")
 
 def get_current_ip_data(column='*'):
