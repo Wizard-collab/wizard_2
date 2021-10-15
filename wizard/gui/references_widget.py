@@ -111,7 +111,7 @@ class references_widget(QtWidgets.QWidget):
                     else:
                         self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
             elif self.work_env_id is None:
-                self.show_info_mode("You need at least one work version\nto create references...", ressources._launch_info_image_)
+                self.show_info_mode("You need to init the work environment\nto create references...", ressources._init_work_env_info_image_)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()

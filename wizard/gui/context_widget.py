@@ -156,8 +156,8 @@ class context_widget(QtWidgets.QFrame):
             self.string_asset_label.setText('')
 
     def open_work_env_folder(self):
-        if self.work_env_id:
-            work_env_path = assets.get_work_env_path(self.work_env_id)
+        if self.work_env_row is not None and self.variant_row is not None:
+            work_env_path = assets.get_work_env_path(self.work_env_row['id'])
             if os.path.isdir(work_env_path):
                 os.startfile(work_env_path)
 
@@ -221,13 +221,13 @@ class context_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.variant_comboBox)
 
         self.work_env_comboBox = QtWidgets.QComboBox()
-        self.work_env_comboBox.setFixedWidth(150)
+        self.work_env_comboBox.setFixedWidth(190)
         gui_utils.application_tooltip(self.work_env_comboBox, "Change work environment")
         self.work_env_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.work_env_comboBox)
 
         self.init_work_env_button = QtWidgets.QPushButton('Init work environment')
-        self.init_work_env_button.setStyleSheet('padding:0px;padding-left:8px;padding-right:8px;')
+        self.init_work_env_button.setObjectName('init_work_env_button')
         self.init_work_env_button.setFixedHeight(29)
         gui_utils.application_tooltip(self.init_work_env_button, "Init work environment")
         self.main_layout.addWidget(self.init_work_env_button)

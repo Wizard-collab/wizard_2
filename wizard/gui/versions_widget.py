@@ -137,7 +137,7 @@ class versions_widget(QtWidgets.QWidget):
                         self.remove_tree_version(version_id)
                 self.check_existence_thread.update_versions_rows(versions_rows)
             elif self.work_env_id is None:
-                self.show_info_mode("No version, launch this asset\nto create the first version !", ressources._launch_info_image_)
+                self.show_info_mode("Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
@@ -161,7 +161,7 @@ class versions_widget(QtWidgets.QWidget):
                         self.remove_icon_version(version_id)
                 self.check_existence_thread.update_versions_rows(versions_rows)
             elif self.work_env_id is None:
-                self.show_info_mode("No version, launch this asset\nto create the first version !", ressources._launch_info_image_)
+                self.show_info_mode("Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
