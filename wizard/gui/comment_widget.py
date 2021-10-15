@@ -21,8 +21,7 @@ class comment_widget(QtWidgets.QDialog):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
     def showEvent(self, event):
-        corner = gui_utils.move_ui(self)
-        event.accept()
+        gui_utils.move_ui(self)
         self.comment_field.setFocus()
 
     def apply_round_corners(self, corner):
@@ -67,9 +66,6 @@ class comment_widget(QtWidgets.QDialog):
         self.accept_button = QtWidgets.QPushButton('Comment')
         self.accept_button.setObjectName("blue_button")
         self.frame_layout.addWidget(self.accept_button)
-
-    def leaveEvent(self, event):
-    	self.reject()
 
     def confirm(self):
     	self.comment = self.comment_field.toPlainText()

@@ -31,147 +31,32 @@ class launcher_widget(QtWidgets.QFrame):
     def __init__(self, parent = None):
         super(launcher_widget, self).__init__(parent)
         
-        self.stage_id = None
-        self.stage_row = None
-        self.variant_row = None
-        self.work_env_row = None
+        self.work_env_id = None
         self.version_row = None
-
-        self.refresh_variant_changed = None
-        self.update_state = None
-        self.refresh_work_env_changed = None
         self.refresh_version_changed = None
 
         self.build_ui()
         self.connect_functions()
-        self.change_stage(None)
-        self.update_state_comboBox_style()
+        self.change_work_env(None)
 
-    def change_stage(self, stage_id):
+    def change_work_env(self, work_env_id):
         start_time = time.time()
-        self.stage_id = stage_id
-        self.refresh_variants_hard()
-        self.update_refresh_time(start_time)
+        self.work_env_id = work_env_id
+        self.refresh_versions_hard()
 
     def refresh(self):
-        start_time = time.time()
-        self.refresh_variants()
-        self.refresh_state()
-        if self.work_env_row is not None:
-            self.work_env_row = project.get_work_env_data(self.work_env_row['id'])
         self.refresh_versions()
         if self.version_row is not None:
             self.version_row = project.get_version_data(self.version_row['id'])
         self.refresh_infos()
-        self.update_refresh_time(start_time)
-
-    def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
-        self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def focus_version(self, version_name):
         if version_name in self.versions.keys():
             self.version_comboBox.setCurrentText(version_name)
 
-    def focus_variant(self, variant_id):
-        self.refresh_variant_changed = None
-        variant_row = project.get_variant_data(variant_id)
-        if variant_row is not None:
-            if variant_row['name'] in self.variants.keys():
-                self.variant_comboBox.setCurrentText(variant_row['name'])
-        self.refresh_variant_changed = 1
-        self.variant_changed(by_user=None)
-
-    def refresh_variants(self, apply_default=None):
-        self.refresh_variant_changed = None
-        if self.stage_id is not None:
-            self.stage_row = project.get_stage_data(self.stage_id)
-        else:
-            self.stage_row = None
-        if self.stage_row is not None:
-            variant_rows = project.get_stage_childs(self.stage_row['id'])
-            if variant_rows is not None:
-                for variant_row in variant_rows:
-                    if variant_row['name'] not in self.variants.keys():
-                        self.variant_comboBox.addItem(variant_row['name'])
-                        self.variants[variant_row['name']] = variant_row['id']
-            if apply_default:
-                default_variant_name = project.get_variant_data(self.stage_row['default_variant_id'], 'name')
-                self.variant_comboBox.setCurrentText(default_variant_name)
-        self.refresh_variant_changed = 1
-
-    def refresh_variants_hard(self):
-        self.refresh_variant_changed = None
-        self.variants = dict()
-        self.variant_comboBox.clear()
-        self.refresh_variants(apply_default=1)
-        self.variant_changed(by_user=None)
-
-    def variant_changed(self, by_user=1):
-        if self.refresh_variant_changed:
-            self.variant_row = None
-            if self.stage_row is not None:
-                self.variant_row = project.get_variant_by_name(self.stage_id, self.variant_comboBox.currentText())
-                if by_user:
-                    if self.variant_row is not None:
-                        project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
-
-            self.refresh_work_envs_hard()
-            self.refresh_state()
-
-    def refresh_state(self):
-        self.update_state = None
-        self.state_comboBox.setCurrentText('todo')
-
-        if self.variant_row is not None:
-            self.state_comboBox.setCurrentText(self.variant_row['state'])
-
-        self.update_state = 1
-
-    def refresh_work_envs_hard(self):
-        self.refresh_work_env_changed = None
-        self.work_env_comboBox.clear()
-
-        if self.variant_row is not None:
-            self.variant_row = project.get_variant_data(self.variant_row['id'])
-            for software_name in assets_vars._stage_softwares_rules_dic_[self.stage_row['name']]:
-                    icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
-                    self.work_env_comboBox.addItem(icon, software_name)
-
-            if self.variant_row['default_work_env_id'] is not None:
-                default_work_env_name = project.get_work_env_data(self.variant_row['default_work_env_id'], 'name')
-                self.work_env_comboBox.setCurrentText(default_work_env_name)
-            self.variant_changed_signal.emit(self.variant_row['id'])
-        else:
-            self.variant_changed_signal.emit(None)
-
-        self.refresh_work_env_changed = 1
-        self.work_env_changed(by_user=None)
-
-    def work_env_changed(self, by_user=1):
-        if self.refresh_work_env_changed:
-            self.work_env_row = None
-            if self.variant_row is not None:
-                self.work_env_row = project.get_work_env_by_name(self.variant_row['id'],
-                                                                self.work_env_comboBox.currentText())
-
-                if by_user:
-                    if self.work_env_row is not None:
-                        project.set_variant_data(self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
-
-                if self.work_env_row is not None and self.variant_row is not None:
-                    self.work_env_changed_signal.emit(self.work_env_row['id'])
-                elif self.work_env_row == None and self.variant_row is not None:
-                    self.work_env_changed_signal.emit(None)
-            else:
-                self.work_env_changed_signal.emit(0)
-                
-            self.refresh_versions_hard()
-
     def refresh_versions(self, set_last=None):
-        self.refresh_version_changed = None
-        if self.work_env_row is not None and self.variant_row is not None:
-            version_rows = project.get_work_versions(self.work_env_row['id'])
+        if self.work_env_id:
+            version_rows = project.get_work_versions(self.work_env_id)
             if (version_rows is not None) and (version_rows != []):
                 new=0
                 for version_row in version_rows:
@@ -182,9 +67,7 @@ class launcher_widget(QtWidgets.QFrame):
                 if new or set_last:
                     self.version_comboBox.setCurrentText(version_rows[-1]['name'])
                     self.version_row = version_rows[-1]
-        elif self.work_env_row == None and self.variant_row is not None:
-            self.version_comboBox.addItem('0001')
-        self.refresh_version_changed = 1
+        self.refresh_version_changed = True
 
     def refresh_versions_hard(self):
         self.refresh_version_changed = None
@@ -196,34 +79,34 @@ class launcher_widget(QtWidgets.QFrame):
     def version_changed(self):
         if self.refresh_version_changed:
             self.version_row = None
-            if self.work_env_row is not None:
-                self.version_row = project.get_work_version_by_name(self.work_env_row['id'], 
+            if self.work_env_id:
+                self.version_row = project.get_work_version_by_name(self.work_env_id, 
                                                                     self.version_comboBox.currentText())
             self.refresh_infos()
 
     def refresh_infos(self):
         if self.version_row:
             self.user_label.setText(self.version_row['creation_user'])
-            self.comment_label.setText(self.version_row['comment'])
+            if self.version_row['comment'] != '':
+                self.comment_label.setText(self.version_row['comment'])
+            else:
+                self.comment_label.setText('Missing comment')
             day, hour = tools.convert_time(self.version_row['creation_time'])
-            work_hours, work_minutes, work_seconds = tools.convert_seconds(self.work_env_row['work_time'])
-            self.work_time_label.setText(f"{work_hours}h:{work_minutes}m:{work_seconds}s")
             self.date_label.setText(f"{day} - {hour}")
             self.refresh_screenshot(self.version_row['screenshot_path'])
             self.refresh_lock_button()
             self.refresh_launch_button()
         else:
-            self.user_label.setText('')
-            self.comment_label.setText('')
-            self.work_time_label.setText('')
-            self.date_label.setText('')
+            self.user_label.setText('user')
+            self.comment_label.setText('comment')
+            self.date_label.setText('date')
             self.refresh_screenshot('')
             self.refresh_lock_button()
             self.refresh_launch_button()
 
     def refresh_launch_button(self):
-        if self.work_env_row is not None:
-            if self.work_env_row['id'] in launch.get():
+        if self.work_env_id:
+            if self.work_env_id in launch.get():
                 self.launch_button.start_animation()
                 self.show_kill_button()
             else:
@@ -244,8 +127,8 @@ class launcher_widget(QtWidgets.QFrame):
         self.lock_button.setStyleSheet('')
         gui_utils.modify_application_tooltip(self.lock_button, "Lock work environment")
         self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
-        if self.work_env_row is not None:
-            lock_id = project.get_work_env_data(self.work_env_row['id'], 'lock_id')
+        if self.work_env_id:
+            lock_id = project.get_work_env_data(self.work_env_id, 'lock_id')
             if lock_id is not None:
                 gui_utils.modify_application_tooltip(self.lock_button, "Unlock work environment")
                 css = "QPushButton{border: 2px solid #f0605b;background-color: #f0605b;}"
@@ -255,71 +138,25 @@ class launcher_widget(QtWidgets.QFrame):
                 self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
 
     def toggle_lock(self):
-        if self.work_env_row is not None:
-            project.toggle_lock(self.work_env_row['id'])
+        if self.work_env_id:
+            project.toggle_lock(self.work_env_id)
             self.refresh_lock_button()
 
     def launch(self):
-        if self.variant_row is not None:
-            if self.work_env_row is not None:
-                launch.launch_work_version(self.version_row['id'])
-            else:
-                software_name = self.work_env_comboBox.currentText()
-                software_id = project.get_software_data_by_name(software_name, 'id')
-                work_env_id = assets.create_work_env(software_id, self.variant_row['id'])
-                project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
-                self.refresh_work_envs_hard()
-                self.launch()
+        if self.work_env_id:
+            launch.launch_work_version(self.version_row['id'])
             gui_server.refresh_ui()
 
-    def state_changed(self, state):
-        if self.update_state:
-            if self.variant_row is not None:
-                project.set_variant_data(self.variant_row['id'], 'state', state)
-        self.update_state_comboBox_style()
-
-    def update_state_comboBox_style(self):
-        current_state = self.state_comboBox.currentText()
-        if current_state == 'todo':
-            color = '#a8a8a8'
-            hover_color = '#bfbfbf'
-        elif current_state == 'wip':
-            color = '#f79360'
-            hover_color = '#fca97e'
-        elif current_state == 'done':
-            color = '#98d47f'
-            hover_color = '#abe094'
-        elif current_state == 'error':
-            color = '#f0605b'
-            hover_color = '#f0817d'
-
-        css = "QComboBox{font:bold;background-color:%s;}"%color
-        css += "QComboBox::drop-down::hover{background-color:%s;}"%hover_color
-        self.state_comboBox.setStyleSheet(css)
-
-    def create_variant(self):
-        if self.stage_row is not None:
-            self.variant_creation_widget = variant_creation_widget(self)
-            if self.variant_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
-                variant_name = self.variant_creation_widget.name_field.text()
-                new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
-                project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
-                gui_server.refresh_ui()
-
     def connect_functions(self):
-        self.state_comboBox.currentTextChanged.connect(self.state_changed)
-        self.variant_comboBox.currentTextChanged.connect(self.variant_changed)
-        self.work_env_comboBox.currentTextChanged.connect(self.work_env_changed)
         self.version_comboBox.currentTextChanged.connect(self.version_changed)
         self.launch_button.clicked.connect(self.launch)
         self.lock_button.clicked.connect(self.toggle_lock)
-        self.add_variant_button.clicked.connect(self.create_variant)
         self.screenshot_button.clicked.connect(self.show_screen_shot)
         self.kill_button.clicked.connect(self.kill)
 
     def kill(self):
-        if self.work_env_row is not None:
-            launch.kill(self.work_env_row['id'])
+        if self.work_env_id:
+            launch.kill(self.work_env_id)
 
     def show_screen_shot(self):
         if self.version_row is not None:
@@ -351,7 +188,7 @@ class launcher_widget(QtWidgets.QFrame):
             self.anim.start()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
@@ -363,54 +200,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.screenshot_button.setIconSize(QtCore.QSize(298, 298))
         self.main_layout.addWidget(self.screenshot_button)
 
-        self.variant_widget = QtWidgets.QWidget()
-        self.variant_layout = QtWidgets.QHBoxLayout()
-        self.variant_layout.setContentsMargins(0,0,0,0)
-        self.variant_layout.setSpacing(6)
-        self.variant_widget.setLayout(self.variant_layout)
-        self.main_layout.addWidget(self.variant_widget)
-
-        self.variant_comboBox = QtWidgets.QComboBox()
-        gui_utils.application_tooltip(self.variant_comboBox, "Change variant")
-        self.variant_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
-        self.variant_layout.addWidget(self.variant_comboBox)
-
-        self.state_comboBox = QtWidgets.QComboBox()
-        gui_utils.application_tooltip(self.state_comboBox, "Change variant state")
-        self.state_comboBox.setFixedWidth(80)
-        self.state_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
-        self.state_comboBox.addItem('todo')
-        self.state_comboBox.addItem('wip')
-        self.state_comboBox.addItem('done')
-        self.state_comboBox.addItem('error')
-        self.variant_layout.addWidget(self.state_comboBox)
-
-        self.add_variant_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.add_variant_button, "Create variant")
-        self.add_variant_button.setFixedSize(29,29)
-        self.add_variant_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.add_variant_button.setIconSize(QtCore.QSize(14,14))
-        self.variant_layout.addWidget(self.add_variant_button)
-
-        self.work_env_comboBox = QtWidgets.QComboBox()
-        gui_utils.application_tooltip(self.work_env_comboBox, "Change work environment")
-        self.work_env_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
-        self.main_layout.addWidget(self.work_env_comboBox)
-
         self.version_comboBox = QtWidgets.QComboBox()
         gui_utils.application_tooltip(self.version_comboBox, "Change version")
         self.version_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.version_comboBox)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        self.main_layout.addSpacerItem(self.spaceItem)
-
-        self.work_time_label = QtWidgets.QLabel()
-        gui_utils.application_tooltip(self.work_time_label, "Work environment work time")
-        self.work_time_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.work_time_label)
-
-        self.comment_label = QtWidgets.QLabel()
+        self.comment_label = QtWidgets.QLabel('comment')
         gui_utils.application_tooltip(self.comment_label, "Version comment")
         self.comment_label.setWordWrap(True)
         self.main_layout.addWidget(self.comment_label)
@@ -422,12 +217,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.version_infos_widget.setLayout(self.version_infos_layout)
         self.main_layout.addWidget(self.version_infos_widget)
 
-        self.date_label = QtWidgets.QLabel()
+        self.date_label = QtWidgets.QLabel('date')
         gui_utils.application_tooltip(self.date_label, "Version date")
         self.date_label.setObjectName('gray_label')
         self.version_infos_layout.addWidget(self.date_label)
 
-        self.user_label = QtWidgets.QLabel()
+        self.user_label = QtWidgets.QLabel('user')
         gui_utils.application_tooltip(self.user_label, "Version user")
         self.version_infos_layout.addWidget(self.user_label)
 
@@ -460,75 +255,6 @@ class launcher_widget(QtWidgets.QFrame):
         self.kill_button.setIconSize(QtCore.QSize(28,28))
         self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
         self.buttons_layout.addWidget(self.kill_button)
-
-        self.refresh_label = QtWidgets.QLabel()
-        self.refresh_label.setAlignment(QtCore.Qt.AlignRight)
-        self.refresh_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.refresh_label)
-
-
-class variant_creation_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super(variant_creation_widget, self).__init__(parent)
-        self.build_ui()
-        self.connect_functions()
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        
-
-    def showEvent(self, event):
-        corner = gui_utils.move_ui(self)
-        self.apply_round_corners(corner)
-        event.accept()
-        self.name_field.setFocus()
-
-    def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#variant_creation_widget{border-%s-radius:0px;}"%corner)
-
-    def build_ui(self):
-        self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
-        self.setLayout(self.main_layout)
-
-        self.main_frame = QtWidgets.QFrame()
-        self.main_frame.setObjectName('instance_creation_frame')
-        self.frame_layout = QtWidgets.QVBoxLayout()
-        self.frame_layout.setSpacing(6)
-        self.main_frame.setLayout(self.frame_layout)
-        self.main_layout.addWidget(self.main_frame)
-
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.main_frame.setGraphicsEffect(self.shadow)
-
-        self.close_frame = QtWidgets.QFrame()
-        self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
-        self.close_layout.setSpacing(2)
-        self.close_frame.setLayout(self.close_layout)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
-        self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = QtWidgets.QPushButton()
-        self.close_pushButton.setObjectName('close_button')
-        self.close_pushButton.setIcon(QtGui.QIcon(ressources._close_icon_))
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
-        self.close_layout.addWidget(self.close_pushButton)
-        self.frame_layout.addWidget(self.close_frame)
-
-        self.name_field = QtWidgets.QLineEdit()
-        self.frame_layout.addWidget(self.name_field)
-
-        self.accept_button = QtWidgets.QPushButton('Create')
-        self.accept_button.setObjectName("blue_button")
-        self.frame_layout.addWidget(self.accept_button)
-
-    def connect_functions(self):
-        self.accept_button.clicked.connect(self.accept)
-        self.close_pushButton.clicked.connect(self.reject)
 
 class custom_launchButton(QtWidgets.QPushButton):
     def __init__(self, parent=None):

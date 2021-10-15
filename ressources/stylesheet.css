@@ -421,6 +421,22 @@ QSlider::handle:horizontal {
     border-radius: 3px;
 }
 
+#init_work_env_button{
+	padding:0px;
+	padding-left:8px;
+	padding-right:8px;
+	background-color: #7cbe6f;
+	border: none;
+}
+
+#init_work_env_button:hover{
+	background-color: #8bd07d;
+}
+
+#init_work_env_button:pressed{
+	background-color: #619756;
+}
+
 #settings_tab_bar::tab {
 	background-color: rgba(36, 36, 43, 170);
 	padding: 9px;

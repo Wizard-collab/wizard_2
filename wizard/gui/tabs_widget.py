@@ -31,9 +31,6 @@ class tabs_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
-        self.string_asset_widget = string_asset_widget(self)
-        self.main_layout.addWidget(self.string_asset_widget)
-
         self.tabs_widget = QtWidgets.QTabWidget()
         self.tabs_widget.setIconSize(QtCore.QSize(16,16))
         self.main_layout.addWidget(self.tabs_widget)
@@ -58,47 +55,3 @@ class tabs_widget(QtWidgets.QFrame):
         if context_dic is not None and context_dic != dict():
             index = context_dic['index']
             self.setCurrentIndex(index)
-
-    def change_work_env(self, work_env_id):
-        self.string_asset_widget.change_work_env(work_env_id)
-
-class string_asset_widget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(string_asset_widget, self).__init__(parent)
-        self.work_env_id = None
-        self.build_ui()
-        self.connect_functions()
-
-    def build_ui(self):
-        self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(2,2,2,2)
-        self.main_layout.setSpacing(2)
-        self.setLayout(self.main_layout)
-
-        self.folder_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.folder_button, "Open work environment folder")
-        self.folder_button.setFixedSize(QtCore.QSize(26, 26))
-        self.folder_button.setIconSize(QtCore.QSize(20, 20))
-        self.folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
-        self.main_layout.addWidget(self.folder_button)
-
-        self.string_asset_lineEdit = QtWidgets.QLineEdit()
-        self.string_asset_lineEdit.setPlaceholderText('...')
-        self.main_layout.addWidget(self.string_asset_lineEdit)
-
-    def change_work_env(self, work_env_id):
-        self.work_env_id = work_env_id
-        if self.work_env_id:
-            string_asset = assets.instance_to_string(('work_env', work_env_id))
-            self.string_asset_lineEdit.setText(string_asset)
-        else:
-            self.string_asset_lineEdit.setText('')
-
-    def connect_functions(self):
-        self.folder_button.clicked.connect(self.open_work_env_folder)
-
-    def open_work_env_folder(self):
-        if self.work_env_id:
-            work_env_path = assets.get_work_env_path(self.work_env_id)
-            if os.path.isdir(work_env_path):
-                os.startfile(work_env_path)
