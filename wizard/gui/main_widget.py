@@ -42,6 +42,7 @@ from wizard.gui import team_widget
 from wizard.gui import popup_wall_widget
 from wizard.gui import user_preferences_widget
 from wizard.gui import softwares_widget
+from wizard.gui import asset_history_widget
 
 class main_widget(custom_window.custom_window):
 
@@ -52,6 +53,7 @@ class main_widget(custom_window.custom_window):
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
         self.user_preferences_widget = user_preferences_widget.user_preferences_widget()
+        self.asset_history_widget = asset_history_widget.asset_history_widget(self)
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.references_widget = references_widget.references_widget(self)
         self.versions_widget = versions_widget.versions_widget(self)
@@ -198,7 +200,7 @@ class main_widget(custom_window.custom_window):
 
     def focus_variant(self, variant_id):
         self.tree_widget.focus_instance(('variant', variant_id))
-        self.launcher_widget.focus_variant(variant_id)
+        self.context_widget.focus_variant(variant_id)
 
     def update_stdout(self, tuple):
         self.footer_widget.handle_record(tuple)
@@ -295,7 +297,16 @@ class main_widget(custom_window.custom_window):
         self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
         self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, QtGui.QIcon(ressources._tickets_icon_), 'Tickets')
         
-        self.contents_1_layout.addWidget(self.launcher_widget)
+        self.contents_3_widget = QtWidgets.QWidget()
+        self.contents_3_widget.setObjectName('main_widget')
+        self.contents_3_layout = QtWidgets.QVBoxLayout()
+        self.contents_3_layout.setSpacing(1)
+        self.contents_3_layout.setContentsMargins(0,0,0,0)
+        self.contents_3_widget.setLayout(self.contents_3_layout)
+        self.contents_1_layout.addWidget(self.contents_3_widget)
+
+        self.contents_3_layout.addWidget(self.asset_history_widget)
+        self.contents_3_layout.addWidget(self.launcher_widget)
         
         self.contents_layout.addWidget(self.wall_widget)
         self.wall_widget.setVisible(0)

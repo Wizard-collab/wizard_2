@@ -34,23 +34,18 @@ class context_widget(QtWidgets.QFrame):
         self.stage_id = None
         self.stage_row = None
         self.variant_row = None
-        self.work_env_row = None
 
         self.refresh_variant_changed = None
-        self.update_state = None
         self.refresh_work_env_changed = None
-        self.refresh_version_changed = None
 
         self.build_ui()
         self.connect_functions()
         self.change_stage(None)
 
     def refresh(self):
-        start_time = time.time()
         self.refresh_variants()
 
     def change_stage(self, stage_id):
-        start_time = time.time()
         self.stage_id = stage_id
         self.refresh_variants_hard()
 
@@ -139,7 +134,7 @@ class context_widget(QtWidgets.QFrame):
             else:
                 self.work_env_changed_signal.emit(0)
                 self.hide_init_work_env_button()
-        self.refresh_string_asset_label()
+            self.refresh_string_asset_label()
                 
     def connect_functions(self):
         self.variant_comboBox.currentTextChanged.connect(self.variant_changed)
@@ -229,6 +224,7 @@ class context_widget(QtWidgets.QFrame):
         self.init_work_env_button = QtWidgets.QPushButton('Init work environment')
         self.init_work_env_button.setObjectName('init_work_env_button')
         self.init_work_env_button.setFixedHeight(29)
+        self.init_work_env_button.setVisible(0)
         gui_utils.application_tooltip(self.init_work_env_button, "Init work environment")
         self.main_layout.addWidget(self.init_work_env_button)
 
@@ -238,7 +234,7 @@ class context_widget(QtWidgets.QFrame):
         self.string_asset_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.main_layout.addWidget(self.string_asset_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(16,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(8,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open work environment folder")

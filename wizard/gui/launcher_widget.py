@@ -31,7 +31,7 @@ class launcher_widget(QtWidgets.QFrame):
     def __init__(self, parent = None):
         super(launcher_widget, self).__init__(parent)
         
-        self.work_env_row = None
+        self.work_env_id = None
         self.version_row = None
         self.refresh_version_changed = None
 
@@ -45,9 +45,6 @@ class launcher_widget(QtWidgets.QFrame):
         self.refresh_versions_hard()
 
     def refresh(self):
-        start_time = time.time()
-        if self.work_env_row is not None:
-            self.work_env_row = project.get_work_env_data(self.work_env_row['id'])
         self.refresh_versions()
         if self.version_row is not None:
             self.version_row = project.get_version_data(self.version_row['id'])
@@ -58,11 +55,8 @@ class launcher_widget(QtWidgets.QFrame):
             self.version_comboBox.setCurrentText(version_name)
 
     def refresh_versions(self, set_last=None):
-        if self.work_env_id != None and self.work_env_id != 0:
-            self.work_env_row = project.get_work_env_data(self.work_env_id)
-
-        if self.work_env_row is not None and self.work_env_id is not None:
-            version_rows = project.get_work_versions(self.work_env_row['id'])
+        if self.work_env_id:
+            version_rows = project.get_work_versions(self.work_env_id)
             if (version_rows is not None) and (version_rows != []):
                 new=0
                 for version_row in version_rows:
@@ -73,8 +67,6 @@ class launcher_widget(QtWidgets.QFrame):
                 if new or set_last:
                     self.version_comboBox.setCurrentText(version_rows[-1]['name'])
                     self.version_row = version_rows[-1]
-        elif self.work_env_row == None and self.work_env_id is not None:
-            self.version_comboBox.addItem('0001')
         self.refresh_version_changed = True
 
     def refresh_versions_hard(self):
@@ -87,38 +79,34 @@ class launcher_widget(QtWidgets.QFrame):
     def version_changed(self):
         if self.refresh_version_changed:
             self.version_row = None
-            if self.work_env_row is not None:
-                self.version_row = project.get_work_version_by_name(self.work_env_row['id'], 
+            if self.work_env_id:
+                self.version_row = project.get_work_version_by_name(self.work_env_id, 
                                                                     self.version_comboBox.currentText())
             self.refresh_infos()
 
     def refresh_infos(self):
         if self.version_row:
             self.user_label.setText(self.version_row['creation_user'])
-            self.comment_label.setText(self.version_row['comment'])
+            if self.version_row['comment'] != '':
+                self.comment_label.setText(self.version_row['comment'])
+            else:
+                self.comment_label.setText('Missing comment')
             day, hour = tools.convert_time(self.version_row['creation_time'])
             self.date_label.setText(f"{day} - {hour}")
             self.refresh_screenshot(self.version_row['screenshot_path'])
             self.refresh_lock_button()
             self.refresh_launch_button()
-            self.refresh_work_time()
         else:
-            self.user_label.setText('')
-            self.comment_label.setText('')
-            self.work_time_label.setText('')
-            self.date_label.setText('')
+            self.user_label.setText('user')
+            self.comment_label.setText('comment')
+            self.date_label.setText('date')
             self.refresh_screenshot('')
             self.refresh_lock_button()
             self.refresh_launch_button()
 
-    def refresh_work_time(self):
-        if self.work_env_row is not None:
-            work_hours, work_minutes, work_seconds = tools.convert_seconds(self.work_env_row['work_time'])
-            self.work_time_label.setText(f"{work_hours}h:{work_minutes}m:{work_seconds}s")
-
     def refresh_launch_button(self):
-        if self.work_env_row is not None:
-            if self.work_env_row['id'] in launch.get():
+        if self.work_env_id:
+            if self.work_env_id in launch.get():
                 self.launch_button.start_animation()
                 self.show_kill_button()
             else:
@@ -139,8 +127,8 @@ class launcher_widget(QtWidgets.QFrame):
         self.lock_button.setStyleSheet('')
         gui_utils.modify_application_tooltip(self.lock_button, "Lock work environment")
         self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
-        if self.work_env_row is not None:
-            lock_id = project.get_work_env_data(self.work_env_row['id'], 'lock_id')
+        if self.work_env_id:
+            lock_id = project.get_work_env_data(self.work_env_id, 'lock_id')
             if lock_id is not None:
                 gui_utils.modify_application_tooltip(self.lock_button, "Unlock work environment")
                 css = "QPushButton{border: 2px solid #f0605b;background-color: #f0605b;}"
@@ -150,15 +138,14 @@ class launcher_widget(QtWidgets.QFrame):
                 self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
 
     def toggle_lock(self):
-        if self.work_env_row is not None:
-            project.toggle_lock(self.work_env_row['id'])
+        if self.work_env_id:
+            project.toggle_lock(self.work_env_id)
             self.refresh_lock_button()
 
     def launch(self):
-        if self.work_env_id is not None:
-            if self.work_env_row is not None:
-                launch.launch_work_version(self.version_row['id'])
-                gui_server.refresh_ui()
+        if self.work_env_id:
+            launch.launch_work_version(self.version_row['id'])
+            gui_server.refresh_ui()
 
     def connect_functions(self):
         self.version_comboBox.currentTextChanged.connect(self.version_changed)
@@ -168,8 +155,8 @@ class launcher_widget(QtWidgets.QFrame):
         self.kill_button.clicked.connect(self.kill)
 
     def kill(self):
-        if self.work_env_row is not None:
-            launch.kill(self.work_env_row['id'])
+        if self.work_env_id:
+            launch.kill(self.work_env_id)
 
     def show_screen_shot(self):
         if self.version_row is not None:
@@ -201,13 +188,10 @@ class launcher_widget(QtWidgets.QFrame):
             self.anim.start()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
-
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        self.main_layout.addSpacerItem(self.spaceItem)
 
         self.screenshot_button = QtWidgets.QPushButton()
         self.screenshot_button.setObjectName('screenshot_button')
@@ -221,12 +205,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.version_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.version_comboBox)
 
-        self.work_time_label = QtWidgets.QLabel()
-        gui_utils.application_tooltip(self.work_time_label, "Work environment work time")
-        self.work_time_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.work_time_label)
-
-        self.comment_label = QtWidgets.QLabel()
+        self.comment_label = QtWidgets.QLabel('comment')
         gui_utils.application_tooltip(self.comment_label, "Version comment")
         self.comment_label.setWordWrap(True)
         self.main_layout.addWidget(self.comment_label)
@@ -238,12 +217,12 @@ class launcher_widget(QtWidgets.QFrame):
         self.version_infos_widget.setLayout(self.version_infos_layout)
         self.main_layout.addWidget(self.version_infos_widget)
 
-        self.date_label = QtWidgets.QLabel()
+        self.date_label = QtWidgets.QLabel('date')
         gui_utils.application_tooltip(self.date_label, "Version date")
         self.date_label.setObjectName('gray_label')
         self.version_infos_layout.addWidget(self.date_label)
 
-        self.user_label = QtWidgets.QLabel()
+        self.user_label = QtWidgets.QLabel('user')
         gui_utils.application_tooltip(self.user_label, "Version user")
         self.version_infos_layout.addWidget(self.user_label)
 
