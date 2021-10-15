@@ -1903,3 +1903,680 @@ ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée 
 2021-10-15 10:04:08,991 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
 2021-10-15 10:04:12,213 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
 2021-10-15 10:04:15,020 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:39:02,644 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:39:02,649 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('10.8.0.6', 65141), nft_wizard_2
+2021-10-15 11:39:02,655 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'nft_wizard_2'}
+2021-10-15 11:39:48,680 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:39:50,018 - WIZARD-SERVER - INFO - New client : l.brunel, ('10.8.0.6', 50557), nft_wizard_2
+2021-10-15 11:39:50,018 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'l.brunel', 'project': 'nft_wizard_2'}
+2021-10-15 11:40:49,576 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:44:04,051 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:44:04,052 - WIZARD-SERVER - INFO - Removing client : l.brunel, ('10.8.0.6', 50557), nft_wizard_2
+2021-10-15 11:44:04,054 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'l.brunel', 'project': 'nft_wizard_2'}
+2021-10-15 11:44:09,740 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:44:11,042 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 51984), nft_wizard_2
+2021-10-15 11:44:11,042 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:45:09,132 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:45:09,132 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 51984), nft_wizard_2
+2021-10-15 11:45:09,135 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:45:13,757 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:45:15,032 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 52789), nft_wizard_2
+2021-10-15 11:45:15,032 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:46:42,939 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:46:42,940 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 52789), nft_wizard_2
+2021-10-15 11:46:42,943 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:46:48,116 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:46:49,458 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 53706), nft_wizard_2
+2021-10-15 11:46:49,459 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:47:10,250 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:47:16,276 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:48:33,955 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:48:33,956 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 53706), nft_wizard_2
+2021-10-15 11:48:33,958 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:48:40,035 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:48:41,376 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 54621), nft_wizard_2
+2021-10-15 11:48:41,376 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:49:47,851 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:49:47,851 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 54621), nft_wizard_2
+2021-10-15 11:49:47,853 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:49:52,384 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:49:53,641 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 55303), nft_wizard_2
+2021-10-15 11:49:53,641 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:50:19,907 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:50:19,908 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 55303), nft_wizard_2
+2021-10-15 11:50:19,910 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:50:25,117 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:50:26,458 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 55701), nft_wizard_2
+2021-10-15 11:50:26,458 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:50:41,382 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:51:31,023 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:51:39,172 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:51:44,851 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:51:55,555 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:51:57,716 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:53:57,032 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:55:01,750 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:55:58,572 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:55:58,572 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 55701), nft_wizard_2
+2021-10-15 11:55:58,574 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:56:14,234 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:56:15,405 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 57669), nft_wizard_2
+2021-10-15 11:56:15,405 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:01,983 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:57:01,983 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 57669), nft_wizard_2
+2021-10-15 11:57:01,985 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:06,609 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:57:07,869 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 57722), nft_wizard_2
+2021-10-15 11:57:07,869 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:51,416 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:53,394 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:54,129 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:57,891 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:57:58,485 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:58:18,062 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 11:59:38,299 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 11:59:38,300 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 57722), nft_wizard_2
+2021-10-15 11:59:38,301 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 11:59:43,028 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 11:59:44,389 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 59506), nft_wizard_2
+2021-10-15 11:59:44,390 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:01:39,074 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:01:39,075 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 59506), nft_wizard_2
+2021-10-15 12:01:39,077 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:01:43,953 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:01:45,210 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 60160), nft_wizard_2
+2021-10-15 12:01:45,211 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:04:25,251 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:04:25,252 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 60160), nft_wizard_2
+2021-10-15 12:04:25,254 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:04:30,358 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:04:31,624 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 60740), nft_wizard_2
+2021-10-15 12:04:31,624 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:05:48,170 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:05:48,171 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 60740), nft_wizard_2
+2021-10-15 12:05:48,173 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:05:52,967 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:05:54,430 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 61221), nft_wizard_2
+2021-10-15 12:05:54,431 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:07:20,778 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:07:20,779 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 61221), nft_wizard_2
+2021-10-15 12:07:20,780 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:07:26,212 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:07:27,470 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 61935), nft_wizard_2
+2021-10-15 12:07:27,470 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:08:37,033 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:08:44,314 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:09:22,058 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:09:22,059 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 61935), nft_wizard_2
+2021-10-15 12:09:22,061 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:11:07,273 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:11:08,523 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 63086), nft_wizard_2
+2021-10-15 12:11:08,523 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:13:05,808 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:13:05,809 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 63086), nft_wizard_2
+2021-10-15 12:13:05,811 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:13:10,365 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:13:11,605 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 63499), nft_wizard_2
+2021-10-15 12:13:11,605 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:13:28,098 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:13:28,099 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 63499), nft_wizard_2
+2021-10-15 12:13:28,101 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:13:45,551 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:13:46,739 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 63879), nft_wizard_2
+2021-10-15 12:13:46,739 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:14:30,162 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:14:30,164 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 63879), nft_wizard_2
+2021-10-15 12:14:30,166 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:22:55,241 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:22:56,384 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 64322), nft_wizard_2
+2021-10-15 12:22:56,384 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:23:05,249 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:23:05,250 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 64322), nft_wizard_2
+2021-10-15 12:23:05,252 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:23:15,661 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:23:16,883 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 64688), nft_wizard_2
+2021-10-15 12:23:16,884 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:23:58,826 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:23:58,826 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 64688), nft_wizard_2
+2021-10-15 12:23:58,828 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:24:03,445 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:24:16,574 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:24:17,781 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 65167), nft_wizard_2
+2021-10-15 12:24:17,782 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:25:15,773 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:25:18,885 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:26:24,259 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:29:44,818 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:29:46,354 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:29:59,228 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:33:04,577 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:33:04,578 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 65167), nft_wizard_2
+2021-10-15 12:33:04,580 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:33:09,212 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:33:10,570 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 50290), nft_wizard_2
+2021-10-15 12:33:10,570 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:33:17,161 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:33:17,162 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 50290), nft_wizard_2
+2021-10-15 12:33:17,164 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:33:45,582 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:33:46,806 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 50661), nft_wizard_2
+2021-10-15 12:33:46,806 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:34:04,169 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:34:04,170 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 50661), nft_wizard_2
+2021-10-15 12:34:04,172 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:34:33,227 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:34:34,449 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 51043), nft_wizard_2
+2021-10-15 12:34:34,449 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:34:43,089 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:34:43,089 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 51043), nft_wizard_2
+2021-10-15 12:34:43,091 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:34:58,345 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:34:59,588 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 51410), nft_wizard_2
+2021-10-15 12:34:59,588 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:35:07,321 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:35:07,321 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 51410), nft_wizard_2
+2021-10-15 12:35:07,324 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:35:34,678 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:35:36,013 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 51778), nft_wizard_2
+2021-10-15 12:35:36,013 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:35:52,137 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:35:52,138 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 51778), nft_wizard_2
+2021-10-15 12:35:52,140 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:36:09,133 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:36:10,510 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 52149), nft_wizard_2
+2021-10-15 12:36:10,510 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:37:13,440 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:37:13,441 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 52149), nft_wizard_2
+2021-10-15 12:37:13,443 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:37:17,903 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:37:19,316 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 52571), nft_wizard_2
+2021-10-15 12:37:19,316 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:41:33,288 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:41:42,059 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:41:46,107 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:42:51,768 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:42:51,769 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 52571), nft_wizard_2
+2021-10-15 12:42:51,773 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:43:10,209 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:43:11,489 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 53471), nft_wizard_2
+2021-10-15 12:43:11,490 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:43:25,152 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 12:43:25,153 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 53471), nft_wizard_2
+2021-10-15 12:43:25,155 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:43:30,196 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 12:43:31,440 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 53844), nft_wizard_2
+2021-10-15 12:43:31,441 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 12:45:35,441 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:45:39,265 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:45:41,361 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:45:48,184 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:46:51,735 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:46:58,172 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 12:47:01,939 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 13:51:50,625 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 13:51:50,626 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 53844), nft_wizard_2
+2021-10-15 13:51:50,628 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 13:53:35,919 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 13:53:37,575 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 55869), nft_wizard_2
+2021-10-15 13:53:37,576 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 13:53:57,573 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 13:53:57,574 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 55869), nft_wizard_2
+2021-10-15 13:53:57,576 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 13:54:01,693 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 13:54:03,058 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 56351), nft_wizard_2
+2021-10-15 13:54:03,058 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 13:58:29,845 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 13:58:29,845 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 56351), nft_wizard_2
+2021-10-15 13:58:29,848 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 13:58:37,909 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 13:58:39,066 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 58106), nft_wizard_2
+2021-10-15 13:58:39,066 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 13:59:16,629 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 13:59:16,629 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 58106), nft_wizard_2
+2021-10-15 13:59:16,631 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:00:08,025 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:00:09,402 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 58586), nft_wizard_2
+2021-10-15 14:00:09,402 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:03:44,181 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:03:44,182 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 58586), nft_wizard_2
+2021-10-15 14:03:44,184 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:03:49,117 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:03:50,363 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 58828), nft_wizard_2
+2021-10-15 14:03:50,364 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:04:14,292 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:04:14,293 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 58828), nft_wizard_2
+2021-10-15 14:04:14,295 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:04:26,311 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:04:27,570 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 58960), nft_wizard_2
+2021-10-15 14:04:27,570 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:05:17,756 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:05:17,757 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 58960), nft_wizard_2
+2021-10-15 14:05:17,759 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:05:55,287 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:05:56,567 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 59152), nft_wizard_2
+2021-10-15 14:05:56,567 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:06:02,372 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:06:02,373 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 59152), nft_wizard_2
+2021-10-15 14:06:02,375 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:06:17,078 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:06:18,321 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 59248), nft_wizard_2
+2021-10-15 14:06:18,322 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:08:31,732 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:08:31,733 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 59248), nft_wizard_2
+2021-10-15 14:08:31,734 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:19:31,663 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:19:32,954 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 56283), nft_wizard_2
+2021-10-15 14:19:32,955 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:20:02,949 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:20:07,508 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:20:10,048 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:20:11,870 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:24:09,059 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:24:09,060 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 56283), nft_wizard_2
+2021-10-15 14:24:09,062 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:28:33,303 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:28:34,569 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 57089), nft_wizard_2
+2021-10-15 14:28:34,570 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:29:43,011 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:29:43,012 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 57089), nft_wizard_2
+2021-10-15 14:29:43,014 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:29:48,193 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:29:49,474 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 57478), nft_wizard_2
+2021-10-15 14:29:49,474 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:31:25,483 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:31:25,484 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 57478), nft_wizard_2
+2021-10-15 14:31:25,486 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:31:29,898 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:31:31,087 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 57889), nft_wizard_2
+2021-10-15 14:31:31,087 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:32:29,819 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:32:29,819 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 57889), nft_wizard_2
+2021-10-15 14:32:29,822 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:32:48,222 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:32:49,463 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 58359), nft_wizard_2
+2021-10-15 14:32:49,463 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:33:05,251 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:33:05,252 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 58359), nft_wizard_2
+2021-10-15 14:33:05,254 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:33:43,458 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:33:44,684 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 58719), nft_wizard_2
+2021-10-15 14:33:44,685 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:34:13,475 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:34:13,476 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 58719), nft_wizard_2
+2021-10-15 14:34:13,477 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:34:50,154 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:34:51,492 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 59070), nft_wizard_2
+2021-10-15 14:34:51,492 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:35:08,979 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:35:08,980 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 59070), nft_wizard_2
+2021-10-15 14:35:08,982 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:35:24,433 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:35:25,641 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 59432), nft_wizard_2
+2021-10-15 14:35:25,642 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:36:25,847 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:36:35,051 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:38:40,170 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:38:40,171 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 59432), nft_wizard_2
+2021-10-15 14:38:40,175 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:38:45,124 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:38:46,375 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 60116), nft_wizard_2
+2021-10-15 14:38:46,375 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:39:11,842 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:39:11,843 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 60116), nft_wizard_2
+2021-10-15 14:39:11,845 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:41:16,008 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:41:17,217 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 60489), nft_wizard_2
+2021-10-15 14:41:17,217 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:41:55,207 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:42:40,466 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:42:40,467 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 60489), nft_wizard_2
+2021-10-15 14:42:40,469 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:42:45,123 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:42:46,500 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 61150), nft_wizard_2
+2021-10-15 14:42:46,500 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:44:36,524 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:44:39,435 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:44:41,225 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:44:43,058 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:44:44,767 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:47:34,530 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:47:34,531 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 61150), nft_wizard_2
+2021-10-15 14:47:34,533 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:48:23,268 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:48:24,625 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 62742), nft_wizard_2
+2021-10-15 14:48:24,625 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:48:30,086 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:48:30,086 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 62742), nft_wizard_2
+2021-10-15 14:48:30,088 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:48:39,095 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:48:40,337 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 62803), nft_wizard_2
+2021-10-15 14:48:40,337 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:48:56,911 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:48:59,927 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:49:02,178 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:49:03,745 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:49:56,018 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:49:56,018 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 62803), nft_wizard_2
+2021-10-15 14:49:56,020 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:50:22,975 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:50:24,314 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 63451), nft_wizard_2
+2021-10-15 14:50:24,314 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:50:33,730 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:50:33,731 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 63451), nft_wizard_2
+2021-10-15 14:50:33,732 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:50:47,403 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:50:48,785 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 63819), nft_wizard_2
+2021-10-15 14:50:48,786 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:51:10,575 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:51:12,255 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:54:45,074 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:54:45,074 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 63819), nft_wizard_2
+2021-10-15 14:54:45,076 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:56:54,157 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:56:55,210 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 64429), nft_wizard_2
+2021-10-15 14:56:55,210 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:57:17,045 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:57:19,588 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:57:21,006 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:57:28,340 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:57:29,748 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:57:31,540 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:58:09,983 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 14:58:12,874 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:58:12,875 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 64429), nft_wizard_2
+2021-10-15 14:58:12,877 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:58:19,207 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:58:20,488 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 64952), nft_wizard_2
+2021-10-15 14:58:20,489 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:59:06,074 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 14:59:06,075 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 64952), nft_wizard_2
+2021-10-15 14:59:06,077 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 14:59:47,195 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 14:59:48,515 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 65248), nft_wizard_2
+2021-10-15 14:59:48,515 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:02:53,049 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 15:02:53,050 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 65248), nft_wizard_2
+2021-10-15 15:02:53,052 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:02:58,009 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 15:02:59,527 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 49574), nft_wizard_2
+2021-10-15 15:02:59,528 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:03:13,569 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 15:03:13,570 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 49574), nft_wizard_2
+2021-10-15 15:03:13,573 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:03:17,832 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 15:03:19,141 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 49703), nft_wizard_2
+2021-10-15 15:03:19,141 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:03:23,289 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 15:03:23,290 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 49703), nft_wizard_2
+2021-10-15 15:03:23,293 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:03:27,433 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 15:03:28,696 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 49775), nft_wizard_2
+2021-10-15 15:03:28,696 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:03:46,969 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 15:03:46,970 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 49775), nft_wizard_2
+2021-10-15 15:03:46,972 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:03:51,193 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 15:03:52,833 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 49962), nft_wizard_2
+2021-10-15 15:03:52,833 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:04:50,996 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 15:04:54,834 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 15:05:04,954 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 15:05:08,698 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 15:05:10,434 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 15:05:20,062 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'nft_wizard_2'}
+2021-10-15 15:05:33,824 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 15:05:33,825 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 49962), nft_wizard_2
+2021-10-15 15:05:33,826 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:07:07,897 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 15:07:09,804 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 50544), nft_wizard_2
+2021-10-15 15:07:09,805 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:07:18,260 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-15 15:07:18,260 - WIZARD-SERVER - INFO - Removing client : admin, ('10.8.0.6', 50544), nft_wizard_2
+2021-10-15 15:07:18,263 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}
+2021-10-15 15:07:22,663 - WIZARD-SERVER - INFO - test_conn
+2021-10-15 15:07:24,276 - WIZARD-SERVER - INFO - New client : admin, ('10.8.0.6', 50667), nft_wizard_2
+2021-10-15 15:07:24,277 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'admin', 'project': 'nft_wizard_2'}

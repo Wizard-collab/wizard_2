@@ -30,6 +30,7 @@ class wall_widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(wall_widget, self).__init__(parent)
+
         self.last_time = 0
         self.event_ids = dict()
         self.time_widgets = []
@@ -37,11 +38,13 @@ class wall_widget(QtWidgets.QWidget):
         self.search_thread = search_thread()
         self.build_ui()
         self.connect_functions()
+        self.get_events_count()
 
     def connect_functions(self):
         self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.id_signal.connect(self.add_search_event)
+        self.event_count_spinBox.valueChanged.connect(self.change_events_count)
 
     def build_ui(self):
         self.setMaximumWidth(300)
@@ -67,7 +70,8 @@ class wall_widget(QtWidgets.QWidget):
         self.wall_scrollArea_widget = QtWidgets.QWidget()
         self.wall_scrollArea_widget.setObjectName('wall_scroll_area')
         self.wall_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.wall_scrollArea_layout.setSpacing(6)
+        self.wall_scrollArea_layout.setContentsMargins(0,0,0,0)
+        self.wall_scrollArea_layout.setSpacing(0)
         self.wall_scrollArea_widget.setLayout(self.wall_scrollArea_layout)
 
         self.wall_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -81,13 +85,23 @@ class wall_widget(QtWidgets.QWidget):
 
         self.infos_frame = QtWidgets.QFrame()
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setContentsMargins(4,4,4,4)
         self.infos_frame.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_frame)
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('tree_datas_label')
         self.infos_layout.addWidget(self.refresh_label)
+        
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.infos_layout.addWidget(QtWidgets.QLabel('Show'))
+        self.event_count_spinBox = QtWidgets.QSpinBox()
+        self.event_count_spinBox.setButtonSymbols(2)
+        self.event_count_spinBox.setRange(1, 10000000)
+        self.event_count_spinBox.setFixedWidth(50)
+        self.infos_layout.addWidget(self.event_count_spinBox)
+        self.infos_layout.addWidget(QtWidgets.QLabel('events'))
 
     def set_context(self):
         if self.isVisible():
@@ -96,6 +110,7 @@ class wall_widget(QtWidgets.QWidget):
             visible = 0
         context_dic = dict()
         context_dic['visibility'] = visible
+        context_dic['events_count'] = self.event_count_spinBox.value()
         user.user().add_context(user_vars._wall_context_, context_dic)
 
     def get_context(self):
@@ -105,6 +120,13 @@ class wall_widget(QtWidgets.QWidget):
                 self.set_visible()
             elif context_dic['visibility'] == 0:
                 self.set_hidden()
+
+    def get_events_count(self):
+        context_dic = user.user().get_context(user_vars._wall_context_)
+        if context_dic is not None and context_dic != dict():
+            self.event_count_spinBox.setValue(context_dic['events_count'])
+        else:
+            self.event_count_spinBox.setValue(10)
 
     def set_visible(self):
         if not self.isVisible():
@@ -144,14 +166,10 @@ class wall_widget(QtWidgets.QWidget):
     def hide_all(self):
         for event_id in self.event_ids.keys():
             self.event_ids[event_id].setVisible(0)
-        for time_widget in self.time_widgets:
-            time_widget.setVisible(0)
 
     def show_all(self):
         for event_id in self.event_ids.keys():
             self.event_ids[event_id].setVisible(1)
-        for time_widget in self.time_widgets:
-            time_widget.setVisible(1)
 
     def update_search(self):
         search_data = self.search_bar.text()
@@ -177,23 +195,44 @@ class wall_widget(QtWidgets.QWidget):
         start_time = time.time()
         event_rows = project.get_all_events()
         if event_rows is not None:
-            for event_row in event_rows:
+
+            event_number = self.event_count_spinBox.value()
+
+            for event_row in event_rows[-event_number:]:
                 if event_row['id'] not in self.event_ids.keys():
-                    if event_row['creation_time']-self.last_time > 350:
-                        time_widget = wall_time_widget(event_row['creation_time'])
-                        self.wall_scrollArea_layout.addWidget(time_widget)
-                        self.time_widgets.append(time_widget)
                     event_widget = wall_event_widget(event_row)
+                    if event_row['creation_time']-self.last_time > 350:
+                        event_widget.add_time()
                     self.wall_scrollArea_layout.addWidget(event_widget)
                     self.event_ids[event_row['id']] = event_widget
                     self.last_time = event_row['creation_time']
                     if not self.isVisible() and self.first_refresh != 1:
                         self.notification.emit(1)
                         self.popup.emit(event_row)
-            self.old_project = environment.get_project_name()
+            self.remove_useless_events(event_number)
+
         self.update_search()
         self.update_refresh_time(start_time)
         self.first_refresh = 0
+
+    def change_events_count(self):
+        self.last_time = 0
+        event_ids_list = list(self.event_ids.keys())
+        for event_id in event_ids_list:
+            self.remove_event(event_id)
+        self.refresh()
+
+    def remove_useless_events(self, event_number):
+        event_ids_list_to_remove = list(self.event_ids.keys())[:-event_number]
+        for event_id in event_ids_list_to_remove:
+            self.remove_event(event_id)
+        self.event_ids[list(self.event_ids.keys())[0]].add_time()
+
+    def remove_event(self, event_id):
+        if event_id in self.event_ids.keys():
+            self.event_ids[event_id].setParent(None)
+            self.event_ids[event_id].deleteLater()
+            del self.event_ids[event_id]
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
@@ -233,15 +272,9 @@ class wall_event_widget(QtWidgets.QFrame):
     def __init__(self, event_row, parent=None):
         super(wall_event_widget, self).__init__(parent)
 
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.setGraphicsEffect(self.shadow)
-
-        self.setObjectName('popup_event_frame')
+        self.setObjectName('transparent_widget')
         self.event_row = event_row
+        self.time_widget = None
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
@@ -288,12 +321,33 @@ class wall_event_widget(QtWidgets.QFrame):
             export_version_id = json.loads(self.event_row['data'])
             gui_server.focus_export_version(export_version_id)
 
+    def add_time(self):
+        if self.time_widget == None:
+            self.time_widget = wall_time_widget(self.event_row['creation_time'])
+            self.widget_layout.insertWidget(0, self.time_widget)
+            self.widget_layout.setContentsMargins(10,0,10,8)
+
     def build_ui(self):
+        self.widget_layout = QtWidgets.QVBoxLayout()
+        self.widget_layout.setContentsMargins(10,8,10,8)
+        self.widget_layout.setSpacing(1)
+        self.setLayout(self.widget_layout)
+
+        self.event_frame = QtWidgets.QFrame()
+        self.event_frame.setObjectName('popup_event_frame')
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
-        self.setLayout(self.main_layout)
+        self.event_frame.setLayout(self.main_layout)
+        self.widget_layout.addWidget(self.event_frame)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.event_frame.setGraphicsEffect(self.shadow)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('dark_widget')
