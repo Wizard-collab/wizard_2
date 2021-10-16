@@ -265,6 +265,7 @@ QProgressBar {
     height:6px;
 	background-color: rgba(0,0,0,50);
 	border-radius:3px;
+	color: transparent;
 }
 
 QProgressBar::chunk {

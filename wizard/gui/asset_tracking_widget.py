@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import time
 
 # Wizard modules
 from wizard.core import tools
@@ -100,6 +101,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout.addWidget(self.estimated_time_label)
 
         self.progress_bar_widget = QtWidgets.QWidget()
+        self.progress_bar_widget.setObjectName('transparent_widget')
         self.progress_bar_layout = QtWidgets.QHBoxLayout()
         self.progress_bar_layout.setContentsMargins(0,0,0,0)
         self.progress_bar_layout.setSpacing(6)
@@ -108,9 +110,10 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.time_progress_bar = QtWidgets.QProgressBar()
         self.time_progress_bar.setMaximumHeight(6)
-        self.time_progress_bar.setObjectName('task_progressBar')
-        self.time_progress_bar.setStyleSheet('#task_progressBar{color:transparent;}')
         self.progress_bar_layout.addWidget(self.time_progress_bar)
+
+        self.percent_label = QtWidgets.QLabel()
+        self.progress_bar_layout.addWidget(self.percent_label)
 
         self.events_scrollArea = QtWidgets.QScrollArea()
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
@@ -137,23 +140,32 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_scrollArea.setWidget(self.events_scrollArea_widget)
         self.main_layout.addWidget(self.events_scrollArea)
 
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.refresh_label)
+
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(300,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
     def change_variant(self, variant_id):
         self.variant_id = variant_id
-        self.clear_tracking_events()
         self.refresh()
 
     def refresh(self):
+        start_time = time.time()
         if self.variant_id is not None:
             self.variant_row = project.get_variant_data(self.variant_id)
         else:
             self.variant_row = None
+        self.refresh_tracking_events()
         self.refresh_state()
         self.refresh_users_dic()
         self.refresh_user()
-        self.refresh_tracking_events()
         self.refresh_time()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_time(self):
         if self.variant_id is not None:
@@ -162,28 +174,50 @@ class asset_tracking_widget(QtWidgets.QFrame):
             if self.variant_row['estimated_time'] is not None:
                 self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.variant_row['estimated_time'])))
                 percent = (float(self.variant_row['work_time'])/float(self.variant_row['estimated_time']))*100
+                self.percent_label.setText(f"{str(int(percent))}%")
+                if percent > 100:
+                    percent = 100
+                    if self.variant_row['state'] != 'done':
+                        self.time_progress_bar.setStyleSheet('::chunk{background-color:#ff5d5d;}')
+                else:
+                    self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
+                if self.variant_row['state'] == 'done':
+                    self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
                 self.time_progress_bar.setValue(percent)
             else:
                 self.estimated_time_label.setText('No estimation')
+                self.time_progress_bar.setValue(0)
+                self.percent_label.setText("0%")
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')
+            self.time_progress_bar.setValue(0)
+            self.percent_label.setText("0%")
 
-    def clear_tracking_events(self):
-        tracking_event_ids = list(self.tracking_event_ids.keys())
-        for tracking_event_id in tracking_event_ids:
-            self.tracking_event_ids[tracking_event_id].setParent(None)
-            self.tracking_event_ids[tracking_event_id].deleteLater()
-            del self.tracking_event_ids[tracking_event_id]
+    def remove_tracking_event(self, event_id):
+        if event_id in self.tracking_event_ids.keys():
+            self.tracking_event_ids[event_id].setVisible(False)
+            self.tracking_event_ids[event_id].setParent(None)
+            self.tracking_event_ids[event_id].deleteLater()
+            del self.tracking_event_ids[event_id]
 
     def refresh_tracking_events(self):
+        start_time = time.time()
+        project_tracking_events_ids = []
         if self.variant_id is not None:
             tracking_event_rows = project.get_asset_tracking_events(self.variant_id)
             for tracking_event_row in tracking_event_rows:
+                project_tracking_events_ids.append(tracking_event_row['id'])
                 if tracking_event_row['id'] not in self.tracking_event_ids.keys():
                     widget = tracking_event_widget(tracking_event_row)
                     self.events_content_layout.addWidget(widget)
                     self.tracking_event_ids[tracking_event_row['id']] = widget
+        tracking_event_ids = list(self.tracking_event_ids.keys())
+        for event_id in tracking_event_ids:
+            if event_id not in project_tracking_events_ids:
+                self.remove_tracking_event(event_id)
+        refresh_time = str(round((time.time()-start_time), 3))
+        print(f"refresh : {refresh_time}s")
 
     def refresh_user(self):
         self.apply_assignment_modification = None
@@ -300,7 +334,7 @@ class tracking_event_widget(QtWidgets.QFrame):
             color = '#ff5d5d'
         self.state_frame.setStyleSheet(f'background-color:{color};')
         
-        self.state_label = QtWidgets.QLabel(self.tracking_event_row['data'])
+        self.state_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())
         self.state_label.setObjectName('bold_label')
         self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.state_frame_layout.addWidget(self.state_label)

@@ -88,11 +88,14 @@ class context_widget(QtWidgets.QFrame):
             self.variant_row = None
             if self.stage_row is not None:
                 self.variant_row = project.get_variant_by_name(self.stage_id, self.variant_comboBox.currentText())
-                if by_user:
-                    if self.variant_row is not None:
-                        project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
-
             self.refresh_work_envs_hard()
+
+            if self.variant_row is not None:
+                if by_user:
+                    project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
+                self.variant_changed_signal.emit(self.variant_row['id'])
+            else:
+                self.variant_changed_signal.emit(None)
 
     def refresh_work_envs_hard(self):
         self.refresh_work_env_changed = None
@@ -107,9 +110,6 @@ class context_widget(QtWidgets.QFrame):
             if self.variant_row['default_work_env_id'] is not None:
                 default_work_env_name = project.get_work_env_data(self.variant_row['default_work_env_id'], 'name')
                 self.work_env_comboBox.setCurrentText(default_work_env_name)
-            self.variant_changed_signal.emit(self.variant_row['id'])
-        else:
-            self.variant_changed_signal.emit(None)
 
         self.refresh_work_env_changed = 1
         self.work_env_changed(by_user=None)

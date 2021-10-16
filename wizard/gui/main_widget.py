@@ -244,7 +244,6 @@ class main_widget(custom_window.custom_window):
         start_time = time.time()
         self.tree_widget.refresh()
         self.context_widget.refresh()
-        self.asset_tracking_widget.refresh()
         self.launcher_widget.refresh()
         self.header_widget.refresh()
         self.references_widget.refresh()
@@ -253,6 +252,7 @@ class main_widget(custom_window.custom_window):
         self.tickets_widget.refresh()
         self.wall_widget.refresh()
         self.softwares_widget.refresh()
+        self.asset_tracking_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):
