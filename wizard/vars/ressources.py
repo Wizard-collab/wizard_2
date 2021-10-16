@@ -95,6 +95,8 @@ _state_todo_ = os.path.join(_icons_path_, 'state_todo.png')
 _state_wip_ = os.path.join(_icons_path_, 'state_wip.png')
 _state_done_ = os.path.join(_icons_path_, 'state_done.png')
 _state_error_ = os.path.join(_icons_path_, 'state_error.png')
+_estimated_time_icon_ = os.path.join(_icons_path_, 'estimated_time.png')
+_work_time_icon_ = os.path.join(_icons_path_, 'work_time.png')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.png')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.png')

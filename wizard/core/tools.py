@@ -40,6 +40,18 @@ def convert_seconds_with_day(time_float):
     seconds = str(int(time.strftime("%S", time.gmtime(time_float))))
     return day, hours, minutes, seconds
 
+def convert_seconds_to_string_time(time_float):
+    days, hours, minutes, seconds = convert_seconds_with_day(time_float)
+    if int(days) != 0:
+        string_time = f"{days}d, {hours}h"
+    if int(hours) != 0 and int(days) == 0:
+        string_time = f"{hours}h, {minutes}m"
+    if int(minutes) != 0 and int(hours) == 0 and int(days) == 0:
+        string_time = f"{minutes}m, {seconds}s"
+    if int(minutes) == 0 and int(hours) == 0 and int(days) == 0:
+        string_time = f"{seconds}s"
+    return string_time
+
 def encrypt_string(string):
     # Hash a string for storing.
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')

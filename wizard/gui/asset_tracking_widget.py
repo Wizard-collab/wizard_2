@@ -68,10 +68,49 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.progress_widget = QtWidgets.QFrame()
         self.progress_widget.setObjectName('asset_tracking_event_frame')
-        self.progress_layout = QtWidgets.QHBoxLayout()
+        self.progress_layout = QtWidgets.QVBoxLayout()
         self.progress_layout.setSpacing(6)
         self.progress_widget.setLayout(self.progress_layout)
         self.main_layout.addWidget(self.progress_widget)
+
+        self.time_infos_widget = QtWidgets.QWidget()
+        self.time_infos_widget.setObjectName('transparent_widget')
+        self.time_infos_layout = QtWidgets.QHBoxLayout()
+        self.time_infos_layout.setContentsMargins(0,0,0,0)
+        self.time_infos_layout.setSpacing(6)
+        self.time_infos_widget.setLayout(self.time_infos_layout)
+        self.progress_layout.addWidget(self.time_infos_widget)
+
+        self.work_time_icon_label = QtWidgets.QLabel()
+        self.work_time_icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.work_time_icon_label.setPixmap(QtGui.QPixmap(ressources._work_time_icon_).scaled(22,22,
+                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.time_infos_layout.addWidget(self.work_time_icon_label)
+
+        self.work_time_label = QtWidgets.QLabel()
+        self.time_infos_layout.addWidget(self.work_time_label)
+
+        self.estimated_time_icon_label = QtWidgets.QLabel()
+        self.estimated_time_icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.estimated_time_icon_label.setPixmap(QtGui.QPixmap(ressources._estimated_time_icon_).scaled(22,22,
+                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.time_infos_layout.addWidget(self.estimated_time_icon_label)
+
+        self.estimated_time_label = QtWidgets.QLabel()
+        self.time_infos_layout.addWidget(self.estimated_time_label)
+
+        self.progress_bar_widget = QtWidgets.QWidget()
+        self.progress_bar_layout = QtWidgets.QHBoxLayout()
+        self.progress_bar_layout.setContentsMargins(0,0,0,0)
+        self.progress_bar_layout.setSpacing(6)
+        self.progress_bar_widget.setLayout(self.progress_bar_layout)
+        self.progress_layout.addWidget(self.progress_bar_widget)
+
+        self.time_progress_bar = QtWidgets.QProgressBar()
+        self.time_progress_bar.setMaximumHeight(6)
+        self.time_progress_bar.setObjectName('task_progressBar')
+        self.time_progress_bar.setStyleSheet('#task_progressBar{color:transparent;}')
+        self.progress_bar_layout.addWidget(self.time_progress_bar)
 
         self.events_scrollArea = QtWidgets.QScrollArea()
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
@@ -114,6 +153,21 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh_users_dic()
         self.refresh_user()
         self.refresh_tracking_events()
+        self.refresh_time()
+
+    def refresh_time(self):
+        if self.variant_id is not None:
+            string_time = tools.convert_seconds_to_string_time(float(self.variant_row['work_time']))
+            self.work_time_label.setText(string_time)
+            if self.variant_row['estimated_time'] is not None:
+                self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.variant_row['estimated_time'])))
+                percent = (float(self.variant_row['work_time'])/float(self.variant_row['estimated_time']))*100
+                self.time_progress_bar.setValue(percent)
+            else:
+                self.estimated_time_label.setText('No estimation')
+        else:
+            self.work_time_label.setText('Work time')
+            self.estimated_time_label.setText('Estimation time')
 
     def clear_tracking_events(self):
         tracking_event_ids = list(self.tracking_event_ids.keys())
@@ -136,10 +190,6 @@ class asset_tracking_widget(QtWidgets.QFrame):
         if self.variant_row is not None:
             if self.variant_row['assignment'] is not None:
                 self.assignment_comboBox.setCurrentText(self.variant_row['assignment'])
-            else:
-                self.assignment_comboBox.setCurrentText('Assign user')
-        else:
-            self.assignment_comboBox.setCurrentText('Assign user')
         self.apply_assignment_modification = 1
 
     def refresh_state(self):
@@ -198,16 +248,7 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
-        days, hours, minutes, seconds = tools.convert_seconds_with_day(float(self.tracking_event_row['data']))
-        print(days, hours, minutes, seconds)
-        if int(days) != 0:
-            string_time = f"{days}d, {hours}h"
-        if int(hours) != 0 and int(days) == 0:
-            string_time = f"{hours}h, {minutes}m"
-        if int(minutes) != 0 and int(hours) == 0 and int(days) == 0:
-            string_time = f"{minutes}m, {seconds}s"
-        if int(seconds) != 0 and int(minutes) == 0 and int(hours) == 0 and int(days) == 0:
-            string_time = f"{seconds}s"
+        string_time = tools.convert_seconds_to_string_time(float(self.tracking_event_row['data']))
 
         self.work_time_label = QtWidgets.QLabel(string_time)
         self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)

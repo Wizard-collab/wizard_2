@@ -3400,3 +3400,144 @@ ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée 
 
 2021-10-15 22:52:50,941 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 61448), asset_tracking
 2021-10-15 22:52:50,943 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 18:41:24,219 - WIZARD-SERVER - INFO - Python : 3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]
+2021-10-16 18:41:24,237 - WIZARD-SERVER - INFO - Starting server on : '10.8.0.6'
+2021-10-16 18:41:24,237 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-10-16 18:41:24,238 - WIZARD-SERVER - INFO - Server started
+2021-10-16 18:41:30,596 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 18:41:32,369 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 63651), asset_tracking
+2021-10-16 18:41:32,369 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 18:42:48,353 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 18:51:51,993 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 18:51:51,994 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 63651), asset_tracking
+2021-10-16 18:51:51,995 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 18:51:57,857 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 18:52:17,919 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 18:52:19,436 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 54552), asset_tracking
+2021-10-16 18:52:19,436 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 18:52:33,112 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 18:52:33,112 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 54552), asset_tracking
+2021-10-16 18:52:33,114 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:00:45,221 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:00:46,715 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 59767), asset_tracking
+2021-10-16 19:00:46,715 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:00:53,041 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:00:53,042 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 59767), asset_tracking
+2021-10-16 19:00:53,043 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:01:01,648 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:01:03,111 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 59857), asset_tracking
+2021-10-16 19:01:03,111 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:01:22,247 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:01:22,247 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 59857), asset_tracking
+2021-10-16 19:01:22,249 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:04:11,834 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:04:13,337 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 59957), asset_tracking
+2021-10-16 19:04:13,337 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:04:16,889 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:04:16,891 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 59957), asset_tracking
+2021-10-16 19:04:16,895 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:06:56,881 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:06:58,299 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 60025), asset_tracking
+2021-10-16 19:06:58,300 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:07:26,836 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:07:26,836 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 60025), asset_tracking
+2021-10-16 19:07:26,838 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:08:02,879 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:08:04,307 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 60126), asset_tracking
+2021-10-16 19:08:04,308 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:08:55,401 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:09:09,671 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:09:13,717 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:09:24,649 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:09:31,619 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:09:49,777 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:09:54,117 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:11:14,920 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:11:22,077 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:17:15,507 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:17:15,507 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 60126), asset_tracking
+2021-10-16 19:17:15,509 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:17:20,746 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:17:22,309 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 61224), asset_tracking
+2021-10-16 19:17:22,310 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:17:29,175 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:17:29,176 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 61224), asset_tracking
+2021-10-16 19:17:29,178 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:18:39,929 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:18:41,497 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 61324), asset_tracking
+2021-10-16 19:18:41,498 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:22:53,078 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:22:53,079 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 61324), asset_tracking
+2021-10-16 19:22:53,081 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:22:58,491 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:23:00,048 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 61455), asset_tracking
+2021-10-16 19:23:00,048 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:25:24,179 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:25:24,180 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 61455), asset_tracking
+2021-10-16 19:25:24,182 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:25:29,679 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:25:31,280 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 61622), asset_tracking
+2021-10-16 19:25:31,281 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:25:56,039 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:25:56,039 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 61622), asset_tracking
+2021-10-16 19:25:56,041 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:26:01,131 - WIZARD-SERVER - INFO - test_conn
+2021-10-16 19:26:02,623 - WIZARD-SERVER - INFO - New client : a.manzanares, ('10.8.0.6', 61723), asset_tracking
+2021-10-16 19:26:02,624 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
+2021-10-16 19:26:46,376 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:26:57,938 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:27:06,205 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:27:09,315 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:27:14,115 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:27:25,149 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'asset_tracking'}
+2021-10-16 19:34:21,377 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "C:\Users\conta\Documents\script\wizard_2\server.py", line 103, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] Une connexion existante a dû être fermée par l’hôte distant
+
+2021-10-16 19:34:21,377 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('10.8.0.6', 61723), asset_tracking
+2021-10-16 19:34:21,380 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'asset_tracking'}
