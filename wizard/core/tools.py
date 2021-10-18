@@ -28,27 +28,20 @@ def convert_time(time_float):
     return day, hour
 
 def convert_seconds(time_float):
-    hours = time.strftime("%H", time.gmtime(time_float))
-    minutes = time.strftime("%M", time.gmtime(time_float))
-    seconds = time.strftime("%S", time.gmtime(time_float))
+    hours = int(time_float/3600)
+    time_float = time_float - (hours*3600)
+    minutes = int(time_float/60)
+    time_float = time_float - (minutes*60)
+    seconds = int(time_float)
     return hours, minutes, seconds
 
-def convert_seconds_with_day(time_float):
-    day = str(int(time.strftime("%d", time.gmtime(time_float)))-1)
-    hours = str(int(time.strftime("%H", time.gmtime(time_float))))
-    minutes = str(int(time.strftime("%M", time.gmtime(time_float))))
-    seconds = str(int(time.strftime("%S", time.gmtime(time_float))))
-    return day, hours, minutes, seconds
-
 def convert_seconds_to_string_time(time_float):
-    days, hours, minutes, seconds = convert_seconds_with_day(time_float)
-    if int(days) != 0:
-        string_time = f"{days}d, {hours}h"
-    if int(hours) != 0 and int(days) == 0:
+    hours, minutes, seconds = convert_seconds(time_float)
+    if int(hours) != 0:
         string_time = f"{hours}h, {minutes}m"
-    if int(minutes) != 0 and int(hours) == 0 and int(days) == 0:
+    if int(minutes) != 0 and int(hours) == 0:
         string_time = f"{minutes}m, {seconds}s"
-    if int(minutes) == 0 and int(hours) == 0 and int(days) == 0:
+    if int(minutes) == 0 and int(hours) == 0:
         string_time = f"{seconds}s"
     return string_time
 

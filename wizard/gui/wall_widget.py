@@ -38,7 +38,7 @@ class wall_widget(QtWidgets.QWidget):
         self.search_thread = search_thread()
         self.build_ui()
         self.connect_functions()
-        self.get_events_count()
+        self.get_context()
 
     def connect_functions(self):
         self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
@@ -120,10 +120,6 @@ class wall_widget(QtWidgets.QWidget):
                 self.set_visible()
             elif context_dic['visibility'] == 0:
                 self.set_hidden()
-
-    def get_events_count(self):
-        context_dic = user.user().get_context(user_vars._wall_context_)
-        if context_dic is not None and context_dic != dict():
             self.event_count_spinBox.setValue(context_dic['events_count'])
         else:
             self.event_count_spinBox.setValue(10)
@@ -192,6 +188,8 @@ class wall_widget(QtWidgets.QWidget):
             self.event_ids[event_id].setVisible(True)
 
     def refresh(self):
+        print('LOL')
+        print(self.first_refresh)
         start_time = time.time()
         event_rows = project.get_all_events()
         if event_rows is not None:

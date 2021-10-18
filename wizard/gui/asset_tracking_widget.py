@@ -8,11 +8,13 @@ import time
 
 # Wizard modules
 from wizard.core import tools
+from wizard.core import user
 from wizard.core import site
 from wizard.core import assets
 from wizard.core import project
 from wizard.vars import ressources
 from wizard.vars import assets_vars
+from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_server
@@ -135,14 +137,30 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.events_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.events_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        #self.events_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.events_scrollArea.setWidgetResizable(True)
         self.events_scrollArea.setWidget(self.events_scrollArea_widget)
         self.main_layout.addWidget(self.events_scrollArea)
 
+        self.infos_frame = QtWidgets.QFrame()
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_frame.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_frame)
+
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.refresh_label)
+        self.infos_layout.addWidget(self.refresh_label)
+        
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.infos_layout.addWidget(QtWidgets.QLabel('Show'))
+        self.event_count_spinBox = QtWidgets.QSpinBox()
+        self.event_count_spinBox.setButtonSymbols(2)
+        self.event_count_spinBox.setRange(1, 10000000)
+        self.event_count_spinBox.setFixedWidth(50)
+        self.infos_layout.addWidget(self.event_count_spinBox)
+        self.infos_layout.addWidget(QtWidgets.QLabel('events'))
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(300,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
@@ -201,23 +219,48 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.tracking_event_ids[event_id].deleteLater()
             del self.tracking_event_ids[event_id]
 
+    def clear_all_tracking_events(self):
+        tracking_event_ids = list(self.tracking_event_ids.keys())
+        for event_id in tracking_event_ids:
+            self.remove_tracking_event(event_id)
+
     def refresh_tracking_events(self):
-        start_time = time.time()
         project_tracking_events_ids = []
         if self.variant_id is not None:
+            event_number = self.event_count_spinBox.value()
             tracking_event_rows = project.get_asset_tracking_events(self.variant_id)
-            for tracking_event_row in tracking_event_rows:
+            for tracking_event_row in tracking_event_rows[-event_number:]:
                 project_tracking_events_ids.append(tracking_event_row['id'])
                 if tracking_event_row['id'] not in self.tracking_event_ids.keys():
                     widget = tracking_event_widget(tracking_event_row)
                     self.events_content_layout.addWidget(widget)
                     self.tracking_event_ids[tracking_event_row['id']] = widget
+            self.remove_useless_events(event_number)
         tracking_event_ids = list(self.tracking_event_ids.keys())
         for event_id in tracking_event_ids:
             if event_id not in project_tracking_events_ids:
                 self.remove_tracking_event(event_id)
-        refresh_time = str(round((time.time()-start_time), 3))
-        print(f"refresh : {refresh_time}s")
+
+    def remove_useless_events(self, event_number):
+        tracking_event_ids_list_to_remove = list(self.tracking_event_ids.keys())[:-event_number]
+        for event_id in tracking_event_ids_list_to_remove:
+            self.remove_tracking_event(event_id)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._asset_tracking_context_)
+        if context_dic is not None and context_dic != dict():
+            self.event_count_spinBox.setValue(context_dic['events_count'])
+        else:
+            self.event_count_spinBox.setValue(5)
+
+    def set_context(self):
+        if self.isVisible():
+            visible = 1
+        else:
+            visible = 0
+        context_dic = dict()
+        context_dic['events_count'] = self.event_count_spinBox.value()
+        user.user().add_context(user_vars._asset_tracking_context_, context_dic)
 
     def refresh_user(self):
         self.apply_assignment_modification = None
@@ -246,10 +289,15 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 assets.modify_variant_assignment(self.variant_id, user_name)
                 gui_server.refresh_ui()
 
+    def change_count(self):
+        self.clear_all_tracking_events()
+        self.refresh_tracking_events()
+
     def connect_functions(self):
         self.state_comboBox.currentTextChanged.connect(self.modify_state)
         self.assignment_comboBox.currentTextChanged.connect(self.modify_assignment)
         self.events_scrollBar.rangeChanged.connect(lambda: self.events_scrollBar.setValue(self.events_scrollBar.maximum()))
+        self.event_count_spinBox.valueChanged.connect(self.change_count)
 
 class tracking_event_widget(QtWidgets.QFrame):
     def __init__(self, tracking_event_row, parent=None):

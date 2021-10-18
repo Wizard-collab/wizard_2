@@ -99,7 +99,7 @@ class main_widget(custom_window.custom_window):
         self.tree_widget.get_context()
         self.tabs_widget.get_context()
         self.versions_widget.get_context()
-        self.wall_widget.get_context()
+        self.asset_tracking_widget.get_context()
         self.console_widget.get_context()
         self.tickets_widget.get_context()
 
@@ -108,6 +108,7 @@ class main_widget(custom_window.custom_window):
         self.tabs_widget.set_context()
         self.versions_widget.set_context()
         self.wall_widget.set_context()
+        self.asset_tracking_widget.set_context()
         self.console_widget.set_context()
         self.tickets_widget.set_context()
 
