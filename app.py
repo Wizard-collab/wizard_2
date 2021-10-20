@@ -1,6 +1,7 @@
 # Python modules
 import sys
 import time
+import os
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
@@ -26,7 +27,10 @@ logger = custom_logger.get_logger(__name__)
 
 class app():
 	def __init__(self):
+		os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 		self.app = QtWidgets.QApplication(sys.argv)
+		self.app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BlackItalic.ttf")
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Bold.ttf")
