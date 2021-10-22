@@ -76,8 +76,7 @@ class ticket_history_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_widget)
 
         self.messages_icon = QtWidgets.QLabel('')
-        self.messages_icon.setPixmap(QtGui.QPixmap(ressources._messages_icon_).scaled(32,32,
-            QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.messages_icon.setPixmap(QtGui.QIcon(ressources._messages_icon_).pixmap(32))
         self.messages_icon.setFixedSize(32,32)
         self.header_layout.addWidget(self.messages_icon)
 

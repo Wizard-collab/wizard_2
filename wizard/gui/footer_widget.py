@@ -55,6 +55,12 @@ class footer_widget(QtWidgets.QFrame):
 
         self.main_layout.addWidget(self.logging_widget)
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.icon_label = QtWidgets.QLabel()
+        self.icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.icon_label.setPixmap(QtGui.QIcon(ressources._chip_icon_).pixmap(22))
+        self.main_layout.addWidget(self.icon_label)
+
         self.main_layout.addWidget(self.hardware_infos_widget)
 
         self.buttons_widget = QtWidgets.QWidget()

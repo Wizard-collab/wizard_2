@@ -219,8 +219,10 @@ class password_lineEdit(QtWidgets.QFrame):
         self.toggle_visibility_button = QtWidgets.QPushButton()
         self.toggle_visibility_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.toggle_visibility_button.setObjectName('password_visibility_button')
+        self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_on_))
         self.toggle_visibility_button.setCheckable(True)
         self.toggle_visibility_button.setFixedSize(16,16)
+        self.toggle_visibility_button.setIconSize(QtCore.QSize(14,14))
         self.main_layout.addWidget(self.toggle_visibility_button)
 
     def connect_functions(self):
@@ -229,8 +231,10 @@ class password_lineEdit(QtWidgets.QFrame):
     def toggle_password_visibility(self):
         if not self.toggle_visibility_button.isChecked():
             self.password_lineEdit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
+            self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_off_))
         else:
             self.password_lineEdit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
+            self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_on_))
 
     def text(self):
         return self.password_lineEdit.text()
@@ -263,8 +267,9 @@ class search_bar(QtWidgets.QFrame):
         self.search_bar = QtWidgets.QLineEdit()
         self.search_bar.setObjectName("search_lineEdit")
         self.main_layout.addWidget(self.search_bar)
-        self.clear_search_button = QtWidgets.QPushButton()
+        self.clear_search_button = close_button()
         self.clear_search_button.setFixedSize(16,16)
+        self.clear_search_button.setIconSize(QtCore.QSize(12,12))
         self.clear_search_button.setObjectName('clear_search_button')
         self.clear_search_button.setVisible(0)
         self.main_layout.addWidget(self.clear_search_button)
@@ -324,6 +329,18 @@ class search_bar(QtWidgets.QFrame):
             self.clear_search_button.setVisible(True)
 
     color = pyqtProperty(QtGui.QColor, fset=_set_color)
+
+class close_button(QtWidgets.QPushButton):
+    def __init__(self, parent=None):
+        super(close_button, self).__init__(parent)
+        self.setIcon(QtGui.QIcon(ressources._close_tranparent_icon_))
+
+    def enterEvent(self, event):
+        self.setIcon(QtGui.QIcon(ressources._close_icon_))
+
+    def leaveEvent(self, event):
+        self.setIcon(QtGui.QIcon(ressources._close_tranparent_icon_))
+
 
 class RoundProgress(QtWidgets.QWidget):
     def __init__(self, parent = None):

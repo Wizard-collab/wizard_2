@@ -180,8 +180,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.header_widget)
 
         self.save_image = QtWidgets.QLabel()
-        self.save_image.setPixmap(QtGui.QPixmap(ressources._save_icon_).scaled(22,22,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.save_image.setPixmap(QtGui.QIcon(ressources._save_icon_).pixmap(22))
         self.header_layout.addWidget(self.save_image)
 
         self.version_name_label = QtWidgets.QLabel()

@@ -115,6 +115,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.percent_label = QtWidgets.QLabel()
         self.progress_bar_layout.addWidget(self.percent_label)
 
+        self.asset_history_label = QtWidgets.QLabel('Asset history')
+        self.main_layout.addWidget(self.asset_history_label)
+
         self.events_scrollArea = QtWidgets.QScrollArea()
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
 

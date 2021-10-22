@@ -95,7 +95,7 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:checked {
-    image: url(ressources/icons/checkBox.png);
+    image: url(ressources/icons/checkBox.svg);
 }
 
 QListView {
@@ -490,12 +490,12 @@ QSlider::handle:horizontal {
     height: 26px;
     background-color:#18181c;
     border-radius: 13px;
-    image: url(ressources/icons/android_cb_off.png);
+    image: url(ressources/icons/android_cb_off.svg);
 }
 
 #android_checkbox::indicator:checked {
     background-color:#7785de;
-    image: url(ressources/icons/android_cb_on.png);
+    image: url(ressources/icons/android_cb_on.svg);
 }
 
 
@@ -718,18 +718,8 @@ QSlider::handle:horizontal {
 	border: none;
 }
 
-#tree_refresh_pushButton{
-	background-image: url(ressources/icons/tree_refresh.png);
-}
-#tree_refresh_pushButton::hover{
-	background-image: url(ressources/icons/tree_refresh_hover.png);
-}
-
 #clear_search_button{
-	background-image: url(ressources/icons/close.png);
-}
-#clear_search_button::hover{
-	background-image: url(ressources/icons/close_hover.png);
+    background: transparent;
 }
 
 #menu_widget_frame{
@@ -785,11 +775,6 @@ QSlider::handle:horizontal {
 #password_visibility_button{
 	background-color: transparent;
 	border: none;
-	background-image: url(ressources/icons/password_visibility_off.png);
-}
-
-#password_visibility_button::checked{
-	background-image: url(ressources/icons/password_visibility_on.png);
 }
 
 #password_lineEdit_frame{
