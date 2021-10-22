@@ -30,6 +30,7 @@ class app():
 		os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 		self.app = QtWidgets.QApplication(sys.argv)
 		self.app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+		self.app.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
 
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BlackItalic.ttf")

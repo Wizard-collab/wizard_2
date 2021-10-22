@@ -50,8 +50,7 @@ class footer_widget(QtWidgets.QFrame):
 
         self.icon_label = QtWidgets.QLabel()
         self.icon_label.setFixedSize(QtCore.QSize(22,22))
-        self.icon_label.setPixmap(QtGui.QPixmap(ressources._info_icon_).scaled(
-            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.icon_label.setPixmap(QtGui.QIcon(ressources._info_icon_).pixmap(22))
         self.main_layout.addWidget(self.icon_label)
 
         self.main_layout.addWidget(self.logging_widget)
@@ -180,8 +179,7 @@ class tooltip_widget(QtWidgets.QFrame):
 
         self.icon_label = QtWidgets.QLabel()
         self.icon_label.setFixedSize(QtCore.QSize(22,22))
-        self.icon_label.setPixmap(QtGui.QPixmap(ressources._bulb_icon_).scaled(
-            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.icon_label.setPixmap(QtGui.QIcon(ressources._bulb_icon_).pixmap(22))
         self.main_layout.addWidget(self.icon_label)
 
         self.main_label = gui_utils.ElidedLabel('Tooltips')
@@ -208,8 +206,7 @@ class script_bar(QtWidgets.QFrame):
 
         self.icon_label = QtWidgets.QLabel()
         self.icon_label.setFixedSize(QtCore.QSize(22,22))
-        self.icon_label.setPixmap(QtGui.QPixmap(ressources._python_icon_).scaled(
-            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.icon_label.setPixmap(QtGui.QIcon(ressources._python_icon_).pixmap(22))
         self.main_layout.addWidget(self.icon_label)
 
         self.script_lineEdit = QtWidgets.QLineEdit()
