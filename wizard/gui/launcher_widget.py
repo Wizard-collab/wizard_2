@@ -117,11 +117,14 @@ class launcher_widget(QtWidgets.QFrame):
             self.hide_kill_button()
 
     def refresh_screenshot(self, screenshot_path):
-        if not os.path.isfile(screenshot_path):
+        if os.path.isfile(screenshot_path):
+            image_bytes, width, height = image.convert_screenshot(screenshot_path)
+            self.screenshot_button.setFixedSize(width, height)
+            gui_utils.round_corners_image_button(self.screenshot_button, image_bytes, (width, height), 10)
+        else:
             screenshot_path = ressources._no_screenshot_
-        image_bytes, width, height = image.convert_screenshot(screenshot_path)
-        self.screenshot_button.setFixedSize(width, height)
-        gui_utils.round_corners_image_button(self.screenshot_button, image_bytes, (width, height), 10)
+            self.screenshot_button.setFixedSize(300, 169)
+            self.screenshot_button.setIcon(QtGui.QIcon(screenshot_path))
 
     def refresh_lock_button(self):
         self.lock_button.setStyleSheet('')
@@ -239,6 +242,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.lock_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.lock_button, "Lock work environment")
         self.lock_button.setFixedSize(60,60)
+        self.lock_button.setIconSize(QtCore.QSize(25,25))
         self.buttons_layout.addWidget(self.lock_button)
 
         self.launch_button = custom_launchButton('Launch')
@@ -252,7 +256,7 @@ class launcher_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.kill_button, "Kill work environment")
         self.kill_button.setFixedSize(0,60)
         self.kill_button.setVisible(0)
-        self.kill_button.setIconSize(QtCore.QSize(28,28))
+        self.kill_button.setIconSize(QtCore.QSize(25,25))
         self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
         self.buttons_layout.addWidget(self.kill_button)
 

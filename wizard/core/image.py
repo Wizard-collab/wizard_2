@@ -20,7 +20,7 @@ def screenshot(file, thumbnail_file):
     base_image = pyautogui.screenshot()
     image = resize_image(base_image, 1000)
 
-    thumbnail = resize_image(base_image, 100)
+    thumbnail, null, null = resize_image_with_fixed_width(base_image, 200)
 
     save_file = tools.get_filename_without_override(file)
     save_thumbnail_file = tools.get_filename_without_override(thumbnail_file)

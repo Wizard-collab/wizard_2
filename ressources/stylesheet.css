@@ -82,7 +82,9 @@ QComboBox::drop-down::hover {
 }
 
 QComboBox::down-arrow {
-    image: url(ressources/icons/combobox.png);
+    image: url(ressources/icons/combobox.svg);
+    width: 15px;
+    height: 15px;
 }
 
 QCheckBox::indicator {
@@ -160,13 +162,17 @@ QTreeView::item:selected:!active {
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
-        image: url(ressources/icons/QTreeViewRight.png);
+        image: url(ressources/icons/QTreeViewRight.svg);
+        width: 10px;
+    	height: 10px;
         background:none;
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  {
-        image: url(ressources/icons/QTreeViewDown.png);
+        image: url(ressources/icons/QTreeViewDown.svg);
+        width: 10px;
+    	height: 10px;
         background:none;
 }
 
@@ -513,7 +519,7 @@ QSlider::handle:horizontal {
 }
 
 #window_decoration_button{
-	border-radius: 8px;
+	border-radius: 3px;
 	border: none;
 }
 

@@ -611,12 +611,15 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
 
     def fill_ui(self):
         icon = QtGui.QIcon()
-        pixmap = QtGui.QPixmap(ressources._no_screenshot_small_)
-        icon.addPixmap(pixmap, QtGui.QIcon.Normal)
-        icon.addPixmap(pixmap, QtGui.QIcon.Selected)
+        
         pixmap = QtGui.QPixmap(self.version_row['thumbnail_path'])
         icon.addPixmap(pixmap, QtGui.QIcon.Normal)
         icon.addPixmap(pixmap, QtGui.QIcon.Selected)
+        if not os.path.isfile(self.version_row['thumbnail_path']):
+            default_icon = QtGui.QIcon(ressources._no_screenshot_small_)
+            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Normal)
+            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Selected)
+
         self.setIcon(icon)
         self.setText(f"{self.version_row['name']} - {self.version_row['creation_user']}")
         self.setTextAlignment(QtCore.Qt.AlignLeft)

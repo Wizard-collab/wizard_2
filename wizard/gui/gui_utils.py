@@ -13,6 +13,16 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_server
 
+def high_dpi_pixmap(image, size):
+    image = QtGui.QImage(image)
+    pixmap = QtGui.QPixmap(size * QtWidgets.QApplication.instance().devicePixelRatio())
+    painter = QtGui.QPainter()
+    painter.begin(pixmap)
+    painter.drawImage(0, 0, image)
+    painter.end()
+    icon = QtGui.QIcon(pixmap)
+    return icon
+
 def move_ui(widget):
     desktop = QtWidgets.QApplication.desktop()
     screenRect = desktop.screenGeometry()
@@ -248,8 +258,7 @@ class search_bar(QtWidgets.QFrame):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
         self.search_icon_label = QtWidgets.QLabel()
-        self.search_icon_label.setPixmap(QtGui.QPixmap(ressources._search_icon_).scaled(
-            18, 18, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.search_icon_label.setPixmap(QtGui.QIcon(ressources._search_icon_).pixmap(18))
         self.main_layout.addWidget(self.search_icon_label)
         self.search_bar = QtWidgets.QLineEdit()
         self.search_bar.setObjectName("search_lineEdit")

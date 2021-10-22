@@ -86,8 +86,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.work_time_icon_label = QtWidgets.QLabel()
         self.work_time_icon_label.setFixedSize(QtCore.QSize(22,22))
-        self.work_time_icon_label.setPixmap(QtGui.QPixmap(ressources._work_time_icon_).scaled(22,22,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.work_time_icon_label.setPixmap(QtGui.QIcon(ressources._work_time_icon_).pixmap(22))
         self.time_infos_layout.addWidget(self.work_time_icon_label)
 
         self.work_time_label = QtWidgets.QLabel()
@@ -95,8 +94,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.estimated_time_icon_label = QtWidgets.QLabel()
         self.estimated_time_icon_label.setFixedSize(QtCore.QSize(22,22))
-        self.estimated_time_icon_label.setPixmap(QtGui.QPixmap(ressources._estimated_time_icon_).scaled(22,22,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.estimated_time_icon_label.setPixmap(QtGui.QIcon(ressources._estimated_time_icon_).pixmap(22))
         self.time_infos_layout.addWidget(self.estimated_time_icon_label)
 
         self.estimated_time_label = QtWidgets.QLabel()

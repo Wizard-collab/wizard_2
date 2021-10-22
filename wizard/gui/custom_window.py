@@ -280,7 +280,7 @@ class header(QtWidgets.QFrame):
         self.decoration_widget.setObjectName('transparent_widget')
         self.decoration_layout = QtWidgets.QHBoxLayout()
         self.decoration_layout.setContentsMargins(6,6,6,6)
-        self.decoration_layout.setSpacing(6)
+        self.decoration_layout.setSpacing(3)
         self.decoration_widget.setLayout(self.decoration_layout)
         self.decoration_content_layout.addWidget(self.decoration_widget)
 
@@ -290,21 +290,21 @@ class header(QtWidgets.QFrame):
         self.minimize_button.setIcon(QtGui.QIcon(ressources._minimize_decoration_))
         self.minimize_button.setIconSize(QtCore.QSize(12,12))
         self.minimize_button.setObjectName('window_decoration_button')
-        self.minimize_button.setFixedSize(16, 16)
+        self.minimize_button.setFixedSize(18, 18)
         self.decoration_layout.addWidget(self.minimize_button)
 
         self.resize_button = QtWidgets.QPushButton()
         self.resize_button.setIcon(QtGui.QIcon(ressources._resize_decoration_))
         self.resize_button.setIconSize(QtCore.QSize(12,12))
         self.resize_button.setObjectName('window_decoration_button')
-        self.resize_button.setFixedSize(16, 16)
+        self.resize_button.setFixedSize(18, 18)
         self.decoration_layout.addWidget(self.resize_button)
 
         self.quit_button = QtWidgets.QPushButton()
         self.quit_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
         self.quit_button.setIconSize(QtCore.QSize(12,12))
         self.quit_button.setObjectName('window_decoration_button')
-        self.quit_button.setFixedSize(16, 16)
+        self.quit_button.setFixedSize(18, 18)
         self.decoration_layout.addWidget(self.quit_button)
 
     def mousePressEvent(self, event):
