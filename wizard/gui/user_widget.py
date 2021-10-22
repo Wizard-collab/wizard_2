@@ -44,7 +44,7 @@ class user_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.ranking_button, "Wizard cup")
         self.ranking_button.setFixedSize(28,28)
         self.ranking_button.setIcon(QtGui.QIcon(ressources._ranking_icon_))
-        self.items_layout.addWidget(self.ranking_button)
+        #self.items_layout.addWidget(self.ranking_button)
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('transparent_widget')
@@ -93,8 +93,7 @@ class user_widget(QtWidgets.QFrame):
 
         self.admin_badge_label = QtWidgets.QLabel()
         gui_utils.application_tooltip(self.admin_badge_label, "Admin badge")
-        self.admin_badge_label.setPixmap(QtGui.QPixmap(ressources._admin_badge_).scaled(
-            22, 22, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.admin_badge_label.setPixmap(QtGui.QIcon(ressources._admin_badge_).pixmap(22))
         self.main_layout.addWidget(self.admin_badge_label)
 
         self.profile_picture = QtWidgets.QLabel()
@@ -132,8 +131,7 @@ class user_widget(QtWidgets.QFrame):
                 icon = ressources._bronze_icon_
         if icon is not None:
             self.crown_label.setVisible(1)
-            self.crown_label.setPixmap(QtGui.QPixmap(icon).scaled(28,28,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+            self.crown_label.setPixmap(QtGui.QIcon(icon).pixmap(22))
         else:
             self.crown_label.setVisible(0)
     
