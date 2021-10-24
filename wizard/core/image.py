@@ -32,14 +32,15 @@ def screenshot(file, thumbnail_file):
     thumbnail.save(save_thumbnail_file, format="JPEG")
     return save_file, save_thumbnail_file
 
-def convert_image_to_bytes(image_file, resize=100):
+def convert_image_to_bytes(image_file, resize=None):
     # Resize the given file to 100*100
     # and return the png bytes
     image = Image.open(image_file)
-    convert_PILLOW_image_to_bytes(iamge, resize)
+    return convert_PILLOW_image_to_bytes(image, resize)
 
-def convert_PILLOW_image_to_bytes(image, resize=100):
-    image = resize_image(image, resize)
+def convert_PILLOW_image_to_bytes(image, resize=None):
+    if resize is not None:
+        image = resize_image(image, resize)
     icc = image.info.get('icc_profile', '')
     if icc:
         icc_io_handle = io.BytesIO(icc)
@@ -51,6 +52,10 @@ def convert_PILLOW_image_to_bytes(image, resize=100):
     imagebytes = stream.getvalue()
     return imagebytes
 
+def convert_image_bytes_to_pillow(image_bytes):
+    image = Image.open(io.BytesIO(image_bytes))
+    return image
+
 def convert_screenshot(image_file, resize=300):
     # Resize the given file to 100*100
     # and return the png bytes
@@ -61,8 +66,12 @@ def convert_screenshot(image_file, resize=300):
     imagebytes = stream.getvalue()
     return imagebytes, width, height
 
-def convert_image_to_str_data(image_file, resize=100):
-    encoded = base64.b64encode(convert_image_to_bytes(image_file, resize)).decode('ascii')
+def convert_image_to_str_data(image_file, resize=None):
+    image_bytes = convert_image_to_bytes(image_file, resize)
+    return convert_bytes_to_str_data(image_bytes)
+
+def convert_bytes_to_str_data(image_bytes):
+    encoded = base64.b64encode(image_bytes).decode('ascii')
     return encoded
 
 def convert_str_data_to_image_bytes(str_data):
@@ -74,6 +83,11 @@ def resize_image(image, fixed_height):
     image = image.resize((width_size, fixed_height), Image.ANTIALIAS)
     return image
 
+def crop_image_height(pillow_image, height):
+    area = (0, 0, pillow_image.size[0], height)
+    cropped_img = pillow_image.crop(area)
+    return cropped_img
+
 def resize_image_with_fixed_width(image, fixed_width):
     width_percent = (fixed_width / float(image.size[0]))
     height_size = int((float(image.size[1]) * float(width_percent)))
@@ -84,7 +98,7 @@ def project_random_image(project_name):
     letter = project_name[0].upper()
     hue = random.randint(0,100)/100.0
     saturation = random.randint(10,50)/100.0
-    value = random.randint(80,90)/100.0
+    value = random.randint(30,60)/100.0
     rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value))
     img = Image.new('RGB', (500, 282), color = rgb_tuple)
 
@@ -100,6 +114,6 @@ def project_random_image(project_name):
     w, h = draw.textsize(letter, font=font)
     draw.text(((500-w)/2,(282-h-30)/2), letter, (255, 255, 255), font=font)
 
-    #img_file = os.path.join(tools.temp_dir(),'temp_img.png')
-    #img.save(img_file)
-    return convert_PILLOW_image_to_bytes(img, 500)
+    img_file = os.path.join(tools.temp_dir(),'temp_img.png')
+    img.save(img_file)
+    return img_file

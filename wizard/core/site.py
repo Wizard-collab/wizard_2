@@ -40,6 +40,11 @@ def create_project(project_name, project_path, project_password, project_image =
         logger.warning("Please provide a password")
         do_creation = 0
 
+    if project_image is None:
+        project_image = image.project_random_image(project_name)   
+
+    project_image_ascii = process_project_image(project_image)
+    
     if do_creation:
         if project_name not in get_projects_names_list():
             if project_path not in get_projects_paths_list():
@@ -55,7 +60,7 @@ def create_project(project_name, project_path, project_password, project_image =
                                     (project_name,
                                     project_path,
                                     tools.encrypt_string(project_password),
-                                    project_image,
+                                    project_image_ascii,
                                     environment.get_user(),
                                     time.time())):
                         logger.info(f'Project {project_name} added to site')
@@ -134,7 +139,7 @@ def modify_project_image(project_name, project_image):
     if project_image:
         if not os.path.isfile(project_image):
             project_image = ressources._default_profile_
-        project_image_ascii = image.convert_image_to_str_data(project_image)
+        project_image_ascii = process_project_image(project_image)
         if db_utils.update_data('site',
                                 'projects',
                                 ('project_image', project_image_ascii),
@@ -145,6 +150,14 @@ def modify_project_image(project_name, project_image):
             return None
     else:
         return None
+
+def process_project_image(image_file):
+    bytes_data = image.convert_image_to_bytes(image_file)
+    pillow_image = image.convert_image_bytes_to_pillow(bytes_data)
+    pillow_image, fixed_width, height_size = image.resize_image_with_fixed_width(pillow_image, 500)
+    pillow_image = image.crop_image_height(pillow_image, 282)
+    bytes_data = image.convert_PILLOW_image_to_bytes(pillow_image)
+    return image.convert_bytes_to_str_data(bytes_data)
 
 def create_user(user_name,
                     password,
@@ -173,7 +186,7 @@ def create_user(user_name,
                     profile_picture = ressources._default_profile_
             else:
                 profile_picture = ressources._default_profile_
-            profile_picture_ascii = image.convert_image_to_str_data(profile_picture)
+            profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
             if db_utils.create_row('site',
                         'users', 
                         ('user_name',
@@ -212,7 +225,7 @@ def modify_user_profile_picture(user_name, profile_picture):
     if profile_picture:
         if not os.path.isfile(profile_picture):
             profile_picture = ressources._default_profile_
-        profile_picture_ascii = image.convert_image_to_str_data(profile_picture)
+        profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
         if db_utils.update_data('site',
                                 'users',
                                 ('profile_picture', profile_picture_ascii),
@@ -512,7 +525,7 @@ def is_site_database():
     return db_utils.check_database_existence('site')
 
 def create_admin_user(admin_password, admin_email):
-    profile_picture = image.convert_image_to_str_data(ressources._default_profile_)
+    profile_picture = image.convert_image_to_str_data(ressources._default_profile_, 100)
     if db_utils.create_row('site',
                             'users', 
                             ('user_name', 

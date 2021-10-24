@@ -150,13 +150,11 @@ class project_icon_widget(QtWidgets.QFrame):
 
         icon = QtGui.QIcon()
         if self.project_row['project_image'] is not None:
-            #project_image = image.convert_str_data_to_image_bytes()
-            pass
-        pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(image.project_random_image(self.project_row['project_name']))
-        icon = QtGui.QIcon(pixmap)
+            project_image = image.convert_str_data_to_image_bytes(self.project_row['project_image'])
+            pixmap = QtGui.QPixmap()
+            pixmap.loadFromData(project_image)
+            icon = QtGui.QIcon(pixmap)
         self.image_label.setPixmap(icon.pixmap(250))
-
 
 class project_log_widget(custom_window.custom_dialog):
     def __init__(self, project_name, parent=None):

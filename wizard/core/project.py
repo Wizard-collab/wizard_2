@@ -1464,7 +1464,7 @@ def get_database_file(project_path):
         database_file = None
     return database_file
 
-def create_project(project_name, project_path, project_password):
+def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1
 
     if project_name == '':
@@ -1478,7 +1478,7 @@ def create_project(project_name, project_path, project_password):
         do_creation = 0
 
     if do_creation:
-        if site.create_project(project_name, project_path, project_password):
+        if site.create_project(project_name, project_path, project_password, project_image):
             if init_project(project_path, project_name):
                 logger.info(f"{project_name} created")
                 environment.build_project_env(project_name, project_path)

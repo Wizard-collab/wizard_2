@@ -13,6 +13,7 @@ from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import user
+from wizard.core import image
 from wizard.core import project
 from wizard.core import environment
 from wizard.core import create_project
@@ -25,9 +26,11 @@ class create_project_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
         super(create_project_widget, self).__init__()
         self.project_path = ''
+        self.use_image_file = 0
         self.build_ui()
         self.connect_functions()
         self.add_title("Create a project")
+        self.get_random_image()
 
     def build_ui(self):
         self.setMinimumWidth(350)
@@ -127,6 +130,35 @@ class create_project_widget(custom_window.custom_dialog):
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
+        self.main_layout.addWidget(QtWidgets.QLabel('Project Image'))
+
+        self.image_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.image_label)
+
+        self.image_buttons_widget = QtWidgets.QWidget()
+        self.image_buttons_layout = QtWidgets.QHBoxLayout()
+        self.image_buttons_layout.setContentsMargins(0,0,0,0)
+        self.image_buttons_layout.setSpacing(4)
+        self.image_buttons_widget.setLayout(self.image_buttons_layout)
+        self.main_layout.addWidget(self.image_buttons_widget)
+
+        self.folder_image_button = QtWidgets.QPushButton()
+        self.folder_image_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
+        self.folder_image_button.setIconSize(QtCore.QSize(20,20))
+        self.folder_image_button.setFixedSize(28,28)
+        self.image_buttons_layout.addWidget(self.folder_image_button)
+
+        self.random_image_button = QtWidgets.QPushButton()
+        self.random_image_button.setIcon(QtGui.QIcon(ressources._random_icon_))
+        self.random_image_button.setIconSize(QtCore.QSize(20,20))
+        self.random_image_button.setFixedSize(28,28)
+        self.image_buttons_layout.addWidget(self.random_image_button)
+
+        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.main_layout.addSpacerItem(self.spaceItem)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0,0,0,0)
@@ -143,12 +175,38 @@ class create_project_widget(custom_window.custom_dialog):
         self.logging_widget = logging_widget.logging_widget(self)
         self.main_layout.addWidget(self.logging_widget)
 
+    def get_random_image(self, force=0):
+        if not self.use_image_file or force:
+            project_name = self.project_name_lineEdit.text()
+            if project_name == '':
+                project_name = ' '
+            image_file = image.project_random_image(project_name)
+            self.image_label.setPixmap(QtGui.QIcon(image_file).pixmap(250))
+            self.image = image_file
+
+    def open_image(self):
+        options = QtWidgets.QFileDialog.Options()
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
+                            options=options)
+        if image_file:
+            extension = image_file.split('.')[-1].upper()
+            if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
+                self.image = image_file
+                self.use_image_file = 1
+                self.image_label.setPixmap(QtGui.QIcon(image_file).pixmap(250))
+            else:
+                logger.warning('{} is not a valid image file...'.format(image_file))
+
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)
         self.create_button.clicked.connect(self.apply)
         self.project_name_lineEdit.textChanged.connect(self.normalise_project_name)
+        self.project_name_lineEdit.textChanged.connect(lambda:self.get_random_image(force=0))
         self.folder_button.clicked.connect(self.open_explorer)
         self.project_name_lineEdit.textChanged.connect(self.update_project_path)
+        self.random_image_button.clicked.connect(lambda:self.get_random_image(force=1))
+        self.folder_image_button.clicked.connect(self.open_image)
 
     def update_project_path(self):
         project_name = self.project_name_lineEdit.text()
@@ -175,7 +233,7 @@ class create_project_widget(custom_window.custom_dialog):
         password = self.password_lineEdit.text()
         password_confirm = self.password_confirm_lineEdit.text()
         if password == password_confirm:
-            if project.create_project(project_name, project_path, password):
+            if project.create_project(project_name, project_path, password, self.image):
                 db_utils.modify_db_name('project', project_name)
                 create_project.create_project(project_name, project_path, password)
                 if old_project_name is not None:
