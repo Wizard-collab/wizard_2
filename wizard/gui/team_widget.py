@@ -130,7 +130,7 @@ class team_widget(QtWidgets.QWidget):
                 self.users_scrollArea.setVisible(0)
                 self.info_widget.setVisible(1)
                 self.info_widget.setText("You're alone\nYou're on your own...")
-                self.info_widget.setImage(ressources._alone_info_)
+                self.info_widget.setImage(ressources._nothing_info_)
             else:
                 self.info_widget.setVisible(0)
                 self.users_scrollArea.setVisible(1)

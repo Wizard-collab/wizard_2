@@ -46,7 +46,7 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def search_ended(self):
         if self.list_view.invisibleRootItem().childCount() == 0:
-            self.show_info_mode('No export found...', ressources._lost_info_image_)
+            self.show_info_mode('No export found...', ressources._nothing_info_)
         else:
             self.hide_info_mode()
 
@@ -160,7 +160,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.list_view.header().resizeSection(1, 110)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.main_widget_layout.addWidget(self.list_view)
-        self.show_info_mode('No export found...', ressources._lost_info_image_)
+        self.show_info_mode('No export found...', ressources._nothing_info_)
 
 class search_thread(QtCore.QThread):
 

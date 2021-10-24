@@ -188,8 +188,6 @@ class wall_widget(QtWidgets.QWidget):
             self.event_ids[event_id].setVisible(True)
 
     def refresh(self):
-        print('LOL')
-        print(self.first_refresh)
         start_time = time.time()
         event_rows = project.get_all_events()
         if event_rows is not None:

@@ -78,17 +78,17 @@ class footer_widget(QtWidgets.QFrame):
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
-        self.refresh_ui_button = QtWidgets.QPushButton()
-        self.refresh_ui_button.setFixedSize(QtCore.QSize(30, 30))
-        gui_utils.application_tooltip(self.refresh_ui_button, "Manually refresh the ui")
-        self.refresh_ui_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
-        self.buttons_layout.addWidget(self.refresh_ui_button)
-
         self.team_connection_button = QtWidgets.QPushButton()
         self.team_connection_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.team_connection_button, "Team connection status")
         self.team_connection_button.setIcon(QtGui.QIcon(ressources._team_connection_off_))
         self.buttons_layout.addWidget(self.team_connection_button)
+        
+        self.refresh_ui_button = QtWidgets.QPushButton()
+        self.refresh_ui_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.refresh_ui_button, "Manually refresh the ui")
+        self.refresh_ui_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
+        self.buttons_layout.addWidget(self.refresh_ui_button)
 
         self.settings_button = QtWidgets.QPushButton()
         self.settings_button.setFixedSize(QtCore.QSize(30, 30))
@@ -273,6 +273,7 @@ class hardware_infos_widget(QtWidgets.QFrame):
             color = '#f79360'
         else:
             color = '#f0605b' 
+        color = '#ffffff'
         self.cpu_progressBar.setChunckColor(color)
         self.cpu_progressBar.setValue(cpu)
 
@@ -282,5 +283,6 @@ class hardware_infos_widget(QtWidgets.QFrame):
             color = '#f79360'
         else:
             color = '#f0605b' 
+        color = '#ffffff'
         self.ram_progressBar.setChunckColor(color)
         self.ram_progressBar.setValue(ram)

@@ -112,7 +112,7 @@ class subtask_manager(custom_window.custom_window):
             self.tasks_scrollArea.setVisible(0)
             self.info_widget.setVisible(1)
             self.info_widget.setText("No current subtask...")
-            self.info_widget.setImage(ressources._chill_info_image_)
+            self.info_widget.setImage(ressources._nothing_info_)
         else:
             self.info_widget.setVisible(0)
             self.tasks_scrollArea.setVisible(1)

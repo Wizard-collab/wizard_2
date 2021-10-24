@@ -127,7 +127,7 @@ class softwares_widget(QtWidgets.QWidget):
             self.work_envs_scrollArea.setVisible(0)
             self.info_widget.setVisible(1)
             self.info_widget.setText("You need to get to work !")
-            self.info_widget.setImage(ressources._chill_info_image_)
+            self.info_widget.setImage(ressources._nothing_info_)
         else:
             self.info_widget.setVisible(0)
             self.work_envs_scrollArea.setVisible(1)

@@ -28,9 +28,9 @@ logger = custom_logger.get_logger(__name__)
 class app():
 	def __init__(self):
 		os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+		QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+		QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
 		self.app = QtWidgets.QApplication(sys.argv)
-		self.app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-		self.app.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
 
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
 		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BlackItalic.ttf")

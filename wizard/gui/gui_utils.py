@@ -447,8 +447,7 @@ class info_widget(QtWidgets.QFrame):
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
     def setImage(self, image):
-        self.image.setPixmap(QtGui.QPixmap(image).scaled(
-            150, 150, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.image.setPixmap(QtGui.QIcon(image).pixmap(200))
 
     def setText(self, text):
         self.text.setText(text)
