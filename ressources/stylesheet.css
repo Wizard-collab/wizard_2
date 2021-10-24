@@ -553,6 +553,27 @@ QSlider::handle:horizontal {
 	border: 2px solid gray;
 }
 
+#transparent_icon_view{
+	padding: 6px;
+	background: transparent;
+}
+
+#transparent_icon_view::item{
+	padding: 2px;
+	background-color: rgba(255,255,255,8);
+	border: 2px solid transparent;
+}
+
+#transparent_icon_view::item:selected{
+	background-color: rgba(255,255,255,16);
+	padding: 2px;
+	border: 2px solid gray;
+}
+
+#transparent_icon_view::item:hover{
+	background-color: rgba(255,255,255,16);
+}
+
 #dark_widget{
 	background-color:#24242b;
 }

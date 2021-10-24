@@ -27,7 +27,7 @@ from wizard.core import image
 from wizard.vars import site_vars
 from wizard.vars import ressources
 
-def create_project(project_name, project_path, project_password):
+def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1
 
     if project_name == '':
@@ -46,10 +46,18 @@ def create_project(project_name, project_path, project_password):
                 if get_user_row_by_name(environment.get_user())['pass']:
                     if db_utils.create_row('site',
                                     'projects', 
-                                    ('project_name', 'project_path', 'project_password'), 
+                                    ('project_name',
+                                        'project_path',
+                                        'project_password',
+                                        'project_image',
+                                        'creation_user',
+                                        'creation_time'), 
                                     (project_name,
                                     project_path,
-                                    tools.encrypt_string(project_password))):
+                                    tools.encrypt_string(project_password),
+                                    project_image,
+                                    environment.get_user(),
+                                    time.time())):
                         logger.info(f'Project {project_name} added to site')
                         return 1
                     else:
@@ -121,6 +129,22 @@ def modify_project_password(project_name,
             logger.warning(f'{project_name} not found')
     else:
         logger.warning('Wrong administrator pass')
+
+def modify_project_image(project_name, project_image):
+    if project_image:
+        if not os.path.isfile(project_image):
+            project_image = ressources._default_profile_
+        project_image_ascii = image.convert_image_to_str_data(project_image)
+        if db_utils.update_data('site',
+                                'projects',
+                                ('project_image', project_image_ascii),
+                                ('project_name', project_name)):
+            logger.info(f'{project_name} image modified')
+            return 1
+        else:
+            return None
+    else:
+        return None
 
 def create_user(user_name,
                     password,
@@ -532,7 +556,10 @@ def create_projects_table():
                                         id serial PRIMARY KEY,
                                         project_name text NOT NULL,
                                         project_path text NOT NULL,
-                                        project_password text NOT NULL
+                                        project_password text NOT NULL,
+                                        project_image text,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL
                                     );"""
     if db_utils.create_table('site', sql_cmd):
         logger.info("Projects table created")
