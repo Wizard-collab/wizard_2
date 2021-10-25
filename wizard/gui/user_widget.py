@@ -106,9 +106,8 @@ class user_widget(QtWidgets.QFrame):
         self.life_progress_bar.setValue(user_row['life'])
         self.level_label.setText(str(user_row['level']))
         self.admin_badge_label.setVisible(user_row['administrator'])
-        gui_utils.round_image(self.profile_picture,
-                                image.convert_str_data_to_image_bytes(user_row['profile_picture']),
-                                28)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 28)
+        self.profile_picture.setPixmap(pm)
         self.crown_check(user_row)
 
     def connect_functions(self):

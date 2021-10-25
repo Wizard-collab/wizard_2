@@ -120,7 +120,10 @@ class launcher_widget(QtWidgets.QFrame):
         if os.path.isfile(screenshot_path):
             image_bytes, width, height = image.convert_screenshot(screenshot_path)
             self.screenshot_button.setFixedSize(width, height)
-            gui_utils.round_corners_image_button(self.screenshot_button, image_bytes, (width, height), 10)
+            pm = gui_utils.round_corners_image_button(image_bytes, (width, height), 10)
+            icon = QtGui.QIcon()
+            icon.addPixmap(pm)
+            self.screenshot_button.setIcon(icon)
         else:
             screenshot_path = ressources._no_screenshot_
             self.screenshot_button.setFixedSize(300, 169)

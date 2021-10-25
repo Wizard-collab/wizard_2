@@ -287,7 +287,8 @@ class ticket_message_widget(QtWidgets.QFrame):
 
     def refresh(self):
         profile_image = site.get_user_row_by_name(self.ticket_message_row['creation_user'], 'profile_picture')
-        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_image), 40)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 40)
+        self.profile_picture.setPixmap(pm)
         self.user_label.setText(self.ticket_message_row['creation_user'])
         day, hour = tools.convert_time(self.ticket_message_row['creation_time'])
         self.date_label.setText(f"{day} - {hour}")

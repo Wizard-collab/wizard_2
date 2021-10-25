@@ -13,16 +13,6 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_server
 
-def high_dpi_pixmap(image, size):
-    image = QtGui.QImage(image)
-    pixmap = QtGui.QPixmap(size * QtWidgets.QApplication.instance().devicePixelRatio())
-    painter = QtGui.QPainter()
-    painter.begin(pixmap)
-    painter.drawImage(0, 0, image)
-    painter.end()
-    icon = QtGui.QIcon(pixmap)
-    return icon
-
 def move_ui(widget):
     desktop = QtWidgets.QApplication.desktop()
     screenRect = desktop.screenGeometry()
@@ -59,90 +49,54 @@ def move_ui_bottom_right(widget, width, height):
     posy = cursor_y - height + 15
     widget.move(posx, posy)
 
-def round_image(label, image_bytes, radius):
-    label.Antialiasing = True
-    label.radius = radius/2
-    label.target = QtGui.QPixmap(label.size())
-    label.target.fill(QtCore.Qt.transparent)
-    pixmap = QtGui.QPixmap()
-    pixmap.loadFromData(image_bytes, 'png')
-    pixmap = pixmap.scaled(
-        radius, radius, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-    painter = QtGui.QPainter(label.target)
-    if label.Antialiasing:
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-    path = QtGui.QPainterPath()
-    path.addRoundedRect(
-        0, 0, label.width(), label.height(), label.radius, label.radius)
-    painter.setClipPath(path)
-    painter.drawPixmap(0, 0, pixmap)
-    label.setPixmap(label.target)
-
-def round_icon(icon, image_bytes, radius):
-    icon.Antialiasing = True
-    icon.radius = radius/2
-    icon.target = QtGui.QPixmap(QtCore.QSize(radius, radius))
-    icon.target.fill(QtCore.Qt.transparent)
-    pixmap = QtGui.QPixmap()
-    pixmap.loadFromData(image_bytes, 'png')
-    pixmap = pixmap.scaled(
-        radius, radius, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-    painter = QtGui.QPainter(icon.target)
-    if icon.Antialiasing:
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-    path = QtGui.QPainterPath()
-    path.addRoundedRect(
-        0, 0, radius, radius, icon.radius, icon.radius)
-    painter.setClipPath(path)
-    painter.drawPixmap(0, 0, pixmap)
-    icon.addPixmap(icon.target, QtGui.QIcon.Normal)
-    icon.addPixmap(icon.target, QtGui.QIcon.Selected)
+def mask_image(imgdata, imgtype='png', size=64):
+    image = QtGui.QImage.fromData(imgdata, imgtype)
+    image.convertToFormat(QtGui.QImage.Format_ARGB32)
+    imgsize = min(image.width(), image.height())
+    rect = QtCore.QRect(
+        (image.width() - imgsize) / 2,
+        (image.height() - imgsize) / 2,
+        imgsize,
+        imgsize,
+    )
+    image = image.copy(rect)
+    out_img = QtGui.QImage(imgsize, imgsize, QtGui.QImage.Format_ARGB32)
+    out_img.fill(QtCore.Qt.transparent)
+    brush = QtGui.QBrush(image)        # Create texture brush
+    painter = QtGui.QPainter(out_img)  # Paint the output image
+    painter.setBrush(brush)      # Use the image texture brush
+    painter.setPen(QtCore.Qt.NoPen)     # Don't draw an outline
+    painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
+    painter.drawEllipse(0, 0, imgsize, imgsize)  # Actually draw the circle
+    painter.end()                # We are done (segfault if you forget this)
+    pr = QtGui.QWindow().devicePixelRatio()
+    pm = QtGui.QPixmap.fromImage(out_img)
+    pm.setDevicePixelRatio(pr)
+    size *= pr
+    pm = pm.scaled(size, size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    return pm
     
-def round_corners_image(label, image_bytes, size_tuple, radius):
-    label.Antialiasing = True
-    label.radius = radius
-    label.target = QtGui.QPixmap(label.size())
-    label.target.fill(QtCore.Qt.transparent)
-    pixmap = QtGui.QPixmap()
-    pixmap.loadFromData(image_bytes, 'png')
-    pixmap = pixmap.scaled(
-        size_tuple[0], size_tuple[1], QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-    painter = QtGui.QPainter(label.target)
-    if label.Antialiasing:
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
+def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
+    image = QtGui.QImage.fromData(imgdata, imgtype)
+    image.convertToFormat(QtGui.QImage.Format_ARGB32)
+    out_img = QtGui.QImage(size_tuple[0], size_tuple[1], QtGui.QImage.Format_ARGB32)
+    out_img.fill(QtCore.Qt.transparent)
+    brush = QtGui.QBrush(image)        # Create texture brush
+    painter = QtGui.QPainter(out_img)  # Paint the output image
+    painter.setBrush(brush)      # Use the image texture brush
+    painter.setPen(QtCore.Qt.NoPen)     # Don't draw an outline
+    painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
     path = QtGui.QPainterPath()
     path.addRoundedRect(
-        0, 0, size_tuple[0], size_tuple[1], label.radius, label.radius)
+        0, 0, size_tuple[0], size_tuple[1], radius, radius)
     painter.setClipPath(path)
-    painter.drawPixmap(0, 0, pixmap)
-    label.setPixmap(label.target)
-
-def round_corners_image_button(button, image_bytes, size_tuple, radius):
-    button.Antialiasing = True
-    button.radius = radius
-    button.target = QtGui.QPixmap(button.size())
-    button.target.fill(QtCore.Qt.transparent)
-    pixmap = QtGui.QPixmap()
-    pixmap.loadFromData(image_bytes, 'png')
-    pixmap = pixmap.scaled(
-        size_tuple[0], size_tuple[1], QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-    painter = QtGui.QPainter(button.target)
-    if button.Antialiasing:
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing, True)
-        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-    path = QtGui.QPainterPath()
-    path.addRoundedRect(
-        0, 0, size_tuple[0], size_tuple[1], button.radius, button.radius)
-    painter.setClipPath(path)
-    painter.drawPixmap(0, 0, pixmap)
-    button.setIcon(QtGui.QIcon(button.target))
+    painter.drawPath(path)
+    painter.end()                # We are done (segfault if you forget this)
+    pr = QtGui.QWindow().devicePixelRatio()
+    pm = QtGui.QPixmap.fromImage(out_img)
+    pm.setDevicePixelRatio(pr)
+    pm = pm.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    return pm
 
 class separator(QtWidgets.QFrame):
     def __init__(self, parent = None):

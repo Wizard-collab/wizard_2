@@ -236,7 +236,8 @@ class custom_ticket_item(QtWidgets.QTreeWidgetItem):
     def fill_ui(self):
         profile_picture = site.get_user_row_by_name(self.ticket_row['creation_user'], 'profile_picture')
         user_icon = QtGui.QIcon()
-        gui_utils.round_icon(user_icon, image.convert_str_data_to_image_bytes(profile_picture), 30)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_picture), 'png', 30)
+        user_icon.addPixmap(pm)
         self.setIcon(0, user_icon)
         self.setText(1, self.ticket_row['title'])
         day, hour = tools.convert_time(self.ticket_row['creation_time'])

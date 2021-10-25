@@ -255,7 +255,8 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
-        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_image), 40)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 40)
+        self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         self.event_content_label.setText(self.event_row['message'])

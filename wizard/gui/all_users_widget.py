@@ -102,7 +102,8 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
 
     def fill_ui(self):
         user_icon = QtGui.QIcon()
-        gui_utils.round_icon(user_icon, image.convert_str_data_to_image_bytes(self.user_row['profile_picture']), 30)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(self.user_row['profile_picture']), 'png', 30)
+        user_icon.addPixmap(pm)
         self.setIcon(0, user_icon)
         self.setText(1, self.user_row['user_name'])
         self.setIcon(2, QtGui.QIcon())

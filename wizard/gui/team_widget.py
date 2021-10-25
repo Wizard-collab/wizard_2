@@ -173,7 +173,8 @@ class user_widget(QtWidgets.QFrame):
 
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.user_name, 'profile_picture')
-        gui_utils.round_image(self.profile_picture, image.convert_str_data_to_image_bytes(profile_image), 26)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 26)
+        self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.user_name)
 
     def build_ui(self):
