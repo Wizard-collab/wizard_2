@@ -109,7 +109,6 @@ QListView {
 QListView::item {
 	padding:2px;
 	border-radius:5px;
-	margin: 1px;
 }
  
 QListView::item:hover {

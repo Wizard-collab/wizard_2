@@ -39,7 +39,6 @@ class project_manager_widget(custom_window.custom_dialog):
         self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.icon_view.setObjectName('transparent_icon_view')
         self.icon_view.setSpacing(4)
-        self.icon_view.setIconSize(QtCore.QSize(200,200))
         self.icon_view.setMovement(QtWidgets.QListView.Static)
         self.icon_view.setResizeMode(QtWidgets.QListView.Adjust)
         self.icon_view.setViewMode(QtWidgets.QListView.IconMode)
@@ -85,8 +84,8 @@ class project_manager_widget(custom_window.custom_dialog):
         project_rows = site.get_projects_list()
         for project_row in project_rows:
             item = QtWidgets.QListWidgetItem()
-            widget = project_icon_widget(project_row, self.icon_view)
-            item.setSizeHint(widget.sizeHint())
+            widget = project_icon_widget(project_row)
+            item.setSizeHint(QtCore.QSize(widget.sizeHint().width()+8, widget.sizeHint().height()+8))
             item.type = 'project'
             self.icon_view.addItem(item)
             self.icon_view.setItemWidget(item, widget)
@@ -188,7 +187,6 @@ class project_icon_widget(QtWidgets.QFrame):
 
         day, hour = tools.convert_time(self.project_row['creation_time'])
         self.project_creation_time_label.setText(f"{day}, {hour}")
-        self.resize(self.sizeHint())
 
         icon = QtGui.QIcon()
         if self.project_row['project_image'] is not None:
@@ -196,7 +194,8 @@ class project_icon_widget(QtWidgets.QFrame):
             pixmap = QtGui.QPixmap()
             pixmap.loadFromData(project_image)
             icon = QtGui.QIcon(pixmap)
-        self.image_label.setPixmap(icon.pixmap(250))
+        pm = gui_utils.round_corners_image_button(project_image, (250,141), 5)
+        self.image_label.setPixmap(pm)
 
 class project_log_widget(custom_window.custom_dialog):
     def __init__(self, project_name, parent=None):

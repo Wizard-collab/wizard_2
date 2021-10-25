@@ -12,6 +12,9 @@ from wizard.core import environment
 from wizard.core import application
 from wizard.vars import ressources
 
+# Wizard gui modules
+from wizard.gui import gui_utils
+
 class loading_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(loading_widget, self).__init__(parent)
@@ -45,8 +48,8 @@ class loading_widget(QtWidgets.QWidget):
 
         self.main_frame.setObjectName('loading_widget_frame')
         self.frame_layout = QtWidgets.QVBoxLayout()
-        self.frame_layout.setContentsMargins(8,8,8,8)
-        self.frame_layout.setSpacing(8)
+        self.frame_layout.setContentsMargins(4,4,4,4)
+        self.frame_layout.setSpacing(6)
         self.main_frame.setLayout(self.frame_layout)
         self.main_layout.addWidget(self.main_frame)
 
@@ -57,7 +60,8 @@ class loading_widget(QtWidgets.QWidget):
         self.datas_widget = QtWidgets.QWidget()
         self.datas_widget.setObjectName('transparent_widget')
         self.datas_layout = QtWidgets.QVBoxLayout()
-        self.datas_layout.setContentsMargins(10,10,10,10)
+        self.datas_layout.setContentsMargins(4,4,4,4)
+        self.datas_layout.setSpacing(6)
         self.datas_widget.setLayout(self.datas_layout)
         self.frame_layout.addWidget(self.datas_widget)
 
@@ -96,4 +100,5 @@ class loading_widget(QtWidgets.QWidget):
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(project_image)
         icon = QtGui.QIcon(pixmap)
-        self.image_label.setPixmap(icon.pixmap(300))
+        pm = gui_utils.round_corners_image_button(project_image, (350,197), 4)
+        self.image_label.setPixmap(pm)

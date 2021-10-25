@@ -70,9 +70,13 @@ def mask_image(imgdata, imgtype='png', size=64):
     return pm
     
 def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
+    pr = QtGui.QWindow().devicePixelRatio()
     image = QtGui.QImage.fromData(imgdata, imgtype)
     image.convertToFormat(QtGui.QImage.Format_ARGB32)
-    out_img = QtGui.QImage(size_tuple[0], size_tuple[1], QtGui.QImage.Format_ARGB32)
+    image = image.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    print(image.width())
+    print(image.height())
+    out_img = QtGui.QImage(size_tuple[0]*pr, size_tuple[1]*pr, QtGui.QImage.Format_ARGB32)
     out_img.fill(QtCore.Qt.transparent)
     brush = QtGui.QBrush(image)        # Create texture brush
     painter = QtGui.QPainter(out_img)  # Paint the output image
@@ -81,14 +85,13 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
     path = QtGui.QPainterPath()
     path.addRoundedRect(
-        0, 0, size_tuple[0], size_tuple[1], radius, radius)
+        0, 0, size_tuple[0]*pr, size_tuple[1]*pr, radius*pr, radius*pr)
     painter.setClipPath(path)
     painter.drawPath(path)
     painter.end()                # We are done (segfault if you forget this)
-    pr = QtGui.QWindow().devicePixelRatio()
     pm = QtGui.QPixmap.fromImage(out_img)
     pm.setDevicePixelRatio(pr)
-    pm = pm.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    #pm = pm.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
     return pm
 
 class separator(QtWidgets.QFrame):
