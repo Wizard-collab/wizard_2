@@ -68,9 +68,9 @@ class wall_widget(QtWidgets.QWidget):
         self.wall_scrollBar = self.wall_scrollArea.verticalScrollBar()
 
         self.wall_scrollArea_widget = QtWidgets.QWidget()
-        self.wall_scrollArea_widget.setObjectName('wall_scroll_area')
+        #self.wall_scrollArea_widget.setObjectName('wall_scroll_area')
         self.wall_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.wall_scrollArea_layout.setContentsMargins(0,0,0,0)
+        self.wall_scrollArea_layout.setContentsMargins(0,0,0,8)
         self.wall_scrollArea_layout.setSpacing(0)
         self.wall_scrollArea_widget.setLayout(self.wall_scrollArea_layout)
 
@@ -321,11 +321,10 @@ class wall_event_widget(QtWidgets.QFrame):
         if self.time_widget == None:
             self.time_widget = wall_time_widget(self.event_row['creation_time'])
             self.widget_layout.insertWidget(0, self.time_widget)
-            self.widget_layout.setContentsMargins(10,0,10,8)
 
     def build_ui(self):
         self.widget_layout = QtWidgets.QVBoxLayout()
-        self.widget_layout.setContentsMargins(10,8,10,8)
+        self.widget_layout.setContentsMargins(8,2,8,2)
         self.widget_layout.setSpacing(1)
         self.setLayout(self.widget_layout)
 
@@ -333,24 +332,16 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_frame.setObjectName('popup_event_frame')
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(9,9,9,9)
+        self.main_layout.setSpacing(6)
         self.event_frame.setLayout(self.main_layout)
         self.widget_layout.addWidget(self.event_frame)
 
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.event_frame.setGraphicsEffect(self.shadow)
-
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('dark_widget')
-        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
+        self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        #self.header_layout.setContentsMargins(11,0,0,0)
-        self.header_layout.setSpacing(12)
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
@@ -388,8 +379,8 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
-        #self.header_layout.setContentsMargins(,0,0,0)
-        self.content_layout.setSpacing(12)
+        self.content_layout.setContentsMargins(0,0,0,0)
+        self.content_layout.setSpacing(2)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
 
@@ -406,7 +397,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0,0,0,0)
-        self.buttons_layout.setSpacing(4)
+        self.buttons_layout.setSpacing(2)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.content_layout.addWidget(self.buttons_widget)
 

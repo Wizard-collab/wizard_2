@@ -806,10 +806,12 @@ QSlider::handle:horizontal {
 
 #wall_event_frame{
 	border-radius: 10px;
+	background-color: #373740;
 }
 
 #popup_event_frame{
 	border-radius: 5px;
+	background-color: #373740;
 }
 
 #drop_files_button{

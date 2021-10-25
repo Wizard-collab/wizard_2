@@ -10,12 +10,14 @@ from wizard.core import site
 from wizard.core import tools
 from wizard.core import user
 from wizard.core import image
+from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import custom_window
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import logging_widget
+from wizard.gui import create_project_widget
 
 class project_manager_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
@@ -68,19 +70,59 @@ class project_manager_widget(custom_window.custom_dialog):
 
     def open_project(self):
         if len(self.icon_view.selectedItems()) == 1:
-            project_name = self.icon_view.itemWidget(self.icon_view.selectedItems()[0]).project_row['project_name']
-            self.project_log_widget = project_log_widget(project_name)
-            if self.project_log_widget.exec_() == QtWidgets.QDialog.Accepted:
-                self.accept()
+            if self.icon_view.selectedItems()[0].type == 'project':
+                project_name = self.icon_view.itemWidget(self.icon_view.selectedItems()[0]).project_row['project_name']
+                self.project_log_widget = project_log_widget(project_name)
+                if self.project_log_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    self.accept()
+            else:
+                self.create_project()
 
     def refresh(self):
+
+        self.icon_view.clear()
+
         project_rows = site.get_projects_list()
         for project_row in project_rows:
             item = QtWidgets.QListWidgetItem()
             widget = project_icon_widget(project_row, self.icon_view)
             item.setSizeHint(widget.sizeHint())
+            item.type = 'project'
             self.icon_view.addItem(item)
             self.icon_view.setItemWidget(item, widget)
+
+        create_project_item = QtWidgets.QListWidgetItem()
+        widget = new_project_widget()
+        create_project_item.setSizeHint(widget.sizeHint())
+        create_project_item.type = 'create_project'
+        self.icon_view.addItem(create_project_item)
+        self.icon_view.setItemWidget(create_project_item, widget)
+
+    def create_project(self):
+        self.create_project_widget = create_project_widget.create_project_widget(self)
+        self.create_project_widget.exec_()
+        self.refresh()
+
+class new_project_widget(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(new_project_widget, self).__init__(parent)
+        self.build_ui()
+
+    def build_ui(self):
+        self.setObjectName('transparent_widget')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.image_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.image_label)
+        self.image_label.setPixmap(QtGui.QIcon(ressources._create_project_image_).pixmap(250))
+
+        self.create_project_label = QtWidgets.QLabel('Create a new project')
+        self.create_project_label.setObjectName('bold_label')
+        self.create_project_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.create_project_label)
 
 class project_icon_widget(QtWidgets.QFrame):
     def __init__(self, project_row, parent=None):

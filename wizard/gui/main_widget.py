@@ -236,10 +236,11 @@ class main_widget(custom_window.custom_window):
         self.communicate_server.stop()
         self.subtask_manager.tasks_server.stop()
         self.softwares_server.stop()
-        self.save_contexts()
 
     def closeEvent(self, event):
         self.quit_threads()
+        self.save_contexts()
+        QtWidgets.QApplication.closeAllWindows()
 
     def refresh(self):
         start_time = time.time()

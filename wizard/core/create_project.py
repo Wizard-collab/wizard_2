@@ -18,6 +18,8 @@
 
 # Wizard modules
 from wizard.core import project
+from wizard.core import user
+from wizard.core import db_utils
 from wizard.core import assets
 from wizard.core import environment
 from wizard.core import tools
@@ -29,6 +31,36 @@ from wizard.vars import softwares_vars
 import os
 
 def create_project(project_name,
+                    project_path,
+                    project_password,
+                    frame_rate=24,
+                    image_format=[1920,1080],
+                    project_image=None):
+    do_creation = 1
+
+    if project_name == '':
+        logger.warning("Please provide a project name")
+        do_creation = 0
+    if project_path == '':
+        logger.warning("Please provide a project path")
+        do_creation = 0
+    if project_password == '':
+        logger.warning("Please provide a password")
+        do_creation = 0
+
+    if do_creation: 
+        old_project_name = environment.get_project_name()
+        if project.create_project(project_name, project_path, project_password, project_image):
+            db_utils.modify_db_name('project', project_name)
+            init_project(project_name, project_path, project_password, frame_rate, image_format)
+            if old_project_name is not None:
+                user.log_project_without_cred(old_project_name)
+            return 1
+    else:
+        return None
+
+
+def init_project(project_name,
                     project_path,
                     project_password,
                     frame_rate=24,

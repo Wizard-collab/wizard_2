@@ -11,7 +11,7 @@ from wizard.gui import psql_widget
 from wizard.gui import team_dns_widget
 from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
-from wizard.gui import project_log_widget
+from wizard.gui import project_manager_widget
 from wizard.gui import create_project_widget
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
@@ -79,12 +79,8 @@ class app():
 				sys.exit()
 
 		if not user.get_project():
-			if not site.get_projects_names_list():
-				self.create_project_widget = create_project_widget.create_project_widget()
-				if self.create_project_widget.exec_() != QtWidgets.QDialog.Accepted:
-					sys.exit()
-			self.project_log_widget = project_log_widget.project_log_widget()
-			if self.project_log_widget.exec_() != QtWidgets.QDialog.Accepted:
+			self.project_manager_widget = project_manager_widget.project_manager_widget()
+			if self.project_manager_widget.exec_() != QtWidgets.QDialog.Accepted:
 				sys.exit()
 
 		db_utils.modify_db_name('project', environment.get_project_name())

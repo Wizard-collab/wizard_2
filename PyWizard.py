@@ -80,10 +80,7 @@ while not user.get_project():
         project_name = tools.flushed_input('Project name : ')
         project_path = tools.flushed_input('Project path : ')
         project_password = tools.flushed_input('Project password : ')
-        if project.create_project(project_name, project_path, project_password):
-            db_server.project_name = project_name
-            create_project.create_project(project_name, project_path, project_password)
-
+        create_project.create_project(project_name, project_path, project_password)
     else:
         project_name = tools.flushed_input('Project name : ')
         project_password = tools.flushed_input('Project password : ')

@@ -14,7 +14,7 @@ from wizard.gui import gui_utils
 from wizard.gui import user_widget
 from wizard.gui import quotes_widget
 from wizard.gui import user_log_widget
-from wizard.gui import project_log_widget
+from wizard.gui import project_manager_widget
 from wizard.gui import create_user_widget
 from wizard.gui import create_project_widget
 
@@ -86,8 +86,8 @@ class header_widget(QtWidgets.QFrame):
         self.user_log_widget.exec_()
 
     def change_project(self):
-        self.project_log_widget = project_log_widget.project_log_widget()
-        self.project_log_widget.exec_()
+        self.project_manager_widget = project_manager_widget.project_manager_widget()
+        self.project_manager_widget.exec_()
 
     def create_user(self):
         self.create_user_widget = create_user_widget.create_user_widget()

@@ -233,11 +233,10 @@ class create_project_widget(custom_window.custom_dialog):
         password = self.password_lineEdit.text()
         password_confirm = self.password_confirm_lineEdit.text()
         if password == password_confirm:
-            if project.create_project(project_name, project_path, password, self.image):
-                db_utils.modify_db_name('project', project_name)
-                create_project.create_project(project_name, project_path, password)
-                if old_project_name is not None:
-                    user.log_project_without_cred(old_project_name)
+            if create_project.create_project(project_name=project_name,
+                                                project_path=project_path,
+                                                project_password=password,
+                                                project_image=self.image):
                 self.accept()
         else:
             logger.warning("Project passwords doesn't matches")

@@ -6,6 +6,8 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
+from wizard.core import image
+from wizard.core import site
 from wizard.core import environment
 from wizard.core import application
 from wizard.vars import ressources
@@ -20,10 +22,14 @@ class loading_widget(QtWidgets.QWidget):
         self.build_ui()
         self.fill_ui()
 
-    def build_ui(self):
-        self.setMaximumSize(QtCore.QSize(416,316))
-        self.setMinimumSize(QtCore.QSize(416,316))
+    def showEvent(self, event):
+        desktop = QtWidgets.QApplication.desktop()
+        screenRect = desktop.screenGeometry()
+        screen_maxX = screenRect.bottomRight().x()
+        screen_maxY = screenRect.bottomRight().y()
+        self.move((screen_maxX-self.width())/2, (screen_maxY-self.height())/2)
 
+    def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)
         self.setLayout(self.main_layout)
@@ -39,13 +45,13 @@ class loading_widget(QtWidgets.QWidget):
 
         self.main_frame.setObjectName('loading_widget_frame')
         self.frame_layout = QtWidgets.QVBoxLayout()
-        self.frame_layout.setContentsMargins(0,0,0,0)
-        self.frame_layout.setSpacing(0)
+        self.frame_layout.setContentsMargins(8,8,8,8)
+        self.frame_layout.setSpacing(8)
         self.main_frame.setLayout(self.frame_layout)
         self.main_layout.addWidget(self.main_frame)
 
         self.image_label = QtWidgets.QLabel()
-        self.image_label.setFixedSize(400,240)
+        #self.image_label.setFixedSize(400,226)
         self.frame_layout.addWidget(self.image_label)
 
         self.datas_widget = QtWidgets.QWidget()
@@ -84,4 +90,10 @@ class loading_widget(QtWidgets.QWidget):
         version_dic = application.get_version()
         self.version_label.setText(f"version {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
         self.build_label.setText(f"- build {version_dic['builds']}")
-        self.image_label.setPixmap(QtGui.QPixmap(ressources._loading_image_))
+
+        project_row = site.get_project_row_by_name(environment.get_project_name())
+        project_image = image.convert_str_data_to_image_bytes(project_row['project_image'])
+        pixmap = QtGui.QPixmap()
+        pixmap.loadFromData(project_image)
+        icon = QtGui.QIcon(pixmap)
+        self.image_label.setPixmap(icon.pixmap(300))

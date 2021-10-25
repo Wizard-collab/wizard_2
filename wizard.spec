@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['app.py'],
-             pathex=['C:\\Users\\conta\\Documents\\script\\Wizard_2'],
+             pathex=['D:\\SCRIPT\\Wizard_2'],
              binaries=[],
              datas=[],
              hiddenimports=['PyQt5.QtPrintSupport'],
@@ -28,7 +28,7 @@ exe = EXE(pyz,
           upx=True,
           console=False,
           version = 'compile\\version.rc',
-          icon="C:\\Users\\conta\\Documents\\script\\Wizard_2\\ressources\\icons\\wizard_icon.ico")
+          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\wizard_icon.ico")
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

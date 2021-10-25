@@ -77,6 +77,7 @@ class compile():
 				shutil.rmtree('dist')
 			if os.path.isdir('build'):
 				shutil.rmtree('build')
+				
 			command_line = "PyInstaller wizard.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
@@ -117,6 +118,14 @@ class compile():
 				shutil.rmtree('dist')
 			if os.path.isdir('build'):
 				shutil.rmtree('build')
+
+			shutil.make_archive(f'{self.build_folder}', 'zip', self.build_folder)
+
+			os.startfile(os.path.dirname(self.build_folder))
+
+			if os.path.isdir(self.build_folder):
+				shutil.rmtree(self.build_folder)
+
 			self.clean_pycache()
 
 	def clean_pycache(self):

@@ -99,6 +99,7 @@ _estimated_time_icon_ = os.path.join(_icons_path_, 'estimated_time.svg')
 _work_time_icon_ = os.path.join(_icons_path_, 'work_time.svg')
 _password_visibility_on_ = os.path.join(_icons_path_, 'password_visibility_on.svg')
 _password_visibility_off_ = os.path.join(_icons_path_, 'password_visibility_off.svg')
+_create_project_image_ = os.path.join(_icons_path_, 'create_project.svg')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.svg')
