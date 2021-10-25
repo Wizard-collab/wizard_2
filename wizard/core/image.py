@@ -117,3 +117,21 @@ def project_random_image(project_name):
     img_file = os.path.join(tools.temp_dir(),'temp_img.png')
     img.save(img_file)
     return img_file
+
+def user_random_image(user_name):
+    letter = user_name[0].upper()
+    hue = random.randint(0,100)/100.0
+    saturation = random.randint(10,50)/100.0
+    value = random.randint(30,60)/100.0
+    rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value))
+    img = Image.new('RGB', (100, 100), color = rgb_tuple)
+
+    draw = ImageDraw.Draw(img)
+
+    font = ImageFont.truetype("ressources/fonts/Poppins-Black.ttf", 40)
+    w, h = draw.textsize(letter, font=font)
+    draw.text(((100-w)/2,(100-h-10)/2), letter, (255, 255, 255), font=font)
+
+    img_file = os.path.join(tools.temp_dir(),'temp_img.png')
+    img.save(img_file)
+    return img_file

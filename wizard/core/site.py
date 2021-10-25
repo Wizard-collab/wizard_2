@@ -163,7 +163,7 @@ def create_user(user_name,
                     password,
                     email,
                     administrator_pass='',
-                    profile_picture=ressources._default_profile_):
+                    profile_picture=None):
     do_creation = 1
     if user_name == '':
         logger.warning('Please provide a user name')
@@ -185,7 +185,7 @@ def create_user(user_name,
                 if not os.path.isfile(profile_picture):
                     profile_picture = ressources._default_profile_
             else:
-                profile_picture = ressources._default_profile_
+                profile_picture = image.user_random_image(user_name)
             profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
             if db_utils.create_row('site',
                         'users', 

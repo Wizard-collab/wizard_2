@@ -11,6 +11,7 @@ from wizard.gui import gui_utils
 from wizard.gui import custom_window
 
 # Wizard modules
+from wizard.core import image
 from wizard.core import site
 from wizard.vars import ressources
 from wizard.core import custom_logger
@@ -20,9 +21,11 @@ class create_user_widget(custom_window.custom_dialog):
     def __init__(self, parent=None):
         super(create_user_widget, self).__init__()
         self.image_file = None
+        self.use_image_file = 0
         self.build_ui()
         self.connect_functions()
         self.add_title("Sign up")
+        self.get_random_profile_picture()
 
     def build_ui(self):
         self.setMinimumWidth(350)
@@ -64,7 +67,7 @@ class create_user_widget(custom_window.custom_dialog):
 
         self.profile_picture_button = QtWidgets.QPushButton()
         self.profile_picture_button.setFixedSize(60,60)
-        self.profile_picture_button.setIcon(QtGui.QIcon(ressources._default_profile_))
+        self.profile_picture_button.setStyleSheet('border-radius:30px;')
         self.profile_picture_button.setIconSize(QtCore.QSize(54,54))
         self.main_layout.addWidget(self.profile_picture_button)
 
@@ -104,6 +107,7 @@ class create_user_widget(custom_window.custom_dialog):
         self.quit_button.clicked.connect(self.reject)
         self.sign_up_button.clicked.connect(self.apply)
         self.profile_picture_button.clicked.connect(self.update_profile_picture)
+        self.user_name_lineEdit.textChanged.connect(lambda:self.get_random_profile_picture(force=0))
 
     def apply(self):
         user_name = self.user_name_lineEdit.text()
@@ -121,6 +125,21 @@ class create_user_widget(custom_window.custom_dialog):
         else:
             logger.warning("User passwords doesn't matches")
 
+    def get_random_profile_picture(self, force=0):
+        if not self.use_image_file or force:
+            user_name = self.user_name_lineEdit.text()
+            if user_name == '':
+                user_name = ' '
+            image_file = image.user_random_image(user_name)
+            self.image_file = image_file
+            self.update_profile_button()
+
+    def update_profile_button(self):
+        icon = QtGui.QIcon()
+        pm = gui_utils.mask_image(image.convert_image_to_bytes(self.image_file), 'png', 54)
+        icon.addPixmap(pm)
+        self.profile_picture_button.setIcon(icon)
+
     def update_profile_picture(self):
         options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
@@ -130,7 +149,8 @@ class create_user_widget(custom_window.custom_dialog):
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
                 self.image_file = image_file
-                self.profile_picture_button.setIcon(QtGui.QIcon(image_file))
+                self.use_image_file = 1
+                self.update_profile_button()
             else:
                 logger.warning('{} is not a valid image file...'.format(image_file))
 
