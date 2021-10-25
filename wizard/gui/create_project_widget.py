@@ -15,6 +15,7 @@ from wizard.gui import gui_server
 from wizard.core import user
 from wizard.core import image
 from wizard.core import project
+from wizard.core import site
 from wizard.core import environment
 from wizard.core import create_project
 from wizard.core import db_utils
@@ -181,8 +182,9 @@ class create_project_widget(custom_window.custom_dialog):
             if project_name == '':
                 project_name = ' '
             image_file = image.project_random_image(project_name)
-            self.image_label.setPixmap(QtGui.QIcon(image_file).pixmap(250))
             self.image = image_file
+            self.use_image_file = 0
+            self.update_image()
 
     def open_image(self):
         options = QtWidgets.QFileDialog.Options()
@@ -194,9 +196,15 @@ class create_project_widget(custom_window.custom_dialog):
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
                 self.image = image_file
                 self.use_image_file = 1
-                self.image_label.setPixmap(QtGui.QIcon(image_file).pixmap(250))
+                self.update_image()
             else:
                 logger.warning('{} is not a valid image file...'.format(image_file))
+
+    def update_image(self):
+        str_image = site.process_project_image(self.image)
+        image_bytes = image.convert_str_data_to_image_bytes(str_image)
+        pm = gui_utils.round_corners_image_button(image_bytes, (250, 141), 5)
+        self.image_label.setPixmap(pm)
 
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)

@@ -525,7 +525,7 @@ def is_site_database():
     return db_utils.check_database_existence('site')
 
 def create_admin_user(admin_password, admin_email):
-    profile_picture = image.convert_image_to_str_data(ressources._default_profile_, 100)
+    profile_picture = image.convert_image_to_str_data(image.user_random_image('admin'), 100)
     if db_utils.create_row('site',
                             'users', 
                             ('user_name', 

@@ -74,8 +74,6 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     image = QtGui.QImage.fromData(imgdata, imgtype)
     image.convertToFormat(QtGui.QImage.Format_ARGB32)
     image = image.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-    print(image.width())
-    print(image.height())
     out_img = QtGui.QImage(size_tuple[0]*pr, size_tuple[1]*pr, QtGui.QImage.Format_ARGB32)
     out_img.fill(QtCore.Qt.transparent)
     brush = QtGui.QBrush(image)        # Create texture brush
@@ -91,7 +89,6 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     painter.end()                # We are done (segfault if you forget this)
     pm = QtGui.QPixmap.fromImage(out_img)
     pm.setDevicePixelRatio(pr)
-    #pm = pm.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
     return pm
 
 class separator(QtWidgets.QFrame):
