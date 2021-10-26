@@ -6,23 +6,17 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import os
 
-# Wizard modules
-from wizard.gui import custom_window
-
-class image_viewer_widget(custom_window.custom_window):
+class image_viewer_widget(QtWidgets.QWidget):
 	def __init__(self, image):
 		super(image_viewer_widget, self).__init__()
 		self.image = image
 		self.build_ui()
-		self.add_title(self.image)
 
 	def build_ui(self):
-		self.main_widget = QtWidgets.QWidget()
 		self.main_layout = QtWidgets.QHBoxLayout()
 		self.main_layout.setContentsMargins(0,0,0,0)
 		self.main_layout.setSpacing(0)
-		self.main_widget.setLayout(self.main_layout)
-		self.setCentralWidget(self.main_widget)
+		self.setLayout(self.main_layout)
 
 		self.main_image_label = QtWidgets.QLabel()
 		self.main_image_label.setPixmap(QtGui.QPixmap(self.image).scaled(1600,100,

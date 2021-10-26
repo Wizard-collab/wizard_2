@@ -11,21 +11,17 @@ from wizard.core import user
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import logging_widget
-from wizard.gui import custom_window
 
-class psql_widget(custom_window.custom_dialog):
+class psql_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(psql_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
-        self.add_title('PostgreSQL Setup')
 
     def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.infos_label = QtWidgets.QLabel('Contact your IT to get thoses informations')
         self.infos_label.setObjectName('gray_label')

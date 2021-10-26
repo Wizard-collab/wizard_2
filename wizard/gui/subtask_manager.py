@@ -11,7 +11,6 @@ import os
 import traceback
 
 # Wizard gui modules
-from wizard.gui import custom_window
 from wizard.gui import logging_widget
 from wizard.gui import log_viewer
 from wizard.gui import gui_utils
@@ -25,7 +24,7 @@ logger = custom_logger.get_logger(__name__)
 
 _DNS_ = ('localhost', 10231)
 
-class subtask_manager(custom_window.custom_window):
+class subtask_manager(QtWidgets.QWidget):
 
     global_status_signal = pyqtSignal(object)
 
@@ -33,7 +32,6 @@ class subtask_manager(custom_window.custom_window):
         super(subtask_manager, self).__init__(parent)
         self.tasks_ids = dict()
 
-        self.add_title('Subtasks manager')
         self.build_ui()
 
         self.tasks_server = tasks_server()
@@ -49,12 +47,10 @@ class subtask_manager(custom_window.custom_window):
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(1)
         self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.info_widget = gui_utils.info_widget(transparent=1)
         self.info_widget.setVisible(0)

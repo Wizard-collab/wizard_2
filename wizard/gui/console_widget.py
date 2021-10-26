@@ -16,9 +16,8 @@ logger = custom_logger.get_logger()
 # Wizard gui modules
 from wizard.gui import script_editor_widget
 from wizard.gui import logging_widget
-from wizard.gui import custom_window
 
-class console_widget(custom_window.custom_window):
+class console_widget(QtWidgets.QWidget):
 
     notification = pyqtSignal(str)
 
@@ -47,20 +46,12 @@ class console_widget(custom_window.custom_window):
             self.notification.emit('')
         event.accept()
 
-    '''
-    def closeEvent(self, event):
-        event.ignore()
-        self.hide()
-    '''
-
     def build_ui(self):
         self.resize(800,600)
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.header_custom_widget = QtWidgets.QWidget()
         self.header_custom_widget.setObjectName('transparent_widget')
@@ -72,7 +63,7 @@ class console_widget(custom_window.custom_window):
         self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.header_custom_layout.addWidget(self.menu_bar)
         self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-        self.add_header_widget(self.header_custom_widget)
+        self.main_layout.addWidget(self.header_custom_widget)
         self.console_action = self.menu_bar.addMenu("Console")
         self.clear_console_action = self.console_action.addAction("Clear")
 

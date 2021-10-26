@@ -7,19 +7,17 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
 from wizard.gui import gui_utils
-from wizard.gui import custom_window
 
 # Wizard modules
 from wizard.core import site
 from wizard.core import image
 from wizard.vars import ressources
 
-class all_users_widget(custom_window.custom_window):
+class all_users_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(all_users_widget, self).__init__(parent)
 
         self.user_ids = dict()
-        self.add_title('Wizard cup')
         self.build_ui()
         self.refresh()
 
@@ -28,12 +26,10 @@ class all_users_widget(custom_window.custom_window):
         self.setMinimumWidth(700)
         self.setMinimumHeight(500)
 
-        self.main_widget = QtWidgets.QFrame()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)

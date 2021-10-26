@@ -339,7 +339,6 @@ QMenuBar {
 	background-color: transparent;
     padding: 0px;
     margin: 0px;
-    margin-left: 8px;
 }
 
 QMenuBar::item {
@@ -347,6 +346,7 @@ QMenuBar::item {
     padding-left: 6px;
     padding-right: 6px;
     border-radius: 4px;
+    margin: 0px;
 }
 
 QMenuBar::item:selected {

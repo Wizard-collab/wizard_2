@@ -120,7 +120,6 @@ class app():
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.refresh()
 		self.main_widget.show()
-		self.main_widget.toggle_size()
 		QtWidgets.QApplication.processEvents()
 		self.main_widget.init_contexts()
 		self.main_widget.stop_threads.connect(self.db_server.stop)

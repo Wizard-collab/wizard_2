@@ -15,14 +15,12 @@ logger = custom_logger.get_logger(__name__)
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import logging_widget
-from wizard.gui import custom_window
 
-class team_dns_widget(custom_window.custom_dialog):
+class team_dns_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(team_dns_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
-        self.add_title('Team DNS Setup')
         self.fill_ui()
 
     def fill_ui(self):
@@ -33,11 +31,9 @@ class team_dns_widget(custom_window.custom_dialog):
             logger.warning("Can't reach server with this DNS")
 
     def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.infos_label = QtWidgets.QLabel('Contact your IT to get thoses informations')
         self.infos_label.setObjectName('gray_label')

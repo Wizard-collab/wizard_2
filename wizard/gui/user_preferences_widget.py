@@ -7,7 +7,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
 from wizard.gui import gui_utils
-from wizard.gui import custom_window
 from wizard.gui import logging_widget
 
 # Wizard modules
@@ -19,15 +18,11 @@ from wizard.core import image
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class user_preferences_widget(custom_window.custom_window):
+class user_preferences_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(user_preferences_widget, self).__init__()
         self.general_widget = general_widget()
         self.user_account_widget = user_account_widget()
-
-        
-
-        self.add_title('User preferences')
 
         self.build_ui()
 
@@ -50,11 +45,9 @@ class user_preferences_widget(custom_window.custom_window):
 
     def build_ui(self):
         self.resize(600,800)
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.tabs_widget = QtWidgets.QTabWidget()
         self.tabBar = self.tabs_widget.tabBar()

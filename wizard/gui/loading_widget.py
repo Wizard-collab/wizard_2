@@ -34,13 +34,13 @@ class loading_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(18,18,18,18)
         self.setLayout(self.main_layout)
 
         self.main_frame = QtWidgets.QFrame()
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
+        self.shadow.setBlurRadius(18)
         self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
         self.shadow.setXOffset(0)
         self.shadow.setYOffset(0)

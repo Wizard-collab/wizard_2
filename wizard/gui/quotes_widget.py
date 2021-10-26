@@ -117,7 +117,7 @@ class quotes_widget(QtWidgets.QFrame):
     def clear_anim(self):
         self.animation = QtCore.QPropertyAnimation(self.animation_handler_widget, b"geometry")
         self.animation.setDuration(200);
-        self.animation.setStartValue(QtCore.QRect(self.geometry().x()-250, self.geometry().y(), self.geometry().width(), self.geometry().height()))
+        self.animation.setStartValue(QtCore.QRect(self.geometry().x()-250, self.geometry().y()-6, self.geometry().width(), self.geometry().height()))
         self.animation.setEndValue(QtCore.QRect(self.geometry().x()-250, 50, self.geometry().width(), self.geometry().height()))
         self.animation.finished.connect(self.get_new_random_quote)
         self.animation.start()
@@ -126,7 +126,7 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation = QtCore.QPropertyAnimation(self.animation_handler_widget, b"geometry")
         self.animation.setDuration(400)
         self.animation.setStartValue(QtCore.QRect(self.geometry().x()-250, -50, self.geometry().width(), self.geometry().height()))
-        self.animation.setEndValue(QtCore.QRect(self.geometry().x()-250, self.geometry().y(), self.geometry().width(), self.geometry().height()))
+        self.animation.setEndValue(QtCore.QRect(self.geometry().x()-250, self.geometry().y()-6, self.geometry().width(), self.geometry().height()))
         self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
         self.animation.start()
 

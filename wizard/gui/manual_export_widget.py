@@ -6,7 +6,6 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
-from wizard.gui import custom_window
 from wizard.gui import drop_files_widget
 
 # Wizard modules
@@ -14,13 +13,12 @@ from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class manual_export_widget(custom_window.custom_dialog):
+class manual_export_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(manual_export_widget, self).__init__()
 
         self.files = []
         self.export_name = None
-        self.add_title('Manual export files')
         self.build_ui()
         self.connect_functions()
 
@@ -72,11 +70,9 @@ class manual_export_widget(custom_window.custom_dialog):
         self.export_name_lineEdit.setText(export_name)
 
     def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(8)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.infos_label = QtWidgets.QLabel('Drag and drop files or use explorer to manually merge files as exports.')
         self.infos_label.setObjectName('gray_label')

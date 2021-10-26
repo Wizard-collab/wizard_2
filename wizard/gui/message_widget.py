@@ -5,25 +5,18 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-# Wizard gui modules
-from wizard.gui import custom_window
-
-class message_widget(custom_window.custom_dialog):
+class message_widget(QtWidgets.QDialog):
     def __init__(self, title, message, parent=None):
         super(message_widget, self).__init__(parent)
         self.title = title
-        self.add_title(self.title)
         self.message = message
         self.build_ui()
         self.connect_functions()
 
     def build_ui(self):
         self.setMinimumWidth(450)
-
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.message_label = QtWidgets.QLabel(self.message)
         self.message_label.setObjectName('gray_label')

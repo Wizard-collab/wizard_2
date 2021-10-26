@@ -5,17 +5,13 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-# Wizard gui modules
-from wizard.gui import custom_window
-
 # Wizard modules
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class confirm_widget(custom_window.custom_dialog):
+class confirm_widget(QtWidgets.QDialog):
     def __init__(self, message, title='Warning', reject_text='Cancel', accept_text='Continue', parent=None):
         super(confirm_widget, self).__init__()
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.security_sentence = None
         self.title = title
         self.message = message
@@ -23,7 +19,6 @@ class confirm_widget(custom_window.custom_dialog):
         self.accept_text = accept_text
         self.build_ui()
         self.connect_functions()
-        self.add_title(self.title)
 
     def set_security_sentence(self, sentence):
         self.security_sentence = sentence
@@ -37,10 +32,8 @@ class confirm_widget(custom_window.custom_dialog):
     def build_ui(self):
         self.setMinimumWidth(450)
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_layout = QtWidgets.QHBoxLayout()

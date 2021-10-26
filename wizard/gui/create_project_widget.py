@@ -8,7 +8,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 # Wizard gui modules
 from wizard.gui import logging_widget
 from wizard.gui import gui_utils
-from wizard.gui import custom_window
 from wizard.gui import gui_server
 
 # Wizard modules
@@ -23,23 +22,20 @@ from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class create_project_widget(custom_window.custom_dialog):
+class create_project_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_project_widget, self).__init__()
         self.project_path = ''
         self.use_image_file = 0
         self.build_ui()
         self.connect_functions()
-        self.add_title("Create a project")
         self.get_random_image()
 
     def build_ui(self):
         self.setMinimumWidth(350)
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)

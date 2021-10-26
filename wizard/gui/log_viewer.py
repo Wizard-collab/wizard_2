@@ -6,19 +6,15 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import os
 
-# Wizard gui modules
-from wizard.gui import custom_window
-
 # Wizard modules
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-class log_viewer(custom_window.custom_window):
+class log_viewer(QtWidgets.QWidget):
 
     def __init__(self, file=None, parent=None):
         super(log_viewer, self).__init__(parent)
 
-        self.add_title('Logs viewer')
         self.build_ui()
         self.file = file
         self.refresh()
@@ -40,12 +36,10 @@ class log_viewer(custom_window.custom_window):
             logger.warning("No valid file given")
 
     def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(12, 12, 12, 12)
         self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.file_name_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.file_name_label)

@@ -13,27 +13,23 @@ from wizard.core import image
 from wizard.vars import ressources
 
 # Wizard gui modules
-from wizard.gui import custom_window
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import logging_widget
 from wizard.gui import create_project_widget
 
-class project_manager_widget(custom_window.custom_dialog):
+class project_manager_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(project_manager_widget, self).__init__()
-        self.add_title('Project manager')
         self.build_ui()
         self.refresh()
         self.connect_functions()
 
     def build_ui(self):
         self.resize(900,700)
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.icon_view = QtWidgets.QListWidget()
         self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -197,21 +193,18 @@ class project_icon_widget(QtWidgets.QFrame):
         pm = gui_utils.round_corners_image_button(project_image, (250,141), 5)
         self.image_label.setPixmap(pm)
 
-class project_log_widget(custom_window.custom_dialog):
+class project_log_widget(QtWidgets.QDialog):
     def __init__(self, project_name, parent=None):
         super(project_log_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
         self.project_name = project_name
-        self.add_title(f"Connect to {project_name}")
 
     def build_ui(self):
         self.setMinimumWidth(300)
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.password_lineEdit = gui_utils.password_lineEdit()
         self.password_lineEdit.setPlaceholderText('Password')

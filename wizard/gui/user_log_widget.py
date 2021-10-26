@@ -12,22 +12,18 @@ from wizard.core import user
 from wizard.gui import logging_widget
 from wizard.gui import create_user_widget
 from wizard.gui import gui_utils
-from wizard.gui import custom_window
 from wizard.gui import gui_server
 
-class user_log_widget(custom_window.custom_dialog):
+class user_log_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(user_log_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
-        self.add_title("Sign in")
 
     def build_ui(self):
-        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
-        self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)

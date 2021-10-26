@@ -20,7 +20,6 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
-from wizard.gui import custom_window
 from wizard.gui import gui_server
 from wizard.gui import tree_widget
 from wizard.gui import references_widget
@@ -44,7 +43,7 @@ from wizard.gui import user_preferences_widget
 from wizard.gui import softwares_widget
 from wizard.gui import asset_tracking_widget
 
-class main_widget(custom_window.custom_window):
+class main_widget(QtWidgets.QWidget):
 
     stop_threads = pyqtSignal(int)
 
@@ -65,7 +64,7 @@ class main_widget(custom_window.custom_window):
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
         self.tickets_widget = tickets_widget.tickets_widget(self)
-        self.subtask_manager = subtask_manager.subtask_manager(self)
+        self.subtask_manager = subtask_manager.subtask_manager()
         self.team_widget = team_widget.team_widget()
         self.team_client = team_client.team_client()
         self.gui_server = gui_server.gui_server()
@@ -258,15 +257,19 @@ class main_widget(custom_window.custom_window):
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):
+        self.main_widget_layout = QtWidgets.QHBoxLayout()
+        self.main_widget_layout.setContentsMargins(0,0,0,0)
         self.main_widget = QtWidgets.QWidget()
         self.main_widget.setObjectName('main_widget')
+        self.main_widget_layout.addWidget(self.main_widget)
+        self.setLayout(self.main_widget_layout)
+        
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(1)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_widget.setLayout(self.main_layout)
-        self.setCentralWidget(self.main_widget)
 
-        self.add_header_widget(self.header_widget)
+        self.main_layout.addWidget(self.header_widget)
 
         self.contents_widget = QtWidgets.QWidget()
         self.contents_widget.setObjectName('main_widget')
