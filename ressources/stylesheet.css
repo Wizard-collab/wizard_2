@@ -362,6 +362,8 @@ QMenu {
 
 QMenu::item {
     padding: 4px;
+    padding-right: 10px;
+    padding-left: 10px;
     min-width: 100px;
     border-radius: 0px;
 }
@@ -381,7 +383,7 @@ QMenu::icon:checked { /* appearance of a 'checked' icon */
 }
 
 QMenu::icon{
-	padding-left: 6px;
+	padding-left: 14px;
 }
 
 QMenu::separator {

@@ -56,16 +56,16 @@ class header_widget(QtWidgets.QFrame):
         self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
 
         self.user_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='User')
-        self.user_log_action = self.user_action.addAction("Change user")
-        self.user_create_action = self.user_action.addAction("Create user")
-        self.user_preferences_action = self.user_action.addAction("Preferences")
+        self.user_log_action = self.user_action.addAction(QtGui.QIcon(ressources._user_icon_), "Change user")
+        self.user_create_action = self.user_action.addAction(QtGui.QIcon(ressources._create_icon_), "Create user")
+        self.user_preferences_action = self.user_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
 
         self.project_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Project')
-        self.project_log_action = self.project_action.addAction("Project manager")
-        self.project_create_action = self.project_action.addAction("Create project")
+        self.project_log_action = self.project_action.addAction(QtGui.QIcon(ressources._project_manager_), "Project manager")
+        self.project_create_action = self.project_action.addAction(QtGui.QIcon(ressources._create_icon_), "Create project")
 
         self.help_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Help')
-        self.documentation_action = self.help_action.addAction("Documentation")
+        self.documentation_action = self.help_action.addAction(QtGui.QIcon(ressources._documentation_icon_), "Documentation")
 
         self.main_layout.addWidget(self.quotes_widget)
         self.main_layout.addWidget(self.user_widget)
