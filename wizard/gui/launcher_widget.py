@@ -206,9 +206,8 @@ class launcher_widget(QtWidgets.QFrame):
         self.screenshot_button.setIconSize(QtCore.QSize(298, 298))
         self.main_layout.addWidget(self.screenshot_button)
 
-        self.version_comboBox = QtWidgets.QComboBox()
+        self.version_comboBox = gui_utils.QComboBox()
         gui_utils.application_tooltip(self.version_comboBox, "Change version")
-        self.version_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.version_comboBox)
 
         self.comment_label = QtWidgets.QLabel('comment')

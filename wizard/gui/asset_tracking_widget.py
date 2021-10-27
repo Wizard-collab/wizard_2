@@ -18,6 +18,7 @@ from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_server
+from wizard.gui import gui_utils
 
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -55,14 +56,13 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.setup_widget.setLayout(self.setup_layout)
         self.main_layout.addWidget(self.setup_widget)
 
-        self.assignment_comboBox = QtWidgets.QComboBox()
+        self.assignment_comboBox = gui_utils.QComboBox()
         self.assignment_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.setup_layout.addWidget(self.assignment_comboBox)
 
-        self.state_comboBox = QtWidgets.QComboBox()
+        self.state_comboBox = gui_utils.QComboBox()
         self.state_comboBox.setIconSize(QtCore.QSize(14,14))
         self.state_comboBox.setFixedWidth(100)
-        self.state_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.setup_layout.addWidget(self.state_comboBox)
         self.state_comboBox.addItem(QtGui.QIcon(ressources._state_todo_), assets_vars._asset_state_todo_)
         self.state_comboBox.addItem(QtGui.QIcon(ressources._state_wip_), assets_vars._asset_state_wip_)

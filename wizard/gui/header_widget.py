@@ -52,8 +52,8 @@ class header_widget(QtWidgets.QFrame):
         self.quit_action = self.wizard_action.addAction("Quit")
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
-        self.console_action = self.window_action.addAction("Console")
-        self.subtask_manager_action = self.window_action.addAction("Subtask manager")
+        self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
+        self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
 
         self.user_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='User')
         self.user_log_action = self.user_action.addAction("Change user")
@@ -61,7 +61,7 @@ class header_widget(QtWidgets.QFrame):
         self.user_preferences_action = self.user_action.addAction("Preferences")
 
         self.project_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Project')
-        self.project_log_action = self.project_action.addAction("Change project")
+        self.project_log_action = self.project_action.addAction("Project manager")
         self.project_create_action = self.project_action.addAction("Create project")
 
         self.help_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Help')

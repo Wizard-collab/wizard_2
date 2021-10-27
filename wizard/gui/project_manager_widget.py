@@ -88,7 +88,7 @@ class project_manager_widget(QtWidgets.QDialog):
 
         create_project_item = QtWidgets.QListWidgetItem()
         widget = new_project_widget()
-        create_project_item.setSizeHint(widget.sizeHint())
+        create_project_item.setSizeHint(QtCore.QSize(270, 203))
         create_project_item.type = 'create_project'
         self.icon_view.addItem(create_project_item)
         self.icon_view.setItemWidget(create_project_item, widget)
@@ -118,6 +118,8 @@ class new_project_widget(QtWidgets.QFrame):
         self.create_project_label.setObjectName('bold_label')
         self.create_project_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addWidget(self.create_project_label)
+
+
 
 class project_icon_widget(QtWidgets.QFrame):
     def __init__(self, project_row, parent=None):
@@ -190,7 +192,7 @@ class project_icon_widget(QtWidgets.QFrame):
             pixmap = QtGui.QPixmap()
             pixmap.loadFromData(project_image)
             icon = QtGui.QIcon(pixmap)
-        pm = gui_utils.round_corners_image_button(project_image, (250,141), 5)
+        pm = gui_utils.round_corners_image_button(project_image, (250,141), 3)
         self.image_label.setPixmap(pm)
 
 class project_log_widget(QtWidgets.QDialog):

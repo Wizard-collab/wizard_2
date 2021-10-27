@@ -91,6 +91,13 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     pm.setDevicePixelRatio(pr)
     return pm
 
+class QComboBox(QtWidgets.QComboBox):
+    def __init__(self, parent = None):
+        super(QComboBox, self).__init__(parent)
+        self.view().window().setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.NoDropShadowWindowHint | QtCore.Qt.FramelessWindowHint)
+        self.view().window().setAttribute(QtCore.Qt.WA_TranslucentBackground);
+        self.setItemDelegate(QtWidgets.QStyledItemDelegate())
+
 class separator(QtWidgets.QFrame):
     def __init__(self, parent = None):
         super(separator, self).__init__(parent)

@@ -209,16 +209,14 @@ class context_widget(QtWidgets.QFrame):
         self.add_variant_button.setIconSize(QtCore.QSize(14,14))
         self.main_layout.addWidget(self.add_variant_button)
 
-        self.variant_comboBox = QtWidgets.QComboBox()
+        self.variant_comboBox = gui_utils.QComboBox()
         self.variant_comboBox.setFixedWidth(150)
         gui_utils.application_tooltip(self.variant_comboBox, "Change variant")
-        self.variant_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.variant_comboBox)
 
-        self.work_env_comboBox = QtWidgets.QComboBox()
+        self.work_env_comboBox = gui_utils.QComboBox()
         self.work_env_comboBox.setFixedWidth(190)
         gui_utils.application_tooltip(self.work_env_comboBox, "Change work environment")
-        self.work_env_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.main_layout.addWidget(self.work_env_comboBox)
 
         self.init_work_env_button = QtWidgets.QPushButton('Init work environment')
