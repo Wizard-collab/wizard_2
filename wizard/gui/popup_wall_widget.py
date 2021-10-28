@@ -232,12 +232,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.fill_ui()
         self.connect_functions()
         self.init_clock()
-        self.play_sound()
         self.start_clock()
-
-    def play_sound(self):
-        if user.user().get_popups_sound_enabled():
-            pass
 
     def enterEvent(self, event):
         self.timer.stop()

@@ -102,8 +102,8 @@ class QComboBox(QtWidgets.QComboBox):
 class separator(QtWidgets.QFrame):
     def __init__(self, parent = None):
         super(separator, self).__init__(parent)
-        self.setMinimumHeight(2)
-        self.setMaximumHeight(2)
+        self.setMinimumHeight(1)
+        self.setMaximumHeight(1)
         self.setObjectName('separator')
 
 class ElidedLabel(QtWidgets.QLabel):

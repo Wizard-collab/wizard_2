@@ -156,16 +156,12 @@ class user:
     def set_popups_settings(self, enabled=1, sound_enabled=1, duration=3):
         popups_settings_dic = dict()
         popups_settings_dic['enabled'] = enabled
-        popups_settings_dic['sound_enabled'] = sound_enabled
         popups_settings_dic['duration'] = duration
         self.prefs_dic[user_vars._popups_settings_] = popups_settings_dic
         self.write_prefs_dic()
 
     def get_popups_enabled(self):
         return self.prefs_dic[user_vars._popups_settings_]['enabled']
-
-    def get_popups_sound_enabled(self):
-        return self.prefs_dic[user_vars._popups_settings_]['sound_enabled']
 
     def get_popups_duration(self):
         return self.prefs_dic[user_vars._popups_settings_]['duration']

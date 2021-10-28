@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import os
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -11,6 +12,7 @@ from wizard.gui import logging_widget
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.core import application
 from wizard.core import user
 from wizard.core import site
 from wizard.core import environment
@@ -84,19 +86,20 @@ class general_widget(QtWidgets.QWidget):
             self.local_path_lineEdit.clear()
 
         popups_enabled = user.user().get_popups_enabled()
-        popups_sound_enabled = user.user().get_popups_sound_enabled()
         popups_duration = user.user().get_popups_duration()
         self.enable_popups_checkbox.setCheckState(popups_enabled)
         self.enable_popups_checkbox.setChecked(popups_enabled)
-        self.enable_popups_sounds_checkbox.setCheckState(popups_sound_enabled)
-        self.enable_popups_sounds_checkbox.setChecked(popups_sound_enabled)
         self.popups_duration_spinBox.setValue(popups_duration)
+
+        self.install_dir_data.setText(os.path.abspath(''))
+        version_dic = application.get_version()
+        self.version_data.setText(f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
+        self.build_data.setText(str(version_dic['builds']))
 
     def apply_popups_settings(self):
         popups_enabled = self.enable_popups_checkbox.isChecked()
-        popups_sound_enabled = self.enable_popups_sounds_checkbox.isChecked()
         popups_duration = self.popups_duration_spinBox.value()
-        user.user().set_popups_settings(popups_enabled, popups_sound_enabled, popups_duration)
+        user.user().set_popups_settings(popups_enabled, popups_duration)
 
     def apply_local_path(self):
         local_path = self.local_path_lineEdit.text()
@@ -127,7 +130,6 @@ class general_widget(QtWidgets.QWidget):
         self.local_path_accept_button.clicked.connect(self.apply_local_path)
         self.folder_button.clicked.connect(self.open_explorer)
         self.enable_popups_checkbox.stateChanged.connect(self.apply_popups_settings)
-        self.enable_popups_sounds_checkbox.stateChanged.connect(self.apply_popups_settings)
         self.popups_duration_spinBox.valueChanged.connect(self.apply_popups_settings)
 
     def open_explorer(self):
@@ -187,10 +189,6 @@ class general_widget(QtWidgets.QWidget):
         self.enable_popups_checkbox = QtWidgets.QCheckBox()
         self.enable_popups_checkbox.setObjectName('android_checkbox')
         self.popups_sublayout.addRow(QtWidgets.QLabel('Popups enabled'), self.enable_popups_checkbox)
-
-        self.enable_popups_sounds_checkbox = QtWidgets.QCheckBox()
-        self.enable_popups_sounds_checkbox.setObjectName('android_checkbox')
-        self.popups_sublayout.addRow(QtWidgets.QLabel('Sounds enabled'), self.enable_popups_sounds_checkbox)
 
         self.popups_duration_spinBox = QtWidgets.QSpinBox()
         self.popups_duration_spinBox.setButtonSymbols(2)
@@ -274,6 +272,45 @@ class general_widget(QtWidgets.QWidget):
         self.team_ip_accept_button = QtWidgets.QPushButton('Apply')
         self.team_ip_accept_button.setObjectName('blue_button')
         self.team_ip_buttons_layout.addWidget(self.team_ip_accept_button)
+
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
+        self.about_frame = QtWidgets.QFrame()
+        self.about_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.about_layout = QtWidgets.QVBoxLayout()
+        self.about_layout.setContentsMargins(0,0,0,0)
+        self.about_layout.setSpacing(6)
+        self.about_frame.setLayout(self.about_layout)
+        self.scrollArea_layout.addWidget(self.about_frame)
+
+        self.about_title = QtWidgets.QLabel('About')
+        self.about_title.setObjectName('bold_label')
+        self.about_layout.addWidget(self.about_title)
+
+        self.about_subwidget = QtWidgets.QWidget()
+        self.about_sublayout = QtWidgets.QFormLayout()
+        self.about_sublayout.setContentsMargins(0,0,0,0)
+        self.about_sublayout.setSpacing(6)
+        self.about_subwidget.setLayout(self.about_sublayout)
+        self.about_layout.addWidget(self.about_subwidget)
+
+        self.install_dir_label = QtWidgets.QLabel('Install directory')
+        self.install_dir_label.setObjectName('gray_label')
+        self.install_dir_data = QtWidgets.QLabel()
+        self.install_dir_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.about_sublayout.addRow(self.install_dir_label, self.install_dir_data)
+
+        self.version_label = QtWidgets.QLabel('Version')
+        self.version_label.setObjectName('gray_label')
+        self.version_data = QtWidgets.QLabel()
+        self.version_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.about_sublayout.addRow(self.version_label, self.version_data)
+
+        self.build_label = QtWidgets.QLabel('Build')
+        self.build_label.setObjectName('gray_label')
+        self.build_data = QtWidgets.QLabel()
+        self.build_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.about_sublayout.addRow(self.build_label, self.build_data)
 
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 

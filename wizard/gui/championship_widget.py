@@ -48,14 +48,12 @@ class championship_widget(QtWidgets.QWidget):
                 self.show()
                 self.raise_()
                 self.refresh()
-                gui_utils.move_ui(self)
             else:
                 self.hide()
         else:
             self.show()
             self.raise_()
             self.refresh()
-            gui_utils.move_ui(self)
 
     def refresh(self):
         all_user_rows = site.get_users_list()
