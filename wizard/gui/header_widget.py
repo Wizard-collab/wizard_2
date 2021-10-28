@@ -23,6 +23,8 @@ class header_widget(QtWidgets.QFrame):
     show_subtask_manager = pyqtSignal(object)
     show_console = pyqtSignal(object)
     show_user_preferences = pyqtSignal(object)
+    show_championship = pyqtSignal(object)
+    show_pywizard = pyqtSignal(object)
     close_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -47,17 +49,21 @@ class header_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.menu_bar)
         
         self.wizard_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='', icon=QtGui.QIcon(ressources._wizard_icon_small_))
-        self.license_action = self.wizard_action.addAction("License")
-        self.about_action = self.wizard_action.addAction("About")
+        self.license_action = self.wizard_action.addAction(QtGui.QIcon(ressources._license_icon_), "License")
+        self.about_action = self.wizard_action.addAction(QtGui.QIcon(ressources._info_icon_), "About")
+        self.wizard_action.addSeparator()
         self.quit_action = self.wizard_action.addAction("Quit")
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
         self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
+        self.championship_action = self.window_action.addAction(QtGui.QIcon(ressources._ranking_icon_), "Championship")
+        self.pywizard_action = self.window_action.addAction(QtGui.QIcon(ressources._python_icon_), "PyWizard")
 
         self.user_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='User')
         self.user_log_action = self.user_action.addAction(QtGui.QIcon(ressources._user_icon_), "Change user")
         self.user_create_action = self.user_action.addAction(QtGui.QIcon(ressources._create_icon_), "Create user")
+        self.user_action.addSeparator()
         self.user_preferences_action = self.user_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
 
         self.project_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Project')
@@ -74,6 +80,8 @@ class header_widget(QtWidgets.QFrame):
         self.quit_action.triggered.connect(self.close_signal.emit)
         self.subtask_manager_action.triggered.connect(self.show_subtask_manager.emit)
         self.console_action.triggered.connect(self.show_console.emit)
+        self.championship_action.triggered.connect(self.show_championship.emit)
+        self.pywizard_action.triggered.connect(self.show_pywizard.emit)
         self.user_log_action.triggered.connect(self.change_user)
         self.user_create_action.triggered.connect(self.create_user)
         self.user_preferences_action.triggered.connect(self.show_user_preferences.emit)

@@ -63,10 +63,6 @@ QComboBox QAbstractItemView::item {
 	border-radius: 0px;
 }
 
-QComboBox QAbstractItemView::item::hover {
-	background-color: #4b4b57;
-}
-
 QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;
@@ -354,7 +350,7 @@ QMenuBar::item:selected {
 }
 
 QMenu {
-	background-color: #1d1d23;
+	background-color: #19191f;
     border-radius: 4px;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -388,7 +384,10 @@ QMenu::icon{
 
 QMenu::separator {
     height: 1px;
-    background: rgba(255,255,255,10);
+    margin: 0px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    background: rgba(255,255,255,30);
 }
 
 QDockWidget {

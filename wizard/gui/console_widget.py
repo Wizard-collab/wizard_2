@@ -14,6 +14,7 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
+from wizard.gui import gui_utils
 from wizard.gui import script_editor_widget
 from wizard.gui import logging_widget
 
@@ -56,18 +57,19 @@ class console_widget(QtWidgets.QWidget):
         self.header_custom_widget = QtWidgets.QWidget()
         self.header_custom_widget.setObjectName('transparent_widget')
         self.header_custom_layout = QtWidgets.QHBoxLayout()
-        self.header_custom_layout.setContentsMargins(0,0,0,0)
+        self.header_custom_layout.setContentsMargins(4,4,4,4)
         self.header_custom_layout.setSpacing(0)
         self.header_custom_widget.setLayout(self.header_custom_layout)
+
         self.menu_bar = QtWidgets.QMenuBar()
         self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.header_custom_layout.addWidget(self.menu_bar)
         self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         self.main_layout.addWidget(self.header_custom_widget)
-        self.console_action = self.menu_bar.addMenu("Console")
+        self.console_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Console")
         self.clear_console_action = self.console_action.addAction("Clear")
 
-        self.script_action = self.menu_bar.addMenu("Script")
+        self.script_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Script")
         self.execute_action = self.script_action.addAction("Execute ( Ctrl+Return )")
         self.clear_script_action = self.script_action.addAction("Clear")
 

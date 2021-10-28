@@ -7,7 +7,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
 from wizard.gui import gui_utils
-from wizard.gui import all_users_widget
 
 # Wizard modules
 from wizard.core import environment
@@ -19,7 +18,6 @@ class user_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(user_widget, self).__init__(parent)
         self.build_ui()
-        self.connect_functions()
 
     def build_ui(self):
         self.setObjectName('transparent_widget')
@@ -109,13 +107,6 @@ class user_widget(QtWidgets.QFrame):
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 28)
         self.profile_picture.setPixmap(pm)
         self.crown_check(user_row)
-
-    def connect_functions(self):
-        self.ranking_button.clicked.connect(self.show_all_user_widget)
-
-    def show_all_user_widget(self):
-        self.all_users_widget = all_users_widget.all_users_widget()
-        self.all_users_widget.toggle()
 
     def crown_check(self, user_row):
         user_rows = site.get_users_list()

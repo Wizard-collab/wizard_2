@@ -42,6 +42,7 @@ from wizard.gui import popup_wall_widget
 from wizard.gui import user_preferences_widget
 from wizard.gui import softwares_widget
 from wizard.gui import asset_tracking_widget
+from wizard.gui import championship_widget
 
 class main_widget(QtWidgets.QWidget):
 
@@ -71,6 +72,7 @@ class main_widget(QtWidgets.QWidget):
         self.communicate_server = communicate.communicate_server()
         self.softwares_server = launch.softwares_server()
         self.softwares_widget = softwares_widget.softwares_widget()
+        self.championship_widget = championship_widget.championship_widget()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -116,6 +118,8 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
+        self.header_widget.show_championship.connect(self.championship_widget.toggle)
+        self.header_widget.show_pywizard.connect(self.show_pywizard)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
@@ -151,6 +155,12 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
+
+    def show_pywizard(self):
+        if sys.argv[0].endswith('.py'):
+            subprocess.Popen('python PyWizard.py')
+        elif sys.argv[0].endswith('.exe'):
+            os.startfile('PyWizard.exe')
 
     def restart(self):
         self.quit_threads()

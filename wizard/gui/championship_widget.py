@@ -13,10 +13,9 @@ from wizard.core import site
 from wizard.core import image
 from wizard.vars import ressources
 
-class all_users_widget(QtWidgets.QWidget):
+class championship_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
-        super(all_users_widget, self).__init__(parent)
-
+        super(championship_widget, self).__init__(parent)
         self.user_ids = dict()
         self.build_ui()
         self.refresh()
@@ -27,7 +26,7 @@ class all_users_widget(QtWidgets.QWidget):
         self.setMinimumHeight(500)
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(6, 6, 6, 6)
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
