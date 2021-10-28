@@ -61,6 +61,7 @@ QComboBox QAbstractItemView {
 QComboBox QAbstractItemView::item {
 	min-height: 24px;
 	border-radius: 0px;
+	height: 24px;
 }
 
 QComboBox::drop-down {
