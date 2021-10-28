@@ -57,7 +57,6 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.setup_widget)
 
         self.assignment_comboBox = gui_utils.QComboBox()
-        self.assignment_comboBox.setItemDelegate(QtWidgets.QStyledItemDelegate())
         self.setup_layout.addWidget(self.assignment_comboBox)
 
         self.state_comboBox = gui_utils.QComboBox()
