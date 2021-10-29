@@ -3410,3 +3410,290 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 
 2021-10-29 14:26:23,072 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 59075), dev3
 2021-10-29 14:26:23,075 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:27:45,014 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:27:46,760 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 59422), dev3
+2021-10-29 14:27:46,760 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:29:37,744 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:29:37,745 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 59422), dev3
+2021-10-29 14:29:37,747 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:29:42,016 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:29:43,679 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 59613), dev3
+2021-10-29 14:29:43,679 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:30:04,640 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:30:04,641 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 59613), dev3
+2021-10-29 14:30:04,643 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:31:19,032 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:31:20,846 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 59807), dev3
+2021-10-29 14:31:20,846 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:31:58,531 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 14:32:00,561 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 14:32:03,334 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 14:32:04,489 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 14:32:07,227 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 14:32:39,927 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:32:39,927 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 59807), dev3
+2021-10-29 14:32:39,930 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:32:42,334 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:32:44,098 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 60120), ski
+2021-10-29 14:32:44,098 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:33:03,603 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:05,404 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:07,090 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:09,828 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:11,212 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:15,603 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:18,497 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:19,904 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:33:26,270 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:34:58,434 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:35:01,662 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:35:03,450 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:35:05,292 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:35:07,363 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:35:48,871 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:37:55,984 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:38:05,048 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:38:05,048 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 60120), ski
+2021-10-29 14:38:05,051 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:38:07,497 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:38:09,274 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 63083), dev3
+2021-10-29 14:38:09,274 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:49:31,881 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 14:49:40,938 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:49:40,939 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 63083), dev3
+2021-10-29 14:49:40,941 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 14:49:43,388 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:49:45,242 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 63539), ski
+2021-10-29 14:49:45,242 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:50:18,280 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:20,596 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:23,235 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:25,851 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:27,042 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:28,206 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:29,654 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:30,779 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:32,059 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:33,697 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:50:38,106 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:11,650 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:14,031 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:16,265 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:18,776 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:37,200 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:45,138 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:47,842 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:49,405 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:52:50,964 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:54:29,322 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 14:56:27,654 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:56:27,655 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 63539), ski
+2021-10-29 14:56:27,657 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:56:32,446 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:56:34,168 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 50071), ski
+2021-10-29 14:56:34,168 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:57:59,382 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 14:57:59,382 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 50071), ski
+2021-10-29 14:57:59,384 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:58:04,608 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 14:58:06,421 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 51445), ski
+2021-10-29 14:58:06,421 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 14:59:11,260 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 15:43:15,233 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 15:43:15,234 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 51445), ski
+2021-10-29 15:43:15,239 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 15:43:17,686 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 15:43:19,415 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 56464), dev3
+2021-10-29 15:43:19,415 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:44:42,375 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 15:44:42,375 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 56464), dev3
+2021-10-29 15:44:42,378 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:44:47,482 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 15:44:49,235 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 56557), dev3
+2021-10-29 15:44:49,235 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:46:03,658 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:05,340 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:07,258 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:08,799 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:10,586 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:13,213 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:14,522 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:15,814 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:17,531 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:31,853 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:34,325 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:37,249 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:46:42,088 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 15:47:07,983 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 15:47:07,983 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 56557), dev3
+2021-10-29 15:47:07,986 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:54:12,783 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 15:54:14,623 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 57113), dev3
+2021-10-29 15:54:14,623 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:54:19,566 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 15:54:19,567 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 57113), dev3
+2021-10-29 15:54:19,569 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:54:33,825 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 15:54:35,611 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 57198), dev3
+2021-10-29 15:54:35,611 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:55:26,918 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 15:55:26,919 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 57198), dev3
+2021-10-29 15:55:26,921 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 15:55:31,560 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 15:55:33,320 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 57307), dev3
+2021-10-29 15:55:33,321 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:06:12,999 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:06:15,065 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:06:17,341 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:06:22,957 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 16:06:22,957 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 57307), dev3
+2021-10-29 16:06:22,960 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:06:37,359 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 16:06:39,186 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 57609), dev3
+2021-10-29 16:06:39,187 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:06:53,435 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:06:54,736 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:06:57,679 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:10:37,025 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:10:38,509 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:10:40,944 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:34:29,964 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 16:34:29,965 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 57609), dev3
+2021-10-29 16:34:29,967 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:35:10,525 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 16:35:12,212 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 58057), dev3
+2021-10-29 16:35:12,212 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:35:44,748 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 16:35:44,749 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 58057), dev3
+2021-10-29 16:35:44,753 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:36:17,832 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 16:36:19,693 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 58202), dev3
+2021-10-29 16:36:19,693 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:40:23,306 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 16:40:23,307 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 58202), dev3
+2021-10-29 16:40:23,309 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:40:25,744 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 16:40:27,577 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 58482), ski
+2021-10-29 16:40:27,577 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 16:53:55,834 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 16:53:57,548 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'ski'}
+2021-10-29 16:54:38,146 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 16:54:38,147 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 58482), ski
+2021-10-29 16:54:38,149 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 16:54:43,036 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 16:54:44,806 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 64214), ski
+2021-10-29 16:54:44,807 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 16:55:06,237 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 16:55:06,237 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 64214), ski
+2021-10-29 16:55:06,239 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'ski'}
+2021-10-29 16:55:08,688 - WIZARD-SERVER - INFO - test_conn
+2021-10-29 16:55:10,446 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 64520), dev3
+2021-10-29 16:55:10,446 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-10-29 16:55:30,752 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:32,885 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:34,205 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:35,130 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:35,650 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:36,719 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:38,273 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:39,787 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:40,285 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:41,614 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:45,028 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:46,047 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:46,714 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:47,889 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:50,161 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:50,558 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:51,388 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:55:52,166 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:56:20,022 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:56:21,832 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:56:27,826 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:28,838 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:30,573 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:32,670 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:36,295 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:49,775 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:53,668 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:56,351 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 16:58:58,341 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'refresh_team', 'project': 'dev3'}
+2021-10-29 17:25:14,635 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 127, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-10-29 17:25:14,635 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 64520), dev3
+2021-10-29 17:25:14,650 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}

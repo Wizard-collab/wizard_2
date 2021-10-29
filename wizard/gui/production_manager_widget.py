@@ -13,6 +13,7 @@ from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.core import site
+from wizard.core import tools
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import image
@@ -23,10 +24,30 @@ class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(production_manager_widget, self).__init__(parent)
         self.build_ui()
+        self.search_thread = search_thread()
         self.users_ids = dict()
         self.asset_ids = dict()
         self.stage_ids = dict()
         self.variant_ids = dict()
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.search_bar.textChanged.connect(self.update_search)
+        self.search_thread.asset_signal.connect(self.add_search_asset)
+
+    def update_search(self, text):
+        if text != '':
+            self.toggle_all_visibility(0)
+            self.search_thread.update_search(text)
+        else:
+            self.toggle_all_visibility(1)
+
+    def toggle_all_visibility(self, visibility):
+        for asset_id in self.asset_ids.keys():
+            self.asset_ids[asset_id]['item'].setHidden(1-visibility)
+
+    def add_search_asset(self, asset_id):
+        self.asset_ids[asset_id]['item'].setHidden(0)
 
     def build_ui(self):
 
@@ -35,8 +56,22 @@ class production_manager_widget(QtWidgets.QWidget):
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(6)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
+
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('dark_widget')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setSpacing(6)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.search_bar = gui_utils.search_bar()
+        self.header_layout.addWidget(self.search_bar)
+
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -57,7 +92,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.list_view)
 
         self.refresh_label = QtWidgets.QLabel()
-        self.refresh_label.setObjectName('tree_datas_label')
+        self.refresh_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.refresh_label)
 
     def toggle(self):
@@ -72,6 +107,10 @@ class production_manager_widget(QtWidgets.QWidget):
             self.show()
             self.raise_()
             self.refresh()
+
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
@@ -114,9 +153,11 @@ class production_manager_widget(QtWidgets.QWidget):
 class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, asset_row, parent=None):
         super(custom_asset_listWidgetItem, self).__init__(parent)
-        self.setText(0, asset_row['name'])
         self.stage_ids = dict()
         self.variant_ids = dict()
+        self.asset_row = asset_row
+        widget = asset_widget(self.asset_row)
+        self.treeWidget().setItemWidget(self, 0, widget)
 
     def add_stage(self, stage_row):
         self.stage_ids[stage_row['id']] = dict()
@@ -144,6 +185,32 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
             widget = self.stage_ids[stage_id]['widget']
             index = self.stage_ids[stage_id]['index']
             self.setSizeHint(index, widget.sizeHint())
+
+class asset_widget(QtWidgets.QWidget):
+    def __init__(self, asset_row, parent=None):
+        super(asset_widget, self).__init__(parent)
+        self.asset_row = asset_row
+        self.build_ui()
+        self.fill_ui()
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(1,2,1,2)
+        self.setLayout(self.main_layout)
+
+        self.main_frame = QtWidgets.QFrame()
+        self.main_frame.setObjectName('production_manager_variant_frame')
+        self.main_frame_layout = QtWidgets.QHBoxLayout()
+        self.main_frame.setLayout(self.main_frame_layout)
+        self.main_layout.addWidget(self.main_frame)
+
+        self.asset_name_label = QtWidgets.QLabel()
+        self.asset_name_label.setObjectName('bold_label')
+        self.asset_name_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_frame_layout.addWidget(self.asset_name_label)
+
+    def fill_ui(self):
+        self.asset_name_label.setText(self.asset_row['name'])
 
 class stage_widget(QtWidgets.QWidget):
 
@@ -191,6 +258,14 @@ class variant_widget(QtWidgets.QFrame):
 
         self.main_layout.addWidget(QtWidgets.QLabel(self.variant_row['name']))
 
+        self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setObjectName('transparent_widget')
+        self.content_layout = QtWidgets.QHBoxLayout()
+        self.content_layout.setContentsMargins(0,0,0,0)
+        self.content_layout.setSpacing(6)
+        self.content_widget.setLayout(self.content_layout)
+        self.main_layout.addWidget(self.content_widget)
+
         self.datas_widget = QtWidgets.QFrame()
         self.datas_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.datas_widget.setObjectName('production_manager_state_frame')
@@ -198,7 +273,7 @@ class variant_widget(QtWidgets.QFrame):
         self.datas_layout.setContentsMargins(5,5,16,5)
         self.datas_layout.setSpacing(6)
         self.datas_widget.setLayout(self.datas_layout)
-        self.main_layout.addWidget(self.datas_widget)
+        self.content_layout.addWidget(self.datas_widget)
 
         self.user_image_label = QtWidgets.QLabel()
         self.user_image_label.setFixedSize(QtCore.QSize(30,30))
@@ -218,6 +293,15 @@ class variant_widget(QtWidgets.QFrame):
         self.modify_state_button.setFixedSize(QtCore.QSize(14,14))
         self.datas_layout.addWidget(self.modify_state_button)
 
+        self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.work_time_label = QtWidgets.QLabel()
+        self.content_layout.addWidget(self.work_time_label)
+
+        self.work_time_image = QtWidgets.QLabel()
+        self.work_time_image.setPixmap(QtGui.QIcon(ressources._work_time_icon_).pixmap(24))
+        self.content_layout.addWidget(self.work_time_image)
+
         self.progress_bar_widget = QtWidgets.QWidget()
         self.progress_bar_widget.setObjectName('transparent_widget')
         self.progress_bar_layout = QtWidgets.QHBoxLayout()
@@ -235,6 +319,8 @@ class variant_widget(QtWidgets.QFrame):
 
     def fill_ui(self):
         self.state_label.setText(self.variant_row['state'].upper())
+        string_time = tools.convert_seconds_to_string_time(float(self.variant_row['work_time']))
+        self.work_time_label.setText(string_time)
         user_image =  site.get_user_row_by_name(self.variant_row['assignment'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
         self.user_image_label.setPixmap(pm)
@@ -302,3 +388,31 @@ class variant_widget(QtWidgets.QFrame):
     def modify_assignment(self, user_name):
         assets.modify_variant_assignment(self.variant_row['id'], user_name)
         gui_server.refresh_ui()
+
+
+class search_thread(QtCore.QThread):
+
+    asset_signal = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(search_thread, self).__init__(parent)
+        self.asset_string = ''
+        self.running = False
+
+    def run(self):
+        # search asset
+        if self.running:
+            if self.asset_string != '':
+                asset_ids = project.search_asset(self.asset_string, column='id')
+                for asset_id in asset_ids:
+                    if not self.running:
+                        break
+                    self.asset_signal.emit(asset_id)
+
+    def update_search(self, asset_string=''):
+        self.asset_string = asset_string
+        self.running = True
+        self.start()
+
+    def stop(self):
+        self.running = False
