@@ -46,11 +46,9 @@ class production_manager_widget(QtWidgets.QWidget):
 
     def update_search(self, text):
         if text != '':
-
             asset = ''
             assignment = ''
             state = ''
-
             text = text.replace(' ', '')
             searchs = text.split('&')
             for item in searchs:
@@ -60,7 +58,6 @@ class production_manager_widget(QtWidgets.QWidget):
                     assignment = item.replace('user:', '')
                 if 'state:' in item:
                     state = item.replace('state:', '')
-
             self.hide_all(asset, assignment, state)
             self.search_thread.update_search(asset=asset, assignment=assignment, state=state)
         else:
@@ -86,14 +83,18 @@ class production_manager_widget(QtWidgets.QWidget):
     def unhide_all(self):
         for asset_id in self.asset_ids.keys():
             self.asset_ids[asset_id]['item'].setHidden(0)
+            QtWidgets.QApplication.processEvents()
         for variant_id in self.variant_ids.keys():
             self.variant_ids[variant_id]['widget'].setVisible(1)
+            QtWidgets.QApplication.processEvents()
 
     def add_search_asset(self, asset_id):
-        self.asset_ids[asset_id]['item'].setHidden(0)
+        if asset_id in self.asset_ids.keys():
+            self.asset_ids[asset_id]['item'].setHidden(0)
 
     def add_search_variant(self, variant_id):
-        self.variant_ids[variant_id]['widget'].visible=1
+        if variant_id in self.variant_ids.keys():
+            self.variant_ids[variant_id]['widget'].setVisible(1)
 
     def build_ui(self):
         self.setMinimumWidth(700)
@@ -166,16 +167,18 @@ class production_manager_widget(QtWidgets.QWidget):
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh(self):
-        start_time = time.time()
-        self.refresh_domains()
-        self.update_refresh_time(start_time)
+        if self.isVisible():
+            start_time = time.time()
+            self.refresh_domains()
+            self.update_refresh_time(start_time)
 
     def refresh_domains(self):
         self.update_categories = False
         domain_rows = project.get_domains()
         for domain_row in domain_rows:
-            if domain_row['id'] not in self.domain_ids:
+            if (domain_row['id'] not in self.domain_ids) and (domain_row['name'] != 'library'):
                 self.domain_comboBox.addItem(domain_row['name'])
+                self.domain_ids.append(domain_row['id'])
         self.update_categories = True
         self.refresh_categories()
 
@@ -195,6 +198,7 @@ class production_manager_widget(QtWidgets.QWidget):
             for category_row in category_rows:
                 if category_row['id'] not in self.category_ids:
                     self.category_comboBox.addItem(category_row['name'])
+                    self.category_ids.append(category_row['id'])
             self.update_assets = True
             self.refresh_assets()
 
@@ -238,12 +242,11 @@ class production_manager_widget(QtWidgets.QWidget):
                         self.variant_ids[variant_row['id']]['row'] = variant_row
                         variant_widget = self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].add_variant(self.variant_ids[variant_row['id']]['row'])
                         self.variant_ids[variant_row['id']]['widget'] = variant_widget
-
                     else:
                         if variant_row != self.variant_ids[variant_row['id']]['row']:
                             self.variant_ids[variant_row['id']]['row'] = variant_row
                             self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].refresh_variant(self.variant_ids[variant_row['id']]['row'])
-
+                    QtWidgets.QApplication.processEvents()
 
 class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, asset_row, parent=None):
@@ -281,6 +284,7 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
             widget = self.stage_ids[stage_id]['widget']
             index = self.stage_ids[stage_id]['index']
             self.setSizeHint(index, widget.sizeHint())
+            self.treeWidget().updateGeometries()
 
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, parent=None):
@@ -290,6 +294,7 @@ class asset_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(1,2,1,2)
         self.setLayout(self.main_layout)
@@ -335,7 +340,6 @@ class variant_widget(QtWidgets.QFrame):
         self.variant_row = variant_row
         self.build_ui()
         self.connect_functions()
-        self.visible = 1
 
     def showEvent(self, event):
         self.update_size.emit(1)
