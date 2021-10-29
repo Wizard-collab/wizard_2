@@ -126,19 +126,15 @@ class production_manager_widget(QtWidgets.QWidget):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('production_manager_list_widget')
-        self.list_view.setColumnCount(6)
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        self.list_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.list_view.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-        self.list_view.header().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-        self.list_view.header().setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
-        self.list_view.header().setSectionResizeMode(5, QtWidgets.QHeaderView.Stretch)
+        
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.list_view.setHeaderLabels(['Asset', 'Modeling', 'Rigging', 'Grooming', 'Texturing', 'Shading'])
+        
+
         self.main_layout.addWidget(self.list_view)
 
         self.refresh_label = QtWidgets.QLabel()
@@ -193,6 +189,7 @@ class production_manager_widget(QtWidgets.QWidget):
             if current_domain != self.domain:
                 self.clear_categories()
                 self.domain = current_domain
+                self.update_header()
             domain_id = project.get_domain_by_name(current_domain, 'id')
             category_rows = project.get_domain_childs(domain_id)
             for category_row in category_rows:
@@ -201,6 +198,18 @@ class production_manager_widget(QtWidgets.QWidget):
                     self.category_ids.append(category_row['id'])
             self.update_assets = True
             self.refresh_assets()
+
+    def update_header(self):
+        if self.domain == 'assets':
+            self.stages_list = assets_vars._assets_stages_list_
+            self.list_view.setHeaderLabels(['Asset']+self.stages_list)
+        elif self.domain == 'sequences':
+            self.stages_list = assets_vars._sequences_stages_list_
+            self.list_view.setHeaderLabels(['Shot']+self.stages_list)
+
+        self.list_view.setColumnCount(len(self.stages_list)+1)
+        for stage in self.stages_list:
+            self.list_view.header().setSectionResizeMode(self.stages_list.index(stage)+1, QtWidgets.QHeaderView.Stretch)
 
     def clear_assets(self):
         self.asset_ids = dict()
@@ -232,7 +241,7 @@ class production_manager_widget(QtWidgets.QWidget):
                     if stage_row['id'] not in self.stage_ids.keys():
                         self.stage_ids[stage_row['id']] = dict()
                         self.stage_ids[stage_row['id']]['row'] = stage_row
-                        self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item'].add_stage(self.stage_ids[stage_row['id']]['row'])
+                        self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item'].add_stage(self.stage_ids[stage_row['id']]['row'], self.stages_list)
                         self.stage_ids[stage_row['id']]['asset_item'] = self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item']
 
             for variant_row in variant_rows:
@@ -257,12 +266,12 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
         widget = asset_widget(self.asset_row)
         self.treeWidget().setItemWidget(self, 0, widget)
 
-    def add_stage(self, stage_row):
+    def add_stage(self, stage_row, stage_list):
         self.stage_ids[stage_row['id']] = dict()
         self.stage_ids[stage_row['id']]['row'] = stage_row
         widget = stage_widget(stage_row, self.treeWidget())
         self.stage_ids[stage_row['id']]['widget'] = widget
-        index = assets_vars._assets_stages_list_.index(stage_row['name'])+1
+        index = stage_list.index(stage_row['name'])+1
         self.stage_ids[stage_row['id']]['index'] = index
         self.treeWidget().setItemWidget(self, index, widget)
 
@@ -440,6 +449,7 @@ class variant_widget(QtWidgets.QFrame):
         if self.variant_row['estimated_time'] is not None:
             percent = (float(self.variant_row['work_time'])/float(self.variant_row['estimated_time']))*100
             self.percent_label.setText(f"{str(int(percent))}%")
+            self.time_progress_bar.setValue(percent)
             if percent > 100:
                 percent = 100
                 if self.variant_row['state'] != 'done':
@@ -448,10 +458,15 @@ class variant_widget(QtWidgets.QFrame):
                 self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
             if self.variant_row['state'] == 'done':
                 self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
-            self.time_progress_bar.setValue(percent)
+                self.time_progress_bar.setValue(100)
+                self.percent_label.setText("100%")
         else:
             self.time_progress_bar.setValue(0)
             self.percent_label.setText("0%")
+            if self.variant_row['state'] == 'done':
+                self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
+                self.time_progress_bar.setValue(100)
+                self.percent_label.setText("100%")
 
     def connect_functions(self):
         self.modify_state_button.clicked.connect(self.states_menu_requested)
