@@ -44,6 +44,7 @@ from wizard.gui import softwares_widget
 from wizard.gui import asset_tracking_widget
 from wizard.gui import championship_widget
 from wizard.gui import license_widget
+from wizard.gui import production_manager_widget
 
 class main_widget(QtWidgets.QWidget):
 
@@ -75,6 +76,7 @@ class main_widget(QtWidgets.QWidget):
         self.softwares_widget = softwares_widget.softwares_widget()
         self.championship_widget = championship_widget.championship_widget()
         self.license_widget = license_widget.license_widget()
+        self.production_manager_widget = production_manager_widget.production_manager_widget()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -119,6 +121,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_console.connect(self.console_widget.toggle)
         self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
+        self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
         self.header_widget.show_championship.connect(self.championship_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
@@ -267,6 +270,7 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget.refresh()
         self.softwares_widget.refresh()
         self.asset_tracking_widget.refresh()
+        self.production_manager_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

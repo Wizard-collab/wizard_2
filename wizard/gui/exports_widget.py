@@ -23,7 +23,6 @@ logger = custom_logger.get_logger(__name__)
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import confirm_widget
-from wizard.gui import menu_widget
 from wizard.gui import create_ticket_widget
 from wizard.gui import manual_export_widget
 from wizard.gui import drop_files_widget
@@ -418,34 +417,34 @@ class exports_widget(QtWidgets.QWidget):
             del self.export_ids[export_id]
 
     def context_menu_requested(self):
+        menu = gui_utils.QMenu(self)
         selection = self.list_view.selectedItems()
-        self.menu_widget = menu_widget.menu_widget(self)
-        folder_action = self.menu_widget.add_action(f'Open folder', ressources._tool_folder_)
-        batch_action = self.menu_widget.add_action(f'Batch export', ressources._tool_batch_publish_)
-        manual_action = self.menu_widget.add_action(f'Manually add a file', ressources._tool_manually_publish_)
+        folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
+        batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export')
+        manual_action = menu.addAction(QtGui.QIcon(ressources._tool_manually_publish_), 'Manually add a file')
         archive_action = None
         ticket_action = None
-        if len(selection)>=1:
-            archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
-            comment_action = self.menu_widget.add_action('Modify comment', ressources._tool_comment_)
         launch_action = None
+        if len(selection)>=1:
+            archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
+            comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         if len(selection)==1:
-            launch_action = self.menu_widget.add_action(f'Launch related work version', ressources._tool_launch_)
-            ticket_action = self.menu_widget.add_action(f'Open a ticket', ressources._tool_ticket_)
-        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
-            if self.menu_widget.function_name is not None:
-                if self.menu_widget.function_name == folder_action:
-                    self.open_folder()
-                elif self.menu_widget.function_name == archive_action:
-                    self.archive()
-                elif self.menu_widget.function_name == launch_action:
-                    self.launch_work_version()
-                elif self.menu_widget.function_name == ticket_action:
-                    self.open_ticket()
-                elif self.menu_widget.function_name == manual_action:
-                    self.merge_files()
-                elif self.menu_widget.function_name == comment_action:
-                    self.modify_comment()
+            launch_action = menu.addAction(QtGui.QIcon(ressources._tool_launch_), 'Launch related work version')
+            ticket_action = menu.addAction(QtGui.QIcon(ressources._tool_ticket_), 'Open a ticket')
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == folder_action:
+                self.open_folder()
+            elif action == archive_action:
+                self.archive()
+            elif action == launch_action:
+                self.launch_work_version()
+            elif action == ticket_action:
+                self.open_ticket()
+            elif action == manual_action:
+                self.merge_files()
+            elif action == comment_action:
+                self.modify_comment()
 
     def modify_comment(self):
         selection = self.list_view.selectedItems()

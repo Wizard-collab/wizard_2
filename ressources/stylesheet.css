@@ -747,6 +747,21 @@ QSlider::handle:horizontal {
 	background-color: transparent;
 }
 
+#dropdown_button{
+	background-color: transparent;
+	border: none;
+	border-image: url(ressources/icons/dropdown.svg);
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+}
+
+#dropdown_button::hover{
+	border-image: url(ressources/icons/dropdown_hover.svg);
+	background-repeat: no-repeat;
+}
+
+
 #search_lineEdit{
 	background: transparent;
 }
@@ -760,10 +775,6 @@ QSlider::handle:horizontal {
     background: transparent;
 }
 
-#menu_widget_frame{
-	border-radius: 10px;
-}
-
 #round_frame{
 	border-radius: 8px;
 }
@@ -771,6 +782,10 @@ QSlider::handle:horizontal {
 #production_manager_variant_frame{
 	border-radius: 4px;
 	background-color: rgba(255,255,255,15);
+}
+
+#production_manager_state_frame{
+	border-radius:19px;
 }
 
 #item_widget_frame{
@@ -797,23 +812,6 @@ QSlider::handle:horizontal {
 	color: gray;
 	font: bold large;
 	font-size: 18px;
-}
-
-
-#menu_widget_button{
-	text-align:left;
-	padding: 6px;
-	background-color: #2c2c33;
-	border: none;
-	border-radius: 0px;
-}
-
-#menu_widget_button::hover{
-	background-color: #3e3e48;
-}
-
-#menu_widget_button::pressed{
-	background-color: #25252b;
 }
 
 #tree_datas_label{

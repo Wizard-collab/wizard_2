@@ -24,7 +24,6 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
-from wizard.gui import menu_widget
 from wizard.gui import confirm_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
@@ -448,27 +447,29 @@ class tree_widget(QtWidgets.QFrame):
                 self.focus_on_item(self.new_category_id[new_category_id], expand=1)
 
     def context_menu_requested(self, point):
-        self.menu_widget = menu_widget.menu_widget(self)
+        menu = gui_utils.QMenu(self)
+        
         item = self.tree.itemAt(point)
-        reduce_all_action = self.menu_widget.add_action(f'Reduce all')
-        hard_refresh_action = self.menu_widget.add_action(f'Hard refresh')
+        reduce_all_action = menu.addAction('Reduce all')
+        hard_refresh_action = menu.addAction('Hard refresh')
         archive_action = None
         open_folder_action = None
         if item:
             if 'creation' not in item.instance_type:
-                open_folder_action = self.menu_widget.add_action(f'Open folder')
+                open_folder_action = menu.addAction('Open folder')
             if 'creation' not in item.instance_type and item.instance_type != 'domain':
-                archive_action = self.menu_widget.add_action(f'Archive {item.instance_type}')
-        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
-            if self.menu_widget.function_name is not None:
-                if self.menu_widget.function_name == archive_action:
-                    self.archive_instance(item)
-                elif self.menu_widget.function_name == open_folder_action:
-                    self.open_folder(item)
-                elif self.menu_widget.function_name == hard_refresh_action:
-                    self.refresh(1)
-                elif self.menu_widget.function_name == reduce_all_action:
-                    self.reduce_all()
+                archive_action = menu.addAction(f'Archive {item.instance_type}')
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == archive_action:
+                self.archive_instance(item)
+            elif action == open_folder_action:
+                self.open_folder(item)
+            elif action == hard_refresh_action:
+                self.refresh(1)
+            elif action == reduce_all_action:
+                self.reduce_all()
 
     def open_folder(self, item):
         if item.instance_type == 'domain':

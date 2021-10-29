@@ -99,6 +99,13 @@ class QComboBox(QtWidgets.QComboBox):
         self.view().window().setStyleSheet("QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
         self.setItemDelegate(QtWidgets.QStyledItemDelegate())
 
+class QMenu(QtWidgets.QMenu):
+    def __init__(self, parent = None):
+        super(QMenu, self).__init__(parent)
+        self.setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.NoDropShadowWindowHint | QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setStyleSheet("QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
+
 class separator(QtWidgets.QFrame):
     def __init__(self, parent = None):
         super(separator, self).__init__(parent)

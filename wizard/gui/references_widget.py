@@ -12,7 +12,6 @@ from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import create_ticket_widget
-from wizard.gui import menu_widget
 
 # Wizard modules
 from wizard.core import assets
@@ -174,29 +173,30 @@ class references_widget(QtWidgets.QWidget):
 
     def context_menu_requested(self):
         selection = self.list_view.selectedItems()
-        self.menu_widget = menu_widget.menu_widget(self)
+        menu = gui_utils.QMenu(self)
         remove_action = None
         update_action = None
         ticket_action = None
-        add_action = self.menu_widget.add_action(f'Add references (Tab)', ressources._tool_add_)
-        update_all_action = self.menu_widget.add_action(f'Update all references', ressources._tool_update_)
+        add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
+        update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         if len(selection)>=1:
-            update_action = self.menu_widget.add_action(f'Update reference(s)', ressources._tool_update_)
-            remove_action = self.menu_widget.add_action(f'Remove reference(s)', ressources._tool_archive_)
+            update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update reference(s)')
+            remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove reference(s)')
         if len(selection)==1:
-            ticket_action = self.menu_widget.add_action(f'Open a ticket', ressources._tool_ticket_)
-        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
-            if self.menu_widget.function_name is not None:
-                if self.menu_widget.function_name == remove_action:
-                    self.remove_selection()
-                elif self.menu_widget.function_name == update_action:
-                    self.update_selection()
-                elif self.menu_widget.function_name == ticket_action:
-                    self.create_ticket()
-                elif self.menu_widget.function_name == add_action:
-                    self.search_reference()
-                elif self.menu_widget.function_name == update_all_action:
-                    self.update_all()
+            ticket_action = menu.addAction(QtGui.QIcon(ressources._tool_ticket_), 'Open a ticket')
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == remove_action:
+                self.remove_selection()
+            elif action == update_action:
+                self.update_selection()
+            elif action == ticket_action:
+                self.create_ticket()
+            elif action == add_action:
+                self.search_reference()
+            elif action == update_all_action:
+                self.update_all()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

@@ -24,7 +24,6 @@ logger = custom_logger.get_logger()
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import confirm_widget
-from wizard.gui import menu_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 
@@ -393,32 +392,33 @@ class versions_widget(QtWidgets.QWidget):
 
     def context_menu_requested(self):
         selection = self.get_selection()
-        self.menu_widget = menu_widget.menu_widget(self)
-        folder_action = self.menu_widget.add_action(f'Open folder', ressources._tool_folder_)
-        empty_version_action = self.menu_widget.add_action(f'Create new empty version', ressources._tool_add_)
+        menu = gui_utils.QMenu(self)
+        folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
+        empty_version_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Create new empty version')
         duplicate_action = None
         archive_action = None
         if len(selection)>=1:
-            duplicate_action = self.menu_widget.add_action(f'Duplicate version(s)', ressources._tool_duplicate_)
-            archive_action = self.menu_widget.add_action(f'Archive version(s)', ressources._tool_archive_)
-            comment_action = self.menu_widget.add_action('Modify comment', ressources._tool_comment_)
+            duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate version(s)')
+            archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
+            comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         launch_action = None
         if len(selection)==1:
-            launch_action = self.menu_widget.add_action(f'Launch version', ressources._tool_launch_)
-        if self.menu_widget.exec_() == QtWidgets.QDialog.Accepted:
-            if self.menu_widget.function_name is not None:
-                if self.menu_widget.function_name == folder_action:
-                    self.open_folder()
-                elif self.menu_widget.function_name == empty_version_action:
-                    self.add_empty_version()
-                elif self.menu_widget.function_name == duplicate_action:
-                    self.duplicate_version()
-                elif self.menu_widget.function_name == archive_action:
-                    self.archive()
-                elif self.menu_widget.function_name == launch_action:
-                    self.launch()
-                elif self.menu_widget.function_name == comment_action:
-                    self.modify_comment()
+            launch_action = menu.addAction(QtGui.QIcon(ressources._tool_launch_), 'Launch version')
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == folder_action:
+                self.open_folder()
+            elif action == empty_version_action:
+                self.add_empty_version()
+            elif action == duplicate_action:
+                self.duplicate_version()
+            elif action == archive_action:
+                self.archive()
+            elif action == launch_action:
+                self.launch()
+            elif action == comment_action:
+                self.modify_comment()
 
     def modify_comment(self):
         items = self.get_selection()
