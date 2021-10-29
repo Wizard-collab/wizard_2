@@ -29,28 +29,73 @@ class production_manager_widget(QtWidgets.QWidget):
         self.asset_ids = dict()
         self.stage_ids = dict()
         self.variant_ids = dict()
+        self.update_categories = True
+        self.update_assets = True
+        self.domain = None
+        self.category = None
+        self.domain_ids = []
+        self.category_ids = []
         self.connect_functions()
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.asset_signal.connect(self.add_search_asset)
+        self.search_thread.variant_signal.connect(self.add_search_variant)
+        self.domain_comboBox.currentTextChanged.connect(self.refresh_categories)
+        self.category_comboBox.currentTextChanged.connect(self.refresh_assets)
 
     def update_search(self, text):
         if text != '':
-            self.toggle_all_visibility(0)
-            self.search_thread.update_search(text)
-        else:
-            self.toggle_all_visibility(1)
 
-    def toggle_all_visibility(self, visibility):
+            asset = ''
+            assignment = ''
+            state = ''
+
+            text = text.replace(' ', '')
+            searchs = text.split('&')
+            for item in searchs:
+                if 'asset:' in item:
+                    asset = item.replace('asset:', '')
+                if 'user:' in item:
+                    assignment = item.replace('user:', '')
+                if 'state:' in item:
+                    state = item.replace('state:', '')
+
+            self.hide_all(asset, assignment, state)
+            self.search_thread.update_search(asset=asset, assignment=assignment, state=state)
+        else:
+            self.unhide_all()
+
+    def hide_all(self, asset, assignment, state):
+        if asset != '':
+            asset_vis = 0
+        else:
+            asset_vis = 1
+
         for asset_id in self.asset_ids.keys():
-            self.asset_ids[asset_id]['item'].setHidden(1-visibility)
+            self.asset_ids[asset_id]['item'].setHidden(1-asset_vis)
+
+        if assignment != '' or state != '':
+            variant_vis = 0
+        elif assignment == '' and state == '':
+            variant_vis = 1
+
+        for variant_id in self.variant_ids.keys():
+            self.variant_ids[variant_id]['widget'].setVisible(variant_vis)
+
+    def unhide_all(self):
+        for asset_id in self.asset_ids.keys():
+            self.asset_ids[asset_id]['item'].setHidden(0)
+        for variant_id in self.variant_ids.keys():
+            self.variant_ids[variant_id]['widget'].setVisible(1)
 
     def add_search_asset(self, asset_id):
         self.asset_ids[asset_id]['item'].setHidden(0)
 
-    def build_ui(self):
+    def add_search_variant(self, variant_id):
+        self.variant_ids[variant_id]['widget'].visible=1
 
+    def build_ui(self):
         self.setMinimumWidth(700)
         self.setMinimumHeight(500)
 
@@ -59,16 +104,20 @@ class production_manager_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
-        self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('dark_widget')
+        self.header_widget = QtWidgets.QFrame()
+        #self.header_widget.setObjectName('dark_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.domain_comboBox = gui_utils.QComboBox()
+        self.header_layout.addWidget(self.domain_comboBox)
+        self.category_comboBox = gui_utils.QComboBox()
+        self.header_layout.addWidget(self.category_comboBox)
 
         self.search_bar = gui_utils.search_bar()
+        self.search_bar.setObjectName('dark_search_bar_frame')
         self.header_layout.addWidget(self.search_bar)
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
@@ -117,10 +166,53 @@ class production_manager_widget(QtWidgets.QWidget):
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh(self):
-        if self.isVisible():
-            start_time = time.time()
+        start_time = time.time()
+        self.refresh_domains()
+        self.update_refresh_time(start_time)
 
-            asset_rows = project.get_all_assets() 
+    def refresh_domains(self):
+        self.update_categories = False
+        domain_rows = project.get_domains()
+        for domain_row in domain_rows:
+            if domain_row['id'] not in self.domain_ids:
+                self.domain_comboBox.addItem(domain_row['name'])
+        self.update_categories = True
+        self.refresh_categories()
+
+    def clear_categories(self):
+        self.category_ids = []
+        self.category_comboBox.clear()
+
+    def refresh_categories(self):
+        if self.update_categories:
+            self.update_assets = False
+            current_domain = self.domain_comboBox.currentText()
+            if current_domain != self.domain:
+                self.clear_categories()
+                self.domain = current_domain
+            domain_id = project.get_domain_by_name(current_domain, 'id')
+            category_rows = project.get_domain_childs(domain_id)
+            for category_row in category_rows:
+                if category_row['id'] not in self.category_ids:
+                    self.category_comboBox.addItem(category_row['name'])
+            self.update_assets = True
+            self.refresh_assets()
+
+    def clear_assets(self):
+        self.asset_ids = dict()
+        self.stage_ids = dict()
+        self.variant_ids = dict()
+        self.list_view.clear()
+
+    def refresh_assets(self):
+        if self.update_assets:
+            current_category = self.category_comboBox.currentText()
+            if current_category != self.category:
+                self.clear_assets()
+                self.category = current_category
+            category_id = project.get_category_data_by_name(current_category, 'id')
+
+            asset_rows = project.get_category_childs(category_id) 
             stage_rows = project.get_all_stages()
             variant_rows = project.get_all_variants()
 
@@ -132,23 +224,26 @@ class production_manager_widget(QtWidgets.QWidget):
                     self.asset_ids[asset_row['id']]['item'] = item
 
             for stage_row in stage_rows:
-                if stage_row['id'] not in self.stage_ids.keys():
-                    self.stage_ids[stage_row['id']] = dict()
-                    self.stage_ids[stage_row['id']]['row'] = stage_row
-                    self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item'].add_stage(self.stage_ids[stage_row['id']]['row'])
-                    self.stage_ids[stage_row['id']]['asset_item'] = self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item']
+                if stage_row['asset_id'] in self.asset_ids.keys():
+                    if stage_row['id'] not in self.stage_ids.keys():
+                        self.stage_ids[stage_row['id']] = dict()
+                        self.stage_ids[stage_row['id']]['row'] = stage_row
+                        self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item'].add_stage(self.stage_ids[stage_row['id']]['row'])
+                        self.stage_ids[stage_row['id']]['asset_item'] = self.asset_ids[self.stage_ids[stage_row['id']]['row']['asset_id']]['item']
 
             for variant_row in variant_rows:
-                if variant_row['id'] not in self.variant_ids.keys():
-                    self.variant_ids[variant_row['id']] = dict()
-                    self.variant_ids[variant_row['id']]['row'] = variant_row
-                    self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].add_variant(self.variant_ids[variant_row['id']]['row'])
-                else:
-                    if variant_row != self.variant_ids[variant_row['id']]['row']:
+                if variant_row['stage_id'] in self.stage_ids.keys():
+                    if variant_row['id'] not in self.variant_ids.keys():
+                        self.variant_ids[variant_row['id']] = dict()
                         self.variant_ids[variant_row['id']]['row'] = variant_row
-                        self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].refresh_variant(self.variant_ids[variant_row['id']]['row'])
+                        variant_widget = self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].add_variant(self.variant_ids[variant_row['id']]['row'])
+                        self.variant_ids[variant_row['id']]['widget'] = variant_widget
 
-            self.update_refresh_time(start_time)
+                    else:
+                        if variant_row != self.variant_ids[variant_row['id']]['row']:
+                            self.variant_ids[variant_row['id']]['row'] = variant_row
+                            self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].refresh_variant(self.variant_ids[variant_row['id']]['row'])
+
 
 class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, asset_row, parent=None):
@@ -176,6 +271,7 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
         self.variant_ids[variant_row['id']] = dict()
         self.variant_ids[variant_row['id']]['row'] = variant_row
         self.variant_ids[variant_row['id']]['widget'] = widget
+        return widget
 
     def refresh_variant(self, variant_row):
         self.variant_ids[variant_row['id']]['widget'].refresh(variant_row)
@@ -239,10 +335,12 @@ class variant_widget(QtWidgets.QFrame):
         self.variant_row = variant_row
         self.build_ui()
         self.connect_functions()
+        self.visible = 1
 
     def showEvent(self, event):
         self.update_size.emit(1)
         self.fill_ui()
+        self.updateGeometry()
 
     def refresh(self, variant_row):
         self.variant_row = variant_row
@@ -393,14 +491,16 @@ class variant_widget(QtWidgets.QFrame):
 class search_thread(QtCore.QThread):
 
     asset_signal = pyqtSignal(int)
+    variant_signal = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(search_thread, self).__init__(parent)
         self.asset_string = ''
+        self.assignment_string = ''
+        self.state_string = ''
         self.running = False
 
     def run(self):
-        # search asset
         if self.running:
             if self.asset_string != '':
                 asset_ids = project.search_asset(self.asset_string, column='id')
@@ -409,8 +509,35 @@ class search_thread(QtCore.QThread):
                         break
                     self.asset_signal.emit(asset_id)
 
-    def update_search(self, asset_string=''):
-        self.asset_string = asset_string
+            variant_ids = []
+
+            if self.assignment_string != '':
+                variant_ids = project.search_variant_by_column_data(('assignment', self.assignment_string), column='id')
+                for variant_id in variant_ids:
+                    if not self.running:
+                        break
+                    if self.state_string != '':
+                        variant_ids.append(variant_id)
+                    else:
+                        self.variant_signal.emit(variant_id)
+
+            if self.state_string != '':
+                variant_ids = project.search_variant_by_column_data(('state', self.state_string), column='id')
+                for variant_id in variant_ids:
+                    if not self.running:
+                        break
+                    if (self.assignment_string != '') and (variant_id in variant_ids):
+                        self.variant_signal.emit(variant_id)
+                    elif (self.assignment_string != '') and (variant_id not in variant_ids):
+                        pass
+                    else:
+                        self.variant_signal.emit(variant_id)
+
+
+    def update_search(self, asset='', assignment='', state=''):
+        self.asset_string = asset
+        self.assignment_string = assignment
+        self.state_string = state
         self.running = True
         self.start()
 

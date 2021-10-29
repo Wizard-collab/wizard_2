@@ -417,6 +417,13 @@ def get_all_variants(column='*'):
                                             column)
     return variants_rows
 
+def search_variant_by_column_data(data_tuple, column='*'):
+    variants_rows = db_utils.get_row_by_column_part_data('project',
+                                                        'variants',
+                                                        (data_tuple[0], data_tuple[1]),
+                                                        column)
+    return variants_rows
+
 def remove_variant(variant_id):
     success = None
     if site.is_admin():

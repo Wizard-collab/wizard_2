@@ -545,6 +545,11 @@ QSlider::handle:horizontal {
 	border-radius: 5px;
 }
 
+#dark_search_bar_frame{
+	border-radius: 5px;
+	background-color:#24242b;
+}
+
 #icon_view{
 	padding: 6px;
 }
