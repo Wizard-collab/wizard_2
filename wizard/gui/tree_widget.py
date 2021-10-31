@@ -50,22 +50,22 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic['add'] = QtGui.QIcon(ressources._add_icon_small_)
         self.icons_dic['folder'] = QtGui.QIcon(ressources._folder_icon_small_)
         self.icons_dic['domain'] = dict()
-        self.icons_dic['domain']['assets'] = QtGui.QIcon(ressources._assets_icon_small_)
-        self.icons_dic['domain']['library'] = QtGui.QIcon(ressources._library_icon_small_)
-        self.icons_dic['domain']['sequences'] = QtGui.QIcon(ressources._sequences_icon_small_)
+        self.icons_dic['domain']['assets'] = QtGui.QIcon(ressources._assets_icon_)
+        self.icons_dic['domain']['library'] = QtGui.QIcon(ressources._library_icon_)
+        self.icons_dic['domain']['sequences'] = QtGui.QIcon(ressources._sequences_icon_)
         self.icons_dic['stage'] = dict()
-        self.icons_dic['stage']['modeling'] = QtGui.QIcon(ressources._modeling_icon_small_)
-        self.icons_dic['stage']['rigging'] = QtGui.QIcon(ressources._rigging_icon_small_)
-        self.icons_dic['stage']['grooming'] = QtGui.QIcon(ressources._grooming_icon_small_)
-        self.icons_dic['stage']['texturing'] = QtGui.QIcon(ressources._texturing_icon_small_)
-        self.icons_dic['stage']['shading'] = QtGui.QIcon(ressources._shading_icon_small_)
-        self.icons_dic['stage']['layout'] = QtGui.QIcon(ressources._layout_icon_small_)
-        self.icons_dic['stage']['animation'] = QtGui.QIcon(ressources._animation_icon_small_)
-        self.icons_dic['stage']['cfx'] = QtGui.QIcon(ressources._cfx_icon_small_)
-        self.icons_dic['stage']['fx'] = QtGui.QIcon(ressources._fx_icon_small_)
-        self.icons_dic['stage']['lighting'] = QtGui.QIcon(ressources._lighting_icon_small_)
-        self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_small_)
-        self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_small_)
+        self.icons_dic['stage']['modeling'] = QtGui.QIcon(ressources._modeling_icon_)
+        self.icons_dic['stage']['rigging'] = QtGui.QIcon(ressources._rigging_icon_)
+        self.icons_dic['stage']['grooming'] = QtGui.QIcon(ressources._grooming_icon_)
+        self.icons_dic['stage']['texturing'] = QtGui.QIcon(ressources._texturing_icon_)
+        self.icons_dic['stage']['shading'] = QtGui.QIcon(ressources._shading_icon_)
+        self.icons_dic['stage']['layout'] = QtGui.QIcon(ressources._layout_icon_)
+        self.icons_dic['stage']['animation'] = QtGui.QIcon(ressources._animation_icon_)
+        self.icons_dic['stage']['cfx'] = QtGui.QIcon(ressources._cfx_icon_)
+        self.icons_dic['stage']['fx'] = QtGui.QIcon(ressources._fx_icon_)
+        self.icons_dic['stage']['lighting'] = QtGui.QIcon(ressources._lighting_icon_)
+        self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_)
+        self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
 
         self.setFixedWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -443,8 +443,8 @@ class tree_widget(QtWidgets.QFrame):
             if new_asset_id in self.asset_ids.keys():
                 self.focus_on_item(self.asset_ids[new_asset_id], expand=1)
         if new_category_id:
-            if new_category_id in self.stage_ids.keys():
-                self.focus_on_item(self.new_category_id[new_category_id], expand=1)
+            if new_category_id in self.category_ids.keys():
+                self.focus_on_item(self.category_ids[new_category_id], expand=1)
 
     def context_menu_requested(self, point):
         menu = gui_utils.QMenu(self)

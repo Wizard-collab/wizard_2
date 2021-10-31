@@ -44,6 +44,10 @@ class production_manager_widget(QtWidgets.QWidget):
         self.domain_comboBox.currentTextChanged.connect(self.refresh_categories)
         self.category_comboBox.currentTextChanged.connect(self.refresh_assets)
 
+    def apply_search(self):
+        search = self.search_bar.text()
+        self.update_search(search)
+
     def update_search(self, text):
         if text != '':
             asset = ''
@@ -106,7 +110,6 @@ class production_manager_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QFrame()
-        #self.header_widget.setObjectName('dark_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
@@ -117,8 +120,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.category_comboBox = gui_utils.QComboBox()
         self.header_layout.addWidget(self.category_comboBox)
 
-        self.search_bar = gui_utils.search_bar()
-        self.search_bar.setObjectName('dark_search_bar_frame')
+        self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43, alpha=255)
         self.header_layout.addWidget(self.search_bar)
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
@@ -173,7 +175,7 @@ class production_manager_widget(QtWidgets.QWidget):
         domain_rows = project.get_domains()
         for domain_row in domain_rows:
             if (domain_row['id'] not in self.domain_ids) and (domain_row['name'] != 'library'):
-                self.domain_comboBox.addItem(domain_row['name'])
+                self.domain_comboBox.addItem(QtGui.QIcon(ressources._domains_icons_dic_[domain_row['name']]), domain_row['name'])
                 self.domain_ids.append(domain_row['id'])
         self.update_categories = True
         self.refresh_categories()
@@ -256,6 +258,7 @@ class production_manager_widget(QtWidgets.QWidget):
                             self.variant_ids[variant_row['id']]['row'] = variant_row
                             self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].refresh_variant(self.variant_ids[variant_row['id']]['row'])
                     QtWidgets.QApplication.processEvents()
+            self.apply_search()
 
 class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, asset_row, parent=None):
@@ -276,7 +279,9 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
         self.treeWidget().setItemWidget(self, index, widget)
 
     def add_variant(self, variant_row):
-        widget = variant_widget(variant_row, self.treeWidget())
+        widget = variant_widget(variant_row,
+                                self.stage_ids[variant_row['stage_id']]['row']['name'],
+                                self.treeWidget())
         widget.update_size.connect(self.update_size)
         stage_widget = self.stage_ids[variant_row['stage_id']]['widget']
         stage_widget.add_variant(widget)
@@ -344,9 +349,10 @@ class variant_widget(QtWidgets.QFrame):
 
     update_size = pyqtSignal(int)
     
-    def __init__(self, variant_row, parent=None):
+    def __init__(self, variant_row, stage, parent=None):
         super(variant_widget, self).__init__(parent)
         self.variant_row = variant_row
+        self.stage = stage
         self.build_ui()
         self.connect_functions()
 
@@ -367,7 +373,19 @@ class variant_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addWidget(QtWidgets.QLabel(self.variant_row['name']))
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(4)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.stage_icon = QtWidgets.QLabel()
+        self.stage_icon.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.header_layout.addWidget(self.stage_icon)
+
+        self.header_layout.addWidget(QtWidgets.QLabel(self.variant_row['name']))
 
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setObjectName('transparent_widget')
@@ -429,6 +447,7 @@ class variant_widget(QtWidgets.QFrame):
         self.progress_bar_layout.addWidget(self.percent_label)
 
     def fill_ui(self):
+        self.stage_icon.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(18))
         self.state_label.setText(self.variant_row['state'].upper())
         string_time = tools.convert_seconds_to_string_time(float(self.variant_row['work_time']))
         self.work_time_label.setText(string_time)
@@ -528,7 +547,7 @@ class search_thread(QtCore.QThread):
                         break
                     self.asset_signal.emit(asset_id)
 
-            variant_ids = []
+            combined_variant_ids = []
 
             if self.assignment_string != '':
                 variant_ids = project.search_variant_by_column_data(('assignment', self.assignment_string), column='id')
@@ -536,7 +555,8 @@ class search_thread(QtCore.QThread):
                     if not self.running:
                         break
                     if self.state_string != '':
-                        variant_ids.append(variant_id)
+                        combined_variant_ids.append(variant_id)
+                        print('mdr')
                     else:
                         self.variant_signal.emit(variant_id)
 
@@ -545,10 +565,11 @@ class search_thread(QtCore.QThread):
                 for variant_id in variant_ids:
                     if not self.running:
                         break
-                    if (self.assignment_string != '') and (variant_id in variant_ids):
+                    if (self.assignment_string != '') and (variant_id in combined_variant_ids):
                         self.variant_signal.emit(variant_id)
-                    elif (self.assignment_string != '') and (variant_id not in variant_ids):
+                    elif (self.assignment_string != '') and (variant_id not in combined_variant_ids):
                         pass
+                        print('lol')
                     else:
                         self.variant_signal.emit(variant_id)
 

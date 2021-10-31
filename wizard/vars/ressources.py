@@ -144,38 +144,42 @@ _lock_icons_[1] = os.path.join(_icons_path_, 'locked.svg')
 _lock_icons_[0] = os.path.join(_icons_path_, 'unlocked.svg')
 
 # Domains icons
-_assets_icon_small_ = os.path.join(_icons_path_, 'assets_small.png')
-_library_icon_small_ = os.path.join(_icons_path_, 'library_small.png')
-_sequences_icon_small_ = os.path.join(_icons_path_, 'sequences_small.png')
+_assets_icon_ = os.path.join(_icons_path_, 'assets.svg')
+_library_icon_ = os.path.join(_icons_path_, 'library.svg')
+_sequences_icon_ = os.path.join(_icons_path_, 'sequences.svg')
+_domains_icons_dic_ = dict()
+_domains_icons_dic_['assets'] = _assets_icon_
+_domains_icons_dic_['library'] = _library_icon_
+_domains_icons_dic_['sequences'] = _sequences_icon_
 
 # Stages icons
-_modeling_icon_small_ = os.path.join(_icons_path_, 'modeling_small.png')
-_rigging_icon_small_ = os.path.join(_icons_path_, 'rigging_small.png')
-_grooming_icon_small_ = os.path.join(_icons_path_, 'grooming_small.png')
-_texturing_icon_small_ = os.path.join(_icons_path_, 'texturing_small.png')
-_shading_icon_small_ = os.path.join(_icons_path_, 'shading_small.png')
+_modeling_icon_ = os.path.join(_icons_path_, 'modeling.svg')
+_rigging_icon_ = os.path.join(_icons_path_, 'rigging.svg')
+_grooming_icon_ = os.path.join(_icons_path_, 'grooming.svg')
+_texturing_icon_ = os.path.join(_icons_path_, 'texturing.svg')
+_shading_icon_ = os.path.join(_icons_path_, 'shading.svg')
 
-_layout_icon_small_ = os.path.join(_icons_path_, 'layout_small.png')
-_animation_icon_small_ = os.path.join(_icons_path_, 'animation_small.png')
-_cfx_icon_small_ = os.path.join(_icons_path_, 'cfx_small.png')
-_fx_icon_small_ = os.path.join(_icons_path_, 'fx_small.png')
-_lighting_icon_small_ = os.path.join(_icons_path_, 'lighting_small.png')
-_compositing_icon_small_ = os.path.join(_icons_path_, 'compositing_small.png')
-_camera_icon_small_ = os.path.join(_icons_path_, 'camera_small.png')
+_layout_icon_ = os.path.join(_icons_path_, 'layout.svg')
+_animation_icon_ = os.path.join(_icons_path_, 'animation.svg')
+_cfx_icon_ = os.path.join(_icons_path_, 'cfx.svg')
+_fx_icon_ = os.path.join(_icons_path_, 'fx.svg')
+_lighting_icon_ = os.path.join(_icons_path_, 'lighting.svg')
+_compositing_icon_ = os.path.join(_icons_path_, 'compositing.svg')
+_camera_icon_ = os.path.join(_icons_path_, 'camera.svg')
 
 _stage_icons_dic_ = dict()
-_stage_icons_dic_['modeling'] = _modeling_icon_small_
-_stage_icons_dic_['rigging'] = _rigging_icon_small_
-_stage_icons_dic_['grooming'] = _grooming_icon_small_
-_stage_icons_dic_['texturing'] = _texturing_icon_small_
-_stage_icons_dic_['shading'] = _shading_icon_small_
-_stage_icons_dic_['layout'] = _layout_icon_small_
-_stage_icons_dic_['animation'] = _animation_icon_small_
-_stage_icons_dic_['cfx'] = _cfx_icon_small_
-_stage_icons_dic_['fx'] = _fx_icon_small_
-_stage_icons_dic_['lighting'] = _lighting_icon_small_
-_stage_icons_dic_['compositing'] = _compositing_icon_small_
-_stage_icons_dic_['camera'] = _camera_icon_small_
+_stage_icons_dic_['modeling'] = _modeling_icon_
+_stage_icons_dic_['rigging'] = _rigging_icon_
+_stage_icons_dic_['grooming'] = _grooming_icon_
+_stage_icons_dic_['texturing'] = _texturing_icon_
+_stage_icons_dic_['shading'] = _shading_icon_
+_stage_icons_dic_['layout'] = _layout_icon_
+_stage_icons_dic_['animation'] = _animation_icon_
+_stage_icons_dic_['cfx'] = _cfx_icon_
+_stage_icons_dic_['fx'] = _fx_icon_
+_stage_icons_dic_['lighting'] = _lighting_icon_
+_stage_icons_dic_['compositing'] = _compositing_icon_
+_stage_icons_dic_['camera'] = _camera_icon_
 
 # Softwares icons
 _sofwares_icons_dic_ = dict()

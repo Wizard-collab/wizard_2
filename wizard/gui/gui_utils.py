@@ -211,11 +211,13 @@ class search_bar(QtWidgets.QFrame):
 
     textChanged = pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, red=44, green=44, blue=51, alpha=255):
         super(search_bar, self).__init__(parent)
+        self.bg_color = QtGui.QColor(red, green, blue, alpha)
         self.build_ui()
         self.connect_functions()
         self.old_text=''
+        self._set_color(self.bg_color)
 
     def build_ui(self):
         self.setObjectName('search_bar_frame')
@@ -274,12 +276,12 @@ class search_bar(QtWidgets.QFrame):
             self.anim = QtCore.QPropertyAnimation(self, b"color")
             self.anim.setDuration(200)
             self.anim.setStartValue(QtGui.QColor(119, 133, 222, 255))
-            self.anim.setEndValue(QtGui.QColor(44, 44, 51, 255))
+            self.anim.setEndValue(self.bg_color)
             self.anim.start()
         elif text != '' and self.old_text == '':
             self.anim = QtCore.QPropertyAnimation(self, b"color")
             self.anim.setDuration(200)
-            self.anim.setStartValue(QtGui.QColor(44, 44, 51, 255))
+            self.anim.setStartValue(self.bg_color)
             self.anim.setEndValue(QtGui.QColor(119, 133, 222, 255))
             self.anim.start()
         self.old_text = text
