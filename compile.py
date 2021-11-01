@@ -59,6 +59,7 @@ class compile():
 			if (MAJOR and MINOR and PATCH) is not None:
 				release_name = f"{MAJOR}.{MINOR}.{PATCH}"
 				self.build_folder = os.path.join(compil_dir, f"{release_name}_{str(build_no).zfill(4)}")
+				self.setup_name = f'{release_name}.{str(build_no).zfill(4)} setup.exe'
 				compil_data_dic['MAJOR'] = MAJOR
 				compil_data_dic['MINOR'] = MINOR
 				compil_data_dic['PATCH'] = PATCH
@@ -94,6 +95,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller uninstall.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			folders_list = ['ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
@@ -105,6 +110,7 @@ class compile():
 							'dist/PyWizard/PyWizard.exe',
 							'dist/PyWizard/PyWizard.exe.manifest',
 							'dist/server/server.exe',
+							'dist/uninstall.exe',
 							'dist/server/server.exe.manifest',
 							'dist/Wizard console/Wizard console.exe',
 							'dist/Wizard console/Wizard console.exe.manifest']
@@ -122,12 +128,27 @@ class compile():
 
 			shutil.make_archive(f'{self.build_folder}', 'zip', self.build_folder)
 
-			os.startfile(os.path.dirname(self.build_folder))
-
 			if os.path.isdir(self.build_folder):
 				shutil.rmtree(self.build_folder)
 
+			# Making installer
+			zip_file = self.build_folder+'.zip'
+			shutil.copyfile(zip_file, '__wizard__.zip')
+
+			command_line = "PyInstaller installer.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
+			shutil.copyfile('dist/__installer_temp__.exe', os.path.join('compile', self.setup_name))
+			os.remove('__wizard__.zip')
+
+			if os.path.isdir('dist'):
+				shutil.rmtree('dist')
+			if os.path.isdir('build'):
+				shutil.rmtree('build')
+
 			self.clean_pycache()
+			os.startfile(os.path.dirname(self.build_folder))
 
 	def clean_pycache(self):
 		total_chars = 0
