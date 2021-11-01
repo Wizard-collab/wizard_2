@@ -16,6 +16,9 @@ class comment_widget(QtWidgets.QDialog):
         super(comment_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Comment")
         
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)

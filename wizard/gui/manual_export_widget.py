@@ -17,6 +17,9 @@ class manual_export_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(manual_export_widget, self).__init__()
 
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Manual exports")
+
         self.files = []
         self.export_name = None
         self.build_ui()

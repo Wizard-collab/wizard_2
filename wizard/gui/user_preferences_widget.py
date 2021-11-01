@@ -23,6 +23,10 @@ logger = custom_logger.get_logger(__name__)
 class user_preferences_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(user_preferences_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Preferences")
+
         self.general_widget = general_widget()
         self.user_account_widget = user_account_widget()
 

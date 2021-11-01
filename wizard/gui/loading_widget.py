@@ -22,6 +22,9 @@ class loading_widget(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Loading - {environment.get_project_name()}")
+
         self.build_ui()
         self.fill_ui()
 

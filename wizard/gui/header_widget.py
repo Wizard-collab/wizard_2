@@ -50,7 +50,7 @@ class header_widget(QtWidgets.QFrame):
 
         self.main_layout.addWidget(self.menu_bar)
         
-        self.wizard_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='', icon=QtGui.QIcon(ressources._wizard_icon_small_))
+        self.wizard_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='', icon=QtGui.QIcon(ressources._wizard_icon_))
         self.license_action = self.wizard_action.addAction(QtGui.QIcon(ressources._license_icon_), "License")
         self.wizard_action.addSeparator()
         self.quit_action = self.wizard_action.addAction("Quit")

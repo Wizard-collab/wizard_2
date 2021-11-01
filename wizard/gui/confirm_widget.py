@@ -6,12 +6,17 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
+from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
 class confirm_widget(QtWidgets.QDialog):
     def __init__(self, message, title='Warning', reject_text='Cancel', accept_text='Continue', parent=None):
         super(confirm_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(title)
+
         self.security_sentence = None
         self.title = title
         self.message = message

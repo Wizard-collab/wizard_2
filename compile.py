@@ -101,6 +101,7 @@ class compile():
 				shutil.copytree(folder, destination)
 
 			files_list = [  'version.yaml',
+							'LICENSE',
 							'dist/PyWizard/PyWizard.exe',
 							'dist/PyWizard/PyWizard.exe.manifest',
 							'dist/server/server.exe',

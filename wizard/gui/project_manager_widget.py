@@ -21,6 +21,10 @@ from wizard.gui import create_project_widget
 class project_manager_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(project_manager_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Project manager")
+
         self.build_ui()
         self.refresh()
         self.connect_functions()

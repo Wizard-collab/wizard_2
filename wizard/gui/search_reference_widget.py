@@ -21,6 +21,9 @@ class search_reference_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(search_reference_widget, self).__init__(parent)
 
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Create references")
+
         self.accept_item_from_thread = True      
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)

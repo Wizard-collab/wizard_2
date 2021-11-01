@@ -16,6 +16,7 @@ from wizard.core import site
 from wizard.core import tools
 from wizard.core import assets
 from wizard.core import project
+from wizard.core import environment
 from wizard.core import image
 from wizard.vars import ressources
 from wizard.vars import assets_vars
@@ -23,6 +24,10 @@ from wizard.vars import assets_vars
 class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(production_manager_widget, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Production manager - {environment.get_project_name()}")
+
         self.build_ui()
         self.search_thread = search_thread()
         self.users_ids = dict()
@@ -51,23 +56,30 @@ class production_manager_widget(QtWidgets.QWidget):
     def update_search(self, text):
         if text != '':
             asset = ''
+            stage = ''
             assignment = ''
             state = ''
             text = text.replace(' ', '')
             searchs = text.split('&')
             for item in searchs:
-                if 'asset:' in item:
-                    asset = item.replace('asset:', '')
+                if self.domain == 'assets':
+                    if 'asset:' in item:
+                        asset = item.replace('asset:', '')
+                if self.domain == 'sequences':
+                    if 'shot:' in item:
+                        asset = item.replace('shot:', '')
                 if 'user:' in item:
                     assignment = item.replace('user:', '')
                 if 'state:' in item:
                     state = item.replace('state:', '')
-            self.hide_all(asset, assignment, state)
+                if 'stage:' in item:
+                    stage = item.replace('stage:', '')
+            self.hide_all(asset, assignment, state, stage)
             self.search_thread.update_search(asset=asset, assignment=assignment, state=state)
         else:
             self.unhide_all()
 
-    def hide_all(self, asset, assignment, state):
+    def hide_all(self, asset, assignment, state, stage):
         if asset != '':
             asset_vis = 0
         else:
@@ -84,6 +96,16 @@ class production_manager_widget(QtWidgets.QWidget):
         for variant_id in self.variant_ids.keys():
             self.variant_ids[variant_id]['widget'].setVisible(variant_vis)
 
+        if stage != '':
+            for domain_stage in self.stages_list:
+                if stage in domain_stage:
+                    self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 0)
+                else:
+                    self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 1)
+        else:
+            for domain_stage in self.stages_list:
+                self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 0)
+
     def unhide_all(self):
         for asset_id in self.asset_ids.keys():
             self.asset_ids[asset_id]['item'].setHidden(0)
@@ -91,6 +113,8 @@ class production_manager_widget(QtWidgets.QWidget):
         for variant_id in self.variant_ids.keys():
             self.variant_ids[variant_id]['widget'].setVisible(1)
             QtWidgets.QApplication.processEvents()
+        for stage in self.stages_list:
+            self.list_view.setColumnHidden(self.stages_list.index(stage)+1, 0)
 
     def add_search_asset(self, asset_id):
         if asset_id in self.asset_ids.keys():
@@ -118,6 +142,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.domain_comboBox = gui_utils.QComboBox()
         self.header_layout.addWidget(self.domain_comboBox)
         self.category_comboBox = gui_utils.QComboBox()
+        self.category_comboBox.setMinimumHeight(32)
         self.header_layout.addWidget(self.category_comboBox)
 
         self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43, alpha=255)
@@ -132,16 +157,19 @@ class production_manager_widget(QtWidgets.QWidget):
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-
-        
 
         self.main_layout.addWidget(self.list_view)
 
+        self.footer_widget = QtWidgets.QFrame()
+        self.footer_layout = QtWidgets.QHBoxLayout()
+        self.footer_layout.setSpacing(6)
+        self.footer_widget.setLayout(self.footer_layout)
+        self.main_layout.addWidget(self.footer_widget)
+
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.refresh_label)
+        self.footer_layout.addWidget(self.refresh_label)
 
     def toggle(self):
         if self.isVisible():
@@ -556,7 +584,6 @@ class search_thread(QtCore.QThread):
                         break
                     if self.state_string != '':
                         combined_variant_ids.append(variant_id)
-                        print('mdr')
                     else:
                         self.variant_signal.emit(variant_id)
 
@@ -569,7 +596,6 @@ class search_thread(QtCore.QThread):
                         self.variant_signal.emit(variant_id)
                     elif (self.assignment_string != '') and (variant_id not in combined_variant_ids):
                         pass
-                        print('lol')
                     else:
                         self.variant_signal.emit(variant_id)
 

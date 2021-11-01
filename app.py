@@ -40,7 +40,6 @@ from wizard.gui import team_dns_widget
 from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
 from wizard.gui import project_manager_widget
-from wizard.gui import create_project_widget
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
 

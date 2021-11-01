@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import os
 
 # Wizard modules
+from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -14,6 +15,9 @@ class log_viewer(QtWidgets.QWidget):
 
     def __init__(self, file=None, parent=None):
         super(log_viewer, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Logs")
 
         self.build_ui()
         self.file = file

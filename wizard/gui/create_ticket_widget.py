@@ -9,6 +9,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from wizard.core import project
 from wizard.core import assets
 from wizard.core import site
+from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import drop_files_widget
@@ -17,6 +18,10 @@ from wizard.gui import gui_server
 class create_ticket_widget(QtWidgets.QDialog):
     def __init__(self, export_version_id, parent=None):
         super(create_ticket_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Create ticket")
+
         self.export_version_id = export_version_id
         self.build_ui()
         self.fill_ui()

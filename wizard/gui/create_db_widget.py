@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 # Wizard modules
 from wizard.core import site
 from wizard.core import db_utils
+from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -19,6 +20,10 @@ from wizard.gui import gui_utils
 class create_db_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_db_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Init database")
+
         self.build_ui()
         self.connect_functions()
 

@@ -30,6 +30,10 @@ class subtask_manager(QtWidgets.QWidget):
 
     def __init__(self, parent = None):
         super(subtask_manager, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Subtasks manager")
+
         self.tasks_ids = dict()
 
         self.build_ui()

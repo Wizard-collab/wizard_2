@@ -25,6 +25,10 @@ logger = custom_logger.get_logger(__name__)
 class create_project_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_project_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Create project")
+
         self.project_path = ''
         self.use_image_file = 0
         self.build_ui()

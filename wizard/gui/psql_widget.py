@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.core import user
+from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -15,6 +16,10 @@ from wizard.gui import logging_widget
 class psql_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(psql_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - PostgreSQL connection")
+
         self.build_ui()
         self.connect_functions()
 

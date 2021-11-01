@@ -5,9 +5,16 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
+# Wizard modules
+from wizard.vars import ressources
+
 class message_widget(QtWidgets.QDialog):
     def __init__(self, title, message, parent=None):
         super(message_widget, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - {title}")
+
         self.title = title
         self.message = message
         self.build_ui()

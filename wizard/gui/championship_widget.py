@@ -16,6 +16,10 @@ from wizard.vars import ressources
 class championship_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(championship_widget, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard championship")
+
         self.user_ids = dict()
         self.build_ui()
         self.refresh()

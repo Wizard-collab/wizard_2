@@ -5,9 +5,16 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 
+# Wizard modules
+from wizard.vars import ressources
+
 class license_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(license_widget, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - License")
+
         self.build_ui()
         self.fill_ui()
 

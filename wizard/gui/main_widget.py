@@ -13,6 +13,7 @@ import sys
 # Wizard modules
 from wizard.vars import ressources
 from wizard.core import project
+from wizard.core import environment
 from wizard.core import communicate
 from wizard.core import launch
 from wizard.core import team_client
@@ -52,6 +53,9 @@ class main_widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(main_widget, self).__init__(parent)
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - {environment.get_project_name()}")
+
         self.tree_widget = tree_widget.tree_widget(self)
         self.console_widget = console_widget.console_widget()
         self.user_preferences_widget = user_preferences_widget.user_preferences_widget()

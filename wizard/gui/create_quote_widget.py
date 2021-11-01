@@ -12,6 +12,10 @@ from wizard.vars import ressources
 class create_quote_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_quote_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Create quote")
+
         self.build_ui()
         self.connect_functions()
 

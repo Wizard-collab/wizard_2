@@ -641,6 +641,7 @@ QSlider::handle:horizontal {
 }
 
 #production_manager_list_widget{
+	margin: 0px;
 	alternate-background-color: rgba(0,0,0,50);
 }
 
