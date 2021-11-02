@@ -86,6 +86,17 @@ def get_version():
         logging.error(f'{version_file} not found')
         return None
 
+def get_size():
+    install_dir = get_install_dir()
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(install_dir):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+
+    return int(total_size/1000)
+
 def create_reg_keys():
     KEY = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Wizard"
     install_dir = get_install_dir()
@@ -95,16 +106,17 @@ def create_reg_keys():
     winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, KEY)
 
     keys_list = []
-    keys_list.append(('UninstallString', "{}\\uninstall.exe".format(install_dir)))
-    keys_list.append(('DisplayName', "Wizard"))
-    keys_list.append(('DisplayVersion', version))
-    keys_list.append(('Publisher', "Wizard - Pipeline manager"))
-    keys_list.append(('InstallLocation', install_dir))
-    keys_list.append(('DisplayIcon', install_dir+'\\wizard.exe'))
+    keys_list.append(('UninstallString', winreg.REG_SZ, "{}\\uninstall.exe".format(install_dir)))
+    keys_list.append(('DisplayName', winreg.REG_SZ, "Wizard"))
+    keys_list.append(('DisplayVersion', winreg.REG_SZ, version))
+    keys_list.append(('Publisher', winreg.REG_SZ, "Wizard - Pipeline manager"))
+    keys_list.append(('InstallLocation', winreg.REG_SZ, install_dir))
+    keys_list.append(('DisplayIcon', winreg.REG_SZ, install_dir+'\\wizard.exe'))
+    keys_list.append(('EstimatedSize', winreg.REG_DWORD, get_size()))
 
     for key in keys_list:
         registry_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, KEY, 0, winreg.KEY_ALL_ACCESS)
-        winreg.SetValueEx(registry_key, key[0], 0, winreg.REG_SZ, key[1])
+        winreg.SetValueEx(registry_key, key[0], 0, key[1], key[2])
         winreg.CloseKey(registry_key)
         print(f"{key[0]} registery key created")
 
@@ -200,7 +212,7 @@ class installer(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-        self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_icon.svg')))
+        self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.svg')))
         self.setWindowTitle(f"Wizard installer")
         self.build_ui()
 
@@ -307,7 +319,7 @@ class installer(QtWidgets.QWidget):
 
         self.image_label = QtWidgets.QLabel()
         self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_icon.svg')).pixmap(34))
+        self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.svg')).pixmap(34))
         self.datas_layout.addWidget(self.image_label)
 
         self.infos_widget = QtWidgets.QWidget()

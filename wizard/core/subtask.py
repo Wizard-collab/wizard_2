@@ -36,6 +36,7 @@ import json
 import shlex
 import os
 import traceback
+import sys
 
 # Wizard modules
 from wizard.vars import user_vars
@@ -180,7 +181,11 @@ class subtask(Thread):
     def build_pycmd(self):
         if self.pycmd is not None:
             py_file = tools.temp_file_from_pycmd(self.pycmd)
-            self.command = f'python PyWizard.py "{py_file}"'
+            if sys.argv[0].endswith('.py'):
+                self.command = f'python PyWizard.py "{py_file}"'
+            else:
+                self.command = f'PyWizard "{py_file}"'
+
 
     def run(self):
         try:
@@ -193,8 +198,6 @@ class subtask(Thread):
             self.add_python_buffer_env()
 
             self.build_pycmd()
-
-            print(self.command)
 
             self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=self.cwd,
                                             stdout = subprocess.PIPE, stderr = subprocess.STDOUT, stdin = subprocess.PIPE)

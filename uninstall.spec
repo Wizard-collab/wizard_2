@@ -16,7 +16,7 @@ a = Analysis(['uninstall.py'],
              cipher=block_cipher,
              noarchive=False)
 
-a.datas += [ ('ressources\\icons\\wizard_icon.svg', '.\\ressources\\icons\\wizard_icon.svg', 'DATA')]
+a.datas += [ ('ressources\\icons\\wizard_setup.svg', '.\\ressources\\icons\\wizard_setup.svg', 'DATA')]
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
@@ -34,4 +34,4 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=False,
-          icon='D:\\script\\wizard_2\\ressources\\icons\\wizard_icon.ico')
+          icon='D:\\script\\wizard_2\\ressources\\icons\\wizard_setup.ico')

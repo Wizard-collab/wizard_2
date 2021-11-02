@@ -317,6 +317,10 @@ def modify_variant_assignment(variant_id, user_name):
     project.set_variant_data(variant_id, 'assignment', user_name)
     asset_tracking.add_assignment_event(variant_id, user_name)
 
+def modify_variant_estimation(variant_id, seconds):
+    project.set_variant_data(variant_id, 'estimated_time', seconds)
+    asset_tracking.add_estimation_event(variant_id, seconds)
+
 def add_work_time(work_env_id, work_time):
     project.add_work_time(work_env_id, work_time)
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')

@@ -431,6 +431,8 @@ def remove_variant(variant_id):
             remove_export(export_id)
         for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
             remove_work_env(work_env_id)
+        for asset_tracking_event_id in get_asset_tracking_events(variant_id, 'id'):
+            remove_asset_tracking_event(asset_tracking_event_id)
         success = db_utils.delete_row('project', 'variants', variant_id)
         if success:
             logger.info(f"Variant removed from project")
@@ -475,6 +477,14 @@ def add_asset_tracking_event(variant_id, event_type, data, comment=''):
     if asset_tracking_event_id:
         logger.debug("Asset tracking event added")
     return asset_tracking_event_id
+
+def remove_asset_tracking_event(asset_tracking_event_id):
+    success = None
+    if site.is_admin():
+        success = db_utils.delete_row('project', 'asset_tracking_events', asset_tracking_event_id)
+        if success:
+            logger.info(f"Asset tracking event removed from project")
+    return success
 
 def get_asset_tracking_event_data(asset_tracking_event_id, column='*'):
     asset_tracking_events_rows = db_utils.get_row_by_column_data('project',

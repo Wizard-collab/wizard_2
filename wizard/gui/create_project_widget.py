@@ -226,7 +226,7 @@ class create_project_widget(QtWidgets.QDialog):
                                        QtWidgets.QFileDialog.ShowDirsOnly
                                        | QtWidgets.QFileDialog.DontResolveSymlinks)
         if project_path:
-            self.project_path = project_path
+            self.project_path = project_path + '/'
             self.update_project_path()
 
     def normalise_project_name(self, project_name):

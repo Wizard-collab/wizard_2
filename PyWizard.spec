@@ -26,9 +26,9 @@ exe = EXE(pyz,
           bootloader_ignore_signals=True,
           strip=False,
           upx=True,
-          console=True,
+          console=False,
           version = 'compile\\version.rc',
-          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\wizard_icon.ico")
+          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\pywizard.ico")
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

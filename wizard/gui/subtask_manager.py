@@ -221,7 +221,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.clock_thread.start()
 
     def show_log_viewer(self):
-        self.log_viewer = log_viewer.log_viewer(self.log_file, parent = self)
+        self.log_viewer = log_viewer.log_viewer(self.log_file)
         self.log_viewer.show()
 
     def update_current_task(self, task):

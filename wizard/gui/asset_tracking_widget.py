@@ -19,6 +19,7 @@ from wizard.vars import user_vars
 # Wizard gui modules
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
+from wizard.gui import estimation_widget
 
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -42,6 +43,13 @@ class asset_tracking_widget(QtWidgets.QFrame):
             if user_id not in self.users_ids.keys():
                 self.users_ids[user_id] = site.get_user_data(user_id, 'user_name')
                 self.assignment_comboBox.addItem(self.users_ids[user_id])
+
+    def edit_estimation(self):
+        self.estimation_widget = estimation_widget.estimation_widget()
+        if self.estimation_widget.exec_() == QtWidgets.QDialog.Accepted:
+            seconds = self.estimation_widget.hours*3600
+            assets.modify_variant_estimation(self.variant_id, seconds)
+            gui_server.refresh_ui()
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -89,7 +97,10 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout.addWidget(self.work_time_icon_label)
 
         self.work_time_label = QtWidgets.QLabel()
+        self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.time_infos_layout.addWidget(self.work_time_label)
+
+        self.time_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.estimated_time_icon_label = QtWidgets.QLabel()
         self.estimated_time_icon_label.setFixedSize(QtCore.QSize(22,22))
@@ -97,7 +108,13 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout.addWidget(self.estimated_time_icon_label)
 
         self.estimated_time_label = QtWidgets.QLabel()
+        self.estimated_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.time_infos_layout.addWidget(self.estimated_time_label)
+
+        self.edit_estimation_button = QtWidgets.QPushButton()
+        self.edit_estimation_button.setObjectName('edit_button')
+        self.edit_estimation_button.setFixedSize(16,16)
+        self.time_infos_layout.addWidget(self.edit_estimation_button)
 
         self.progress_bar_widget = QtWidgets.QWidget()
         self.progress_bar_widget.setObjectName('transparent_widget')
@@ -297,6 +314,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.assignment_comboBox.currentTextChanged.connect(self.modify_assignment)
         self.events_scrollBar.rangeChanged.connect(lambda: self.events_scrollBar.setValue(self.events_scrollBar.maximum()))
         self.event_count_spinBox.valueChanged.connect(self.change_count)
+        self.edit_estimation_button.clicked.connect(self.edit_estimation)
 
 class tracking_event_widget(QtWidgets.QFrame):
     def __init__(self, tracking_event_row, parent=None):
