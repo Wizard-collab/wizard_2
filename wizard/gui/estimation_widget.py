@@ -52,7 +52,7 @@ class estimation_widget(QtWidgets.QDialog):
         self.main_frame.setGraphicsEffect(self.shadow)
 
         self.hours_spinBox = QtWidgets.QSpinBox()
-        self.hours_spinBox.setRange(0, 200)
+        self.hours_spinBox.setRange(1, 200)
         self.hours_spinBox.setValue(6)
         self.hours_spinBox.setButtonSymbols(2)
         self.frame_layout.addWidget(self.hours_spinBox)

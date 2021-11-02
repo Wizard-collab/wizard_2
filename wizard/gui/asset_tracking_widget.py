@@ -329,6 +329,8 @@ class tracking_event_widget(QtWidgets.QFrame):
             self.build_assignment_ui()
         elif self.tracking_event_row['event_type'] == 'work_session':
             self.build_work_session_ui()
+        elif self.tracking_event_row['event_type'] == 'estimation':
+            self.build_estimation_ui()
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -336,6 +338,24 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
+
+    def build_estimation_ui(self):
+        self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.user_label)
+
+        self.info_label = QtWidgets.QLabel('estimated task at')
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.info_label)
+
+        string_time = tools.convert_seconds_to_string_time(float(self.tracking_event_row['data']))
+
+        self.estimation_label = QtWidgets.QLabel(string_time)
+        self.estimation_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.estimation_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
     def build_work_session_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])

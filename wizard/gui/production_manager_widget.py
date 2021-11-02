@@ -107,12 +107,16 @@ class production_manager_widget(QtWidgets.QWidget):
                 self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 0)
 
     def unhide_all(self):
-        for asset_id in self.asset_ids.keys():
-            self.asset_ids[asset_id]['item'].setHidden(0)
-            QtWidgets.QApplication.processEvents()
-        for variant_id in self.variant_ids.keys():
-            self.variant_ids[variant_id]['widget'].setVisible(1)
-            QtWidgets.QApplication.processEvents()
+        asset_ids = list(self.asset_ids.keys())
+        for asset_id in asset_ids:
+            if asset_id in self.asset_ids.keys():
+                self.asset_ids[asset_id]['item'].setHidden(0)
+                QtWidgets.QApplication.processEvents()
+        variant_ids = list(self.variant_ids.keys())
+        for variant_id in variant_ids:
+            if variant_id in self.variant_ids.keys():
+                self.variant_ids[variant_id]['widget'].setVisible(1)
+                QtWidgets.QApplication.processEvents()
         for stage in self.stages_list:
             self.list_view.setColumnHidden(self.stages_list.index(stage)+1, 0)
 
@@ -263,7 +267,7 @@ class production_manager_widget(QtWidgets.QWidget):
                 if asset_row['id'] not in self.asset_ids.keys():
                     self.asset_ids[asset_row['id']] = dict()
                     self.asset_ids[asset_row['id']]['row'] = asset_row
-                    item = custom_asset_listWidgetItem(self.asset_ids[asset_row['id']]['row'], self.list_view.invisibleRootItem())
+                    item = custom_asset_listWidgetItem(self.asset_ids[asset_row['id']]['row'], self.domain, self.list_view.invisibleRootItem())
                     self.asset_ids[asset_row['id']]['item'] = item
 
             for stage_row in stage_rows:
@@ -289,12 +293,13 @@ class production_manager_widget(QtWidgets.QWidget):
             self.apply_search()
 
 class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
-    def __init__(self, asset_row, parent=None):
+    def __init__(self, asset_row, domain, parent=None):
         super(custom_asset_listWidgetItem, self).__init__(parent)
         self.stage_ids = dict()
         self.variant_ids = dict()
         self.asset_row = asset_row
-        widget = asset_widget(self.asset_row)
+        self.domain = domain
+        widget = asset_widget(self.asset_row, self.domain)
         self.treeWidget().setItemWidget(self, 0, widget)
 
     def add_stage(self, stage_row, stage_list):
@@ -329,9 +334,10 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
             self.treeWidget().updateGeometries()
 
 class asset_widget(QtWidgets.QWidget):
-    def __init__(self, asset_row, parent=None):
+    def __init__(self, asset_row, domain, parent=None):
         super(asset_widget, self).__init__(parent)
         self.asset_row = asset_row
+        self.domain = domain
         self.build_ui()
         self.fill_ui()
 
@@ -343,17 +349,49 @@ class asset_widget(QtWidgets.QWidget):
 
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('production_manager_variant_frame')
-        self.main_frame_layout = QtWidgets.QHBoxLayout()
+        self.main_frame_layout = QtWidgets.QVBoxLayout()
+        self.main_frame_layout.setSpacing(4)
         self.main_frame.setLayout(self.main_frame_layout)
         self.main_layout.addWidget(self.main_frame)
 
+        self.main_frame_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
         self.asset_name_label = QtWidgets.QLabel()
         self.asset_name_label.setObjectName('bold_label')
-        self.asset_name_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.asset_name_label.setAlignment(QtCore.Qt.AlignLeft)
         self.main_frame_layout.addWidget(self.asset_name_label)
+
+        if self.domain == 'sequences':
+            self.frame_range_label = QtWidgets.QLabel('frame range')
+            self.frame_range_label.setAlignment(QtCore.Qt.AlignLeft)
+            self.frame_range_label.setObjectName('gray_label')
+            self.main_frame_layout.addWidget(self.frame_range_label)
+
+            self.frame_range_widget = QtWidgets.QWidget()
+            self.frame_range_widget.setObjectName('transparent_widget')
+            self.frame_range_layout = QtWidgets.QHBoxLayout()
+            self.frame_range_layout.setContentsMargins(0,0,0,0)
+            self.frame_range_layout.setSpacing(4)
+            self.frame_range_widget.setLayout(self.frame_range_layout)
+            self.main_frame_layout.addWidget(self.frame_range_widget)
+
+            self.in_frame_label = QtWidgets.QLabel()
+            self.frame_range_layout.addWidget(self.in_frame_label)
+            self.out_frame_label = QtWidgets.QLabel()
+            self.frame_range_layout.addWidget(self.out_frame_label)
+
+            self.edit_frange_button = QtWidgets.QPushButton()
+            self.edit_frange_button.setObjectName('edit_button')
+            self.edit_frange_button.setFixedSize(16,16)
+            self.frame_range_layout.addWidget(self.edit_frange_button)
+
+        self.main_frame_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
     def fill_ui(self):
         self.asset_name_label.setText(self.asset_row['name'])
+        if self.domain == 'sequences':
+            self.in_frame_label.setText(str(self.asset_row['inframe']))
+            self.out_frame_label.setText(str(self.asset_row['outframe']))
 
 class stage_widget(QtWidgets.QWidget):
 
@@ -427,8 +465,8 @@ class variant_widget(QtWidgets.QFrame):
         self.datas_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.datas_widget.setObjectName('production_manager_state_frame')
         self.datas_layout = QtWidgets.QHBoxLayout()
-        self.datas_layout.setContentsMargins(5,5,16,5)
-        self.datas_layout.setSpacing(6)
+        self.datas_layout.setContentsMargins(3,3,8,3)
+        self.datas_layout.setSpacing(3)
         self.datas_widget.setLayout(self.datas_layout)
         self.content_layout.addWidget(self.datas_widget)
 
@@ -452,12 +490,26 @@ class variant_widget(QtWidgets.QFrame):
 
         self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.work_time_label = QtWidgets.QLabel()
-        self.content_layout.addWidget(self.work_time_label)
+        self.work_times_widget = QtWidgets.QWidget()
+        self.work_times_widget.setObjectName('transparent_widget')
+        self.work_times_layout = QtWidgets.QFormLayout()
+        self.work_times_layout.setContentsMargins(0,0,0,0)
+        self.work_times_layout.setSpacing(4)
+        self.work_times_widget.setLayout(self.work_times_layout)
+        self.content_layout.addWidget(self.work_times_widget)
 
         self.work_time_image = QtWidgets.QLabel()
-        self.work_time_image.setPixmap(QtGui.QIcon(ressources._work_time_icon_).pixmap(24))
-        self.content_layout.addWidget(self.work_time_image)
+        self.work_time_image.setPixmap(QtGui.QIcon(ressources._work_time_icon_).pixmap(14))
+        self.work_time_label = QtWidgets.QLabel()
+        self.work_times_layout.addRow(self.work_time_image, self.work_time_label)
+
+        self.estimated_time_image = QtWidgets.QLabel()
+        self.estimated_time_image.setPixmap(QtGui.QIcon(ressources._estimated_time_icon_).pixmap(14))
+        self.estimated_time_label = QtWidgets.QLabel()
+        self.estimate_button = QtWidgets.QPushButton()
+        self.estimate_button.setObjectName('estimate_button')
+        self.estimate_button.setFixedSize(QtCore.QSize(14,14))
+        self.work_times_layout.addRow(self.estimated_time_image, self.estimated_time_label)
 
         self.progress_bar_widget = QtWidgets.QWidget()
         self.progress_bar_widget.setObjectName('transparent_widget')
@@ -476,9 +528,12 @@ class variant_widget(QtWidgets.QFrame):
 
     def fill_ui(self):
         self.stage_icon.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(18))
-        self.state_label.setText(self.variant_row['state'].upper())
+        self.state_label.setText(self.variant_row['state'])
         string_time = tools.convert_seconds_to_string_time(float(self.variant_row['work_time']))
         self.work_time_label.setText(string_time)
+        if self.variant_row['estimated_time'] is not None:
+            string_time = tools.convert_seconds_to_string_time(float(self.variant_row['estimated_time']))
+            self.estimated_time_label.setText(string_time)
         user_image =  site.get_user_row_by_name(self.variant_row['assignment'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
         self.user_image_label.setPixmap(pm)
