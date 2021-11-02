@@ -29,7 +29,7 @@
 # Python modules
 import socket
 import sys
-from threading import *
+import threading
 import time
 import traceback
 import json
@@ -42,7 +42,10 @@ import struct
 logger = logging.getLogger('WIZARD-SERVER')
 logger.setLevel(logging.DEBUG)
 
-log_file = "wizard_server.log"
+user_path = os.path.expanduser('~/Documents/wizard_2/')
+if not os.path.isdir(user_path):
+    os.mkdir(user_path)
+log_file = os.path.join(user_path, "wizard_server.log")
 # create file handler and set level to debug
 file_handler = RotatingFileHandler(log_file, mode='a', maxBytes=1000000, backupCount=1000, encoding=None, delay=False)
 # create console handler and set level to debug
@@ -140,7 +143,7 @@ def recvall_with_given_len(sock, n):
         return None
     return data
 
-class server(Thread):
+class server(threading.Thread):
     def __init__(self):
         super(server, self).__init__()
         hostname = socket.gethostname()
@@ -179,7 +182,7 @@ class server(Thread):
             client_dic['project'] = project
             self.client_ids[user_name]=client_dic
 
-            Thread(target=self.clientThread, args=(user_name, conn, addr, project)).start()
+            threading.Thread(target=self.clientThread, args=(user_name, conn, addr, project)).start()
             logger.info("New client : {}, {}, {}".format(user_name, addr, project))
             signal_dic = dict()
             signal_dic['type'] = 'new_user'

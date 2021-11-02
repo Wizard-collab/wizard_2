@@ -43,15 +43,21 @@ import tempfile
 
 # CHECK ADMIN
 def is_bootsrap():
-    if os.path.normpath(os.path.abspath('')) != os.path.normpath(get_current_install()[3]):
-        return True
+    if not sys.argv[0].endswith('.py'):
+        if os.path.normpath(os.path.abspath('')) != os.path.normpath(get_current_install()[3]):
+            if os.path.normpath(os.path.abspath('')) == os.path.normpath('C:/Windows/ImmersiveControlPanel'):
+                return False
+            else:
+                return True
+        else:
+            return False
     else:
-        return False
+        return True
 
 def create_bootstrap():
     tempdir = tempfile.mkdtemp()
     if not sys.argv[0].endswith('.py'):
-        bootstrap = os.path.join(tempdir, 'wizard_bootstrap.exe')
+        bootstrap = os.path.join(tempdir, 'uninstall.exe')
         shutil.copyfile(os.path.join(os.path.abspath(''), sys.argv[0]), bootstrap)
         os.chdir(tempdir)
         os.startfile(bootstrap)
@@ -129,8 +135,12 @@ def uninstall():
 class uninstaller(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(uninstaller, self).__init__(parent)
-        self.setWindowIcon(QtGui.QIcon('ressources/icons/wizard_icon.svg'))
+        self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_icon.svg')))
         self.setWindowTitle(f"Wizard uninstaller")
+
+        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
@@ -141,6 +151,7 @@ class uninstaller(QtWidgets.QWidget):
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
         self.move((screen_maxX-self.width())/2, (screen_maxY-self.height())/2)
+        print(os.path.abspath(''))
 
     def fill_ui(self):
         version = get_current_install()[1]
@@ -185,24 +196,59 @@ class uninstaller(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(18,18,18,18)
         self.setLayout(self.main_layout)
 
+        self.main_frame = QtWidgets.QFrame()
+        self.main_frame.setStyleSheet('QFrame{border-radius:10px;}')
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(18)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.main_frame.setGraphicsEffect(self.shadow)
+
+        self.frame_layout = QtWidgets.QVBoxLayout()
+        self.frame_layout.setContentsMargins(20,20,20,20)
+        self.frame_layout.setSpacing(6)
+        self.main_frame.setLayout(self.frame_layout)
+        self.main_layout.addWidget(self.main_frame)
+
+        self.datas_widget = QtWidgets.QWidget()
+        self.datas_layout = QtWidgets.QHBoxLayout()
+        self.datas_layout.setContentsMargins(0,0,0,0)
+        self.datas_layout.setSpacing(12)
+        self.datas_widget.setLayout(self.datas_layout)
+        self.frame_layout.addWidget(self.datas_widget)
+
+        self.image_label = QtWidgets.QLabel()
+        self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_icon.svg')).pixmap(34))
+        self.datas_layout.addWidget(self.image_label)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_layout = QtWidgets.QVBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setSpacing(6)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.datas_layout.addWidget(self.infos_widget)
+
         self.infos_label = QtWidgets.QLabel('Uninstall ?')
-        self.main_layout.addWidget(self.infos_label)
+        self.infos_layout.addWidget(self.infos_label)
 
         self.version_label = QtWidgets.QLabel()
         self.version_label.setStyleSheet('color:gray;')
-        self.main_layout.addWidget(self.version_label)
+        self.infos_layout.addWidget(self.version_label)
 
         self.progress_bar = QtWidgets.QProgressBar()
         self.progress_bar.setStyleSheet('QProgressBar{height:6px;background-color: rgba(0,0,0,50);border-radius:3px;color: transparent;}QProgressBar::chunk {background-color: #7785de;border-radius:3px;}')
         self.progress_bar.setMaximumHeight(6)
-        self.main_layout.addWidget(self.progress_bar)
+        self.frame_layout.addWidget(self.progress_bar)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
-        self.main_layout.addWidget(self.buttons_widget)
+        self.frame_layout.addWidget(self.buttons_widget)
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 

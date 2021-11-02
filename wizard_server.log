@@ -4785,3 +4785,27 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2021-11-01 16:25:21,140 - WIZARD-SERVER - INFO - test_conn
 2021-11-01 16:25:23,024 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 50224), dev3
 2021-11-01 16:25:23,024 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-11-02 10:47:00,617 - WIZARD-SERVER - INFO - Python : 3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)]
+2021-11-02 10:47:00,617 - WIZARD-SERVER - INFO - Starting server on : '192.168.1.82'
+2021-11-02 10:47:00,617 - WIZARD-SERVER - INFO - Default port : '50333'
+2021-11-02 10:47:00,617 - WIZARD-SERVER - INFO - Server started
+2021-11-02 10:47:10,657 - WIZARD-SERVER - INFO - test_conn
+2021-11-02 10:47:13,182 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 50797), dev3
+2021-11-02 10:47:13,182 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-11-02 10:47:55,258 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 128, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-11-02 10:47:55,274 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 50797), dev3
+2021-11-02 10:47:55,274 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-11-02 10:48:07,973 - WIZARD-SERVER - INFO - test_conn
+2021-11-02 10:48:09,760 - WIZARD-SERVER - INFO - New client : a.manzanares, ('192.168.1.82', 51263), dev3
+2021-11-02 10:48:09,760 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'new_user', 'user_name': 'a.manzanares', 'project': 'dev3'}
+2021-11-02 10:48:17,788 - WIZARD-SERVER - DEBUG - Traceback (most recent call last):
+  File "D:\SCRIPT\wizard_2\server.py", line 128, in recvall_with_given_len
+    packet = sock.recv(n - len(data))
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+2021-11-02 10:48:17,788 - WIZARD-SERVER - INFO - Removing client : a.manzanares, ('192.168.1.82', 51263), dev3
+2021-11-02 10:48:17,788 - WIZARD-SERVER - DEBUG - Broadcasting : {'type': 'remove_user', 'user_name': 'a.manzanares', 'project': 'dev3'}

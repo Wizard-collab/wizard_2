@@ -44,6 +44,7 @@ from wizard.gui import loading_widget
 from wizard.gui import main_widget
 
 # Wizard modules
+import server
 from wizard.core import user
 from wizard.core import environment
 from wizard.core import site
