@@ -44,7 +44,6 @@ from wizard.gui import loading_widget
 from wizard.gui import main_widget
 
 # Wizard modules
-import server
 from wizard.core import user
 from wizard.core import environment
 from wizard.core import site
@@ -119,7 +118,7 @@ class app():
 
 		self.main_widget = main_widget.main_widget()
 		self.main_widget.refresh()
-		self.main_widget.show()
+		self.main_widget.showMaximized()
 		QtWidgets.QApplication.processEvents()
 		self.main_widget.init_contexts()
 		self.main_widget.stop_threads.connect(self.db_server.stop)

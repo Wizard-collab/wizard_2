@@ -59,7 +59,7 @@ class compile():
 			if (MAJOR and MINOR and PATCH) is not None:
 				release_name = f"{MAJOR}.{MINOR}.{PATCH}"
 				self.build_folder = os.path.join(compil_dir, f"{release_name}_{str(build_no).zfill(4)}")
-				self.setup_name = f'{release_name}.{str(build_no).zfill(4)} setup.exe'
+				self.setup_name = f'{release_name}.{str(build_no).zfill(4)}-setup.exe'
 				compil_data_dic['MAJOR'] = MAJOR
 				compil_data_dic['MINOR'] = MINOR
 				compil_data_dic['PATCH'] = PATCH

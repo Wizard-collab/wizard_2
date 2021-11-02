@@ -125,8 +125,8 @@ class production_manager_widget(QtWidgets.QWidget):
             self.variant_ids[variant_id]['widget'].setVisible(1)
 
     def build_ui(self):
-        self.setMinimumWidth(700)
-        self.setMinimumHeight(500)
+        self.setMinimumWidth(1500)
+        self.setMinimumHeight(1000)
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
