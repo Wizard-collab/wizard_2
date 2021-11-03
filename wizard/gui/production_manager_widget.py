@@ -21,6 +21,21 @@ from wizard.core import image
 from wizard.vars import ressources
 from wizard.vars import assets_vars
 
+stages_colors = dict()
+stages_colors['modeling'] = 'rgba(255,81,81,ALPHA)'
+stages_colors['rigging'] = 'rgba(81,255,121,ALPHA)'
+stages_colors['grooming'] = 'rgba(255,209,81,ALPHA)'
+stages_colors['texturing'] = 'rgba(81,90,255,ALPHA)'
+stages_colors['shading'] = 'rgba(214,81,255,ALPHA)'
+
+stages_colors['layout'] = 'rgba(255,81,81,ALPHA)'
+stages_colors['animation'] = 'rgba(81,255,121,ALPHA)'
+stages_colors['cfx'] = 'rgba(255,209,81,ALPHA)'
+stages_colors['fx'] = 'rgba(55,220,255,ALPHA)'
+stages_colors['camera'] = 'rgba(255,138,44,ALPHA)'
+stages_colors['lighting'] = 'rgba(214,81,255,ALPHA)'
+stages_colors['compositing'] = 'rgba(81,90,255,ALPHA)'
+
 class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(production_manager_widget, self).__init__(parent)
@@ -154,6 +169,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        self.list_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
         self.main_layout.addWidget(self.list_view)
@@ -240,14 +256,14 @@ class production_manager_widget(QtWidgets.QWidget):
     def update_header(self):
         if self.domain == 'assets':
             self.stages_list = assets_vars._assets_stages_list_
-            self.list_view.setHeaderLabels(['Asset']+self.stages_list)
+            self.list_view.setHeaderLabels(['Asset', 'Preview']+self.stages_list)
         elif self.domain == 'sequences':
             self.stages_list = assets_vars._sequences_stages_list_
-            self.list_view.setHeaderLabels(['Shot']+self.stages_list)
+            self.list_view.setHeaderLabels(['Shot', 'Preview']+self.stages_list)
 
-        self.list_view.setColumnCount(len(self.stages_list)+1)
+        self.list_view.setColumnCount(len(self.stages_list)+2)
         for stage in self.stages_list:
-            self.list_view.header().setSectionResizeMode(self.stages_list.index(stage)+1, QtWidgets.QHeaderView.Stretch)
+            self.list_view.header().setSectionResizeMode(self.stages_list.index(stage)+2, QtWidgets.QHeaderView.Stretch)
 
     def clear_assets(self):
         self.asset_ids = dict()
@@ -388,7 +404,7 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem, QtCore.QObject):
         self.stage_ids[stage_row['id']]['row'] = stage_row
         widget = stage_widget(stage_row, self.treeWidget())
         self.stage_ids[stage_row['id']]['widget'] = widget
-        index = stage_list.index(stage_row['name'])+1
+        index = stage_list.index(stage_row['name'])+2
         self.stage_ids[stage_row['id']]['index'] = index
         self.treeWidget().setItemWidget(self, index, widget)
 
@@ -423,12 +439,13 @@ class asset_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(1,2,1,2)
+        self.main_layout.setContentsMargins(1,1,1,1)
         self.setLayout(self.main_layout)
 
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('production_manager_variant_frame')
         self.main_frame_layout = QtWidgets.QVBoxLayout()
+        self.main_frame_layout.setContentsMargins(6,6,6,6)
         self.main_frame_layout.setSpacing(4)
         self.main_frame.setLayout(self.main_frame_layout)
         self.main_layout.addWidget(self.main_frame)
@@ -441,11 +458,6 @@ class asset_widget(QtWidgets.QWidget):
         self.main_frame_layout.addWidget(self.asset_name_label)
 
         if self.domain == 'sequences':
-            self.frame_range_label = QtWidgets.QLabel('frame range')
-            self.frame_range_label.setAlignment(QtCore.Qt.AlignLeft)
-            self.frame_range_label.setObjectName('gray_label')
-            self.main_frame_layout.addWidget(self.frame_range_label)
-
             self.frame_range_widget = QtWidgets.QWidget()
             self.frame_range_widget.setObjectName('transparent_widget')
             self.frame_range_layout = QtWidgets.QHBoxLayout()
@@ -455,15 +467,17 @@ class asset_widget(QtWidgets.QWidget):
             self.main_frame_layout.addWidget(self.frame_range_widget)
 
             self.in_frame_label = QtWidgets.QLabel()
+            self.in_frame_label.setObjectName('gray_label')
             self.frame_range_layout.addWidget(self.in_frame_label)
             self.out_frame_label = QtWidgets.QLabel()
+            self.out_frame_label.setObjectName('gray_label')
             self.frame_range_layout.addWidget(self.out_frame_label)
 
             self.edit_frange_button = QtWidgets.QPushButton()
             self.edit_frange_button.setObjectName('edit_button')
             self.edit_frange_button.setFixedSize(16,16)
             self.frame_range_layout.addWidget(self.edit_frange_button)
-
+            
         self.main_frame_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
     def fill_ui(self):
@@ -480,9 +494,9 @@ class stage_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(1,2,1,2)
+        self.main_layout.setContentsMargins(1,1,1,1)
         self.main_layout.setSpacing(2)
         self.setLayout(self.main_layout)
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
@@ -515,12 +529,17 @@ class variant_widget(QtWidgets.QFrame):
     def set_selected(self, selected=True):
         self.selected = selected
         if selected:
-            self.setStyleSheet('#production_manager_variant_frame{background-color: rgba(255,255,255,50);}')
+            self.setStyleSheet('#production_manager_variant_frame{background-color:%s;}'%stages_colors[self.stage].replace('ALPHA', str(120)))
         else:
-            self.setStyleSheet('')
+            self.setStyleSheet('''#production_manager_variant_frame{background-color:%s;}
+                                #production_manager_variant_frame:hover{background-color:%s;}'''%(stages_colors[self.stage].replace('ALPHA', str(40)),
+                                                                                                    stages_colors[self.stage].replace('ALPHA', str(60))))
 
     def build_ui(self):
         self.setObjectName('production_manager_variant_frame')
+        self.setStyleSheet('''#production_manager_variant_frame{background-color:%s;}
+                                #production_manager_variant_frame:hover{background-color:%s;}'''%(stages_colors[self.stage].replace('ALPHA', str(40)),
+                                                                                                    stages_colors[self.stage].replace('ALPHA', str(60))))
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)
@@ -540,6 +559,8 @@ class variant_widget(QtWidgets.QFrame):
         self.header_layout.addWidget(self.stage_icon)
 
         self.header_layout.addWidget(QtWidgets.QLabel(self.variant_row['name']))
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setObjectName('transparent_widget')
