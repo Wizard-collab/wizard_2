@@ -168,8 +168,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        self.list_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
         self.main_layout.addWidget(self.list_view)
@@ -256,12 +255,17 @@ class production_manager_widget(QtWidgets.QWidget):
     def update_header(self):
         if self.domain == 'assets':
             self.stages_list = assets_vars._assets_stages_list_
-            self.list_view.setHeaderLabels(['Asset', 'Preview']+self.stages_list)
+            self.headers_label_list = ['Asset', 'Preview']+self.stages_list
         elif self.domain == 'sequences':
             self.stages_list = assets_vars._sequences_stages_list_
-            self.list_view.setHeaderLabels(['Shot', 'Preview']+self.stages_list)
+            self.headers_label_list = ['Shot', 'Preview']+self.stages_list
 
         self.list_view.setColumnCount(len(self.stages_list)+2)
+        self.list_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        self.list_view.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+
+        self.list_view.setHeaderLabels(self.headers_label_list)
+
         for stage in self.stages_list:
             self.list_view.header().setSectionResizeMode(self.stages_list.index(stage)+2, QtWidgets.QHeaderView.Stretch)
 
@@ -397,7 +401,9 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem, QtCore.QObject):
         self.asset_row = asset_row
         self.domain = domain
         self.widget = asset_widget(self.asset_row, self.domain)
+        self.image_widget = image_widget(self.asset_row)
         self.treeWidget().setItemWidget(self, 0, self.widget)
+        self.treeWidget().setItemWidget(self, 1, self.image_widget)
 
     def add_stage(self, stage_row, stage_list):
         self.stage_ids[stage_row['id']] = dict()
@@ -421,6 +427,26 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem, QtCore.QObject):
 
     def refresh_variant(self, variant_row):
         self.variant_ids[variant_row['id']]['widget'].refresh(variant_row)
+
+class image_widget(QtWidgets.QWidget):
+    def __init__(self, asset_row, parent=None):
+        super(image_widget, self).__init__(parent)
+        self.asset_row = asset_row
+        self.build_ui()
+        self.fill_ui()
+
+    def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(1,1,1,1)
+        self.setLayout(self.main_layout)
+
+        self.image_label = QtWidgets.QLabel()
+        self.image_label.setStyleSheet('border:1px solid gray;')
+        self.main_layout.addWidget(self.image_label)
+
+    def fill_ui(self):
+        self.image_label.setPixmap(QtGui.QIcon(ressources._no_screenshot_).pixmap(200))
 
 class asset_widget(QtWidgets.QWidget):
 
