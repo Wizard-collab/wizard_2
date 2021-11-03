@@ -103,12 +103,12 @@ class production_manager_widget(QtWidgets.QWidget):
         if stage != '':
             for domain_stage in self.stages_list:
                 if stage in domain_stage:
-                    self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 0)
+                    self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+2, 0)
                 else:
-                    self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 1)
+                    self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+2, 1)
         else:
             for domain_stage in self.stages_list:
-                self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 0)
+                self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+2, 0)
         self.refresh_infos()
 
     def unhide_all(self):
@@ -442,11 +442,11 @@ class image_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.image_label = QtWidgets.QLabel()
-        self.image_label.setStyleSheet('border:1px solid gray;')
+        self.image_label.setObjectName('production_manager_variant_frame')
         self.main_layout.addWidget(self.image_label)
 
     def fill_ui(self):
-        self.image_label.setPixmap(QtGui.QIcon(ressources._no_screenshot_).pixmap(200))
+        self.image_label.setPixmap(QtGui.QIcon(ressources._no_preview_).pixmap(140))
 
 class asset_widget(QtWidgets.QWidget):
 
