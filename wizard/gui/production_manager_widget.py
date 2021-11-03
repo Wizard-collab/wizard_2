@@ -40,14 +40,19 @@ class production_manager_widget(QtWidgets.QWidget):
         self.category = None
         self.domain_ids = []
         self.category_ids = []
+        self.selection = []
         self.connect_functions()
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.update_search)
-        self.search_thread.asset_signal.connect(self.add_search_asset)
-        self.search_thread.variant_signal.connect(self.add_search_variant)
+        self.search_thread.assets_signal.connect(self.add_search_assets)
+        self.search_thread.variants_signal.connect(self.add_search_variants)
         self.domain_comboBox.currentTextChanged.connect(self.refresh_categories)
         self.category_comboBox.currentTextChanged.connect(self.refresh_assets)
+        self.select_all_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Ctrl+A'), self)
+        self.select_all_sc.activated.connect(self.select_all)
+        self.list_view.clicked.connect(self.deselect_all)
+        self.refresh_ui_button.clicked.connect(gui_server.refresh_ui)
 
     def apply_search(self):
         search = self.search_bar.text()
@@ -74,28 +79,12 @@ class production_manager_widget(QtWidgets.QWidget):
                     state = item.replace('state:', '')
                 if 'stage:' in item:
                     stage = item.replace('stage:', '')
-            self.hide_all(asset, assignment, state, stage)
+            self.hide_columns(stage)
             self.search_thread.update_search(asset=asset, assignment=assignment, state=state)
         else:
             self.unhide_all()
 
-    def hide_all(self, asset, assignment, state, stage):
-        if asset != '':
-            asset_vis = 0
-        else:
-            asset_vis = 1
-
-        for asset_id in self.asset_ids.keys():
-            self.asset_ids[asset_id]['item'].setHidden(1-asset_vis)
-
-        if assignment != '' or state != '':
-            variant_vis = 0
-        elif assignment == '' and state == '':
-            variant_vis = 1
-
-        for variant_id in self.variant_ids.keys():
-            self.variant_ids[variant_id]['widget'].setVisible(variant_vis)
-
+    def hide_columns(self, stage):
         if stage != '':
             for domain_stage in self.stages_list:
                 if stage in domain_stage:
@@ -105,28 +94,32 @@ class production_manager_widget(QtWidgets.QWidget):
         else:
             for domain_stage in self.stages_list:
                 self.list_view.setColumnHidden(self.stages_list.index(domain_stage)+1, 0)
+        self.refresh_infos()
 
     def unhide_all(self):
         asset_ids = list(self.asset_ids.keys())
         for asset_id in asset_ids:
             if asset_id in self.asset_ids.keys():
                 self.asset_ids[asset_id]['item'].setHidden(0)
-                QtWidgets.QApplication.processEvents()
         variant_ids = list(self.variant_ids.keys())
         for variant_id in variant_ids:
             if variant_id in self.variant_ids.keys():
                 self.variant_ids[variant_id]['widget'].setVisible(1)
-                QtWidgets.QApplication.processEvents()
         for stage in self.stages_list:
             self.list_view.setColumnHidden(self.stages_list.index(stage)+1, 0)
+        self.refresh_infos()
 
-    def add_search_asset(self, asset_id):
-        if asset_id in self.asset_ids.keys():
-            self.asset_ids[asset_id]['item'].setHidden(0)
+    def add_search_assets(self, assets_list):
+        asset_ids = self.asset_ids.keys()
+        for asset_id in asset_ids:
+            self.asset_ids[asset_id]['item'].setHidden(1-(asset_id in assets_list))
+        self.refresh_infos()
 
-    def add_search_variant(self, variant_id):
-        if variant_id in self.variant_ids.keys():
-            self.variant_ids[variant_id]['widget'].setVisible(1)
+    def add_search_variants(self, variants_list):
+        variant_ids = list(self.variant_ids.keys())
+        for variant_id in variant_ids:
+            self.variant_ids[variant_id]['widget'].setVisible(variant_id in variants_list)
+        self.refresh_infos()
 
     def build_ui(self):
         self.setMinimumWidth(1500)
@@ -154,14 +147,14 @@ class production_manager_widget(QtWidgets.QWidget):
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.list_view = QtWidgets.QTreeWidget()
+        self.list_view = custom_list_view(self)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('production_manager_list_widget')
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
         self.main_layout.addWidget(self.list_view)
 
@@ -174,6 +167,17 @@ class production_manager_widget(QtWidgets.QWidget):
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
         self.footer_layout.addWidget(self.refresh_label)
+
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.selection_info_label = QtWidgets.QLabel()
+        self.footer_layout.addWidget(self.selection_info_label)
+
+        self.refresh_ui_button = QtWidgets.QPushButton()
+        self.refresh_ui_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.refresh_ui_button, "Manually refresh the ui")
+        self.refresh_ui_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
+        self.footer_layout.addWidget(self.refresh_ui_button)
 
     def toggle(self):
         if self.isVisible():
@@ -269,6 +273,8 @@ class production_manager_widget(QtWidgets.QWidget):
                     self.asset_ids[asset_row['id']]['row'] = asset_row
                     item = custom_asset_listWidgetItem(self.asset_ids[asset_row['id']]['row'], self.domain, self.list_view.invisibleRootItem())
                     self.asset_ids[asset_row['id']]['item'] = item
+                    self.asset_ids[asset_row['id']]['widget'] = item.widget
+                    self.asset_ids[asset_row['id']]['widget'].clicked.connect(self.select_asset)
 
             for stage_row in stage_rows:
                 if stage_row['asset_id'] in self.asset_ids.keys():
@@ -284,23 +290,98 @@ class production_manager_widget(QtWidgets.QWidget):
                         self.variant_ids[variant_row['id']] = dict()
                         self.variant_ids[variant_row['id']]['row'] = variant_row
                         variant_widget = self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].add_variant(self.variant_ids[variant_row['id']]['row'])
+                        self.variant_ids[variant_row['id']]['item'] = self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item']
+                        variant_widget.clicked.connect(self.select)
+                        variant_widget.modify_state_signal.connect(self.modify_selection_state)
+                        variant_widget.modify_assignment_signal.connect(self.modify_selection_assignment)
                         self.variant_ids[variant_row['id']]['widget'] = variant_widget
                     else:
                         if variant_row != self.variant_ids[variant_row['id']]['row']:
                             self.variant_ids[variant_row['id']]['row'] = variant_row
                             self.stage_ids[self.variant_ids[variant_row['id']]['row']['stage_id']]['asset_item'].refresh_variant(self.variant_ids[variant_row['id']]['row'])
-                    QtWidgets.QApplication.processEvents()
             self.apply_search()
+            self.refresh_infos()
 
-class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
+    def refresh_infos(self):
+        variant_ids = list(self.variant_ids.keys())
+        visible_items_count = 0
+        visible_selected_items_count = 0
+        for variant_id in variant_ids:
+            if self.variant_ids[variant_id]['widget'].isVisible():
+                visible_items_count += 1
+                if variant_id in self.selection:
+                    visible_selected_items_count += 1
+        self.selection_info_label.setText(f'{str(visible_selected_items_count)} selected/{str(visible_items_count)} items')
+
+    def select_asset(self, asset_id):
+        if asset_id in self.asset_ids.keys():
+            self.select(list(self.asset_ids[asset_id]['item'].variant_ids.keys()))
+
+    def select_all(self):
+        self.selection = list(self.variant_ids.keys())
+        self.refresh_selection()
+
+    def deselect_all(self):
+        self.clear_selection()
+        self.refresh_selection()
+
+    def select(self, variant_ids):
+        modifier = QtWidgets.QApplication.keyboardModifiers()
+        if modifier != QtCore.Qt.ShiftModifier and modifier != QtCore.Qt.ControlModifier:
+            self.clear_selection()
+        if modifier == QtCore.Qt.ControlModifier:
+            for variant_id in variant_ids:
+                if variant_id in self.selection:
+                    self.selection.remove(variant_id)
+        else:
+            self.selection += variant_ids
+        self.refresh_selection()
+
+    def refresh_selection(self):
+        variant_ids = list(self.variant_ids.keys())
+        for variant_id in variant_ids:
+            self.variant_ids[variant_id]['widget'].set_selected(selected=(variant_id in self.selection))
+        self.refresh_infos()
+
+    def clear_selection(self):
+        self.selection = []
+
+    def modify_selection_state(self, state):
+        variant_ids = list(self.variant_ids.keys())
+        for variant_id in variant_ids:
+            if variant_id in self.selection:
+                if (self.variant_ids[variant_id]['row']['state'] != state) and (self.variant_ids[variant_id]['widget'].isVisible()):
+                    assets.modify_variant_state(variant_id, state)
+        gui_server.refresh_ui()
+
+    def modify_selection_assignment(self, assignment):
+        variant_ids = list(self.variant_ids.keys())
+        for variant_id in variant_ids:
+            if variant_id in self.selection:
+                if (self.variant_ids[variant_id]['row']['assignment'] != assignment) and (self.variant_ids[variant_id]['widget'].isVisible()):
+                    assets.modify_variant_assignment(variant_id, assignment)
+        gui_server.refresh_ui()
+
+class custom_list_view(QtWidgets.QTreeWidget):
+
+    clicked = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(custom_list_view, self).__init__(parent)
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit(1)
+
+class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem, QtCore.QObject):
+
     def __init__(self, asset_row, domain, parent=None):
         super(custom_asset_listWidgetItem, self).__init__(parent)
         self.stage_ids = dict()
         self.variant_ids = dict()
         self.asset_row = asset_row
         self.domain = domain
-        widget = asset_widget(self.asset_row, self.domain)
-        self.treeWidget().setItemWidget(self, 0, widget)
+        self.widget = asset_widget(self.asset_row, self.domain)
+        self.treeWidget().setItemWidget(self, 0, self.widget)
 
     def add_stage(self, stage_row, stage_list):
         self.stage_ids[stage_row['id']] = dict()
@@ -315,7 +396,6 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
         widget = variant_widget(variant_row,
                                 self.stage_ids[variant_row['stage_id']]['row']['name'],
                                 self.treeWidget())
-        widget.update_size.connect(self.update_size)
         stage_widget = self.stage_ids[variant_row['stage_id']]['widget']
         stage_widget.add_variant(widget)
         self.variant_ids[variant_row['id']] = dict()
@@ -326,20 +406,19 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem):
     def refresh_variant(self, variant_row):
         self.variant_ids[variant_row['id']]['widget'].refresh(variant_row)
 
-    def update_size(self):
-        for stage_id in self.stage_ids:
-            widget = self.stage_ids[stage_id]['widget']
-            index = self.stage_ids[stage_id]['index']
-            self.setSizeHint(index, widget.sizeHint())
-            self.treeWidget().updateGeometries()
-
 class asset_widget(QtWidgets.QWidget):
+
+    clicked = pyqtSignal(int)
+
     def __init__(self, asset_row, domain, parent=None):
         super(asset_widget, self).__init__(parent)
         self.asset_row = asset_row
         self.domain = domain
         self.build_ui()
         self.fill_ui()
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit(self.asset_row['id'])
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -401,7 +480,7 @@ class stage_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(1,2,1,2)
         self.main_layout.setSpacing(2)
@@ -413,23 +492,32 @@ class stage_widget(QtWidgets.QWidget):
 
 class variant_widget(QtWidgets.QFrame):
 
-    update_size = pyqtSignal(int)
-    
+    clicked = pyqtSignal(list)
+    modify_state_signal = pyqtSignal(str)
+    modify_assignment_signal = pyqtSignal(str)
+
     def __init__(self, variant_row, stage, parent=None):
         super(variant_widget, self).__init__(parent)
         self.variant_row = variant_row
         self.stage = stage
+        self.selected = False
         self.build_ui()
-        self.connect_functions()
-
-    def showEvent(self, event):
-        self.update_size.emit(1)
         self.fill_ui()
-        self.updateGeometry()
+        self.connect_functions()
 
     def refresh(self, variant_row):
         self.variant_row = variant_row
         self.fill_ui()
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit([self.variant_row['id']])
+
+    def set_selected(self, selected=True):
+        self.selected = selected
+        if selected:
+            self.setStyleSheet('#production_manager_variant_frame{background-color: rgba(255,255,255,50);}')
+        else:
+            self.setStyleSheet('')
 
     def build_ui(self):
         self.setObjectName('production_manager_variant_frame')
@@ -463,6 +551,7 @@ class variant_widget(QtWidgets.QFrame):
 
         self.datas_widget = QtWidgets.QFrame()
         self.datas_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.datas_widget.setMinimumHeight(36)
         self.datas_widget.setObjectName('production_manager_state_frame')
         self.datas_layout = QtWidgets.QHBoxLayout()
         self.datas_layout.setContentsMargins(3,3,8,3)
@@ -575,7 +664,8 @@ class variant_widget(QtWidgets.QFrame):
         self.modify_assignment_button.clicked.connect(self.users_menu_requested)
 
     def states_menu_requested(self, point):
-
+        if not self.selected:
+            self.clicked.emit([self.variant_row['id']])
         menu = gui_utils.QMenu(self)
         menu.addAction(QtGui.QIcon(ressources._state_todo_), 'todo')
         menu.addAction(QtGui.QIcon(ressources._state_wip_), 'wip')
@@ -586,8 +676,9 @@ class variant_widget(QtWidgets.QFrame):
             self.modify_state(action.text())
 
     def users_menu_requested(self, point):
+        if not self.selected:
+            self.clicked.emit([self.variant_row['id']])
         users_actions = []
-        
         menu = gui_utils.QMenu(self)
         users_ids = project.get_users_ids_list()
         for user_id in users_ids:
@@ -601,18 +692,15 @@ class variant_widget(QtWidgets.QFrame):
             self.modify_assignment(action.text())
 
     def modify_state(self, state):
-        assets.modify_variant_state(self.variant_row['id'], state)
-        gui_server.refresh_ui()
+        self.modify_state_signal.emit(state)
 
     def modify_assignment(self, user_name):
-        assets.modify_variant_assignment(self.variant_row['id'], user_name)
-        gui_server.refresh_ui()
-
+        self.modify_assignment_signal.emit(user_name)
 
 class search_thread(QtCore.QThread):
 
-    asset_signal = pyqtSignal(int)
-    variant_signal = pyqtSignal(int)
+    assets_signal = pyqtSignal(list)
+    variants_signal = pyqtSignal(list)
 
     def __init__(self, parent=None):
         super(search_thread, self).__init__(parent)
@@ -622,13 +710,17 @@ class search_thread(QtCore.QThread):
         self.running = False
 
     def run(self):
+
+        assets_list = []
+        variants_list = []
+
         if self.running:
             if self.asset_string != '':
                 asset_ids = project.search_asset(self.asset_string, column='id')
                 for asset_id in asset_ids:
                     if not self.running:
                         break
-                    self.asset_signal.emit(asset_id)
+                    assets_list.append(asset_id)
 
             combined_variant_ids = []
 
@@ -640,7 +732,7 @@ class search_thread(QtCore.QThread):
                     if self.state_string != '':
                         combined_variant_ids.append(variant_id)
                     else:
-                        self.variant_signal.emit(variant_id)
+                        variants_list.append(variant_id)
 
             if self.state_string != '':
                 variant_ids = project.search_variant_by_column_data(('state', self.state_string), column='id')
@@ -648,12 +740,16 @@ class search_thread(QtCore.QThread):
                     if not self.running:
                         break
                     if (self.assignment_string != '') and (variant_id in combined_variant_ids):
-                        self.variant_signal.emit(variant_id)
+                        variants_list.append(variant_id)
                     elif (self.assignment_string != '') and (variant_id not in combined_variant_ids):
                         pass
                     else:
-                        self.variant_signal.emit(variant_id)
+                        variants_list.append(variant_id)
 
+        if self.asset_string != '':
+            self.assets_signal.emit(assets_list)
+        if self.assignment_string != '' or self.state_string != '':
+            self.variants_signal.emit(variants_list)
 
     def update_search(self, asset='', assignment='', state=''):
         self.asset_string = asset

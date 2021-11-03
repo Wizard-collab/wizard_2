@@ -651,6 +651,13 @@ QSlider::handle:horizontal {
 	border-radius: 0px;
 }
 
+#production_manager_list_widget::item:hover{
+	padding: 0px;
+	margin: 0px;
+	border-radius: 0px;
+	background: transparent;
+}
+
 #main_widget{
 	background-color: #19191f;
 }
@@ -799,9 +806,18 @@ QSlider::handle:horizontal {
 	border-radius: 8px;
 }
 
+#production_manager_mask_frame{
+	border-radius: 4px;
+	background-color: rgba(0,0,0,200);
+}
+
 #production_manager_variant_frame{
 	border-radius: 4px;
 	background-color: rgba(255,255,255,15);
+}
+
+#production_manager_variant_frame:hover{
+	background-color: rgba(255,255,255,30);
 }
 
 #production_manager_state_frame{
