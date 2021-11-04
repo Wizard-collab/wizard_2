@@ -450,15 +450,16 @@ class tree_widget(QtWidgets.QFrame):
         menu = gui_utils.QMenu(self)
         
         item = self.tree.itemAt(point)
-        reduce_all_action = menu.addAction('Reduce all')
-        hard_refresh_action = menu.addAction('Hard refresh')
+        reduce_all_action = menu.addAction(QtGui.QIcon(ressources._reduce_icon_), 'Reduce all')
         archive_action = None
         open_folder_action = None
         if item:
             if 'creation' not in item.instance_type:
-                open_folder_action = menu.addAction('Open folder')
+                open_folder_action = menu.addAction(QtGui.QIcon(ressources._folder_icon_), 'Open folder')
             if 'creation' not in item.instance_type and item.instance_type != 'domain':
-                archive_action = menu.addAction(f'Archive {item.instance_type}')
+                archive_action = menu.addAction(QtGui.QIcon(ressources._archive_icon_), f'Archive {item.instance_type}')
+            if 'creation' not in item.instance_type and item.instance_type == 'stage':
+                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type}')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -466,10 +467,10 @@ class tree_widget(QtWidgets.QFrame):
                 self.archive_instance(item)
             elif action == open_folder_action:
                 self.open_folder(item)
-            elif action == hard_refresh_action:
-                self.refresh(1)
             elif action == reduce_all_action:
                 self.reduce_all()
+            elif action == launch_action:
+                self.launch_stage_signal.emit(1)
 
     def open_folder(self, item):
         if item.instance_type == 'domain':

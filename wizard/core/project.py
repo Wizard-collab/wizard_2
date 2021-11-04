@@ -223,10 +223,50 @@ def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=
                                 postroll,
                                 category_id))
         if asset_id:
+            add_asset_preview(asset_id)
             logger.info(f"Asset {name} added to project")
         return asset_id
     else:
         logger.warning(f"{name} already exists")
+        return None
+
+def add_asset_preview(asset_id):
+    asset_preview_id = db_utils.create_row('project',
+                                            'assets_preview', 
+                                            ('manual_override',
+                                            'preview_path',
+                                            'asset_id'), 
+                                            (None, 
+                                            None, 
+                                            asset_id))
+    if asset_preview_id:
+        logger.info(f"Asset preview added to project")
+    return asset_preview_id
+
+def get_all_assets_preview(column='*'):
+    assets_preview_rows = db_utils.get_rows('project',
+                                            'assets_preview',
+                                            column)
+    return assets_preview_rows
+
+def modify_asset_preview(asset_id, preview_path):
+    if db_utils.update_data('project',
+                            'assets_preview',
+                            ('preview_path', preview_path),
+                            ('asset_id', asset_id)):
+        logger.debug('Asset preview modified')
+        return 1
+    else:
+        return None
+
+def modify_asset_manual_preview(asset_id, preview_path):
+    if db_utils.update_data('project',
+                            'assets_preview',
+                            ('manual_override', preview_path),
+                            ('asset_id', asset_id)):
+        logger.debug('Asset preview modified')
+        return 1
+    else:
         return None
 
 def get_all_assets(column='*'):
@@ -1541,6 +1581,7 @@ def init_project(project_path, project_name):
             create_domains_table(project_name)
             create_categories_table(project_name)
             create_assets_table(project_name)
+            create_assets_preview_table(project_name)
             create_stages_table(project_name)
             create_variants_table(project_name)
             create_asset_tracking_events_table(project_name)
@@ -1596,6 +1637,17 @@ def create_assets_table(database):
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Assets table created")
+
+def create_assets_preview_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS assets_preview (
+                                        id serial PRIMARY KEY,
+                                        manual_override text,
+                                        preview_path text,
+                                        asset_id integer NOT NULL,
+                                        FOREIGN KEY (asset_id) REFERENCES assets (id)
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Assets preview table created")
 
 def create_stages_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS stages (

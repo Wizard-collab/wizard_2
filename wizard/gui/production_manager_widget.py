@@ -10,16 +10,20 @@ import time
 # Wizard gui modules
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
+from wizard.gui import logging_widget
 
 # Wizard modules
 from wizard.core import site
 from wizard.core import tools
 from wizard.core import assets
 from wizard.core import project
+from wizard.core import launch
 from wizard.core import environment
 from wizard.core import image
 from wizard.vars import ressources
 from wizard.vars import assets_vars
+from wizard.core import custom_logger
+logger = custom_logger.get_logger()
 
 stages_colors = dict()
 stages_colors['modeling'] = 'rgba(255,81,81,ALPHA)'
@@ -42,6 +46,7 @@ class production_manager_widget(QtWidgets.QWidget):
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Production manager - {environment.get_project_name()}")
+        self.logging_widget = logging_widget.logging_widget()
 
         self.build_ui()
         self.search_thread = search_thread()
@@ -56,6 +61,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.domain_ids = []
         self.category_ids = []
         self.selection = []
+
         self.connect_functions()
 
     def connect_functions(self):
@@ -179,11 +185,17 @@ class production_manager_widget(QtWidgets.QWidget):
         self.footer_widget.setLayout(self.footer_layout)
         self.main_layout.addWidget(self.footer_widget)
 
+        self.icon_label = QtWidgets.QLabel()
+        self.icon_label.setFixedSize(QtCore.QSize(22,22))
+        self.icon_label.setPixmap(QtGui.QIcon(ressources._info_icon_).pixmap(22))
+        self.footer_layout.addWidget(self.icon_label)
+
+        self.footer_layout.addWidget(self.logging_widget)
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
         self.footer_layout.addWidget(self.refresh_label)
-
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.selection_info_label = QtWidgets.QLabel()
         self.footer_layout.addWidget(self.selection_info_label)
@@ -284,6 +296,12 @@ class production_manager_widget(QtWidgets.QWidget):
             category_id = project.get_category_data_by_name(current_category, 'id')
 
             asset_rows = project.get_category_childs(category_id) 
+            assets_preview_rows = project.get_all_assets_preview()
+            
+            assets_preview = dict()
+            for assets_preview_row in assets_preview_rows:
+                assets_preview[assets_preview_row['asset_id']] = assets_preview_row
+
             stage_rows = project.get_all_stages()
             variant_rows = project.get_all_variants()
 
@@ -291,10 +309,22 @@ class production_manager_widget(QtWidgets.QWidget):
                 if asset_row['id'] not in self.asset_ids.keys():
                     self.asset_ids[asset_row['id']] = dict()
                     self.asset_ids[asset_row['id']]['row'] = asset_row
-                    item = custom_asset_listWidgetItem(self.asset_ids[asset_row['id']]['row'], self.domain, self.list_view.invisibleRootItem())
+                    self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
+                    item = custom_asset_listWidgetItem(self.asset_ids[asset_row['id']]['row'],
+                                                            self.asset_ids[asset_row['id']]['preview_row'],
+                                                            self.domain,
+                                                            self.list_view.invisibleRootItem())
                     self.asset_ids[asset_row['id']]['item'] = item
                     self.asset_ids[asset_row['id']]['widget'] = item.widget
                     self.asset_ids[asset_row['id']]['widget'].clicked.connect(self.select_asset)
+                else:
+                    if self.asset_ids[asset_row['id']]['row'] != asset_row:
+                        self.asset_ids[asset_row['id']]['item'].refresh_asset(asset_row)
+                        self.asset_ids[asset_row['id']]['row'] = asset_row
+                    if self.asset_ids[asset_row['id']]['preview_row'] != assets_preview[asset_row['id']]:
+                        self.asset_ids[asset_row['id']]['item'].refresh_asset_preview(assets_preview[asset_row['id']])
+                        self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
+
 
             for stage_row in stage_rows:
                 if stage_row['asset_id'] in self.asset_ids.keys():
@@ -394,16 +424,25 @@ class custom_list_view(QtWidgets.QTreeWidget):
 
 class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem, QtCore.QObject):
 
-    def __init__(self, asset_row, domain, parent=None):
+    def __init__(self, asset_row, preview_row, domain, parent=None):
         super(custom_asset_listWidgetItem, self).__init__(parent)
         self.stage_ids = dict()
         self.variant_ids = dict()
         self.asset_row = asset_row
+        self.preview_row = preview_row
         self.domain = domain
         self.widget = asset_widget(self.asset_row, self.domain)
-        self.image_widget = image_widget(self.asset_row)
+        self.image_widget = image_widget(self.preview_row)
         self.treeWidget().setItemWidget(self, 0, self.widget)
         self.treeWidget().setItemWidget(self, 1, self.image_widget)
+
+    def refresh_asset(self, asset_row):
+        self.asset_row = asset_row
+        self.widget.refresh_asset(self.asset_row)
+
+    def refresh_asset_preview(self, preview_row):
+        self.preview_row = preview_row
+        self.image_widget.refresh_asset_preview(self.preview_row)
 
     def add_stage(self, stage_row, stage_list):
         self.stage_ids[stage_row['id']] = dict()
@@ -429,11 +468,40 @@ class custom_asset_listWidgetItem(QtWidgets.QTreeWidgetItem, QtCore.QObject):
         self.variant_ids[variant_row['id']]['widget'].refresh(variant_row)
 
 class image_widget(QtWidgets.QWidget):
-    def __init__(self, asset_row, parent=None):
+    def __init__(self, preview_row, parent=None):
         super(image_widget, self).__init__(parent)
-        self.asset_row = asset_row
+        self.preview_row = preview_row
         self.build_ui()
         self.fill_ui()
+
+    def show_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        custom_preview_action = menu.addAction(QtGui.QIcon(ressources._add_icon_), 'Add custom preview')
+        default_preview_action = menu.addAction(QtGui.QIcon(ressources._refresh_icon_), 'Set preview to auto')
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == default_preview_action:
+                assets.set_asset_preview(self.preview_row['asset_id'], None)
+                gui_server.refresh_ui()
+            elif action == custom_preview_action:
+                self.set_preview()
+
+    def set_preview(self):
+        options = QtWidgets.QFileDialog.Options()
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
+                            options=options)
+        if image_file:
+            extension = image_file.split('.')[-1].upper()
+            if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
+                assets.set_asset_preview(self.preview_row['asset_id'], image_file)
+                gui_server.refresh_ui()
+            else:
+                logger.warning('{} is not a valid image file...'.format(image_file))
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.show_context_menu()
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -442,11 +510,22 @@ class image_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.image_label = QtWidgets.QLabel()
+        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.image_label.setObjectName('production_manager_variant_frame')
         self.main_layout.addWidget(self.image_label)
 
+    def refresh_asset_preview(self, preview_row):
+        self.preview_row = preview_row
+        self.fill_ui()
+
     def fill_ui(self):
-        self.image_label.setPixmap(QtGui.QIcon(ressources._no_preview_).pixmap(140))
+        image = ressources._no_preview_
+        if self.preview_row['manual_override'] is None:
+            if self.preview_row['preview_path'] is not None:
+                image = self.preview_row['preview_path']
+        else:
+            image = self.preview_row['manual_override']
+        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(142, 90))
 
 class asset_widget(QtWidgets.QWidget):
 
@@ -491,20 +570,20 @@ class asset_widget(QtWidgets.QWidget):
             self.frame_range_layout.setSpacing(4)
             self.frame_range_widget.setLayout(self.frame_range_layout)
             self.main_frame_layout.addWidget(self.frame_range_widget)
-
             self.in_frame_label = QtWidgets.QLabel()
             self.in_frame_label.setObjectName('gray_label')
+            self.in_frame_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
             self.frame_range_layout.addWidget(self.in_frame_label)
             self.out_frame_label = QtWidgets.QLabel()
             self.out_frame_label.setObjectName('gray_label')
+            self.out_frame_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
             self.frame_range_layout.addWidget(self.out_frame_label)
-
-            self.edit_frange_button = QtWidgets.QPushButton()
-            self.edit_frange_button.setObjectName('edit_button')
-            self.edit_frange_button.setFixedSize(16,16)
-            self.frame_range_layout.addWidget(self.edit_frange_button)
             
         self.main_frame_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+    def refresh_asset(self, asset_row):
+        self.asset_row = asset_row
+        self.fill_ui()
 
     def fill_ui(self):
         self.asset_name_label.setText(self.asset_row['name'])
@@ -550,7 +629,30 @@ class variant_widget(QtWidgets.QFrame):
         self.fill_ui()
 
     def mouseReleaseEvent(self, event):
-        self.clicked.emit([self.variant_row['id']])
+        if event.button() == QtCore.Qt.RightButton:
+            self.show_context_menu()
+        elif event.button() == QtCore.Qt.LeftButton:
+            self.clicked.emit([self.variant_row['id']])
+
+    def show_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch work environment')
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == launch_action:
+                self.launch()
+
+    def launch(self):
+        work_env_id = project.get_variant_data(self.variant_row['id'], 'default_work_env_id')
+        work_versions_ids = project.get_work_versions(work_env_id, 'id')
+        if work_versions_ids is not None:
+            if len(work_versions_ids) >= 1:
+                launch.launch_work_version(work_versions_ids[-1])
+                gui_server.refresh_ui()
+            else:
+                logger.warning('No version to launch')
+        else:
+            logger.warning('No version to launch')
 
     def set_selected(self, selected=True):
         self.selected = selected
@@ -566,6 +668,7 @@ class variant_widget(QtWidgets.QFrame):
         self.setStyleSheet('''#production_manager_variant_frame{background-color:%s;}
                                 #production_manager_variant_frame:hover{background-color:%s;}'''%(stages_colors[self.stage].replace('ALPHA', str(40)),
                                                                                                     stages_colors[self.stage].replace('ALPHA', str(60))))
+        
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)

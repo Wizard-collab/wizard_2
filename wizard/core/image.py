@@ -56,6 +56,16 @@ def screenshot(file, thumbnail_file):
     thumbnail.save(save_thumbnail_file, format="JPEG")
     return save_file, save_thumbnail_file
 
+def resize_preview(file, destination, size=200):
+    if os.path.isfile(file):
+        image = Image.open(file)
+        preview, null, null = resize_image_with_fixed_width(image, size)
+        preview_file = tools.get_filename_without_override(destination)
+        preview.save(preview_file, format="PNG")
+        return preview_file
+    else:
+        return None
+
 def convert_image_to_bytes(image_file, resize=None):
     # Resize the given file to 100*100
     # and return the png bytes

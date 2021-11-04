@@ -573,6 +573,11 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
 
     if do_screenshot:
         screenshot_file, thumbnail_file = image.screenshot(screenshot_file, thumbnail_file)
+        variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+        stage_id = project.get_variant_data(variant_id, 'stage_id')
+        asset_id = project.get_stage_data(stage_id, 'asset_id')
+        project.modify_asset_preview(asset_id, thumbnail_file)
+
     version_id = project.add_version(new_version,
                                                 file_name,
                                                 work_env_id,
@@ -583,6 +588,17 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
         game.add_xps(1)
         game.analyse_comment(comment, 2)
     return version_id
+
+def set_asset_preview(asset_id, image_file):
+    if image_file is not None:
+        preview_path = os.path.join(get_asset_path(asset_id), 'preview')
+        if not os.path.isdir(preview_path):
+            os.mkdir(preview_path)
+        destination = os.path.join(preview_path, f"{project.get_asset_data(asset_id, 'name')}.jpg")
+        preview_file = image.resize_preview(image_file, destination)
+    else:
+        preview_file = None
+    project.modify_asset_manual_preview(asset_id, preview_file)
 
 def merge_file(file, work_env_id, comment="", do_screenshot=1):
     if os.path.isfile(file):
