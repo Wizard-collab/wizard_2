@@ -5,7 +5,7 @@ import statistics
 
 
 
-
+total = []
 
 category_rows = project.get_all_categories()
 asset_rows = project.get_all_assets()
@@ -72,6 +72,13 @@ for variant_row in variant_rows:
         categories_ids_percents[category_id]['stages_percent'][stage_name] = []
     categories_ids_percents[category_id]['stages_percent'][stage_name].append(percent)
 
+    total.append(percent)
+
+print('\n')
+
+if total != []:
+    print(f"TOTAL : {str(statistics.mean(total))}")
+
 print('\n')
 
 
@@ -85,18 +92,14 @@ for stage in stages_percent.keys():
 print('\n')
 
 for category in categories_ids_percents.keys():
-    if categories_ids_percents[category]['percents_list'] == []:
-        percent = '0'
-    else:
+    if categories_ids_percents[category]['percents_list'] != []:
         percent = str(statistics.mean(categories_ids_percents[category]['percents_list']))
+        print(f"{categories_ids_percents[category]['row']['name']} : {percent}%")
 
-    print(f"{categories_ids_percents[category]['row']['name']} : {percent}%")
     for stage in categories_ids_percents[category]['stages_percent'].keys():
-        if categories_ids_percents[category]['stages_percent'][stage] == []:
-            percent = 0
-        else:
+        if categories_ids_percents[category]['stages_percent'][stage] != []:
             percent = str(statistics.mean(categories_ids_percents[category]['stages_percent'][stage]))
-        print(f"    {stage} : {percent}%")
-
-    print('\n')
-
+            print(f"    {stage} : {percent}%")
+    
+    if categories_ids_percents[category]['percents_list'] != []:
+        print('\n') 

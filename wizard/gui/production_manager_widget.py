@@ -525,7 +525,7 @@ class image_widget(QtWidgets.QWidget):
                 image = self.preview_row['preview_path']
         else:
             image = self.preview_row['manual_override']
-        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(142, 90))
+        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(132, 80))
 
 class asset_widget(QtWidgets.QWidget):
 
@@ -675,19 +675,7 @@ class variant_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('transparent_widget')
-        self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
-        self.header_layout.setSpacing(4)
-        self.header_widget.setLayout(self.header_layout)
-        self.main_layout.addWidget(self.header_widget)
-
-        self.stage_icon = QtWidgets.QLabel()
-        self.stage_icon.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.header_layout.addWidget(self.stage_icon)
-
-        self.header_layout.addWidget(QtWidgets.QLabel(self.variant_row['name']))
+        self.main_layout.addWidget(QtWidgets.QLabel(self.variant_row['name']))
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
@@ -729,27 +717,6 @@ class variant_widget(QtWidgets.QFrame):
 
         self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.work_times_widget = QtWidgets.QWidget()
-        self.work_times_widget.setObjectName('transparent_widget')
-        self.work_times_layout = QtWidgets.QFormLayout()
-        self.work_times_layout.setContentsMargins(0,0,0,0)
-        self.work_times_layout.setSpacing(4)
-        self.work_times_widget.setLayout(self.work_times_layout)
-        self.content_layout.addWidget(self.work_times_widget)
-
-        self.work_time_image = QtWidgets.QLabel()
-        self.work_time_image.setPixmap(QtGui.QIcon(ressources._work_time_icon_).pixmap(14))
-        self.work_time_label = QtWidgets.QLabel()
-        self.work_times_layout.addRow(self.work_time_image, self.work_time_label)
-
-        self.estimated_time_image = QtWidgets.QLabel()
-        self.estimated_time_image.setPixmap(QtGui.QIcon(ressources._estimated_time_icon_).pixmap(14))
-        self.estimated_time_label = QtWidgets.QLabel()
-        self.estimate_button = QtWidgets.QPushButton()
-        self.estimate_button.setObjectName('estimate_button')
-        self.estimate_button.setFixedSize(QtCore.QSize(14,14))
-        self.work_times_layout.addRow(self.estimated_time_image, self.estimated_time_label)
-
         self.progress_bar_widget = QtWidgets.QWidget()
         self.progress_bar_widget.setObjectName('transparent_widget')
         self.progress_bar_layout = QtWidgets.QHBoxLayout()
@@ -762,17 +729,8 @@ class variant_widget(QtWidgets.QFrame):
         self.time_progress_bar.setMaximumHeight(6)
         self.progress_bar_layout.addWidget(self.time_progress_bar)
 
-        self.percent_label = QtWidgets.QLabel()
-        self.progress_bar_layout.addWidget(self.percent_label)
-
     def fill_ui(self):
-        self.stage_icon.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(18))
         self.state_label.setText(self.variant_row['state'])
-        string_time = tools.convert_seconds_to_string_time(float(self.variant_row['work_time']))
-        self.work_time_label.setText(string_time)
-        if self.variant_row['estimated_time'] is not None:
-            string_time = tools.convert_seconds_to_string_time(float(self.variant_row['estimated_time']))
-            self.estimated_time_label.setText(string_time)
         user_image =  site.get_user_row_by_name(self.variant_row['assignment'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
         self.user_image_label.setPixmap(pm)
@@ -789,7 +747,6 @@ class variant_widget(QtWidgets.QFrame):
 
         if self.variant_row['estimated_time'] is not None:
             percent = (float(self.variant_row['work_time'])/float(self.variant_row['estimated_time']))*100
-            self.percent_label.setText(f"{str(int(percent))}%")
             self.time_progress_bar.setValue(percent)
             if percent > 100:
                 percent = 100
@@ -800,14 +757,11 @@ class variant_widget(QtWidgets.QFrame):
             if self.variant_row['state'] == 'done':
                 self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
                 self.time_progress_bar.setValue(100)
-                self.percent_label.setText("100%")
         else:
             self.time_progress_bar.setValue(0)
-            self.percent_label.setText("0%")
             if self.variant_row['state'] == 'done':
                 self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
                 self.time_progress_bar.setValue(100)
-                self.percent_label.setText("100%")
 
     def connect_functions(self):
         self.modify_state_button.clicked.connect(self.states_menu_requested)
