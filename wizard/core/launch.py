@@ -126,10 +126,9 @@ def build_command(file_path, software_row, version_id):
         if software_row['name'] == softwares_vars._substance_painter_:
             work_env_id = project.get_version_data(version_id, 'work_env_id')
             references_dic = assets.get_references_files(work_env_id) 
-            print(references_dic)
             if 'modeling' in references_dic.keys():
                 reference_file = references_dic['modeling'][0]['files'][0]
-                raw_command = raw_command.replace(softwares_vars._reference_key_, reference_file)
+                raw_command = raw_command.replace(softwares_vars._reference_key_, reference_file.replace('\\', '/'))
             else:
                 logger.warning('Please create ONE modeling reference to launch Substance Painter')
 
@@ -192,6 +191,7 @@ class software_thread(Thread):
  
     def run(self):
         start_time = time.time()
+        print(self.command)
         self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
         self.process.wait()
         work_time = time.time()-start_time
