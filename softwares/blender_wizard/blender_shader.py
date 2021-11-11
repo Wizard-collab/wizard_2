@@ -95,37 +95,32 @@ def get_textures_dic(files_list):
             height_maps.append(file)
 
     if len(diffuse_maps) >=1:
-        textures_dic['diffuse'] = bpy.data.images.load(diffuse_maps[0])
-        if len(diffuse_maps) >1:
-            textures_dic['diffuse'].source = 'TILED'
+        image = bpy.ops.image.open(filepath=diffuse_maps[0], directory=os.path.dirname(diffuse_maps[0]), use_udim_detecting=True)
+        textures_dic['diffuse'] = bpy.data.images[os.path.basename(diffuse_maps[0])]
     else:
         textures_dic['diffuse'] = None
 
     if len(roughness_maps) >=1:
-        textures_dic['roughness'] = bpy.data.images.load(roughness_maps[0])
-        if len(diffuse_maps) >1:
-            textures_dic['roughness'].source = 'TILED'
+        image = bpy.ops.image.open(filepath=roughness_maps[0], directory=os.path.dirname(roughness_maps[0]), use_udim_detecting=True)
+        textures_dic['roughness'] = bpy.data.images[os.path.basename(roughness_maps[0])]
     else:
         textures_dic['roughness'] = None
 
     if len(metalness_maps) >=1:
-        textures_dic['metalness'] = bpy.data.images.load(metalness_maps[0])
-        if len(diffuse_maps) >1:
-            textures_dic['metalness'].source = 'TILED'
+        image = bpy.ops.image.open(filepath=metalness_maps[0], directory=os.path.dirname(metalness_maps[0]), use_udim_detecting=True)
+        textures_dic['metalness'] = bpy.data.images[os.path.basename(metalness_maps[0])]
     else:
         textures_dic['metalness'] = None
 
     if len(normal_maps) >=1:
-        textures_dic['normal_map'] = bpy.data.images.load(normal_maps[0])
-        if len(normal_maps) >1:
-            textures_dic['normal_map'].source = 'TILED'
+        image = bpy.ops.image.open(filepath=normal_maps[0], directory=os.path.dirname(normal_maps[0]), use_udim_detecting=True)
+        textures_dic['normal_map'] = bpy.data.images[os.path.basename(normal_maps[0])]
     else:
         textures_dic['normal_map'] = None
 
     if len(height_maps) >=1:
-        textures_dic['height_map'] = bpy.data.images.load(height_maps[0])
-        if len(height_maps) >1:
-            textures_dic['height_map'].source = 'TILED'
+        image = bpy.ops.image.open(filepath=height_maps[0], directory=os.path.dirname(height_maps[0]), use_udim_detecting=True)
+        textures_dic['height_map'] = bpy.data.images[os.path.basename(height_maps[0])]
     else:
         textures_dic['height_map'] = None
 
