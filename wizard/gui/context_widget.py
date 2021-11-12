@@ -141,6 +141,7 @@ class context_widget(QtWidgets.QFrame):
         self.work_env_comboBox.currentTextChanged.connect(self.work_env_changed)
         self.add_variant_button.clicked.connect(self.create_variant)
         self.folder_button.clicked.connect(self.open_work_env_folder)
+        self.sandbox_button.clicked.connect(self.open_sandbox_folder)
         self.init_work_env_button.clicked.connect(self.init_work_env)
 
     def refresh_string_asset_label(self):
@@ -155,6 +156,12 @@ class context_widget(QtWidgets.QFrame):
             work_env_path = assets.get_work_env_path(self.work_env_row['id'])
             if os.path.isdir(work_env_path):
                 os.startfile(work_env_path)
+
+    def open_sandbox_folder(self):
+        if self.variant_row is not None:
+            sandbox_path = os.path.join(assets.get_variant_path(self.variant_row['id']), '_SANDBOX')
+            if os.path.isdir(sandbox_path):
+                os.startfile(sandbox_path)
 
     def create_variant(self):
         if self.stage_row is not None:
@@ -240,6 +247,13 @@ class context_widget(QtWidgets.QFrame):
         self.folder_button.setIconSize(QtCore.QSize(20, 20))
         self.folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
         self.main_layout.addWidget(self.folder_button)
+
+        self.sandbox_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.sandbox_button, "Open sandbox folder")
+        self.sandbox_button.setFixedSize(QtCore.QSize(26, 26))
+        self.sandbox_button.setIconSize(QtCore.QSize(20, 20))
+        self.sandbox_button.setIcon(QtGui.QIcon(ressources._sandbox_icon_))
+        self.main_layout.addWidget(self.sandbox_button)
 
 class variant_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):

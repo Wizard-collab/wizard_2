@@ -136,6 +136,7 @@ _production_manager_icon_ =  os.path.join(_icons_path_, 'production_manager.svg'
 _launch_icon_ = os.path.join(_icons_path_, 'launch.svg')
 _archive_icon_ = os.path.join(_icons_path_, 'archive.svg')
 _reduce_icon_ = os.path.join(_icons_path_, 'reduce.svg')
+_sandbox_icon_ = os.path.join(_icons_path_, 'sandbox.svg')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.svg')
