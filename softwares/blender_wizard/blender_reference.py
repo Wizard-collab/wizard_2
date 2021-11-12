@@ -13,13 +13,13 @@ from blender_wizard import tools
 def reference_textures(namespace, files_list):
 	if bpy.context.scene.render.engine == 'REDSHIFT':
 		redshift_shader.plug_textures(namespace, files_list)
-	elif bpy.context.scene.render.engine == ('BLENDER_EEVEE' or 'CYCLES'):
+	elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':
 		blender_shader.plug_textures(namespace, files_list)
 
 def reload_textures(namespace, files_list):
 	if bpy.context.scene.render.engine == 'REDSHIFT':
 		redshift_shader.plug_textures(namespace, files_list, update=True)
-	elif bpy.context.scene.render.engine == ('BLENDER_EEVEE' or 'CYCLES'):
+	elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':
 		blender_shader.plug_textures(namespace, files_list, update=True)
 
 def import_modeling_hard(namespace, files_list):
