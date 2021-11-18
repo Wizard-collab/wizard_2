@@ -58,7 +58,7 @@ class references_widget(QtWidgets.QWidget):
 
     def search_reference(self):
         if self.work_env_id is not None and self.work_env_id != 0:
-            self.search_reference_widget = search_reference_widget.search_reference_widget()
+            self.search_reference_widget = search_reference_widget.search_reference_widget(self)
             self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
             self.search_reference_widget.show()
 

@@ -21,6 +21,8 @@ class search_reference_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(search_reference_widget, self).__init__(parent)
 
+        self.parent = parent
+
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Create references")
 
@@ -35,8 +37,36 @@ class search_reference_widget(QtWidgets.QWidget):
         self.build_ui()
         self.connect_functions()
 
+    def move_ui(self):
+        cursor = self.mapFromGlobal(QtGui.QCursor.pos())
+        area = self.parent.rect()
+        if area.contains(cursor):
+            screen_minX = area.topLeft().x()
+            screen_minY = area.topLeft().y()
+            screen_maxX = area.bottomRight().x()
+            screen_maxY = area.bottomRight().y()
+            win_width = self.frameSize().width()
+            win_heigth = self.frameSize().height()
+
+            if (cursor.y() - 30 - win_heigth) <= screen_minY:
+                posy = cursor.y() - 15
+                angley = 'top'
+            else:
+                posy = cursor.y() - win_heigth + 15
+                angley = 'bottom'
+            if (cursor.x() + 30 + win_width) >= screen_maxX:
+                posx = cursor.x() - win_width + 15
+                anglex = 'right'
+            else:
+                posx = cursor.x() - 15
+                anglex = 'left'
+
+            self.move(posx, posy)
+        else:
+            self.close()
+
     def showEvent(self, event):
-        #corner = gui_utils.move_ui(self)
+        self.move_ui()
         self.search_bar.search_bar.setFocus()
         event.accept()
 
