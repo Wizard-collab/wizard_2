@@ -163,6 +163,7 @@ class launcher_widget(QtWidgets.QFrame):
     def kill(self):
         if self.work_env_id:
             launch.kill(self.work_env_id)
+            gui_server.refresh_ui()
 
     def show_screen_shot(self):
         if self.version_row is not None:

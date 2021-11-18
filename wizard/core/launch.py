@@ -70,7 +70,7 @@ def kill(work_env_id):
     signal_dic = dict()
     signal_dic['function'] = 'kill'
     signal_dic['work_env_id'] = work_env_id
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=0.5)
+    return socket_utils.send_signal(_DNS_, signal_dic, timeout=10)
 
 def died(work_env_id):
     signal_dic = dict()
@@ -84,9 +84,7 @@ def get():
     return socket_utils.send_signal(_DNS_, signal_dic, timeout=0.5)
 
 def core_kill_software_thread(software_thread):
-    software_thread.kill()
-    logger.info(f"Software process killed")
-    return 1
+    return software_thread.kill()
 
 def core_launch_version(version_id):
     thread = None
@@ -188,22 +186,29 @@ class software_thread(Thread):
         self.env = env
         self.software = software
         self.work_env_id = work_env_id
+        self.killed = False
+        self.start_time = time.time()
  
     def run(self):
-        start_time = time.time()
-        print(self.command)
         self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
         self.process.wait()
-        work_time = time.time()-start_time
         died(self.work_env_id)
+        if not self.killed:
+            self.set_infos()
+
+    def set_infos(self):
+        work_time = time.time()-self.start_time
         project.set_work_env_lock(self.work_env_id, 0)
         assets.add_work_time(self.work_env_id, work_time)
-        gui_server.refresh_ui()
         logger.info(f"{self.software} closed")
 
     def kill(self):
         self.process.kill()
+        self.process.wait()
+        self.killed = True
+        self.set_infos()
         logger.info(f"{self.software} killed")
+        return 1
 
 class softwares_server(Thread):
     ''' A "server" thread that manage softwares processes

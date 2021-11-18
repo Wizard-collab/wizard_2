@@ -18,6 +18,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 class softwares_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -167,6 +168,7 @@ class work_env_widget(QtWidgets.QFrame):
 
     def kill(self):
         launch.kill(self.work_env_id)
+        gui_server.refresh_ui()
 
     def build_ui(self):
         self.setObjectName('item_widget_frame')

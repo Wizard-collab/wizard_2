@@ -46,6 +46,7 @@ from wizard.gui import asset_tracking_widget
 from wizard.gui import championship_widget
 from wizard.gui import license_widget
 from wizard.gui import production_manager_widget
+from wizard.gui import confirm_widget
 
 class main_widget(QtWidgets.QWidget):
 
@@ -238,7 +239,6 @@ class main_widget(QtWidgets.QWidget):
         self.versions_widget.change_work_env(work_env_id)
         self.launcher_widget.change_work_env(work_env_id)
         self.references_widget.change_work_env(work_env_id)
-        #self.tabs_widget.change_work_env(work_env_id)
 
     def tab_changed(self):
         self.references_widget.refresh()
@@ -257,9 +257,21 @@ class main_widget(QtWidgets.QWidget):
         self.softwares_server.stop()
 
     def closeEvent(self, event):
-        self.quit_threads()
-        self.save_contexts()
-        QtWidgets.QApplication.closeAllWindows()
+        close = False
+        print(launch.get())
+        if launch.get() == []:
+            close = True
+        else:
+            self.confirm_widget = confirm_widget.confirm_widget('Softwares are running...\nKill all softwares ?',
+                                                                accept_text='Kill')
+            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                for id in launch.get():
+                    launch.kill(id)
+                close = True
+        if close:
+            self.quit_threads()
+            self.save_contexts()
+            QtWidgets.QApplication.closeAllWindows()
 
     def refresh(self):
         start_time = time.time()
