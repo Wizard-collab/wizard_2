@@ -440,6 +440,11 @@ QSlider::handle:horizontal {
 	background-color: #373740;
 }
 
+#asset_tracking_event_bg_frame{
+	border-radius: 5px;
+	background-color: #24242b;
+}
+
 #init_work_env_button{
 	padding:0px;
 	padding-left:8px;

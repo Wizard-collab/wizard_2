@@ -68,7 +68,6 @@ class wall_widget(QtWidgets.QWidget):
         self.wall_scrollBar = self.wall_scrollArea.verticalScrollBar()
 
         self.wall_scrollArea_widget = QtWidgets.QWidget()
-        #self.wall_scrollArea_widget.setObjectName('wall_scroll_area')
         self.wall_scrollArea_layout = QtWidgets.QVBoxLayout()
         self.wall_scrollArea_layout.setContentsMargins(0,0,0,8)
         self.wall_scrollArea_layout.setSpacing(0)
@@ -204,7 +203,8 @@ class wall_widget(QtWidgets.QWidget):
                     self.last_time = event_row['creation_time']
                     if not self.isVisible() and self.first_refresh != 1:
                         self.notification.emit(1)
-                    self.popup.emit(event_row)
+                    if self.first_refresh != 1:
+                        self.popup.emit(event_row)
             self.remove_useless_events(event_number)
 
         self.update_search()
@@ -216,6 +216,7 @@ class wall_widget(QtWidgets.QWidget):
         event_ids_list = list(self.event_ids.keys())
         for event_id in event_ids_list:
             self.remove_event(event_id)
+        self.first_refresh = 1
         self.refresh()
 
     def remove_useless_events(self, event_number):

@@ -715,6 +715,9 @@ class variant_widget(QtWidgets.QFrame):
         self.modify_state_button.setFixedSize(QtCore.QSize(14,14))
         self.datas_layout.addWidget(self.modify_state_button)
 
+        self.comment_label = QtWidgets.QLabel()
+        self.content_layout.addWidget(self.comment_label)
+        
         self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.progress_bar_widget = QtWidgets.QWidget()
@@ -731,6 +734,8 @@ class variant_widget(QtWidgets.QFrame):
 
     def fill_ui(self):
         self.state_label.setText(self.variant_row['state'])
+        if self.variant_row['tracking_comment'] is not None:
+            self.comment_label.setText(self.variant_row['tracking_comment'])
         user_image =  site.get_user_row_by_name(self.variant_row['assignment'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
         self.user_image_label.setPixmap(pm)

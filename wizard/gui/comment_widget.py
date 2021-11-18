@@ -27,9 +27,6 @@ class comment_widget(QtWidgets.QDialog):
         gui_utils.move_ui(self)
         self.comment_field.setFocus()
 
-    def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
-
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)

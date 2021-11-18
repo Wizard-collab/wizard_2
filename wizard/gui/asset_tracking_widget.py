@@ -20,11 +20,13 @@ from wizard.vars import user_vars
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import estimation_widget
+from wizard.gui import comment_widget
 
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(asset_tracking_widget, self).__init__(parent)
 
+        self.last_time = 0
         self.variant_id = None
         self.variant_row = None
         self.users_ids = dict()
@@ -158,6 +160,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_scrollArea.setWidget(self.events_scrollArea_widget)
         self.main_layout.addWidget(self.events_scrollArea)
 
+        self.add_comment_button = QtWidgets.QPushButton('Add comment')
+        self.main_layout.addWidget(self.add_comment_button)
+
         self.infos_frame = QtWidgets.QFrame()
         self.infos_layout = QtWidgets.QHBoxLayout()
         self.infos_layout.setContentsMargins(0,0,0,0)
@@ -249,8 +254,14 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 project_tracking_events_ids.append(tracking_event_row['id'])
                 if tracking_event_row['id'] not in self.tracking_event_ids.keys():
                     widget = tracking_event_widget(tracking_event_row)
+
+                    if tracking_event_row['creation_time']-self.last_time > 350:
+                        widget.add_time()
+                    self.last_time = tracking_event_row['creation_time']
+
                     self.events_content_layout.addWidget(widget)
                     self.tracking_event_ids[tracking_event_row['id']] = widget
+
             self.remove_useless_events(event_number)
         tracking_event_ids = list(self.tracking_event_ids.keys())
         for event_id in tracking_event_ids:
@@ -261,6 +272,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
         tracking_event_ids_list_to_remove = list(self.tracking_event_ids.keys())[:-event_number]
         for event_id in tracking_event_ids_list_to_remove:
             self.remove_tracking_event(event_id)
+        events_ids_list = list(self.tracking_event_ids.keys())
+        if events_ids_list is not None and events_ids_list != []:
+            self.tracking_event_ids[events_ids_list[0]].add_time()
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._asset_tracking_context_)
@@ -296,13 +310,24 @@ class asset_tracking_widget(QtWidgets.QFrame):
     def modify_state(self, state):
         if self.variant_id is not None:
             if self.apply_state_modification:
-                assets.modify_variant_state(self.variant_id, state)
-                gui_server.refresh_ui()
+                self.comment_widget = comment_widget.comment_widget()
+                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    comment = self.comment_widget.comment
+                    assets.modify_variant_state(self.variant_id, state, comment)
+                    gui_server.refresh_ui()
 
     def modify_assignment(self, user_name):
         if self.variant_id is not None:
             if self.apply_assignment_modification:
                 assets.modify_variant_assignment(self.variant_id, user_name)
+                gui_server.refresh_ui()
+
+    def add_comment(self):
+        if self.variant_id is not None:
+            self.comment_widget = comment_widget.comment_widget()
+            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                comment = self.comment_widget.comment
+                assets.add_variant_comment(self.variant_id, comment)
                 gui_server.refresh_ui()
 
     def change_count(self):
@@ -315,10 +340,36 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_scrollBar.rangeChanged.connect(lambda: self.events_scrollBar.setValue(self.events_scrollBar.maximum()))
         self.event_count_spinBox.valueChanged.connect(self.change_count)
         self.edit_estimation_button.clicked.connect(self.edit_estimation)
+        self.add_comment_button.clicked.connect(self.add_comment)
+
+class time_widget(QtWidgets.QWidget):
+    def __init__(self, time_float, parent = None):
+        super(time_widget, self).__init__(parent)
+        self.time_float = time_float
+        self.build_ui()
+
+    def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(4,4,4,4)
+        self.main_layout.setSpacing(0)
+        self.setLayout(self.main_layout)
+        day, hour = tools.convert_time(self.time_float)
+        self.day_label = QtWidgets.QLabel(f"{day} - ")
+        self.day_label.setObjectName('gray_label')
+        self.hour_label = QtWidgets.QLabel(hour)
+        self.hour_label.setObjectName('bold_label')
+        current_day, current_hour = tools.convert_time(time.time())
+        if current_day != day:
+            self.main_layout.addWidget(self.day_label)
+        self.main_layout.addWidget(self.hour_label)
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
 class tracking_event_widget(QtWidgets.QFrame):
     def __init__(self, tracking_event_row, parent=None):
         super(tracking_event_widget, self).__init__(parent)
+
+        self.time_widget = None
         self.tracking_event_row = tracking_event_row
 
         self.build_ui()
@@ -331,13 +382,62 @@ class tracking_event_widget(QtWidgets.QFrame):
             self.build_work_session_ui()
         elif self.tracking_event_row['event_type'] == 'estimation':
             self.build_estimation_ui()
+        elif self.tracking_event_row['event_type'] == 'comment':
+            self.build_comment_event_ui()
+
+        if self.tracking_event_row['comment'] is not None and self.tracking_event_row['comment'] != '':
+            self.build_comment_ui()
+
+    def add_time(self):
+        if self.time_widget == None:
+            self.time_widget = time_widget(self.tracking_event_row['creation_time'])
+            self.overall_layout.insertWidget(0, self.time_widget)
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.setObjectName('asset_tracking_event_frame')
+        self.setObjectName('transparent_widget')
+        self.overall_layout = QtWidgets.QVBoxLayout()
+        self.overall_layout.setContentsMargins(0,0,0,0)
+        self.overall_layout.setSpacing(6)
+        self.setLayout(self.overall_layout)
+
+        self.overall_widget = QtWidgets.QWidget()
+        self.overall_widget.setObjectName('asset_tracking_event_bg_frame')
+        self.widget_layout = QtWidgets.QVBoxLayout()
+        self.widget_layout.setContentsMargins(0,0,0,0)
+        self.widget_layout.setSpacing(0)
+        self.overall_widget.setLayout(self.widget_layout)
+        self.overall_layout.addWidget(self.overall_widget)
+
+        self.main_widget = QtWidgets.QWidget()
+        self.main_widget.setObjectName('asset_tracking_event_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(6)
-        self.setLayout(self.main_layout)
+        self.main_widget.setLayout(self.main_layout)
+        self.widget_layout.addWidget(self.main_widget)
+
+    def build_comment_ui(self):
+        self.comment_widget = QtWidgets.QWidget()
+        self.comment_widget.setObjectName('transparent_widget')
+        self.comment_layout = QtWidgets.QHBoxLayout()
+        self.comment_layout.setSpacing(6)
+        self.comment_widget.setLayout(self.comment_layout)
+        self.widget_layout.addWidget(self.comment_widget)
+        self.comment_label = QtWidgets.QLabel(self.tracking_event_row['comment'])
+        self.comment_label.setWordWrap(True)
+        self.comment_layout.addWidget(self.comment_label)
+
+    def build_comment_event_ui(self):
+        self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.user_label)
+
+        self.info_label = QtWidgets.QLabel('added a comment')
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.info_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
     def build_estimation_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])

@@ -60,4 +60,4 @@ def add_work_session_event(variant_id, work_time, comment=''):
 def add_comment_event(variant_id, comment):
 	event_type = 'comment'
 	data = comment
-	project.add_asset_tracking_event(variant_id, event_type, data)
+	project.add_asset_tracking_event(variant_id, event_type, data, comment)

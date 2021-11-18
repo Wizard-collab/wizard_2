@@ -309,9 +309,15 @@ def archive_variant(variant_id):
     else:
         return None
 
-def modify_variant_state(variant_id, state):
+def modify_variant_state(variant_id, state, comment=''):
     project.set_variant_data(variant_id, 'state', state)
-    asset_tracking.add_state_switch_event(variant_id, state)
+    if comment is not None and comment != '':
+        project.set_variant_data(variant_id, 'tracking_comment', comment)
+    asset_tracking.add_state_switch_event(variant_id, state, comment)
+
+def add_variant_comment(variant_id, comment):
+    project.set_variant_data(variant_id, 'tracking_comment', comment)
+    asset_tracking.add_comment_event(variant_id, comment)
 
 def modify_variant_assignment(variant_id, user_name):
     project.set_variant_data(variant_id, 'assignment', user_name)

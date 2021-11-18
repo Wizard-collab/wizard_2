@@ -1687,6 +1687,7 @@ def create_variants_table(database):
                                         assignment text,
                                         work_time real NOT NULL,
                                         estimated_time real,
+                                        tracking_comment text,
                                         default_work_env_id integer,
                                         stage_id integer NOT NULL,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
