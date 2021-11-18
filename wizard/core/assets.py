@@ -662,38 +662,6 @@ def archive_version(version_id):
     else:
         return None
 
-def create_ticket(title, message, export_version_id, destination_user=None, files=[]):
-    ticket_id = project.create_ticket(title, export_version_id, message, files, destination_user)
-    if ticket_id:
-        events.add_ticket_openned_event(ticket_id, message)
-    return ticket_id
-
-def add_ticket_message(ticket_id, message, files=[]):
-    ticket_message_id = project.add_ticket_message(ticket_id, message, files)
-    if ticket_message_id:
-        pass
-        #events.add_ticket_openned_event(ticket_id)
-    return ticket_message_id
-
-def close_ticket(ticket_id):
-    success = project.change_ticket_state(ticket_id, 0)
-    if success:
-        events.add_ticket_closed_event(ticket_id)
-    return success
-
-def open_ticket(ticket_id):
-    success = project.change_ticket_state(ticket_id, 1)
-    if success:
-        events.add_ticket_openned_event(ticket_id, 'Reopen')
-    return success
-
-def toggle_ticket(ticket_id):
-    state = project.get_ticket_data(ticket_id, 'state')
-    if  state == 1:
-        return close_ticket(ticket_id)
-    elif state == 0:
-        return open_ticket(ticket_id)
-
 def get_domain_path(domain_id):
     dir_name = None
     domain_name = project.get_domain_data(domain_id, 'name')

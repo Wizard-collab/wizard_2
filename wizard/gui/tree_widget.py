@@ -188,7 +188,6 @@ class tree_widget(QtWidgets.QFrame):
         self.project_stage_ids = []
 
         self.all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
-        self.openned_tickets_stage_ids = project.get_all_openned_tickets('stage_id')
 
         for domain_row in project.get_domains():
             self.add_domain(domain_row)
@@ -292,10 +291,6 @@ class tree_widget(QtWidgets.QFrame):
                 self.stage_ids[row['id']].publish_indicator.setVisible(1)
             else:
                 self.stage_ids[row['id']].publish_indicator.setVisible(0)
-            if self.openned_tickets_stage_ids is not None and row['id'] in self.openned_tickets_stage_ids:
-                self.stage_ids[row['id']].ticket_indicator.setVisible(1)
-            else:
-                self.stage_ids[row['id']].ticket_indicator.setVisible(0)
 
     def remove_stage_creation_item(self, parent_widget, stage_name):
         child_count = parent_widget.childCount()
@@ -566,10 +561,7 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
         self.widget_layout.addSpacerItem(self.spaceItem)
         self.publish_indicator = indicator('#83cc56')
         self.publish_indicator.setVisible(0)
-        self.ticket_indicator = indicator('#ffa27a')
-        self.ticket_indicator.setVisible(0)
         self.widget_layout.addWidget(self.publish_indicator)
-        self.widget_layout.addWidget(self.ticket_indicator)
         self.spaceItem = QtWidgets.QSpacerItem(150,10,QtWidgets.QSizePolicy.Expanding)
         self.widget_layout.addSpacerItem(self.spaceItem)
 

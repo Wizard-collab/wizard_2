@@ -667,7 +667,7 @@ QSlider::handle:horizontal {
 	background-color: #19191f;
 }
 
-#wall_scroll_area, #tickets_scroll_area {
+#wall_scroll_area {
 	background-color: #24242b;
 }
 
@@ -905,18 +905,6 @@ QSlider::handle:horizontal {
 #file_button{
 	padding: 2px;
 	border-radius: 3px;
-}
-
-#ticket_message_header_frame{
-	background-color: transparent;
-}
-
-#ticket_message_content_widget{
-	background-color: transparent;
-}
-
-#ticket_message_widget{
-	background-color: #28282f;
 }
 
 #shelf_script_button{

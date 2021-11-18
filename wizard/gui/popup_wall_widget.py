@@ -272,9 +272,6 @@ class popup_event_widget(QtWidgets.QFrame):
             if self.event_row['creation_user'] == environment.get_user():
                 self.comment_widget.setVisible(True)
 
-        elif 'ticket' in self.event_row['type']:
-            profile_color = '#f79360'
-            gui_utils.application_tooltip(self.action_button_button, "View ticket")
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
             gui_utils.application_tooltip(self.action_button_button, "Open .zip file")

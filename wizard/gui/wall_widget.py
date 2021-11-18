@@ -299,9 +299,6 @@ class wall_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
             gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
-        elif 'ticket' in self.event_row['type']:
-            profile_color = '#f79360'
-            gui_utils.application_tooltip(self.action_button_button, "View ticket")
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
             gui_utils.application_tooltip(self.action_button_button, "Open .zip file")

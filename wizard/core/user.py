@@ -186,7 +186,6 @@ class user:
             self.prefs_dic[user_vars._wall_context_] = dict()
             self.prefs_dic[user_vars._asset_tracking_context_] = dict()
             self.prefs_dic[user_vars._console_context_] = dict()
-            self.prefs_dic[user_vars._tickets_context_] = dict()
             self.prefs_dic[user_vars._local_path_] = None
             self.prefs_dic[user_vars._popups_settings_] = dict()
             self.prefs_dic[user_vars._popups_settings_]['enabled'] = 1

@@ -737,8 +737,6 @@ def get_export_versions_by_variant(variant_id, column='*'):
 def remove_export_version(export_version_id):
     success = None
     if site.is_admin():
-        for ticket_id in get_export_version_tickets(export_version_id, 'id'):
-            remove_ticket(ticket_id)
         for reference_id in get_export_version_destinations(export_version_id, 'id'):
             remove_reference(reference_id)
         success = db_utils.delete_row('project', 'export_versions', export_version_id)
@@ -759,13 +757,6 @@ def search_export_version(data_to_search, variant_id=None, column_to_search='nam
                                                             (column_to_search, data_to_search),
                                                             column)
     return export_versions_rows
-
-def get_export_version_tickets(export_version_id, column='*'):
-    tickets_rows = db_utils.get_row_by_column_data('project',
-                                                        'tickets',
-                                                        ('export_version_id', export_version_id),
-                                                        column)
-    return tickets_rows
 
 def get_export_version_data(export_version_id, column='*'):
     export_versions_rows = db_utils.get_row_by_column_data('project', 
@@ -1304,149 +1295,6 @@ def update_users_list(users_ids_list):
     else:
         return None
 
-def create_ticket(title, export_version_id, message, files=[], destination_user=None):
-    ticket_id = None
-
-    do_creation = 1
-
-    if title == '':
-        logger.warning("Please enter a title")
-        do_creation = None
-
-    if do_creation:
-
-        export_id = get_export_version_data(export_version_id, 'export_id')
-
-        is_user = None
-        if not destination_user:
-            is_user=1
-        elif destination_user:
-            if site.get_user_row_by_name(destination_user):
-                is_user=1
-
-        if is_user:
-            if export_id:
-                variant_id = get_export_data(export_id, 'variant_id')
-                stage_id = get_variant_data(variant_id, 'stage_id')
-                if variant_id:
-                    ticket_id = db_utils.create_row('project',
-                                                        'tickets',
-                                                        ('creation_user',
-                                                            'creation_time',
-                                                            'title',
-                                                            'state',
-                                                            'stage_id',
-                                                            'variant_id',
-                                                            'export_version_id',
-                                                            'destination_user'),
-                                                        (environment.get_user(),
-                                                            time.time(),
-                                                            title,
-                                                            True,
-                                                            stage_id,
-                                                            variant_id,
-                                                            export_version_id,
-                                                            destination_user))
-                    if ticket_id:
-                        logger.info("Ticket created")
-                        add_ticket_message(ticket_id, message, files)
-    return ticket_id
-
-def add_ticket_message(ticket_id, message, files=[]):
-    ticket_message_id = None
-    copied_files = tools.copy_files(files, get_shared_files_folder())
-    if copied_files is not None:
-        ticket_message_id = db_utils.create_row('project',
-                                        'ticket_messages',
-                                        ('creation_user',
-                                            'creation_time',
-                                            'message',
-                                            'files',
-                                            'ticket_id'),
-                                        (environment.get_user(),
-                                            time.time(),
-                                            message,
-                                            json.dumps(copied_files),
-                                            ticket_id))
-        if ticket_message_id:
-            logger.info("Ticket message added")
-    return ticket_message_id
-
-def get_ticket_messages(ticket_id, column='*'):
-    ticket_messages_rows = db_utils.get_row_by_column_data('project',
-                                                        'ticket_messages',
-                                                        ('ticket_id', ticket_id),
-                                                        column)
-    return ticket_messages_rows
-
-def remove_ticket_message(ticket_message_id):
-    success = None
-    if site.is_admin():
-        success = db_utils.delete_row('project', 'ticket_messages', ticket_message_id)
-        if success :
-            logger.info(f"Ticket message removed from project")
-    return success
-
-def get_ticket_data(ticket_id, column='*'):
-    tickets_rows = db_utils.get_row_by_column_data('project',
-                                                        'tickets',
-                                                        ('id', ticket_id),
-                                                        column)
-    if tickets_rows and len(tickets_rows) >= 1:
-        return tickets_rows[0]
-    else:
-        logger.error("Ticket not found")
-        return None
-
-def change_ticket_state(ticket_id, state):
-    if state == 1:
-        state = True
-    if state == 0:
-        state = False
-    if db_utils.update_data('project',
-                                    'tickets',
-                                    ('state', state),
-                                    ('id', ticket_id)):
-        if not state:
-            logger.info('Ticket closed')
-        else:
-            logger.info('Ticket openned')
-        return 1
-    else:
-        return None
-
-def get_all_openned_tickets(column='*'):
-    tickets_rows = db_utils.get_row_by_column_data('project',
-                                                        'tickets',
-                                                        ('state', True),
-                                                        column)
-    return tickets_rows
-
-def get_all_tickets(column='*'):
-    tickets_rows = db_utils.get_rows('project',
-                                        'tickets',
-                                        column)
-    return tickets_rows
-
-def get_tickets_by_stage(stage_id, column='*'):
-    tickets_rows = db_utils.get_row_by_column_data('project',
-                                                        'tickets',
-                                                        ('stage_id', stage_id),
-                                                        column)
-    return tickets_rows
-
-def remove_ticket(ticket_id):
-    success = None
-    if site.is_admin():
-
-        for ticket_message_id in get_ticket_messages(ticket_id, 'id'):
-            remove_ticket_message(ticket_message_id)
-
-        success = db_utils.delete_row('project', 'tickets', ticket_id)
-        if success :
-            logger.info(f"Ticket removed from project")
-    return success
-
 def get_shared_files_folder():
     shared_files_folder = os.path.join(environment.get_project_path(), project_vars._shared_files_folder_)
     return shared_files_folder
@@ -1605,8 +1453,6 @@ def init_project(project_path, project_name):
             create_export_versions_table(project_name)
             create_references_table(project_name)
             create_extensions_table(project_name)
-            create_tickets_table(project_name)
-            create_ticket_messages_table(project_name)
             create_events_table(project_name)
             create_shelf_scripts_table(project_name)
             return project_name
@@ -1824,37 +1670,6 @@ def create_extensions_table(database):
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Extensions table created")
-
-def create_tickets_table(database):
-    sql_cmd = """ CREATE TABLE IF NOT EXISTS tickets (
-                                        id serial PRIMARY KEY,
-                                        creation_user text NOT NULL,
-                                        creation_time real NOT NULL,
-                                        title text NOT NULL,
-                                        state bool,
-                                        stage_id integer NOT NULL,
-                                        variant_id integer NOT NULL,
-                                        export_version_id integer NOT NULL,
-                                        destination_user text,
-                                        FOREIGN KEY (stage_id) REFERENCES stages (id),
-                                        FOREIGN KEY (variant_id) REFERENCES variants (id),
-                                        FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
-                                    );"""
-    if db_utils.create_table(database, sql_cmd):
-        logger.info("Tickets table created")
-
-def create_ticket_messages_table(database):
-    sql_cmd = """ CREATE TABLE IF NOT EXISTS ticket_messages (
-                                        id serial PRIMARY KEY,
-                                        creation_user text NOT NULL,
-                                        creation_time real NOT NULL,
-                                        message text NOT NULL,
-                                        files text,
-                                        ticket_id integer NOT NULL,
-                                        FOREIGN KEY (ticket_id) REFERENCES tickets (id)
-                                    );"""
-    if db_utils.create_table(database, sql_cmd):
-        logger.info("Tickets messages table created")
 
 def create_events_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS events (

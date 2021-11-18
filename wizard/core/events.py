@@ -57,23 +57,3 @@ def add_archive_event(message, archive_path, additional_message):
 	title = 'Archive event'
 	data = archive_path
 	project.add_event('archive', title, message, additional_message, data)
-
-def add_ticket_openned_event(ticket_id, ticket_message):
-	data = ticket_id
-	ticket_row = project.get_ticket_data(ticket_id)
-	export_version_id = ticket_row['export_version_id']
-	string_instance = assets.instance_to_string(('export_version', export_version_id))
-	destination_user = ticket_row['destination_user']
-	if destination_user is None:
-		destination_user = 'everybody'
-	title = f"Adressed a ticket to {destination_user}"
-	additional_message = f"{ticket_row['title']}:\n{ticket_message}"
-	project.add_event('ticket_openned', title, string_instance, data, additional_message)
-
-def add_ticket_closed_event(ticket_id):
-	title = f"Closed a ticket"
-	data = ticket_id
-	ticket_row = project.get_ticket_data(ticket_id)
-	export_version_id = ticket_row['export_version_id']
-	string_instance = assets.instance_to_string(('export_version', export_version_id))
-	project.add_event('ticket_closed', title, string_instance, data, ticket_row['title'])

@@ -36,7 +36,6 @@ from wizard.gui import shelf_widget
 from wizard.gui import footer_widget
 from wizard.gui import console_widget
 from wizard.gui import header_widget
-from wizard.gui import tickets_widget
 from wizard.gui import subtask_manager
 from wizard.gui import team_widget
 from wizard.gui import popup_wall_widget
@@ -71,7 +70,6 @@ class main_widget(QtWidgets.QWidget):
         self.popup_wall_widget = popup_wall_widget.popup_wall_widget()
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
-        self.tickets_widget = tickets_widget.tickets_widget(self)
         self.subtask_manager = subtask_manager.subtask_manager()
         self.team_widget = team_widget.team_widget()
         self.team_client = team_client.team_client()
@@ -111,7 +109,6 @@ class main_widget(QtWidgets.QWidget):
         self.versions_widget.get_context()
         self.asset_tracking_widget.get_context()
         self.console_widget.get_context()
-        self.tickets_widget.get_context()
 
     def save_contexts(self):
         self.tree_widget.set_context()
@@ -120,7 +117,6 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget.set_context()
         self.asset_tracking_widget.set_context()
         self.console_widget.set_context()
-        self.tickets_widget.set_context()
 
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
@@ -228,7 +224,6 @@ class main_widget(QtWidgets.QWidget):
 
     def stage_changed(self, stage_id):
         self.context_widget.change_stage(stage_id)
-        self.tickets_widget.change_stage(stage_id)
 
     def variant_changed(self, variant_id):
         self.exports_widget.change_variant(variant_id)
@@ -243,7 +238,6 @@ class main_widget(QtWidgets.QWidget):
         self.references_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
-        self.tickets_widget.refresh()
 
     def quit_threads(self):
         self.stop_threads.emit(1)
@@ -285,7 +279,6 @@ class main_widget(QtWidgets.QWidget):
         self.references_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
-        self.tickets_widget.refresh()
         self.wall_widget.refresh()
         self.softwares_widget.refresh()
         self.asset_tracking_widget.refresh()
@@ -338,7 +331,6 @@ class main_widget(QtWidgets.QWidget):
         self.references_tab_index = self.tabs_widget.addTab(self.references_widget, QtGui.QIcon(ressources._references_icon_), 'References')
         self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, QtGui.QIcon(ressources._work_icon_), 'Work versions')
         self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
-        self.tickets_tab_index = self.tabs_widget.addTab(self.tickets_widget, QtGui.QIcon(ressources._tickets_icon_), 'Tickets')
         
         self.contents_3_widget = QtWidgets.QWidget()
         self.contents_3_widget.setObjectName('main_widget')

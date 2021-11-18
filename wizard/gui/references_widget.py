@@ -11,7 +11,6 @@ import time
 from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
-from wizard.gui import create_ticket_widget
 
 # Wizard modules
 from wizard.core import assets
@@ -50,7 +49,6 @@ class references_widget(QtWidgets.QWidget):
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
         self.update_button.clicked.connect(self.update_selection)
-        self.create_ticket_button.clicked.connect(self.create_ticket)
         self.add_reference_button.clicked.connect(self.search_reference)
 
     def update_item_infos(self, infos_list):
@@ -127,15 +125,6 @@ class references_widget(QtWidgets.QWidget):
             assets.remove_reference(reference_id)
         gui_server.refresh_ui()
 
-    def create_ticket(self):
-        selected_items = self.list_view.selectedItems()
-        if len(selected_items) == 1:
-            export_version_id = selected_items[0].reference_row['export_version_id']
-            self.create_ticket_widget = create_ticket_widget.create_ticket_widget(export_version_id)
-            self.create_ticket_widget.show()
-        else:
-            logger.warning('Please select one reference')
-
     def update_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
@@ -176,14 +165,11 @@ class references_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu(self)
         remove_action = None
         update_action = None
-        ticket_action = None
         add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         if len(selection)>=1:
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update reference(s)')
             remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove reference(s)')
-        if len(selection)==1:
-            ticket_action = menu.addAction(QtGui.QIcon(ressources._tool_ticket_), 'Open a ticket')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -191,8 +177,6 @@ class references_widget(QtWidgets.QWidget):
                 self.remove_selection()
             elif action == update_action:
                 self.update_selection()
-            elif action == ticket_action:
-                self.create_ticket()
             elif action == add_action:
                 self.search_reference()
             elif action == update_all_action:
@@ -273,13 +257,6 @@ class references_widget(QtWidgets.QWidget):
         self.add_reference_button.setIconSize(QtCore.QSize(30,30))
         self.add_reference_button.setIcon(QtGui.QIcon(ressources._tool_add_))
         self.buttons_layout.addWidget(self.add_reference_button)
-
-        self.create_ticket_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.create_ticket_button, "Open a ticket")
-        self.create_ticket_button.setFixedSize(35,35)
-        self.create_ticket_button.setIconSize(QtCore.QSize(30,30))
-        self.create_ticket_button.setIcon(QtGui.QIcon(ressources._tool_ticket_))
-        self.buttons_layout.addWidget(self.create_ticket_button)     
 
         self.update_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.update_button, "Update selected references")
