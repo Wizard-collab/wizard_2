@@ -159,8 +159,8 @@ def update_data(level,
     sql_cmd += f''' WHERE {where_tuple[0]} = %s'''
     return execute_sql(sql_cmd, level, 0, (set_tuple[1], where_tuple[1]), 0)
     
-def delete_row(level, table, id):
-    sql_cmd = f'DELETE FROM {table} WHERE id=%s'
+def delete_row(level, table, id, column='id'):
+    sql_cmd = f'DELETE FROM {table} WHERE {column}=%s'
     return execute_sql(sql_cmd, level, 0, (id,), 0)
 
 def check_database_existence(database):

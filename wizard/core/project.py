@@ -259,6 +259,12 @@ def modify_asset_preview(asset_id, preview_path):
     else:
         return None
 
+def remove_asset_preview(asset_id):
+    success = db_utils.delete_row('project', 'assets_preview', asset_id, 'asset_id')
+    if success:
+        logger.info(f"Asset preview removed from project")
+    return success
+
 def modify_asset_manual_preview(asset_id, preview_path):
     if db_utils.update_data('project',
                             'assets_preview',
@@ -294,8 +300,9 @@ def remove_asset(asset_id):
     if site.is_admin():
         for stage_id in get_asset_childs(asset_id, 'id'):
             remove_stage(stage_id)
+        remove_asset_preview(asset_id)
         success = db_utils.delete_row('project', 'assets', asset_id)
-        if success:
+        if success:  
             logger.info(f"Asset removed from project")
     return success
 
