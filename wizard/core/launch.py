@@ -70,7 +70,12 @@ def kill(work_env_id):
     signal_dic = dict()
     signal_dic['function'] = 'kill'
     signal_dic['work_env_id'] = work_env_id
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=10)
+    return socket_utils.send_signal(_DNS_, signal_dic, timeout=100)
+
+def kill_all():
+    signal_dic = dict()
+    signal_dic['function'] = 'kill_all'
+    return socket_utils.send_signal(_DNS_, signal_dic, timeout=100)
 
 def died(work_env_id):
     signal_dic = dict()
@@ -195,6 +200,7 @@ class software_thread(Thread):
         died(self.work_env_id)
         if not self.killed:
             self.set_infos()
+            gui_server.refresh_ui()
 
     def set_infos(self):
         work_time = time.time()-self.start_time
@@ -249,6 +255,8 @@ class softwares_server(Thread):
             returned = self.launch(signal_dic['version_id'])
         if signal_dic['function'] == 'kill':
             returned = self.kill(signal_dic['work_env_id'])
+        if signal_dic['function'] == 'kill_all':
+            returned = self.kill_all()
         if signal_dic['function'] == 'get':
             returned = list(self.software_threads_dic.keys())
         if signal_dic['function'] == 'died':
@@ -266,6 +274,13 @@ class softwares_server(Thread):
         else:
             logger.warning(f"You are already running a work instance of this asset")
             return 0
+
+    def kill_all(self):
+        software_threads_ids = list(self.software_threads_dic.keys())
+        if software_threads_ids is not None:
+            for work_env_id in software_threads_ids:
+                self.kill(work_env_id)
+        return 1
 
     def kill(self, work_env_id):
         if work_env_id in self.software_threads_dic.keys():

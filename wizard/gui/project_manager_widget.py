@@ -19,8 +19,10 @@ from wizard.gui import logging_widget
 from wizard.gui import create_project_widget
 
 class project_manager_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, wait_for_restart=False):
         super(project_manager_widget, self).__init__()
+
+        self.wait_for_restart = wait_for_restart
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Project manager")
@@ -71,7 +73,7 @@ class project_manager_widget(QtWidgets.QDialog):
         if len(self.icon_view.selectedItems()) == 1:
             if self.icon_view.selectedItems()[0].type == 'project':
                 project_name = self.icon_view.itemWidget(self.icon_view.selectedItems()[0]).project_row['project_name']
-                self.project_log_widget = project_log_widget(project_name)
+                self.project_log_widget = project_log_widget(project_name, wait_for_restart=self.wait_for_restart)
                 if self.project_log_widget.exec_() == QtWidgets.QDialog.Accepted:
                     self.accept()
             else:
@@ -200,11 +202,12 @@ class project_icon_widget(QtWidgets.QFrame):
         self.image_label.setPixmap(pm)
 
 class project_log_widget(QtWidgets.QDialog):
-    def __init__(self, project_name, parent=None):
+    def __init__(self, project_name, parent=None, wait_for_restart=False):
         super(project_log_widget, self).__init__()
         self.build_ui()
         self.connect_functions()
         self.project_name = project_name
+        self.wait_for_restart = wait_for_restart
 
     def build_ui(self):
         self.setMinimumWidth(300)
@@ -238,6 +241,6 @@ class project_log_widget(QtWidgets.QDialog):
 
     def apply(self):
         project_password = self.password_lineEdit.text()
-        if user.log_project(self.project_name, project_password):
+        if user.log_project(self.project_name, project_password, wait_for_restart=self.wait_for_restart):
             gui_server.restart_ui()
             self.accept()

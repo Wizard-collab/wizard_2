@@ -255,16 +255,17 @@ def get_user():
     else:
         return None
 
-def log_project(project_name, password):
+def log_project(project_name, password, wait_for_restart=False):
     if project_name in site.get_projects_names_list():
         project_row = site.get_project_row_by_name(project_name)
         if tools.decrypt_string(project_row['project_password'],
                                 password):
             site.update_current_ip_data('project_id', project_row['id'])
-            environment.build_project_env(project_name, project_row['project_path'])
-            db_utils.modify_db_name('project', project_name)
             logger.info(f'Successfully signed in {project_name} project')
-            project.add_user(site.get_user_row_by_name(environment.get_user(),
+            if not wait_for_restart:
+                environment.build_project_env(project_name, project_row['project_path'])
+                db_utils.modify_db_name('project', project_name)
+                project.add_user(site.get_user_row_by_name(environment.get_user(),
                                                                 'id'))
             return 1
         else:

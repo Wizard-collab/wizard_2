@@ -204,7 +204,7 @@ class wall_widget(QtWidgets.QWidget):
                     self.last_time = event_row['creation_time']
                     if not self.isVisible() and self.first_refresh != 1:
                         self.notification.emit(1)
-                        self.popup.emit(event_row)
+                    self.popup.emit(event_row)
             self.remove_useless_events(event_number)
 
         self.update_search()
@@ -286,6 +286,10 @@ class wall_event_widget(QtWidgets.QFrame):
             self.event_additional_content_label.setText(self.event_row['additional_message'])
         else:
             self.event_additional_content_label.setVisible(0)
+        if self.event_row['image_path'] is not None:
+            self.image_label.setPixmap(QtGui.QIcon(self.event_row['image_path']).pixmap(300))
+        else:
+            self.image_label.setVisible(0)
         self.action_button_button.setText('View')
         
         if self.event_row['type'] == 'creation':
@@ -393,6 +397,9 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_additional_content_label.setObjectName('gray_label')
         self.event_additional_content_label.setWordWrap(True)
         self.content_layout.addWidget(self.event_additional_content_label)
+
+        self.image_label = QtWidgets.QLabel()
+        self.content_layout.addWidget(self.image_label)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')

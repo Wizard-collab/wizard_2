@@ -174,12 +174,11 @@ class main_widget(QtWidgets.QWidget):
             os.startfile('PyWizard.exe')
 
     def restart(self):
-        self.quit_threads()
+        self.close()
         command = 'wizard.exe'
         if sys.argv[0].endswith('.py'):
             command = 'python app.py'
         subprocess.Popen(command, shell=True)
-        self.close()
 
     def raise_window(self):
         self.raise_()
@@ -256,22 +255,26 @@ class main_widget(QtWidgets.QWidget):
         self.subtask_manager.tasks_server.stop()
         self.softwares_server.stop()
 
-    def closeEvent(self, event):
+    def prepare_close(self):
         close = False
-        print(launch.get())
         if launch.get() == []:
             close = True
         else:
             self.confirm_widget = confirm_widget.confirm_widget('Softwares are running...\nKill all softwares ?',
                                                                 accept_text='Kill')
             if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
-                for id in launch.get():
-                    launch.kill(id)
+                launch.kill_all()
                 close = True
         if close:
             self.quit_threads()
             self.save_contexts()
+        return close
+
+    def closeEvent(self, event):
+        if self.prepare_close():
             QtWidgets.QApplication.closeAllWindows()
+        else:
+            event.ignore()
 
     def refresh(self):
         start_time = time.time()

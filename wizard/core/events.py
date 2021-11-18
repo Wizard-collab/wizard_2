@@ -51,7 +51,7 @@ def add_export_event(export_version_id):
 	data = export_version_id
 	export_version_row = project.get_export_version_data(export_version_id)
 	message = assets.instance_to_string(('export_version', export_version_id))
-	project.add_event('export', title, message, data, export_version_row['comment'])
+	project.add_event('export', title, message, data, export_version_row['comment'], export_version_row['work_version_thumbnail_path'])
 
 def add_archive_event(message, archive_path, additional_message):
 	title = 'Archive event'

@@ -97,7 +97,7 @@ class header_widget(QtWidgets.QFrame):
         self.user_log_widget.exec_()
 
     def change_project(self):
-        self.project_manager_widget = project_manager_widget.project_manager_widget()
+        self.project_manager_widget = project_manager_widget.project_manager_widget(wait_for_restart=True)
         self.project_manager_widget.exec_()
 
     def create_user(self):

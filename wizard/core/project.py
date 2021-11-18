@@ -680,11 +680,14 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
         variant_id = get_export_data(export_id, 'variant_id')
         stage_id = get_variant_data(variant_id, 'stage_id')
         if work_version_id is not None:
-            work_env_id = get_version_data(work_version_id, 'work_env_id')
+            version_row = get_version_data(work_version_id)
+            work_version_thumbnail = version_row['thumbnail_path']
+            work_env_id = version_row['work_env_id']
             software_id = get_work_env_data(work_env_id, 'software_id')
             software = get_software_data(software_id, 'name')
         else:
             software = None
+            work_version_thumbnail = None
 
         export_version_id = db_utils.create_row('project',
                             'export_versions', 
@@ -696,6 +699,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 'variant_id',
                                 'stage_id',
                                 'work_version_id',
+                                'work_version_thumbnail_path',
                                 'software',
                                 'export_id'), 
                             (name,
@@ -706,6 +710,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 variant_id,
                                 stage_id,
                                 work_version_id,
+                                work_version_thumbnail,
                                 software,
                                 export_id))
         if export_version_id:
@@ -1450,7 +1455,7 @@ def get_scripts_folder():
     shared_files_folder = os.path.join(environment.get_project_path(), project_vars._scripts_folder_)
     return shared_files_folder
 
-def add_event(event_type, title, message, data, additional_message=None):
+def add_event(event_type, title, message, data, additional_message=None, image_path=None):
     event_id = db_utils.create_row('project',
                                             'events',
                                             ('creation_user',
@@ -1459,14 +1464,16 @@ def add_event(event_type, title, message, data, additional_message=None):
                                                 'title',
                                                 'message',
                                                 'data',
-                                                'additional_message'),
+                                                'additional_message',
+                                                'image_path'),
                                             (environment.get_user(),
                                                 time.time(),
                                                 event_type,
                                                 title,
                                                 message,
                                                 json.dumps(data),
-                                                additional_message))
+                                                additional_message,
+                                                image_path))
     if event_id:
         logger.debug("Event added")
     return event_id
@@ -1772,6 +1779,7 @@ def create_export_versions_table(database):
                                         variant_id integer NOT NULL,
                                         stage_id integer NOT NULL,
                                         work_version_id integer,
+                                        work_version_thumbnail_path text,
                                         software text,
                                         export_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
@@ -1856,7 +1864,8 @@ def create_events_table(database):
                                         title text NOT NULL,
                                         message text NOT NULL,
                                         data text,
-                                        additional_message text
+                                        additional_message text,
+                                        image_path text
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Events table created")
