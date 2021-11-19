@@ -133,8 +133,22 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.percent_label = QtWidgets.QLabel()
         self.progress_bar_layout.addWidget(self.percent_label)
 
+        self.separation_widget = QtWidgets.QWidget()
+        self.separation_layout = QtWidgets.QHBoxLayout()
+        self.separation_layout.setContentsMargins(0,0,0,0)
+        self.separation_layout.setSpacing(6)
+        self.separation_widget.setLayout(self.separation_layout)
+        self.main_layout.addWidget(self.separation_widget)
+
         self.asset_history_label = QtWidgets.QLabel('Asset history')
-        self.main_layout.addWidget(self.asset_history_label)
+        self.separation_layout.addWidget(self.asset_history_label)
+
+        self.separation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.add_comment_button = QtWidgets.QPushButton('Add comment')
+        self.add_comment_button.setMaximumHeight(24)
+        self.add_comment_button.setStyleSheet('padding:2px;')
+        self.separation_layout.addWidget(self.add_comment_button)
 
         self.events_scrollArea = QtWidgets.QScrollArea()
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
@@ -159,9 +173,6 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_scrollArea.setWidgetResizable(True)
         self.events_scrollArea.setWidget(self.events_scrollArea_widget)
         self.main_layout.addWidget(self.events_scrollArea)
-
-        self.add_comment_button = QtWidgets.QPushButton('Add comment')
-        self.main_layout.addWidget(self.add_comment_button)
 
         self.infos_frame = QtWidgets.QFrame()
         self.infos_layout = QtWidgets.QHBoxLayout()

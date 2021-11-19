@@ -333,56 +333,56 @@ class versions_widget(QtWidgets.QWidget):
         self.toggle_view_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.toggle_view_button, "Switch to list view")
         self.toggle_view_button.setFixedSize(35,35)
-        self.toggle_view_button.setIconSize(QtCore.QSize(30,30))
+        self.toggle_view_button.setIconSize(QtCore.QSize(25,25))
         self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
         self.buttons_layout.addWidget(self.toggle_view_button)
 
         self.manual_merge_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.manual_merge_button, "Manually merge a file")
         self.manual_merge_button.setFixedSize(35,35)
-        self.manual_merge_button.setIconSize(QtCore.QSize(30,30))
+        self.manual_merge_button.setIconSize(QtCore.QSize(25,25))
         self.manual_merge_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_merge_button)
 
         self.comment_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.comment_button, "Modify comment")
         self.comment_button.setFixedSize(35,35)
-        self.comment_button.setIconSize(QtCore.QSize(30,30))
+        self.comment_button.setIconSize(QtCore.QSize(25,25))
         self.comment_button.setIcon(QtGui.QIcon(ressources._tool_comment_))
         self.buttons_layout.addWidget(self.comment_button)
 
         self.launch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.launch_button, "Launch selection")
         self.launch_button.setFixedSize(35,35)
-        self.launch_button.setIconSize(QtCore.QSize(30,30))
-        self.launch_button.setIcon(QtGui.QIcon(ressources._tool_launch_))
+        self.launch_button.setIconSize(QtCore.QSize(25,25))
+        self.launch_button.setIcon(QtGui.QIcon(ressources._launch_icon_))
         self.buttons_layout.addWidget(self.launch_button)
 
         self.duplicate_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.duplicate_button, "Duplicate selection")
         self.duplicate_button.setFixedSize(35,35)
-        self.duplicate_button.setIconSize(QtCore.QSize(30,30))
+        self.duplicate_button.setIconSize(QtCore.QSize(25,25))
         self.duplicate_button.setIcon(QtGui.QIcon(ressources._tool_duplicate_))
         self.buttons_layout.addWidget(self.duplicate_button)
 
         self.new_version_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.new_version_button, "Create empty version")
         self.new_version_button.setFixedSize(35,35)
-        self.new_version_button.setIconSize(QtCore.QSize(30,30))
+        self.new_version_button.setIconSize(QtCore.QSize(25,25))
         self.new_version_button.setIcon(QtGui.QIcon(ressources._tool_add_))
         self.buttons_layout.addWidget(self.new_version_button)
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open versions folder")
         self.folder_button.setFixedSize(35,35)
-        self.folder_button.setIconSize(QtCore.QSize(30,30))
+        self.folder_button.setIconSize(QtCore.QSize(25,25))
         self.folder_button.setIcon(QtGui.QIcon(ressources._tool_folder_))
         self.buttons_layout.addWidget(self.folder_button)
 
         self.archive_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.archive_button, "Archive selection")
         self.archive_button.setFixedSize(35,35)
-        self.archive_button.setIconSize(QtCore.QSize(30,30))
+        self.archive_button.setIconSize(QtCore.QSize(25,25))
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
@@ -395,15 +395,17 @@ class versions_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu(self)
         folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
         empty_version_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Create new empty version')
+        merge_action = menu.addAction(QtGui.QIcon(ressources._tool_manually_publish_), 'Manually merge a file')
         duplicate_action = None
         archive_action = None
+        comment_action = None
         if len(selection)>=1:
             duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate version(s)')
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
             comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         launch_action = None
         if len(selection)==1:
-            launch_action = menu.addAction(QtGui.QIcon(ressources._tool_launch_), 'Launch version')
+            launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch version')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -419,6 +421,8 @@ class versions_widget(QtWidgets.QWidget):
                 self.launch()
             elif action == comment_action:
                 self.modify_comment()
+            elif action == merge_action:
+                self.open_files()
 
     def modify_comment(self):
         items = self.get_selection()

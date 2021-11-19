@@ -445,7 +445,6 @@ class user_account_widget(QtWidgets.QWidget):
 
         self.profile_picture_button = QtWidgets.QPushButton()
         self.profile_picture_button.setFixedSize(60,60)
-        self.profile_picture_button.setIcon(QtGui.QIcon(ressources._default_profile_))
         self.profile_picture_button.setIconSize(QtCore.QSize(54,54))
         self.profile_subwidget_layout.addWidget(self.profile_picture_button)
 

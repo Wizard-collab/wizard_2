@@ -27,15 +27,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1"
-     inkscape:cx="290"
-     inkscape:cy="212.5"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="186.67619"
+     inkscape:cy="160.51324"
      inkscape:window-width="1920"
      inkscape:window-height="1121"
      inkscape:window-x="-7"
      inkscape:window-y="-7"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g6111"
+     inkscape:current-layer="layer25"
      fit-margin-top="50"
      fit-margin-left="50"
      fit-margin-right="50"
@@ -287,7 +287,7 @@
      inkscape:groupmode="layer"
      id="g6111"
      inkscape:label="tool_icon_view"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:none;stroke:#ffffff;stroke-width:11;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:186.406;paint-order:normal"
        id="rect6107"
@@ -306,6 +306,27 @@
        cx="74.877083"
        cy="44.185417"
        r="10.054167" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer25"
+     inkscape:label="tool_list_view">
+    <path
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:12;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 23.955796,51.103141 c 75.40625,0 76.199994,0 76.199994,0"
+       id="path7321" />
+    <path
+       style="opacity:1;fill:#ffffff;stroke:#ffffff;stroke-width:12;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 23.955796,28.821731 c 75.40625,0 76.199994,0 76.199994,0"
+       id="path7700" />
+    <path
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:12;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 23.955796,93.110919 c 75.40625,0 76.199994,0 76.199994,0"
+       id="path7702" />
+    <path
+       style="opacity:0.5;fill:#ffffff;stroke:#ffffff;stroke-width:12;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 23.955796,72.326218 c 75.40625,0 76.199994,0 76.199994,0"
+       id="path7704" />
   </g>
   <g
      inkscape:groupmode="layer"

@@ -139,35 +139,35 @@ class exports_widget(QtWidgets.QWidget):
         self.manual_publish_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.manual_publish_button, "Manually add a file")
         self.manual_publish_button.setFixedSize(35,35)
-        self.manual_publish_button.setIconSize(QtCore.QSize(30,30))
+        self.manual_publish_button.setIconSize(QtCore.QSize(25,25))
         self.manual_publish_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_publish_button)
 
         self.batch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.batch_button, "Batch export")
         self.batch_button.setFixedSize(35,35)
-        self.batch_button.setIconSize(QtCore.QSize(30,30))
+        self.batch_button.setIconSize(QtCore.QSize(25,25))
         self.batch_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
         self.buttons_layout.addWidget(self.batch_button)
 
         self.launch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.launch_button, "Launch related work version")
         self.launch_button.setFixedSize(35,35)
-        self.launch_button.setIconSize(QtCore.QSize(30,30))
-        self.launch_button.setIcon(QtGui.QIcon(ressources._tool_launch_))
+        self.launch_button.setIconSize(QtCore.QSize(25,25))
+        self.launch_button.setIcon(QtGui.QIcon(ressources._launch_icon_))
         self.buttons_layout.addWidget(self.launch_button)
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open export folder")
         self.folder_button.setFixedSize(35,35)
-        self.folder_button.setIconSize(QtCore.QSize(30,30))
+        self.folder_button.setIconSize(QtCore.QSize(25,25))
         self.folder_button.setIcon(QtGui.QIcon(ressources._tool_folder_))
         self.buttons_layout.addWidget(self.folder_button)
 
         self.archive_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.archive_button, "Archive selection")
         self.archive_button.setFixedSize(35,35)
-        self.archive_button.setIconSize(QtCore.QSize(30,30))
+        self.archive_button.setIconSize(QtCore.QSize(25,25))
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
@@ -409,7 +409,7 @@ class exports_widget(QtWidgets.QWidget):
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
             comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         if len(selection)==1:
-            launch_action = menu.addAction(QtGui.QIcon(ressources._tool_launch_), 'Launch related work version')
+            launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             if action == folder_action:

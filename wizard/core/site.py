@@ -161,16 +161,18 @@ def modify_project_password(project_name,
 
 def modify_project_image(project_name, project_image):
     if project_image:
-        if not os.path.isfile(project_image):
-            project_image = ressources._default_profile_
-        project_image_ascii = process_project_image(project_image)
-        if db_utils.update_data('site',
-                                'projects',
-                                ('project_image', project_image_ascii),
-                                ('project_name', project_name)):
-            logger.info(f'{project_name} image modified')
-            return 1
+        if os.path.isfile(project_image):
+            project_image_ascii = process_project_image(project_image)
+            if db_utils.update_data('site',
+                                    'projects',
+                                    ('project_image', project_image_ascii),
+                                    ('project_name', project_name)):
+                logger.info(f'{project_name} image modified')
+                return 1
+            else:
+                return None
         else:
+            logger.warning(f'{project_image} not found')
             return None
     else:
         return None
@@ -207,7 +209,7 @@ def create_user(user_name,
                 administrator = 1
             if profile_picture:
                 if not os.path.isfile(profile_picture):
-                    profile_picture = ressources._default_profile_
+                    profile_picture = image.user_random_image(user_name)
             else:
                 profile_picture = image.user_random_image(user_name)
             profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
@@ -247,16 +249,18 @@ def create_user(user_name,
 
 def modify_user_profile_picture(user_name, profile_picture):
     if profile_picture:
-        if not os.path.isfile(profile_picture):
-            profile_picture = ressources._default_profile_
-        profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
-        if db_utils.update_data('site',
-                                'users',
-                                ('profile_picture', profile_picture_ascii),
-                                ('user_name', user_name)):
-            logger.info(f'{user_name} profile picture modified')
-            return 1
+        if os.path.isfile(profile_picture):
+            profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
+            if db_utils.update_data('site',
+                                    'users',
+                                    ('profile_picture', profile_picture_ascii),
+                                    ('user_name', user_name)):
+                logger.info(f'{user_name} profile picture modified')
+                return 1
+            else:
+                return None
         else:
+            logger.warning(f'{profile_picture} not found')
             return None
     else:
         return None
