@@ -14,12 +14,16 @@ from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import assets
+from wizard.core import launch
 from wizard.core import project
 from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
 class references_widget(QtWidgets.QWidget):
+
+    focus_export = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super(references_widget, self).__init__(parent)
         self.reference_infos_thread = reference_infos_thread()
@@ -137,6 +141,21 @@ class references_widget(QtWidgets.QWidget):
             if assets.set_reference_last_version(reference_id):
                 gui_server.refresh_ui()
 
+    def launch_work_version(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            export_version_id = selected_item.reference_row['export_version_id']
+            export_version_row = project.get_export_version_data(export_version_id)
+            if export_version_row['work_version_id'] is not None:
+                launch.launch_work_version(export_version_row['work_version_id'])
+
+        gui_server.refresh_ui()
+
+    def focus_on_export_version(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            self.focus_export.emit(selected_item.reference_row['export_version_id'])
+
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():
             item = self.reference_ids[reference_id]
@@ -165,11 +184,16 @@ class references_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu(self)
         remove_action = None
         update_action = None
-        add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
+        launch_action = None
+        focus_action = None
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         if len(selection)>=1:
-            update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update reference(s)')
-            remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove reference(s)')
+            update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
+            remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected references')
+            if len(selection) == 1:
+                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
+                focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
+        add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -181,6 +205,11 @@ class references_widget(QtWidgets.QWidget):
                 self.search_reference()
             elif action == update_all_action:
                 self.update_all()
+            elif action == launch_action:
+                self.launch_work_version()
+            elif action == focus_action:
+                self.focus_on_export_version()
+
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

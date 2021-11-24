@@ -370,6 +370,20 @@ class tree_widget(QtWidgets.QFrame):
             if stage_id in self.stage_ids.keys():
                 self.focus_on_item(self.stage_ids[stage_id])
 
+    def isolate_item(self, item):
+        search_text = ''
+        if item.instance_type == 'category':
+            search_text = f"{item.instance_name}:"
+        elif item.instance_type == 'asset':
+            category_item = self.category_ids[item.parent().instance_id]
+            search_text = f"{category_item.instance_name}:{item.instance_name}"
+        elif item.instance_type == 'stage':
+            asset_item = self.asset_ids[item.parent().instance_id]
+            category_item = self.category_ids[asset_item.parent().instance_id]
+            search_text = f"{category_item.instance_name}:{asset_item.instance_name}*{item.instance_name}"
+        if search_text != '':
+            self.search_bar.setText(search_text)
+
     def apply_search(self):
         search = self.search_bar.text()
         self.search_asset(search)
@@ -446,15 +460,21 @@ class tree_widget(QtWidgets.QFrame):
         
         item = self.tree.itemAt(point)
         reduce_all_action = menu.addAction(QtGui.QIcon(ressources._reduce_icon_), 'Reduce all')
+        launch_action = None
         archive_action = None
+        isolate_action = None
         open_folder_action = None
+        open_sandbox_folder_action = None
         if item:
             if 'creation' not in item.instance_type:
                 open_folder_action = menu.addAction(QtGui.QIcon(ressources._folder_icon_), 'Open folder')
             if 'creation' not in item.instance_type and item.instance_type != 'domain':
                 archive_action = menu.addAction(QtGui.QIcon(ressources._archive_icon_), f'Archive {item.instance_type}')
+                isolate_action = menu.addAction(QtGui.QIcon(ressources._isolate_icon_), f'Isolate {item.instance_type}')
             if 'creation' not in item.instance_type and item.instance_type == 'stage':
-                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type}')
+                menu.addSeparator()
+                open_sandbox_folder_action = menu.addAction(QtGui.QIcon(ressources._sandbox_icon_), 'Open Sandbox folder')
+                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type} (Double click)')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -466,6 +486,10 @@ class tree_widget(QtWidgets.QFrame):
                 self.reduce_all()
             elif action == launch_action:
                 self.launch_stage_signal.emit(1)
+            elif action == isolate_action:
+                self.isolate_item(item)
+            elif action == open_sandbox_folder_action:
+                self.open_sandbox_folder(item)
 
     def open_folder(self, item):
         if item.instance_type == 'domain':
@@ -480,6 +504,11 @@ class tree_widget(QtWidgets.QFrame):
             os.startfile(path)
         else:
             logger.error(f"{path} not found")
+
+    def open_sandbox_folder(self, item):
+        variant_id = project.get_stage_data(item.instance_id, 'default_variant_id')
+        sandbox_path = os.path.join(assets.get_variant_path(variant_id), '_SANDBOX')
+        os.startfile(sandbox_path)
 
     def archive_instance(self, item):
         self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)

@@ -146,6 +146,7 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
         self.subtask_manager.global_status_signal.connect(self.footer_widget.update_subtask_manager_button)
+        self.references_widget.focus_export.connect(self.focus_export_version)
 
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
         self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)

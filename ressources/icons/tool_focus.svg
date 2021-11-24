@@ -28,14 +28,14 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.70710678"
-     inkscape:cx="186.67619"
+     inkscape:cx="152.73506"
      inkscape:cy="160.51324"
      inkscape:window-width="1920"
      inkscape:window-height="1121"
      inkscape:window-x="-7"
      inkscape:window-y="-7"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g2913"
+     inkscape:current-layer="layer26"
      fit-margin-top="50"
      fit-margin-left="50"
      fit-margin-right="50"
@@ -396,7 +396,7 @@
      inkscape:groupmode="layer"
      id="g2913"
      inkscape:label="tool_batch_publish"
-     style="display:inline">
+     style="display:none">
     <rect
        style="opacity:1;fill:#ffffff;stroke:none;stroke-width:11;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4.4;stroke-dasharray:22, 11;stroke-dashoffset:49.5001;paint-order:markers fill stroke"
        id="rect3018"
@@ -428,6 +428,43 @@
        d="M 29.876544,96.371928 H 94.235043"
        id="path8073"
        sodipodi:nodetypes="cc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer26"
+     inkscape:label="focus_on_instance">
+    <path
+       style="opacity:0.5;fill:none;stroke:#ffffff;stroke-width:12;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 97.382272,65.456446 V 56.476191"
+       id="path980"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="opacity:1;fill:#ffffff;stroke:none;stroke-width:11;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4.4;stroke-dasharray:22, 11;stroke-dashoffset:49.5001;paint-order:markers fill stroke"
+       id="rect948"
+       width="13.470383"
+       height="32.178585"
+       x="91.678963"
+       y="-18.891344"
+       rx="6.6028996"
+       transform="rotate(45)" />
+    <rect
+       style="opacity:1;fill:#ffffff;stroke:none;stroke-width:11;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4.4;stroke-dasharray:22, 11;stroke-dashoffset:49.5001;paint-order:markers fill stroke"
+       id="rect946"
+       width="13.470383"
+       height="32.178585"
+       x="-18.929949"
+       y="-105.11074"
+       rx="6.6028996"
+       transform="rotate(135)" />
+    <rect
+       style="opacity:1;fill:#ffffff;stroke:none;stroke-width:11;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4.4;stroke-dasharray:22, 11;stroke-dashoffset:49.5001;paint-order:markers fill stroke"
+       id="rect944"
+       width="13.470383"
+       height="63.984329"
+       x="54.371445"
+       y="-84.713646"
+       rx="6.7351913"
+       transform="rotate(90)" />
   </g>
   <g
      inkscape:groupmode="layer"
