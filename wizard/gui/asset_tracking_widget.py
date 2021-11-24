@@ -273,11 +273,13 @@ class asset_tracking_widget(QtWidgets.QFrame):
                     self.events_content_layout.addWidget(widget)
                     self.tracking_event_ids[tracking_event_row['id']] = widget
 
-            self.remove_useless_events(event_number)
         tracking_event_ids = list(self.tracking_event_ids.keys())
         for event_id in tracking_event_ids:
             if event_id not in project_tracking_events_ids:
                 self.remove_tracking_event(event_id)
+        
+        if self.variant_id is not None:
+            self.remove_useless_events(event_number)
 
     def remove_useless_events(self, event_number):
         tracking_event_ids_list_to_remove = list(self.tracking_event_ids.keys())[:-event_number]
