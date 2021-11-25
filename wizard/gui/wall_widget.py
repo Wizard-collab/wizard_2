@@ -282,7 +282,10 @@ class wall_event_widget(QtWidgets.QFrame):
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
-        self.event_content_label.setText(self.event_row['message'])
+        if self.event_row['message'] is not None and self.event_row['message'] != '':
+            self.event_content_label.setText(self.event_row['message'])
+        else:
+            self.event_content_label.setVisible(0)
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
             self.event_additional_content_label.setText(self.event_row['additional_message'])
         else:
@@ -370,7 +373,7 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.event_title_label = QtWidgets.QLabel()
         self.event_title_label.setWordWrap(True)
-        self.event_title_label.setObjectName('title_label')
+        self.event_title_label.setObjectName('title_label_2')
         self.title_layout.addWidget(self.event_title_label)
 
         self.user_name_label = QtWidgets.QLabel()
@@ -383,7 +386,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
         self.content_layout.setContentsMargins(0,0,0,0)
-        self.content_layout.setSpacing(2)
+        self.content_layout.setSpacing(6)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
 

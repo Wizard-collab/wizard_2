@@ -838,6 +838,11 @@ QSlider::handle:horizontal {
 	font-size: 18px;
 }
 
+#title_label_2{
+	font: bold large;
+	font-size: 14px;
+}
+
 #window_title_label{
 	font: bold large;
 	font-size: 16px;
