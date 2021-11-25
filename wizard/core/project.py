@@ -836,12 +836,14 @@ def create_reference(work_env_id, export_version_id, namespace):
                                     'namespace',
                                     'stage',
                                     'work_env_id',
+                                    'export_id',
                                     'export_version_id'),
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
                                     stage_name,
                                     work_env_id,
+                                    export_id,
                                     export_version_id))
         if work_env_id:
             logger.info(f"Reference created")
@@ -869,7 +871,12 @@ def get_references_by_export_version(export_version_id, column='*'):
                                                         column)
     return references_rows
 
-
+def get_references_by_export(export_id, column='*'):
+    references_rows = db_utils.get_row_by_column_data('project',
+                                                        'references_data',
+                                                        ('export_id', export_id),
+                                                        column)
+    return references_rows
 
 def get_reference_data(reference_id, column='*'):
     reference_rows = db_utils.get_row_by_column_data('project',
@@ -938,6 +945,12 @@ def get_work_env_data(work_env_id, column='*'):
     else:
         logger.error("Work env not found")
         return None
+
+def get_all_work_envs(column='*'):
+    work_env_rows = db_utils.get_rows('project',
+                                                'work_envs',
+                                                column)
+    return work_env_rows
 
 def get_work_env_by_name(variant_id, name, column='*'):
     work_env_row = db_utils.get_row_by_multiple_data('project', 
@@ -1580,8 +1593,10 @@ def create_references_table(database):
                                         namespace text NOT NULL,
                                         stage text NOT NULL,
                                         work_env_id integer NOT NULL,
+                                        export_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id),
+                                        FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):

@@ -26,6 +26,7 @@ from wizard.gui import confirm_widget
 from wizard.gui import manual_export_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
+from wizard.gui import destination_manager
 
 class exports_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -51,6 +52,7 @@ class exports_widget(QtWidgets.QWidget):
         self.export_ids = dict()
         self.export_versions_ids = dict()
         self.check_existence_thread = check_existence_thread()
+        self.destination_manager = None
         self.build_ui()
         self.connect_functions()
         self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
@@ -365,6 +367,8 @@ class exports_widget(QtWidgets.QWidget):
                 self.setAcceptDrops(False)
         self.refresh_infos()
         self.update_refresh_time(start_time)
+        if self.destination_manager is not None:
+            self.destination_manager.refresh()
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
@@ -410,6 +414,7 @@ class exports_widget(QtWidgets.QWidget):
             comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
+            destination_action = menu.addAction(QtGui.QIcon(ressources._destination_icon_), 'Open destination manager')
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             if action == folder_action:
@@ -422,6 +427,19 @@ class exports_widget(QtWidgets.QWidget):
                 self.merge_files()
             elif action == comment_action:
                 self.modify_comment()
+            elif action == destination_action:
+                self.open_destination_manager()
+
+    def open_destination_manager(self):
+        selection = self.list_view.selectedItems()
+        if len(selection) == 1:
+            item = selection[0]
+            if item.type == 'export':
+                export_id = item.export_row['id']
+            else:
+                export_id = item.parent().export_row['id']
+            self.destination_manager = destination_manager.destination_manager(export_id)  
+            self.destination_manager.show()  
 
     def modify_comment(self):
         selection = self.list_view.selectedItems()
@@ -443,6 +461,7 @@ class exports_widget(QtWidgets.QWidget):
                     work_version_id = item.export_version_row['work_version_id']
                     if work_version_id is not None:
                         launch.launch_work_version(work_version_id)
+                        gui_server.refresh_ui()
 
     def merge_files(self, files=[]):
         if self.variant_id is not None:
