@@ -14,6 +14,7 @@ import os
 from wizard.core import user
 from wizard.core import site
 from wizard.core import image
+from wizard.core import game
 from wizard.core import project
 from wizard.core import environment
 from wizard.vars import ressources
@@ -98,6 +99,12 @@ class popup_wall_widget(QtWidgets.QWidget):
         if popup_id in self.popup_ids.keys():
             widget = self.popup_ids[popup_id]
             del self.popup_ids[popup_id]
+
+            if widget.is_comment:
+                comment = widget.comment_textEdit.toPlainText()
+                game.add_xps(3)
+                game.analyse_comment(comment, 10)
+
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
@@ -106,6 +113,11 @@ class popup_wall_widget(QtWidgets.QWidget):
         if popup_id in self.popup_save_ids.keys():
             widget = self.popup_save_ids[popup_id]
             del self.popup_save_ids[popup_id]
+
+            comment = widget.comment_textEdit.toPlainText()
+            game.add_xps(1)
+            game.analyse_comment(comment, 2)
+
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
@@ -227,6 +239,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.setGraphicsEffect(self.shadow)
 
         self.setObjectName('popup_event_frame')
+        self.is_comment = False
         self.event_row = event_row
         self.build_ui()
         self.fill_ui()
@@ -271,6 +284,7 @@ class popup_event_widget(QtWidgets.QFrame):
             # Show comment widget if user is current user
             if self.event_row['creation_user'] == environment.get_user():
                 self.comment_widget.setVisible(True)
+                self.is_comment = True
 
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'

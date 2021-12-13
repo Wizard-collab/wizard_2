@@ -409,16 +409,16 @@ def get_references_files(work_env_id):
         references_dic[reference_row['stage']].append(reference_dic)
     return references_dic
 
-def merge_file_as_export_version(export_name, files, variant_id, comment=''):
+def merge_file_as_export_version(export_name, files, variant_id, comment='', execute_xp=True):
     return add_export_version(export_name, files, variant_id, None, comment)
 
-def add_export_version_from_version_id(export_name, files, version_id, comment=''):
+def add_export_version_from_version_id(export_name, files, version_id, comment='', execute_xp=True):
     work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))
     if work_env_row is not None:
         variant_id = work_env_row['variant_id']
-        return add_export_version(export_name, files, variant_id, version_id, comment)
+        return add_export_version(export_name, files, variant_id, version_id, comment, execute_xp)
 
-def add_export_version(export_name, files, variant_id, version_id, comment=''):
+def add_export_version(export_name, files, variant_id, version_id, comment='', execute_xp=True):
     # For adding an export version, wizard need an existing files list
     # it will just create the new version in the database
     # and copy the files in the corresponding directory
@@ -457,8 +457,9 @@ def add_export_version(export_name, files, variant_id, version_id, comment=''):
                                                                             export_id,
                                                                             version_id,
                                                                             comment)
-                            game.add_xps(3)
-                            game.analyse_comment(comment, 10)
+                            if execute_xp:
+                                game.add_xps(3)
+                                game.analyse_comment(comment, 10)
                             events.add_export_event(export_version_id)
                 return export_version_id
             else:
@@ -532,6 +533,7 @@ def get_or_add_export(name, variant_id):
 def archive_export_version(export_version_id):
     if site.is_admin():
         export_version_row = project.get_export_version_data(export_version_id)
+        export_id = export_version_row['export_id']
         if export_version_row:
             dir_name = get_export_version_path(export_version_id)
             if os.path.isdir(dir_name):
@@ -546,6 +548,8 @@ def archive_export_version(export_version_id):
             if success:
                 events.add_archive_event("Archived export version", f"{instance_to_string(('export', export_version_row['export_id']))} - {export_version_row['name']}",
                                                 archive_file)
+                if len(project.get_export_versions(export_id)) == 0:
+                    archive_export(export_id)
             return success
         else:
             return None

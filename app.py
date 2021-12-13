@@ -111,6 +111,7 @@ class app():
 				sys.exit()
 
 		db_utils.modify_db_name('project', environment.get_project_name())
+		
 
 		self.loading_widget = loading_widget.loading_widget()
 		self.loading_widget.show()

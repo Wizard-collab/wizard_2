@@ -889,6 +889,30 @@ def get_reference_data(reference_id, column='*'):
         logger.error("Reference not found")
         return None
 
+def modify_reference_variant(reference_id, variant_id):
+    exports_list = get_variant_export_childs(variant_id, 'id')
+    if exports_list is not None and exports_list != []:
+        export_id = exports_list[0]
+        export_version_id = get_last_export_version(export_id, 'id')
+        update_reference_data(reference_id, ('export_id', export_id))
+        update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
+    else:
+        logger.warning("No export found")
+
+def modify_reference_export(reference_id, export_id):
+    export_version_id = get_last_export_version(export_id, 'id')
+    update_reference_data(reference_id, ('export_id', export_id))
+    update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
+
+def update_reference_data(reference_id, data_tuple):
+    success = db_utils.update_data('project',
+                        'references_data',
+                        data_tuple,
+                        ('id', reference_id))
+    if success:
+        logger.info('Reference modified')
+    return success
+
 def update_reference(reference_id, export_version_id):
     success = db_utils.update_data('project',
                         'references_data',

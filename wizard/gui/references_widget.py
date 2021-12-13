@@ -103,6 +103,8 @@ class references_widget(QtWidgets.QWidget):
                                     self.stage_dic[stage] = stage_item
                                 reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
                                 self.reference_ids[reference_row['id']] = reference_item
+                            else:
+                                self.reference_ids[reference_row['id']].reference_row = reference_row
                         references_list_ids = list(self.reference_ids.keys())
                         for reference_id in references_list_ids:
                             if reference_id not in project_references_id:
@@ -314,23 +316,122 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         super(custom_reference_tree_item, self).__init__(parent)
         self.reference_row = reference_row
         self.fill_ui()
+        self.connect_functions()
 
     def fill_ui(self):
         self.setText(1, self.reference_row['namespace'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
+
         self.setFont(1, bold_font)
-        self.setFont(4, bold_font)
+        self.variant_widget = editable_data_widget()
+        self.treeWidget().setItemWidget(self, 2, self.variant_widget)
+        self.export_widget = editable_data_widget()
+        self.treeWidget().setItemWidget(self, 3, self.export_widget)
+        self.version_widget = editable_data_widget(bold=True)
+        self.treeWidget().setItemWidget(self, 4, self.version_widget)
+
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
 
     def update_item_infos(self, infos_list):
-        self.setText(2, infos_list[1])
-        self.setText(3, infos_list[2])
-        self.setText(4, infos_list[3])
+        self.variant_widget.setText(infos_list[1])
+        self.export_widget.setText(infos_list[2])
+        self.version_widget.setText(infos_list[3])
         if infos_list[4]:
-            self.setForeground(4, QtGui.QBrush(QtGui.QColor('#9ce87b')))
+            self.version_widget.setColor('#9ce87b')
         else:
-            self.setForeground(4, QtGui.QBrush(QtGui.QColor('#f79360')))
+            self.version_widget.setColor('#f79360')
+
+    def connect_functions(self):
+        self.version_widget.button_clicked.connect(self.version_modification_requested)
+        self.export_widget.button_clicked.connect(self.export_modification_requested)
+        self.variant_widget.button_clicked.connect(self.variant_modification_requested)
+
+    def variant_modification_requested(self, point):
+        variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
+        stage_id = project.get_variant_data(variant_id, 'stage_id')
+        variants_list = project.get_stage_childs(stage_id)
+        if variants_list is not None and variants_list != []:
+            menu = gui_utils.QMenu()
+            for variant in variants_list:
+                action = menu.addAction(variant['name'])
+                action.id = variant['id']
+            action = menu.exec_(QtGui.QCursor().pos())
+            if action is not None:
+                self.modify_variant(action.id)
+
+    def export_modification_requested(self, point):
+        variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
+        exports_list = project.get_variant_export_childs(variant_id)
+        if exports_list is not None and exports_list != []:
+            menu = gui_utils.QMenu()
+            for export in exports_list:
+                action = menu.addAction(export['name'])
+                action.id = export['id']
+            action = menu.exec_(QtGui.QCursor().pos())
+            if action is not None:
+                self.modify_export(action.id)
+
+    def version_modification_requested(self, point):
+        versions_list = project.get_export_versions(self.reference_row['export_id'])
+        if versions_list is not None and versions_list != []:
+            menu = gui_utils.QMenu()
+            for version in versions_list:
+                action = menu.addAction(version['name'])
+                action.id = version['id']
+            action = menu.exec_(QtGui.QCursor().pos())
+            if action is not None:
+                self.modify_version(action.id)
+
+    def modify_version(self, export_version_id):
+        project.update_reference(self.reference_row['id'], export_version_id)
+        gui_server.refresh_ui()
+
+    def modify_export(self, export_id):
+        project.modify_reference_export(self.reference_row['id'], export_id)
+        gui_server.refresh_ui()
+
+    def modify_variant(self, variant_id):
+        project.modify_reference_variant(self.reference_row['id'], variant_id)
+        gui_server.refresh_ui()
+
+class editable_data_widget(QtWidgets.QFrame):
+
+    button_clicked = pyqtSignal(int)
+
+    def __init__(self, parent=None, bold=False):
+        super(editable_data_widget, self).__init__(parent)
+        self.bold=bold
+        self.build_ui()
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.main_button.clicked.connect(self.button_clicked.emit)
+
+    def build_ui(self):
+        self.setObjectName('reference_edit_widget')
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(8,4,4,4)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.label)
+        if self.bold:
+            bold_font=QtGui.QFont()
+            bold_font.setBold(True)
+            self.label.setFont(bold_font)
+
+        self.main_button = QtWidgets.QPushButton()
+        self.main_button.setObjectName('dropdown_button')
+        self.main_button.setFixedSize(QtCore.QSize(14,14))
+        self.main_layout.addWidget(self.main_button)
+
+    def setText(self, text):
+        self.label.setText(text)
+
+    def setColor(self, color):
+        self.setStyleSheet(f'color:{color}')
 
 class reference_infos_thread(QtCore.QThread):
 

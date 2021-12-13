@@ -264,8 +264,8 @@ def log_project(project_name, password, wait_for_restart=False):
             if not wait_for_restart:
                 environment.build_project_env(project_name, project_row['project_path'])
                 db_utils.modify_db_name('project', project_name)
-                project.add_user(site.get_user_row_by_name(environment.get_user(),
-                                                                'id'))
+            project.add_user(site.get_user_row_by_name(environment.get_user(),
+                                                            'id'))
             return 1
         else:
             logger.warning(f'Wrong password for {project_name}')
