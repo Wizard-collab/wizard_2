@@ -4,6 +4,7 @@ Wizard is an autonomous software for managing CGI productions.
 http://93.19.210.30/
 
 * Installation:
+	* Install PostgreSQL on your computer or any server
 	* This repository :
 		* Clone the repository
 		* Install `python 3.9.5`
