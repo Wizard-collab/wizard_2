@@ -59,7 +59,12 @@ class championship_widget(QtWidgets.QWidget):
             self.raise_()
             self.refresh()
 
+    def clear(self):
+        self.list_view.clear()
+        self.user_ids = dict()
+
     def refresh(self):
+        self.clear()
         all_user_rows = site.get_users_list()
         if all_user_rows is not None:
             for user_row in all_user_rows:

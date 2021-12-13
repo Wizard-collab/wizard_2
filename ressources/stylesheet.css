@@ -428,11 +428,11 @@ QSlider::groove:horizontal {
 }
 
 QSlider::handle:horizontal {
-    background: url(ressources/icons/note_slider.png);
-    width: 20px;
-    height: 20px;
-    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    background: #42424d;
     border-radius: 3px;
+    width: 6px;
+    height: 3px;
+    margin: -3px 0;
 }
 
 #asset_tracking_event_frame{

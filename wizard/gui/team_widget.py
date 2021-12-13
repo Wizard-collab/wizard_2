@@ -70,12 +70,6 @@ class team_widget(QtWidgets.QWidget):
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.settings_button = QtWidgets.QPushButton()
-        self.settings_button.setFixedSize(22,22)
-        self.settings_button.setIconSize(QtCore.QSize(18,18))
-        self.settings_button.setIcon(QtGui.QIcon(ressources._settings_icon_))
-        self.header_layout.addWidget(self.settings_button)
-
         self.main_layout.addWidget(self.header_widget)
 
         self.info_widget = gui_utils.info_widget(transparent=1)
