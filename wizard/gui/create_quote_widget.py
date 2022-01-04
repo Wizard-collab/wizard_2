@@ -68,8 +68,7 @@ class create_quote_widget(QtWidgets.QDialog):
 
         self.warning_icon = QtWidgets.QLabel()
         self.warning_icon.setAlignment(QtCore.Qt.AlignTop)
-        self.warning_icon.setPixmap(QtGui.QPixmap(ressources._handshake_icon_).scaled(30,30,
-                QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+        self.warning_icon.setPixmap(QtGui.QIcon(ressources._agreement_icon_).pixmap(30))
         self.warning_icon.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.warning_layout.addWidget(self.warning_icon)
 
