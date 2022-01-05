@@ -556,7 +556,7 @@ def archive_export_version(export_version_id):
     else:
         return None
 
-def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
+def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_comment=None):
     if fresh:
         new_version = '0001'
     else:
@@ -594,7 +594,7 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None):
                                                 comment,
                                                 screenshot_file,
                                                 thumbnail_file)
-    if not fresh:
+    if (analyse_comment or fresh) and version_id:
         game.add_xps(1)
         game.analyse_comment(comment, 2)
     return version_id

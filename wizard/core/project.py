@@ -1050,26 +1050,37 @@ def add_variant_work_time(variant_id, time_to_add):
     return success
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
-    version_id = db_utils.create_row('project',
-                        'versions', 
-                        ('name',
-                            'creation_time',
-                            'creation_user',
-                            'comment',
-                            'file_path',
-                            'screenshot_path',
-                            'thumbnail_path',
-                            'work_env_id'),
-                        (name,
-                            time.time(),
-                            environment.get_user(),
-                            comment,
-                            file_path,
-                            screenshot_path,
-                            thumbnail_path,
-                            work_env_id))
-    if version_id:
-        logger.info(f"Version {name} added to project")
+
+    version_id = None
+    
+    if not (db_utils.check_existence_by_multiple_data('project', 
+                                    'versions',
+                                    ('name', 'work_env_id'),
+                                    (name, work_env_id))):
+
+        version_id = db_utils.create_row('project',
+                            'versions', 
+                            ('name',
+                                'creation_time',
+                                'creation_user',
+                                'comment',
+                                'file_path',
+                                'screenshot_path',
+                                'thumbnail_path',
+                                'work_env_id'),
+                            (name,
+                                time.time(),
+                                environment.get_user(),
+                                comment,
+                                file_path,
+                                screenshot_path,
+                                thumbnail_path,
+                                work_env_id))
+        if version_id:
+            logger.info(f"Version {name} added to project")
+    else:
+        logger.warning(f"Version {name} already exists")
+
     return version_id
 
 def get_version_data(version_id, column='*'):

@@ -108,12 +108,15 @@ class communicate_server(Thread):
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 
     # of the new version
-    version_id = assets.add_version(work_env_id, fresh=1)
-    version_path = project.get_version_data(version_id,
-                                                    'file_path')
-    gui_server.refresh_ui()
-    gui_server.save_popup(version_id)
-    return (version_path, version_id)
+    version_id = assets.add_version(work_env_id, analyse_comment=1)
+    if version_id:
+        version_path = project.get_version_data(version_id,
+                                                        'file_path')
+        gui_server.refresh_ui()
+        gui_server.save_popup(version_id)
+        return (version_path, version_id)
+    else:
+        return (None, None)
 
 def request_export(work_env_id, export_name):
     # Just return a temporary file name using the 'assets' module
