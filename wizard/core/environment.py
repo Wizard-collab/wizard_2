@@ -61,6 +61,43 @@ def get_psql_dns():
 		logger.error('No PostgreSQL DNS defined')
 		return None
 
+def set_communicate_server_port(port):
+	os.environ[env_vars._communicate_server_port_] = str(port)
+	return 1
+
+def set_softwares_server_port(port):
+	os.environ[env_vars._softwares_server_port_] = str(port)
+	return 1
+
+def get_softwares_server_port():
+	if env_vars._softwares_server_port_ in os.environ.keys():
+		return int(os.environ[env_vars._softwares_server_port_])
+	else:
+		logger.error('No softwares server port defined')
+		return None
+
+def set_gui_server_port(port):
+	os.environ[env_vars._gui_server_port_] = str(port)
+	return 1
+
+def get_gui_server_port():
+	if env_vars._gui_server_port_ in os.environ.keys():
+		return int(os.environ[env_vars._gui_server_port_])
+	else:
+		logger.error('No gui server port defined')
+		return None
+
+def set_local_db_server_port(port):
+	os.environ[env_vars._local_db_server_port_] = str(port)
+	return 1
+
+def get_local_db_server_port():
+	if env_vars._local_db_server_port_ in os.environ.keys():
+		return int(os.environ[env_vars._local_db_server_port_])
+	else:
+		logger.error('No local db server port defined')
+		return None
+
 def set_team_dns(DNS):
 	os.environ[env_vars._team_dns_] = json.dumps(DNS)
 	return 1

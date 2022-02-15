@@ -61,6 +61,14 @@ def get_connection(DNS, timeout=5.0, only_debug=False):
             logger.error(str(traceback.format_exc()))
         return None
 
+def get_port(ip_adress):
+    port = 11111
+    while get_connection(('localhost', port),
+                            timeout=0.02,
+                            only_debug=True):
+        port+=1
+    return port
+
 def get_server(DNS):
     server = None
     server_address = None

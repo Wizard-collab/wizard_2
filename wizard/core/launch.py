@@ -58,35 +58,33 @@ from wizard.gui import gui_server
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-_DNS_ = ('localhost', 11114)
-
 def launch_work_version(version_id):
     signal_dic = dict()
     signal_dic['function'] = 'launch'
     signal_dic['version_id'] = version_id
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=0.5)
+    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=0.5)
 
 def kill(work_env_id):
     signal_dic = dict()
     signal_dic['function'] = 'kill'
     signal_dic['work_env_id'] = work_env_id
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=100)
+    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=100)
 
 def kill_all():
     signal_dic = dict()
     signal_dic['function'] = 'kill_all'
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=100)
+    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=100)
 
 def died(work_env_id):
     signal_dic = dict()
     signal_dic['function'] = 'died'
     signal_dic['work_env_id'] = work_env_id
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=0.5)
+    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=0.5)
 
 def get():
     signal_dic = dict()
     signal_dic['function'] = 'get'
-    return socket_utils.send_signal(_DNS_, signal_dic, timeout=0.5)
+    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=0.5)
 
 def core_kill_software_thread(software_thread):
     return software_thread.kill()
@@ -222,7 +220,9 @@ class softwares_server(Thread):
     '''
     def __init__(self):
         super(softwares_server, self).__init__()
-        self.server, self.server_address = socket_utils.get_server(_DNS_)
+        self.port = socket_utils.get_port('localhost')
+        environment.set_softwares_server_port(self.port)
+        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
         self.running = True
 
         self.software_threads_dic = dict()
@@ -232,9 +232,9 @@ class softwares_server(Thread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = socket_utils.recvall(conn).decode('utf8')
+                    signal_as_str = socket_utils.recvall(conn)
                     if signal_as_str:
-                        self.analyse_signal(signal_as_str, conn)
+                        self.analyse_signal(signal_as_str.decode('utf8'), conn)
             except OSError:
                 pass
             except:

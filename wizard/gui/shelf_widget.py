@@ -33,9 +33,9 @@ class shelf_widget(QtWidgets.QFrame):
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.add_script_button = QtWidgets.QPushButton()
-        self.add_script_button.setFixedSize(30,30)
+        self.add_script_button.setFixedSize(20,20)
         self.add_script_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.add_script_button.setIconSize(QtCore.QSize(12,12))
+        self.add_script_button.setIconSize(QtCore.QSize(10,10))
         self.main_layout.addWidget(self.add_script_button)
 
     def refresh(self):
@@ -56,12 +56,12 @@ class shelf_script_button(QtWidgets.QToolButton):
     def __init__(self, shelf_script_row, parent=None):
         super(shelf_script_button, self).__init__(parent)
         self.shelf_script_row = shelf_script_row
-        self.setFixedWidth(40)
+        self.setFixedWidth(30)
         self.setObjectName('shelf_script_button')
         self.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.setText(shelf_script_row['name'])
         self.setIcon(QtGui.QIcon(shelf_script_row['icon']))
-        self.setIconSize(QtCore.QSize(18,18))
+        self.setIconSize(QtCore.QSize(10,10))
         self.connect_functions()
 
     def connect_functions(self):

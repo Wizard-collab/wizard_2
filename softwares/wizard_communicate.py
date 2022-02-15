@@ -3,6 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+import os
 import sys
 import socket
 import time
@@ -19,7 +20,14 @@ import socket_utils
 if sys.version_info[0] == 2:
     from socket import error as ConnectionRefusedError
 
-_DNS_ = ('localhost', 11111)
+communicate_server_port_key = 'wizard_communicate_server_port'
+
+def get_port():
+    if communicate_server_port_key in os.environ.keys():
+        return int(os.environ[communicate_server_port_key])
+    else:
+        logging.error('No communicate server port defined')
+        return None
 
 def add_version(work_env_id):
     # Send a new version request to wizard
@@ -27,7 +35,7 @@ def add_version(work_env_id):
     signal_dic=dict()
     signal_dic['function'] = 'add_version'
     signal_dic['work_env_id'] = work_env_id
-    file_path, version_id = socket_utils.send_signal(_DNS_, signal_dic)
+    file_path, version_id = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return file_path, version_id
 
 def request_export(work_env_id, export_name):
@@ -36,7 +44,7 @@ def request_export(work_env_id, export_name):
     signal_dic['function'] = 'request_export'
     signal_dic['work_env_id'] = work_env_id
     signal_dic['export_name'] = export_name
-    file_path = socket_utils.send_signal(_DNS_, signal_dic)
+    file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return file_path
 
 def add_export_version(export_name, files, version_id, comment=''):
@@ -48,7 +56,7 @@ def add_export_version(export_name, files, version_id, comment=''):
     signal_dic['files'] = files
     signal_dic['version_id'] = version_id
     signal_dic['comment'] = comment
-    export_version_id = socket_utils.send_signal(_DNS_, signal_dic)
+    export_version_id = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return export_version_id
 
 def get_references(work_env_id):
@@ -57,7 +65,7 @@ def get_references(work_env_id):
     signal_dic=dict()
     signal_dic['function'] = 'get_references'
     signal_dic['work_env_id'] = work_env_id
-    references_tuples = socket_utils.send_signal(_DNS_, signal_dic)
+    references_tuples = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return references_tuples
 
 def get_frame_range(work_env_id):
@@ -66,7 +74,7 @@ def get_frame_range(work_env_id):
     signal_dic=dict()
     signal_dic['function'] = 'get_frame_range'
     signal_dic['work_env_id'] = work_env_id
-    frame_range = socket_utils.send_signal(_DNS_, signal_dic)
+    frame_range = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return frame_range
 
 def get_image_format():
@@ -74,12 +82,12 @@ def get_image_format():
     # Return a [width, height] list
     signal_dic=dict()
     signal_dic['function'] = 'get_image_format'
-    image_format = socket_utils.send_signal(_DNS_, signal_dic)
+    image_format = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return image_format
 
 def get_user_folder():
     # Request the user folder ( Documents/Wizard )
     signal_dic=dict()
     signal_dic['function'] = 'get_user_folder'
-    user_folder = socket_utils.send_signal(_DNS_, signal_dic)
+    user_folder = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return user_folder

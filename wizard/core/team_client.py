@@ -45,6 +45,7 @@ class team_client(QThread):
     remove_user_signal = pyqtSignal(str)
 
     def __init__(self):
+        self.conn = None
         super(team_client, self).__init__()
 
     def create_conn(self):

@@ -39,8 +39,8 @@ import json
 
 # Wizard modules
 from wizard.core import db_core
+from wizard.core import environment
 from wizard.core import socket_utils
-from wizard.vars import db_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -186,11 +186,11 @@ def execute_sql(sql, level, as_dict, data=None, fetch=2):
     signal_dic['as_dict'] = as_dict
     signal_dic['data'] = data
     signal_dic['fetch'] = fetch
-    return socket_utils.send_signal(db_vars._LOCAL_DNS_, signal_dic)
+    return socket_utils.send_signal(('localhost', environment.get_local_db_server_port()), signal_dic)
 
 def modify_db_name(level, db_name):
     signal_dic = dict()
     signal_dic['request'] = 'modify_database_name'
     signal_dic['level'] = level
     signal_dic['db_name'] = db_name
-    return socket_utils.send_signal(db_vars._LOCAL_DNS_, signal_dic)
+    return socket_utils.send_signal(('localhost', environment.get_local_db_server_port()), signal_dic)

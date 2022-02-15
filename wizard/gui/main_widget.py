@@ -57,6 +57,7 @@ class main_widget(QtWidgets.QWidget):
         self.setWindowTitle(f"Wizard - {environment.get_project_name()}")
 
         self.tree_widget = tree_widget.tree_widget(self)
+        self.shelf_widget = shelf_widget.shelf_widget(self)
         self.console_widget = console_widget.console_widget()
         self.user_preferences_widget = user_preferences_widget.user_preferences_widget()
         self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget(self)
@@ -300,6 +301,7 @@ class main_widget(QtWidgets.QWidget):
         self.main_widget.setLayout(self.main_layout)
 
         self.main_layout.addWidget(self.header_widget)
+        self.main_layout.addWidget(self.shelf_widget)
 
         self.contents_widget = QtWidgets.QWidget()
         self.contents_widget.setObjectName('main_widget')

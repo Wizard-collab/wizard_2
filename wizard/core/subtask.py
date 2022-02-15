@@ -186,7 +186,6 @@ class subtask(Thread):
             else:
                 self.command = f'PyWizard "{py_file}"'
 
-
     def run(self):
         try:
             self.running = True

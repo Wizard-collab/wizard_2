@@ -73,13 +73,15 @@ class app():
 		with open('ressources/stylesheet.css', 'r') as f:
 			self.app.setStyleSheet(f.read())
 
+		'''
 		if gui_server.try_connection():
 			gui_server.raise_ui()
 			self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
 																"You're already running an instance of Wizard.")
 			self.instance_running_info_widget.exec_()
 			sys.exit()
-			
+		'''
+		
 		if not user.user().get_psql_dns():
 			self.psql_widget = psql_widget.psql_widget()
 			if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:

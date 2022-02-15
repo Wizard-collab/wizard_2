@@ -40,14 +40,16 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 # Wizard modules
 from wizard.core import environment
 from wizard.core import socket_utils
-from wizard.vars import db_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
 class db_server(threading.Thread):
     def __init__(self, project_name=None):
         super(db_server, self).__init__()
-        self.server, self.server_address = socket_utils.get_server(db_vars._LOCAL_DNS_)
+
+        self.port = socket_utils.get_port('localhost')
+        environment.set_local_db_server_port(self.port)
+        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
         self.running = True
         self.project_name = None
         self.site = None
@@ -59,11 +61,10 @@ class db_server(threading.Thread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = socket_utils.recvall(conn).decode('utf8')
+                    signal_as_str = socket_utils.recvall(conn)
                     if signal_as_str:
-                        returned = self.execute_signal(signal_as_str)
+                        returned = self.execute_signal(signal_as_str.decode('utf8'))
                         socket_utils.send_signal_with_conn(conn, returned)
-                        #conn.send(json.dumps(returned).encode('utf-8'))
                         conn.close()
             except OSError:
                 pass
@@ -131,6 +132,8 @@ class db_server(threading.Thread):
                     if self.project_conn:
                         self.project_conn.close()
                     self.project_conn = create_connection(self.project_name)
+                return 1
+            elif signal_dic['request'] == 'port':
                 return 1
 
 

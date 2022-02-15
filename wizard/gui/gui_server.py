@@ -19,11 +19,10 @@ import traceback
 import json
 
 # Wizard modules
+from wizard.core import environment
 from wizard.core import socket_utils
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
-
-_DNS_ = ('localhost', 11113)
 
 class streamHandler(QtCore.QObject):
 
@@ -56,7 +55,9 @@ class gui_server(QThread):
         #sys.stdout = self.streamHandler
         #sys.stderr = self.streamHandler
 
-        self.server, self.server_address = socket_utils.get_server(_DNS_)
+        self.port = socket_utils.get_port('localhost')
+        environment.set_gui_server_port(self.port)
+        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
         self.running = True
 
         self.connect_functions()
@@ -119,43 +120,47 @@ def refresh_ui():
     refresh_team_ui()
     signal_dic = dict()
     signal_dic['function'] = 'refresh'
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def refresh_team_ui():
     signal_dic = dict()
     signal_dic['function'] = 'refresh_team'
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def restart_ui():
     signal_dic = dict()
     signal_dic['function'] = 'restart'
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def save_popup(version_id):
     signal_dic = dict()
     signal_dic['function'] = 'save_popup'
     signal_dic['version_id'] = version_id
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def tooltip(tooltip):
     signal_dic = dict()
     signal_dic['function'] = 'tooltip'
     signal_dic['tooltip'] = tooltip
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def focus_instance(instance_tuple):
     signal_dic = dict()
     signal_dic['function'] = 'focus_instance'
     signal_dic['instance_tuple'] = instance_tuple
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def focus_export_version(export_version_id):
     signal_dic = dict()
     signal_dic['function'] = 'export_version_focus'
     signal_dic['export_version_id'] = export_version_id
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
 
 def raise_ui():
     signal_dic = dict()
     signal_dic['function'] = 'raise'
-    socket_utils.send_bottle(_DNS_, signal_dic, timeout=0.5)
+    send_signal(signal_dic)
+
+def send_signal(signal_dic):
+    socket_utils.send_bottle(('localhost', environment.get_gui_server_port()), signal_dic, timeout=0.5)
+

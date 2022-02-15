@@ -21,6 +21,7 @@ class custom_handler(QtCore.QObject, logging.Handler):
 
     def __init__(self, parent):
         super(custom_handler, self).__init__(parent)
+        self.setFormatter(logging.Formatter('[%(name)-23.23s] %(message)s'))
 
     def emit(self, record):
         try:

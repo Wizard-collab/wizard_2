@@ -45,6 +45,7 @@ import json
 from wizard.gui import gui_server
 
 # Wizard modules
+from wizard.core import environment
 from wizard.core import socket_utils
 from wizard.core import assets
 from wizard.core import project
@@ -52,12 +53,12 @@ from wizard.vars import user_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-_DNS_ = ('localhost', 11111)
-
 class communicate_server(Thread):
     def __init__(self):
         super(communicate_server, self).__init__()
-        self.server, self.server_address = socket_utils.get_server(_DNS_)
+        self.port = socket_utils.get_port('localhost')
+        environment.set_communicate_server_port(self.port)
+        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
         self.running = True
 
     def run(self):
@@ -65,9 +66,9 @@ class communicate_server(Thread):
             try:
                 conn, addr = self.server.accept()
                 if addr[0] == self.server_address:
-                    signal_as_str = socket_utils.recvall(conn).decode('utf8')
+                    signal_as_str = socket_utils.recvall(conn)
                     if signal_as_str:
-                        self.analyse_signal(signal_as_str, conn)
+                        self.analyse_signal(signal_as_str.decode('utf8'), conn)
             except OSError:
                 pass
             except:
