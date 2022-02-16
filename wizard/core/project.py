@@ -1399,6 +1399,34 @@ def get_all_events(column='*'):
                                         column)
     return events_rows
 
+def add_shelf_separator():
+    rows = get_all_shelf_scripts()
+    shelf_script_id = db_utils.create_row('project',
+                                            'shelf_scripts',
+                                            ('creation_user',
+                                                'creation_time',
+                                                'name',
+                                                'py_file',
+                                                'help',
+                                                'only_subprocess',
+                                                'icon',
+                                                'type',
+                                                'position'),
+                                            (environment.get_user(),
+                                                time.time(),
+                                                'separator',
+                                                None,
+                                                None,
+                                                None,
+                                                None,
+                                                'separator',
+                                                len(rows)))
+    if shelf_script_id:
+        logger.info("Shelf separator created")
+    else:
+        logger.warning(f"{name} already exists")
+    return shelf_script_id
+
 def add_shelf_script(name,
                         py_file,
                         help,
@@ -1500,9 +1528,12 @@ def delete_shelf_script(script_id):
     if site.is_admin():
         success = db_utils.delete_row('project', 'shelf_scripts', script_id)
         if success:
-            tools.remove_file(script_row['py_file'])
-            tools.remove_file(script_row['icon'])
-            logger.info(f"Tool removed from project")
+            if script_row['type'] == 'tool':
+                tools.remove_file(script_row['py_file'])
+                tools.remove_file(script_row['icon'])
+                logger.info(f"Tool removed from project")
+            else:
+                logger.info(f"Separator removed from project")
     return success
 
 def get_shelf_script_data(script_id, column='*'):
@@ -1815,11 +1846,11 @@ def create_shelf_scripts_table(database):
                                         id serial PRIMARY KEY,
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL,
-                                        name text NOT NULL UNIQUE,
-                                        py_file text NOT NULL,
-                                        help text NOT NULL,
-                                        only_subprocess bool NOT NULL,
-                                        icon text NOT NULL,
+                                        name text NOT NULL,
+                                        py_file text,
+                                        help text,
+                                        only_subprocess bool,
+                                        icon text,
                                         type text NOT NULL,
                                         position integer NOT NULL
                                     );"""

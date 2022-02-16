@@ -79,6 +79,9 @@ def create_project_script(name,
 	else:
 		return None
 
+def create_separator():
+	project.add_shelf_separator()
+
 def edit_project_script(id,
 						help,
 						icon,

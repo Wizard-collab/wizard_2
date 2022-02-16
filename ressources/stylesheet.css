@@ -948,3 +948,9 @@ QSlider::handle:horizontal {
 #edit_mode_button::checked{
 	border: 1px solid #f79360;
 }
+
+#shelf_seperator_container{
+	border: 1px solid transparent;
+	background-color: transparent;
+	border-radius: 2px;
+}
