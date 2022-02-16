@@ -34,6 +34,12 @@ QPushButton::pressed, QToolButton::pressed, #classic_button::pressed{
 	background-color: #1d1d21;
 }
 
+QPushButton::checked{
+	border: 2px solid #1d1d21;
+	background-color: #1d1d21;
+}
+
+
 QLineEdit, QSpinBox, QTextEdit{
 	background-color:#24242b;
 	padding: 4px;
@@ -937,4 +943,8 @@ QSlider::handle:horizontal {
 
 #shelf_script_button::pressed{
 	background-color: #1d1d21;
+}
+
+#edit_mode_button::checked{
+	border: 1px solid #f79360;
 }

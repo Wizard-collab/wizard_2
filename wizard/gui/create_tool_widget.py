@@ -34,6 +34,7 @@ class create_tool_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.apply_button.clicked.connect(self.apply)
+        self.cancel_button.clicked.connect(self.close)
         self.icon_button.clicked.connect(self.modify_icon)
 
     def refresh(self):
@@ -79,6 +80,8 @@ class create_tool_widget(QtWidgets.QWidget):
             self.icon_button.setIcon(QtGui.QIcon(self.icon))
 
     def build_ui(self):
+        self.resize(QtCore.QSize(800, 600))
+
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)

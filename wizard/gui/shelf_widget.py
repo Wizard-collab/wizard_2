@@ -24,12 +24,13 @@ class shelf_widget(QtWidgets.QFrame):
 
         self.help_widget = help_widget(self)
         self.scripts_ids = dict()
+        self.edit_mode = False
 
         self.build_ui()
         self.connect_functions()
-        self.refresh()
 
     def build_ui(self):
+        self.setObjectName('shelf_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(4,4,4,4)
@@ -43,6 +44,35 @@ class shelf_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.buttons_widget)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.edit_mode_widget = QtWidgets.QWidget()
+        self.edit_mode_layout = QtWidgets.QHBoxLayout()
+        self.edit_mode_layout.setContentsMargins(0,0,0,0)
+        self.edit_mode_layout.setSpacing(1)
+        self.edit_mode_widget.setLayout(self.edit_mode_layout)
+        self.main_layout.addWidget(self.edit_mode_widget)
+        self.edit_mode_widget.setVisible(False)
+
+        self.move_left_button = QtWidgets.QPushButton()
+        self.move_left_button.setIcon(QtGui.QIcon(ressources._left_icon_))
+        self.move_left_button.setFixedSize(20,20)
+        self.move_right_button = QtWidgets.QPushButton()
+        self.move_right_button.setIcon(QtGui.QIcon(ressources._right_icon_))
+        self.move_right_button.setFixedSize(20,20)
+        self.edit_mode_layout.addWidget(self.move_left_button)
+        self.edit_mode_layout.addWidget(self.move_right_button)
+
+        self.edit_mode_label = QtWidgets.QLabel(' edit mode ')
+        self.edit_mode_label.setObjectName('orange_label')
+        self.edit_mode_layout.addWidget(self.edit_mode_label)
+
+        self.edit_mode_button = QtWidgets.QPushButton()
+        self.edit_mode_button.setObjectName('edit_mode_button')
+        self.edit_mode_button.setCheckable(True)
+        self.edit_mode_button.setFixedSize(20,20)
+        self.edit_mode_button.setIcon(QtGui.QIcon(ressources._edit_icon_))
+        self.edit_mode_button.setIconSize(QtCore.QSize(10,10))
+        self.main_layout.addWidget(self.edit_mode_button)
 
         self.add_script_button = QtWidgets.QPushButton()
         self.add_script_button.setFixedSize(20,20)
@@ -59,6 +89,9 @@ class shelf_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.add_script_button.clicked.connect(self.create_script)
         self.script_folder_button.clicked.connect(self.open_script_folder)
+        self.edit_mode_button.clicked.connect(self.toggle_edit_mode)
+        self.move_left_button.clicked.connect(self.move_checked_left)
+        self.move_right_button.clicked.connect(self.move_checked_right)
 
     def open_script_folder(self):
         os.startfile(project.get_scripts_folder())
@@ -75,6 +108,43 @@ class shelf_widget(QtWidgets.QFrame):
         if project.delete_shelf_script(script_id):
             gui_server.refresh_ui()
 
+    def toggle_edit_mode(self):
+        if self.edit_mode:
+            self.apply_positions()
+
+        self.edit_mode = self.edit_mode_button.isChecked()
+        self.edit_mode_widget.setVisible(self.edit_mode)
+        for script_id in self.scripts_ids.keys():
+            self.scripts_ids[script_id]['button'].toggle_edit_mode(self.edit_mode)
+
+    def apply_positions(self):
+        for script_id in self.scripts_ids.keys():
+            script_id = self.scripts_ids[script_id]['row']['id']
+            position = self.buttons_layout.indexOf(self.scripts_ids[script_id]['button'])
+            if position != self.scripts_ids[script_id]['row']['position']:
+                project.modify_shelf_script_position(script_id, position)
+        gui_server.refresh_ui()
+
+    def move_checked_left(self):
+        positions_list = self.get_positions()
+        for item in positions_list:
+            if item[1] > 0:
+                self.buttons_layout.insertWidget(item[1]-1, self.scripts_ids[item[0]]['button'])
+
+    def move_checked_right(self):
+        positions_list = self.get_positions()
+        for item in positions_list:
+            if item[1] < self.buttons_layout.count()-1:
+                self.buttons_layout.insertWidget(item[1]+1, self.scripts_ids[item[0]]['button'])
+
+    def get_positions(self):
+        positions_list = []
+        for script_id in self.scripts_ids.keys():
+            if self.scripts_ids[script_id]['button'].isChecked():
+                index = self.buttons_layout.indexOf(self.scripts_ids[script_id]['button'])
+                positions_list.append((script_id, index))
+        return positions_list
+
     def refresh(self):
         shelf_scripts_rows = project.get_all_shelf_scripts()
         if shelf_scripts_rows is not None:
@@ -90,11 +160,13 @@ class shelf_widget(QtWidgets.QFrame):
                     self.button.hide_help_signal.connect(self.hide_help)
                     self.button.edit_signal.connect(self.edit_script)
                     self.button.delete_signal.connect(self.delete_script)
-                    self.buttons_layout.addWidget(self.button)
+                    self.buttons_layout.insertWidget(shelf_script_row['position'], self.button)
                     self.scripts_ids[shelf_script_row['id']]['button'] = self.button
                 else:
                     self.scripts_ids[shelf_script_row['id']]['row'] = shelf_script_row
                     self.scripts_ids[shelf_script_row['id']]['button'].update(shelf_script_row)
+                    self.buttons_layout.insertWidget(shelf_script_row['position'], self.scripts_ids[shelf_script_row['id']]['button'])
+
             scripts_ids_list = list(self.scripts_ids.keys())
             for script_id in scripts_ids_list:
                 if script_id not in project_scripts_ids:
@@ -174,12 +246,19 @@ class shelf_script_button(QtWidgets.QPushButton):
         self.timer=QtCore.QTimer(self)
         self.w=QtWidgets.QWidget()
 
+        self.edit_mode = False
+
         self.shelf_script_row = shelf_script_row
         self.setFixedSize(20, 20)
         self.setObjectName('shelf_script_button')
         gui_utils.application_tooltip(self, '')
         self.connect_functions()
         self.refresh()
+
+    def toggle_edit_mode(self, state):
+        self.edit_mode = state
+        self.setCheckable(state)
+        self.setStyleSheet('')
 
     def update(self, shelf_script_row):
         self.shelf_script_row = shelf_script_row
@@ -200,33 +279,50 @@ class shelf_script_button(QtWidgets.QPushButton):
         self.timer.stop()
 
     def enterEvent(self, event):
-        self.timer.start(500)
+        if not self.edit_mode:
+            self.timer.start(500)
 
     def leaveEvent(self, event):
-        self.hide_help_signal.emit(self.shelf_script_row['id'])
-        self.timer.stop()
+        if not self.edit_mode:
+            self.hide_help_signal.emit(self.shelf_script_row['id'])
+            self.timer.stop()
 
     def mousePressEvent(self, event):
         event.accept()
-        self.hide_help_signal.emit(self.shelf_script_row['id'])
-        if event.button() == QtCore.Qt.LeftButton:
-            self.setStyleSheet('background-color:#1d1d21;')
-        self.timer.stop()
+        if not self.edit_mode:
+            self.hide_help_signal.emit(self.shelf_script_row['id'])
+            if event.button() == QtCore.Qt.LeftButton:
+                self.setStyleSheet('background-color:#1d1d21;')
+            self.timer.stop()
+        else:
+            if event.button() == QtCore.Qt.LeftButton:
+                self.setStyleSheet('background-color:#1d1d21;')
 
     def mouseReleaseEvent(self, event):
         event.accept()
-        self.setStyleSheet('')
-        if event.button() == QtCore.Qt.RightButton:
-            self.custom_menu()
-        elif event.button() == QtCore.Qt.LeftButton:
-            self.execute()
+        if not self.edit_mode:
+            self.setStyleSheet('')
+            if event.button() == QtCore.Qt.RightButton:
+                self.custom_menu()
+            elif event.button() == QtCore.Qt.LeftButton:
+                self.execute()
+        else:
+            if event.button() == QtCore.Qt.LeftButton:
+                if self.isChecked():
+                    self.setStyleSheet('')
+                    self.setChecked(False)
+                else:
+                    self.setStyleSheet('border:1px solid #f79360;')
+                    self.setChecked(True)
+
 
     def custom_menu(self):
-        menu = gui_utils.QMenu()
-        edit_action = menu.addAction(QtGui.QIcon(ressources._tool_edit_), 'Edit')
-        delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
-        action = menu.exec_(QtGui.QCursor().pos())
-        if action == edit_action:
-            self.edit_signal.emit(self.shelf_script_row['id'])
-        elif action == delete_action:
-            self.delete_signal.emit(self.shelf_script_row['id'])
+        if not self.edit_mode:
+            menu = gui_utils.QMenu()
+            edit_action = menu.addAction(QtGui.QIcon(ressources._tool_edit_), 'Edit')
+            delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
+            action = menu.exec_(QtGui.QCursor().pos())
+            if action == edit_action:
+                self.edit_signal.emit(self.shelf_script_row['id'])
+            elif action == delete_action:
+                self.delete_signal.emit(self.shelf_script_row['id'])

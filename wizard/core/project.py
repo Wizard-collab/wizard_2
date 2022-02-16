@@ -1418,6 +1418,8 @@ def add_shelf_script(name,
         shutil.copyfile(icon, shared_icon)
         image.resize_image_file(shared_icon, 60)
 
+        rows = get_all_shelf_scripts()
+
         shelf_script_id = db_utils.create_row('project',
                                                 'shelf_scripts',
                                                 ('creation_user',
@@ -1426,14 +1428,18 @@ def add_shelf_script(name,
                                                     'py_file',
                                                     'help',
                                                     'only_subprocess',
-                                                    'icon'),
+                                                    'icon',
+                                                    'type',
+                                                    'position'),
                                                 (environment.get_user(),
                                                     time.time(),
                                                     name,
                                                     py_file,
                                                     help,
                                                     only_subprocess,
-                                                    shared_icon))
+                                                    shared_icon,
+                                                    'tool',
+                                                    len(rows)))
         if shelf_script_id:
             logger.info("Shelf script created")
     else:
@@ -1475,6 +1481,17 @@ def edit_shelf_script(script_id, help, icon, only_subprocess):
             logger.info('Tool settings modified')
         else:
             success = False
+    return success
+
+def modify_shelf_script_position(script_id, position):
+    success = True
+    if db_utils.update_data('project',
+                            'shelf_scripts',
+                            ('position', position),
+                            ('id', script_id)):
+        logger.info('Tool position modified')
+    else:
+        success = False
     return success
 
 def delete_shelf_script(script_id):
@@ -1802,7 +1819,9 @@ def create_shelf_scripts_table(database):
                                         py_file text NOT NULL,
                                         help text NOT NULL,
                                         only_subprocess bool NOT NULL,
-                                        icon text NOT NULL
+                                        icon text NOT NULL,
+                                        type text NOT NULL,
+                                        position integer NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Shelf scripts table created")
