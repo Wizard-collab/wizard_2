@@ -44,17 +44,46 @@ from wizard.core import user
 from wizard.core import tools
 from wizard.vars import ressources
 from wizard.vars import user_vars
+from wizard.core import custom_logger
+logger = custom_logger.get_logger()
 
 def create_project_script(name,
 							script,
+							help,
 							only_subprocess=0,
 							icon=ressources._default_script_shelf_icon_):
-	scripts_folder = project.get_scripts_folder()
-	file_name = f"{name}.py"
-	file = tools.get_filename_without_override(os.path.normpath(os.path.join(scripts_folder, file_name)))
-	if project.add_shelf_script(name, file, only_subprocess, icon):
-		with open(file, 'w') as f:
-			f.write(script)
+	
+	execute = True
+	if name is None or name =='':
+		logger.warning('Please provide a tool name')
+		execute = False
+
+	if script is None or script =='':
+		logger.warning('Please provide a script')
+		execute = False
+
+	if help is None or help =='':
+		logger.warning('Please provide a short help for your tool')
+		execute = False
+
+	if execute:
+		scripts_folder = project.get_scripts_folder()
+		file_name = f"{name}.py"
+		file = tools.get_filename_without_override(os.path.normpath(os.path.join(scripts_folder, file_name)))
+		if project.add_shelf_script(name, file, help, only_subprocess, icon):
+			with open(file, 'w') as f:
+				f.write(script)
+			return 1
+		else:
+			return None
+	else:
+		return None
+
+def edit_project_script(id,
+						help,
+						icon,
+						only_subprocess=0):
+	return project.edit_shelf_script(id, help, icon, only_subprocess)
 
 def execute_script(script_id):
 	py_file = project.get_shelf_script_data(script_id, 'py_file')

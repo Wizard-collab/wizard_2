@@ -12,9 +12,9 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 
 class comment_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, title='Add comment'):
         super(comment_widget, self).__init__(parent)
-        self.build_ui()
+        self.build_ui(title)
         self.connect_functions()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
@@ -27,7 +27,7 @@ class comment_widget(QtWidgets.QDialog):
         gui_utils.move_ui(self)
         self.comment_field.setFocus()
 
-    def build_ui(self):
+    def build_ui(self, title):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)
         self.setLayout(self.main_layout)
@@ -50,6 +50,7 @@ class comment_widget(QtWidgets.QDialog):
         self.close_layout.setContentsMargins(2,2,2,2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
+        self.close_layout.addWidget(QtWidgets.QLabel(title))
         self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = QtWidgets.QPushButton()

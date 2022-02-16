@@ -244,6 +244,21 @@ def remove_tree(dir_name):
         logger.error(f"{dir_name} access denied")
     return success
 
+def remove_file(file):
+    # Tries to remove a folder tree
+    # If not possible return None and
+    # log the corresponding error
+    success = None
+    try:
+        os.remove(file)
+        logger.info(f'{file} deleted')
+        success = 1
+    except FileNotFoundError:
+        logger.error(f"{os.path.dirname(file)} doesn't exists")
+    except PermissionError:
+        logger.error(f"{file} access denied")
+    return success
+
 def temp_file_from_pycmd(pycmd):
     # return a .py temporary file 
     # from given script ( as string )

@@ -117,6 +117,11 @@ def resize_image(image, fixed_height):
     image = image.resize((width_size, fixed_height), Image.ANTIALIAS)
     return image
 
+def resize_image_file(image_file, fixed_height):
+    image = Image.open(image_file)
+    image = resize_image(image, fixed_height)
+    image.save(image_file, format="PNG")
+
 def crop_image_height(pillow_image, height):
     area = (0, 0, pillow_image.size[0], height)
     cropped_img = pillow_image.crop(area)

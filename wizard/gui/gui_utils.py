@@ -13,7 +13,7 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_server
 
-def move_ui(widget):
+def move_ui(widget, margin=0):
     desktop = QtWidgets.QApplication.desktop()
     screenRect = desktop.screenGeometry()
 
@@ -26,17 +26,20 @@ def move_ui(widget):
     win_width = widget.frameSize().width()
     win_heigth = widget.frameSize().height()
 
-    if (cursor_y - 30 - win_heigth) <= screen_minY:
-        posy = cursor_y - 15
+    if margin != 0:
+        margin -= 15
+
+    if (cursor_y - (30-margin*2) - win_heigth) <= screen_minY:
+        posy = cursor_y - (15-margin)
         angley = 'top'
     else:
-        posy = cursor_y - win_heigth + 15
+        posy = cursor_y - win_heigth + (15-margin)
         angley = 'bottom'
-    if (cursor_x + 30 + win_width) >= screen_maxX:
-        posx = cursor_x - win_width + 15
+    if (cursor_x + (30-margin*2) + win_width) >= screen_maxX:
+        posx = cursor_x - win_width + (15-margin)
         anglex = 'right'
     else:
-        posx = cursor_x - 15
+        posx = cursor_x - (15-margin)
         anglex = 'left'
 
     widget.move(posx, posy)

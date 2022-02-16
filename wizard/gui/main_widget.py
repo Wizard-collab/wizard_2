@@ -167,7 +167,7 @@ class main_widget(QtWidgets.QWidget):
 
     def show_pywizard(self):
         if sys.argv[0].endswith('.py'):
-            subprocess.Popen('python PyWizard.py')
+            subprocess.Popen('python PyWizard.py', creationflags=subprocess.CREATE_NEW_CONSOLE)
         elif sys.argv[0].endswith('.exe'):
             os.startfile('PyWizard.exe')
 
@@ -285,6 +285,7 @@ class main_widget(QtWidgets.QWidget):
         self.softwares_widget.refresh()
         self.asset_tracking_widget.refresh()
         self.production_manager_widget.refresh()
+        self.shelf_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

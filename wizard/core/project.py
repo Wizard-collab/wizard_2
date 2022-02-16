@@ -48,6 +48,7 @@
 import os
 import time
 import json
+import shutil
 
 # Wizard modules
 from wizard.core import custom_logger
@@ -1400,6 +1401,7 @@ def get_all_events(column='*'):
 
 def add_shelf_script(name,
                         py_file,
+                        help,
                         only_subprocess=0,
                         icon=ressources._default_script_shelf_icon_):
     if only_subprocess == 0:
@@ -1410,6 +1412,11 @@ def add_shelf_script(name,
     if not db_utils.check_existence('project', 'shelf_scripts', 'name', name):
         if not os.path.isfile(icon):
             icon = ressources._default_script_shelf_icon_
+        
+        shared_icon = tools.get_filename_without_override(os.path.join(get_shared_files_folder(),
+                                                            os.path.basename(icon)))
+        shutil.copyfile(icon, shared_icon)
+        image.resize_image_file(shared_icon, 60)
 
         shelf_script_id = db_utils.create_row('project',
                                                 'shelf_scripts',
@@ -1417,19 +1424,69 @@ def add_shelf_script(name,
                                                     'creation_time',
                                                     'name',
                                                     'py_file',
+                                                    'help',
                                                     'only_subprocess',
                                                     'icon'),
                                                 (environment.get_user(),
                                                     time.time(),
                                                     name,
                                                     py_file,
+                                                    help,
                                                     only_subprocess,
-                                                    icon))
+                                                    shared_icon))
         if shelf_script_id:
             logger.info("Shelf script created")
     else:
         logger.warning(f"{name} already exists")
     return shelf_script_id
+
+def edit_shelf_script(script_id, help, icon, only_subprocess):
+    script_row = get_shelf_script_data(script_id)
+    success = True
+    if script_row['help'] != help:
+        if db_utils.update_data('project',
+                                'shelf_scripts',
+                                ('help', help),
+                                ('id', script_id)):
+            logger.info('Tool help modified')
+        else:
+            success = False
+    if script_row['icon'] != icon:
+        if not os.path.isfile(icon):
+            icon = ressources._default_script_shelf_icon_
+        
+        shared_icon = tools.get_filename_without_override(os.path.join(get_shared_files_folder(), 
+                                                            os.path.basename(icon)))
+        shutil.copyfile(icon, shared_icon)
+        image.resize_image_file(shared_icon, 60)
+        
+        if db_utils.update_data('project',
+                                'shelf_scripts',
+                                ('icon', shared_icon),
+                                ('id', script_id)):
+            logger.info('Tool icon modified')
+        else:
+            success = False
+    if script_row['only_subprocess'] != only_subprocess:
+        if db_utils.update_data('project',
+                                'shelf_scripts',
+                                ('only_subprocess', only_subprocess),
+                                ('id', script_id)):
+            logger.info('Tool settings modified')
+        else:
+            success = False
+    return success
+
+def delete_shelf_script(script_id):
+    script_row = get_shelf_script_data(script_id)
+    success = None
+    if site.is_admin():
+        success = db_utils.delete_row('project', 'shelf_scripts', script_id)
+        if success:
+            tools.remove_file(script_row['py_file'])
+            tools.remove_file(script_row['icon'])
+            logger.info(f"Tool removed from project")
+    return success
 
 def get_shelf_script_data(script_id, column='*'):
     shelf_scripts_rows = db_utils.get_row_by_column_data('project',
@@ -1743,6 +1800,7 @@ def create_shelf_scripts_table(database):
                                         creation_time real NOT NULL,
                                         name text NOT NULL UNIQUE,
                                         py_file text NOT NULL,
+                                        help text NOT NULL,
                                         only_subprocess bool NOT NULL,
                                         icon text NOT NULL
                                     );"""

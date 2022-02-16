@@ -296,6 +296,7 @@ class variant_creation_widget(QtWidgets.QDialog):
         self.close_layout.setContentsMargins(2,2,2,2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
+        self.close_layout.addWidget(QtWidgets.QLabel('New variant'))
         self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = QtWidgets.QPushButton()

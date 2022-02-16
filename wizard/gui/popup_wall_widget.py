@@ -398,6 +398,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.content_layout.addWidget(self.event_additional_content_label)
 
         self.comment_widget = QtWidgets.QWidget()
+        self.comment_widget.setObjectName('transparent_widget')
         self.comment_widget_layout = QtWidgets.QVBoxLayout()
         self.comment_widget_layout.setContentsMargins(0,0,0,0)
         self.comment_widget_layout.setSpacing(4)

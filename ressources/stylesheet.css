@@ -811,6 +811,11 @@ QSlider::handle:horizontal {
 	border-radius: 8px;
 }
 
+#black_round_frame{
+	border-radius: 8px;
+	background-color: #19191f;
+}
+
 #reference_edit_widget{
 	border-radius: 4px;
 	background-color: rgba(0,0,0,22);
@@ -927,8 +932,9 @@ QSlider::handle:horizontal {
 
 #shelf_script_button::hover{
 	color: white;
+	background-color: rgba(255,255,255,30);
 }
 
 #shelf_script_button::pressed{
-	color: #1d1d21;
+	background-color: #1d1d21;
 }

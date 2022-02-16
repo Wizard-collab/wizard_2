@@ -561,9 +561,12 @@ class tree_widget(QtWidgets.QFrame):
             self.tree.clearSelection()
 
     def add_search_item(self, ids_list):
-        self.domain_ids[ids_list[0]].setHidden(0)
-        self.category_ids[ids_list[1]].setHidden(0)
-        self.asset_ids[ids_list[2]].setHidden(0)
+        if ids_list[0] in self.domain_ids.keys():
+            self.domain_ids[ids_list[0]].setHidden(0)
+        if ids_list[1] in self.category_ids.keys():
+            self.category_ids[ids_list[1]].setHidden(0)
+        if ids_list[2] in self.asset_ids.keys():
+            self.asset_ids[ids_list[2]].setHidden(0)
 
 class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent, instance_name, instance_type, instance_id=None, parent_id=None):

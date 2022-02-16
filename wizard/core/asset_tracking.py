@@ -53,9 +53,11 @@ def add_state_switch_event(variant_id, new_state, comment=''):
 	project.add_asset_tracking_event(variant_id, event_type, data, comment)
 
 def add_work_session_event(variant_id, work_time, comment=''):
-	event_type = 'work_session'
-	data = work_time
-	project.add_asset_tracking_event(variant_id, event_type, data, comment)
+	print(work_time)
+	if work_time > 120:
+		event_type = 'work_session'
+		data = work_time
+		project.add_asset_tracking_event(variant_id, event_type, data, comment)
 
 def add_comment_event(variant_id, comment):
 	event_type = 'comment'
