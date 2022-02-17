@@ -111,6 +111,10 @@ while not user.get_project():
         user.log_project(project_name, project_password)
 
 db_server.project_name = environment.get_project_name()
+
+communicate_server = communicate.communicate_server()
+communicate_server.start()
+
 softwares_server = launch.softwares_server()
 softwares_server.start()
 
@@ -122,8 +126,10 @@ if len(sys.argv) == 2:
     finally:
         db_server.stop()
         softwares_server.stop()
+        communicate_server.stop()
 else:
     console = code.InteractiveConsole()
     console.interact(banner=None, exitmsg=None)
     db_server.stop()
     softwares_server.stop()
+    communicate_server.stop()

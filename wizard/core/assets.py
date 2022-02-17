@@ -28,15 +28,15 @@
 
 # This module is the main instances management module
 # You can create, get the path and archive the following instances
-# - domains
-# - categories
-# - assets
-# - stages
-# - variants
-# - work env
-# - versions
-# - export assets
-# - export versions
+#/domains
+#/categories
+#/assets
+#/stages
+#/variants
+#/work env
+#/versions
+#/export assets
+#/export versions
 
 # The creation of an instance basically log the instance 
 # in the project database and create the corresponding folders
@@ -137,7 +137,7 @@ def archive_category(category_id):
                 archive_file = ''
             success = project.remove_category(category_id)
             if success:
-                events.add_archive_event("Archived category", f"{instance_to_string(('domain', category_row['domain_id']))} - {category_row['name']}",
+                events.add_archive_event("Archived category", f"{instance_to_string(('domain', category_row['domain_id']))}/{category_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -181,7 +181,7 @@ def archive_asset(asset_id):
                 archive_file = ''
             success = project.remove_asset(asset_id)
             if success:
-                events.add_archive_event("Archived asset", f"{instance_to_string(('category', asset_row['category_id']))} - {asset_row['name']}",
+                events.add_archive_event("Archived asset", f"{instance_to_string(('category', asset_row['category_id']))}/{asset_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -256,7 +256,7 @@ def archive_stage(stage_id):
                 archive_file = ''
             success = project.remove_stage(stage_id)
             if success:
-                events.add_archive_event("Archived stage", f"{instance_to_string(('asset', stage_row['asset_id']))} - {stage_row['name']}", archive_file)
+                events.add_archive_event("Archived stage", f"{instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}", archive_file)
             return success
         else:
             return None
@@ -301,7 +301,7 @@ def archive_variant(variant_id):
                 archive_file=''
             success = project.remove_variant(variant_id)
             if success:
-                events.add_archive_event("Archived variant", f"{instance_to_string(('stage', variant_row['stage_id']))} - {variant_row['name']}",
+                events.add_archive_event("Archived variant", f"{instance_to_string(('stage', variant_row['stage_id']))}/{variant_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -332,6 +332,9 @@ def add_work_time(work_env_id, work_time):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     project.add_variant_work_time(variant_id, work_time)
     asset_tracking.add_work_session_event(variant_id, work_time)
+
+def get_software_id_by_name(software):
+    return project.get_software_data_by_name(software, 'id')
 
 def create_work_env(software_id, variant_id):
     work_env_id = None
@@ -498,7 +501,7 @@ def archive_export(export_id):
                 archive_file = ''
             success = project.remove_export(export_id)
             if success:
-                events.add_archive_event("Archived export", f"{instance_to_string(('variant', export_row['variant_id']))} - {export_row['name']}",
+                events.add_archive_event("Archived export", f"{instance_to_string(('variant', export_row['variant_id']))}/{export_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -546,7 +549,7 @@ def archive_export_version(export_version_id):
                 archive_file = ''
             success = project.remove_export_version(export_version_id)
             if success:
-                events.add_archive_event("Archived export version", f"{instance_to_string(('export', export_version_row['export_id']))} - {export_version_row['name']}",
+                events.add_archive_event("Archived export version", f"{instance_to_string(('export', export_version_row['export_id']))}/{export_version_row['name']}",
                                                 archive_file)
                 if len(project.get_export_versions(export_id)) == 0:
                     archive_export(export_id)
@@ -818,8 +821,8 @@ def instance_to_string(instance_tuple):
         asset_row = project.get_asset_data(stage_row['asset_id'])
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
-        string+=f" - {stage_row['name']} - {variant_row['name']} - {export_row['name']} - {export_version_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string+=f"/{stage_row['name']}/{variant_row['name']}/{export_row['name']}/{export_version_row['name']}"
     elif instance_type == 'export':
         export_row = project.get_export_data(instance_id)
         variant_row = project.get_variant_data(export_row['variant_id'])
@@ -827,8 +830,8 @@ def instance_to_string(instance_tuple):
         asset_row = project.get_asset_data(stage_row['asset_id'])
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
-        string+=f" - {stage_row['name']} - {variant_row['name']} - {export_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string+=f"/{stage_row['name']}/{variant_row['name']}/{export_row['name']}"
     elif instance_type == 'work_version':
         version_row = project.get_version_data(instance_id)
         work_env_row = project.get_work_env_data(version_row['work_env_id'])
@@ -837,8 +840,8 @@ def instance_to_string(instance_tuple):
         asset_row = project.get_asset_data(stage_row['asset_id'])
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
-        string+=f" - {stage_row['name']} - {variant_row['name']} - {work_env_row['name']} - {version_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string+=f"/{stage_row['name']}/{variant_row['name']}/{work_env_row['name']}/{version_row['name']}"
     elif instance_type == 'work_env':
         work_env_row = project.get_work_env_data(instance_id)
         variant_row = project.get_variant_data(work_env_row['variant_id'])
@@ -846,39 +849,39 @@ def instance_to_string(instance_tuple):
         asset_row = project.get_asset_data(stage_row['asset_id'])
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
-        string+=f" - {stage_row['name']} - {variant_row['name']} - {work_env_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string+=f"/{stage_row['name']}/{variant_row['name']}/{work_env_row['name']}"
     elif instance_type == 'variant':
         variant_row = project.get_variant_data(instance_id)
         stage_row = project.get_stage_data(variant_row['stage_id'])
         asset_row = project.get_asset_data(stage_row['asset_id'])
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
-        string+=f" - {stage_row['name']} - {variant_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string+=f"/{stage_row['name']}/{variant_row['name']}"
     elif instance_type == 'stage':
         stage_row = project.get_stage_data(instance_id)
         asset_row = project.get_asset_data(stage_row['asset_id'])
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
-        string+=f" - {stage_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string+=f"/{stage_row['name']}"
     elif instance_type == 'asset':
         asset_row = project.get_asset_data(instance_id)
         category_row = project.get_category_data(asset_row['category_id'])
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']} - {asset_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
     elif instance_type == 'category':
         category_row = project.get_category_data(instance_id)
         domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']} - {category_row['name']}"
+        string=f"{domain_row['name']}/{category_row['name']}"
     elif instance_type == 'domain':
         domain_row = project.get_domain_data(instance_id)
         string=f"{domain_row['name']}"
     return string
 
 def string_to_instance(string):
-    instances_list = string.split(' - ')
+    instances_list = string.split('/')
 
     if len(instances_list) == 1:
         instance_type = 'domain'
@@ -905,5 +908,22 @@ def string_to_instance(string):
         asset_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
         stage_id = project.get_asset_child_by_name(asset_id, instances_list[3], 'id')
         instance_id = project.get_stage_child_by_name(stage_id, instances_list[4], 'id')
+
+    return (instance_type, instance_id)
+
+def string_to_work_instance(string):
+    instances_list = string.split('/')
+    if len(instances_list) == 6:
+        instance_type = 'work_env'
+        work_env_name = instances_list.pop(-1)
+        _, variant_id = string_to_instance(('/').join(instances_list))
+        instance_id = project.get_variant_work_env_child_by_name(variant_id, work_env_name, 'id')
+    elif len(instances_list) == 7:
+        instance_type = 'work_version'
+        work_version_name = instances_list.pop(-1)
+        work_env_name = instances_list.pop(-1)
+        _, variant_id = string_to_instance(('/').join(instances_list))
+        work_env_id = project.get_variant_work_env_child_by_name(variant_id, work_env_name, 'id')
+        instance_id = project.get_work_version_by_name(work_env_id, work_version_name, 'id')
 
     return (instance_type, instance_id)

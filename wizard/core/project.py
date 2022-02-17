@@ -472,6 +472,18 @@ def search_variant_by_column_data(data_tuple, column='*'):
                                                         column)
     return variants_rows
 
+def get_variant_work_env_child_by_name(variant_id, work_env_name, column='*'):
+    work_envs_rows = db_utils.get_row_by_multiple_data('project',
+                                                    'work_envs',
+                                                    ('variant_id', 'name'),
+                                                    (variant_id, work_env_name),
+                                                    column)
+    if len(work_envs_rows) >= 1:
+        return work_envs_rows[0]
+    else:
+        logger.error("Work env not found")
+        return None
+
 def remove_variant(variant_id):
     success = None
     if site.is_admin():
@@ -946,7 +958,8 @@ def get_work_version_by_name(work_env_id, name, column='*'):
     version_row = db_utils.get_row_by_multiple_data('project', 
                                                         'versions', 
                                                         ('name', 'work_env_id'), 
-                                                        (name, work_env_id))
+                                                        (name, work_env_id),
+                                                        column)
     if version_row and len(version_row) >= 1:
         return version_row[0]
     else:
@@ -981,7 +994,8 @@ def get_work_env_by_name(variant_id, name, column='*'):
     work_env_row = db_utils.get_row_by_multiple_data('project', 
                                                         'work_envs', 
                                                         ('name', 'variant_id'), 
-                                                        (name, variant_id))
+                                                        (name, variant_id),
+                                                        column)
     if work_env_row and len(work_env_row) >= 1:
         return work_env_row[0]
     else:
