@@ -171,6 +171,7 @@ class shelf_widget(QtWidgets.QFrame):
                     if shelf_script_row['type'] == 'tool':
                         self.button = shelf_script_button(shelf_script_row)
                         self.button.exec_signal.connect(self.exec_script)
+                        self.button.subtask_signal.connect(self.exec_subtask)
                         self.button.help_signal.connect(self.show_help)
                         self.button.hide_help_signal.connect(self.hide_help)
                         self.button.edit_signal.connect(self.edit_script)
@@ -208,6 +209,9 @@ class shelf_widget(QtWidgets.QFrame):
 
     def exec_script(self, script_id):
         shelf.execute_script(script_id)
+
+    def exec_subtask(self, script_id):
+        shelf.execute_script_as_subtask(script_id)
 
 class help_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -331,6 +335,7 @@ class shelf_separator(QtWidgets.QFrame):
 class shelf_script_button(QtWidgets.QPushButton):
 
     exec_signal = pyqtSignal(int)
+    subtask_signal = pyqtSignal(int)
     help_signal = pyqtSignal(int) 
     hide_help_signal = pyqtSignal(int)
     edit_signal = pyqtSignal(int)
@@ -368,7 +373,10 @@ class shelf_script_button(QtWidgets.QPushButton):
         self.timer.timeout.connect(self.show_details)
 
     def execute(self):
-        self.exec_signal.emit(self.shelf_script_row['id'])
+        if self.shelf_script_row['only_subprocess']:
+            self.subtask_signal.emit(self.shelf_script_row['id'])
+        else:
+            self.exec_signal.emit(self.shelf_script_row['id'])
 
     def show_details(self):
         self.help_signal.emit(self.shelf_script_row['id'])
@@ -415,6 +423,7 @@ class shelf_script_button(QtWidgets.QPushButton):
     def custom_menu(self):
         if not self.edit_mode:
             menu = gui_utils.QMenu()
+            subtask_action = menu.addAction(QtGui.QIcon(ressources._tasks_icon_), 'Execute as subtask')
             edit_action = menu.addAction(QtGui.QIcon(ressources._tool_edit_), 'Edit')
             delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
             action = menu.exec_(QtGui.QCursor().pos())
@@ -422,3 +431,5 @@ class shelf_script_button(QtWidgets.QPushButton):
                 self.edit_signal.emit(self.shelf_script_row['id'])
             elif action == delete_action:
                 self.delete_signal.emit(self.shelf_script_row['id'])
+            elif action == subtask_action:
+                self.subtask_signal.emit(self.shelf_script_row['id'])

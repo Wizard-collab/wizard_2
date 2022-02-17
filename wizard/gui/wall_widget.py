@@ -335,7 +335,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.setLayout(self.widget_layout)
 
         self.event_frame = QtWidgets.QFrame()
-        self.event_frame.setObjectName('popup_event_frame')
+        self.event_frame.setObjectName('wall_event_frame')
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(9,9,9,9)

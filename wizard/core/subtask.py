@@ -180,7 +180,11 @@ class subtask(Thread):
 
     def build_pycmd(self):
         if self.pycmd is not None:
-            py_file = tools.temp_file_from_pycmd(self.pycmd)
+            if self.pycmd.endswith('.py') and os.path.isfile(self.pycmd):
+                py_file = self.pycmd
+            else:
+                py_file = tools.temp_file_from_pycmd(self.pycmd)
+                
             if sys.argv[0].endswith('.py'):
                 self.command = f'python PyWizard.py "{py_file}"'
             else:

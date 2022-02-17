@@ -898,7 +898,12 @@ QSlider::handle:horizontal {
 }
 
 #popup_event_frame{
-	border-radius: 5px;
+	border-radius: 10px;
+	background-color: #19191f;
+}
+
+#wall_event_frame{
+	border-radius: 10px;
 	background-color: #373740;
 }
 

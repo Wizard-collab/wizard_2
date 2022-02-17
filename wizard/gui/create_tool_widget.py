@@ -45,6 +45,7 @@ class create_tool_widget(QtWidgets.QWidget):
             self.name_field.setText(self.script_row['name'])
             self.name_field.setEnabled(False)
             self.help_textEdit.setText(self.script_row['help'])
+            self.only_subtask_checkBox.setChecked(self.script_row['only_subprocess'])
             if os.path.isfile(self.script_row['py_file']):
                 with open(self.script_row['py_file']) as f:
                     script_data = f.read()
@@ -59,14 +60,15 @@ class create_tool_widget(QtWidgets.QWidget):
         name = self.name_field.text()
         script = self.script_editor_widget.text()
         help = self.help_textEdit.toPlainText()
+        only_subprocess = self.only_subtask_checkBox.isChecked()
         if self.script_id is None:
-            if shelf.create_project_script(name, script, help, icon=self.icon):
+            if shelf.create_project_script(name, script, help, icon=self.icon, only_subprocess=only_subprocess):
                 self.close()
                 gui_server.refresh_ui()
         else:
             with open(self.script_row['py_file'], 'w') as f:
                 f.write(script)
-            if shelf.edit_project_script(self.script_id, help, icon=self.icon):
+            if shelf.edit_project_script(self.script_id, help, icon=self.icon, only_subprocess=only_subprocess):
                 self.close()
                 gui_server.refresh_ui()
 
@@ -109,6 +111,17 @@ class create_tool_widget(QtWidgets.QWidget):
         self.help_textEdit.setMaximumHeight(200)
         self.help_textEdit.setPlaceholderText('Please enter a comment about your tool and how to use it.')
         self.main_layout.addWidget(self.help_textEdit)
+
+        self.subtask_widget = QtWidgets.QWidget()
+        self.subtask_layout = QtWidgets.QHBoxLayout()
+        self.subtask_layout.setContentsMargins(0,0,0,0)
+        self.subtask_layout.setSpacing(6)
+        self.subtask_widget.setLayout(self.subtask_layout)
+        self.main_layout.addWidget(self.subtask_widget)
+
+        self.subtask_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.only_subtask_checkBox = QtWidgets.QCheckBox('Only execute as subtask')
+        self.subtask_layout.addWidget(self.only_subtask_checkBox)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')

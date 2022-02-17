@@ -40,6 +40,7 @@ import os
 
 # Wizard modules
 from wizard.core import project
+from wizard.core import subtask
 from wizard.core import user
 from wizard.core import tools
 from wizard.vars import ressources
@@ -92,3 +93,9 @@ def execute_script(script_id):
 	py_file = project.get_shelf_script_data(script_id, 'py_file')
 	if py_file:
 		user.user().execute_py(py_file)
+
+def execute_script_as_subtask(script_id):
+	py_file = project.get_shelf_script_data(script_id, 'py_file')
+	if py_file:
+		task = subtask.subtask(pycmd=py_file)
+		task.start()

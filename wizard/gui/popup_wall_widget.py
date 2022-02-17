@@ -184,7 +184,7 @@ class popup_save_widget(QtWidgets.QFrame):
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
-        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
+        #self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(0,0,0,0)
         self.header_layout.setSpacing(6)
@@ -267,11 +267,13 @@ class popup_event_widget(QtWidgets.QFrame):
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
-        self.event_content_label.setText(self.event_row['message'])
+        if self.event_row['message'] is not None and self.event_row['message'] != '':
+            self.event_content_label.setVisible(1)
+            self.event_content_label.setText(self.event_row['message'])
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
+            self.event_additional_content_label.setVisible(1)
             self.event_additional_content_label.setText(self.event_row['additional_message'])
-        else:
-            self.event_additional_content_label.setVisible(0)
+
         self.action_button_button.setText('View')
         
         if self.event_row['type'] == 'creation':
@@ -326,14 +328,15 @@ class popup_event_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('dark_widget')
-        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
+        self.header_widget.setObjectName('transparent_widget')
+        #self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(12)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
         self.profile_frame = QtWidgets.QFrame()
+        self.profile_frame.setObjectName('transparent_widget')
         self.profile_frame.setObjectName('wall_profile_frame')
         self.profile_layout = QtWidgets.QHBoxLayout()
         self.profile_layout.setContentsMargins(0,0,0,0)
@@ -389,10 +392,12 @@ class popup_event_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.content_widget)
 
         self.event_content_label = QtWidgets.QLabel()
+        self.event_content_label.setVisible(0)
         self.event_content_label.setWordWrap(True)
         self.content_layout.addWidget(self.event_content_label)
 
         self.event_additional_content_label = QtWidgets.QLabel()
+        self.event_additional_content_label.setVisible(0)
         self.event_additional_content_label.setObjectName('gray_label')
         self.event_additional_content_label.setWordWrap(True)
         self.content_layout.addWidget(self.event_additional_content_label)
