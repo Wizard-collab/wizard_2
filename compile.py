@@ -107,6 +107,7 @@ class compile():
 
 			files_list = [  'version.yaml',
 							'LICENSE',
+							'wapi.py',
 							'dist/PyWizard/PyWizard.exe',
 							'dist/PyWizard/PyWizard.exe.manifest',
 							'dist/server/server.exe',

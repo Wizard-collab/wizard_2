@@ -35,9 +35,13 @@ import sys
 import os
 import traceback
 import code
+from PyQt5 import QtWidgets
 
 # Append current dir to sys.path
 sys.path.append(os.path.abspath(''))
+
+# Wizard gui modules
+from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import user
@@ -109,6 +113,13 @@ while not user.get_project():
         project_name = tools.flushed_input('Project name : ')
         project_password = tools.flushed_input('Project password : ')
         user.log_project(project_name, project_password)
+
+if not user.user().get_team_dns():
+    while tools.flushed_input('Enter a team server DNS (y/n) ? : ') == 'y':
+        team_ip = str(tools.flushed_input('Team server host ( ip adress ) : '))
+        team_port = int(tools.flushed_input('Team server port : '))
+        if user.user().set_team_dns(team_ip, team_port):
+            break
 
 db_server.project_name = environment.get_project_name()
 

@@ -108,6 +108,8 @@ class footer_widget(QtWidgets.QFrame):
         self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_icon_))
         self.buttons_layout.addWidget(self.task_manager_button)
 
+        self.task_info_widget = task_info_widget(self.task_manager_button)
+
         self.console_button = QtWidgets.QPushButton()
         self.console_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.console_button, "Show console")
@@ -169,6 +171,58 @@ class footer_widget(QtWidgets.QFrame):
             self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_done_icon_))
         else:
             self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_icon_))
+
+    def show_new_subtask_info(self):
+        self.task_info_widget.title_label.setText('Subtask started !')
+        self.task_info_widget.show()
+        gui_utils.move_ui(self.task_info_widget,
+                            margin=20,
+                            pos=self.task_manager_button.mapToGlobal(QtCore.QPoint(0,0)))
+
+class task_info_widget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(task_info_widget, self).__init__(parent)
+
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        self.timer = QtCore.QTimer(self)
+
+        self.build_ui()
+        self.connect_functions()
+
+    def showEvent(self, event):
+        self.timer.start(3000)
+        event.accept()
+
+    def connect_functions(self):
+        self.timer.timeout.connect(self.close)
+
+    def build_ui(self):
+        self.main_widget_layout = QtWidgets.QHBoxLayout()
+        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
+        self.setLayout(self.main_widget_layout)
+
+        self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setObjectName('black_round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(6)
+        self.main_widget.setLayout(self.main_layout)
+        self.main_widget_layout.addWidget(self.main_widget)
+
+        self.title_label = QtWidgets.QLabel('')
+        self.title_label.setObjectName('bold_label')
+        self.main_layout.addWidget(self.title_label)
+
+        self.line_frame = QtWidgets.QFrame()
+        self.line_frame.setFixedHeight(1)
+        self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
+        self.main_layout.addWidget(self.line_frame)
+
+        self.info_label = QtWidgets.QLabel('Open the subtask manager to view\nprogress and task output')
+        self.info_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.info_label)
+
 
 class tooltip_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):

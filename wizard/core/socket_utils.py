@@ -94,7 +94,7 @@ def send_bottle(DNS, msg_raw, timeout=0.01):
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.settimeout(timeout)
-        server.connect(DNS)
+        server.connect((DNS[0], DNS[1]))
         msg = json.dumps(msg_raw).encode('utf8')
         msg = struct.pack('>I', len(msg)) + msg
         server.sendall(msg)

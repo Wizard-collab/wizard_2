@@ -2,6 +2,30 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# This file is part of Wizard
+
+# MIT License
+
+# Copyright (c) 2021 Leo brunel
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 # This module permits to access the wizard
 # core with simplified commands
 
@@ -85,6 +109,8 @@ class assets:
 		return string_sequence
 
 	def create_asset(self, parent, name):
+		# The parent argument should look like
+		# "assets/characters"
 		string_asset = None
 		instance_type, category_id = core.assets.string_to_instance(parent)
 		if category_id:
@@ -95,9 +121,13 @@ class assets:
 		return string_asset
 
 	def create_shot(self, parent, name):
+		# The parent argument should look like
+		# "sequences/Intro"
 		return self.create_asset(parent, name)
 
 	def create_stage(self, parent, stage):
+		# The parent argument should look like
+		# "assets/characters/Joe"
 		string_stage = None
 		instance_type, asset_id = core.assets.string_to_instance(parent)
 		if asset_id:
@@ -108,6 +138,8 @@ class assets:
 		return string_stage
 
 	def create_variant(self, parent, name):
+		# The parent argument should look like
+		# "assets/characters/Joe/modeling"
 		string_variant = None
 		instance_type, stage_id = core.assets.string_to_instance(parent)
 		if stage_id:
@@ -118,6 +150,8 @@ class assets:
 		return string_variant
 
 	def create_work_env(self, parent, software):
+		# The parent argument should look like
+		# "assets/characters/Joe/modeling/main"
 		string_work_env = None
 		instance_type, variant_id = core.assets.string_to_instance(parent)
 		if variant_id:
@@ -134,6 +168,7 @@ class launch:
 		pass
 
 	def work_env(self, work_env):
+		# Run the last version of the given work environment related software
 		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
 		if work_env_id:
 			last_work_version_id = core.project.get_last_work_version(work_env_id, 'id')
@@ -141,16 +176,19 @@ class launch:
 				core.launch.launch_work_version(last_work_version_id[0])
 
 	def work_version(self, work_version):
+		# Run the given work version related software
 		instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
 		if work_version_id:
 			core.launch.launch_work_version(work_version_id)
 
 	def kill_work_env(self, work_env):
+		# Terminate the given work environment related software instance
 		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
 		if work_env_id:
 			core.launch.kill(work_env_id)
 
 	def get_running_work_envs(self):
+		# Return the running work environments related softwares instances
 		running_work_envs = []
 		running_work_env_ids = core.launch.get()
 		if running_work_env_ids:
@@ -159,8 +197,17 @@ class launch:
 																			work_env_id)))
 		return running_work_envs
 
+class team:
+	def __init__(self):
+		pass
+
+	def refresh_ui(self):
+		# Refresh the project team interfaces
+		core.team_client.refresh_team(core.environment.get_team_dns())
+
 site = site()
 user = user()
 project = project()
 assets = assets()
 launch = launch()
+team = team()

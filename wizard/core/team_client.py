@@ -113,3 +113,9 @@ def try_connection(DNS):
     signal_dic = dict()
     signal_dic['type'] = 'test_conn'
     return socket_utils.send_bottle(DNS, signal_dic)
+
+def refresh_team(DNS):
+    signal_dic = dict()
+    signal_dic['type'] = 'refresh_team'
+    signal_dic['project'] = environment.get_project_name()
+    return socket_utils.send_bottle(DNS, signal_dic)

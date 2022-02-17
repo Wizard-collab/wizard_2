@@ -167,44 +167,46 @@ class server(threading.Thread):
         
     def analyse_signal(self, msg_raw, conn, addr):
         data = json.loads(msg_raw)
-        print(data)
         if data['type'] == 'test_conn':
             logger.info('test_conn')
+        elif data['type'] == 'refresh_team':
+            client_dic = dict()
+            client_dic['id'] = None
+            self.broadcast(data, client_dic)
         elif data['type'] == 'new_client':
             self.add_client(data['user_name'], conn, addr, data['project'])
 
     def add_client(self, user_name, conn, addr, project):
-        if user_name not in self.client_ids.keys():
-            client_dic = dict()
-            client_dic['user_name'] = user_name
-            client_dic['conn'] = conn
-            client_dic['addr'] = addr
-            client_dic['project'] = project
-            self.client_ids[user_name]=client_dic
+        client_dic = dict()
+        client_dic['user_name'] = user_name
+        client_dic['conn'] = conn
+        client_dic['addr'] = addr
+        client_dic['project'] = project
+        client_id = str(time.time())
+        client_dic['id'] = client_id
+        self.client_ids[client_id]=client_dic
 
-            threading.Thread(target=self.clientThread, args=(user_name, conn, addr, project)).start()
-            logger.info("New client : {}, {}, {}".format(user_name, addr, project))
-            signal_dic = dict()
-            signal_dic['type'] = 'new_user'
-            signal_dic['user_name'] = user_name
-            signal_dic['project'] = project
-            self.broadcast(signal_dic, self.client_ids[user_name])
-            self.send_users_to_new_client(client_dic)
-        else:
-            conn.close()
-            logger.info("Client already exists : {}, {}, {}".format(user_name, addr, project))
+        threading.Thread(target=self.clientThread, args=(client_id, user_name, conn, addr, project)).start()
+        logger.info("New client : {}, {}, {}, {}".format(client_id, user_name, addr, project))
+        signal_dic = dict()
+        signal_dic['type'] = 'new_user'
+        signal_dic['user_name'] = user_name
+        signal_dic['project'] = project
+        self.broadcast(signal_dic, self.client_ids[client_id])
+        self.send_users_to_new_client(client_dic)
 
     def send_users_to_new_client(self, client_dic):
         for client in self.client_ids.keys():
-            if self.client_ids[client]['user_name'] != client_dic['user_name']:
+            if client != client_dic['id']:
                 signal_dic = dict()
                 signal_dic['type'] = 'new_user'
                 signal_dic['user_name'] = self.client_ids[client]['user_name']
                 signal_dic['project'] = self.client_ids[client]['project']
                 send_signal_with_conn(client_dic['conn'], signal_dic)
 
-    def clientThread(self, user_name, conn, addr, project):
+    def clientThread(self, client_id, user_name, conn, addr, project):
         client_dic = dict()
+        client_dic['id'] = client_id
         client_dic['user_name'] = user_name
         client_dic['conn'] = conn
         client_dic['addr'] = addr
@@ -215,6 +217,7 @@ class server(threading.Thread):
                 raw_data = recvall(client_dic['conn'])
                 if raw_data is not None:
                     data = json.loads(raw_data)
+                    print(data)
                     self.broadcast(data, client_dic)
                 else:
                     if conn is not None:
@@ -227,14 +230,14 @@ class server(threading.Thread):
     def broadcast(self, data, client_dic):
         logger.debug("Broadcasting : " + str(data))
         for client in self.client_ids.keys(): 
-            if client != client_dic['user_name']:
+            if client != client_dic['id']:
                 if not send_signal_with_conn(self.client_ids[client]['conn'], data):
                     self.remove_client(self.client_ids[client])
 
     def remove_client(self, client_dic): 
-        if client_dic['user_name'] in self.client_ids.keys(): 
-            logger.info("Removing client : {}, {}, {}".format(client_dic['user_name'], client_dic['addr'], client_dic['project']))
-            del self.client_ids[client_dic['user_name']]
+        if client_dic['id'] in self.client_ids.keys(): 
+            logger.info("Removing client : {}, {}, {}, {}".format(client_dic['id'], client_dic['user_name'], client_dic['addr'], client_dic['project']))
+            del self.client_ids[client_dic['id']]
             client_dic['conn'].close()
             signal_dic = dict()
             signal_dic['type'] = 'remove_user'
