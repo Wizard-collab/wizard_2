@@ -72,8 +72,8 @@ def add_domain(name):
         logger.info(f"Domain {name} added to project")
     return domain_id
 
-def get_domains():
-    domain_rows = db_utils.get_rows('project', 'domains')
+def get_domains(column='*'):
+    domain_rows = db_utils.get_rows('project', 'domains', column=column)
     return domain_rows
 
 def get_domain_data(domain_id, column='*'):

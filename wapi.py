@@ -100,6 +100,8 @@ class assets:
 	def __init__(self):
 		pass
 
+	# Creation commands
+
 	def create_sequence(self, name):
 		string_sequence = None
 		sequence_id = core.assets.create_category(name, 3)
@@ -162,6 +164,110 @@ class assets:
 					string_work_env = core.assets.instance_to_string(('work_env',
 																		work_env_id))
 		return string_work_env
+
+	# Archive commands
+
+	def archive_asset(self, asset):
+		success = None
+		instance_type, asset_id = core.assets.string_to_instance(asset)
+		if asset_id:
+			success = core.assets.archive_asset(asset_id)
+		return success
+
+	def archive_sequence(self, sequence):
+		success = None
+		instance_type, sequence_id = core.assets.string_to_instance(sequence)
+		if sequence_id:
+			success = core.assets.archive_category(sequence_id)
+		return success
+
+	def archive_stage(self, stage):
+		success = None
+		instance_type, stage_id = core.assets.string_to_instance(stage)
+		if stage_id:
+			success = core.assets.archive_stage(stage_id)
+		return success
+
+	def archive_variant(self, variant):
+		success = None
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			success = core.assets.archive_variant(variant_id)
+		return success
+
+	def archive_work_env(self, work_env):
+		success = None
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if instance_type == 'work_env' and work_env_id:
+			success = core.assets.archive_work_env(work_env_id)
+		return success
+
+	def archive_work_version(self, work_version):
+		success = None
+		instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+		if instance_type == 'work_version' and work_version_id:
+			success = core.assets.archive_work_version(work_version_id)
+		return success
+
+	# List commands
+
+	def list_domains(self):
+		domains = core.project.get_domains('name')
+		return domains
+
+	def list_categories(self, parent):
+		# The parent argument should look like
+		# "assets"
+		categories = None
+		instance_type, domain_id = core.assets.string_to_instance(parent)
+		if domain_id:
+			categories = core.project.get_domain_childs(domain_id, 'name')
+		return categories
+
+	def list_assets(self, parent):
+		# The parent argument should look like
+		# "assets/characters"
+		assets = None
+		instance_type, category_id = core.assets.string_to_instance(parent)
+		if category_id:
+			assets = core.project.get_category_childs(category_id, 'name')
+		return assets
+
+	def list_stages(self, parent):
+		# The parent argument should look like
+		# "assets/characters/Joe"
+		stages = None
+		instance_type, asset_id = core.assets.string_to_instance(parent)
+		if asset_id:
+			stages = core.project.get_asset_childs(asset_id, 'name')
+		return stages
+
+	def list_variants(self, parent):
+		# The parent argument should look like
+		# "assets/characters/Joe/modeling"
+		variants = None
+		instance_type, stage_id = core.assets.string_to_instance(parent)
+		if stage_id:
+			variants = core.project.get_stage_childs(stage_id, 'name')
+		return variants
+
+	def list_work_envs(self, parent):
+		# The parent argument should look like
+		# "assets/characters/Joe/modeling/main"
+		work_envs = None
+		instance_type, variant_id = core.assets.string_to_instance(parent)
+		if variant_id:
+			work_envs = core.project.get_variant_work_envs_childs(variant_id, 'name')
+		return work_envs
+
+	def list_work_versions(self, parent):
+		# The parent argument should look like
+		# "assets/characters/Joe/modeling/main/blender"
+		work_versions = None
+		instance_type, work_env_id = core.assets.string_to_work_instance(parent)
+		if work_env_id:
+			work_versions = core.project.get_work_versions(work_env_id, 'name')
+		return work_versions
 
 class launch:
 	def __init__(self):
