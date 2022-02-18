@@ -114,47 +114,63 @@ _stages_rules_dic_ = dict()
 _stages_rules_dic_[_assets_] = _assets_stages_list_
 _stages_rules_dic_[_sequences_] = _sequences_stages_list_
 
-# Export rules
-''' The _export_ext_dic_ dictionnary 
-stores the software export extensions rules as
-list depending on the software and the stage 
-'''
-_export_ext_dic_ = {}
-_export_ext_dic_[_modeling_] = ['abc', 'ma']
-_export_ext_dic_[_rigging_] = ['ma', 'blend']
-_export_ext_dic_[_grooming_] = ['ma']
-_export_ext_dic_[_shading_] = ['ma']
-_export_ext_dic_[_modeling_] = ['abc', 'blend']
-_export_ext_dic_[_texturing_] = ['exr', 'png', 'tiff', 'sbsar']
-_export_ext_dic_[_shading_] = ['gnode']
-_export_ext_dic_[_compositing_] = ['exr']
-_export_ext_dic_[_fx_] = ['hip', 'vdb', 'abc']
-
-
 # Default export dic
-''' The _default_ext_dic_ dictionnary 
+''' The _ext_dic_ dictionnary 
 stores the default software export extensions as
 strings depending on the software and the stage
 '''
-_default_ext_dic_ = {}
-_default_ext_dic_[_maya_] = {}
-_default_ext_dic_[_blender_] = {}
-_default_ext_dic_[_substance_painter_] = {}
-_default_ext_dic_[_substance_designer_] = {}
-_default_ext_dic_[_guerilla_render_] = {}
-_default_ext_dic_[_nuke_] = {}
-_default_ext_dic_[_houdini_] = {}
-_default_ext_dic_[_maya_][_modeling_] = 'abc'
-_default_ext_dic_[_maya_][_rigging_] = 'ma'
-_default_ext_dic_[_maya_][_grooming_] = 'ma'
-_default_ext_dic_[_maya_][_shading_] = 'ma'
-_default_ext_dic_[_blender_][_modeling_] = 'abc'
-_default_ext_dic_[_blender_][_rigging_] = 'blend'
-_default_ext_dic_[_substance_painter_][_texturing_] = 'exr'
-_default_ext_dic_[_substance_designer_][_texturing_] = 'sbsar'
-_default_ext_dic_[_guerilla_render_][_shading_] = 'gnode'
-_default_ext_dic_[_nuke_][_compositing_] = 'exr'
-_default_ext_dic_[_houdini_][_fx_] = 'abc'
+_ext_dic_ = dict()
+_ext_dic_[_modeling_] = dict()
+_ext_dic_[_modeling_][_maya_] = ['abc', 'ma']
+_ext_dic_[_modeling_][_blender_] = ['abc', 'blend']
+_ext_dic_[_modeling_][_houdini_] = ['abc', 'hip']
+_ext_dic_[_rigging_] = dict()
+_ext_dic_[_rigging_][_maya_] = ['ma']
+_ext_dic_[_rigging_][_blender_] = ['blend']
+_ext_dic_[_rigging_][_houdini_] = ['hip']
+_ext_dic_[_grooming_] = dict()
+_ext_dic_[_grooming_][_maya_] = ['ma']
+_ext_dic_[_grooming_][_blender_] = ['blend']
+_ext_dic_[_grooming_][_houdini_] = ['hip']
+_ext_dic_[_texturing_] = dict()
+_ext_dic_[_texturing_][_maya_] = ['exr', 'png', 'tiff']
+_ext_dic_[_texturing_][_blender_] = ['exr', 'png']
+_ext_dic_[_texturing_][_substance_painter_] = ['exr', 'png']
+_ext_dic_[_texturing_][_substance_designer_] = ['sbsar', 'exr', 'png']
+_ext_dic_[_texturing_][_houdini_] = ['exr', 'png', 'tiff']
+_ext_dic_[_shading_] = dict()
+_ext_dic_[_shading_][_maya_] = ['ma']
+_ext_dic_[_shading_][_blender_] = ['blend']
+_ext_dic_[_shading_][_guerilla_render_] = ['gnode']
+_ext_dic_[_shading_][_houdini_] = ['hip']
+_ext_dic_[_layout_] = dict()
+_ext_dic_[_layout_][_maya_] = ['abc', 'ma']
+_ext_dic_[_layout_][_blender_] = ['abc', 'blend']
+_ext_dic_[_layout_][_houdini_] = ['abc', 'hip']
+_ext_dic_[_animation_] = dict()
+_ext_dic_[_animation_][_maya_] = ['abc', 'ma']
+_ext_dic_[_animation_][_blender_] = ['abc', 'blend']
+_ext_dic_[_animation_][_houdini_] = ['abc', 'hip']
+_ext_dic_[_cfx_] = dict()
+_ext_dic_[_cfx_][_maya_] = ['abc', 'ma']
+_ext_dic_[_cfx_][_blender_] = ['abc', 'blend']
+_ext_dic_[_cfx_][_houdini_] = ['abc', 'hip']
+_ext_dic_[_fx_] = dict()
+_ext_dic_[_fx_][_maya_] = ['abc', 'ma', 'vdb']
+_ext_dic_[_fx_][_blender_] = ['abc', 'blend', 'vdb']
+_ext_dic_[_fx_][_houdini_] = ['abc', 'hip', 'vdb']
+_ext_dic_[_camera_] = dict()
+_ext_dic_[_camera_][_maya_] = ['abc', 'ma']
+_ext_dic_[_camera_][_blender_] = ['abc', 'blend']
+_ext_dic_[_camera_][_houdini_] = ['abc', 'hip']
+_ext_dic_[_lighting_] = dict()
+_ext_dic_[_lighting_][_maya_] = ['exr']
+_ext_dic_[_lighting_][_blender_] = ['exr']
+_ext_dic_[_lighting_][_guerilla_render_] = ['exr']
+_ext_dic_[_lighting_][_houdini_] = ['exr']
+_ext_dic_[_compositing_] = dict()
+_ext_dic_[_compositing_][_blender_] = ['exr']
+_ext_dic_[_compositing_][_nuke_] = ['exr']
 
 # Stages softwares rules
 _stage_softwares_rules_dic_ = dict()

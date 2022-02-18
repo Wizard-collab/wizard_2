@@ -113,9 +113,10 @@ def init_project(project_name,
                             softwares_vars._extensions_dic_[software],
                             softwares_vars._file_command_[software],
                             softwares_vars._no_file_command_[software])
-            for stage in assets_vars._default_ext_dic_[software].keys():
-                extension = assets_vars._default_ext_dic_[software][stage]
-                project.create_extension_row(stage, software_id, extension)
+            for stage in assets_vars._ext_dic_.keys():
+                if software in assets_vars._ext_dic_[stage].keys():
+                    extension = assets_vars._ext_dic_[stage][software][0]
+                    project.create_extension_row(stage, software_id, extension)
 
         tools.create_folder(project.get_shared_files_folder())
         tools.create_folder(project.get_scripts_folder())

@@ -429,8 +429,15 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
     variant_row = project.get_variant_data(variant_id)
     stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
     extension_errors = []
+
+    # Get the extensions rules of the stage
+    extensions_rules = []
+    for software in assets_vars._ext_dic_[stage_name].keys():
+        extensions_rules += assets_vars._ext_dic_[stage_name][software]
+    extensions_rules = list(dict.fromkeys(extensions_rules))
+
     for file in files:
-        if os.path.splitext(file)[-1].replace('.', '') not in assets_vars._export_ext_dic_[stage_name]:
+        if os.path.splitext(file)[-1].replace('.', '') not in extensions_rules:
             extension_errors.append(file)
     if extension_errors == []:
         if variant_row:
@@ -471,7 +478,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
             return None
     else:
         for file in extension_errors:
-            logger.warning(f"{file} format doesn't math the stage export rules ( {(', ').join(assets_vars._export_ext_dic_[stage_name])} )")
+            logger.warning(f"{file} format doesn't math the stage export rules ( {(', ').join(extensions_rules)} )")
 
 def request_export(work_env_id, export_name, multiple=None, only_dir=None):
     # Gives a temporary ( and local ) export file name
