@@ -5,5 +5,5 @@
 # Wizard modules
 import wizard_communicate
 
-from blender_wizard import menu
-menu.register()
+from blender_wizard import wizard_menu
+wizard_menu.register()

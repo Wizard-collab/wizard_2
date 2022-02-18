@@ -20,7 +20,7 @@ import socket_utils
 if sys.version_info[0] == 2:
     from socket import error as ConnectionRefusedError
 
-communicate_server_port_key = 'wizard_communicate_server_port'
+communicate_server_port_key = 'wizard_communicate_server_port'.upper()
 
 def get_port():
     if communicate_server_port_key in os.environ.keys():

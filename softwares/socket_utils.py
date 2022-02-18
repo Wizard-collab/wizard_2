@@ -11,6 +11,7 @@ import sys
 
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 # Handle ConnectionRefusedError in python 2
 if sys.version_info[0] == 2:
@@ -138,6 +139,8 @@ def recvall(sock):
         raw_msglen = recvall_with_given_len(sock, 4)
         if not raw_msglen:
             return None
+        if sys.version_info[0] == 2:
+            raw_msglen = str(raw_msglen)
         msglen = struct.unpack('>I', raw_msglen)[0]
         return recvall_with_given_len(sock, msglen)
     except ConnectionRefusedError:

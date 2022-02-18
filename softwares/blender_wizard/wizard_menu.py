@@ -7,8 +7,8 @@ import bpy
 import bpy.utils.previews
 
 # Wizard modules
-from blender_wizard import blender_wizard
-from blender_wizard import tools
+from blender_wizard import wizard_plugin
+from blender_wizard import wizard_tools
 
 bl_info = {
     "name": "Wizard",
@@ -30,7 +30,7 @@ class save_increment(bpy.types.Operator):
     bl_description = "Save file in Wizard's hierarchy"
     
     def execute(self, context):
-        blender_wizard.save_increment()
+        wizard_plugin.save_increment()
         return {'FINISHED'}
 
 class export(bpy.types.Operator):
@@ -41,7 +41,7 @@ class export(bpy.types.Operator):
     bl_description = "Export file in Wizard's hierarchy"
     
     def execute(self, context):
-        blender_wizard.export()
+        wizard_plugin.export()
         return {'FINISHED'}
 
 class import_modeling(bpy.types.Operator):
@@ -52,7 +52,7 @@ class import_modeling(bpy.types.Operator):
     bl_description = "Import modleing ( hard )"
     
     def execute(self, context):
-        blender_wizard.reference_modeling()
+        wizard_plugin.reference_modeling()
         return {'FINISHED'}
 
 class import_textures(bpy.types.Operator):
@@ -63,7 +63,7 @@ class import_textures(bpy.types.Operator):
     bl_description = "Import textures and create shader"
     
     def execute(self, context):
-        blender_wizard.reference_textures()
+        wizard_plugin.reference_textures()
         return {'FINISHED'}
 
 class reload_textures(bpy.types.Operator):
@@ -74,7 +74,7 @@ class reload_textures(bpy.types.Operator):
     bl_description = "Reload existing textures in shaders"
     
     def execute(self, context):
-        blender_wizard.reload_textures()
+        wizard_plugin.reload_textures()
         return {'FINISHED'}
 
 class set_image_size(bpy.types.Operator):
@@ -85,7 +85,7 @@ class set_image_size(bpy.types.Operator):
     bl_description = "Apply wizard project image size"
     
     def execute(self, context):
-        blender_wizard.set_image_size()
+        wizard_plugin.set_image_size()
         return {'FINISHED'}
 
 class clear_all_materials(bpy.types.Operator):
@@ -96,7 +96,7 @@ class clear_all_materials(bpy.types.Operator):
     bl_description = "Clear all materials of selected object and children"
     
     def execute(self, context):
-        tools.clear_all_materials_of_selection()
+        wizard_tools.clear_all_materials_of_selection()
         return {'FINISHED'}
 
 class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):

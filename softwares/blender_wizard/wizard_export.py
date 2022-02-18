@@ -12,7 +12,7 @@ import bpy
 
 # Wizard modules
 import wizard_communicate
-from blender_wizard import tools
+from blender_wizard import wizard_tools
 
 def export(export_file, stage_name, export_name):
     if stage_name == 'modeling':
@@ -30,7 +30,7 @@ def export_modeling(export_file, export_name):
         logger.warning(f"{GRP_NAME} not found")
 
 def export_abc(export_GRP, export_file):
-    tools.select_GRP_and_all_children(export_GRP)
+    wizard_tools.select_GRP_and_all_children(export_GRP)
     bpy.ops.wm.alembic_export(filepath=export_file, 
                       selected=True)
 
