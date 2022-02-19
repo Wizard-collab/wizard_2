@@ -67,6 +67,15 @@ def get_maya():
 	else:
 		return None
 
+def get_guerilla():
+	executable = os.path.join(program_files,
+								'Guerilla Render',
+								'guerilla.exe')
+	if os.path.isfile(executable):
+		return {'Guerilla Render':executable.replace('\\', '/')}
+	else:
+		return None
+
 def get_substance_painter():
 	executable = os.path.join(program_files,
 								'Allegorithmic',
@@ -79,7 +88,11 @@ def get_substance_painter():
 
 def get_software_executables(software_name):
 	functions_dic = dict()
+	functions_dic['guerilla_render'] = get_guerilla
 	functions_dic['blender'] = get_blender
 	functions_dic['maya'] = get_maya
 	functions_dic['substance_painter'] = get_substance_painter
-	return functions_dic[software_name]()
+	if software_name in functions_dic.keys():
+		return functions_dic[software_name]()
+	else:
+		return None
