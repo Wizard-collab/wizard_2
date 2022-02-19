@@ -50,6 +50,8 @@ from wizard.core import tools
 from wizard.vars import assets_vars
 from wizard.vars import project_vars
 from wizard.vars import softwares_vars
+from wizard.core import custom_logger
+logger = custom_logger.get_logger(__name__)
 
 # Python modules
 import os

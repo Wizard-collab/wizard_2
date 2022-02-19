@@ -207,10 +207,9 @@ class popup_save_widget(QtWidgets.QFrame):
         self.decoration_content.setLayout(self.decoration_content_layout)
         self.header_layout.addWidget(self.decoration_content)
 
-        self.quit_button = QtWidgets.QPushButton()
-        self.quit_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
+        self.quit_button = gui_utils.close_button()
         self.quit_button.setIconSize(QtCore.QSize(12,12))
-        self.quit_button.setObjectName('window_decoration_button')
+        self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout.addWidget(self.quit_button)
         
@@ -263,25 +262,23 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 40)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         if self.event_row['message'] is not None and self.event_row['message'] != '':
             self.event_content_label.setVisible(1)
+            self.content_widget.setVisible(1)
             self.event_content_label.setText(self.event_row['message'])
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
             self.event_additional_content_label.setVisible(1)
+            self.content_widget.setVisible(1)
             self.event_additional_content_label.setText(self.event_row['additional_message'])
 
-        self.action_button_button.setText('View')
-        
         if self.event_row['type'] == 'creation':
             profile_color = '#77c5f2'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
 
             # Show comment widget if user is current user
             if self.event_row['creation_user'] == environment.get_user():
@@ -290,12 +287,10 @@ class popup_event_widget(QtWidgets.QFrame):
 
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
-            gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
 
-        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
+        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
 
     def connect_functions(self):
-        self.action_button_button.clicked.connect(self.action)
         self.comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
 
@@ -341,11 +336,11 @@ class popup_event_widget(QtWidgets.QFrame):
         self.profile_layout = QtWidgets.QHBoxLayout()
         self.profile_layout.setContentsMargins(0,0,0,0)
         self.profile_frame.setLayout(self.profile_layout)
-        self.profile_frame.setFixedSize(44,44)
+        self.profile_frame.setFixedSize(34,34)
         self.header_layout.addWidget(self.profile_frame)
 
         self.profile_picture = QtWidgets.QLabel()
-        self.profile_picture.setFixedSize(40,40)
+        self.profile_picture.setFixedSize(30,30)
         self.profile_layout.addWidget(self.profile_picture)
 
         self.title_widget = QtWidgets.QWidget()
@@ -358,7 +353,7 @@ class popup_event_widget(QtWidgets.QFrame):
 
         self.event_title_label = QtWidgets.QLabel()
         self.event_title_label.setWordWrap(True)
-        self.event_title_label.setObjectName('title_label')
+        self.event_title_label.setObjectName('bold_label')
         self.title_layout.addWidget(self.event_title_label)
 
         self.user_name_label = QtWidgets.QLabel()
@@ -375,18 +370,19 @@ class popup_event_widget(QtWidgets.QFrame):
         self.decoration_content.setLayout(self.decoration_content_layout)
         self.header_layout.addWidget(self.decoration_content)
 
-        self.quit_button = QtWidgets.QPushButton()
-        self.quit_button.setIcon(QtGui.QIcon(ressources._quit_decoration_))
+        self.quit_button = gui_utils.close_button()
         self.quit_button.setIconSize(QtCore.QSize(12,12))
-        self.quit_button.setObjectName('window_decoration_button')
+        self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout.addWidget(self.quit_button)
         
         self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setVisible(0)
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
+        self.content_layout.setContentsMargins(11,0,11,11)
         self.content_layout.setSpacing(12)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -405,10 +401,10 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_widget = QtWidgets.QWidget()
         self.comment_widget.setObjectName('transparent_widget')
         self.comment_widget_layout = QtWidgets.QVBoxLayout()
-        self.comment_widget_layout.setContentsMargins(0,0,0,0)
+        self.comment_widget_layout.setContentsMargins(11,0,11,11)
         self.comment_widget_layout.setSpacing(4)
         self.comment_widget.setLayout(self.comment_widget_layout)
-        self.content_layout.addWidget(self.comment_widget)
+        self.main_layout.addWidget(self.comment_widget)
         self.comment_widget.setVisible(False)
 
         self.comment_textEdit = QtWidgets.QTextEdit()
@@ -418,21 +414,3 @@ class popup_event_widget(QtWidgets.QFrame):
 
         self.comment_button = QtWidgets.QPushButton('Comment')
         self.comment_widget_layout.addWidget(self.comment_button)
-
-        self.buttons_widget = QtWidgets.QWidget()
-        self.buttons_widget.setObjectName('transparent_widget')
-        self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
-        self.buttons_layout.setSpacing(4)
-        self.buttons_widget.setLayout(self.buttons_layout)
-        self.content_layout.addWidget(self.buttons_widget)
-
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-        
-        self.action_button_button = QtWidgets.QPushButton()
-        self.action_button_button.setIcon(QtGui.QIcon(ressources._rigth_arrow_icon_))
-        self.action_button_button.setIconSize(QtCore.QSize(14,14))
-        self.action_button_button.setLayoutDirection(QtCore.Qt.RightToLeft)
-
-        self.action_button_button.setObjectName('blue_text_button')
-        self.buttons_layout.addWidget(self.action_button_button)

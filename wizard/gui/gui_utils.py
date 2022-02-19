@@ -360,7 +360,6 @@ class RoundProgress(QtWidgets.QWidget):
             the_gradient.setColorAt(the_angle+0.001,QtGui.QColor(self.bg_color))
         painter.fillPath(the_path,the_gradient)
 
-
 def enterEvent(self, event=None):
     gui_server.tooltip(self.application_tooltip)
     self.legacy_enterEvent(event)

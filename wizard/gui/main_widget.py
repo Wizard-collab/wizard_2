@@ -21,6 +21,7 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger()
 
 # Wizard gui modules
+from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import tree_widget
 from wizard.gui import references_widget
@@ -46,6 +47,7 @@ from wizard.gui import championship_widget
 from wizard.gui import license_widget
 from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
+from wizard.gui import warning_tooltip
 
 class main_widget(QtWidgets.QWidget):
 
@@ -56,6 +58,7 @@ class main_widget(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - {environment.get_project_name()}")
 
+        self.warning_tooltip = warning_tooltip.warning_tooltip(self)
         self.tree_widget = tree_widget.tree_widget(self)
         self.shelf_widget = shelf_widget.shelf_widget(self)
         self.console_widget = console_widget.console_widget()
@@ -144,6 +147,7 @@ class main_widget(QtWidgets.QWidget):
         self.footer_widget.refresh_signal.connect(self.refresh)
         self.footer_widget.show_softwares_widget.connect(self.softwares_widget.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
+        self.console_widget.warning_signal.connect(self.warning_tooltip.invoke)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
         self.subtask_manager.global_status_signal.connect(self.footer_widget.update_subtask_manager_button)

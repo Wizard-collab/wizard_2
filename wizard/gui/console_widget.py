@@ -22,6 +22,7 @@ from wizard.gui import logging_widget
 class console_widget(QtWidgets.QWidget):
 
     notification = pyqtSignal(str)
+    warning_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(console_widget, self).__init__(parent)
@@ -128,9 +129,11 @@ class console_widget(QtWidgets.QWidget):
                 record_msg = f'<strong><span style="color:#f79360;">{record_msg}</strong>'
                 if not self.isActiveWindow():
                     self.notification.emit('warning')
+                    self.warning_signal.emit(('Warning', record_msg))
             elif level == 'ERROR':
                 record_msg = f'<strong><span style="color:#f0605b;">{record_msg}</strong>'
                 if not self.isActiveWindow():
                     self.notification.emit('error')
+                    self.warning_signal.emit(('Error', record_msg))
             self.console_viewer.insertHtml(record_msg)
             self.console_viewer.insertHtml('<br>')

@@ -1004,6 +1004,16 @@ def get_work_env_by_name(variant_id, name, column='*'):
         logger.debug("Work env not found")
         return None
 
+def set_work_env_extension(work_env_id, export_extension):
+    if db_utils.update_data('project',
+                                'work_envs',
+                                ('export_extension', export_extension),
+                                ('id', work_env_id)):
+        logger.info(f'Work env export extension modified')
+        return 1
+    else:
+        return None
+
 def get_lock(work_env_id):
     current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
     work_env_lock_id = get_work_env_data(work_env_id, 'lock_id')
@@ -1252,7 +1262,7 @@ def create_extension_row(stage, software_id, extension):
     else:
         return None
 
-def get_extension(stage, software_id):
+def get_default_extension(stage, software_id):
     export_row = db_utils.get_row_by_multiple_data('project', 
                                                         'extensions', 
                                                         ('stage', 'software_id'), 

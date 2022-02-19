@@ -137,7 +137,7 @@ def archive_category(category_id):
                 archive_file = ''
             success = project.remove_category(category_id)
             if success:
-                events.add_archive_event("Archived category", f"{instance_to_string(('domain', category_row['domain_id']))}/{category_row['name']}",
+                events.add_archive_event(f"Archived {instance_to_string(('domain', category_row['domain_id']))}/{category_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -181,7 +181,7 @@ def archive_asset(asset_id):
                 archive_file = ''
             success = project.remove_asset(asset_id)
             if success:
-                events.add_archive_event("Archived asset", f"{instance_to_string(('category', asset_row['category_id']))}/{asset_row['name']}",
+                events.add_archive_event(f"Archived {instance_to_string(('category', asset_row['category_id']))}/{asset_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -256,7 +256,7 @@ def archive_stage(stage_id):
                 archive_file = ''
             success = project.remove_stage(stage_id)
             if success:
-                events.add_archive_event("Archived stage", f"{instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}", archive_file)
+                events.add_archive_event(f"Archived {instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}", archive_file)
             return success
         else:
             return None
@@ -301,7 +301,7 @@ def archive_variant(variant_id):
                 archive_file=''
             success = project.remove_variant(variant_id)
             if success:
-                events.add_archive_event("Archived variant", f"{instance_to_string(('stage', variant_row['stage_id']))}/{variant_row['name']}",
+                events.add_archive_event(f"Archived {instance_to_string(('stage', variant_row['stage_id']))}/{variant_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -508,7 +508,7 @@ def archive_export(export_id):
                 archive_file = ''
             success = project.remove_export(export_id)
             if success:
-                events.add_archive_event("Archived export", f"{instance_to_string(('variant', export_row['variant_id']))}/{export_row['name']}",
+                events.add_archive_event(f"Archived {instance_to_string(('variant', export_row['variant_id']))}/{export_row['name']}",
                                                 archive_file)
             return success
         else:
@@ -556,7 +556,7 @@ def archive_export_version(export_version_id):
                 archive_file = ''
             success = project.remove_export_version(export_version_id)
             if success:
-                events.add_archive_event("Archived export version", f"{instance_to_string(('export', export_version_row['export_id']))}/{export_version_row['name']}",
+                events.add_archive_event(f"Archived{instance_to_string(('export', export_version_row['export_id']))}/{export_version_row['name']}",
                                                 archive_file)
                 if len(project.get_export_versions(export_id)) == 0:
                     archive_export(export_id)
@@ -789,7 +789,11 @@ def build_export_file_name(work_env_id, export_name, multiple=None):
     extension = work_env_row['export_extension']
     if not extension:
     '''
-    extension = project.get_extension(stage_row['name'], work_env_row['software_id'])
+    if not work_env_row['export_extension']:
+        extension = project.get_default_extension(stage_row['name'], work_env_row['software_id'])
+    else:
+        extension = work_env_row['export_extension']
+
     if extension:
         file_name = f"{category_row['name']}"
         file_name += f"_{asset_row['name']}"

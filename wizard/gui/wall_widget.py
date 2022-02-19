@@ -336,7 +336,7 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.event_frame = QtWidgets.QFrame()
         self.event_frame.setObjectName('wall_event_frame')
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        #self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(9,9,9,9)
         self.main_layout.setSpacing(6)
@@ -373,7 +373,7 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.event_title_label = QtWidgets.QLabel()
         self.event_title_label.setWordWrap(True)
-        self.event_title_label.setObjectName('title_label_2')
+        self.event_title_label.setObjectName('bold_label')
         self.title_layout.addWidget(self.event_title_label)
 
         self.user_name_label = QtWidgets.QLabel()

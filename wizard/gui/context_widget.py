@@ -135,10 +135,36 @@ class context_widget(QtWidgets.QFrame):
                 self.work_env_changed_signal.emit(0)
                 self.hide_init_work_env_button()
             self.refresh_string_asset_label()
-                
+            self.refresh_extension_hard()
+
+    def refresh_extension_hard(self):
+        self.refresh_extension_changed = None
+        self.export_extension_comboBox.clear()
+
+        if self.stage_row is not None and self.work_env_row is not None:
+            default_extension = f"Default ({project.get_default_extension(self.stage_row['name'], self.work_env_row['software_id'])})"
+            extensions_list = [default_extension]
+            extensions_list += assets_vars._ext_dic_[self.stage_row['name']][self.work_env_row['name']]
+            self.export_extension_comboBox.addItems(extensions_list)
+
+            if self.work_env_row['export_extension'] is None:
+                self.export_extension_comboBox.setCurrentText(default_extension)
+            else:
+                self.export_extension_comboBox.setCurrentText(self.work_env_row['export_extension'])
+
+        self.refresh_extension_changed = 1
+
+    def extension_changed(self):
+        if self.refresh_extension_changed:
+            export_extension = self.export_extension_comboBox.currentText()
+            if 'Default' in export_extension:
+                export_extension = None
+            project.set_work_env_extension(self.work_env_row['id'], export_extension)
+
     def connect_functions(self):
         self.variant_comboBox.currentTextChanged.connect(self.variant_changed)
         self.work_env_comboBox.currentTextChanged.connect(self.work_env_changed)
+        self.export_extension_comboBox.currentTextChanged.connect(self.extension_changed)
         self.add_variant_button.clicked.connect(self.create_variant)
         self.folder_button.clicked.connect(self.open_work_env_folder)
         self.sandbox_button.clicked.connect(self.open_sandbox_folder)
@@ -232,6 +258,11 @@ class context_widget(QtWidgets.QFrame):
         self.init_work_env_button.setVisible(0)
         gui_utils.application_tooltip(self.init_work_env_button, "Init work environment")
         self.main_layout.addWidget(self.init_work_env_button)
+
+        self.export_extension_comboBox = gui_utils.QComboBox()
+        self.export_extension_comboBox.setFixedWidth(150)
+        gui_utils.application_tooltip(self.export_extension_comboBox, "Change export extension")
+        self.main_layout.addWidget(self.export_extension_comboBox)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 

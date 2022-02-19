@@ -541,6 +541,21 @@ QSlider::handle:horizontal {
 	border: none;
 }
 
+#quit_button{
+	background-color: transparent;
+	border: none;
+}
+
+#quit_button::hover{
+	background-color: transparent;
+	border: none;
+}
+
+#quit_button::pressed{
+	background-color: transparent;
+	border: none;
+}
+
 #console_textEdit{
 	background-color: #1d1d23;
 	border-radius: 0px;
