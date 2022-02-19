@@ -140,6 +140,7 @@ _sandbox_icon_ = os.path.join(_icons_path_, 'sandbox.svg')
 _destination_icon_ = os.path.join(_icons_path_, 'destination.svg')
 _edit_icon_ = os.path.join(_icons_path_, 'edit_hover.svg')
 _separator_icon_ = os.path.join(_icons_path_, 'separator_icon.svg')
+_congrats_icon_ = os.path.join(_icons_path_, 'congrats.svg')
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.svg')

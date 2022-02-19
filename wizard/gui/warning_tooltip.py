@@ -11,6 +11,7 @@ import time
 from wizard.gui import gui_utils
 
 # Wizard modules
+from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
@@ -35,15 +36,30 @@ class warning_tooltip(QtWidgets.QWidget):
         self.setLayout(self.main_widget_layout)
 
         self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setMaximumWidth(300)
         self.main_widget.setObjectName('black_round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.main_widget_layout.addWidget(self.main_widget)
 
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(6)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.icon_label = QtWidgets.QLabel()
+        self.icon_label.setPixmap(QtGui.QIcon(ressources._info_icon_).pixmap(18))
+        self.header_layout.addWidget(self.icon_label)
+
         self.log_level = QtWidgets.QLabel()
         self.log_level.setObjectName('bold_label')
-        self.main_layout.addWidget(self.log_level)
+        self.header_layout.addWidget(self.log_level)
+
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.line_frame = QtWidgets.QFrame()
         self.line_frame.setFixedHeight(1)
@@ -51,6 +67,7 @@ class warning_tooltip(QtWidgets.QWidget):
         self.main_layout.addWidget(self.line_frame)
 
         self.log_msg = QtWidgets.QLabel()
+        self.log_msg.setWordWrap(True)
         self.main_layout.addWidget(self.log_msg)
 
         self.open_console_label = QtWidgets.QLabel('Open console for more informations')
@@ -66,18 +83,22 @@ class warning_tooltip(QtWidgets.QWidget):
         self.additional_labels = []
 
     def invoke(self, log_tuple):
-        gui_utils.move_ui(self, 5)
         if not self.main_widget.isVisible():
+            self.resize(QtCore.QSize(10,10))
+            QtWidgets.QApplication.processEvents()
             self.log_level.setText(log_tuple[0])
             self.log_msg.setText(log_tuple[1])
-
             self.main_widget.setVisible(1)
+            QtWidgets.QApplication.processEvents()
+            gui_utils.move_ui(self, 5)
             QtWidgets.QApplication.processEvents()
             self.custom_leave_thread.start()
         else:
             new_label = QtWidgets.QLabel(log_tuple[1])
             self.additional_labels.append(new_label)
             self.main_layout.insertWidget(self.main_layout.count()-1, new_label)
+            QtWidgets.QApplication.processEvents()
+            gui_utils.move_ui(self, 5)
 
 class custom_leave_thread(QtCore.QThread):
 

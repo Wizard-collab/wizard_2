@@ -19,6 +19,7 @@ import traceback
 import json
 
 # Wizard modules
+from wizard.vars import ressources
 from wizard.core import environment
 from wizard.core import socket_utils
 from wizard.core import custom_logger
@@ -47,6 +48,7 @@ class gui_server(QThread):
     focus_instance_signal = pyqtSignal(object)
     save_popup_signal = pyqtSignal(int)
     raise_ui_signal = pyqtSignal(int)
+    popup_signal = pyqtSignal(object)
 
     def __init__(self):
         super(gui_server, self).__init__()
@@ -104,6 +106,8 @@ class gui_server(QThread):
             self.save_popup_signal.emit(signal_dic['version_id'])
         elif signal_dic['function'] == 'raise':
             self.raise_ui_signal.emit(1)
+        elif signal_dic['function'] == 'popup':
+            self.popup_signal.emit(signal_dic['data'])
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
@@ -136,6 +140,12 @@ def save_popup(version_id):
     signal_dic = dict()
     signal_dic['function'] = 'save_popup'
     signal_dic['version_id'] = version_id
+    send_signal(signal_dic)
+
+def custom_popup(title, msg, icon=ressources._info_icon_, profile_picture=None):
+    signal_dic = dict()
+    signal_dic['function'] = 'popup'
+    signal_dic['data'] = [title, msg, icon, profile_picture]
     send_signal(signal_dic)
 
 def tooltip(tooltip):

@@ -14,6 +14,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 class team_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -101,6 +102,7 @@ class team_widget(QtWidgets.QWidget):
             self.users_scrollArea_layout.addWidget(widget)
             self.user_ids[user_name] = widget
             self.refresh()
+            gui_server.custom_popup(f"{user_name} is online !", "", icon=None, profile_picture=user_name)
 
     def remove_user(self, user_name):
         if user_name in self.user_ids.keys():
@@ -110,6 +112,7 @@ class team_widget(QtWidgets.QWidget):
             widget.deleteLater()
             del self.user_ids[user_name]
             self.refresh()
+            gui_server.custom_popup(f"{user_name} is offline !", "", icon=None, profile_picture=user_name)
 
     def set_team_connection(self, connection_status):
         self.connection_status = connection_status

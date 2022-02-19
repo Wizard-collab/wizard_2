@@ -9,6 +9,7 @@ from PyQt5.QtCore import pyqtSignal
 import json
 import traceback
 import os
+import time
 
 # Wizard modules
 from wizard.core import user
@@ -87,6 +88,14 @@ class popup_wall_widget(QtWidgets.QWidget):
             self.popup_ids[event_row['id']] = widget
             self.popups_scrollArea_layout.addWidget(widget)
             self.popup_ids[event_row['id']].time_out.connect(self.remove_popup)
+
+    def add_custom_popup(self, data):
+        if user.user().get_popups_enabled():
+            popup_id = time.time()
+            widget = popup_custom_widget(data[0], data[1], data[2], data[3], popup_id)
+            self.popup_ids[popup_id] = widget
+            self.popups_scrollArea_layout.addWidget(widget)
+            self.popup_ids[popup_id].time_out.connect(self.remove_popup)
 
     def add_save_popup(self, version_id):
         if user.user().get_popups_enabled():
@@ -178,13 +187,12 @@ class popup_save_widget(QtWidgets.QFrame):
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(10,10,10,10)
+        self.main_layout.setContentsMargins(17,17,17,17)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
-        #self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(0,0,0,0)
         self.header_layout.setSpacing(6)
@@ -318,13 +326,12 @@ class popup_event_widget(QtWidgets.QFrame):
         self.setMinimumWidth(320)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(6,6,6,6)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
-        #self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:5px;border-top-right-radius:5px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(12)
         self.header_widget.setLayout(self.header_layout)
@@ -414,3 +421,114 @@ class popup_event_widget(QtWidgets.QFrame):
 
         self.comment_button = QtWidgets.QPushButton('Comment')
         self.comment_widget_layout.addWidget(self.comment_button)
+
+class popup_custom_widget(QtWidgets.QFrame):
+
+    time_out = pyqtSignal(float)
+
+    def __init__(self, title, msg, icon, profile_picture, popup_id, parent=None):
+        super(popup_custom_widget, self).__init__(parent)
+
+        self.title = title
+        self.msg = msg
+        self.icon = icon
+        self.profile_picture = profile_picture
+        self.popup_id = popup_id
+        
+        self.is_comment = False
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(8)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.setGraphicsEffect(self.shadow)
+
+        self.setObjectName('popup_event_frame')
+        self.build_ui()
+        self.fill_ui()
+        self.connect_functions()
+        self.init_clock()
+        self.start_clock()
+
+    def enterEvent(self, event):
+        self.timer.stop()
+
+    def leaveEvent(self, event):
+        self.start_clock()
+
+    def init_clock(self):
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(lambda: self.time_out.emit(self.popup_id))
+    
+    def start_clock(self):
+        duration = user.user().get_popups_duration()
+        self.timer.start(duration*1000)
+
+    def fill_ui(self):
+        if self.icon:
+            self.icon_picture.setPixmap(QtGui.QIcon(self.icon).pixmap(30))
+        if self.profile_picture:
+            profile_image = site.get_user_row_by_name(self.profile_picture, 'profile_picture')
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
+            self.icon_picture.setPixmap(pm)
+        self.event_title_label.setText(self.title)
+        self.msg_label.setText(self.msg)
+
+    def connect_functions(self):
+        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.popup_id))
+
+    def build_ui(self):
+        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setMinimumWidth(320)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setSpacing(0)
+        self.setLayout(self.main_layout)
+
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setSpacing(12)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.icon_picture = QtWidgets.QLabel()
+        self.icon_picture.setFixedSize(30,30)
+        self.header_layout.addWidget(self.icon_picture)
+
+        self.title_widget = QtWidgets.QWidget()
+        self.title_widget.setObjectName('transparent_widget')
+        self.title_layout = QtWidgets.QVBoxLayout()
+        self.title_layout.setContentsMargins(0,0,0,0)
+        self.title_layout.setSpacing(2)
+        self.title_widget.setLayout(self.title_layout)
+        self.header_layout.addWidget(self.title_widget)
+
+        self.event_title_label = QtWidgets.QLabel()
+        self.event_title_label.setWordWrap(True)
+        self.event_title_label.setObjectName('bold_label')
+        self.title_layout.addWidget(self.event_title_label)
+
+        self.msg_label = QtWidgets.QLabel()
+        self.msg_label.setObjectName('gray_label')
+        self.title_layout.addWidget(self.msg_label)
+
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+        self.decoration_content = QtWidgets.QWidget()
+        self.decoration_content.setObjectName('transparent_widget')
+        self.decoration_content_layout = QtWidgets.QVBoxLayout()
+        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setSpacing(0)
+        self.decoration_content.setLayout(self.decoration_content_layout)
+        self.header_layout.addWidget(self.decoration_content)
+
+        self.quit_button = gui_utils.close_button()
+        self.quit_button.setIconSize(QtCore.QSize(12,12))
+        self.quit_button.setObjectName('quit_button')
+        self.quit_button.setFixedSize(16, 16)
+        self.decoration_content_layout.addWidget(self.quit_button)
+        
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))

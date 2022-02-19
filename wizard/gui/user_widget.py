@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import environment
@@ -17,6 +18,8 @@ from wizard.vars import ressources
 class user_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(user_widget, self).__init__(parent)
+        user_row = site.get_user_row_by_name(environment.get_user())
+        self.old_level = user_row['level']
         self.build_ui()
 
     def build_ui(self):
@@ -107,6 +110,15 @@ class user_widget(QtWidgets.QFrame):
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 28)
         self.profile_picture.setPixmap(pm)
         self.crown_check(user_row)
+
+        if user_row['level'] != self.old_level:
+            if user_row['level'] > self.old_level:
+                gui_server.custom_popup(f"You are now level {user_row['level']}", 'Congratulation', ressources._congrats_icon_)
+            else:
+                gui_server.custom_popup(f"You are now level {user_row['level']}", 'You just lost a level, take care of your comments')
+
+            self.old_level = user_row['level']
+
 
     def crown_check(self, user_row):
         user_rows = site.get_users_list()

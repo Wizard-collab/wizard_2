@@ -14,6 +14,7 @@ import traceback
 from wizard.gui import logging_widget
 from wizard.gui import log_viewer
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import socket_utils
@@ -28,7 +29,6 @@ class subtask_manager(QtWidgets.QWidget):
 
     global_status_signal = pyqtSignal(object)
     new_task_signal = pyqtSignal(int)
-    ended_task_signal = pyqtSignal(int)
 
     def __init__(self, parent = None):
         super(subtask_manager, self).__init__(parent)
@@ -259,6 +259,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.task_thread.connection_dead.connect(lambda:self.update_thread_status('Task closed'))
         self.task_thread.connection_dead.connect(self.clock_thread.stop)
         self.task_thread.connection_dead.connect(self.update_status_signal.emit)
+        self.task_thread.connection_dead.connect(self.create_popup)
         self.kill_button.clicked.connect(self.task_thread.kill)
         self.delete_task_button.clicked.connect(self.delete_task)
         self.show_log_viewer_button.clicked.connect(self.show_log_viewer)
@@ -270,6 +271,9 @@ class subtask_widget(QtWidgets.QFrame):
             self.remove_task_signal.emit(self.process_id)
             self.setParent(None)
             self.deleteLater()
+
+    def create_popup(self):
+        gui_server.custom_popup('A subtask just finished !', 'Open the subtask manager to see details', ressources._tasks_icon_)
 
     def analyse_signal(self, signal_list):
         process_id = signal_list[0]

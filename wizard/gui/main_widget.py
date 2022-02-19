@@ -169,6 +169,7 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
+        self.gui_server.popup_signal.connect(self.popup_wall_widget.add_custom_popup)
 
     def show_pywizard(self):
         if sys.argv[0].endswith('.py'):
