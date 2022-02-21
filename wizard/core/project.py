@@ -342,16 +342,21 @@ def add_stage(name, asset_id):
                                     'stages',
                                     ('name', 'asset_id'),
                                     (name, asset_id))):
+
+        category_id = get_asset_data(asset_id, 'category_id')
+        domain_id = get_category_data(category_id, 'domain_id')
         stage_id = db_utils.create_row('project',
                             'stages', 
                             ('name',
                                 'creation_time',
                                 'creation_user',
-                                'asset_id'), 
+                                'asset_id',
+                                'domain_id'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
-                                asset_id))
+                                asset_id,
+                                domain_id))
         if stage_id:
             logger.info(f"Stage {name} added to project")
         return stage_id
@@ -804,7 +809,7 @@ def modify_export_version_comment(export_version_id, comment):
         logger.warning("You did not created this file, modification forbidden")
     return success
 
-def add_work_env(name, software_id, variant_id):
+def add_work_env(name, software_id, variant_id, export_extension=None):
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'work_envs',
                                     ('name', 'variant_id'),
@@ -824,7 +829,7 @@ def add_work_env(name, software_id, variant_id):
                                 environment.get_user(),
                                 variant_id,
                                 None,
-                                None,
+                                export_extension,
                                 0.0,
                                 software_id))
         if work_env_id:
@@ -1696,7 +1701,9 @@ def create_stages_table(database):
                                         creation_user text NOT NULL,
                                         default_variant_id integer,
                                         asset_id integer NOT NULL,
-                                        FOREIGN KEY (asset_id) REFERENCES assets (id)
+                                        domain_id integer NOT NULL,
+                                        FOREIGN KEY (asset_id) REFERENCES assets (id),
+                                        FOREIGN KEY (domain_id) REFERENCES domains (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Stages table created")

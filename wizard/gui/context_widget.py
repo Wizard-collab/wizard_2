@@ -142,9 +142,10 @@ class context_widget(QtWidgets.QFrame):
         self.export_extension_comboBox.clear()
 
         if self.stage_row is not None and self.work_env_row is not None:
-            default_extension = f"Default ({project.get_default_extension(self.stage_row['name'], self.work_env_row['software_id'])})"
-            extensions_list = [default_extension]
-            extensions_list += assets_vars._ext_dic_[self.stage_row['name']][self.work_env_row['name']]
+            extensions_list = assets_vars._ext_dic_[self.stage_row['name']][self.work_env_row['name']]
+            if self.stage_row['name'] != assets_vars._custom_stage_:
+                default_extension = f"Default ({project.get_default_extension(self.stage_row['name'], self.work_env_row['software_id'])})"
+                extensions_list = [default_extension] + extensions_list
             self.export_extension_comboBox.addItems(extensions_list)
 
             if self.work_env_row['export_extension'] is None:

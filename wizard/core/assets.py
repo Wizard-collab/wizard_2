@@ -219,7 +219,12 @@ def create_stage(name, asset_id):
         if name in assets_vars._assets_stages_list_:
             allowed = 1
     if domain_name == assets_vars._sequences_:
+        if name in assets_vars._sequences_stages_list_:
             allowed = 1
+    if domain_name == assets_vars._library_:
+        if name in assets_vars._library_stages_list_:
+            allowed = 1
+
     if allowed:
         asset_path = get_asset_path(asset_id)
         if asset_path:
@@ -342,11 +347,17 @@ def create_work_env(software_id, variant_id):
     if name in project.get_softwares_names_list():
         variant_path = get_variant_path(variant_id)
         if variant_path:
+            stage_row = project.get_stage_data(project.get_variant_data(variant_id, 'stage_id'))
+            if stage_row['name'] == assets_vars._custom_stage_:
+                export_extension = assets_vars._ext_dic_[assets_vars._custom_stage_][name][0]
+            else:
+                export_extension = None
             dir_name = os.path.normpath(os.path.join(variant_path, name))
             screenshots_dir_name = os.path.normpath(os.path.join(dir_name, 'screenshots'))
             work_env_id = project.add_work_env(name,
-                                                        software_id,
-                                                        variant_id)
+                                                software_id,
+                                                variant_id,
+                                                export_extension)
             if work_env_id:
                 if (not tools.create_folder(dir_name)) or (not tools.create_folder(screenshots_dir_name)) :
                     project.remove_work_env(work_env_id)

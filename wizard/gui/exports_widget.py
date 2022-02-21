@@ -47,6 +47,7 @@ class exports_widget(QtWidgets.QWidget):
         self.icons_dic['lighting'] = QtGui.QIcon(ressources._lighting_icon_)
         self.icons_dic['camera'] = QtGui.QIcon(ressources._camera_icon_)
         self.icons_dic['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
+        self.icons_dic['custom'] = QtGui.QIcon(ressources._custom_icon_)
 
         self.variant_id = None
         self.export_ids = dict()
