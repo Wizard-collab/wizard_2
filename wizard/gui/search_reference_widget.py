@@ -9,7 +9,6 @@ from PyQt5.QtCore import pyqtSignal
 # Wizard modules
 from wizard.core import assets
 from wizard.core import project
-from wizard.vars import assets_vars
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -262,9 +261,5 @@ class custom_item(QtWidgets.QTreeWidgetItem):
         bold_font.setBold(True)
         self.setFont(1, bold_font)
         self.setText(2, self.stage_row['name'])
-        if self.stage_row['domain_id'] == assets_vars._library_id_:
-            icon = QtGui.QIcon('')
-        else:
-            icon = QtGui.QIcon(ressources._stage_icons_dic_[self.stage_row['name']])
-        self.setIcon(2, icon)
+        self.setIcon(2, QtGui.QIcon(ressources._stage_icons_dic_[self.stage_row['name']]))
         self.setText(3, self.variant_row['name'])

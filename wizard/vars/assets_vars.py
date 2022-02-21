@@ -105,13 +105,18 @@ _sequences_stages_list_ = [_layout_,
 
 _library_stages_list_ = _assets_stages_list_ + _sequences_stages_list_ + [_custom_stage_]
 
+_stages_list_ = dict()
+_stages_list_[_assets_] = _assets_stages_list_
+_stages_list_[_library_] = _library_stages_list_
+_stages_list_[_sequences_] = _sequences_stages_list_
+
 _stages_indexes_ = dict()
 _stages_indexes_[_modeling_] = 0
 _stages_indexes_[_rigging_] = 1
 _stages_indexes_[_grooming_] = 2
 _stages_indexes_[_texturing_] = 3
 _stages_indexes_[_shading_] = 4
-_stages_indexes_[_custom_stage_] = 0
+_stages_indexes_[_custom_stage_] = 7
 _stages_indexes_[_layout_] = 0
 _stages_indexes_[_animation_] = 1
 _stages_indexes_[_cfx_] = 2

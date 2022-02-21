@@ -66,6 +66,7 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic['stage']['lighting'] = QtGui.QIcon(ressources._lighting_icon_)
         self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_)
         self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
+        self.icons_dic['stage']['custom'] = QtGui.QIcon(ressources._custom_icon_)
 
         self.setFixedWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -267,8 +268,7 @@ class tree_widget(QtWidgets.QFrame):
                 parent_widget.addChild(asset_item)
                 domain_id = project.get_category_data(row['category_id'], 'domain_id')
                 domain_name = project.get_domain_data(domain_id, 'name')
-                for stage in assets_vars._stages_rules_dic_[domain_name]:
-                    self.add_creation_item(asset_item, stage, 'stage_creation')
+                self.add_creation_item(asset_item, 'new', 'stage_creation')
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
@@ -279,15 +279,16 @@ class tree_widget(QtWidgets.QFrame):
                                                     instance_id = row['id'],
                                                     instance_type = 'stage')
                 stage_item.setText(0, row['name'])
-                if row['name'] != assets_vars._custom_stage_:
-                    stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
+                stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
                 self.stage_ids[row['id']] = stage_item
 
                 index = assets_vars._stages_indexes_[row['name']]
-                parent_widget.insertChild(index, stage_item)
+                #parent_widget.insertChild(index, stage_item)
+                parent_widget.addChild(stage_item)
 
                 stage_item.set_item_widget()
                 self.remove_stage_creation_item(parent_widget, row['name'])
+
             if self.all_export_versions_stage_ids is not None and row['id'] in self.all_export_versions_stage_ids:
                 self.stage_ids[row['id']].publish_indicator.setVisible(1)
             else:
@@ -415,12 +416,20 @@ class tree_widget(QtWidgets.QFrame):
         new_category_id = None
 
         if item.instance_type == 'stage_creation':
-            stage_name = item.instance_name
-            parent_id = item.instance_parent_id
-            new_stage_id = assets.create_stage(stage_name, parent_id)
-            if new_stage_id:
-                self.refresh()
-                gui_server.refresh_ui()
+            menu = gui_utils.QMenu()
+            domain_name = item.parent().parent().parent().instance_name 
+            for stage in assets_vars._stages_list_[domain_name]:
+                action = menu.addAction(QtGui.QIcon(self.icons_dic['stage'][stage]), stage)
+                action.name = stage
+            action = menu.exec_(QtGui.QCursor().pos())
+            if action is not None:
+                stage_name = action.name
+                parent_id = item.instance_parent_id
+                new_stage_id = assets.create_stage(stage_name, parent_id)
+                if new_stage_id:
+                    self.refresh()
+                    gui_server.refresh_ui()
+
         elif item.instance_type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self)
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
@@ -554,8 +563,6 @@ class tree_widget(QtWidgets.QFrame):
         item = self.stage_ids[id]
         is_selected = item.isSelected()
         parent_item = item.parent()
-        stage_name = item.instance_name
-        self.add_creation_item(parent_item, stage_name, 'stage_creation', use_index=True)
         parent_item.removeChild(item)
         del self.stage_ids[id]
         if is_selected:

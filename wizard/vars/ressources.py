@@ -176,6 +176,8 @@ _lighting_icon_ = os.path.join(_icons_path_, 'lighting.svg')
 _compositing_icon_ = os.path.join(_icons_path_, 'compositing.svg')
 _camera_icon_ = os.path.join(_icons_path_, 'camera.svg')
 
+_custom_icon_ = os.path.join(_icons_path_, 'custom.svg')
+
 _stage_icons_dic_ = dict()
 _stage_icons_dic_['modeling'] = _modeling_icon_
 _stage_icons_dic_['rigging'] = _rigging_icon_
@@ -189,6 +191,7 @@ _stage_icons_dic_['fx'] = _fx_icon_
 _stage_icons_dic_['lighting'] = _lighting_icon_
 _stage_icons_dic_['compositing'] = _compositing_icon_
 _stage_icons_dic_['camera'] = _camera_icon_
+_stage_icons_dic_['custom'] = _custom_icon_
 
 # Softwares icons
 _sofwares_icons_dic_ = dict()

@@ -306,8 +306,7 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
 
     def fill_ui(self):
         self.setText(0, self.stage)
-        if self.stage in ressources._stage_icons_dic_.keys():
-            self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.stage]))
+        self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.stage]))
 
     def update_infos(self, childs):
         self.setText(0, f"{self.stage} ({childs})")
@@ -332,8 +331,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_widget = editable_data_widget(bold=True)
         self.treeWidget().setItemWidget(self, 4, self.version_widget)
 
-        if self.reference_row['stage'] in ressources._stage_icons_dic_.keys():
-            self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
+        self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
 
     def update_item_infos(self, infos_list):
         self.variant_widget.setText(infos_list[1])
