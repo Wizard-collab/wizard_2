@@ -41,6 +41,10 @@ _library_ = 'library'
 _sequences_ = 'sequences'
 _domains_list_ = [_assets_, _library_, _sequences_]
 
+_assets_id_ = 1
+_library_id_ = 2
+_sequences_id_ = 3
+
 # Asset categories vars
 _characters_ = 'characters'
 _props_ = 'props'
@@ -58,6 +62,8 @@ _grooming_ = 'grooming'
 _texturing_ = 'texturing'
 _shading_ = 'shading'
 
+_custom_stage_ = 'custom'
+
 _layout_ = 'layout'
 _animation_ = 'animation'
 _cfx_ = 'cfx'
@@ -71,6 +77,7 @@ _all_stages_ = [_modeling_,
 				_grooming_,
 				_texturing_,
 				_shading_,
+				_custom_stage_,
 				_layout_, 
 				_animation_,
 				_cfx_,
@@ -96,12 +103,15 @@ _sequences_stages_list_ = [_layout_,
 								_compositing_,
 								]
 
+_library_stages_list_ = _assets_stages_list_ + _sequences_stages_list_ + [_custom_stage_]
+
 _stages_indexes_ = dict()
 _stages_indexes_[_modeling_] = 0
 _stages_indexes_[_rigging_] = 1
 _stages_indexes_[_grooming_] = 2
 _stages_indexes_[_texturing_] = 3
 _stages_indexes_[_shading_] = 4
+_stages_indexes_[_custom_stage_] = 0
 _stages_indexes_[_layout_] = 0
 _stages_indexes_[_animation_] = 1
 _stages_indexes_[_cfx_] = 2
@@ -113,6 +123,7 @@ _stages_indexes_[_compositing_] = 6
 _stages_rules_dic_ = dict()
 _stages_rules_dic_[_assets_] = _assets_stages_list_
 _stages_rules_dic_[_sequences_] = _sequences_stages_list_
+_stages_rules_dic_[_library_] = _library_stages_list_
 
 # Default export dic
 ''' The _ext_dic_ dictionnary 
@@ -171,6 +182,14 @@ _ext_dic_[_lighting_][_houdini_] = ['exr']
 _ext_dic_[_compositing_] = dict()
 _ext_dic_[_compositing_][_blender_] = ['exr']
 _ext_dic_[_compositing_][_nuke_] = ['exr']
+_ext_dic_[_custom_stage_] = dict()
+_ext_dic_[_custom_stage_][_maya_] = ['ma', 'abc']
+_ext_dic_[_custom_stage_][_blender_] = ['blend', 'abc']
+_ext_dic_[_custom_stage_][_houdini_] = ['vdb', 'abc', 'hip']
+_ext_dic_[_custom_stage_][_guerilla_render_] = ['gproject', 'gnode']
+_ext_dic_[_custom_stage_][_substance_painter_] = ['sbsar']
+_ext_dic_[_custom_stage_][_substance_designer_] = ['sbsar']
+_ext_dic_[_custom_stage_][_nuke_] = ['nk']
 
 # Stages softwares rules
 _stage_softwares_rules_dic_ = dict()
@@ -186,6 +205,7 @@ _stage_softwares_rules_dic_[_fx_] = [_houdini_, _maya_, _blender_]
 _stage_softwares_rules_dic_[_camera_] = [_maya_, _houdini_, _blender_]
 _stage_softwares_rules_dic_[_lighting_] = [_guerilla_render_, _maya_, _houdini_, _blender_]
 _stage_softwares_rules_dic_[_compositing_] = [_nuke_, _blender_]
+_stage_softwares_rules_dic_[_custom_stage_] = [_maya_, _blender_, _houdini_, _guerilla_render_, _substance_painter_, _substance_designer_, _nuke_ ]
 
 # Asset states
 _asset_state_todo_ = 'todo'

@@ -236,7 +236,7 @@ class tree_widget(QtWidgets.QFrame):
             domain_item.setText(0, row['name'])
             self.domain_ids[row['id']] = domain_item
             self.tree.addTopLevelItem(domain_item)
-            if row['id'] == 3:
+            if row['id'] != 1:
                 self.add_creation_item(domain_item, 'new', 'category_creation')
 
     def add_category(self, row):
@@ -279,7 +279,8 @@ class tree_widget(QtWidgets.QFrame):
                                                     instance_id = row['id'],
                                                     instance_type = 'stage')
                 stage_item.setText(0, row['name'])
-                stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
+                if row['name'] != assets_vars._custom_stage_:
+                    stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
                 self.stage_ids[row['id']] = stage_item
 
                 index = assets_vars._stages_indexes_[row['name']]

@@ -15,6 +15,7 @@ from wizard.core import assets
 from wizard.core import project
 from wizard.core import tools
 from wizard.core import subtasks_library
+from wizard.vars import assets_vars
 from wizard.vars import ressources
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
@@ -320,8 +321,12 @@ class exports_widget(QtWidgets.QWidget):
             if self.variant_id is not None:
                 self.setAcceptDrops(True)
                 stage_id = project.get_variant_data(self.variant_id, 'stage_id')
-                stage_name = project.get_stage_data(stage_id, 'name')
-                stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
+                stage_row = project.get_stage_data(stage_id)
+                stage_name = stage_row['name']
+                if stage_row['domain_id'] == assets_vars._library_id_:
+                    stage_icon = QtGui.QIcon('')
+                else:
+                    stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
                 exports_rows = project.get_variant_export_childs(self.variant_id)
                 project_export_id = []
                 if exports_rows is not None:
