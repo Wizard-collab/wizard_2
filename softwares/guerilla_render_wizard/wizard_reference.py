@@ -19,6 +19,4 @@ def update_modeling(namespace, files_list):
         refNode = wizard_tools.get_node_from_name(namespace)
         with Modifier() as mod:
             refNode.ReferenceFileName.set(files_list[0])
-            refNode.ReferenceFileName.validate()
-            refNode.ReferenceFileName.setvalid()
             refNode.reload(files_list[0])

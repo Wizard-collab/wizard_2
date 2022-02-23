@@ -91,3 +91,11 @@ def get_user_folder():
     signal_dic['function'] = 'get_user_folder'
     user_folder = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return user_folder
+
+def modify_modeling_reference_LOD(work_env_id, LOD):
+    signal_dic=dict()
+    signal_dic['function'] = 'modify_modeling_reference_LOD'
+    signal_dic['work_env_id'] = work_env_id
+    signal_dic['LOD'] = LOD
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned

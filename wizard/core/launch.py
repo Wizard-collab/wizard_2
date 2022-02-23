@@ -178,6 +178,14 @@ def build_env(work_env_id, software_row, version_id):
         else:
             env[key] = additionnal_env[key]
 
+    # Clean QT from env
+    if 'QT_PLUGIN_PATH' in env.keys():
+        del env['QT_PLUGIN_PATH']
+    if 'QML2_IMPORT_PATH' in env.keys():
+        del env['QML2_IMPORT_PATH']
+    if 'QT_AUTO_SCREEN_SCALE_FACTOR' in env.keys():
+        del env['QT_AUTO_SCREEN_SCALE_FACTOR']
+
     return env
 
 class software_thread(Thread):
@@ -194,7 +202,9 @@ class software_thread(Thread):
         self.start_time = time.time()
  
     def run(self):
-        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd='softwares')
+        for key in self.env.keys():
+            print(f"{key} = {self.env[key]}\n")
+        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=os.path.abspath('softwares'))
         self.process.wait()
         died(self.work_env_id)
         if not self.killed:
