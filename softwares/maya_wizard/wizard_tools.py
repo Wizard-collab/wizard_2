@@ -19,3 +19,11 @@ def remove_LOD_from_names(object_list):
 def reassign_old_name_to_objects(objects_dic):
     for object in objects_dic.keys():
     	pm.rename(object.name(), objects_dic[object])
+
+def get_selection_nspace_list():
+    namespaces_list = []
+    selection = pm.ls(sl=True)
+    for object in selection:
+        if object.namespace() not in namespaces_list:
+            namespaces_list.append(object.namespace().replace(':', ''))
+    return namespaces_list

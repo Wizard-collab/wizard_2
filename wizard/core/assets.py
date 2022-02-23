@@ -414,14 +414,13 @@ def set_reference_last_version(reference_id):
                 logger.info("Reference is up to date")
                 return None
 
-def modify_modeling_reference_LOD(work_env_id, LOD):
+def modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list):
     references_rows = project.get_references(work_env_id)
-    print(references_rows)
+    print(namespaces_list)
     for reference_row in references_rows:
-        if reference_row['stage'] == assets_vars._modeling_:
+        if (reference_row['stage'] == assets_vars._modeling_) and (reference_row['namespace'] in namespaces_list):
             export_row = project.get_export_data(reference_row['export_id'])
             export_rows = project.get_variant_export_childs(export_row['variant_id'])
-            print(export_rows)
             for export_row in export_rows:
                 if export_row['name'] == LOD:
                     project.modify_reference_export(reference_row['id'], export_row['id'])

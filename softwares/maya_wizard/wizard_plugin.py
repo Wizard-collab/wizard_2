@@ -10,6 +10,7 @@ import pymel.core as pm
 import wizard_communicate
 from maya_wizard import wizard_reference
 from maya_wizard import wizard_export
+from maya_wizard import wizard_tools
 
 def save_increment(*args):
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
@@ -34,7 +35,8 @@ def update_modeling(*args):
 
 def modify_modeling_reference_LOD(LOD):
     work_env_id = int(os.environ['wizard_work_env_id'])
-    wizard_communicate.modify_modeling_reference_LOD(work_env_id, LOD)
+    namespaces_list = wizard_tools.get_selection_nspace_list()
+    wizard_communicate.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
     update_modeling()
 
 def LOD1(*args):

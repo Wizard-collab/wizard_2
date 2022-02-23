@@ -105,7 +105,8 @@ class communicate_server(Thread):
             returned = get_references(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'modify_modeling_reference_LOD':
             returned = modify_modeling_reference_LOD(signal_dic['work_env_id'],
-                                                        signal_dic['LOD'])
+                                                        signal_dic['LOD'],
+                                                        signal_dic['namespaces_list'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -149,8 +150,8 @@ def get_frame_range(work_env_id):
     else:
         return None
 
-def modify_modeling_reference_LOD(work_env_id, LOD):
-    assets.modify_modeling_reference_LOD(work_env_id, LOD)
+def modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list):
+    assets.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
     return None
 
 def get_image_format():
