@@ -31,8 +31,8 @@ class menu():
     cmd = save_increment('Save', 'icons/save_increment.png')
     cmd.install('Wizard')
     command.addseparator ('Wizard')
-    cmd = import_modeling('Modeling', 'icons/import_modeling.png')
+    cmd = import_modeling('Import modeling', 'icons/modeling.png')
     cmd.install('Wizard', ' Import')
-    cmd = update_modeling('Modeling', 'icons/import_modeling.png')
+    cmd = update_modeling('Update modeling', 'icons/modeling.png')
     cmd.install('Wizard', ' Update')
     

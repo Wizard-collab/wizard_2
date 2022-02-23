@@ -5,6 +5,7 @@
 # Python modules
 import os
 import math
+import traceback
 
 # Substance Painter modules
 import substance_painter.export
@@ -20,8 +21,8 @@ try:
     import substance_painter_hook
 except:
     substance_painter_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import substance_painter_hook")
+    logging.error(str(traceback.format_exc()))
+    logging.warning("Can't import substance_painter_hook")
 
 def export_textures(material, size, file_type) :
 
@@ -30,7 +31,7 @@ def export_textures(material, size, file_type) :
         try:
             substance_painter_hook.before_export()
         except:
-            logger.error(str(traceback.format_exc()))
+            logging.error(str(traceback.format_exc()))
 
     if file_type == 'exr':
         bitdepth = '32f'
@@ -79,4 +80,4 @@ def export_textures(material, size, file_type) :
         try:
             substance_painter_hook.after_export(export_dir)
         except:
-            logger.error(str(traceback.format_exc()))
+            logging.error(str(traceback.format_exc()))

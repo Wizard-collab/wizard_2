@@ -5,8 +5,6 @@
 # Python modules
 import os
 
-# Wizard modules
-
 # Maya modules
 import pymel.core as pm
 
@@ -21,7 +19,10 @@ def update_modeling(namespace, files_list):
 def create_reference(file, namespace, group):
     if not pm.objExists(group):
         pm.group( em=True, name=group )
-    pm.createReference(file, namespace=namespace, groupName='wizard_temp_reference_node', groupReference=True)
+    pm.createReference(file,
+                        namespace=namespace,
+                        groupName='wizard_temp_reference_node',
+                        groupReference=True)
     for object in pm.listRelatives('wizard_temp_reference_node'):
         pm.parent(object, group)
     pm.delete('wizard_temp_reference_node')

@@ -26,7 +26,7 @@ class save_increment(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
     bl_idname = "wizard.save_increment"
-    bl_label = "Save File"
+    bl_label = "Save"
     bl_description = "Save file in Wizard's hierarchy"
     
     def execute(self, context):
@@ -66,15 +66,15 @@ class import_textures(bpy.types.Operator):
         wizard_plugin.reference_textures()
         return {'FINISHED'}
 
-class reload_textures(bpy.types.Operator):
+class update_textures(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
-    bl_idname = "wizard.reload_textures"
-    bl_label = "Reload textures"
-    bl_description = "Reload existing textures in shaders"
+    bl_idname = "wizard.update_textures"
+    bl_label = "Update textures"
+    bl_description = "Update existing textures in shaders"
     
     def execute(self, context):
-        wizard_plugin.reload_textures()
+        wizard_plugin.update_textures()
         return {'FINISHED'}
 
 class set_image_size(bpy.types.Operator):
@@ -104,15 +104,15 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("wizard.import_modeling", icon_value=wizard_icons["import_modeling"].icon_id)
-        layout.operator("wizard.import_textures", icon_value=wizard_icons["import_textures"].icon_id)
+        layout.operator("wizard.import_modeling", icon_value=wizard_icons["modeling"].icon_id)
+        layout.operator("wizard.import_textures", icon_value=wizard_icons["textures"].icon_id)
 
 class TOPBAR_MT_wizard_reload_submenu(bpy.types.Menu):
     bl_label = "Reload"
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("wizard.reload_textures", icon_value=wizard_icons["import_textures"].icon_id)
+        layout.operator("wizard.reload_textures", icon_value=wizard_icons["textures"].icon_id)
 
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
@@ -139,7 +139,7 @@ classes = (save_increment,
                 export,
                 import_modeling,
                 import_textures,
-                reload_textures,
+                update_textures,
                 set_image_size,
                 clear_all_materials,
                 TOPBAR_MT_wizard_import_submenu,
@@ -158,9 +158,9 @@ def register():
     wizard_icons.load("save_increment", 'icons/save_increment.png', 'IMAGE')
     wizard_icons.load("export", 'icons/export.png', 'IMAGE')
     wizard_icons.load("import", 'icons/import.png', 'IMAGE')
-    wizard_icons.load("reload", 'icons/reload.png', 'IMAGE')
-    wizard_icons.load("import_modeling", 'icons/import_modeling.png', 'IMAGE')
-    wizard_icons.load("import_textures", 'icons/import_textures.png', 'IMAGE')
+    wizard_icons.load("update", 'icons/update.png', 'IMAGE')
+    wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
+    wizard_icons.load("textures", 'icons/textures.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("clear_all_materials", 'icons/remove_all_materials.png', 'IMAGE')
 

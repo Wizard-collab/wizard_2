@@ -9,11 +9,16 @@ import pymel.core as pm
 # Wizard modules
 import wizard_communicate
 from maya_wizard import wizard_reference
+from maya_wizard import wizard_export
 
 def save_increment(*args):
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
     if file_path:
         pm.saveAs(file_path)
+
+def export(*args):
+    stage_name = os.environ['wizard_stage_name']
+    wizard_export.export(stage_name)
 
 def reference_modeling(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))

@@ -4,5 +4,4 @@
 
 # Wizard modules
 from maya_wizard import wizard_menu
-
 wizard_menu.menu()
