@@ -1383,6 +1383,10 @@ def get_scripts_folder():
     shared_files_folder = os.path.join(environment.get_project_path(), project_vars._scripts_folder_)
     return shared_files_folder
 
+def get_hooks_folder():
+    hooks_folder = os.path.join(environment.get_project_path(), project_vars._hooks_folder_)
+    return hooks_folder
+
 def add_event(event_type, title, message, data, additional_message=None, image_path=None):
     event_id = db_utils.create_row('project',
                                             'events',

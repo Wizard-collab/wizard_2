@@ -1,2 +1,2 @@
-string $command = "from maya_wizard import startup\nstartup.init()";
+string $command = "from maya_wizard import startup";
 python($command);

@@ -45,7 +45,6 @@ def request_export(work_env_id, export_name):
     signal_dic['work_env_id'] = work_env_id
     signal_dic['export_name'] = export_name
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
-    print(file_path)
     return file_path
 
 def add_export_version(export_name, files, version_id, comment=''):
@@ -57,8 +56,8 @@ def add_export_version(export_name, files, version_id, comment=''):
     signal_dic['files'] = files
     signal_dic['version_id'] = version_id
     signal_dic['comment'] = comment
-    export_version_id = socket_utils.send_signal(('localhost', get_port()), signal_dic)
-    return export_version_id
+    export_dir = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return export_dir
 
 def get_references(work_env_id):
     # Request the scene references

@@ -39,3 +39,18 @@ def clear_all_materials_of_selection():
 
 def import_abc(file_path):
     bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False)
+
+def remove_LOD_from_names(object_list):
+    objects_dic = dict()
+    for object in object_list:
+        old_name = object.name
+        for NUM in range(1,4):
+            LOD = '_LOD{}'.format(str(NUM))
+            if object.name.endswith(LOD):
+                object.name = old_name.replace(LOD, '')
+        objects_dic[object] = old_name
+    return objects_dic
+
+def reassign_old_name_to_objects(objects_dic):
+    for object in objects_dic.keys():
+        object.name = objects_dic[object]

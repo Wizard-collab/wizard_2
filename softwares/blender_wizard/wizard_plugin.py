@@ -23,10 +23,8 @@ def save_increment():
     	os.environ['wizard_version_id'] = str(version_id)
 
 def export():
-	export_name='main'
-	file_path = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']), export_name)
 	stage_name = os.environ['wizard_stage_name']
-	wizard_export.export(file_path, stage_name, export_name)
+	wizard_export.export(stage_name)
 
 def set_image_size():
 	image_format = wizard_communicate.get_image_format()

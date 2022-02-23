@@ -15,7 +15,22 @@ import substance_painter.logging as logging
 # Wizard modules
 import wizard_communicate
 
+# Hook modules
+try:
+    import substance_painter_hook
+except:
+    substance_painter_hook = None
+    logger.error(str(traceback.format_exc()))
+    logger.warning("Can't import substance_painter_hook")
+
 def export_textures(material, size, file_type) :
+
+    # Trigger the before export hook
+    if substance_painter_hook:
+        try:
+            substance_painter_hook.before_export()
+        except:
+            logger.error(str(traceback.format_exc()))
 
     if file_type == 'exr':
         bitdepth = '32f'
@@ -57,4 +72,11 @@ def export_textures(material, size, file_type) :
         for exported in v:
             exported_files.append(exported)
 
-    wizard_communicate.add_export_version(export_name, exported_files, int(os.environ['wizard_version_id']))
+    export_dir = wizard_communicate.add_export_version(export_name, exported_files, int(os.environ['wizard_version_id']))
+
+    # Trigger the after export hook
+    if substance_painter_hook:
+        try:
+            substance_painter_hook.after_export(export_dir)
+        except:
+            logger.error(str(traceback.format_exc()))

@@ -153,6 +153,7 @@ def build_env(work_env_id, software_row, version_id):
     env['wizard_stage_name'] = str(stage_name)
 
     env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
+    env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + project.get_hooks_folder()
 
     # Substance Painter specific env
     if software_row['name'] == softwares_vars._substance_painter_:

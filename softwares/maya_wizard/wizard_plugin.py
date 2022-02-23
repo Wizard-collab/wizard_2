@@ -8,27 +8,37 @@ import pymel.core as pm
 
 # Wizard modules
 import wizard_communicate
+from maya_wizard import wizard_reference
 
-def save_increment():
-    file_path=wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
+def save_increment(*args):
+    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
     if file_path:
         pm.saveAs(file_path)
 
-def save():
-    pm.saveFile()
+def reference_modeling(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'modeling' in references.keys():
+        for modeling_reference in references['modeling']:
+            wizard_reference.reference_modeling(modeling_reference['namespace'], modeling_reference['files'])
 
-def set_frame_range():
+def update_modeling(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'modeling' in references.keys():
+        for modeling_reference in references['modeling']:
+            wizard_reference.update_modeling(modeling_reference['namespace'], modeling_reference['files'])
+
+def set_frame_range(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
     pm.playbackOptions(animationStartTime=frame_range[1], animationEndTime=frame_range[2], minTime=frame_range[1], maxTime=frame_range[2])
 
-def set_frame_range_with_rolls():
+def set_frame_range_with_rolls(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
 
     inframe = frame_range[1] - frame_range[0]
     outframe = frame_range[2] + frame_range[3]
     pm.playbackOptions(animationStartTime=inframe, animationEndTime=outframe, minTime=inframe, maxTime=outframe)
 
-def set_image_format():
+def set_image_format(*args):
     image_format = wizard_communicate.get_image_format()
 
     width=float(image_format[0])

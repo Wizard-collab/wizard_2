@@ -372,7 +372,11 @@ def create_work_env(software_id, variant_id):
 
 def create_references_from_variant_id(work_env_id, variant_id):
     export_rows = project.get_variant_export_childs(variant_id)
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
+    stage = project.get_stage_data(stage_id, 'name')
     if export_rows is not None:
+        if stage == assets_vars._modeling_:
+            export_rows = [export_rows[0]]
         for export_row in export_rows:
             export_version_id = project.get_last_export_version(export_row['id'], 'id')
             if export_version_id is not None and len(export_version_id)>=1:

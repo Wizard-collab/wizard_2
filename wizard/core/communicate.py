@@ -128,8 +128,9 @@ def add_export_version(export_name, files, version_id, comment):
     # Add an export version using the 'assets' module and return the export_version_id 
     # of the new export version
     export_version_id = assets.add_export_version_from_version_id(export_name, files, version_id, comment, execute_xp=False)
+    export_dir = assets.get_export_version_path(export_version_id)
     gui_server.refresh_ui()
-    return export_version_id
+    return export_dir
 
 def get_references(work_env_id):
     # Get the scene references
