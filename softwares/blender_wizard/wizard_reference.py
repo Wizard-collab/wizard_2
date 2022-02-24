@@ -14,13 +14,13 @@ from blender_wizard import wizard_tools
 import logging
 logger = logging.getLogger(__name__)
 
-def reference_textures(namespace, files_list):
+def reference_texturing(namespace, files_list):
 	if bpy.context.scene.render.engine == 'REDSHIFT':
 		redshift_shader.plug_textures(namespace, files_list)
 	elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':
 		cycles_shader.plug_textures(namespace, files_list)
 
-def update_textures(namespace, files_list):
+def update_texturing(namespace, files_list):
 	if bpy.context.scene.render.engine == 'REDSHIFT':
 		redshift_shader.plug_textures(namespace, files_list, update=True)
 	elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':

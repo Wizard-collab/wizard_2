@@ -55,26 +55,26 @@ class import_modeling(bpy.types.Operator):
         wizard_plugin.reference_modeling()
         return {'FINISHED'}
 
-class import_textures(bpy.types.Operator):
+class import_texturing(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
-    bl_idname = "wizard.import_textures"
-    bl_label = "Import textures"
-    bl_description = "Import textures and create shader"
+    bl_idname = "wizard.import_texturing"
+    bl_label = "Import texturing"
+    bl_description = "Import texturing and create shader"
     
     def execute(self, context):
-        wizard_plugin.reference_textures()
+        wizard_plugin.reference_texturing()
         return {'FINISHED'}
 
-class update_textures(bpy.types.Operator):
+class update_texturing(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
-    bl_idname = "wizard.update_textures"
-    bl_label = "Update textures"
-    bl_description = "Update existing textures in shaders"
+    bl_idname = "wizard.update_texturing"
+    bl_label = "Update texturing"
+    bl_description = "Update existing texturing in shaders"
     
     def execute(self, context):
-        wizard_plugin.update_textures()
+        wizard_plugin.update_texturing()
         return {'FINISHED'}
 
 class set_image_size(bpy.types.Operator):
@@ -105,14 +105,14 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator("wizard.import_modeling", icon_value=wizard_icons["modeling"].icon_id)
-        layout.operator("wizard.import_textures", icon_value=wizard_icons["textures"].icon_id)
+        layout.operator("wizard.import_texturing", icon_value=wizard_icons["texturing"].icon_id)
 
 class TOPBAR_MT_wizard_reload_submenu(bpy.types.Menu):
     bl_label = "Reload"
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("wizard.reload_textures", icon_value=wizard_icons["textures"].icon_id)
+        layout.operator("wizard.reload_texturing", icon_value=wizard_icons["texturing"].icon_id)
 
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
@@ -138,8 +138,8 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 classes = (save_increment,
                 export,
                 import_modeling,
-                import_textures,
-                update_textures,
+                import_texturing,
+                update_texturing,
                 set_image_size,
                 clear_all_materials,
                 TOPBAR_MT_wizard_import_submenu,
@@ -160,7 +160,7 @@ def register():
     wizard_icons.load("import", 'icons/import.png', 'IMAGE')
     wizard_icons.load("update", 'icons/update.png', 'IMAGE')
     wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
-    wizard_icons.load("textures", 'icons/textures.png', 'IMAGE')
+    wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("clear_all_materials", 'icons/remove_all_materials.png', 'IMAGE')
 

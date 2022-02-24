@@ -430,9 +430,16 @@ def get_references_files(work_env_id):
     references_dic = dict()
     for reference_row in references_rows:
         reference_files_list = json.loads(project.get_export_version_data(reference_row['export_version_id'], 'files'))
+
+        variant_id = project.get_work_env_data(reference_row['work_env_id'], 'variant_id')
+        stage_id = project.get_variant_data(variant_id, 'stage_id')
+        asset_id = project.get_stage_data(stage_id, 'asset_id')
+        asset_name = project.get_asset_data(asset_id, 'name')
+
         reference_dic = dict()
         reference_dic['files'] = reference_files_list
         reference_dic['namespace'] = reference_row['namespace']
+        reference_dic['asset_name'] = asset_name
         if reference_row['stage'] not in references_dic.keys():
             references_dic[reference_row['stage']] = []
         references_dic[reference_row['stage']].append(reference_dic)

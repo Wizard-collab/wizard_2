@@ -31,17 +31,17 @@ def set_image_size():
 	bpy.context.scene.render.resolution_x = image_format[0]
 	bpy.context.scene.render.resolution_y = image_format[1]
 
-def reference_textures():
+def reference_texturing():
 	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
 	if 'texturing' in references.keys():
 		for texturing_reference in references['texturing']:
-			wizard_reference.reference_textures(texturing_reference['namespace'], texturing_reference['files'])
+			wizard_reference.reference_texturing(texturing_reference['namespace'], texturing_reference['files'])
 
-def rupdate_textures():
+def update_texturing():
 	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
 	if 'texturing' in references.keys():
 		for texturing_reference in references['texturing']:
-			wizard_reference.update_textures(texturing_reference['namespace'], texturing_reference['files'])
+			wizard_reference.update_texturing(texturing_reference['namespace'], texturing_reference['files'])
 
 def reference_modeling():
 	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))

@@ -152,6 +152,7 @@ def get_frame_range(work_env_id):
 
 def modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list):
     assets.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
+    gui_server.refresh_ui()
     return None
 
 def get_image_format():

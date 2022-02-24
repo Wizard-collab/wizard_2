@@ -377,7 +377,11 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         if versions_list is not None and versions_list != []:
             menu = gui_utils.QMenu()
             for version in versions_list:
-                action = menu.addAction(version['name'])
+                if len(version['comment']) > 20:
+                    comment = version['comment'][-20:] + '...'
+                else:
+                    comment = version['comment']
+                action = menu.addAction(f"{version['name']} - {comment}")
                 action.id = version['id']
             action = menu.exec_(QtGui.QCursor().pos())
             if action is not None:

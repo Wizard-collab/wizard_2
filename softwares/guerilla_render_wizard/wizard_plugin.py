@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 # Wizard modules
 import wizard_communicate
 from guerilla_render_wizard import wizard_reference
+from guerilla_render_wizard import guerilla_shader
 
 # Guerilla modules
 from guerilla import Document, pynode
@@ -34,3 +35,19 @@ def update_modeling():
 	if 'modeling' in references.keys():
 		for modeling_reference in references['modeling']:
 			wizard_reference.update_modeling(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_texturing():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'texturing' in references.keys():
+		for texturing_reference in references['texturing']:
+			guerilla_shader.import_texturing(texturing_reference['namespace'],
+												texturing_reference['files'],
+												texturing_reference['asset_name'])
+
+def update_texturing():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'texturing' in references.keys():
+		for texturing_reference in references['texturing']:
+			guerilla_shader.update_texturing(texturing_reference['namespace'],
+												texturing_reference['files'],
+												texturing_reference['asset_name'])
