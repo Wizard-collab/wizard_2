@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
+from guerilla_render_wizard import wizard_export
 from guerilla_render_wizard import wizard_reference
 from guerilla_render_wizard import guerilla_shader
 
@@ -23,6 +24,10 @@ def save_increment():
 		logger.error('Saving failed')
 	if version_id is not None:
 		os.environ['wizard_version_id'] = str(version_id)
+
+def export():
+	stage_name = os.environ['wizard_stage_name']
+	wizard_export.export(stage_name)
 
 def reference_modeling():
 	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
@@ -51,3 +56,27 @@ def update_texturing():
 			guerilla_shader.update_texturing(texturing_reference['namespace'],
 												texturing_reference['files'],
 												texturing_reference['asset_name'])
+
+def import_shading():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'shading' in references.keys():
+		for modeling_reference in references['shading']:
+			wizard_reference.reference_shading(modeling_reference['namespace'], modeling_reference['files'])
+
+def update_shading():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'shading' in references.keys():
+		for modeling_reference in references['shading']:
+			wizard_reference.update_shading(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_custom():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'custom' in references.keys():
+		for modeling_reference in references['custom']:
+			wizard_reference.reference_custom(modeling_reference['namespace'], modeling_reference['files'])
+
+def update_custom():
+	references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+	if 'custom' in references.keys():
+		for modeling_reference in references['custom']:
+			wizard_reference.update_custom(modeling_reference['namespace'], modeling_reference['files'])

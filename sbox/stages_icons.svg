@@ -9,6 +9,9 @@
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    sodipodi:docname="stages_icons.svg"
+   inkscape:export-filename="D:\SCRIPT\wizard_2\softwares\icons\compositing.png"
+   inkscape:export-xdpi="11.52"
+   inkscape:export-ydpi="11.52"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +28,7 @@
      showgrid="false"
      units="px"
      inkscape:zoom="1"
-     inkscape:cx="213.5"
+     inkscape:cx="190"
      inkscape:cy="204.5"
      inkscape:window-width="1920"
      inkscape:window-height="1121"
@@ -201,7 +204,8 @@
   <g
      inkscape:groupmode="layer"
      id="layer16"
-     inkscape:label="cusom">
+     inkscape:label="custom"
+     style="display:none">
     <path
        id="path897"
        style="fill:#e2cc46;fill-opacity:1;stroke-width:0.80589"

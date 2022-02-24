@@ -107,12 +107,12 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
         layout.operator("wizard.import_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.import_texturing", icon_value=wizard_icons["texturing"].icon_id)
 
-class TOPBAR_MT_wizard_reload_submenu(bpy.types.Menu):
-    bl_label = "Reload"
+class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
+    bl_label = "Update"
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("wizard.reload_texturing", icon_value=wizard_icons["texturing"].icon_id)
+        layout.operator("wizard.update_texturing", icon_value=wizard_icons["texturing"].icon_id)
 
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
@@ -125,7 +125,7 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
         layout.operator("wizard.export", icon_value=wizard_icons["export"].icon_id)
         layout.menu("TOPBAR_MT_wizard_import_submenu", icon_value=wizard_icons["import"].icon_id)
-        layout.menu("TOPBAR_MT_wizard_reload_submenu", icon_value=wizard_icons["reload"].icon_id)
+        layout.menu("TOPBAR_MT_wizard_update_submenu", icon_value=wizard_icons["update"].icon_id)
 
         layout.separator()
 
@@ -143,7 +143,7 @@ classes = (save_increment,
                 set_image_size,
                 clear_all_materials,
                 TOPBAR_MT_wizard_import_submenu,
-                TOPBAR_MT_wizard_reload_submenu,
+                TOPBAR_MT_wizard_update_submenu,
                 TOPBAR_MT_wizard_menu)
 
 def register():
