@@ -8,7 +8,9 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
 from wizard.gui import script_editor_widget
+from wizard.gui import choose_icon_widget
 from wizard.gui import gui_server
+from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.core import project
@@ -24,6 +26,8 @@ class create_tool_widget(QtWidgets.QWidget):
         self.icon = ressources._python_icon_
         self.script_id = script_id
         self.script_row = None
+
+        self.choose_icon_widget = choose_icon_widget.choose_icon_widget()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Console")
@@ -73,12 +77,27 @@ class create_tool_widget(QtWidgets.QWidget):
                 gui_server.refresh_ui()
 
     def modify_icon(self):
+        menu = gui_utils.QMenu()
+        custom_icon_action = menu.addAction('Choose from disk')
+        existing_icon_action = menu.addAction('Choose from wizard')
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action == custom_icon_action:
+            self.custom_icon()
+        elif action == existing_icon_action:
+            self.existing_icon()
+
+    def custom_icon(self):
         options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
                             "All Files (*);;Images Files (*.png);;Images Files (*.svg);;Images Files (*.jpg);;Images Files (*.jpeg)",
                             options=options)
         if image_file:
             self.icon = image_file
+            self.icon_button.setIcon(QtGui.QIcon(self.icon))
+
+    def existing_icon(self):
+        if self.choose_icon_widget.exec_() == QtWidgets.QDialog.Accepted:
+            self.icon = self.choose_icon_widget.icon_path
             self.icon_button.setIcon(QtGui.QIcon(self.icon))
 
     def build_ui(self):
