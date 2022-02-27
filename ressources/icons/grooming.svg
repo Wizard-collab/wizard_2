@@ -8,6 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="grooming.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,8 +25,8 @@
      showgrid="false"
      units="px"
      inkscape:zoom="1.1734878"
-     inkscape:cx="377.08103"
-     inkscape:cy="260.33504"
+     inkscape:cx="377.08104"
+     inkscape:cy="260.33505"
      inkscape:window-width="1920"
      inkscape:window-height="1121"
      inkscape:window-x="-7"
@@ -34,45 +35,6 @@
      inkscape:current-layer="layer3" />
   <defs
      id="defs2" />
-  <g
-     inkscape:label="modeling"
-     inkscape:groupmode="layer"
-     id="layer1"
-     style="display:none">
-    <path
-       style="fill:#fc857f;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 11.775683,97.647587 12.138012,31.341435 64.934631,7.8913613 119.94869,31.565445 120.39963,98.529282 65.038004,124.64108 Z"
-       id="path4942" />
-    <path
-       style="display:inline;fill:#fa6763;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 11.775683,97.647589 0.362329,-66.306154 52.537663,26.812325 0.362329,66.48732 z"
-       id="path1083" />
-    <path
-       style="fill:#fb7771;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 64.675675,58.15376 119.94869,31.565445 120.39963,98.529284 65.038004,124.64108 Z"
-       id="path2566" />
-    <path
-       style="fill:#fc857f;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 12.138012,31.341435 64.675675,58.15376 119.94869,31.565445 64.934631,7.8913613 Z"
-       id="path3675" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="rigging"
-     style="display:none">
-    <circle
-       style="fill:#fc857f;fill-opacity:1;stroke:none;stroke-width:20;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:186.406;stroke-opacity:0.551402;paint-order:markers fill stroke"
-       id="path5169"
-       cx="96.352837"
-       cy="82.295631"
-       r="14.429918" />
-    <path
-       id="rect5343"
-       style="fill:#f25f5c;fill-opacity:1;stroke:none;stroke-width:75.5906;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:186.406;stroke-opacity:0.551402;paint-order:markers fill stroke"
-       d="m 205.25781,51.457031 c -0.40871,-0.0047 -0.81776,-0.0038 -1.22656,0.0039 -7.84896,0.147413 -15.68927,2.588241 -22.5,7.503906 -18.16193,13.108438 -21.93069,38.696972 -8.45117,57.373043 l 113.22265,156.87305 a 86.920375,86.920375 0 0 1 65.19141,-47.84375 L 238.64648,69.015625 C 230.48506,57.707844 217.92782,51.60413 205.25781,51.457031 Z M 278.2207,301.16406 120.54492,364.20508 c -21.386445,8.55062 -31.910931,32.17887 -23.595701,52.97656 8.315231,20.7977 32.226831,30.65609 53.613281,22.10547 l 157.02734,-62.7793 a 86.920375,86.920375 0 0 1 -30.34179,-65.46875 86.920375,86.920375 0 0 1 0.97265,-9.875 z"
-       transform="scale(0.26458333)" />
-  </g>
   <g
      inkscape:groupmode="layer"
      id="layer3"

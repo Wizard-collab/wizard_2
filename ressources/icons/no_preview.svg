@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   sodipodi:docname="no_screenshot.svg"
+   sodipodi:docname="no_preview.svg"
    inkscape:export-filename="C:\Users\leo\Desktop\svgs\combobox.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
@@ -27,7 +27,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.7831927"
-     inkscape:cx="153.60058"
+     inkscape:cx="145.15703"
      inkscape:cy="115.87412"
      inkscape:window-width="1920"
      inkscape:window-height="1121"
@@ -116,6 +116,78 @@
          result="composite2"
          id="feComposite48260" />
     </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Drop Shadow"
+       id="filter48262-6"
+       x="-0.11650321"
+       y="-0.11797703"
+       width="1.3759789"
+       height="1.3795844">
+      <feFlood
+         flood-opacity="0.211765"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood48252-0" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite48254-9" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="1"
+         result="blur"
+         id="feGaussianBlur48256-0" />
+      <feOffset
+         dx="0.7"
+         dy="0.7"
+         result="offset"
+         id="feOffset48258-1" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite48260-4" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Drop Shadow"
+       id="filter41397-0"
+       x="-0.4636397"
+       y="-0.4636397"
+       width="2.0236785"
+       height="2.0043981">
+      <feFlood
+         flood-opacity="0.498039"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood41387-7" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite41389-0" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="3"
+         result="blur"
+         id="feGaussianBlur41391-6" />
+      <feOffset
+         dx="1.49701"
+         dy="1.1976"
+         result="offset"
+         id="feOffset41393-8" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite41395-4" />
+    </filter>
   </defs>
   <g
      inkscape:groupmode="layer"
@@ -123,38 +195,31 @@
      inkscape:label="no_screenshot"
      transform="translate(-26.135904,-38.420418)"
      style="display:inline">
-    <rect
-       style="display:none;opacity:1;fill:#24242b;fill-opacity:1;stroke:none;stroke-width:6.20001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
-       id="rect28015"
-       width="79.375"
-       height="44.714584"
-       x="26.135904"
-       y="38.420418"
-       rx="2.6458333" />
     <g
-       id="g38984"
-       style="display:inline;opacity:1;filter:url(#filter48262)">
+       id="g38984-4"
+       style="display:inline;filter:url(#filter48262-6)"
+       inkscape:label="no_screenshot">
       <path
-         id="rect30808"
+         id="rect30808-7"
          style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:23.4331;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
          d="m 118.2207,46.138672 c -4.18771,0 -7.55859,3.370877 -7.55859,7.558594 v 61.662114 c 0,4.18771 3.37088,7.55859 7.55859,7.55859 h 54.66797 l 15.63281,-15.63281 V 53.697266 c 0,-4.187717 -3.37087,-7.558594 -7.55859,-7.558594 z"
          transform="matrix(0.26458333,0,0,0.26458333,26.135904,38.420418)" />
       <rect
          style="display:inline;opacity:1;fill:#bfbfbf;fill-opacity:1;stroke:none;stroke-width:5.24915;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
-         id="rect31106"
+         id="rect31106-6"
          width="17.441036"
          height="17.198799"
          x="56.994888"
          y="52.185822"
          rx="1.6932702" />
       <path
-         id="rect40000"
-         style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:23.4331;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal;filter:url(#filter41397)"
+         id="rect40000-1"
+         style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:23.4331;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal;filter:url(#filter41397-0)"
          d="m 180.33984,107.49609 c -4.18771,0 -7.55859,3.37088 -7.55859,7.5586 v 7.9707 l 15.5293,-15.5293 z"
          transform="matrix(0.26458333,0,0,0.26458333,26.135904,38.420418)"
          sodipodi:nodetypes="ssccs" />
       <path
-         id="rect41582"
+         id="rect41582-4"
          style="opacity:1;fill:#aeaeae;fill-opacity:1;stroke:none;stroke-width:6.01356;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
          d="m 67.409415,55.057442 a 1.2771968,1.2771968 0 0 0 -1.276924,1.277441 1.2771968,1.2771968 0 0 0 1.276924,1.276925 1.2771968,1.2771968 0 0 0 1.277443,-1.276925 1.2771968,1.2771968 0 0 0 -1.277443,-1.277441 z m -4.470011,2.481502 c -0.21481,0 -0.429681,0.109391 -0.594278,0.328662 l -4.643128,6.185669 c -0.189166,0.251998 -0.269047,0.592114 -0.240813,0.919324 h 16.624826 c 0.02946,-0.253982 -0.02871,-0.522316 -0.176217,-0.718819 l -3.468521,-4.620907 c -0.245907,-0.327584 -0.641898,-0.327584 -0.887802,0 l -2.347145,3.127458 -3.672644,-4.892725 c -0.164597,-0.219271 -0.379468,-0.328662 -0.594278,-0.328662 z" />
     </g>

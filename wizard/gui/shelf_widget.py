@@ -276,7 +276,7 @@ class shelf_separator(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setFixedWidth(1)
-        self.main_frame.setStyleSheet('background-color:white;')
+        self.main_frame.setStyleSheet('background-color:rgb(215,215,215);')
         self.main_layout.addWidget(self.main_frame)
 
     def isChecked(self):
