@@ -156,7 +156,7 @@ class drop_files_button(QtWidgets.QPushButton):
 
     def open_files(self):
         options = QtWidgets.QFileDialog.Options()
-        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select files", "",
                                                   "All Files (*);", options=options)
         if fileList:
             for file in fileList:

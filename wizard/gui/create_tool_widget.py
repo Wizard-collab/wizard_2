@@ -30,7 +30,7 @@ class create_tool_widget(QtWidgets.QWidget):
         self.choose_icon_widget = choose_icon_widget.choose_icon_widget()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
-        self.setWindowTitle(f"Wizard - Console")
+        self.setWindowTitle(f"Wizard - Create tool")
 
         self.build_ui()
         self.connect_functions()
@@ -88,7 +88,7 @@ class create_tool_widget(QtWidgets.QWidget):
 
     def custom_icon(self):
         options = QtWidgets.QFileDialog.Options()
-        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select tool icon", "",
                             "All Files (*);;Images Files (*.png);;Images Files (*.svg);;Images Files (*.jpg);;Images Files (*.jpeg)",
                             options=options)
         if image_file:
@@ -156,4 +156,5 @@ class create_tool_widget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.cancel_button)
         self.apply_button = QtWidgets.QPushButton()
         self.apply_button.setObjectName('blue_button')
+        self.apply_button.setDefault(True)
         self.buttons_layout.addWidget(self.apply_button)

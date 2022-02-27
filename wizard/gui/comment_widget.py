@@ -66,6 +66,7 @@ class comment_widget(QtWidgets.QDialog):
 
         self.accept_button = QtWidgets.QPushButton('Comment')
         self.accept_button.setObjectName("blue_button")
+        self.accept_button.setDefault(True)
         self.frame_layout.addWidget(self.accept_button)
 
     def confirm(self):

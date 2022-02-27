@@ -171,6 +171,7 @@ class create_project_widget(QtWidgets.QDialog):
         self.buttons_layout.addWidget(self.quit_button)
         self.create_button = QtWidgets.QPushButton('Create project')
         self.create_button.setObjectName('blue_button')
+        self.create_button.setDefault(True)
         self.buttons_layout.addWidget(self.create_button)
 
         self.logging_widget = logging_widget.logging_widget(self)
@@ -188,7 +189,7 @@ class create_project_widget(QtWidgets.QDialog):
 
     def open_image(self):
         options = QtWidgets.QFileDialog.Options()
-        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select project image", "",
                             "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
                             options=options)
         if image_file:
@@ -218,7 +219,10 @@ class create_project_widget(QtWidgets.QDialog):
 
     def update_project_path(self):
         project_name = self.project_name_lineEdit.text()
-        self.project_path_lineEdit.setText(self.project_path+project_name)
+        if self.project_path != '':
+            self.project_path_lineEdit.setText(self.project_path+project_name)
+        else:
+            self.project_path_lineEdit.setText('')
 
     def open_explorer(self):
         project_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Open project directory",

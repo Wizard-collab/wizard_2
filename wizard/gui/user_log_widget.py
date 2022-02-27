@@ -55,6 +55,7 @@ class user_log_widget(QtWidgets.QDialog):
         self.buttons_layout.addWidget(self.quit_button)
         self.sign_in_button = QtWidgets.QPushButton('Sign in')
         self.sign_in_button.setObjectName('blue_button')
+        self.sign_in_button.setDefault(True)
         self.buttons_layout.addWidget(self.sign_in_button)
 
         self.sign_up_line_widget = QtWidgets.QWidget()

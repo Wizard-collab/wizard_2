@@ -252,6 +252,7 @@ class launcher_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.launch_button, "Launch work version")
         self.launch_button.setMinimumHeight(60)
         self.launch_button.setObjectName('blue_button')
+        self.launch_button.setDefault(True)
         self.launch_button.setStyleSheet('font:bold')
         self.buttons_layout.addWidget(self.launch_button)
 

@@ -120,4 +120,5 @@ class manual_export_widget(QtWidgets.QDialog):
 
         self.merge_button = QtWidgets.QPushButton('Merge')
         self.merge_button.setObjectName('blue_button')
+        self.merge_button.setDefault(True)
         self.buttons_layout.addWidget(self.merge_button)

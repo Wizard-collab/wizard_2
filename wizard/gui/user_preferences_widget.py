@@ -240,6 +240,7 @@ class general_widget(QtWidgets.QWidget):
 
         self.local_path_accept_button = QtWidgets.QPushButton('Apply')
         self.local_path_accept_button.setObjectName('blue_button')
+        self.local_path_accept_button.setDefault(True)
         self.local_path_buttons_layout.addWidget(self.local_path_accept_button)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
@@ -275,6 +276,7 @@ class general_widget(QtWidgets.QWidget):
 
         self.team_ip_accept_button = QtWidgets.QPushButton('Apply')
         self.team_ip_accept_button.setObjectName('blue_button')
+        self.team_ip_accept_button.setDefault(True)
         self.team_ip_buttons_layout.addWidget(self.team_ip_accept_button)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
@@ -386,7 +388,7 @@ class user_account_widget(QtWidgets.QWidget):
 
     def update_profile_picture(self):
         options = QtWidgets.QFileDialog.Options()
-        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select profile picture", "",
                             "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
                             options=options)
         if image_file:
@@ -493,6 +495,7 @@ class user_account_widget(QtWidgets.QWidget):
 
         self.email_accept_button = QtWidgets.QPushButton('Apply')
         self.email_accept_button.setObjectName('blue_button')
+        self.email_accept_button.setDefault(True)
         self.email_buttons_layout.addWidget(self.email_accept_button)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
@@ -532,6 +535,7 @@ class user_account_widget(QtWidgets.QWidget):
 
         self.pwd_accept_button = QtWidgets.QPushButton('Apply')
         self.pwd_accept_button.setObjectName('blue_button')
+        self.pwd_accept_button.setDefault(True)
         self.pwd_buttons_layout.addWidget(self.pwd_accept_button)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())

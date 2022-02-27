@@ -98,6 +98,7 @@ class create_user_widget(QtWidgets.QDialog):
         self.buttons_layout.addWidget(self.quit_button)
         self.sign_up_button = QtWidgets.QPushButton('Sign up')
         self.sign_up_button.setObjectName('blue_button')
+        self.sign_up_button.setDefault(True)
         self.buttons_layout.addWidget(self.sign_up_button)
 
         self.logging_widget = logging_widget.logging_widget(self)
@@ -142,7 +143,7 @@ class create_user_widget(QtWidgets.QDialog):
 
     def update_profile_picture(self):
         options = QtWidgets.QFileDialog.Options()
-        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select profile picture", "",
                             "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
                             options=options)
         if image_file:

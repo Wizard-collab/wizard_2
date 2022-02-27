@@ -62,6 +62,7 @@ class project_manager_widget(QtWidgets.QDialog):
 
         self.open_button = QtWidgets.QPushButton('Open')
         self.open_button.setObjectName('blue_button')
+        self.open_button.setDefault(True)
         self.buttons_layout.addWidget(self.open_button)
 
     def connect_functions(self):
@@ -124,8 +125,6 @@ class new_project_widget(QtWidgets.QFrame):
         self.create_project_label.setObjectName('bold_label')
         self.create_project_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addWidget(self.create_project_label)
-
-
 
 class project_icon_widget(QtWidgets.QFrame):
     def __init__(self, project_row, parent=None):
@@ -204,6 +203,10 @@ class project_icon_widget(QtWidgets.QFrame):
 class project_log_widget(QtWidgets.QDialog):
     def __init__(self, project_name, parent=None, wait_for_restart=False):
         super(project_log_widget, self).__init__()
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Log in")
+
         self.build_ui()
         self.connect_functions()
         self.project_name = project_name
@@ -230,6 +233,7 @@ class project_log_widget(QtWidgets.QDialog):
         self.buttons_layout.addWidget(self.quit_button)
         self.sign_in_button = QtWidgets.QPushButton('Sign in')
         self.sign_in_button.setObjectName('blue_button')
+        self.sign_in_button.setDefault(True)
         self.buttons_layout.addWidget(self.sign_in_button)
 
         self.logging_widget = logging_widget.logging_widget(self)

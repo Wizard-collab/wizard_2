@@ -69,7 +69,7 @@ class versions_widget(QtWidgets.QWidget):
 
     def open_files(self):
         options = QtWidgets.QFileDialog.Options()
-        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
+        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select files", "",
                                                   "All Files (*);", options=options)
         if fileList:
             self.merge_files(fileList)

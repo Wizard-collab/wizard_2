@@ -73,6 +73,7 @@ class team_dns_widget(QtWidgets.QDialog):
 
         self.continue_button = QtWidgets.QPushButton('Continue')
         self.continue_button.setObjectName('blue_button')
+        self.continue_button.setDefault(True)
         self.buttons_layout.addWidget(self.continue_button)
 
         self.logging_widget = logging_widget.logging_widget(self)

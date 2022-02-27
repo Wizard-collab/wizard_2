@@ -488,7 +488,7 @@ class image_widget(QtWidgets.QWidget):
 
     def set_preview(self):
         options = QtWidgets.QFileDialog.Options()
-        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select preview image", "",
                             "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
                             options=options)
         if image_file:

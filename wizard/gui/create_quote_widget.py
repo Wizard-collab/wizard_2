@@ -96,4 +96,5 @@ class create_quote_widget(QtWidgets.QDialog):
 
         self.accept_button = QtWidgets.QPushButton('Add')
         self.accept_button.setObjectName('blue_button')
+        self.accept_button.setDefault(True)
         self.buttons_layout.addWidget(self.accept_button)

@@ -20,6 +20,7 @@ from wizard.gui import gui_utils
 class softwares_preferences_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(softwares_preferences_widget, self).__init__(parent)
+
         self.build_ui()
         self.fill_softwares()
         self.connect_functions()
@@ -80,11 +81,12 @@ class softwares_preferences_widget(QtWidgets.QWidget):
 
         self.apply_button = QtWidgets.QPushButton('Apply')
         self.apply_button.setObjectName('blue_button')
+        self.apply_button.setDefault(True)
         self.buttons_layout.addWidget(self.apply_button)
 
     def open_folder(self):
         options = QtWidgets.QFileDialog.Options()
-        software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select software executable", "",
                             "All Files (*);;",
                             options=options)
         if software_path:
