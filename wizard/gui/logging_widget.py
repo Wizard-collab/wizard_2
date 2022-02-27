@@ -54,7 +54,7 @@ class logging_widget(QtWidgets.QFrame):
             if level == 'INFO':
                 self.log_label.setStyleSheet('color:#90d1f0;')
             elif level == 'STDOUT':
-                self.log_label.setStyleSheet('color:white;')
+                self.log_label.setStyleSheet('color:rgb(215,215,215);')
             elif level == 'WARNING':
                 self.log_label.setStyleSheet('color:#f79360;')
             elif level == 'ERROR':

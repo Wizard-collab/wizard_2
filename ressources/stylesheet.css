@@ -1,6 +1,6 @@
 QWidget{
 	background-color: #2c2c33;
-	color:white;
+	color:rgb(215,215,215);
 	border:none;
 	font-family: Roboto;
 }
@@ -128,7 +128,7 @@ QListView::item:selected:active{
  
 QListView::item:selected:!active {
 	background-color:rgba(255,255,255,30);
-	color:white;
+	color:rgb(215,215,215);
 }
 
 QTreeView {
@@ -159,7 +159,7 @@ QTreeView::item:selected:active{
  
 QTreeView::item:selected:!active {
 	background-color:rgba(255,255,255,30);
-	color:white;
+	color:rgb(215,215,215);
 }
 
 QTreeView::branch:has-children:!has-siblings:closed,
@@ -180,7 +180,7 @@ QTreeView::branch:open:has-children:has-siblings  {
 
 QTreeView::branch:selected {
     background: none;
-    color: white;
+    color: rgb(215,215,215);
 }
 
 QTreeView::branch {
@@ -332,7 +332,7 @@ QTabBar::tab:hover {
 QToolTip
 {
     background-clip: border;
-    color: white;
+    color: rgb(215,215,215);
     background: #2c2c33;
     padding: 8px;
     border: none;
@@ -957,7 +957,7 @@ QSlider::handle:horizontal {
 }
 
 #shelf_script_button::hover{
-	color: white;
+	color: rgb(215,215,215);
 	background-color: rgba(255,255,255,30);
 }
 
