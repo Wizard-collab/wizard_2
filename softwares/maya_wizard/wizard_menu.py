@@ -27,8 +27,14 @@ class menu():
         pm.menuItem(l='Import modeling', c=wizard_plugin.reference_modeling, i='icons/modeling.png')
         pm.setParent(import_menu, menu=True)
 
+        pm.menuItem(l='Import rigging', c=wizard_plugin.reference_rigging, i='icons/rigging.png')
+        pm.setParent(import_menu, menu=True)
+
         update_menu = pm.menuItem(l='Update', subMenu=True, parent=mainMenu, i='icons/update.png')
+        
         pm.menuItem(l='Update modeling', c=wizard_plugin.update_modeling, i='icons/modeling.png')
+        pm.setParent(update_menu, menu=True)
+        pm.menuItem(l='Update rigging', c=wizard_plugin.update_rigging, i='icons/rigging.png')
         pm.setParent(update_menu, menu=True)
 
         pm.menuItem(divider=True, parent=mainMenu)

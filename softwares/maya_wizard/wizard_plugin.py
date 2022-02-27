@@ -48,6 +48,18 @@ def LOD2(*args):
 def LOD3(*args):
     modify_modeling_reference_LOD('LOD3')
 
+def reference_rigging(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'rigging' in references.keys():
+        for modeling_reference in references['rigging']:
+            wizard_reference.reference_rigging(modeling_reference['namespace'], modeling_reference['files'])
+
+def update_rigging(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'rigging' in references.keys():
+        for modeling_reference in references['rigging']:
+            wizard_reference.update_rigging(modeling_reference['namespace'], modeling_reference['files'])
+
 def set_frame_range(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
     pm.playbackOptions(animationStartTime=frame_range[1], animationEndTime=frame_range[2], minTime=frame_range[1], maxTime=frame_range[2])

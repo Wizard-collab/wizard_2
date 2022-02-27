@@ -16,6 +16,14 @@ def update_modeling(namespace, files_list):
     if pm.namespace(exists=namespace):
         update_reference(namespace, files_list)
 
+def reference_rigging(namespace, files_list):
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'RIGGING')
+
+def update_rigging(namespace, files_list):
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+
 def create_reference(file, namespace, group):
     if not pm.objExists(group):
         pm.group( em=True, name=group )

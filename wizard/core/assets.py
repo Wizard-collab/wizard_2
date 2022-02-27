@@ -848,9 +848,10 @@ def build_namespace(export_version_id):
     stage_row = project.get_stage_data(variant_row['stage_id'])
     asset_row = project.get_asset_data(stage_row['asset_id'])
     category_row = project.get_category_data(asset_row['category_id'])
+    domain_row = project.get_domain_data(category_row['domain_id'])
     namespace = f"{category_row['name']}" 
     namespace += f"_{asset_row['name']}" 
-    namespace += f"_{stage_row['name']}"
+    namespace += f"_{stage_row['name'][:3]}"
     return namespace
 
 def instance_to_string(instance_tuple):
