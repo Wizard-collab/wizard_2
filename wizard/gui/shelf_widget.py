@@ -68,27 +68,23 @@ class shelf_widget(QtWidgets.QFrame):
         self.edit_mode_label.setObjectName('orange_label')
         self.edit_mode_layout.addWidget(self.edit_mode_label)
 
-        self.edit_mode_button = QtWidgets.QPushButton()
+        self.edit_mode_button = gui_utils.transparent_button(ressources._edit_transparent_icon_, ressources._edit_icon_)
         gui_utils.application_tooltip(self.edit_mode_button, 'Switch to edit mode')
-        self.edit_mode_button.setObjectName('edit_mode_button')
         self.edit_mode_button.setCheckable(True)
+        self.edit_mode_button.setIconSize(QtCore.QSize(16,16))
         self.edit_mode_button.setFixedSize(20,20)
-        self.edit_mode_button.setIcon(QtGui.QIcon(ressources._edit_icon_))
-        self.edit_mode_button.setIconSize(QtCore.QSize(10,10))
         self.main_layout.addWidget(self.edit_mode_button)
 
-        self.add_script_button = QtWidgets.QPushButton()
+        self.add_script_button = gui_utils.transparent_button(ressources._add_transparent_icon_, ressources._add_icon_)
         gui_utils.application_tooltip(self.add_script_button, 'Create shelf tool')
+        self.add_script_button.setIconSize(QtCore.QSize(16,16))
         self.add_script_button.setFixedSize(20,20)
-        self.add_script_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.add_script_button.setIconSize(QtCore.QSize(10,10))
         self.main_layout.addWidget(self.add_script_button)
 
-        self.script_folder_button = QtWidgets.QPushButton()
+        self.script_folder_button = gui_utils.transparent_button(ressources._folder_transparent_icon_, ressources._folder_icon_)
         gui_utils.application_tooltip(self.script_folder_button, 'Open scripts folder')
+        self.add_script_button.setIconSize(QtCore.QSize(16,16))
         self.script_folder_button.setFixedSize(20,20)
-        self.script_folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
-        self.script_folder_button.setIconSize(QtCore.QSize(10,10))
         self.main_layout.addWidget(self.script_folder_button)
 
     def connect_functions(self):
@@ -126,6 +122,10 @@ class shelf_widget(QtWidgets.QFrame):
             self.apply_positions()
 
         self.edit_mode = self.edit_mode_button.isChecked()
+        if self.edit_mode:
+            self.edit_mode_button.setStyleSheet('border: 1px solid #f79360;')
+        else:
+            self.edit_mode_button.reset_stylesheet()
         self.edit_mode_widget.setVisible(self.edit_mode)
         for script_id in self.scripts_ids.keys():
             self.scripts_ids[script_id]['widget'].toggle_edit_mode(self.edit_mode)

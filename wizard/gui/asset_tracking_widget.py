@@ -113,8 +113,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.estimated_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.time_infos_layout.addWidget(self.estimated_time_label)
 
-        self.edit_estimation_button = QtWidgets.QPushButton()
-        self.edit_estimation_button.setObjectName('edit_button')
+        self.edit_estimation_button = gui_utils.transparent_button(ressources._edit_transparent_icon_, ressources._edit_icon_)
         self.edit_estimation_button.setFixedSize(16,16)
         self.time_infos_layout.addWidget(self.edit_estimation_button)
 

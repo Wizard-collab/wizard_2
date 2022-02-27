@@ -421,3 +421,20 @@ class info_widget(QtWidgets.QFrame):
 
     def setText(self, text):
         self.text.setText(text)
+
+class transparent_button(QtWidgets.QPushButton):
+    def __init__(self, icon, hover_icon, parent=None):
+        super(transparent_button, self).__init__(parent)
+        self.icon = icon
+        self.hover_icon = hover_icon
+        self.setIcon(QtGui.QIcon(self.icon))
+        self.reset_stylesheet()
+
+    def enterEvent(self, event):
+        self.setIcon(QtGui.QIcon(self.hover_icon))
+
+    def leaveEvent(self, event):
+        self.setIcon(QtGui.QIcon(self.icon))
+
+    def reset_stylesheet(self):
+        self.setStyleSheet('background-color: transparent;border: none;')
