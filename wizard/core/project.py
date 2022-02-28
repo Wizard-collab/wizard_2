@@ -134,19 +134,23 @@ def get_all_categories(column='*'):
     return categories_rows
 
 def add_category(name, domain_id):
-    if not (db_utils.check_existence_by_multiple_data('project', 
-                                    'categories',
-                                    ('name', 'domain_id'),
-                                    (name, domain_id))):
-        category_id = db_utils.create_row('project',
-                            'categories',
-                            ('name', 'creation_time', 'creation_user', 'domain_id'), 
-                            (name, time.time(), environment.get_user(), domain_id))
-        if category_id:
-            logger.info(f"Category {name} added to project")
-        return category_id
+    if (name != '') and (name is not None):
+        if not (db_utils.check_existence_by_multiple_data('project', 
+                                        'categories',
+                                        ('name', 'domain_id'),
+                                        (name, domain_id))):
+            category_id = db_utils.create_row('project',
+                                'categories',
+                                ('name', 'creation_time', 'creation_user', 'domain_id'), 
+                                (name, time.time(), environment.get_user(), domain_id))
+            if category_id:
+                logger.info(f"Category {name} added to project")
+            return category_id
+        else:
+            logger.warning(f"{name} already exists")
+            return None
     else:
-        logger.warning(f"{name} already exists")
+        logger.warning(f"Please provide a category name")
         return None
 
 def remove_category(category_id):
@@ -201,34 +205,38 @@ def get_category_data_by_name(name, column='*'):
         return None
 
 def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=0):
-    if not (db_utils.check_existence_by_multiple_data('project', 
-                                    'assets',
-                                    ('name', 'category_id'),
-                                    (name, category_id))):
-        asset_id = db_utils.create_row('project',
-                            'assets', 
-                            ('name',
-                                'creation_time',
-                                'creation_user',
-                                'inframe',
-                                'outframe',
-                                'preroll',
-                                'postroll',
-                                'category_id'), 
-                            (name, 
-                                time.time(), 
-                                environment.get_user(),
-                                inframe,
-                                outframe,
-                                preroll,
-                                postroll,
-                                category_id))
-        if asset_id:
-            add_asset_preview(asset_id)
-            logger.info(f"Asset {name} added to project")
-        return asset_id
+    if (name != '') and (name is not None):
+        if not (db_utils.check_existence_by_multiple_data('project', 
+                                        'assets',
+                                        ('name', 'category_id'),
+                                        (name, category_id))):
+            asset_id = db_utils.create_row('project',
+                                'assets', 
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'inframe',
+                                    'outframe',
+                                    'preroll',
+                                    'postroll',
+                                    'category_id'), 
+                                (name, 
+                                    time.time(), 
+                                    environment.get_user(),
+                                    inframe,
+                                    outframe,
+                                    preroll,
+                                    postroll,
+                                    category_id))
+            if asset_id:
+                add_asset_preview(asset_id)
+                logger.info(f"Asset {name} added to project")
+            return asset_id
+        else:
+            logger.warning(f"{name} already exists")
+            return None
     else:
-        logger.warning(f"{name} already exists")
+        logger.warning(f"Please provide an asset name")
         return None
 
 def add_asset_preview(asset_id):
@@ -420,37 +428,43 @@ def get_stage_child_by_name(stage_id, variant_name, column='*'):
         return None
 
 def add_variant(name, stage_id, comment):
-    if not (db_utils.check_existence_by_multiple_data('project', 
-                                    'variants',
-                                    ('name', 'stage_id'),
-                                    (name, stage_id))):
-        variant_id = db_utils.create_row('project',
-                            'variants', 
-                            ('name',
-                                'creation_time',
-                                'creation_user',
-                                'comment',
-                                'state',
-                                'assignment',
-                                'work_time',
-                                'estimated_time',
-                                'default_work_env_id',
-                                'stage_id'), 
-                            (name,
-                                time.time(),
-                                environment.get_user(),
-                                comment,
-                                'todo',
-                                environment.get_user(),
-                                0.0,
-                                None,
-                                None,
-                                stage_id))
-        if variant_id:
-            logger.info(f"Variant {name} added to project")
-        return variant_id
+
+    if (name != '') and (name is not None):
+
+        if not (db_utils.check_existence_by_multiple_data('project', 
+                                        'variants',
+                                        ('name', 'stage_id'),
+                                        (name, stage_id))):
+            variant_id = db_utils.create_row('project',
+                                'variants', 
+                                ('name',
+                                    'creation_time',
+                                    'creation_user',
+                                    'comment',
+                                    'state',
+                                    'assignment',
+                                    'work_time',
+                                    'estimated_time',
+                                    'default_work_env_id',
+                                    'stage_id'), 
+                                (name,
+                                    time.time(),
+                                    environment.get_user(),
+                                    comment,
+                                    'todo',
+                                    environment.get_user(),
+                                    0.0,
+                                    None,
+                                    None,
+                                    stage_id))
+            if variant_id:
+                logger.info(f"Variant {name} added to project")
+            return variant_id
+        else:
+            logger.warning(f"{name} already exists")
+            return None
     else:
-        logger.warning(f"{name} already exists")
+        logger.warning(f"Please provide a variant name")
         return None
 
 def get_variant_by_name(stage_id, name, column='*'):

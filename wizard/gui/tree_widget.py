@@ -432,7 +432,7 @@ class tree_widget(QtWidgets.QFrame):
                     gui_server.refresh_ui()
 
         elif item.instance_type == 'asset_creation':
-            self.instance_creation_widget = instance_creation_widget(self)
+            self.instance_creation_widget = instance_creation_widget(self, title='Create asset')
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 asset_name = self.instance_creation_widget.name_field.text()
                 inframe = self.instance_creation_widget.inframe
@@ -445,7 +445,7 @@ class tree_widget(QtWidgets.QFrame):
                     self.refresh()
                     gui_server.refresh_ui()
         elif item.instance_type == 'category_creation':
-            self.instance_creation_widget = instance_creation_widget(self, request_frames=None)
+            self.instance_creation_widget = instance_creation_widget(self, request_frames=None, title='Create category')
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.instance_parent_id
@@ -626,13 +626,14 @@ class indicator(QtWidgets.QFrame):
         self.setStyleSheet(f'background-color:{color};border-radius:4px;')
  
 class instance_creation_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None, request_frames=1):
+    def __init__(self, parent=None, request_frames=1, title=''):
         super(instance_creation_widget, self).__init__(parent)
         self.request_frames = request_frames
         self.inframe = 100
         self.outframe = 220
         self.preroll = 100
         self.postroll = 0
+        self.title = title
         self.build_ui()
         self.connect_functions()
         
@@ -671,11 +672,11 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.close_layout.setContentsMargins(2,2,2,2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
+        self.title_label = QtWidgets.QLabel(self.title)
+        self.close_layout.addWidget(self.title_label)
         self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = QtWidgets.QPushButton()
-        self.close_pushButton.setObjectName('window_decoration_button')
-        self.close_pushButton.setIcon(QtGui.QIcon(ressources._close_icon_))
+        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)
         self.close_pushButton.setIconSize(QtCore.QSize(12,12))
         self.close_layout.addWidget(self.close_pushButton)
