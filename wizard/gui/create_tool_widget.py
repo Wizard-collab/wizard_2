@@ -153,8 +153,11 @@ class create_tool_widget(QtWidgets.QWidget):
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
+        self.cancel_button.setDefault(False)
+        self.cancel_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.cancel_button)
         self.apply_button = QtWidgets.QPushButton()
         self.apply_button.setObjectName('blue_button')
         self.apply_button.setDefault(True)
+        self.apply_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.apply_button)

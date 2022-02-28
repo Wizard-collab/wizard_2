@@ -69,11 +69,14 @@ class team_dns_widget(QtWidgets.QDialog):
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
         self.quit_button = QtWidgets.QPushButton('Continue without setting team DNS')
+        self.quit_button.setDefault(False)
+        self.quit_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.quit_button)
 
         self.continue_button = QtWidgets.QPushButton('Continue')
         self.continue_button.setObjectName('blue_button')
         self.continue_button.setDefault(True)
+        self.continue_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.continue_button)
 
         self.logging_widget = logging_widget.logging_widget(self)

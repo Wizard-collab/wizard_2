@@ -92,9 +92,12 @@ class create_quote_widget(QtWidgets.QDialog):
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
+        self.cancel_button.setDefault(False)
+        self.cancel_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.cancel_button)
 
         self.accept_button = QtWidgets.QPushButton('Add')
         self.accept_button.setObjectName('blue_button')
         self.accept_button.setDefault(True)
+        self.accept_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.accept_button)

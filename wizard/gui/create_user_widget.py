@@ -95,10 +95,13 @@ class create_user_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.buttons_widget)
 
         self.quit_button = QtWidgets.QPushButton("Quit")
+        self.quit_button.setDefault(False)
+        self.quit_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.quit_button)
         self.sign_up_button = QtWidgets.QPushButton('Sign up')
         self.sign_up_button.setObjectName('blue_button')
         self.sign_up_button.setDefault(True)
+        self.sign_up_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.sign_up_button)
 
         self.logging_widget = logging_widget.logging_widget(self)

@@ -41,6 +41,8 @@ class message_widget(QtWidgets.QDialog):
         self.buttons_layout.addSpacerItem(self.spaceItem)
         self.ok_button = QtWidgets.QPushButton('Ok')
         self.ok_button.setObjectName("red_button")
+        self.ok_button.setDefault(True)
+        self.ok_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.ok_button)
         self.main_layout.addWidget(self.buttons_widget)
 

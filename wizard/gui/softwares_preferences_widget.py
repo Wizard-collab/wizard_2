@@ -82,6 +82,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.apply_button = QtWidgets.QPushButton('Apply')
         self.apply_button.setObjectName('blue_button')
         self.apply_button.setDefault(True)
+        self.apply_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.apply_button)
 
     def open_folder(self):

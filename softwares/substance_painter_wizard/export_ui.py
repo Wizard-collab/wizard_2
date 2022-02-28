@@ -77,6 +77,7 @@ class export_ui(QtWidgets.QDialog):
         self.export_button.setIcon(QtGui.QIcon(export_icon))
         self.main_layout.addWidget(self.export_button)
         self.export_button.setDefault(True)
+        self.export_button.setAutoDefault(True)
 
     def get_settings_file(self):
         user_folder = os.path.join(wizard_communicate.get_user_folder(),

@@ -58,11 +58,14 @@ class project_manager_widget(QtWidgets.QDialog):
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Quit')
+        self.cancel_button.setDefault(False)
+        self.cancel_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.cancel_button)
 
         self.open_button = QtWidgets.QPushButton('Open')
         self.open_button.setObjectName('blue_button')
         self.open_button.setDefault(True)
+        self.open_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.open_button)
 
     def connect_functions(self):
@@ -230,10 +233,13 @@ class project_log_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.buttons_widget)
 
         self.quit_button = QtWidgets.QPushButton("Cancel")
+        self.quit_button.setDefault(False)
+        self.quit_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.quit_button)
         self.sign_in_button = QtWidgets.QPushButton('Sign in')
         self.sign_in_button.setObjectName('blue_button')
         self.sign_in_button.setDefault(True)
+        self.sign_in_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.sign_in_button)
 
         self.logging_widget = logging_widget.logging_widget(self)

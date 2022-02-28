@@ -168,10 +168,13 @@ class create_project_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.buttons_widget)
 
         self.quit_button = QtWidgets.QPushButton("Quit")
+        self.quit_button.setDefault(False)
+        self.quit_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.quit_button)
         self.create_button = QtWidgets.QPushButton('Create project')
         self.create_button.setObjectName('blue_button')
         self.create_button.setDefault(True)
+        self.create_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.create_button)
 
         self.logging_widget = logging_widget.logging_widget(self)

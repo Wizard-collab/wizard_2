@@ -116,9 +116,12 @@ class manual_export_widget(QtWidgets.QDialog):
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
+        self.reject_button.setDefault(False)
+        self.reject_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.reject_button)
 
         self.merge_button = QtWidgets.QPushButton('Merge')
         self.merge_button.setObjectName('blue_button')
         self.merge_button.setDefault(True)
+        self.merge_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.merge_button)

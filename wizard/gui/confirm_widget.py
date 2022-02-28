@@ -86,9 +86,13 @@ class confirm_widget(QtWidgets.QDialog):
         self.spaceItem = QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
         self.reject_button = QtWidgets.QPushButton(self.reject_text)
+        self.reject_button.setDefault(False)
+        self.reject_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.reject_button)
         self.accept_button = QtWidgets.QPushButton(self.accept_text)
         self.accept_button.setObjectName("red_button")
+        self.accept_button.setDefault(True)
+        self.accept_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.accept_button)
         self.main_layout.addWidget(self.buttons_widget)
 
