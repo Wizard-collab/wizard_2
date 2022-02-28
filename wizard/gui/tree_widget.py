@@ -282,7 +282,7 @@ class tree_widget(QtWidgets.QFrame):
                 stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
                 self.stage_ids[row['id']] = stage_item
 
-                index = assets_vars._stages_indexes_[row['name']]
+                #index = assets_vars._stages_indexes_[row['name']]
                 #parent_widget.insertChild(index, stage_item)
                 parent_widget.addChild(stage_item)
 
@@ -296,11 +296,13 @@ class tree_widget(QtWidgets.QFrame):
 
     def remove_stage_creation_item(self, parent_widget, stage_name):
         child_count = parent_widget.childCount()
-        for i in range(child_count):
-            if stage_name == parent_widget.child(i).instance_name and parent_widget.child(i).instance_type == 'stage_creation':
-                self.creation_items.remove(parent_widget.child(i))
-                parent_widget.takeChild(i)
-                break
+        domain_name = parent_widget.parent().parent().instance_name
+        if child_count == len(assets_vars._stages_list_[domain_name]) + 1:
+            for i in range(child_count):
+                if parent_widget.child(i).instance_type == 'stage_creation':
+                    self.creation_items.remove(parent_widget.child(i))
+                    parent_widget.takeChild(i)
+                    break
 
     def add_creation_item(self, parent_widget, text, item_type, use_index=False):
         creation_item = custom_treeWidgetItem( None,
@@ -313,11 +315,10 @@ class tree_widget(QtWidgets.QFrame):
         creation_item.setForeground(0, QtGui.QBrush(QtGui.QColor('gray')))
         self.creation_items.append(creation_item)
 
-        if not use_index:
+        if use_index is None:
             parent_widget.addChild(creation_item)
         else:
-            index = assets_vars._stages_indexes_[text]
-            parent_widget.insertChild(index, creation_item)
+            parent_widget.insertChild(use_index, creation_item)
 
     def reduce_all(self):
         for id in self.domain_ids.keys():
@@ -564,6 +565,16 @@ class tree_widget(QtWidgets.QFrame):
         is_selected = item.isSelected()
         parent_item = item.parent()
         parent_item.removeChild(item)
+
+        stage_creation_presence = None
+        child_count = parent_item.childCount()
+        for i in range(child_count):
+            if parent_item.child(i).instance_type == 'stage_creation':
+                stage_creation_presence = True
+                break
+        if not stage_creation_presence:
+            self.add_creation_item(parent_item, 'new', 'stage_creation', use_index=0)
+
         del self.stage_ids[id]
         if is_selected:
             self.tree.clearSelection()

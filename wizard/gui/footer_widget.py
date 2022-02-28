@@ -322,21 +322,19 @@ class hardware_infos_widget(QtWidgets.QFrame):
         ram = dict(psutil.virtual_memory()._asdict())['percent']
         cpu = psutil.cpu_percent()
         if 0<=int(cpu)<=33:
-            color = '#98d47f'
+            color = '#d9d9d9'
         elif 33<int(cpu)<66:
             color = '#f79360'
         else:
             color = '#f0605b' 
-        color = '#ffffff'
         self.cpu_progressBar.setChunckColor(color)
         self.cpu_progressBar.setValue(cpu)
 
         if 0<=int(ram)<=33:
-            color = '#98d47f'
+            color = '#d9d9d9'
         elif 33<int(ram)<66:
             color = '#f79360'
         else:
             color = '#f0605b' 
-        color = '#ffffff'
         self.ram_progressBar.setChunckColor(color)
         self.ram_progressBar.setValue(ram)
