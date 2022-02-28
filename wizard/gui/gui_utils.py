@@ -316,7 +316,7 @@ class close_button(QtWidgets.QPushButton):
 class RoundProgress(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(RoundProgress, self).__init__(parent)
-        self.chunck_color = '#7785de'
+        self.chunck_color = '#d9d9d9'
         self.bg_color = '#24242b'
         self.angle=90
         self.drawAngle=self.angle
@@ -325,9 +325,6 @@ class RoundProgress(QtWidgets.QWidget):
         self.timeLine.frameChanged.connect(self.updateTimeline)
  
     def setValue(self, percent):
-        #self.drawAngle = percent*3.6
-        #self.update()
-
         self.angle=percent*3.6
         self.timeLine.setFrameRange(self.drawAngle,self.angle)
         self.timeLine.stop()

@@ -330,9 +330,9 @@ class hardware_infos_widget(QtWidgets.QFrame):
         self.cpu_progressBar.setChunckColor(color)
         self.cpu_progressBar.setValue(cpu)
 
-        if 0<=int(ram)<=33:
+        if 0<=int(ram)<=56:
             color = '#d9d9d9'
-        elif 33<int(ram)<66:
+        elif 56<int(ram)<86:
             color = '#f79360'
         else:
             color = '#f0605b' 
