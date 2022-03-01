@@ -27,6 +27,7 @@ class header_widget(QtWidgets.QFrame):
     show_championship = pyqtSignal(object)
     show_pywizard = pyqtSignal(object)
     show_license = pyqtSignal(object)
+    show_whatsnew = pyqtSignal(object)
     close_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -52,6 +53,7 @@ class header_widget(QtWidgets.QFrame):
         
         self.wizard_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='', icon=QtGui.QIcon(ressources._wizard_icon_))
         self.license_action = self.wizard_action.addAction(QtGui.QIcon(ressources._license_icon_), "License")
+        self.whatsnew_action = self.wizard_action.addAction(QtGui.QIcon(ressources._whatsnew_icon_), "What's new ?")
         self.wizard_action.addSeparator()
         self.quit_action = self.wizard_action.addAction("Quit")
 
@@ -80,6 +82,7 @@ class header_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.license_action.triggered.connect(self.show_license.emit)
+        self.whatsnew_action.triggered.connect(self.show_whatsnew.emit)
         self.quit_action.triggered.connect(self.close_signal.emit)
         self.subtask_manager_action.triggered.connect(self.show_subtask_manager.emit)
         self.console_action.triggered.connect(self.show_console.emit)

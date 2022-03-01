@@ -143,6 +143,17 @@ class user:
         else:
             return None
 
+    def get_show_whatsnew(self):
+        if user_vars._show_whatsnew_ in self.prefs_dic.keys():
+            return self.prefs_dic[user_vars._show_whatsnew_]
+        else:
+            self.set_show_whatsnew(True)
+            return True
+
+    def set_show_whatsnew(self, show_whatsnew):
+        self.prefs_dic[user_vars._show_whatsnew_] = show_whatsnew
+        self.write_prefs_dic()
+
     def set_local_path(self, path):
         if path != '' and os.path.isdir(path):
             self.prefs_dic[user_vars._local_path_] = path
@@ -169,6 +180,17 @@ class user:
     def get_local_path(self):
         return self.prefs_dic[user_vars._local_path_]
 
+    def get_user_build(self):
+        if user_vars._user_build_ in self.prefs_dic.keys():
+            return self.prefs_dic[user_vars._user_build_]
+        else:
+            self.set_user_build(None)
+            return None
+
+    def set_user_build(self, build):
+        self.prefs_dic[user_vars._user_build_] = build
+        self.write_prefs_dic()
+
     def get_user_prefs_dic(self):
         # Read ~/Documents/wizard/prefences.yaml
         # or init it if not found
@@ -191,6 +213,8 @@ class user:
             self.prefs_dic[user_vars._popups_settings_]['enabled'] = 1
             self.prefs_dic[user_vars._popups_settings_]['sound_enabled'] = 1
             self.prefs_dic[user_vars._popups_settings_]['duration'] = 3
+            self.prefs_dic[user_vars._show_whatsnew_] = True
+            self.prefs_dic[user_vars._user_build_] = None
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:

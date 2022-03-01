@@ -218,6 +218,8 @@ _available_icons_list_.append(_congrats_icon_)
 _guess_icon_ = os.path.join(_icons_path_, 'guess.svg')
 _available_icons_list_.append(_guess_icon_)
 _edit_transparent_icon_ = os.path.join(_icons_path_, 'edit.svg')
+_whatsnew_icon_ = os.path.join(_icons_path_, 'whatsnew.svg')
+_available_icons_list_.append(_whatsnew_icon_)
 
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.svg')

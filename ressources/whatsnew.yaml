@@ -1,0 +1,16 @@
+All blue and red buttons are now default:
+  comment: You can now press enter on dialogs, it will automatically press the blue
+    or red button
+  type: debug
+All wizard white are now 85% white:
+  comment: null
+  type: modification
+Stage creation item hidden when all stage are existing:
+  comment: null
+  type: debug
+Substance painter custom export:
+  comment: You can now export maps from substance painter with custom export preset
+  type: debug
+This whatsnew widget:
+  comment: See the wizard version modification here
+  type: new

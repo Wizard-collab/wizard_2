@@ -127,6 +127,8 @@ class app():
 		self.main_widget.stop_threads.connect(self.db_server.stop)
 		self.loading_widget.close()
 
+		self.main_widget.whatsnew()
+
 		sys.exit(self.app.exec_())
 
 if __name__ == '__main__':

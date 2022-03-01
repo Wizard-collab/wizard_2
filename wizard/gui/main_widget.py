@@ -12,6 +12,8 @@ import sys
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.core import application
+from wizard.core import user
 from wizard.core import project
 from wizard.core import environment
 from wizard.core import communicate
@@ -48,6 +50,7 @@ from wizard.gui import license_widget
 from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
 from wizard.gui import warning_tooltip
+from wizard.gui import whatsnew_widget
 
 class main_widget(QtWidgets.QWidget):
 
@@ -83,6 +86,7 @@ class main_widget(QtWidgets.QWidget):
         self.softwares_widget = softwares_widget.softwares_widget()
         self.championship_widget = championship_widget.championship_widget()
         self.license_widget = license_widget.license_widget()
+        self.whatsnew_widget = whatsnew_widget.whatsnew_widget()
         self.production_manager_widget = production_manager_widget.production_manager_widget()
         self.build_ui()
         self.connect_functions()
@@ -91,6 +95,19 @@ class main_widget(QtWidgets.QWidget):
         self.init_team_client()
         self.init_popup_wall_widget()
         self.init_softwares_server()
+        #self.whatsnew()
+
+    def whatsnew(self):
+        current_build = application.get_version()['builds']
+        last_user_build = user.user().get_user_build()
+        show_whatsnew = user.user().get_show_whatsnew()
+
+        if current_build != last_user_build:
+            self.whatsnew_widget.toggle()
+            user.user().set_user_build(current_build)
+        else:
+            if show_whatsnew:
+                self.whatsnew_widget.toggle()
 
     def init_popup_wall_widget(self):
         self.popup_wall_widget.show()
@@ -131,6 +148,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_championship.connect(self.championship_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
         self.header_widget.show_license.connect(self.license_widget.toggle)
+        self.header_widget.show_whatsnew.connect(self.whatsnew_widget.toggle)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
