@@ -30,9 +30,12 @@
 import sys
 import time
 import os
+import traceback
+import subprocess
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard gui modules
+from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import message_widget
 from wizard.gui import psql_widget
@@ -42,6 +45,7 @@ from wizard.gui import user_log_widget
 from wizard.gui import project_manager_widget
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
+import error_handler
 
 # Wizard modules
 from wizard.core import user
@@ -53,83 +57,78 @@ from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
 class app():
-	def __init__(self):
-		os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-		QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-		QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
-		self.app = QtWidgets.QApplication(sys.argv)
+    def __init__(self):
+        self.app = gui_utils.get_app()
 
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BlackItalic.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Bold.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BoldItalic.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Light.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-LightItalic.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Medium.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-MediumItalic.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Regular.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Thin.ttf")
-		QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-ThinItalic.ttf")
-		with open('ressources/stylesheet.css', 'r') as f:
-			self.app.setStyleSheet(f.read())
+        '''
+        if gui_server.try_connection():
+            gui_server.raise_ui()
+            self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
+                                                                "You're already running an instance of Wizard.")
+            self.instance_running_info_widget.exec_()
+            sys.exit()
+        '''
+        
+        if not user.user().get_psql_dns():
+            self.psql_widget = psql_widget.psql_widget()
+            if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:
+                sys.exit()
 
-		'''
-		if gui_server.try_connection():
-			gui_server.raise_ui()
-			self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
-																"You're already running an instance of Wizard.")
-			self.instance_running_info_widget.exec_()
-			sys.exit()
-		'''
-		
-		if not user.user().get_psql_dns():
-			self.psql_widget = psql_widget.psql_widget()
-			if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:
-				sys.exit()
+        self.db_server = db_core.db_server()
+        self.db_server.start()
 
-		self.db_server = db_core.db_server()
-		self.db_server.start()
+        if not user.user().get_team_dns():
+            self.team_dns_widget = team_dns_widget.team_dns_widget()
+            self.team_dns_widget.exec_()
 
-		if not user.user().get_team_dns():
-			self.team_dns_widget = team_dns_widget.team_dns_widget()
-			self.team_dns_widget.exec_()
+        if not site.is_site_database():
+            self.create_db_widget = create_db_widget.create_db_widget()
+            if self.create_db_widget.exec_() != QtWidgets.QDialog.Accepted:
+                sys.exit()
 
-		if not site.is_site_database():
-			self.create_db_widget = create_db_widget.create_db_widget()
-			if self.create_db_widget.exec_() != QtWidgets.QDialog.Accepted:
-				sys.exit()
+        db_utils.modify_db_name('site', 'site')
+        site.add_ip_user()
 
-		db_utils.modify_db_name('site', 'site')
-		site.add_ip_user()
+        if not user.get_user():
+            self.user_log_widget = user_log_widget.user_log_widget()
+            if self.user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
+                sys.exit()
 
-		if not user.get_user():
-			self.user_log_widget = user_log_widget.user_log_widget()
-			if self.user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
-				sys.exit()
+        if not user.get_project():
+            self.project_manager_widget = project_manager_widget.project_manager_widget()
+            if self.project_manager_widget.exec_() != QtWidgets.QDialog.Accepted:
+                sys.exit()
 
-		if not user.get_project():
-			self.project_manager_widget = project_manager_widget.project_manager_widget()
-			if self.project_manager_widget.exec_() != QtWidgets.QDialog.Accepted:
-				sys.exit()
+        db_utils.modify_db_name('project', environment.get_project_name())
+        
 
-		db_utils.modify_db_name('project', environment.get_project_name())
-		
+        self.loading_widget = loading_widget.loading_widget()
+        self.loading_widget.show()
+        QtWidgets.QApplication.processEvents()
 
-		self.loading_widget = loading_widget.loading_widget()
-		self.loading_widget.show()
-		QtWidgets.QApplication.processEvents()
+        self.main_widget = main_widget.main_widget()
+        self.main_widget.refresh()
+        self.main_widget.showMaximized()
+        QtWidgets.QApplication.processEvents()
+        self.main_widget.init_contexts()
+        self.main_widget.stop_threads.connect(self.db_server.stop)
+        self.loading_widget.close()
 
-		self.main_widget = main_widget.main_widget()
-		self.main_widget.refresh()
-		self.main_widget.showMaximized()
-		QtWidgets.QApplication.processEvents()
-		self.main_widget.init_contexts()
-		self.main_widget.stop_threads.connect(self.db_server.stop)
-		self.loading_widget.close()
+        self.main_widget.whatsnew()
 
-		self.main_widget.whatsnew()
+        #sys.exit(self.app.exec_())
 
-		sys.exit(self.app.exec_())
+def excepthook(exc_type, exc_value, exc_tb):
+    tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+    QtWidgets.QApplication.closeAllWindows()
+    command = f'error_handler.exe "{tb}"'
+    if sys.argv[0].endswith('.py'):
+        command = f'python error_handler.py "{tb}"'
+    subprocess.Popen(command, start_new_session=True)
 
 if __name__ == '__main__':
-	app()
+    sys.excepthook = excepthook
+    wizard_app = app()
+    ret = wizard_app.app.exec_()
+    sys.exit(ret)
+

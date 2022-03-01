@@ -95,7 +95,6 @@ class main_widget(QtWidgets.QWidget):
         self.init_team_client()
         self.init_popup_wall_widget()
         self.init_softwares_server()
-        #self.whatsnew()
 
     def whatsnew(self):
         current_build = application.get_version()['builds']

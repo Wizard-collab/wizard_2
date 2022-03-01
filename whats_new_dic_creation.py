@@ -14,6 +14,9 @@ whats_new_dic['All blue and red buttons are now default']['comment'] = 'You can 
 whats_new_dic['This whatsnew widget'] = dict()
 whats_new_dic['This whatsnew widget']['type'] = 'new'
 whats_new_dic['This whatsnew widget']['comment'] = 'See the wizard version modification here'
+whats_new_dic['Crash error handler'] = dict()
+whats_new_dic['Crash error handler']['type'] = 'new'
+whats_new_dic['Crash error handler']['comment'] = 'An error handler pop when Wizard crash, use it to share the crash logs'
 
 import yaml
 with open('ressources/whatsnew.yaml', 'w') as f:

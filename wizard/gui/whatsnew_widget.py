@@ -38,6 +38,10 @@ class whatsnew_widget(QtWidgets.QWidget):
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
+        self.icon_image = QtWidgets.QLabel()
+        self.icon_image.setPixmap(QtGui.QIcon(ressources._whatsnew_icon_).pixmap(60))
+        self.header_layout.addWidget(self.icon_image)
+
         self.title_label = QtWidgets.QLabel("What's new ?")
         self.title_label.setObjectName('title_label')
         self.header_layout.addWidget(self.title_label)
@@ -45,6 +49,7 @@ class whatsnew_widget(QtWidgets.QWidget):
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.version_label = QtWidgets.QLabel()
+        self.version_label.setObjectName('bold_label')
         self.header_layout.addWidget(self.version_label)
 
         self.scrollArea = QtWidgets.QScrollArea()
@@ -60,7 +65,7 @@ class whatsnew_widget(QtWidgets.QWidget):
         self.content_widget = QtWidgets.QWidget()
         self.content_layout = QtWidgets.QVBoxLayout()
         self.content_layout.setContentsMargins(0,0,0,0)
-        self.content_layout.setSpacing(10)
+        self.content_layout.setSpacing(4)
         self.content_widget.setLayout(self.content_layout)
         self.scrollArea_layout.addWidget(self.content_widget)
 
@@ -161,7 +166,7 @@ class row_widget(QtWidgets.QFrame):
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
 
-        self.title_label = QtWidgets.QLabel(self.title)
+        self.title_label = QtWidgets.QLabel(f"{self.type} - {self.title}")
         self.title_label.setObjectName('title_label_2')
         self.title_label.setWordWrap(True)
         self.content_layout.addWidget(self.title_label)

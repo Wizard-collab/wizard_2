@@ -99,6 +99,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller error_handler.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			folders_list = ['ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
@@ -114,7 +118,9 @@ class compile():
 							'dist/uninstall.exe',
 							'dist/server/server.exe.manifest',
 							'dist/Wizard console/Wizard console.exe',
-							'dist/Wizard console/Wizard console.exe.manifest']
+							'dist/Wizard console/Wizard console.exe.manifest',
+							'dist/error_handler/error_handler.exe',
+							'dist/error_handler/error_handler.exe.manifest']
 							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))

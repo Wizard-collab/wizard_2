@@ -576,6 +576,11 @@ QSlider::handle:horizontal {
 	background-color:#24242b;
 }
 
+#error_handler_frame{
+	border-radius: 5px;
+	background-color:#24242b;
+}
+
 #icon_view{
 	padding: 6px;
 }

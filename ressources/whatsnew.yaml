@@ -5,6 +5,9 @@ All blue and red buttons are now default:
 All wizard white are now 85% white:
   comment: null
   type: modification
+Crash error handler:
+  comment: An error handler pop when Wizard crash, use it to share the crash logs
+  type: new
 Stage creation item hidden when all stage are existing:
   comment: null
   type: debug
