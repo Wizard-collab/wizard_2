@@ -255,7 +255,7 @@ def log_user(user_name, password):
         if tools.decrypt_string(user_row['pass'],
                                 password):
             site.update_current_ip_data('user_id', user_row['id'])
-            environment.build_user_env(user_name)
+            environment.build_user_env(user_row)
             logger.info(f'{user_name} signed in')
             return 1
         else:
@@ -272,8 +272,7 @@ def disconnect_user():
 def get_user():
     user_id = site.get_current_ip_data('user_id')
     if user_id:
-        environment.build_user_env(user_name=site.get_user_data(user_id,
-                                                                'user_name'))
+        environment.build_user_env(user_row=site.get_user_data(user_id))
         return 1
     else:
         return None

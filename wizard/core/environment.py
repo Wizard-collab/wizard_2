@@ -41,8 +41,9 @@ from wizard.vars import env_vars
 from wizard.core import custom_logger
 logger = custom_logger.get_logger(__name__)
 
-def build_user_env(user_name):
-	os.environ[env_vars._username_env_] = user_name
+def build_user_env(user_row):
+	os.environ[env_vars._username_env_] = user_row['user_name']
+	os.environ[env_vars._useremail_env_] = user_row['email']
 	return 1
 
 def build_project_env(project_name, project_path):
@@ -114,6 +115,13 @@ def get_user():
 		return os.environ[env_vars._username_env_]
 	else:
 		logger.error('No user defined')
+		return None
+
+def get_user_email():
+	if env_vars._useremail_env_ in os.environ.keys():
+		return os.environ[env_vars._useremail_env_]
+	else:
+		logger.error('No user email defined')
 		return None
 
 def get_project_name():

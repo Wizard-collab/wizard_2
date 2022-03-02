@@ -36,6 +36,8 @@ from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.core import support
+from wizard.core import environment
 
 class error_handler(QtWidgets.QWidget):
     def __init__(self, error, parent = None):
@@ -53,7 +55,8 @@ class error_handler(QtWidgets.QWidget):
         self.send_to_support_button.clicked.connect(self.send_to_support)
 
     def send_to_support(self):
-        pass
+        support.send_log(self.error)
+        self.close()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

@@ -6,3 +6,4 @@ pip install pillow
 pip install psycopg2
 pip install psutil
 pip install QScintilla
+pip install requests

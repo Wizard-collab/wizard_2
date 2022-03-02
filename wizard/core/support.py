@@ -26,15 +26,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-_site_path_env_ = 'wizard_site_path'
-_username_env_ = 'wizard_user'
-_useremail_env_ = 'wizard_user_email'
-_project_name_env_ = 'wizard_project'
-_project_path_env_ = 'wizard_project_path'
-_running_work_envs_ = 'wizard_running_work_envs'
-_psql_dns_ = 'wizard_psql_dns'
-_local_db_server_port_ = 'wizard_local_db_port'
-_gui_server_port_ = 'wizard_gui_server_port'
-_communicate_server_port_ = 'wizard_communicate_server_port'
-_softwares_server_port_ = 'wizard_softwares_server_port'
-_team_dns_ = 'wizard_team_dns'
+# Python modules
+import requests
+
+# Wizard modules
+from wizard.core import application
+from wizard.core import environment
+
+URL = "http://93.19.210.30/support/"
+
+def send_log(log):
+	contact_dic = dict()
+	contact_dic['username'] = environment.get_user()
+	contact_dic['log'] = log
+	version_dic = application.get_version()
+	contact_dic['wizard_version'] = f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}.{version_dic['builds']}"
+	contact_dic['user_email'] = environment.get_user_email()
+	requests.post(URL, data = contact_dic)

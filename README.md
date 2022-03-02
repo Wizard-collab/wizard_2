@@ -22,6 +22,7 @@ http://93.19.210.30/
 	* psycopg2
 	* psutil
 	* QScintilla
+	* requests
 
 * Database dependency:
 	* PostgreSQL
