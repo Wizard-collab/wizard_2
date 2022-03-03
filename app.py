@@ -58,6 +58,7 @@ logger = custom_logger.get_logger(__name__)
 
 class app():
     def __init__(self):
+
         self.app = gui_utils.get_app()
 
         '''
@@ -100,7 +101,6 @@ class app():
                 sys.exit()
 
         db_utils.modify_db_name('project', environment.get_project_name())
-        
 
         self.loading_widget = loading_widget.loading_widget()
         self.loading_widget.show()
@@ -115,8 +115,7 @@ class app():
         self.loading_widget.close()
 
         self.main_widget.whatsnew()
-
-        #sys.exit(self.app.exec_())
+        1/0
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))

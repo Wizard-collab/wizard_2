@@ -430,7 +430,6 @@ def get_stage_child_by_name(stage_id, variant_name, column='*'):
 def add_variant(name, stage_id, comment):
 
     if (name != '') and (name is not None):
-
         if not (db_utils.check_existence_by_multiple_data('project', 
                                         'variants',
                                         ('name', 'stage_id'),

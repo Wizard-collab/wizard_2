@@ -55,7 +55,8 @@ class error_handler(QtWidgets.QWidget):
         self.send_to_support_button.clicked.connect(self.send_to_support)
 
     def send_to_support(self):
-        support.send_log(self.error)
+        additionnal_message = self.additionnal_message_field.toPlainText()
+        support.send_log(self.error, additionnal_message)
         self.close()
 
     def build_ui(self):
@@ -111,6 +112,11 @@ class error_handler(QtWidgets.QWidget):
         self.error_label = QtWidgets.QLabel(self.error)
         self.error_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.error_layout.addWidget(self.error_label)
+
+        self.content_layout.addWidget(QtWidgets.QLabel('You can add some details :'))
+
+        self.additionnal_message_field = QtWidgets.QTextEdit()
+        self.content_layout.addWidget(self.additionnal_message_field)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
