@@ -7,7 +7,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard gui modules
-from wizard.gui import logging_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
@@ -177,9 +176,6 @@ class create_project_widget(QtWidgets.QDialog):
         self.create_button.setDefault(True)
         self.create_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.create_button)
-
-        self.logging_widget = logging_widget.logging_widget(self)
-        self.main_layout.addWidget(self.logging_widget)
 
     def get_random_image(self, force=0):
         if not self.use_image_file or force:

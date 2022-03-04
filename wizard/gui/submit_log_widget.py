@@ -61,6 +61,7 @@ class submit_log_widget(QtWidgets.QWidget):
         self.close()
 
     def build_ui(self):
+        self.resize(450,400)
         self.setMaximumWidth(600)
         self.setMaximumHeight(700)
         

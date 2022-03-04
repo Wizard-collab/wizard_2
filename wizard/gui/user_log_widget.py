@@ -10,7 +10,6 @@ from wizard.core import user
 from wizard.vars import ressources
 
 # Wizard gui modules
-from wizard.gui import logging_widget
 from wizard.gui import create_user_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
@@ -77,9 +76,6 @@ class user_log_widget(QtWidgets.QDialog):
         self.register_button = QtWidgets.QPushButton('Register')
         self.register_button.setObjectName('blue_text_button')
         self.sign_up_line_layout.addWidget(self.register_button)
-
-        self.logging_widget = logging_widget.logging_widget(self)
-        self.main_layout.addWidget(self.logging_widget)
 
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)

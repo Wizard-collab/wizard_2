@@ -13,7 +13,6 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
-from wizard.gui import logging_widget
 
 logger = logging.getLogger(__name__)
 
@@ -78,9 +77,6 @@ class team_dns_widget(QtWidgets.QDialog):
         self.continue_button.setDefault(True)
         self.continue_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.continue_button)
-
-        self.logging_widget = logging_widget.logging_widget(self)
-        self.main_layout.addWidget(self.logging_widget)
 
     def connect_functions(self):
         self.continue_button.clicked.connect(self.apply)

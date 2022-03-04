@@ -7,7 +7,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard gui modules
-from wizard.gui import logging_widget
 from wizard.gui import gui_utils
 
 # Wizard modules
@@ -104,9 +103,6 @@ class create_user_widget(QtWidgets.QDialog):
         self.sign_up_button.setDefault(True)
         self.sign_up_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.sign_up_button)
-
-        self.logging_widget = logging_widget.logging_widget(self)
-        self.main_layout.addWidget(self.logging_widget)
 
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)

@@ -46,6 +46,8 @@ from wizard.gui import user_log_widget
 from wizard.gui import project_manager_widget
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
+from wizard.gui import warning_tooltip
+from wizard.gui import logging_widget
 import error_handler
 
 # Wizard modules
@@ -60,9 +62,16 @@ custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
 
 class app():
-    def __init__(self):
+    def __init__(self, project_manager):
+
+        self.db_server = None
 
         self.app = gui_utils.get_app()
+
+        self.warning_tooltip = warning_tooltip.warning_tooltip()
+        self.custom_handler = logging_widget.custom_handler(long_formatter=False, parent=None)
+        self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
+        logging.getLogger().addHandler(self.custom_handler)
 
         '''
         if gui_server.try_connection():
@@ -76,7 +85,7 @@ class app():
         if not user.user().get_psql_dns():
             self.psql_widget = psql_widget.psql_widget()
             if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:
-                sys.exit()
+                self.quit()
 
         self.db_server = db_core.db_server()
         self.db_server.start()
@@ -88,7 +97,7 @@ class app():
         if not site.is_site_database():
             self.create_db_widget = create_db_widget.create_db_widget()
             if self.create_db_widget.exec_() != QtWidgets.QDialog.Accepted:
-                sys.exit()
+                self.quit()
 
         db_utils.modify_db_name('site', 'site')
         site.add_ip_user()
@@ -96,12 +105,12 @@ class app():
         if not user.get_user():
             self.user_log_widget = user_log_widget.user_log_widget()
             if self.user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
-                sys.exit()
+                self.quit()
 
-        if not user.get_project():
+        if (not user.get_project()) or project_manager:
             self.project_manager_widget = project_manager_widget.project_manager_widget()
             if self.project_manager_widget.exec_() != QtWidgets.QDialog.Accepted:
-                sys.exit()
+                self.quit()
 
         db_utils.modify_db_name('project', environment.get_project_name())
 
@@ -110,14 +119,22 @@ class app():
         QtWidgets.QApplication.processEvents()
 
         self.main_widget = main_widget.main_widget()
+        self.main_widget.stop_threads.connect(self.db_server.stop)
         self.main_widget.refresh()
         self.main_widget.showMaximized()
         QtWidgets.QApplication.processEvents()
         self.main_widget.init_contexts()
-        self.main_widget.stop_threads.connect(self.db_server.stop)
         self.loading_widget.close()
 
         self.main_widget.whatsnew()
+
+    def quit(self):
+        if self.db_server:
+            self.db_server.stop()
+        QtWidgets.QApplication.closeAllWindows()
+        QtWidgets.QApplication.quit()
+        sys.exit()
+
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
@@ -128,9 +145,11 @@ def excepthook(exc_type, exc_value, exc_tb):
         command = f'python error_handler.py "{tb}"'
     subprocess.Popen(command, start_new_session=True)
 
-if __name__ == '__main__':
+def main(project_manager=False):
     sys.excepthook = excepthook
-    wizard_app = app()
+    wizard_app = app(project_manager)
     ret = wizard_app.app.exec_()
     sys.exit(ret)
 
+if __name__ == '__main__':
+    main()
