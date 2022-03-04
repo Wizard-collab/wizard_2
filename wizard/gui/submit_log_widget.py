@@ -61,20 +61,18 @@ class submit_log_widget(QtWidgets.QWidget):
         self.close()
 
     def build_ui(self):
+        self.setMaximumWidth(600)
+        self.setMaximumHeight(700)
+        
         self.main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.main_layout)
 
         self.main_layout.addWidget(QtWidgets.QLabel('Here is the log data :'))
 
-        self.log_frame = QtWidgets.QFrame()
-        self.log_frame.setObjectName('error_handler_frame')
-        self.log_layout = QtWidgets.QHBoxLayout()
-        self.log_frame.setLayout(self.log_layout)
-        self.main_layout.addWidget(self.log_frame)
-
-        self.log_label = QtWidgets.QLabel(self.log)
+        self.log_label = QtWidgets.QTextEdit()
+        self.log_label.setText(self.log)
         self.log_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.log_layout.addWidget(self.log_label)
+        self.main_layout.addWidget(self.log_label)
 
         self.main_layout.addWidget(QtWidgets.QLabel('Please add some details :'))
 

@@ -60,6 +60,9 @@ class error_handler(QtWidgets.QWidget):
         self.close()
 
     def build_ui(self):
+        self.setMaximumWidth(600)
+        self.setMaximumHeight(700)
+
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
@@ -103,15 +106,10 @@ class error_handler(QtWidgets.QWidget):
 
         self.content_layout.addWidget(QtWidgets.QLabel('Here is the error :'))
 
-        self.error_frame = QtWidgets.QFrame()
-        self.error_frame.setObjectName('error_handler_frame')
-        self.error_layout = QtWidgets.QHBoxLayout()
-        self.error_frame.setLayout(self.error_layout)
-        self.content_layout.addWidget(self.error_frame)
-
-        self.error_label = QtWidgets.QLabel(self.error)
+        self.error_label = QtWidgets.QTextEdit()
+        self.error_label.setText(self.error)
         self.error_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.error_layout.addWidget(self.error_label)
+        self.content_layout.addWidget(self.error_label)
 
         self.content_layout.addWidget(QtWidgets.QLabel('You can add some details :'))
 

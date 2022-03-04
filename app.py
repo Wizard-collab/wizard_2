@@ -119,6 +119,7 @@ class app():
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     QtWidgets.QApplication.closeAllWindows()
+    logger.critical(tb)
     command = f'error_handler.exe "{tb}"'
     if sys.argv[0].endswith('.py'):
         command = f'python error_handler.py "{tb}"'
