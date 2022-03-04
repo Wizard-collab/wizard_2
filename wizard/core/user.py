@@ -64,10 +64,10 @@ def create_user_folders():
     # ~/Documets/wizard/icons
     # ~/Documets/wizard/scripts
     if not os.path.isdir(user_vars._script_path_):
-        os.mkdir(user_vars._script_path_)
+        os.makedirs(user_vars._script_path_)
     sys.path.append(user_vars._script_path_)
     if not os.path.isdir(user_vars._icons_path_):
-        os.mkdir(user_vars._icons_path_)
+        os.makedirs(user_vars._icons_path_)
 
 def init_user_session():
     # Init the session.py file
@@ -107,6 +107,24 @@ class user:
                 return None
         else:
             logger.info("No postgreSQL DNS set")
+            return None
+
+    def get_site(self):
+        if self.prefs_dic[user_vars._site_]:
+            environment.set_site(self.prefs_dic[user_vars._site_])
+            return 1
+        else:
+            logger.info("No site defined")
+            return None
+
+    def set_site(self, site):
+        if tools.is_dbname_safe(site):
+            self.prefs_dic[user_vars._site_] = site
+            environment.set_site(self.prefs_dic[user_vars._site_])
+            self.write_prefs_dic()
+            return 1
+        else:
+            logger.warning(f'Please enter a site name with only lowercase characters, numbers and "_"')
             return None
 
     def set_team_dns(self, host, port):
@@ -201,6 +219,7 @@ class user:
         if not os.path.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
+            self.prefs_dic[user_vars._site_] = None
             self.prefs_dic[user_vars._team_dns_] = None
             self.prefs_dic[user_vars._tree_context_] = dict()
             self.prefs_dic[user_vars._tabs_context_] = dict()

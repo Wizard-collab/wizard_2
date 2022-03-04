@@ -40,6 +40,7 @@ from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import message_widget
 from wizard.gui import psql_widget
+from wizard.gui import site_widget
 from wizard.gui import team_dns_widget
 from wizard.gui import create_db_widget
 from wizard.gui import user_log_widget
@@ -87,6 +88,11 @@ class app():
             if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:
                 self.quit()
 
+        if not user.user().get_site():
+            self.site_widget = site_widget.site_widget()
+            if self.site_widget.exec_() != QtWidgets.QDialog.Accepted:
+                self.quit()
+
         self.db_server = db_core.db_server()
         self.db_server.start()
 
@@ -99,7 +105,7 @@ class app():
             if self.create_db_widget.exec_() != QtWidgets.QDialog.Accepted:
                 self.quit()
 
-        db_utils.modify_db_name('site', 'site')
+        db_utils.modify_db_name('site', environment.get_site())
         site.add_ip_user()
 
         if not user.get_user():

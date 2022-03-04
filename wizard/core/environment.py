@@ -107,7 +107,7 @@ def get_team_dns():
 	if env_vars._team_dns_ in os.environ.keys():
 		return json.loads(os.environ[env_vars._team_dns_])
 	else:
-		logger.error('No team DNS defined')
+		logger.info('No team DNS defined')
 		return None
 
 def get_user():
@@ -137,3 +137,13 @@ def get_project_path():
 	else:
 		logger.error('No project defined')
 		return None
+
+def get_site():
+	if env_vars._site_env_ in os.environ.keys():
+		return os.environ[env_vars._site_env_]
+	else:
+		logger.error('No site defined')
+		return None
+
+def set_site(site):
+	os.environ[env_vars._site_env_] = f"site_{site}"

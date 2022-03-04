@@ -40,6 +40,7 @@ _session_file_ = os.path.join(_script_path_, 'session.py')
 
 # Dictionary keys
 _user_ = 'user'
+_site_ = 'site'
 _project_ = 'project'
 _scripts_ = 'scripts'
 _psql_dns_ = 'psql_dns'

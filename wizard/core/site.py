@@ -72,7 +72,7 @@ def create_project(project_name, project_path, project_password, project_image =
     if do_creation:
         if project_name not in get_projects_names_list():
             if project_path not in get_projects_paths_list():
-                if get_user_row_by_name(environment.get_user())['pass']:
+                if get_user_row_by_name(environment.get_user())['administrator']:
                     if db_utils.create_row('site',
                                     'projects', 
                                     ('project_name',
@@ -547,7 +547,7 @@ def init_site(admin_password, admin_email):
     return 1
 
 def create_site_database():
-    if db_utils.create_database('site'):
+    if db_utils.create_database(environment.get_site()):
         create_users_table()
         create_projects_table()
         create_ip_wrap_table()
@@ -557,7 +557,7 @@ def create_site_database():
         return None
 
 def is_site_database():
-    return db_utils.check_database_existence('site')
+    return db_utils.check_database_existence(environment.get_site())
 
 def create_admin_user(admin_password, admin_email):
     profile_picture = image.convert_image_to_str_data(image.user_random_image('admin'), 100)
@@ -596,7 +596,7 @@ def create_users_table():
                                         life integer NOT NULL,
                                         administrator integer NOT NULL
                                     );"""
-    if db_utils.create_table('site', sql_cmd):
+    if db_utils.create_table(environment.get_site(), sql_cmd):
         logger.info("Users table created")
 
 def create_projects_table():
@@ -609,7 +609,7 @@ def create_projects_table():
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL
                                     );"""
-    if db_utils.create_table('site', sql_cmd):
+    if db_utils.create_table(environment.get_site(), sql_cmd):
         logger.info("Projects table created")
 
 def create_ip_wrap_table():
@@ -621,7 +621,7 @@ def create_ip_wrap_table():
                                         FOREIGN KEY (user_id) REFERENCES users (id),
                                         FOREIGN KEY (project_id) REFERENCES projects (id)
                                     );"""
-    if db_utils.create_table('site', sql_cmd):
+    if db_utils.create_table(environment.get_site(), sql_cmd):
         logger.info("Ips wrap table created")
 
 def create_quotes_table():
@@ -632,5 +632,5 @@ def create_quotes_table():
                                         score text NOT NULL,
                                         voters text NOT NULL
                                     );"""
-    if db_utils.create_table('site', sql_cmd):
+    if db_utils.create_table(environment.get_site(), sql_cmd):
         logger.info("Quotes table created")
