@@ -39,17 +39,17 @@ import os
 import time
 import socket
 import json
+import logging
 
 # Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
-
 from wizard.core import db_utils
 from wizard.core import tools
 from wizard.core import environment
 from wizard.core import image
 from wizard.vars import site_vars
 from wizard.vars import ressources
+
+logger = logging.getLogger(__name__)
 
 def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1

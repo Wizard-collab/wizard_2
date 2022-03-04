@@ -6,19 +6,20 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import sys
+import logging
 
 # Wizard modules
 from wizard.core import user
 from wizard.vars import user_vars
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import script_editor_widget
 from wizard.gui import logging_widget
 from wizard.gui import submit_log_widget
+
+logger = logging.getLogger(__name__)
 
 class console_widget(QtWidgets.QWidget):
 
@@ -32,7 +33,8 @@ class console_widget(QtWidgets.QWidget):
         self.setWindowTitle(f"Wizard - Console")
 
         self.custom_handler = logging_widget.custom_handler(self)
-        logger.addHandler(self.custom_handler)
+        root_logger = logging.getLogger()
+        root_logger.addHandler(self.custom_handler)
         self.script_editor_widget = script_editor_widget.script_editor_widget()
         self.build_ui()
         self.connect_functions()

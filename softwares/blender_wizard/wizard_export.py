@@ -6,6 +6,7 @@
 import os
 import traceback
 import logging
+
 logger = logging.getLogger(__name__)
 
 # Blender modules

@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import time
+import logging
 
 # Wizard gui modules
 from wizard.gui import search_reference_widget
@@ -17,8 +18,8 @@ from wizard.core import assets
 from wizard.core import launch
 from wizard.core import project
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 class references_widget(QtWidgets.QWidget):
 

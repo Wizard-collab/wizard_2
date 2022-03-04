@@ -37,6 +37,7 @@
 
 # Python modules
 import os
+import logging
 
 # Wizard modules
 from wizard.core import project
@@ -45,8 +46,8 @@ from wizard.core import user
 from wizard.core import tools
 from wizard.vars import ressources
 from wizard.vars import user_vars
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
+
+logger = logging.getLogger(__name__)
 
 def create_project_script(name,
 							script,

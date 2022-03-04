@@ -29,12 +29,13 @@
 # Python modules
 import requests
 import json
+import logging
 
 # Wizard modules
 from wizard.core import application
 from wizard.core import environment
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 URL = "http://93.19.210.30/support/"
 

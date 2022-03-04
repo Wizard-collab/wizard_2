@@ -4,11 +4,12 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import logging
 
 # Wizard modules
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 class confirm_widget(QtWidgets.QDialog):
     def __init__(self, message, title='Warning', reject_text='Cancel', accept_text='Continue', parent=None):

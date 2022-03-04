@@ -5,13 +5,14 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 import yaml
+import logging
 
 # Wizard modules
 from wizard.vars import ressources
 from wizard.core import application
 from wizard.core import user
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 class whatsnew_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

@@ -29,12 +29,12 @@
 # This provide substasks pycmds
 
 # Python modules
-
+import logging
 
 # Wizard modules
 from wizard.core import subtask
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
+
+logger = logging.getLogger(__name__)
 
 def archive_versions(version_ids):
 	command =  "# coding: utf-8\n"

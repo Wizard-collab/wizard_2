@@ -5,17 +5,18 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+import logging
 
 # Wizard modules
 from wizard.core import assets
 from wizard.core import project
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+
+logger = logging.getLogger(__name__)
 
 class destination_manager(QtWidgets.QWidget):
     def __init__(self, export_id, parent=None):

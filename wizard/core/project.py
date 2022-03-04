@@ -49,11 +49,9 @@ import os
 import time
 import json
 import shutil
+import logging
 
 # Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
-
 from wizard.core import db_utils
 from wizard.core import tools
 from wizard.core import site
@@ -62,6 +60,8 @@ from wizard.core import image
 from wizard.vars import softwares_vars
 from wizard.vars import project_vars
 from wizard.vars import ressources
+
+logger = logging.getLogger(__name__)
 
 def add_domain(name):
     domain_id = db_utils.create_row('project',

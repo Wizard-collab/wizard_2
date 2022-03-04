@@ -40,6 +40,9 @@
 # It intialize the defaults softwares in the 
 # project database and initialize the project settings
 
+# Python modules
+import logging
+
 # Wizard modules
 from wizard.core import project
 from wizard.core import user
@@ -50,8 +53,7 @@ from wizard.core import tools
 from wizard.vars import assets_vars
 from wizard.vars import project_vars
 from wizard.vars import softwares_vars
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Python modules
 import os

@@ -36,13 +36,13 @@
 import traceback
 import socket
 import json
+import logging
 
 # Wizard modules
 from wizard.core import db_core
 from wizard.core import environment
 from wizard.core import socket_utils
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def create_database(database):
     return db_core.create_database(database)

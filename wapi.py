@@ -29,10 +29,12 @@
 # This module permits to access the wizard
 # core with simplified commands
 
+# Python modules
+import logging
+
 # Wizard modules
 from wizard import core
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 class site:
 	def __init__(self):

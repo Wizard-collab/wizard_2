@@ -9,6 +9,7 @@ import time
 import os
 import subprocess
 import sys
+import logging
 
 # Wizard modules
 from wizard.vars import ressources
@@ -19,8 +20,6 @@ from wizard.core import environment
 from wizard.core import communicate
 from wizard.core import launch
 from wizard.core import team_client
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -51,6 +50,8 @@ from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
 from wizard.gui import warning_tooltip
 from wizard.gui import whatsnew_widget
+
+logger = logging.getLogger(__name__)
 
 class main_widget(QtWidgets.QWidget):
 
