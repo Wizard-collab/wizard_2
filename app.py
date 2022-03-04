@@ -63,8 +63,8 @@ logger = logging.getLogger(__name__)
 
 class app():
     def __init__(self):
-
         self.app = gui_utils.get_app()
+
         self.warning_tooltip = warning_tooltip.warning_tooltip()
         self.custom_handler = logging_widget.custom_handler(long_formatter=False, parent=None)
         self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
@@ -116,11 +116,11 @@ class app():
         QtWidgets.QApplication.processEvents()
 
         self.main_widget = main_widget.main_widget()
+        self.main_widget.stop_threads.connect(self.db_server.stop)
         self.main_widget.refresh()
         self.main_widget.showMaximized()
         QtWidgets.QApplication.processEvents()
         self.main_widget.init_contexts()
-        self.main_widget.stop_threads.connect(self.db_server.stop)
         self.loading_widget.close()
 
         self.main_widget.whatsnew()

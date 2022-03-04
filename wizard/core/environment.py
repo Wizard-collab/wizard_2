@@ -85,7 +85,7 @@ def get_gui_server_port():
 	if env_vars._gui_server_port_ in os.environ.keys():
 		return int(os.environ[env_vars._gui_server_port_])
 	else:
-		logger.error('No gui server port defined')
+		logger.debug('No gui server port defined')
 		return None
 
 def set_local_db_server_port(port):

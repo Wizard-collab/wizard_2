@@ -124,6 +124,5 @@ class custom_leave_thread(QtCore.QThread):
         while True:
             time.sleep(0.01)
             if not self.widget.geometry().contains(self.widget.mapFromGlobal(QtGui.QCursor.pos())):
-                #self.widget.setVisible(0)
                 self.hide_signal.emit(1)
                 break
