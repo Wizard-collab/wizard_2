@@ -32,13 +32,15 @@
 # this module decode what is stored in the
 # event rows
 
-# Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+# Python modules
+import logging
 
+# Wizard modules
 from wizard.core import environment
 from wizard.core import project
 from wizard.core import assets
+
+logger = logging.getLogger(__name__)
 
 def add_creation_event(instance_type, instance_id):
 	data = (instance_type, instance_id)

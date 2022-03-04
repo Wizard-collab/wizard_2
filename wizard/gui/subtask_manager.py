@@ -9,6 +9,7 @@ import time
 import json
 import os
 import traceback
+import logging
 
 # Wizard gui modules
 from wizard.gui import logging_widget
@@ -21,8 +22,8 @@ from wizard.gui import submit_log_widget
 from wizard.core import socket_utils
 from wizard.core import tools
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 _DNS_ = ('localhost', 10231)
 

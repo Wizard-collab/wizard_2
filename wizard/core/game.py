@@ -32,10 +32,11 @@
 # Uses this module to add xps, levels,
 # remove levels and remove life
 
-# Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+# Python modules
+import logging
+logger = logging.getLogger(__name__)
 
+# Wizard modules
 from wizard.core import site
 from wizard.core import environment
 

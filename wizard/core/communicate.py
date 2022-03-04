@@ -40,6 +40,7 @@ from threading import Thread
 import time
 import traceback
 import json
+import logging
 
 # Wizard gui modules
 from wizard.gui import gui_server
@@ -50,8 +51,7 @@ from wizard.core import socket_utils
 from wizard.core import assets
 from wizard.core import project
 from wizard.vars import user_vars
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 class communicate_server(Thread):
     def __init__(self):

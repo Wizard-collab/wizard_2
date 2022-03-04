@@ -31,10 +31,9 @@ import socket
 import json
 import traceback
 import struct
+import logging
 
-# Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def get_connection(DNS, timeout=5.0, only_debug=False):
     connection = None

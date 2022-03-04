@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import os
 import time
+import logging
 
 # Wizard modules
 from wizard.core import launch
@@ -17,8 +18,6 @@ from wizard.core import tools
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.vars import user_vars
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -26,6 +25,8 @@ from wizard.gui import gui_server
 from wizard.gui import confirm_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
+
+logger = logging.getLogger(__name__)
 
 class versions_widget(QtWidgets.QWidget):
 

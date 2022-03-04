@@ -36,6 +36,7 @@ import os
 import traceback
 import code
 from PyQt5 import QtWidgets
+import logging
 
 # Append current dir to sys.path
 sys.path.append(os.path.abspath(''))
@@ -54,7 +55,8 @@ from wizard.core import environment
 from wizard.core import launch
 from wizard.core import db_core
 from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+custom_logger.get_root_logger()
+logger = logging.getLogger(__name__)
 
 while not user.user().get_psql_dns():
     psql_host = tools.flushed_input("PostgreSQL host : ")

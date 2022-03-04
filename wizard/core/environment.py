@@ -34,12 +34,12 @@
 # Pyton modules
 import os
 import json
+import logging
 
 # Wizard modules
 from wizard.vars import env_vars
 
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def build_user_env(user_row):
 	os.environ[env_vars._username_env_] = user_row['user_name']

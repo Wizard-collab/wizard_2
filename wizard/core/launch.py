@@ -44,6 +44,7 @@ import json
 import traceback
 import time
 from threading import Thread
+import logging
 
 # Wizard modules
 from wizard.core import assets
@@ -55,8 +56,7 @@ from wizard.vars import softwares_vars
 # Wizard gui modules
 from wizard.gui import gui_server
 
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def launch_work_version(version_id):
     signal_dic = dict()

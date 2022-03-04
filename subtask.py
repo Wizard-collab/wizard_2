@@ -29,11 +29,12 @@
 # Python modules
 import sys
 import time
+import logging
 
 # Wizard modules
 from wizard.core import subtask
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 args = sys.argv
 

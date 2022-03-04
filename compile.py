@@ -3,8 +3,8 @@ import os
 import shutil
 import yaml
 import sys
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+import logging
+logger = logging.getLogger(__name__)
 
 class compile():
 	def __init__(self):

@@ -29,10 +29,10 @@
 # Python modules
 import yaml
 import os
+import logging
 
 # Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def get_version():
 	version_file = 'version.yaml'

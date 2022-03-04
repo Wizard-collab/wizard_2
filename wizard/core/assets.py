@@ -55,6 +55,7 @@ import os
 import time
 import shutil
 import json
+import logging
 
 # Wizard modules
 from wizard.core import environment
@@ -68,8 +69,7 @@ from wizard.core import asset_tracking
 from wizard.vars import assets_vars
 from wizard.vars import softwares_vars
 
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def create_domain(name):
     domain_id = None

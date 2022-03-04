@@ -5,6 +5,7 @@
 # Python modules
 import os
 from PyQt5 import QtWidgets, QtCore, QtGui
+import logging
 
 # Wizard gui modules
 from wizard.gui import script_editor_widget
@@ -16,8 +17,8 @@ from wizard.gui import gui_utils
 from wizard.core import project
 from wizard.core import shelf
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
+
+logger = logging.getLogger(__name__)
 
 class create_tool_widget(QtWidgets.QWidget):
     def __init__(self, parent=None, script_id=None):

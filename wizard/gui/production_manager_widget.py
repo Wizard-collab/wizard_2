@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import time
+import logging
 
 # Wizard gui modules
 from wizard.gui import gui_server
@@ -22,8 +23,8 @@ from wizard.core import environment
 from wizard.core import image
 from wizard.vars import ressources
 from wizard.vars import assets_vars
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
+
+logger = logging.getLogger(__name__)
 
 stages_colors = dict()
 stages_colors['modeling'] = 'rgba(255,81,81,ALPHA)'

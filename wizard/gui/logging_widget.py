@@ -5,12 +5,8 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
-import logging
 import sys
-
-# Wizard modules
-from wizard.core import custom_logger
-logger = custom_logger.get_logger()
+import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -34,7 +30,8 @@ class logging_widget(QtWidgets.QFrame):
         super(logging_widget, self).__init__(parent)
 
         self.custom_handler = custom_handler(self)
-        logger.addHandler(self.custom_handler)
+        root_logger = logging.getLogger()
+        root_logger.addHandler(self.custom_handler)
 
         self.build_ui()
         self.connect_functions()

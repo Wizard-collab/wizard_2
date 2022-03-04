@@ -5,6 +5,7 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 import os
+import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -17,8 +18,8 @@ from wizard.core import user
 from wizard.core import site
 from wizard.core import environment
 from wizard.core import image
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 class user_preferences_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

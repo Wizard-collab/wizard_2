@@ -8,10 +8,9 @@ import json
 import traceback
 import struct
 import sys
-
 import logging
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 # Handle ConnectionRefusedError in python 2
 if sys.version_info[0] == 2:

@@ -29,13 +29,13 @@
 # Python modules
 from PyQt5.QtCore import pyqtSignal, QThread
 import json
+import logging
 
 # Wizard modules
 from wizard.core import socket_utils
 from wizard.core import environment
 
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 class team_client(QThread):
 

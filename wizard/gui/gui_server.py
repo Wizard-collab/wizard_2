@@ -17,13 +17,14 @@ import sys
 import time
 import traceback
 import json
+import logging
 
 # Wizard modules
 from wizard.vars import ressources
 from wizard.core import environment
 from wizard.core import socket_utils
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 class streamHandler(QtCore.QObject):
 

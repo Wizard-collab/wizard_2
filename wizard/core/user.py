@@ -43,6 +43,7 @@ import os
 import importlib
 import sys
 import shutil
+import logging
 
 # Wizard modules
 from wizard.vars import user_vars
@@ -56,8 +57,7 @@ from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import team_client
 
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 def create_user_folders():
     # Init the user folders

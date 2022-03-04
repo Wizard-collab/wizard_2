@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import logging
 
 # Wizard gui modules
 from wizard.gui import logging_widget
@@ -19,8 +20,8 @@ from wizard.core import environment
 from wizard.core import create_project
 from wizard.core import db_utils
 from wizard.vars import ressources
-from wizard.core import custom_logger
-logger = custom_logger.get_logger(__name__)
+
+logger = logging.getLogger(__name__)
 
 class create_project_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
