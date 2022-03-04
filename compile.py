@@ -103,6 +103,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller project_manager.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			folders_list = ['ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
@@ -119,6 +123,8 @@ class compile():
 							'dist/server/server.exe.manifest',
 							'dist/Wizard console/Wizard console.exe',
 							'dist/Wizard console/Wizard console.exe.manifest',
+							'dist/Project Manager/Project Manager.exe',
+							'dist/Project Manager/Project Manager.exe.manifest',
 							'dist/error_handler/error_handler.exe',
 							'dist/error_handler/error_handler.exe.manifest']
 							

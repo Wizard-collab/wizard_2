@@ -516,6 +516,13 @@ def update_current_ip_data(column, data):
                                     ('ip', ip))
         logger.debug("Ip wrap data updated")
 
+def unlog_project():
+    ip = socket.gethostbyname(socket.gethostname())
+    db_utils.update_data('site',
+                            'ips_wrap',
+                            ('project_id', None),
+                            ('ip', ip))
+
 def get_current_ip_data(column='*'):
     ip = socket.gethostbyname(socket.gethostname())
     ip_rows = db_utils.get_row_by_column_data('site',
