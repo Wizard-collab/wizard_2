@@ -46,6 +46,8 @@ from wizard.gui import user_log_widget
 from wizard.gui import project_manager_widget
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
+from wizard.gui import warning_tooltip
+from wizard.gui import logging_widget
 import error_handler
 
 # Wizard modules
@@ -63,6 +65,10 @@ class app():
     def __init__(self):
 
         self.app = gui_utils.get_app()
+        self.warning_tooltip = warning_tooltip.warning_tooltip()
+        self.custom_handler = logging_widget.custom_handler(long_formatter=False, parent=None)
+        self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
+        logging.getLogger().addHandler(self.custom_handler)
 
         '''
         if gui_server.try_connection():

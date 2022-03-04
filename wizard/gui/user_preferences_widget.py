@@ -9,7 +9,6 @@ import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
-from wizard.gui import logging_widget
 
 # Wizard modules
 from wizard.vars import ressources
@@ -63,9 +62,6 @@ class user_preferences_widget(QtWidgets.QWidget):
 
         self.general_tab_index = self.tabs_widget.addTab(self.general_widget, QtGui.QIcon(ressources._settings_icon_), 'General')
         self.account_tab_index = self.tabs_widget.addTab(self.user_account_widget, QtGui.QIcon(ressources._user_icon_), 'Account')
-
-        self.logging_widget = logging_widget.logging_widget(self)
-        self.main_layout.addWidget(self.logging_widget)
 
 class general_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

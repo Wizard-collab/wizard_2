@@ -12,7 +12,6 @@ import traceback
 import logging
 
 # Wizard gui modules
-from wizard.gui import logging_widget
 from wizard.gui import log_viewer
 from wizard.gui import gui_utils
 from wizard.gui import gui_server

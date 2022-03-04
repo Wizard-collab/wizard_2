@@ -15,7 +15,6 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
-from wizard.gui import logging_widget
 from wizard.gui import create_project_widget
 
 class project_manager_widget(QtWidgets.QDialog):
@@ -241,9 +240,6 @@ class project_log_widget(QtWidgets.QDialog):
         self.sign_in_button.setDefault(True)
         self.sign_in_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.sign_in_button)
-
-        self.logging_widget = logging_widget.logging_widget(self)
-        self.main_layout.addWidget(self.logging_widget)
 
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)

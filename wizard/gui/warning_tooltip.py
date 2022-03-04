@@ -84,22 +84,31 @@ class warning_tooltip(QtWidgets.QWidget):
         self.additional_labels = []
 
     def invoke(self, log_tuple):
-        if not self.main_widget.isVisible():
-            self.resize(QtCore.QSize(10,10))
-            QtWidgets.QApplication.processEvents()
-            self.log_level.setText(log_tuple[0])
-            self.log_msg.setText(log_tuple[1])
-            self.main_widget.setVisible(1)
-            QtWidgets.QApplication.processEvents()
-            gui_utils.move_ui(self, 5)
-            QtWidgets.QApplication.processEvents()
-            self.custom_leave_thread.start()
-        else:
-            new_label = QtWidgets.QLabel(log_tuple[1])
-            self.additional_labels.append(new_label)
-            self.main_layout.insertWidget(self.main_layout.count()-1, new_label)
-            QtWidgets.QApplication.processEvents()
-            gui_utils.move_ui(self, 5)
+        level = log_tuple[0]
+        if (level == 'WARNING') or (level == 'ERROR'):
+            record_msg = log_tuple[1]
+            if level == 'WARNING':
+                record_msg = f'<span style="color:#f79360;">{record_msg}'
+            elif level == 'ERROR':
+                record_msg = f'<strong><span style="color:#f0605b;">{record_msg}</strong>'
+
+            if not self.main_widget.isVisible():
+                self.resize(QtCore.QSize(10,10))
+                QtWidgets.QApplication.processEvents()
+                self.log_level.setText(level)
+                self.log_msg.setText(record_msg)
+                self.main_widget.setVisible(1)
+                QtWidgets.QApplication.processEvents()
+                gui_utils.move_ui(self, 5)
+                QtWidgets.QApplication.processEvents()
+                self.custom_leave_thread.start()
+            else:
+                new_label = QtWidgets.QLabel(record_msg)
+                new_label.setWordWrap(True)
+                self.additional_labels.append(new_label)
+                self.main_layout.insertWidget(self.main_layout.count()-1, new_label)
+                QtWidgets.QApplication.processEvents()
+                gui_utils.move_ui(self, 5)
 
 class custom_leave_thread(QtCore.QThread):
 

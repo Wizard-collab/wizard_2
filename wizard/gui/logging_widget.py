@@ -15,9 +15,12 @@ class custom_handler(QtCore.QObject, logging.Handler):
 
     log_record = pyqtSignal(tuple)
 
-    def __init__(self, parent):
+    def __init__(self, long_formatter, parent):
         super(custom_handler, self).__init__(parent)
-        self.setFormatter(logging.Formatter('[%(name)-23.23s] %(message)s'))
+        if long_formatter:
+            self.setFormatter(logging.Formatter('[%(name)-23.23s] %(message)s'))
+        else:
+            self.setFormatter(logging.Formatter('%(message)s'))
 
     def emit(self, record):
         try:
@@ -26,10 +29,10 @@ class custom_handler(QtCore.QObject, logging.Handler):
             pass
 
 class logging_widget(QtWidgets.QFrame):
-    def __init__(self, parent=None):
+    def __init__(self, long_formatter=False, parent=None):
         super(logging_widget, self).__init__(parent)
 
-        self.custom_handler = custom_handler(self)
+        self.custom_handler = custom_handler(long_formatter, self)
         root_logger = logging.getLogger()
         root_logger.addHandler(self.custom_handler)
 
