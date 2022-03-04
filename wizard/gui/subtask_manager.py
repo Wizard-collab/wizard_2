@@ -15,6 +15,7 @@ from wizard.gui import logging_widget
 from wizard.gui import log_viewer
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import submit_log_widget
 
 # Wizard modules
 from wizard.core import socket_utils
@@ -176,6 +177,12 @@ class subtask_widget(QtWidgets.QFrame):
         self.current_task_data_label = QtWidgets.QLabel()
         self.header_layout.addWidget(self.current_task_data_label)
 
+        self.send_log_button = QtWidgets.QPushButton()
+        self.send_log_button.setFixedSize(16, 16)
+        self.send_log_button.setIconSize(QtCore.QSize(10,10))
+        self.send_log_button.setIcon(QtGui.QIcon(ressources._send_icon_))
+        self.header_layout.addWidget(self.send_log_button)
+
         self.show_log_viewer_button = QtWidgets.QPushButton()
         self.show_log_viewer_button.setFixedSize(16, 16)
         self.show_log_viewer_button.setIconSize(QtCore.QSize(10,10))
@@ -228,6 +235,15 @@ class subtask_widget(QtWidgets.QFrame):
         self.log_viewer = log_viewer.log_viewer(self.log_file)
         self.log_viewer.show()
 
+    def send_to_support(self):
+        if os.path.isfile(self.log_file):
+            with open(self.log_file, 'r') as f:
+                data = f.read()
+            self.submit_log_widget = submit_log_widget.submit_log_widget(data, 'subtask')
+            self.submit_log_widget.show()
+        else:
+            logger.warning(f"{self.log_file} not found")
+
     def update_current_task(self, task):
         self.current_task_data_label.setText(task)
         self.current_task = task
@@ -263,6 +279,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.kill_button.clicked.connect(self.task_thread.kill)
         self.delete_task_button.clicked.connect(self.delete_task)
         self.show_log_viewer_button.clicked.connect(self.show_log_viewer)
+        self.send_log_button.clicked.connect(self.send_to_support)
 
     def delete_task(self):
         if self.task_thread.conn is not None:

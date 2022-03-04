@@ -115,7 +115,6 @@ class app():
         self.loading_widget.close()
 
         self.main_widget.whatsnew()
-        1/0
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))

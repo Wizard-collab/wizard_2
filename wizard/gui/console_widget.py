@@ -18,6 +18,7 @@ logger = custom_logger.get_logger()
 from wizard.gui import gui_utils
 from wizard.gui import script_editor_widget
 from wizard.gui import logging_widget
+from wizard.gui import submit_log_widget
 
 class console_widget(QtWidgets.QWidget):
 
@@ -72,11 +73,12 @@ class console_widget(QtWidgets.QWidget):
         self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         self.main_layout.addWidget(self.header_custom_widget)
         self.console_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Console")
-        self.clear_console_action = self.console_action.addAction("Clear")
+        self.clear_console_action = self.console_action.addAction(QtGui.QIcon(ressources._archive_icon_), "Clear")
+        self.send_to_support_action = self.console_action.addAction(QtGui.QIcon(ressources._send_icon_), "Send to support")
 
         self.script_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Script")
-        self.execute_action = self.script_action.addAction("Execute ( Ctrl+Return )")
-        self.clear_script_action = self.script_action.addAction("Clear")
+        self.execute_action = self.script_action.addAction(QtGui.QIcon(ressources._play_icon_), "Execute ( Ctrl+Return )")
+        self.clear_script_action = self.script_action.addAction(QtGui.QIcon(ressources._archive_icon_), "Clear")
 
         self.console_viewer = QtWidgets.QTextEdit()
         self.console_viewer.setObjectName('console_textEdit')
@@ -93,9 +95,15 @@ class console_widget(QtWidgets.QWidget):
         self.exec_sc.activated.connect(self.execute_script)
 
         self.clear_console_action.triggered.connect(self.console_viewer.clear)
+        self.send_to_support_action.triggered.connect(self.send_to_support)
 
         self.execute_action.triggered.connect(self.execute_script)
         self.clear_script_action.triggered.connect(self.script_editor_widget.clear)
+
+    def send_to_support(self):
+        log = self.console_viewer.toPlainText()
+        self.submit_log_widget = submit_log_widget.submit_log_widget(log, 'console')
+        self.submit_log_widget.show()
 
     def execute_script(self):
         data = self.script_editor_widget.selectedText()

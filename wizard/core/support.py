@@ -38,7 +38,7 @@ logger = custom_logger.get_logger(__name__)
 
 URL = "http://93.19.210.30/support/"
 
-def send_log(log, additionnal_message=''):
+def send_log(log, type, additionnal_message=''):
 	contact_dic = dict()
 	contact_dic['username'] = environment.get_user()
 	contact_dic['log'] = log
@@ -46,6 +46,7 @@ def send_log(log, additionnal_message=''):
 	version_dic = application.get_version()
 	contact_dic['wizard_version'] = f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}.{version_dic['builds']}"
 	contact_dic['user_email'] = environment.get_user_email()
+	contact_dic['type'] = type
 	response = requests.post(URL, data=contact_dic)
 	response_dic = response.json()
 	if response_dic['success']:

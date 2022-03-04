@@ -56,7 +56,7 @@ class error_handler(QtWidgets.QWidget):
 
     def send_to_support(self):
         additionnal_message = self.additionnal_message_field.toPlainText()
-        support.send_log(self.error, additionnal_message)
+        support.send_log(self.error, 'crash', additionnal_message)
         self.close()
 
     def build_ui(self):
