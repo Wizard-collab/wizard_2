@@ -1622,12 +1622,14 @@ def create_project(project_name, project_path, project_password, project_image =
         do_creation = 0
 
     if do_creation:
-        if site.create_project(project_name, project_path, project_password, project_image):
+        project_id = site.create_project(project_name, project_path, project_password, project_image)
+        if project_id:
             if init_project(project_path, project_name):
                 logger.info(f"{project_name} created")
                 environment.build_project_env(project_name, project_path)
                 return 1
             else:
+                site.remove_project_row(project_id)
                 return None
         else:
             return None
@@ -1658,7 +1660,7 @@ def init_project(project_path, project_name):
             create_shelf_scripts_table(project_name)
             return project_name
     else:
-        logger.warning("Project database already exists")
+        logger.warning(f"Database {project_name} already exists")
         return None
 
 def create_domains_table(database):

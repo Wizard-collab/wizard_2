@@ -118,13 +118,17 @@ class user:
             return None
 
     def set_site(self, site):
-        if tools.is_dbname_safe(site):
-            self.prefs_dic[user_vars._site_] = site
-            environment.set_site(self.prefs_dic[user_vars._site_])
-            self.write_prefs_dic()
-            return 1
+        if (site is not None) and (site != ''):
+            if tools.is_dbname_safe(site):
+                self.prefs_dic[user_vars._site_] = site
+                environment.set_site(self.prefs_dic[user_vars._site_])
+                self.write_prefs_dic()
+                return 1
+            else:
+                logger.warning(f'Please enter a site name with only lowercase characters, numbers and "_"')
+                return None
         else:
-            logger.warning(f'Please enter a site name with only lowercase characters, numbers and "_"')
+            logger.warning(f'Please provide a site name')
             return None
 
     def set_team_dns(self, host, port):

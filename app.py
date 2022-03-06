@@ -96,9 +96,7 @@ class app():
         self.db_server = db_core.db_server()
         self.db_server.start()
 
-        if not user.user().get_team_dns():
-            self.team_dns_widget = team_dns_widget.team_dns_widget()
-            self.team_dns_widget.exec_()
+        user.user().get_team_dns()
 
         if not site.is_site_database():
             self.create_db_widget = create_db_widget.create_db_widget()

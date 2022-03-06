@@ -128,14 +128,14 @@ def get_project_name():
 	if env_vars._project_name_env_ in os.environ.keys():
 		return os.environ[env_vars._project_name_env_]
 	else:
-		logger.error('No project defined')
+		logger.info('No project defined')
 		return None
 
 def get_project_path():
 	if env_vars._project_path_env_ in os.environ.keys():
 		return os.environ[env_vars._project_path_env_]
 	else:
-		logger.error('No project defined')
+		logger.info('No project defined')
 		return None
 
 def get_site():

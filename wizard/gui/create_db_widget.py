@@ -23,7 +23,7 @@ class create_db_widget(QtWidgets.QDialog):
         super(create_db_widget, self).__init__()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
-        self.setWindowTitle(f"Wizard - Init database")
+        self.setWindowTitle(f"Wizard - Init {environment.get_site()[5:]} database")
 
         self.build_ui()
         self.connect_functions()
@@ -32,6 +32,9 @@ class create_db_widget(QtWidgets.QDialog):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
+
+        self.infos_label = QtWidgets.QLabel(f'Warning, {environment.get_site()[5:]} database does not exists')
+        self.main_layout.addWidget(self.infos_label)
 
         self.infos_label = QtWidgets.QLabel('You need to init the database')
         self.infos_label.setObjectName('gray_label')

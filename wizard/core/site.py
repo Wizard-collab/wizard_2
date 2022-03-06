@@ -73,7 +73,7 @@ def create_project(project_name, project_path, project_password, project_image =
         if project_name not in get_projects_names_list():
             if project_path not in get_projects_paths_list():
                 if get_user_row_by_name(environment.get_user())['administrator']:
-                    if db_utils.create_row('site',
+                    project_id = db_utils.create_row('site',
                                     'projects', 
                                     ('project_name',
                                         'project_path',
@@ -86,9 +86,10 @@ def create_project(project_name, project_path, project_password, project_image =
                                     tools.encrypt_string(project_password),
                                     project_image_ascii,
                                     environment.get_user(),
-                                    time.time())):
+                                    time.time()))
+                    if project_id:
                         logger.info(f'Project {project_name} added to site')
-                        return 1
+                        return project_id
                     else:
                         return None
                 else:
@@ -100,6 +101,13 @@ def create_project(project_name, project_path, project_password, project_image =
         else:
             logger.warning(f'Project {project_name} already exists')
             return None
+    else:
+        return None
+
+def remove_project_row(project_id):
+    if db_utils.delete_row('site', 'projects', project_id):
+        logger.info('Project row removed')
+        return 1
     else:
         return None
 
