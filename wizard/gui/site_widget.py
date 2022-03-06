@@ -7,23 +7,21 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
-from wizard.core import site
-from wizard.core import db_utils
 from wizard.core import environment
+from wizard.core import user
 from wizard.vars import ressources
 
 # Wizard gui modules
-from wizard.gui import message_widget
 from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
-class create_db_widget(QtWidgets.QDialog):
+class site_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        super(create_db_widget, self).__init__()
+        super(site_widget, self).__init__()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
-        self.setWindowTitle(f"Wizard - Init {environment.get_site()[5:]} database")
+        self.setWindowTitle(f"Wizard - Enter site")
 
         self.build_ui()
         self.connect_functions()
@@ -33,26 +31,13 @@ class create_db_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel(f'Warning, {environment.get_site()[5:]} database does not exists')
-        self.main_layout.addWidget(self.infos_label)
-
-        self.infos_label = QtWidgets.QLabel('You need to init the database')
+        self.infos_label = QtWidgets.QLabel('Enter the wizard site')
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        self.main_layout.addSpacerItem(self.spaceItem)
-
-        self.password_lineEdit = gui_utils.password_lineEdit()
-        self.password_lineEdit.setPlaceholderText('Administrator password')
-        self.main_layout.addWidget(self.password_lineEdit)
-
-        self.email_lineEdit = QtWidgets.QLineEdit()
-        self.email_lineEdit.setPlaceholderText('Administrator email')
-        self.main_layout.addWidget(self.email_lineEdit)
-
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        self.main_layout.addSpacerItem(self.spaceItem)
+        self.site_lineEdit = QtWidgets.QLineEdit()
+        self.site_lineEdit.setPlaceholderText('Site name')
+        self.main_layout.addWidget(self.site_lineEdit)
 
         self.button_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -80,9 +65,6 @@ class create_db_widget(QtWidgets.QDialog):
         self.quit_button.clicked.connect(self.reject)
 
     def apply(self):
-        admin_password = self.password_lineEdit.text()
-        admin_email = self.email_lineEdit.text()
-        site.create_site_database()
-        db_utils.modify_db_name('site', environment.get_site())
-        site.init_site(admin_password, admin_email)
-        self.accept()
+        site = self.site_lineEdit.text()
+        if user.user().set_site(site):
+            self.accept()

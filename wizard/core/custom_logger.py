@@ -50,4 +50,4 @@ def get_root_logger():
 
 def create_prefs_folder():
     if not os.path.isdir(user_vars._user_path_):
-        os.mkdir(user_vars._user_path_)
+        os.makedirs(user_vars._user_path_)

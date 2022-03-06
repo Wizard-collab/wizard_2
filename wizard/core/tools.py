@@ -94,6 +94,13 @@ def is_safe(input):
     string = charRe.search(input)
     return not bool(string)
 
+def is_dbname_safe(input):
+    # Check if the given string doesn't 
+    # contains illegal characters
+    charRe = re.compile(r'[^a-z0-9_]')
+    string = charRe.search(input)
+    return not bool(string)
+
 def zip_files(files_list, destination):
     # Create an archive with the given file list
     # No folder structure, the files are just inserted in the
