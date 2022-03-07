@@ -112,7 +112,7 @@ class team_client(QThread):
 def try_connection(DNS):
     signal_dic = dict()
     signal_dic['type'] = 'test_conn'
-    return socket_utils.send_bottle(DNS, signal_dic)
+    return socket_utils.send_bottle(DNS, signal_dic, timeout=1)
 
 def refresh_team(DNS):
     signal_dic = dict()
