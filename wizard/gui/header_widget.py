@@ -24,6 +24,7 @@ class header_widget(QtWidgets.QFrame):
     show_production_manager = pyqtSignal(object)
     show_console = pyqtSignal(object)
     show_user_preferences = pyqtSignal(object)
+    show_project_preferences = pyqtSignal(object)
     show_championship = pyqtSignal(object)
     show_pywizard = pyqtSignal(object)
     show_license = pyqtSignal(object)
@@ -73,6 +74,8 @@ class header_widget(QtWidgets.QFrame):
         self.project_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Project')
         self.project_log_action = self.project_action.addAction(QtGui.QIcon(ressources._project_manager_), "Project manager")
         self.project_create_action = self.project_action.addAction(QtGui.QIcon(ressources._create_icon_), "Create project")
+        self.project_action.addSeparator()
+        self.project_preferences_action = self.project_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
 
         self.help_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Help')
         self.documentation_action = self.help_action.addAction(QtGui.QIcon(ressources._documentation_icon_), "Documentation")
@@ -93,6 +96,7 @@ class header_widget(QtWidgets.QFrame):
         self.user_preferences_action.triggered.connect(self.show_user_preferences.emit)
         self.project_log_action.triggered.connect(self.change_project)
         self.project_create_action.triggered.connect(self.create_project)
+        self.project_preferences_action.triggered.connect(self.show_project_preferences.emit)
         self.production_manager_action.triggered.connect(self.show_production_manager.emit)
 
     def change_user(self):

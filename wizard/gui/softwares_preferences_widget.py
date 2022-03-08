@@ -34,6 +34,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.open_folder_button.clicked.connect(self.open_folder)
 
     def build_ui(self):
+        self.setMinimumWidth(600)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)

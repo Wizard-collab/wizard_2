@@ -42,6 +42,7 @@ from wizard.gui import subtask_manager
 from wizard.gui import team_widget
 from wizard.gui import popup_wall_widget
 from wizard.gui import user_preferences_widget
+from wizard.gui import project_preferences_widget
 from wizard.gui import softwares_widget
 from wizard.gui import asset_tracking_widget
 from wizard.gui import championship_widget
@@ -65,6 +66,7 @@ class main_widget(QtWidgets.QWidget):
         self.shelf_widget = shelf_widget.shelf_widget(self)
         self.console_widget = console_widget.console_widget()
         self.user_preferences_widget = user_preferences_widget.user_preferences_widget()
+        self.project_preferences_widget = project_preferences_widget.project_preferences_widget()
         self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget(self)
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.references_widget = references_widget.references_widget(self)
@@ -141,6 +143,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_console.connect(self.console_widget.toggle)
         self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
+        self.header_widget.show_project_preferences.connect(self.project_preferences_widget.toggle)
         self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
         self.header_widget.show_championship.connect(self.championship_widget.toggle)

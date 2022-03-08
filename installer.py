@@ -129,9 +129,6 @@ def delete_reg_keys():
 
 def create_shortcuts():
     create_shortcut('Wizard', 'Wizard.exe')
-    create_shortcut('PyWizard', 'PyWizard.exe')
-    create_shortcut('Wizard Console', 'Wizard console.exe')
-    create_shortcut('Wizard Server', 'server.exe')
 
 def delete_shortcuts():
     delete_shortcut('Wizard')

@@ -9,6 +9,7 @@ import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import custom_tab_widget
 
 # Wizard modules
 from wizard.vars import ressources
@@ -46,22 +47,22 @@ class user_preferences_widget(QtWidgets.QWidget):
             self.refresh()
 
     def refresh(self):
-        self.general_widget.refresh()
-        self.user_account_widget.refresh()
+        if self.isVisible():
+            self.general_widget.refresh()
+            self.user_account_widget.refresh()
 
     def build_ui(self):
         self.resize(600,800)
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
-        self.tabs_widget = QtWidgets.QTabWidget()
-        self.tabBar = self.tabs_widget.tabBar()
-        self.tabBar.setObjectName('settings_tab_bar')
+        self.tabs_widget = custom_tab_widget.custom_tab_widget()
         self.main_layout.addWidget(self.tabs_widget)
 
-        self.general_tab_index = self.tabs_widget.addTab(self.general_widget, QtGui.QIcon(ressources._settings_icon_), 'General')
-        self.account_tab_index = self.tabs_widget.addTab(self.user_account_widget, QtGui.QIcon(ressources._user_icon_), 'Account')
+        self.general_tab_index = self.tabs_widget.addTab(self.general_widget, 'General', QtGui.QIcon(ressources._settings_icon_))
+        self.account_tab_index = self.tabs_widget.addTab(self.user_account_widget, 'Account', QtGui.QIcon(ressources._user_icon_))
 
 class general_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -96,6 +97,17 @@ class general_widget(QtWidgets.QWidget):
         version_dic = application.get_version()
         self.version_data.setText(f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
         self.build_data.setText(str(version_dic['builds']))
+
+        psql_dns = environment.get_psql_dns()
+        psql_host = psql_dns.split(' ')[0].split('=')[-1]
+        psql_port = psql_dns.split(' ')[1].split('=')[-1]
+        psql_user = psql_dns.split(' ')[2].split('=')[-1]
+        self.psql_host_data.setText(psql_host)
+        self.psql_port_data.setText(psql_port)
+        self.psql_user_data.setText(psql_user)
+
+        site_db = environment.get_site()[5:]
+        self.site_data.setText(site_db)
 
     def apply_popups_settings(self):
         popups_enabled = self.enable_popups_checkbox.isChecked()
@@ -143,7 +155,6 @@ class general_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -313,6 +324,72 @@ class general_widget(QtWidgets.QWidget):
         self.build_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.about_sublayout.addRow(self.build_label, self.build_data)
 
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
+        self.psql_frame = QtWidgets.QFrame()
+        self.psql_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.psql_layout = QtWidgets.QVBoxLayout()
+        self.psql_layout.setContentsMargins(0,0,0,0)
+        self.psql_layout.setSpacing(6)
+        self.psql_frame.setLayout(self.psql_layout)
+        self.scrollArea_layout.addWidget(self.psql_frame)
+
+        self.psql_title = QtWidgets.QLabel('PostgreSQL - DNS')
+        self.psql_title.setObjectName('bold_label')
+        self.psql_layout.addWidget(self.psql_title)
+
+        self.psql_subwidget = QtWidgets.QWidget()
+        self.psql_sublayout = QtWidgets.QFormLayout()
+        self.psql_sublayout.setContentsMargins(0,0,0,0)
+        self.psql_sublayout.setSpacing(6)
+        self.psql_subwidget.setLayout(self.psql_sublayout)
+        self.psql_layout.addWidget(self.psql_subwidget)
+
+        self.psql_host_label = QtWidgets.QLabel('Host')
+        self.psql_host_label.setObjectName('gray_label')
+        self.psql_host_data = QtWidgets.QLabel()
+        self.psql_host_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.psql_sublayout.addRow(self.psql_host_label, self.psql_host_data)
+
+        self.psql_port_label = QtWidgets.QLabel('Port')
+        self.psql_port_label.setObjectName('gray_label')
+        self.psql_port_data = QtWidgets.QLabel()
+        self.psql_port_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.psql_sublayout.addRow(self.psql_port_label, self.psql_port_data)
+
+        self.psql_user_label = QtWidgets.QLabel('User')
+        self.psql_user_label.setObjectName('gray_label')
+        self.psql_user_data = QtWidgets.QLabel()
+        self.psql_user_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.psql_sublayout.addRow(self.psql_user_label, self.psql_user_data)
+
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
+        self.site_frame = QtWidgets.QFrame()
+        self.site_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.site_layout = QtWidgets.QVBoxLayout()
+        self.site_layout.setContentsMargins(0,0,0,0)
+        self.site_layout.setSpacing(6)
+        self.site_frame.setLayout(self.site_layout)
+        self.scrollArea_layout.addWidget(self.site_frame)
+
+        self.site_title = QtWidgets.QLabel('Site Database')
+        self.site_title.setObjectName('bold_label')
+        self.site_layout.addWidget(self.site_title)
+
+        self.site_subwidget = QtWidgets.QWidget()
+        self.site_sublayout = QtWidgets.QFormLayout()
+        self.site_sublayout.setContentsMargins(0,0,0,0)
+        self.site_sublayout.setSpacing(6)
+        self.site_subwidget.setLayout(self.site_sublayout)
+        self.site_layout.addWidget(self.site_subwidget)
+
+        self.site_label = QtWidgets.QLabel('Site')
+        self.site_label.setObjectName('gray_label')
+        self.site_data = QtWidgets.QLabel()
+        self.site_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.site_sublayout.addRow(self.site_label, self.site_data)
+
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
 class user_account_widget(QtWidgets.QWidget):
@@ -396,7 +473,6 @@ class user_account_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
