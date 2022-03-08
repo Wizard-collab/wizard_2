@@ -26,6 +26,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+ip_address = 'localhost'
+port = 50333
+
 # Python modules
 import socket
 import sys
@@ -146,9 +149,6 @@ def recvall_with_given_len(sock, n):
 class server(threading.Thread):
     def __init__(self):
         super(server, self).__init__()
-        hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(hostname)
-        port = 50333
         logger.info("Starting server on : '" + str(ip_address) + "'")
         logger.info("Default port : '" + str(port) + "'")
         self.server, self.server_adress = get_server((ip_address, port))
