@@ -226,6 +226,8 @@ _send_icon_ = os.path.join(_icons_path_, 'send.svg')
 _available_icons_list_.append(_send_icon_)
 _play_icon_ = os.path.join(_icons_path_, 'play.svg')
 _available_icons_list_.append(_play_icon_)
+_plug_icon_ = os.path.join(_icons_path_, 'plug.svg')
+_available_icons_list_.append(_plug_icon_)
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.svg')

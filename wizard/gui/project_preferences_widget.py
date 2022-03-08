@@ -62,4 +62,4 @@ class project_preferences_widget(QtWidgets.QWidget):
 
         self.softwares_tab_index = self.tabs_widget.addTab(self.softwares_preferences_widget,
                                                             'Softwares',
-                                                            QtGui.QIcon(ressources._settings_icon_))
+                                                            QtGui.QIcon(ressources._plug_icon_))
