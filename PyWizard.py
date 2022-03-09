@@ -53,6 +53,7 @@ from wizard.core import create_project
 from wizard.core import communicate
 from wizard.core import environment
 from wizard.core import launch
+from wizard.core import launch_batch
 from wizard.core import db_core
 from wizard.core import custom_logger
 custom_logger.get_root_logger()

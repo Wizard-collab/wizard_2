@@ -253,9 +253,16 @@ class versions_widget(QtWidgets.QWidget):
         self.search_thread.id_signal.connect(self.add_search_version)
 
     def batch_export(self):
-        last_version_id = project.get_last_work_version(self.work_env_id, 'id')
-        if last_version_id:
-            subtasks_library.batch_export(last_version_id[0])
+        selection = self.get_selection()
+        version_id = None
+        if len(selection) == 1:
+            version_id = selection[0].version_row['id']
+        elif len(selection) == 0:
+            last_version_id = project.get_last_work_version(self.work_env_id, 'id')
+            if last_version_id:
+                version_id = last_version_id[0]
+        if version_id:
+            subtasks_library.batch_export(version_id)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -413,6 +420,7 @@ class versions_widget(QtWidgets.QWidget):
         duplicate_action = None
         archive_action = None
         comment_action = None
+        batch_action = None
         if len(selection)>=1:
             duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate version(s)')
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
@@ -420,6 +428,7 @@ class versions_widget(QtWidgets.QWidget):
         launch_action = None
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch version')
+            batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export version')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -437,6 +446,8 @@ class versions_widget(QtWidgets.QWidget):
                 self.modify_comment()
             elif action == merge_action:
                 self.open_files()
+            elif action == batch_action:
+                self.batch_export()
 
     def modify_comment(self):
         items = self.get_selection()

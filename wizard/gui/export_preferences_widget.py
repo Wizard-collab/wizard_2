@@ -37,7 +37,7 @@ class export_preferences_widget(QtWidgets.QWidget):
 
     def add_software_row(self, software, extensions_list, extension_row):
         software_icon = QtWidgets.QLabel()
-        software_icon.setPixmap(QtGui.QIcon(ressources._sofwares_icons_dic_[software]).pixmap(24))
+        software_icon.setPixmap(QtGui.QIcon(ressources._sofwares_icons_dic_[software]).pixmap(18))
         software_label = QtWidgets.QLabel(software)
 
         info_widget = QtWidgets.QWidget()
