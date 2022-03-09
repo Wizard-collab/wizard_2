@@ -1,3 +1,6 @@
+Batch exports:
+  comment: You can now export data from the work versions tab
+  type: new
 Project preferences:
   comment: You can now modify your project settings
   type: new

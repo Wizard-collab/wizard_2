@@ -96,10 +96,10 @@ def send_signal(DNS, msg_raw, timeout=5.0):
         returned = recvall(server).decode('utf8')
         return json.loads(returned)
     except ConnectionRefusedError:
-        logger.debug("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
+        logger.info("Socket connection refused : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except socket.timeout:
-        logger.debug("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
+        logger.info("Socket timeout : host={}, port={}".format(DNS[0], DNS[1]))
         return None
     except:
         logger.error(str(traceback.format_exc()))

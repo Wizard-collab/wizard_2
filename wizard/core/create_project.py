@@ -116,7 +116,9 @@ def init_project(project_name,
             software_id = project.add_software(software,
                             softwares_vars._extensions_dic_[software],
                             softwares_vars._file_command_[software],
-                            softwares_vars._no_file_command_[software])
+                            softwares_vars._no_file_command_[software],
+                            softwares_vars._batch_file_command_[software],
+                            softwares_vars._batch_no_file_command_[software])
             for stage in assets_vars._ext_dic_.keys():
                 if software in assets_vars._ext_dic_[stage].keys():
                     extension = assets_vars._ext_dic_[stage][software][0]

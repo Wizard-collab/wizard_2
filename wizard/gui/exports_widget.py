@@ -147,13 +147,6 @@ class exports_widget(QtWidgets.QWidget):
         self.manual_publish_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_publish_button)
 
-        self.batch_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.batch_button, "Batch export")
-        self.batch_button.setFixedSize(35,35)
-        self.batch_button.setIconSize(QtCore.QSize(25,25))
-        self.batch_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
-        self.buttons_layout.addWidget(self.batch_button)
-
         self.launch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.launch_button, "Launch related work version")
         self.launch_button.setFixedSize(35,35)

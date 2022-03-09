@@ -45,6 +45,7 @@ def request_export(work_env_id, export_name):
     signal_dic['work_env_id'] = work_env_id
     signal_dic['export_name'] = export_name
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    print(file_path)
     return file_path
 
 def add_export_version(export_name, files, version_id, comment=''):

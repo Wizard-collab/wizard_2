@@ -202,8 +202,6 @@ class software_thread(Thread):
         self.start_time = time.time()
  
     def run(self):
-        for key in self.env.keys():
-            print(f"{key} = {self.env[key]}\n")
         self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=os.path.abspath('softwares'))
         self.process.wait()
         died(self.work_env_id)

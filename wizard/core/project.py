@@ -1177,7 +1177,7 @@ def search_version(data_to_search, work_env_id=None, column_to_search='name', co
                                                             column)
     return versions_rows
 
-def add_software(name, extension, file_command, no_file_command):
+def add_software(name, extension, file_command, no_file_command, batch_file_command='', batch_no_file_command=''):
     if name in softwares_vars._softwares_list_:
         if name not in get_softwares_names_list():
             software_id = db_utils.create_row('project',
@@ -1185,17 +1185,23 @@ def add_software(name, extension, file_command, no_file_command):
                             ('name', 
                                 'extension',
                                 'path',
+                                'batch_path',
                                 'additionnal_scripts',
                                 'additionnal_env',
                                 'file_command',
-                                'no_file_command'), 
+                                'no_file_command',
+                                'batch_file_command',
+                                'batch_no_file_command'), 
                             (name,
                                 extension,
                                 '',
                                 '',
                                 '',
+                                '',
                                 file_command,
-                                no_file_command))
+                                no_file_command,
+                                batch_file_command,
+                                batch_no_file_command))
             if software_id:
                 logger.info(f"Software {name} added to project")
             return software_id
@@ -1217,6 +1223,20 @@ def set_software_path(software_id, path):
                             ('path', path),
                             ('id', software_id)):
             logger.info('Software path modified')
+            return 1
+        else:
+            return None
+    else:
+        logger.warning(f"{path} is not a valid executable")
+        return None
+
+def set_software_batch_path(software_id, path):
+    if os.path.isfile(path):
+        if db_utils.update_data('project',
+                            'softwares',
+                            ('batch_path', path),
+                            ('id', software_id)):
+            logger.info('Software batch path modified')
             return 1
         else:
             return None
@@ -1872,10 +1892,13 @@ def create_softwares_table(database):
                                         name text NOT NULL,
                                         extension text NOT NULL,
                                         path text,
+                                        batch_path text,
                                         additionnal_scripts text,
                                         additionnal_env text,
                                         file_command text NOT NULL,
-                                        no_file_command text NOT NULL
+                                        no_file_command text NOT NULL,
+                                        batch_file_command text,
+                                        batch_no_file_command text
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Softwares table created")

@@ -98,8 +98,11 @@ class subtask(Thread):
 
     def analyse_missed_stdout(self):
         stdout, stderr = self.process.communicate()
+        print(stdout)
+        print(stderr)
         out = stdout.strip().decode('utf-8')
         self.buffer_stdout(out)
+
 
     def buffer_stdout(self, out):
 

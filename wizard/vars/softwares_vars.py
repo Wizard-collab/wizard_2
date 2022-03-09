@@ -80,6 +80,24 @@ _no_file_command_[_nuke_] = '"{}" --nukex'.format(_executable_key_)
 _no_file_command_[_houdini_] = '"{}" waitforui "{}" '.format(_executable_key_, _script_key_)
 _no_file_command_[_blender_] = '"{}" --python "{}"'.format(_executable_key_, _script_key_)
 
+_batch_file_command_ = dict()
+_batch_file_command_[_maya_] = '"{}" -file "{}" -script "{}"'.format(_executable_key_, _file_key_, _script_key_)
+_batch_file_command_[_guerilla_render_] = '''"{}" "{}" --nogui --pycmd "execfile('{}')"'''.format(_executable_key_, _file_key_, _script_key_)
+_batch_file_command_[_substance_painter_] = ''
+_batch_file_command_[_substance_designer_] = ''
+_batch_file_command_[_nuke_] = ''
+_batch_file_command_[_houdini_] = ''
+_batch_file_command_[_blender_] = '"{}" "{}" -b --python "{}"'.format(_executable_key_, _file_key_, _script_key_)
+
+_batch_no_file_command_ = dict()
+_batch_no_file_command_[_maya_] = '"{}" -script "{}"'.format(_executable_key_, _script_key_)
+_batch_no_file_command_[_guerilla_render_] = '''"{}" --nogui --pycmd "execfile('{}')"'''.format(_executable_key_, _script_key_)
+_batch_no_file_command_[_substance_painter_] = ''
+_batch_no_file_command_[_substance_designer_] = ''
+_batch_no_file_command_[_nuke_] = ''
+_batch_no_file_command_[_houdini_] = ''
+_batch_no_file_command_[_blender_] = '"{}" -b --python "{}"'.format(_executable_key_, _script_key_)
+
 # Environments
 _script_env_dic_=dict()
 _script_env_dic_[_maya_]='PYTHONPATH'
@@ -103,7 +121,13 @@ _plugins_path_[_blender_]  = os.path.normpath(os.path.abspath(os.path.join('soft
 
 # Scripts files
 _scripts_dic_ = dict()
-_scripts_dic_[_maya_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_maya_], 'startup.mel')))
-_scripts_dic_[_guerilla_render_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_guerilla_render_], 'startup.py')))
-_scripts_dic_[_blender_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_blender_], 'startup.py')))
-_scripts_dic_[_houdini_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_houdini_], 'startup.py')))
+_scripts_dic_[_maya_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_maya_], 'startup.mel'))).replace('\\', '/')
+_scripts_dic_[_guerilla_render_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_guerilla_render_], 'startup.py'))).replace('\\', '/')
+_scripts_dic_[_blender_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_blender_], 'startup.py'))).replace('\\', '/')
+_scripts_dic_[_houdini_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_houdini_], 'startup.py'))).replace('\\', '/')
+
+_batch_scripts_dic_ = dict()
+_batch_scripts_dic_[_maya_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_maya_], 'batch_startup.mel'))).replace('\\', '/')
+_batch_scripts_dic_[_guerilla_render_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_guerilla_render_], 'batch_startup.py'))).replace('\\', '/')
+_batch_scripts_dic_[_blender_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_blender_], 'batch_startup.py'))).replace('\\', '/')
+_batch_scripts_dic_[_houdini_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_houdini_], 'batch_startup.py'))).replace('\\', '/')

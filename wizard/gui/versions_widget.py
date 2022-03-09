@@ -238,6 +238,7 @@ class versions_widget(QtWidgets.QWidget):
 
         self.archive_button.clicked.connect(self.archive)
         self.manual_merge_button.clicked.connect(self.open_files)
+        self.batch_button.clicked.connect(self.batch_export)
         self.duplicate_button.clicked.connect(self.duplicate_version)
         self.new_version_button.clicked.connect(self.add_empty_version)
         self.folder_button.clicked.connect(self.open_folder)
@@ -250,6 +251,11 @@ class versions_widget(QtWidgets.QWidget):
 
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.id_signal.connect(self.add_search_version)
+
+    def batch_export(self):
+        last_version_id = project.get_last_work_version(self.work_env_id, 'id')
+        if last_version_id:
+            subtasks_library.batch_export(last_version_id[0])
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -344,6 +350,13 @@ class versions_widget(QtWidgets.QWidget):
         self.manual_merge_button.setIconSize(QtCore.QSize(25,25))
         self.manual_merge_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_merge_button)
+
+        self.batch_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.batch_button, "Batch export")
+        self.batch_button.setFixedSize(35,35)
+        self.batch_button.setIconSize(QtCore.QSize(25,25))
+        self.batch_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
+        self.buttons_layout.addWidget(self.batch_button)
 
         self.comment_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.comment_button, "Modify comment")

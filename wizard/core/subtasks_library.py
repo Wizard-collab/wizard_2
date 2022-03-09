@@ -36,6 +36,14 @@ from wizard.core import subtask
 
 logger = logging.getLogger(__name__)
 
+def batch_export(version_id):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import launch_batch\n"
+	command += f"launch_batch.batch_export({version_id})\n"
+	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task.start()
+	logger.info('Export started as subtask, open the subtask manager to get more informations')
+
 def archive_versions(version_ids):
 	command =  "# coding: utf-8\n"
 	command += "from wizard.core import assets\n"

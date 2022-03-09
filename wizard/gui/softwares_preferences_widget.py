@@ -74,6 +74,10 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.guess_button.setFixedSize(24, 24)
         self.path_layout.addWidget(self.guess_button)
 
+        self.batch_path_lineEdit = QtWidgets.QLineEdit()
+        self.batch_path_lineEdit.setPlaceholderText('Software batch executable path')
+        self.main_layout.addWidget(self.batch_path_lineEdit)
+
         self.custom_script_paths_textEdit = QtWidgets.QTextEdit()
         self.custom_script_paths_textEdit.setPlaceholderText('path/to/my/scripts')
         self.main_layout.addWidget(self.custom_script_paths_textEdit)
@@ -126,6 +130,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         software = self.softwares_comboBox.currentText()
         software_row = project.get_software_data_by_name(software)
         self.path_lineEdit.setText(software_row['path'])
+        self.batch_path_lineEdit.setText(software_row['batch_path'])
         self.custom_script_paths_textEdit.setText(software_row['additionnal_scripts'])
         self.custom_env_textEdit.setText(self.load_additionnal_env(software_row['additionnal_env']))
 
@@ -133,8 +138,11 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         software = self.softwares_comboBox.currentText()
         software_row = project.get_software_data_by_name(software)
         path = self.path_lineEdit.text()
+        batch_path = self.batch_path_lineEdit.text()
         if path != software_row['path']:
             project.set_software_path(software_row['id'], path)
+        if batch_path != software_row['batch_path']:
+            project.set_software_batch_path(software_row['id'], batch_path)
         additionnal_scripts = self.custom_script_paths_textEdit.toPlainText()
         if additionnal_scripts != software_row['additionnal_scripts']:
             project.set_software_additionnal_scripts(software_row['id'], additionnal_scripts)

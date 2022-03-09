@@ -73,9 +73,13 @@ while not user.user().get_psql_dns():
 db_server = db_core.db_server()
 db_server.start()
 
+if not user.user().get_site():
+    input_site = tools.flushed_input("Site : ")
+    user.user().set_site(input_site)
+
 if not site.is_site_database():
     while not site.is_site_database():
-        init_site = tools.flushed_input("Site database doesn't exists, init database (y/n) ? : ")
+        init_site = tools.flushed_input("Warning, site database doesn't exists, init database (y/n) ? : ")
         if init_site == 'y':
             admin_password = tools.flushed_input('Administator password : ')
             admin_email = tools.flushed_input('Administator email : ')
@@ -83,7 +87,7 @@ if not site.is_site_database():
             db_server.site='site'
             site.init_site(admin_password, admin_email)
 
-db_server.site='site'
+db_server.site=environment.get_site()
 site.add_ip_user()
 
 while not user.get_user():
@@ -115,13 +119,6 @@ while not user.get_project():
         project_name = tools.flushed_input('Project name : ')
         project_password = tools.flushed_input('Project password : ')
         user.log_project(project_name, project_password)
-
-if not user.user().get_team_dns():
-    while tools.flushed_input('Enter a team server DNS (y/n) ? : ') == 'y':
-        team_ip = str(tools.flushed_input('Team server host ( ip adress ) : '))
-        team_port = int(tools.flushed_input('Team server port : '))
-        if user.user().set_team_dns(team_ip, team_port):
-            break
 
 db_server.project_name = environment.get_project_name()
 
