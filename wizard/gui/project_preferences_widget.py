@@ -11,6 +11,8 @@ import logging
 from wizard.gui import gui_utils
 from wizard.gui import custom_tab_widget
 from wizard.gui import softwares_preferences_widget
+from wizard.gui import project_general_preferences_widget
+from wizard.gui import export_preferences_widget
 
 # Wizard modules
 from wizard.vars import ressources
@@ -29,7 +31,9 @@ class project_preferences_widget(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Project preferences")
 
+        self.project_general_preferences_widget = project_general_preferences_widget.project_general_preferences_widget()
         self.softwares_preferences_widget = softwares_preferences_widget.softwares_preferences_widget()
+        self.export_preferences_widget = export_preferences_widget.export_preferences_widget()
 
         self.build_ui()
 
@@ -48,7 +52,9 @@ class project_preferences_widget(QtWidgets.QWidget):
 
     def refresh(self):
         if self.isVisible():
+            self.project_general_preferences_widget.refresh()
             self.softwares_preferences_widget.refresh()
+            self.export_preferences_widget.refresh()
 
     def build_ui(self):
         self.resize(600,800)
@@ -60,6 +66,12 @@ class project_preferences_widget(QtWidgets.QWidget):
         self.tabs_widget = custom_tab_widget.custom_tab_widget()
         self.main_layout.addWidget(self.tabs_widget)
 
+        self.general_tab_index = self.tabs_widget.addTab(self.project_general_preferences_widget,
+                                                            'General',
+                                                            QtGui.QIcon(ressources._settings_icon_))
         self.softwares_tab_index = self.tabs_widget.addTab(self.softwares_preferences_widget,
                                                             'Softwares',
                                                             QtGui.QIcon(ressources._plug_icon_))
+        self.exports_tab_index = self.tabs_widget.addTab(self.export_preferences_widget,
+                                                            'Exports',
+                                                            QtGui.QIcon(ressources._exports_icon_))

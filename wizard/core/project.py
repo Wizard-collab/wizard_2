@@ -1291,6 +1291,27 @@ def get_default_extension(stage, software_id):
         logger.error("Extension not found")
         return None
 
+def get_default_extension_row(stage, software_id):
+    export_row = db_utils.get_row_by_multiple_data('project', 
+                                                        'extensions', 
+                                                        ('stage', 'software_id'), 
+                                                        (stage, software_id))
+    if export_row and len(export_row) >= 1:
+        return export_row[0]
+    else:
+        logger.error("Extension row not found")
+        return None
+
+def set_default_extension(extension_id, extension):
+    if db_utils.update_data('project',
+                            'extensions',
+                            ('extension', extension),
+                            ('id', extension_id)):
+        logger.info('Extension modified')
+        return 1
+    else:
+        return None
+
 def create_settings_row(frame_rate, image_format):
     if len(db_utils.get_rows('project', 'settings', 'id'))==0:
         if db_utils.create_row('project',

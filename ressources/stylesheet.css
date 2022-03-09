@@ -442,6 +442,7 @@ QSlider::handle:horizontal {
 }
 
 #tab_button{
+	text-align: left;
 	background-color: transparent;
 	border: none;
 	padding: 8px;

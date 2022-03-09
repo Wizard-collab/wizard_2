@@ -62,14 +62,12 @@ class custom_tab_widget(QtWidgets.QWidget):
 		return index
 
 	def tab_selected(self, index):
-		print(index)
 		for tab_index in self.tabs_dic.keys():
 			if tab_index != index:
 				self.tabs_dic[tab_index]['button'].setChecked(False)
 				self.tabs_dic[tab_index]['widget'].setVisible(0)
-			else:
-				self.tabs_dic[tab_index]['button'].setChecked(True)
-				self.tabs_dic[tab_index]['widget'].setVisible(1)
+		self.tabs_dic[index]['button'].setChecked(True)
+		self.tabs_dic[index]['widget'].setVisible(1)
 
 class tab_button(QtWidgets.QPushButton):
 

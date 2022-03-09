@@ -34,10 +34,20 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.open_folder_button.clicked.connect(self.open_folder)
 
     def build_ui(self):
-        self.setMinimumWidth(600)
+        self.container_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(self.container_layout)
+
+        self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(6)
-        self.setLayout(self.main_layout)
+        self.main_layout.setSpacing(12)
+        self.main_widget.setLayout(self.main_layout)
+        self.container_layout.addWidget(self.main_widget)
+
+        self.title = QtWidgets.QLabel('Softwares')
+        self.title.setObjectName('title_label')
+        self.main_layout.addWidget(self.title)
+
+        self.main_layout.addWidget(gui_utils.separator())
 
         self.softwares_comboBox = gui_utils.QComboBox()
         self.softwares_comboBox.setFixedWidth(200)
