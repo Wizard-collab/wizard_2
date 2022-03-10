@@ -28,8 +28,10 @@ class references_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(references_widget, self).__init__(parent)
         self.reference_infos_thread = reference_infos_thread()
+        self.group_item = None
         self.work_env_id = None
         self.reference_ids = dict()
+        self.referenced_group_ids = dict()
         self.stage_dic = dict()
         self.build_ui()
         self.connect_functions()
@@ -81,7 +83,9 @@ class references_widget(QtWidgets.QWidget):
 
     def change_work_env(self, work_env_id):
         self.reference_ids = dict()
+        self.referenced_group_ids = dict()
         self.stage_dic = dict()
+        self.group_item = None
         self.list_view.clear()
         self.work_env_id = work_env_id
         self.refresh()
@@ -91,27 +95,13 @@ class references_widget(QtWidgets.QWidget):
         if self.isVisible():
             if self.work_env_id is not None and self.work_env_id != 0:
                 reference_rows = project.get_references(self.work_env_id)
-                project_references_id = []
-                if reference_rows is not None:
+                referenced_groups_rows = project.get_referenced_groups(self.work_env_id)
+                self.project_referenced_groups_id = []
+                if (reference_rows is not None) or (referenced_groups_rows is not None):
                     self.hide_info_mode()
-                    if len(reference_rows) >=1:
-                        for reference_row in reference_rows:
-                            project_references_id.append(reference_row['id'])
-                            if reference_row['id'] not in self.reference_ids.keys():
-                                stage = reference_row['stage']
-                                if stage not in self.stage_dic.keys():
-                                    stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
-                                    self.stage_dic[stage] = stage_item
-                                reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
-                                self.reference_ids[reference_row['id']] = reference_item
-                            else:
-                                self.reference_ids[reference_row['id']].reference_row = reference_row
-                        references_list_ids = list(self.reference_ids.keys())
-                        for reference_id in references_list_ids:
-                            if reference_id not in project_references_id:
-                                self.remove_reference_item(reference_id)
-                        self.reference_infos_thread.update_references_rows(reference_rows)
-                        self.update_stages_items()
+                    if (len(reference_rows) >=1) or (len(referenced_groups_rows) >=1):
+                        self.add_references_rows(reference_rows)
+                        self.add_referenced_groups_rows(referenced_groups_rows)
                     else:
                         self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
             elif self.work_env_id is None:
@@ -121,6 +111,41 @@ class references_widget(QtWidgets.QWidget):
             self.refresh_infos()
         self.update_refresh_time(start_time)
 
+    def add_references_rows(self, reference_rows):
+        project_references_id = []
+        for reference_row in reference_rows:
+            project_references_id.append(reference_row['id'])
+            if reference_row['id'] not in self.reference_ids.keys():
+                stage = reference_row['stage']
+                if stage not in self.stage_dic.keys():
+                    stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
+                    self.stage_dic[stage] = stage_item
+                reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
+                self.reference_ids[reference_row['id']] = reference_item
+            else:
+                self.reference_ids[reference_row['id']].reference_row = reference_row
+        references_list_ids = list(self.reference_ids.keys())
+        for reference_id in references_list_ids:
+            if reference_id not in project_references_id:
+                self.remove_reference_item(reference_id)
+        self.reference_infos_thread.update_references_rows(reference_rows)
+        self.update_stages_items()
+
+    def add_referenced_groups_rows(self, referenced_groups_rows):
+        self.add_group_item()
+        project_referenced_groups_id = []
+        for referenced_group_row in referenced_groups_rows:
+            project_referenced_groups_id.append(referenced_group_row['id'])
+            if referenced_group_row['id'] not in self.referenced_group_ids.keys():
+                referenced_group_item = custom_referenced_group_tree_item(referenced_group_row,
+                                                            self.group_item)
+                self.referenced_group_ids[referenced_group_row['id']] = referenced_group_item
+        referenced_group_list_ids = list(self.referenced_group_ids.keys())
+        for referenced_group_id in referenced_group_list_ids:
+            if referenced_group_id not in project_referenced_groups_id:
+                self.remove_referenced_group_item(referenced_group_id)
+        self.update_group_item()
+
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
         self.refresh_label.setText(f"- refresh : {refresh_time}s")
@@ -128,15 +153,20 @@ class references_widget(QtWidgets.QWidget):
     def remove_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            reference_id = selected_item.reference_row['id']
-            assets.remove_reference(reference_id)
+            if selected_item.type == 'reference':
+                reference_id = selected_item.reference_row['id']
+                assets.remove_reference(reference_id)
+            elif selected_item.type == 'group':
+                referenced_group_id = selected_item.referenced_group_row['id']
+                assets.remove_referenced_group(referenced_group_id)
         gui_server.refresh_ui()
 
     def update_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            reference_id = selected_item.reference_row['id']
-            assets.set_reference_last_version(reference_id)
+            if selected_item.type == 'reference':
+                reference_id = selected_item.reference_row['id']
+                assets.set_reference_last_version(reference_id)
         gui_server.refresh_ui()
 
     def update_all(self):
@@ -147,23 +177,42 @@ class references_widget(QtWidgets.QWidget):
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            export_version_id = selected_item.reference_row['export_version_id']
-            export_version_row = project.get_export_version_data(export_version_id)
-            if export_version_row['work_version_id'] is not None:
-                launch.launch_work_version(export_version_row['work_version_id'])
-
+            if selected_item.type == 'reference':
+                export_version_id = selected_item.reference_row['export_version_id']
+                export_version_row = project.get_export_version_data(export_version_id)
+                if export_version_row['work_version_id'] is not None:
+                    launch.launch_work_version(export_version_row['work_version_id'])
         gui_server.refresh_ui()
 
     def focus_on_export_version(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            self.focus_export.emit(selected_item.reference_row['export_version_id'])
+            if selected_item.type == 'reference':
+                self.focus_export.emit(selected_item.reference_row['export_version_id'])
 
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():
             item = self.reference_ids[reference_id]
             item.parent().removeChild(item)
             del self.reference_ids[reference_id]
+
+    def remove_referenced_group_item(self, referenced_group_id):
+        if referenced_group_id in self.referenced_group_ids.keys():
+            item = self.referenced_group_ids[referenced_group_id]
+            item.parent().removeChild(item)
+            del self.referenced_group_ids[referenced_group_id]
+
+    def add_group_item(self):
+        if self.group_item is None:
+            self.group_item = custom_group_tree_item(self.list_view.invisibleRootItem())
+
+    def update_group_item(self):
+        if self.group_item is not None:
+            childs = self.group_item.childCount()
+            if childs == 0:
+                pass
+                self.list_view.invisibleRootItem().removeChild(self.group_item)
+                self.group_item = None
 
     def update_stages_items(self):
         stages_list = list(self.stage_dic.keys())
@@ -194,8 +243,9 @@ class references_widget(QtWidgets.QWidget):
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
             remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected references')
             if len(selection) == 1:
-                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
-                focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
+                if selection[0].type == 'reference':
+                    launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
+                    focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
         add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
 
         action = menu.exec_(QtGui.QCursor().pos())
@@ -212,7 +262,6 @@ class references_widget(QtWidgets.QWidget):
                 self.launch_work_version()
             elif action == focus_action:
                 self.focus_on_export_version()
-
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -312,9 +361,32 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
     def update_infos(self, childs):
         self.setText(0, f"{self.stage} ({childs})")
 
+class custom_group_tree_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, parent=None):
+        super(custom_group_tree_item, self).__init__(parent)
+        self.setFlags(QtCore.Qt.ItemIsEnabled)
+        self.setExpanded(1)
+        self.setText(0, 'Groups')
+
+class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, referenced_group_row, parent=None):
+        super(custom_referenced_group_tree_item, self).__init__(parent)
+        self.type = 'group'
+        self.referenced_group_row = referenced_group_row
+        self.fill_ui()
+
+    def fill_ui(self):
+        self.setText(0, self.referenced_group_row['group_name'])
+        self.setText(1, self.referenced_group_row['namespace'])
+        bold_font=QtGui.QFont()
+        bold_font.setBold(True)
+        self.setFont(1, bold_font)
+        self.setIcon(0, QtGui.QIcon(ressources._group_icon_))
+
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, parent=None):
         super(custom_reference_tree_item, self).__init__(parent)
+        self.type = 'reference'
         self.reference_row = reference_row
         self.fill_ui()
         self.connect_functions()
@@ -323,7 +395,6 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.reference_row['namespace'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
-
         self.setFont(1, bold_font)
         self.variant_widget = editable_data_widget()
         self.treeWidget().setItemWidget(self, 2, self.variant_widget)

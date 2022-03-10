@@ -878,7 +878,7 @@ def create_reference(work_env_id, export_version_id, namespace):
                                     work_env_id,
                                     export_id,
                                     export_version_id))
-        if work_env_id:
+        if reference_id:
             logger.info(f"Reference created")
     else:
         logger.warning(f"{namespace} already exists")
@@ -1642,6 +1642,163 @@ def get_all_shelf_scripts(column='*'):
                                             column)
     return shelf_scripts_rows
 
+def create_group(name, auto_update):
+    group_id = None
+    if not (db_utils.check_existence('project', 
+                                    'groups',
+                                    'name', name)):
+        group_id = db_utils.create_row('project',
+                                    'groups',
+                                    ('name',
+                                        'creation_time',
+                                        'creation_user',
+                                        'auto_update'),
+                                    (name,
+                                        time.time(),
+                                        environment.get_user(),
+                                        auto_update))
+        if group_id:
+            logger.info('Group created')
+    else:
+        logger.warning(f"{name} already exists")
+    return group_id
+
+def get_group_data(group_id, column='*'):
+    groups_rows = db_utils.get_row_by_column_data('project', 
+                                                    'groups', 
+                                                    ('id', group_id), 
+                                                    column)
+    if groups_rows and len(groups_rows) >= 1:
+        return groups_rows[0]
+    else:
+        logger.error("Group not found")
+        return None
+
+def remove_group(group_id):
+    success = None
+    for grouped_reference_id in get_grouped_references(group_id, 'id'):
+        remove_grouped_reference(grouped_reference_id)
+    for referenced_group_id in get_referenced_groups_by_group_id(group_id, 'id'):
+        remove_referenced_group(referenced_group_id)
+    success = db_utils.delete_row('project', 'groups', group_id)
+    if success:
+        logger.info(f"Group removed from project")
+    return success
+
+def create_referenced_group(work_env_id, group_id, namespace):
+    referenced_group_id = None
+    group_name = get_group_data(group_id, 'name')
+    if not (db_utils.check_existence_by_multiple_data('project', 
+                                    'referenced_groups_data',
+                                    ('namespace', 'work_env_id'),
+                                    (namespace, work_env_id))):
+        referenced_group_id = db_utils.create_row('project',
+                                'referenced_groups_data', 
+                                ('creation_time',
+                                    'creation_user',
+                                    'namespace',
+                                    'group_id',
+                                    'group_name',
+                                    'work_env_id'),
+                                (time.time(),
+                                    environment.get_user(),
+                                    namespace,
+                                    group_id,
+                                    group_name,
+                                    work_env_id))
+        if referenced_group_id:
+            logger.info(f"Referenced group created")
+    else:
+        logger.warning(f"{namespace} already exists")
+    return referenced_group_id
+
+def remove_referenced_group(referenced_group_id):
+    success = db_utils.delete_row('project', 'referenced_groups_data', referenced_group_id)
+    if success:
+        logger.info(f"Referenced group removed from project")
+    return success
+
+def get_referenced_groups(work_env_id, column='*'):
+    referenced_groups_rows = db_utils.get_row_by_column_data('project',
+                                                        'referenced_groups_data',
+                                                        ('work_env_id', work_env_id),
+                                                        column)
+    return referenced_groups_rows
+
+def get_referenced_groups_by_group_id(group_id, column='*'):
+    referenced_groups_rows = db_utils.get_row_by_column_data('project',
+                                                        'referenced_groups_data',
+                                                        ('group_id', group_id),
+                                                        column)
+    return referenced_groups_rows
+
+def get_referenced_group_data(referenced_group_id, column='*'):
+    referenced_groups_rows = db_utils.get_row_by_column_data('project', 
+                                                    'referenced_groups_data', 
+                                                    ('id', referenced_group_id), 
+                                                    column)
+    if referenced_groups_rows and len(referenced_groups_rows) >= 1:
+        return referenced_groups_rows[0]
+    else:
+        logger.error("Referenced group not found")
+        return None
+
+def create_grouped_reference(group_id, export_version_id, namespace):
+    reference_id = None
+
+    export_id = get_export_version_data(export_version_id, 'export_id')
+    stage_name = get_stage_data(get_variant_data(get_export_data(export_id, 'variant_id'), 'stage_id'), 'name')
+
+    if not (db_utils.check_existence_by_multiple_data('project', 
+                                    'grouped_references_data',
+                                    ('namespace', 'group_id'),
+                                    (namespace, group_id))):
+        reference_id = db_utils.create_row('project',
+                                'grouped_references_data', 
+                                ('creation_time',
+                                    'creation_user',
+                                    'namespace',
+                                    'stage',
+                                    'group_id',
+                                    'export_id',
+                                    'export_version_id'),
+                                (time.time(),
+                                    environment.get_user(),
+                                    namespace,
+                                    stage_name,
+                                    group_id,
+                                    export_id,
+                                    export_version_id))
+        if reference_id:
+            logger.info(f"Grouped reference created")
+    else:
+        logger.warning(f"{namespace} already exists")
+    return reference_id
+
+def remove_grouped_reference(grouped_reference_id):
+    success = db_utils.delete_row('project', 'grouped_references_data', grouped_reference_id)
+    if success:
+        logger.info("Grouped reference deleted")
+    return success
+
+def get_grouped_references(group_id, column='*'):
+    grouped_references_rows = db_utils.get_row_by_column_data('project',
+                                                        'grouped_references_data',
+                                                        ('group_id', group_id),
+                                                        column)
+    return grouped_references_rows
+
+def get_grouped_reference_data(grouped_reference_id, column='*'):
+    grouped_references_rows = db_utils.get_row_by_column_data('project', 
+                                                    'grouped_references_data', 
+                                                    ('id', grouped_reference_id), 
+                                                    column)
+    if grouped_references_rows and len(grouped_references_rows) >= 1:
+        return grouped_references_rows[0]
+    else:
+        logger.error("Grouped reference not found")
+        return None
+
 def get_database_file(project_path):
     if project_path:
         database_file = os.path.join(project_path, project_vars._project_database_file_)
@@ -1699,6 +1856,9 @@ def init_project(project_path, project_name):
             create_extensions_table(project_name)
             create_events_table(project_name)
             create_shelf_scripts_table(project_name)
+            create_groups_table(project_name)
+            create_referenced_groups_table(project_name)
+            create_grouped_references_table(project_name)
             return project_name
     else:
         logger.warning(f"Database {project_name} already exists")
@@ -1835,6 +1995,49 @@ def create_references_table(database):
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("References table created")
+
+def create_referenced_groups_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS referenced_groups_data (
+                                        id serial PRIMARY KEY,
+                                        creation_time real NOT NULL,
+                                        creation_user text NOT NULL,
+                                        namespace text NOT NULL,
+                                        group_id integer NOT NULL,
+                                        group_name text NOT NULL,
+                                        work_env_id integer NOT NULL,
+                                        FOREIGN KEY (group_id) REFERENCES groups (id),
+                                        FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Referenced groups table created")
+
+def create_grouped_references_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS grouped_references_data (
+                                        id serial PRIMARY KEY,
+                                        creation_time real NOT NULL,
+                                        creation_user text NOT NULL,
+                                        namespace text NOT NULL,
+                                        stage text NOT NULL,
+                                        group_id integer NOT NULL,
+                                        export_id integer NOT NULL,
+                                        export_version_id integer NOT NULL,
+                                        FOREIGN KEY (group_id) REFERENCES groups (id),
+                                        FOREIGN KEY (export_id) REFERENCES exports (id),
+                                        FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Grouped references table created")
+
+def create_groups_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS groups (
+                                        id serial PRIMARY KEY,
+                                        name text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        creation_user text NOT NULL,
+                                        auto_update bool NOT NULL
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Groups table created")
 
 def create_exports_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS exports (
