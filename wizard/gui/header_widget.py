@@ -61,7 +61,7 @@ class header_widget(QtWidgets.QFrame):
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
         self.production_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._production_manager_icon_), "Production manager")
-        self.groups_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._group_icon_), "Group manager")
+        self.groups_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._group_icon_), "Groups manager")
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
         self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
         self.championship_action = self.window_action.addAction(QtGui.QIcon(ressources._ranking_icon_), "Championship")

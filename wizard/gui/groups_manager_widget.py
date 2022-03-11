@@ -14,6 +14,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import references_widget
+from wizard.gui import color_picker
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
@@ -78,6 +79,11 @@ class groups_manager_widget(QtWidgets.QWidget):
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
+        self.color_button = QtWidgets.QPushButton()
+        self.color_button.setFixedSize(26,26)
+        self.color_button.setObjectName('color_button')
+        self.header_layout.addWidget(self.color_button)
+
         self.delete_group_button = QtWidgets.QPushButton()
         self.delete_group_button.setFixedSize(26,26)
         self.delete_group_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
@@ -89,6 +95,7 @@ class groups_manager_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.create_group_button.clicked.connect(self.create_group)
+        self.color_button.clicked.connect(self.modify_color)
         self.delete_group_button.clicked.connect(self.delete_group)
         self.groups_comboBox.currentTextChanged.connect(self.current_group_changed)
 
@@ -96,7 +103,32 @@ class groups_manager_widget(QtWidgets.QWidget):
         self.old_group_id = self.group_id
         if self.update_grouped_references:
             self.get_current_group_id()
+            self.update_color()
             self.references_widget.change_work_env(self.group_id)
+
+    def update_color(self):
+        group_name = self.get_current_group()
+        if group_name != '':
+            color = self.groups[group_name]['color']
+        else:
+            color = 'transparent'
+        self.update_button_color(color)
+
+    def modify_color(self):
+        group_name = self.get_current_group()
+        if group_name != '':
+            color = self.groups[group_name]['color']
+            self.color_picker = color_picker.color_picker(color=color)
+            self.color_picker.color_signal.connect(self.update_button_color)
+            self.color_picker.validate_signal.connect(self.modify_group_color)
+            self.color_picker.show()
+
+    def modify_group_color(self, color):
+        project.modify_group_color(self.group_id, color)
+        gui_server.refresh_ui()
+
+    def update_button_color(self, color):
+        self.color_button.setStyleSheet(f'background-color:{color};')
 
     def get_current_group_id(self):
         current_group = self.groups_comboBox.currentText()
@@ -104,6 +136,9 @@ class groups_manager_widget(QtWidgets.QWidget):
             self.group_id = self.groups[current_group]['id']
         else:
             self.group_id = None
+
+    def get_current_group(self):
+        return self.groups_comboBox.currentText()
 
     def create_group(self):
         self.group_creation_widget = group_creation_widget(self)
@@ -134,8 +169,14 @@ class groups_manager_widget(QtWidgets.QWidget):
             for group_row in groups_rows:
                 project_groups.append(group_row['name'])
                 if group_row['name'] not in self.groups.keys():
-                    index = self.groups_comboBox.addItem(QtGui.QIcon(ressources._group_icon_), group_row['name'])
-                    self.groups[group_row['name']] = group_row
+                    index = self.groups_comboBox.addItem(gui_utils.QIcon_from_svg(ressources._group_icon_,
+                                                            group_row['color']), group_row['name'])
+                else:
+                    index = self.groups_comboBox.findText(group_row['name'])
+                    self.groups_comboBox.setItemIcon(index, gui_utils.QIcon_from_svg(ressources._group_icon_,
+                                                            group_row['color']))
+                self.groups[group_row['name']] = group_row
+
             groups = list(self.groups.keys())
             for group in groups:
                 if group not in project_groups:

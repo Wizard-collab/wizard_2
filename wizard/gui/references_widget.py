@@ -68,7 +68,7 @@ class references_widget(QtWidgets.QWidget):
 
     def search_reference(self):
         if self.parent_instance_id is not None and self.parent_instance_id != 0:
-            self.search_reference_widget = search_reference_widget.search_reference_widget(self)
+            self.search_reference_widget = search_reference_widget.search_reference_widget(self.context, self)
             self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
             self.search_reference_widget.groups_ids_signal.connect(self.create_referenced_groups)
             self.search_reference_widget.show()
@@ -156,13 +156,23 @@ class references_widget(QtWidgets.QWidget):
 
     def add_referenced_groups_rows(self, referenced_groups_rows):
         self.add_group_item()
+
+        groups_ids = dict()
+        groups_rows = project.get_groups()
+        for group_row in groups_rows:
+            groups_ids[group_row['id']] = group_row
+
         project_referenced_groups_id = []
         for referenced_group_row in referenced_groups_rows:
             project_referenced_groups_id.append(referenced_group_row['id'])
+            group_row = groups_ids[referenced_group_row['group_id']]
             if referenced_group_row['id'] not in self.referenced_group_ids.keys():
-                referenced_group_item = custom_referenced_group_tree_item(referenced_group_row,
+                referenced_group_item = custom_referenced_group_tree_item(referenced_group_row, group_row,
                                                             self.group_item)
                 self.referenced_group_ids[referenced_group_row['id']] = referenced_group_item
+            else:
+                self.referenced_group_ids[referenced_group_row['id']].update(group_row)
+
         referenced_group_list_ids = list(self.referenced_group_ids.keys())
         for referenced_group_id in referenced_group_list_ids:
             if referenced_group_id not in project_referenced_groups_id:
@@ -405,10 +415,11 @@ class custom_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(0, 'Groups')
 
 class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
-    def __init__(self, referenced_group_row, parent=None):
+    def __init__(self, referenced_group_row, group_row, parent=None):
         super(custom_referenced_group_tree_item, self).__init__(parent)
         self.type = 'group'
         self.referenced_group_row = referenced_group_row
+        self.group_row = group_row
         self.fill_ui()
 
     def fill_ui(self):
@@ -417,7 +428,12 @@ class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
-        self.setIcon(0, QtGui.QIcon(ressources._group_icon_))
+        self.setIcon(0, gui_utils.QIcon_from_svg(ressources._group_icon_,
+                                                    self.group_row['color']))
+
+    def update(self, group_row):
+        self.group_row = group_row
+        self.fill_ui()
 
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, context, parent=None):

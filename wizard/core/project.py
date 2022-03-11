@@ -1642,7 +1642,7 @@ def get_all_shelf_scripts(column='*'):
                                             column)
     return shelf_scripts_rows
 
-def create_group(name, auto_update):
+def create_group(name, auto_update, color):
     group_id = None
     if not (db_utils.check_existence('project', 
                                     'groups',
@@ -1652,11 +1652,13 @@ def create_group(name, auto_update):
                                     ('name',
                                         'creation_time',
                                         'creation_user',
-                                        'auto_update'),
+                                        'auto_update',
+                                        'color'),
                                     (name,
                                         time.time(),
                                         environment.get_user(),
-                                        auto_update))
+                                        auto_update,
+                                        color))
         if group_id:
             logger.info('Group created')
     else:
@@ -1677,6 +1679,15 @@ def get_group_data(group_id, column='*'):
     else:
         logger.error("Group not found")
         return None
+
+def modify_group_color(group_id, color):
+    success = db_utils.update_data('project',
+                        'groups',
+                        ('color', color),
+                        ('id', group_id))
+    if success:
+        logger.info('Group color modified')
+    return success
 
 def remove_group(group_id):
     success = None
@@ -2071,7 +2082,8 @@ def create_groups_table(database):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
-                                        auto_update bool NOT NULL
+                                        auto_update bool NOT NULL,
+                                        color text
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Groups table created")

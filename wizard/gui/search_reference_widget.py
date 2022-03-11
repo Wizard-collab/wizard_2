@@ -22,10 +22,11 @@ class search_reference_widget(QtWidgets.QWidget):
     variant_ids_signal = pyqtSignal(list)
     groups_ids_signal = pyqtSignal(list)
 
-    def __init__(self, parent = None):
+    def __init__(self, context, parent = None):
         super(search_reference_widget, self).__init__(parent)
 
         self.parent = parent
+        self.context = context
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Create references")
@@ -35,7 +36,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)       
 
-        self.search_thread = search_thread()
+        self.search_thread = search_thread(self.context)
         self.variant_ids = dict()
         self.groups_ids = dict()
 
@@ -217,8 +218,9 @@ class search_thread(QtCore.QThread):
     group_signal = pyqtSignal(object)
     search_ended = pyqtSignal(int)
 
-    def __init__(self):
+    def __init__(self, context):
         super().__init__()
+        self.context = context
         self.category = None
         self.asset = None
         self.running = True
@@ -261,11 +263,11 @@ class search_thread(QtCore.QThread):
                             if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
                                 if self.running:
                                     self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
-            groups_list = project.search_group(self.group)
-            for group_row in groups_list:
-                if self.running:
-                    self.group_signal.emit(group_row)
-
+            if self.context == 'work_env':
+                groups_list = project.search_group(self.group)
+                for group_row in groups_list:
+                    if self.running:
+                        self.group_signal.emit(group_row)
         self.search_ended.emit(1)
 
 class custom_item(QtWidgets.QTreeWidgetItem):
@@ -298,7 +300,8 @@ class custom_group_item(QtWidgets.QTreeWidgetItem):
     def fill_ui(self):
         self.setText(1, self.group_row['name'])
         self.setText(2, 'group')
-        self.setIcon(2, QtGui.QIcon(ressources._group_icon_))
+        self.setIcon(2, gui_utils.QIcon_from_svg(ressources._group_icon_,
+                                                    self.group_row['color']))
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
