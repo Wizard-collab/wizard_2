@@ -24,12 +24,14 @@ logger = logging.getLogger(__name__)
 class references_widget(QtWidgets.QWidget):
 
     focus_export = pyqtSignal(int)
+    focus_on_group_signal = pyqtSignal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, context='work_env', parent=None):
         super(references_widget, self).__init__(parent)
         self.reference_infos_thread = reference_infos_thread()
+        self.context = context
         self.group_item = None
-        self.work_env_id = None
+        self.parent_instance_id = None
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
@@ -52,6 +54,7 @@ class references_widget(QtWidgets.QWidget):
         self.search_sc.activated.connect(self.search_reference)
         self.reference_infos_thread.reference_infos_signal.connect(self.update_item_infos)
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
+        self.list_view.itemDoubleClicked.connect(self.item_double_clicked)
         self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
@@ -64,22 +67,36 @@ class references_widget(QtWidgets.QWidget):
             self.reference_ids[reference_id].update_item_infos(infos_list)
 
     def search_reference(self):
-        if self.work_env_id is not None and self.work_env_id != 0:
+        if self.parent_instance_id is not None and self.parent_instance_id != 0:
             self.search_reference_widget = search_reference_widget.search_reference_widget(self)
             self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
+            self.search_reference_widget.groups_ids_signal.connect(self.create_referenced_groups)
             self.search_reference_widget.show()
 
-            variant_row = project.get_variant_data(project.get_work_env_data(self.work_env_id, 'variant_id'))
-            stage_row = project.get_stage_data(variant_row['stage_id'])
-            asset_row = project.get_asset_data(stage_row['asset_id'])
-            category_row = project.get_category_data(asset_row['category_id'])
-            self.search_reference_widget.search_asset(f"{category_row['name']}:{asset_row['name']}")
+            if self.context == 'work_env':
+                variant_row = project.get_variant_data(project.get_work_env_data(self.parent_instance_id, 'variant_id'))
+                stage_row = project.get_stage_data(variant_row['stage_id'])
+                asset_row = project.get_asset_data(stage_row['asset_id'])
+                category_row = project.get_category_data(asset_row['category_id'])
+                self.search_reference_widget.search_asset(f"{category_row['name']}:{asset_row['name']}")
+            else:
+                self.search_reference_widget.search_asset(f"")
 
     def create_references_from_variant_ids(self, variant_ids):
-        if self.work_env_id is not None:
+        if self.parent_instance_id is not None:
             for variant_id in variant_ids:
-                if assets.create_references_from_variant_id(self.work_env_id, variant_id):
-                    gui_server.refresh_ui()
+                if self.context == 'work_env':
+                    if assets.create_references_from_variant_id(self.parent_instance_id, variant_id):
+                        gui_server.refresh_ui()
+                else:
+                    if assets.create_grouped_references_from_variant_id(self.parent_instance_id, variant_id):
+                        gui_server.refresh_ui()
+
+    def create_referenced_groups(self, groups_ids):
+        if self.context == 'work_env':
+            for group_id in groups_ids:
+                assets.create_referenced_group(self.parent_instance_id, group_id)
+            gui_server.refresh_ui()
 
     def change_work_env(self, work_env_id):
         self.reference_ids = dict()
@@ -87,16 +104,19 @@ class references_widget(QtWidgets.QWidget):
         self.stage_dic = dict()
         self.group_item = None
         self.list_view.clear()
-        self.work_env_id = work_env_id
+        self.parent_instance_id = work_env_id
         self.refresh()
 
     def refresh(self):
         start_time = time.time()
         if self.isVisible():
-            if self.work_env_id is not None and self.work_env_id != 0:
-                reference_rows = project.get_references(self.work_env_id)
-                referenced_groups_rows = project.get_referenced_groups(self.work_env_id)
-                self.project_referenced_groups_id = []
+            if self.parent_instance_id is not None and self.parent_instance_id != 0:
+                if self.context == 'work_env':
+                    reference_rows = project.get_references(self.parent_instance_id)
+                    referenced_groups_rows = project.get_referenced_groups(self.parent_instance_id)
+                else:
+                    reference_rows = project.get_grouped_references(self.parent_instance_id)
+                    referenced_groups_rows = []
                 if (reference_rows is not None) or (referenced_groups_rows is not None):
                     self.hide_info_mode()
                     if (len(reference_rows) >=1) or (len(referenced_groups_rows) >=1):
@@ -104,8 +124,11 @@ class references_widget(QtWidgets.QWidget):
                         self.add_referenced_groups_rows(referenced_groups_rows)
                     else:
                         self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
-            elif self.work_env_id is None:
-                self.show_info_mode("You need to init the work environment\nto create references...", ressources._init_work_env_info_image_)
+            elif self.parent_instance_id is None:
+                if self.context == 'work_env':
+                    self.show_info_mode("You need to init the work environment\nto create references...", ressources._init_work_env_info_image_)
+                else:
+                    self.show_info_mode("You need to add a group\nto create references...", ressources._add_group_info_image_)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
@@ -120,7 +143,7 @@ class references_widget(QtWidgets.QWidget):
                 if stage not in self.stage_dic.keys():
                     stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
                     self.stage_dic[stage] = stage_item
-                reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
+                reference_item = custom_reference_tree_item(reference_row, self.context, self.stage_dic[stage])
                 self.reference_ids[reference_row['id']] = reference_item
             else:
                 self.reference_ids[reference_row['id']].reference_row = reference_row
@@ -155,7 +178,10 @@ class references_widget(QtWidgets.QWidget):
         for selected_item in selected_items:
             if selected_item.type == 'reference':
                 reference_id = selected_item.reference_row['id']
-                assets.remove_reference(reference_id)
+                if self.context == 'work_env':
+                    assets.remove_reference(reference_id)
+                else:
+                    assets.remove_grouped_reference(reference_id)
             elif selected_item.type == 'group':
                 referenced_group_id = selected_item.referenced_group_row['id']
                 assets.remove_referenced_group(referenced_group_id)
@@ -166,13 +192,19 @@ class references_widget(QtWidgets.QWidget):
         for selected_item in selected_items:
             if selected_item.type == 'reference':
                 reference_id = selected_item.reference_row['id']
-                assets.set_reference_last_version(reference_id)
+                if self.context == 'work_env':
+                    assets.set_reference_last_version(reference_id)
+                else:
+                    assets.set_grouped_reference_last_version(reference_id)
         gui_server.refresh_ui()
 
     def update_all(self):
         for reference_id in self.reference_ids.keys():
-            if assets.set_reference_last_version(reference_id):
-                gui_server.refresh_ui()
+            if self.context == 'work_env':
+                assets.set_reference_last_version(reference_id)
+            else:
+                assets.set_grouped_reference_last_version(reference_id)
+        gui_server.refresh_ui()
 
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
@@ -262,6 +294,10 @@ class references_widget(QtWidgets.QWidget):
                 self.launch_work_version()
             elif action == focus_action:
                 self.focus_on_export_version()
+
+    def item_double_clicked(self, item):
+        if item.type == 'group':
+            self.focus_on_group_signal.emit(item.referenced_group_row['group_id'])
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -384,8 +420,9 @@ class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.setIcon(0, QtGui.QIcon(ressources._group_icon_))
 
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
-    def __init__(self, reference_row, parent=None):
+    def __init__(self, reference_row, context, parent=None):
         super(custom_reference_tree_item, self).__init__(parent)
+        self.context = context
         self.type = 'reference'
         self.reference_row = reference_row
         self.fill_ui()
@@ -460,15 +497,24 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
                 self.modify_version(action.id)
 
     def modify_version(self, export_version_id):
-        project.update_reference(self.reference_row['id'], export_version_id)
+        if self.context == 'work_env':
+            project.update_reference(self.reference_row['id'], export_version_id)
+        else:
+            project.update_grouped_reference(self.reference_row['id'], export_version_id)
         gui_server.refresh_ui()
 
     def modify_export(self, export_id):
-        project.modify_reference_export(self.reference_row['id'], export_id)
+        if self.context == 'work_env':
+            project.modify_reference_export(self.reference_row['id'], export_id)
+        else:
+            project.modify_grouped_reference_export(self.reference_row['id'], export_id)
         gui_server.refresh_ui()
 
     def modify_variant(self, variant_id):
-        project.modify_reference_variant(self.reference_row['id'], variant_id)
+        if self.context == 'work_env':
+            project.modify_reference_variant(self.reference_row['id'], variant_id)
+        else:
+            project.modify_grouped_reference_variant(self.reference_row['id'], variant_id)
         gui_server.refresh_ui()
 
 class editable_data_widget(QtWidgets.QFrame):

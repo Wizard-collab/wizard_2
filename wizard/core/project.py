@@ -1663,6 +1663,10 @@ def create_group(name, auto_update):
         logger.warning(f"{name} already exists")
     return group_id
 
+def get_groups(column='*'):
+    groups_rows = db_utils.get_rows('project', 'groups', column=column)
+    return groups_rows
+
 def get_group_data(group_id, column='*'):
     groups_rows = db_utils.get_row_by_column_data('project', 
                                                     'groups', 
@@ -1799,12 +1803,45 @@ def get_grouped_reference_data(grouped_reference_id, column='*'):
         logger.error("Grouped reference not found")
         return None
 
-def get_database_file(project_path):
-    if project_path:
-        database_file = os.path.join(project_path, project_vars._project_database_file_)
+def update_grouped_reference_data(grouped_reference_id, data_tuple):
+    success = db_utils.update_data('project',
+                        'grouped_references_data',
+                        data_tuple,
+                        ('id', grouped_reference_id))
+    if success:
+        logger.info('Grouped reference modified')
+    return success
+
+def update_grouped_reference(grouped_reference_id, export_version_id):
+    success = db_utils.update_data('project',
+                        'grouped_references_data',
+                        ('export_version_id', export_version_id),
+                        ('id', grouped_reference_id))
+    if success:
+        logger.info('Grouped reference modified')
+    return success
+
+def modify_grouped_reference_export(grouped_reference_id, export_id):
+    export_version_id = get_last_export_version(export_id, 'id')
+    update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
+    update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
+
+def modify_grouped_reference_variant(grouped_reference_id, variant_id):
+    exports_list = get_variant_export_childs(variant_id, 'id')
+    if exports_list is not None and exports_list != []:
+        export_id = exports_list[0]
+        export_version_id = get_last_export_version(export_id, 'id')
+        update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
+        update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
     else:
-        database_file = None
-    return database_file
+        logger.warning("No export found")
+
+def search_group(name, column='*'):
+    groups_rows = db_utils.get_row_by_column_part_data('project',
+                                                        'groups',
+                                                        ('name', name),
+                                                        column)
+    return groups_rows
 
 def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1

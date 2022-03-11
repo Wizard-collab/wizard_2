@@ -760,6 +760,20 @@ def create_grouped_reference(group_id, export_version_id):
 def remove_grouped_reference(grouped_reference_id):
     return project.remove_grouped_reference(grouped_reference_id)
 
+def set_grouped_reference_last_version(grouped_reference_id):
+    export_version_id = project.get_grouped_reference_data(grouped_reference_id, 'export_version_id')
+    if export_version_id is not None:
+        export_version_row = project.get_export_version_data(export_version_id)
+        export_row = project.get_export_data(export_version_row['export_id'])
+        last_export_version_id = project.get_last_export_version(export_row['id'], 'id')
+        if last_export_version_id is not None and len(last_export_version_id)==1:
+            if last_export_version_id[0] != export_version_id:
+                project.update_grouped_reference(grouped_reference_id, last_export_version_id[0])
+                return 1
+            else:
+                logger.info("Grouped reference is up to date")
+                return None
+
 def get_domain_path(domain_id):
     dir_name = None
     domain_name = project.get_domain_data(domain_id, 'name')

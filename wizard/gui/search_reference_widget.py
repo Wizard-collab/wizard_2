@@ -5,6 +5,7 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+import logging
 
 # Wizard modules
 from wizard.core import assets
@@ -14,9 +15,12 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_utils
 
+logger = logging.getLogger(__name__)
+
 class search_reference_widget(QtWidgets.QWidget):
 
     variant_ids_signal = pyqtSignal(list)
+    groups_ids_signal = pyqtSignal(list)
 
     def __init__(self, parent = None):
         super(search_reference_widget, self).__init__(parent)
@@ -33,6 +37,7 @@ class search_reference_widget(QtWidgets.QWidget):
 
         self.search_thread = search_thread()
         self.variant_ids = dict()
+        self.groups_ids = dict()
 
         self.build_ui()
         self.connect_functions()
@@ -71,7 +76,6 @@ class search_reference_widget(QtWidgets.QWidget):
         event.accept()
 
     def clear(self):
-        #self.search_bar.setFocus(1)
         self.search_bar.setText('')
 
     def leaveEvent(self, event):
@@ -87,6 +91,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.accept_item_from_thread = False
         self.list_view.clear()
         self.variant_ids = dict()
+        self.groups_ids = dict()
         if len(search) > 1:
             stage_filter = None
             if '*' in search:
@@ -111,9 +116,16 @@ class search_reference_widget(QtWidgets.QWidget):
                 variant_item = custom_item(item_list[0], item_list[1], item_list[2], item_list[3], self.list_view.invisibleRootItem())
                 self.variant_ids[item_list[3]['id']] = variant_item
 
+    def add_group(self, group_row):
+        if self.accept_item_from_thread:
+            if group_row['id'] not in self.groups_ids.keys():
+                group_item = custom_group_item(group_row, self.list_view.invisibleRootItem())
+                self.groups_ids[group_row['id']] = group_item
+
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
         self.search_thread.item_signal.connect(self.add_item)
+        self.search_thread.group_signal.connect(self.add_group)
         self.search_thread.search_ended.connect(self.search_ended)
         self.list_view.itemDoubleClicked.connect(self.return_references)
 
@@ -130,11 +142,16 @@ class search_reference_widget(QtWidgets.QWidget):
         selected_items = self.list_view.selectedItems()
         if selected_items is not None and len(selected_items)>=1:
             variant_ids = []
+            groups_ids = []
             for selected_item in selected_items:
-                variant_ids.append(selected_item.variant_row['id'])
+                if selected_item.type == 'variant':
+                    variant_ids.append(selected_item.variant_row['id'])
+                elif selected_item.type == 'group':
+                    groups_ids.append(selected_item.group_row['id'])
             if variant_ids != []:
                 self.variant_ids_signal.emit(variant_ids)
-                print(variant_ids)
+            if groups_ids != []:
+                self.groups_ids_signal.emit(groups_ids)
             self.close()
 
     def show_info_mode(self, text, image):
@@ -148,7 +165,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.list_view.setVisible(1)
 
     def build_ui(self):
-        self.setMinimumWidth(500)
+        self.setMinimumWidth(550)
         self.setMinimumHeight(500)
         self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
 
@@ -173,7 +190,6 @@ class search_reference_widget(QtWidgets.QWidget):
         self.main_widget.setGraphicsEffect(self.shadow)
 
         self.search_bar = gui_utils.search_bar()
-        #self.search_bar.setObjectName('transparent_widget')
         self.search_bar.setPlaceholderText('"asset", "category:asset"')
         self.main_widget_layout.addWidget(self.search_bar)
 
@@ -189,8 +205,8 @@ class search_reference_widget(QtWidgets.QWidget):
         self.list_view.setHeaderHidden(True)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.header().resizeSection(0, 110)
-        self.list_view.header().resizeSection(1, 110)
+        self.list_view.header().resizeSection(0, 100)
+        self.list_view.header().resizeSection(1, 150)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.main_widget_layout.addWidget(self.list_view)
         self.show_info_mode('No export found...', ressources._nothing_info_)
@@ -198,6 +214,7 @@ class search_reference_widget(QtWidgets.QWidget):
 class search_thread(QtCore.QThread):
 
     item_signal = pyqtSignal(list)
+    group_signal = pyqtSignal(object)
     search_ended = pyqtSignal(int)
 
     def __init__(self):
@@ -212,6 +229,7 @@ class search_thread(QtCore.QThread):
         self.all_export_versions_variant_ids = project.get_all_export_versions('variant_id')
         self.category = category
         self.asset = asset
+        self.group = asset
         self.stage_filter = stage_filter
         self.running = True
         self.start()
@@ -243,11 +261,17 @@ class search_thread(QtCore.QThread):
                             if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
                                 if self.running:
                                     self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+            groups_list = project.search_group(self.group)
+            for group_row in groups_list:
+                if self.running:
+                    self.group_signal.emit(group_row)
+
         self.search_ended.emit(1)
 
 class custom_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, category_row, asset_row, stage_row, variant_row, parent=None):
         super(custom_item, self).__init__(parent)
+        self.type = 'variant'
         self.category_row = category_row
         self.asset_row = asset_row
         self.stage_row = stage_row
@@ -263,3 +287,18 @@ class custom_item(QtWidgets.QTreeWidgetItem):
         self.setText(2, self.stage_row['name'])
         self.setIcon(2, QtGui.QIcon(ressources._stage_icons_dic_[self.stage_row['name']]))
         self.setText(3, self.variant_row['name'])
+
+class custom_group_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, group_row, parent=None):
+        super(custom_group_item, self).__init__(parent)
+        self.type = 'group'
+        self.group_row = group_row
+        self.fill_ui()
+
+    def fill_ui(self):
+        self.setText(1, self.group_row['name'])
+        self.setText(2, 'group')
+        self.setIcon(2, QtGui.QIcon(ressources._group_icon_))
+        bold_font=QtGui.QFont()
+        bold_font.setBold(True)
+        self.setFont(1, bold_font)
