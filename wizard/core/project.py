@@ -746,10 +746,29 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 export_id))
         if export_version_id:
             logger.info(f"Export version {name} added to project")
+            propagate_auto_update(export_id, export_version_id)
         return export_version_id
     else:
         logger.warning(f"{name} already exists")
         return None
+
+def propagate_auto_update(export_id, export_version_id):
+    references_ids = db_utils.get_row_by_multiple_data('project', 
+                                                        'references_data', 
+                                                        ('export_id', 'auto_update'), 
+                                                        (export_id, 1),
+                                                        'id')
+    grouped_references_ids = db_utils.get_row_by_multiple_data('project', 
+                                                        'grouped_references_data', 
+                                                        ('export_id', 'auto_update'), 
+                                                        (export_id, 1),
+                                                        'id')
+    for reference_id in references_ids:
+        update_reference_data(reference_id, 
+                                ('export_version_id', export_version_id))
+    for grouped_reference_id in grouped_references_ids:
+        update_grouped_reference_data(grouped_reference_id, 
+                                ('export_version_id', export_version_id))
 
 def get_export_version_destinations(export_version_id, column='*'):
     references_rows = db_utils.get_row_by_column_data('project',
@@ -870,14 +889,16 @@ def create_reference(work_env_id, export_version_id, namespace):
                                     'stage',
                                     'work_env_id',
                                     'export_id',
-                                    'export_version_id'),
+                                    'export_version_id',
+                                    'auto_update'),
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
                                     stage_name,
                                     work_env_id,
                                     export_id,
-                                    export_version_id))
+                                    export_version_id,
+                                    0))
         if reference_id:
             logger.info(f"Reference created")
     else:
@@ -936,6 +957,15 @@ def modify_reference_export(reference_id, export_id):
     export_version_id = get_last_export_version(export_id, 'id')
     update_reference_data(reference_id, ('export_id', export_id))
     update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
+
+def modify_reference_auto_update(reference_id, auto_update):
+    if auto_update:
+        auto_update = 1
+    update_reference_data(reference_id, ('auto_update', auto_update))
+    if auto_update:
+        export_id = get_reference_data(reference_id, 'export_id')
+        export_version_id = get_last_export_version(export_id, 'id')
+        update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
 
 def update_reference_data(reference_id, data_tuple):
     success = db_utils.update_data('project',
@@ -1642,7 +1672,7 @@ def get_all_shelf_scripts(column='*'):
                                             column)
     return shelf_scripts_rows
 
-def create_group(name, auto_update, color):
+def create_group(name, color):
     group_id = None
     if not (db_utils.check_existence('project', 
                                     'groups',
@@ -1652,12 +1682,10 @@ def create_group(name, auto_update, color):
                                     ('name',
                                         'creation_time',
                                         'creation_user',
-                                        'auto_update',
                                         'color'),
                                     (name,
                                         time.time(),
                                         environment.get_user(),
-                                        auto_update,
                                         color))
         if group_id:
             logger.info('Group created')
@@ -1776,14 +1804,16 @@ def create_grouped_reference(group_id, export_version_id, namespace):
                                     'stage',
                                     'group_id',
                                     'export_id',
-                                    'export_version_id'),
+                                    'export_version_id',
+                                    'auto_update'),
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
                                     stage_name,
                                     group_id,
                                     export_id,
-                                    export_version_id))
+                                    export_version_id,
+                                    0))
         if reference_id:
             logger.info(f"Grouped reference created")
     else:
@@ -1846,6 +1876,15 @@ def modify_grouped_reference_variant(grouped_reference_id, variant_id):
         update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
     else:
         logger.warning("No export found")
+
+def modify_grouped_reference_auto_update(grouped_reference_id, auto_update):
+    if auto_update:
+        auto_update = 1
+    update_grouped_reference_data(grouped_reference_id, ('auto_update', auto_update))
+    if auto_update:
+        export_id = get_grouped_reference_data(grouped_reference_id, 'export_id')
+        export_version_id = get_last_export_version(export_id, 'id')
+        update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
 
 def search_group(name, column='*'):
     groups_rows = db_utils.get_row_by_column_part_data('project',
@@ -2037,6 +2076,7 @@ def create_references_table(database):
                                         work_env_id integer NOT NULL,
                                         export_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
+                                        auto_update integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id),
                                         FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
@@ -2069,6 +2109,7 @@ def create_grouped_references_table(database):
                                         group_id integer NOT NULL,
                                         export_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
+                                        auto_update integer NOT NULL,
                                         FOREIGN KEY (group_id) REFERENCES groups (id),
                                         FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
@@ -2082,7 +2123,6 @@ def create_groups_table(database):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
-                                        auto_update bool NOT NULL,
                                         color text
                                     );"""
     if db_utils.create_table(database, sql_cmd):

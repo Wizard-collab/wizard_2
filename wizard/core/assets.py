@@ -709,8 +709,8 @@ def archive_version(version_id):
     else:
         return None
 
-def create_group(name, auto_update=False, color='#798fe8'):
-    return project.create_group(name, auto_update, color)
+def create_group(name, color='#798fe8'):
+    return project.create_group(name, color)
 
 def remove_group(group_id):
     return project.remove_group(group_id)

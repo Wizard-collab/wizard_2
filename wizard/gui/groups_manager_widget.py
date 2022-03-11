@@ -54,7 +54,7 @@ class groups_manager_widget(QtWidgets.QWidget):
             self.groups_comboBox.setCurrentText(group_name)
 
     def build_ui(self):
-        self.resize(QtCore.QSize(1000,700))
+        self.resize(QtCore.QSize(1200,700))
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)

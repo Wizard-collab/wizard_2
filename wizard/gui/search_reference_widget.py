@@ -264,7 +264,10 @@ class search_thread(QtCore.QThread):
                                 if self.running:
                                     self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
             if self.context == 'work_env':
-                groups_list = project.search_group(self.group)
+                if self.group in 'group':
+                    groups_list = project.get_groups()
+                else:
+                    groups_list = project.search_group(self.group)
                 for group_row in groups_list:
                     if self.running:
                         self.group_signal.emit(group_row)
@@ -299,8 +302,8 @@ class custom_group_item(QtWidgets.QTreeWidgetItem):
 
     def fill_ui(self):
         self.setText(1, self.group_row['name'])
-        self.setText(2, 'group')
-        self.setIcon(2, gui_utils.QIcon_from_svg(ressources._group_icon_,
+        self.setText(0, 'group')
+        self.setIcon(1, gui_utils.QIcon_from_svg(ressources._group_icon_,
                                                     self.group_row['color']))
         bold_font=QtGui.QFont()
         bold_font.setBold(True)

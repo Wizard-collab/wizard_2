@@ -323,13 +323,15 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(5)
+        self.list_view.setColumnCount(6)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Export version'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Export version', 'Auto update'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
         self.list_view.header().resizeSection(3, 250)
+        self.list_view.header().resizeSection(4, 250)
+        self.list_view.header().resizeSection(5, 20)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -455,6 +457,9 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.treeWidget().setItemWidget(self, 3, self.export_widget)
         self.version_widget = editable_data_widget(bold=True)
         self.treeWidget().setItemWidget(self, 4, self.version_widget)
+        self.auto_update_checkbox = QtWidgets.QCheckBox()
+        self.auto_update_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 5, self.auto_update_checkbox)
 
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
 
@@ -462,6 +467,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.variant_widget.setText(infos_list[1])
         self.export_widget.setText(infos_list[2])
         self.version_widget.setText(infos_list[3])
+        self.set_auto_update(infos_list[5])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
@@ -471,6 +477,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_widget.button_clicked.connect(self.version_modification_requested)
         self.export_widget.button_clicked.connect(self.export_modification_requested)
         self.variant_widget.button_clicked.connect(self.variant_modification_requested)
+        self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
 
     def variant_modification_requested(self, point):
         variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
@@ -511,6 +518,22 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             action = menu.exec_(QtGui.QCursor().pos())
             if action is not None:
                 self.modify_version(action.id)
+
+    def set_auto_update(self, auto_update):
+        self.apply_auto_update_change = False
+        self.auto_update_checkbox.setChecked(auto_update)
+        if auto_update:
+            self.version_widget.hide_button()
+        else:
+            self.version_widget.unhide_button()
+        self.apply_auto_update_change = True
+
+    def modify_auto_update(self, auto_update):
+        if self.context == 'work_env':
+            project.modify_reference_auto_update(self.reference_row['id'], auto_update)
+        else:
+            project.modify_grouped_reference_auto_update(self.reference_row['id'], auto_update)
+        gui_server.refresh_ui()
 
     def modify_version(self, export_version_id):
         if self.context == 'work_env':
@@ -565,6 +588,12 @@ class editable_data_widget(QtWidgets.QFrame):
         self.main_button.setFixedSize(QtCore.QSize(14,14))
         self.main_layout.addWidget(self.main_button)
 
+    def hide_button(self):
+        self.main_button.setVisible(0)
+
+    def unhide_button(self):
+        self.main_button.setVisible(1)
+
     def setText(self, text):
         self.label.setText(text)
 
@@ -593,7 +622,12 @@ class reference_infos_thread(QtCore.QThread):
                 else:
                     up_to_date = 1
 
-                self.reference_infos_signal.emit([reference_row['id'], variant_row['name'], export_row['name'], export_version_row['name'], up_to_date])
+                self.reference_infos_signal.emit([reference_row['id'], 
+                                                    variant_row['name'], 
+                                                    export_row['name'], 
+                                                    export_version_row['name'], 
+                                                    up_to_date, 
+                                                    reference_row['auto_update']])
 
     def update_references_rows(self, reference_rows):
         self.running = False
