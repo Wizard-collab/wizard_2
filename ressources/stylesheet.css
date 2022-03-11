@@ -441,6 +441,10 @@ QSlider::handle:horizontal {
     margin: -3px 0;
 }
 
+#color_button{
+	background-color: transparent;
+}
+
 #tab_button{
 	text-align: left;
 	background-color: transparent;
@@ -528,10 +532,10 @@ QSlider::handle:horizontal {
 }
 
 #android_checkbox::indicator {
-    width: 40px;
-    height: 26px;
+    width: 28px;
+    height: 18px;
     background-color:#18181c;
-    border-radius: 13px;
+    border-radius: 9px;
     image: url(ressources/icons/android_cb_off.svg);
 }
 
@@ -539,7 +543,6 @@ QSlider::handle:horizontal {
     background-color:#7785de;
     image: url(ressources/icons/android_cb_on.svg);
 }
-
 
 #loading_widget_frame{
 	border-radius: 5px;

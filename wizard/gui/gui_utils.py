@@ -36,6 +36,14 @@ def get_app():
         app.setStyleSheet(f.read())
     return app
 
+def QIcon_from_svg(svg_filepath, color='black'):
+    img = QtGui.QPixmap(svg_filepath)
+    qp = QtGui.QPainter(img)
+    qp.setCompositionMode(QtGui.QPainter.CompositionMode_SourceIn)
+    qp.fillRect( img.rect(), QtGui.QColor(color) )
+    qp.end()
+    return QtGui.QIcon(img)
+
 def move_ui(widget, margin=0, pos=None):
     desktop = QtWidgets.QApplication.desktop()
     screenRect = desktop.screenGeometry()

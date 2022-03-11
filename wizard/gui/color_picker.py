@@ -7,12 +7,15 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import colorsys
 
+# Wizard gui modules
+from wizard.gui import gui_utils
+
 class color_picker(QtWidgets.QWidget):
 
-    validate_signal = pyqtSignal(int)
+    validate_signal = pyqtSignal(str)
     color_signal = pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, color='#798fe8', parent=None):
         super(color_picker, self).__init__(parent)
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.ToolTip)
@@ -21,8 +24,32 @@ class color_picker(QtWidgets.QWidget):
         self.build_ui()
         self.connect_functions()
 
+        self.set_color(color)
+
+    def showEvent(self, event):
+        gui_utils.move_ui(self)
+        event.accept()
+
+    def set_color(self, hex):
+        h, s, v = self.hex_to_hsv(hex)
+        self.set_HSV(h, s, v)
+
+    def set_HSV(self, h, s, v):
+        self.hue_selector.move(0, (100 - h) * 1.85)
+        self.color_view.setStyleSheet(f"border-radius: 5px;background-color: qlineargradient(x1:1, x2:0, stop:0 hsl({h}%,100%,50%), stop:1 #fff);")
+        self.selector.move(s * 2 - 6, (200 - v * 2) - 6)
+
+    def hex_to_hsv(self, hex):
+        hex = hex.replace('#', '')
+        if len(hex) < 6: hex += "0"*(6-len(hex))
+        elif len(hex) > 6: hex = hex[0:6]
+        r,g,b = tuple(int(hex[i:i+2], 16) for i in (0,2,4))
+        h,s,v = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
+        return (h * 100, s * 100, v * 100)
+
     def leaveEvent(self, event):
-        self.validate_signal.emit(1)
+        h, s, v = self.get_color()
+        self.validate_signal.emit(self.hsv_to_hex(h, s, v))
         self.close()
 
     def connect_functions(self):
@@ -54,9 +81,13 @@ class color_picker(QtWidgets.QWidget):
         return hex
 
     def hsvChanged(self):
-        h,s,v = (100 - self.hue_selector.y() / 1.85, (self.selector.x() + 6) / 2.0, (194 - self.selector.y()) / 2.0)
+        h, s, v = self.get_color()
         self.color_signal.emit(self.hsv_to_hex(h,s,v))
         self.color_view.setStyleSheet(f"border-radius: 5px;background-color: qlineargradient(x1:1, x2:0, stop:0 hsl({h}%,100%,50%), stop:1 #fff);")
+
+    def get_color(self):
+        h,s,v = (100 - self.hue_selector.y() / 1.85, (self.selector.x() + 6) / 2.0, (194 - self.selector.y()) / 2.0)
+        return h, s, v
 
     def build_ui(self):
         self.main_widget_layout = QtWidgets.QHBoxLayout()

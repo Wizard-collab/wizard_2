@@ -709,6 +709,71 @@ def archive_version(version_id):
     else:
         return None
 
+def create_group(name, color='#798fe8'):
+    return project.create_group(name, color)
+
+def remove_group(group_id):
+    return project.remove_group(group_id)
+
+def create_referenced_group(work_env_id, group_id):
+    namespaces_list = project.get_referenced_groups(work_env_id, 'namespace')
+    count = 0
+    namespace_raw = project.get_group_data(group_id, 'name')
+    namespace = f"{namespace_raw}_{str(count).zfill(1)}"
+    while namespace in namespaces_list:
+        count+=1
+        namespace = f"{namespace_raw}_{str(count).zfill(1)}"
+    return project.create_referenced_group(work_env_id,
+                                            group_id,
+                                            namespace)
+
+def remove_referenced_group(referenced_group_id):
+    return project.remove_referenced_group(referenced_group_id)
+
+def create_grouped_references_from_variant_id(group_id, variant_id):
+    export_rows = project.get_variant_export_childs(variant_id)
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
+    stage = project.get_stage_data(stage_id, 'name')
+    if export_rows is not None:
+        if stage == assets_vars._modeling_:
+            export_rows = [export_rows[0]]
+        for export_row in export_rows:
+            export_version_id = project.get_last_export_version(export_row['id'], 'id')
+            if export_version_id is not None and len(export_version_id)>=1:
+                create_grouped_reference(group_id, export_version_id[0])
+        return 1
+    else:
+        return None
+
+def create_grouped_reference(group_id, export_version_id):
+    namespaces_list = project.get_grouped_references(group_id, 'namespace')
+    count = 0
+    namespace_raw = build_namespace(export_version_id)
+    namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+    while namespace in namespaces_list:
+        count+=1
+        namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+    return project.create_grouped_reference(group_id,
+                                            export_version_id,
+                                            namespace)
+
+def remove_grouped_reference(grouped_reference_id):
+    return project.remove_grouped_reference(grouped_reference_id)
+
+def set_grouped_reference_last_version(grouped_reference_id):
+    export_version_id = project.get_grouped_reference_data(grouped_reference_id, 'export_version_id')
+    if export_version_id is not None:
+        export_version_row = project.get_export_version_data(export_version_id)
+        export_row = project.get_export_data(export_version_row['export_id'])
+        last_export_version_id = project.get_last_export_version(export_row['id'], 'id')
+        if last_export_version_id is not None and len(last_export_version_id)==1:
+            if last_export_version_id[0] != export_version_id:
+                project.update_grouped_reference(grouped_reference_id, last_export_version_id[0])
+                return 1
+            else:
+                logger.info("Grouped reference is up to date")
+                return None
+
 def get_domain_path(domain_id):
     dir_name = None
     domain_name = project.get_domain_data(domain_id, 'name')

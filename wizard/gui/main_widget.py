@@ -50,6 +50,7 @@ from wizard.gui import license_widget
 from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
 from wizard.gui import whatsnew_widget
+from wizard.gui import groups_manager_widget
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +70,7 @@ class main_widget(QtWidgets.QWidget):
         self.project_preferences_widget = project_preferences_widget.project_preferences_widget()
         self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget(self)
         self.launcher_widget = launcher_widget.launcher_widget(self)
-        self.references_widget = references_widget.references_widget(self)
+        self.references_widget = references_widget.references_widget('work_env', self)
         self.versions_widget = versions_widget.versions_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
         self.context_widget = context_widget.context_widget(self)
@@ -89,6 +90,7 @@ class main_widget(QtWidgets.QWidget):
         self.license_widget = license_widget.license_widget()
         self.whatsnew_widget = whatsnew_widget.whatsnew_widget()
         self.production_manager_widget = production_manager_widget.production_manager_widget()
+        self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -145,6 +147,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
         self.header_widget.show_project_preferences.connect(self.project_preferences_widget.toggle)
         self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
+        self.header_widget.show_groups_manager.connect(self.groups_manager_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
         self.header_widget.show_championship.connect(self.championship_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
@@ -171,6 +174,7 @@ class main_widget(QtWidgets.QWidget):
         self.subtask_manager.global_status_signal.connect(self.footer_widget.update_subtask_manager_button)
         self.subtask_manager.new_task_signal.connect(self.footer_widget.show_new_subtask_info)
         self.references_widget.focus_export.connect(self.focus_export_version)
+        self.references_widget.focus_on_group_signal.connect(self.focus_on_group)
 
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
         self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
@@ -213,6 +217,10 @@ class main_widget(QtWidgets.QWidget):
             self.tree_widget.focus_instance(('stage', export_version_row['stage_id']))
             self.tabs_widget.setCurrentIndex(self.exports_tab_index)
             self.exports_widget.focus_export_version(export_version_id)
+
+    def focus_on_group(self, group_id):
+        self.groups_manager_widget.toggle()
+        self.groups_manager_widget.set_group_id(group_id)
 
     def focus_instance(self, instance_tuple):
         instance_type = instance_tuple[0]
@@ -310,6 +318,7 @@ class main_widget(QtWidgets.QWidget):
         self.asset_tracking_widget.refresh()
         self.production_manager_widget.refresh()
         self.shelf_widget.refresh()
+        self.groups_manager_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

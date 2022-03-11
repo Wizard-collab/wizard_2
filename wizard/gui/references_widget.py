@@ -24,12 +24,16 @@ logger = logging.getLogger(__name__)
 class references_widget(QtWidgets.QWidget):
 
     focus_export = pyqtSignal(int)
+    focus_on_group_signal = pyqtSignal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, context='work_env', parent=None):
         super(references_widget, self).__init__(parent)
         self.reference_infos_thread = reference_infos_thread()
-        self.work_env_id = None
+        self.context = context
+        self.group_item = None
+        self.parent_instance_id = None
         self.reference_ids = dict()
+        self.referenced_group_ids = dict()
         self.stage_dic = dict()
         self.build_ui()
         self.connect_functions()
@@ -50,6 +54,7 @@ class references_widget(QtWidgets.QWidget):
         self.search_sc.activated.connect(self.search_reference)
         self.reference_infos_thread.reference_infos_signal.connect(self.update_item_infos)
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
+        self.list_view.itemDoubleClicked.connect(self.item_double_clicked)
         self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
@@ -62,64 +67,117 @@ class references_widget(QtWidgets.QWidget):
             self.reference_ids[reference_id].update_item_infos(infos_list)
 
     def search_reference(self):
-        if self.work_env_id is not None and self.work_env_id != 0:
-            self.search_reference_widget = search_reference_widget.search_reference_widget(self)
+        if self.parent_instance_id is not None and self.parent_instance_id != 0:
+            self.search_reference_widget = search_reference_widget.search_reference_widget(self.context, self)
             self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
+            self.search_reference_widget.groups_ids_signal.connect(self.create_referenced_groups)
             self.search_reference_widget.show()
 
-            variant_row = project.get_variant_data(project.get_work_env_data(self.work_env_id, 'variant_id'))
-            stage_row = project.get_stage_data(variant_row['stage_id'])
-            asset_row = project.get_asset_data(stage_row['asset_id'])
-            category_row = project.get_category_data(asset_row['category_id'])
-            self.search_reference_widget.search_asset(f"{category_row['name']}:{asset_row['name']}")
+            if self.context == 'work_env':
+                variant_row = project.get_variant_data(project.get_work_env_data(self.parent_instance_id, 'variant_id'))
+                stage_row = project.get_stage_data(variant_row['stage_id'])
+                asset_row = project.get_asset_data(stage_row['asset_id'])
+                category_row = project.get_category_data(asset_row['category_id'])
+                self.search_reference_widget.search_asset(f"{category_row['name']}:{asset_row['name']}")
+            else:
+                self.search_reference_widget.search_asset(f"")
 
     def create_references_from_variant_ids(self, variant_ids):
-        if self.work_env_id is not None:
+        if self.parent_instance_id is not None:
             for variant_id in variant_ids:
-                if assets.create_references_from_variant_id(self.work_env_id, variant_id):
-                    gui_server.refresh_ui()
+                if self.context == 'work_env':
+                    if assets.create_references_from_variant_id(self.parent_instance_id, variant_id):
+                        gui_server.refresh_ui()
+                else:
+                    if assets.create_grouped_references_from_variant_id(self.parent_instance_id, variant_id):
+                        gui_server.refresh_ui()
+
+    def create_referenced_groups(self, groups_ids):
+        if self.context == 'work_env':
+            for group_id in groups_ids:
+                assets.create_referenced_group(self.parent_instance_id, group_id)
+            gui_server.refresh_ui()
 
     def change_work_env(self, work_env_id):
         self.reference_ids = dict()
+        self.referenced_group_ids = dict()
         self.stage_dic = dict()
+        self.group_item = None
         self.list_view.clear()
-        self.work_env_id = work_env_id
+        self.parent_instance_id = work_env_id
         self.refresh()
 
     def refresh(self):
         start_time = time.time()
         if self.isVisible():
-            if self.work_env_id is not None and self.work_env_id != 0:
-                reference_rows = project.get_references(self.work_env_id)
-                project_references_id = []
-                if reference_rows is not None:
+            if self.parent_instance_id is not None and self.parent_instance_id != 0:
+                if self.context == 'work_env':
+                    reference_rows = project.get_references(self.parent_instance_id)
+                    referenced_groups_rows = project.get_referenced_groups(self.parent_instance_id)
+                else:
+                    reference_rows = project.get_grouped_references(self.parent_instance_id)
+                    referenced_groups_rows = []
+                if (reference_rows is not None) or (referenced_groups_rows is not None):
                     self.hide_info_mode()
-                    if len(reference_rows) >=1:
-                        for reference_row in reference_rows:
-                            project_references_id.append(reference_row['id'])
-                            if reference_row['id'] not in self.reference_ids.keys():
-                                stage = reference_row['stage']
-                                if stage not in self.stage_dic.keys():
-                                    stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
-                                    self.stage_dic[stage] = stage_item
-                                reference_item = custom_reference_tree_item(reference_row, self.stage_dic[stage])
-                                self.reference_ids[reference_row['id']] = reference_item
-                            else:
-                                self.reference_ids[reference_row['id']].reference_row = reference_row
-                        references_list_ids = list(self.reference_ids.keys())
-                        for reference_id in references_list_ids:
-                            if reference_id not in project_references_id:
-                                self.remove_reference_item(reference_id)
-                        self.reference_infos_thread.update_references_rows(reference_rows)
-                        self.update_stages_items()
+                    if (len(reference_rows) >=1) or (len(referenced_groups_rows) >=1):
+                        self.add_references_rows(reference_rows)
+                        self.add_referenced_groups_rows(referenced_groups_rows)
                     else:
                         self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
-            elif self.work_env_id is None:
-                self.show_info_mode("You need to init the work environment\nto create references...", ressources._init_work_env_info_image_)
+            elif self.parent_instance_id is None:
+                if self.context == 'work_env':
+                    self.show_info_mode("You need to init the work environment\nto create references...", ressources._init_work_env_info_image_)
+                else:
+                    self.show_info_mode("You need to add a group\nto create references...", ressources._add_group_info_image_)
             else:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
         self.update_refresh_time(start_time)
+
+    def add_references_rows(self, reference_rows):
+        project_references_id = []
+        for reference_row in reference_rows:
+            project_references_id.append(reference_row['id'])
+            if reference_row['id'] not in self.reference_ids.keys():
+                stage = reference_row['stage']
+                if stage not in self.stage_dic.keys():
+                    stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
+                    self.stage_dic[stage] = stage_item
+                reference_item = custom_reference_tree_item(reference_row, self.context, self.stage_dic[stage])
+                self.reference_ids[reference_row['id']] = reference_item
+            else:
+                self.reference_ids[reference_row['id']].reference_row = reference_row
+        references_list_ids = list(self.reference_ids.keys())
+        for reference_id in references_list_ids:
+            if reference_id not in project_references_id:
+                self.remove_reference_item(reference_id)
+        self.reference_infos_thread.update_references_rows(reference_rows)
+        self.update_stages_items()
+
+    def add_referenced_groups_rows(self, referenced_groups_rows):
+        self.add_group_item()
+
+        groups_ids = dict()
+        groups_rows = project.get_groups()
+        for group_row in groups_rows:
+            groups_ids[group_row['id']] = group_row
+
+        project_referenced_groups_id = []
+        for referenced_group_row in referenced_groups_rows:
+            project_referenced_groups_id.append(referenced_group_row['id'])
+            group_row = groups_ids[referenced_group_row['group_id']]
+            if referenced_group_row['id'] not in self.referenced_group_ids.keys():
+                referenced_group_item = custom_referenced_group_tree_item(referenced_group_row, group_row,
+                                                            self.group_item)
+                self.referenced_group_ids[referenced_group_row['id']] = referenced_group_item
+            else:
+                self.referenced_group_ids[referenced_group_row['id']].update(group_row)
+
+        referenced_group_list_ids = list(self.referenced_group_ids.keys())
+        for referenced_group_id in referenced_group_list_ids:
+            if referenced_group_id not in project_referenced_groups_id:
+                self.remove_referenced_group_item(referenced_group_id)
+        self.update_group_item()
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
@@ -128,42 +186,75 @@ class references_widget(QtWidgets.QWidget):
     def remove_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            reference_id = selected_item.reference_row['id']
-            assets.remove_reference(reference_id)
+            if selected_item.type == 'reference':
+                reference_id = selected_item.reference_row['id']
+                if self.context == 'work_env':
+                    assets.remove_reference(reference_id)
+                else:
+                    assets.remove_grouped_reference(reference_id)
+            elif selected_item.type == 'group':
+                referenced_group_id = selected_item.referenced_group_row['id']
+                assets.remove_referenced_group(referenced_group_id)
         gui_server.refresh_ui()
 
     def update_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            reference_id = selected_item.reference_row['id']
-            assets.set_reference_last_version(reference_id)
+            if selected_item.type == 'reference':
+                reference_id = selected_item.reference_row['id']
+                if self.context == 'work_env':
+                    assets.set_reference_last_version(reference_id)
+                else:
+                    assets.set_grouped_reference_last_version(reference_id)
         gui_server.refresh_ui()
 
     def update_all(self):
         for reference_id in self.reference_ids.keys():
-            if assets.set_reference_last_version(reference_id):
-                gui_server.refresh_ui()
+            if self.context == 'work_env':
+                assets.set_reference_last_version(reference_id)
+            else:
+                assets.set_grouped_reference_last_version(reference_id)
+        gui_server.refresh_ui()
 
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            export_version_id = selected_item.reference_row['export_version_id']
-            export_version_row = project.get_export_version_data(export_version_id)
-            if export_version_row['work_version_id'] is not None:
-                launch.launch_work_version(export_version_row['work_version_id'])
-
+            if selected_item.type == 'reference':
+                export_version_id = selected_item.reference_row['export_version_id']
+                export_version_row = project.get_export_version_data(export_version_id)
+                if export_version_row['work_version_id'] is not None:
+                    launch.launch_work_version(export_version_row['work_version_id'])
         gui_server.refresh_ui()
 
     def focus_on_export_version(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
-            self.focus_export.emit(selected_item.reference_row['export_version_id'])
+            if selected_item.type == 'reference':
+                self.focus_export.emit(selected_item.reference_row['export_version_id'])
 
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():
             item = self.reference_ids[reference_id]
             item.parent().removeChild(item)
             del self.reference_ids[reference_id]
+
+    def remove_referenced_group_item(self, referenced_group_id):
+        if referenced_group_id in self.referenced_group_ids.keys():
+            item = self.referenced_group_ids[referenced_group_id]
+            item.parent().removeChild(item)
+            del self.referenced_group_ids[referenced_group_id]
+
+    def add_group_item(self):
+        if self.group_item is None:
+            self.group_item = custom_group_tree_item(self.list_view.invisibleRootItem())
+
+    def update_group_item(self):
+        if self.group_item is not None:
+            childs = self.group_item.childCount()
+            if childs == 0:
+                pass
+                self.list_view.invisibleRootItem().removeChild(self.group_item)
+                self.group_item = None
 
     def update_stages_items(self):
         stages_list = list(self.stage_dic.keys())
@@ -194,8 +285,9 @@ class references_widget(QtWidgets.QWidget):
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
             remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected references')
             if len(selection) == 1:
-                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
-                focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
+                if selection[0].type == 'reference':
+                    launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
+                    focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
         add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
 
         action = menu.exec_(QtGui.QCursor().pos())
@@ -213,6 +305,9 @@ class references_widget(QtWidgets.QWidget):
             elif action == focus_action:
                 self.focus_on_export_version()
 
+    def item_double_clicked(self, item):
+        if item.type == 'group':
+            self.focus_on_group_signal.emit(item.referenced_group_row['group_id'])
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -228,13 +323,15 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(5)
+        self.list_view.setColumnCount(6)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Export version'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Export version', 'Auto update'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
         self.list_view.header().resizeSection(3, 250)
+        self.list_view.header().resizeSection(4, 250)
+        self.list_view.header().resizeSection(5, 20)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -312,9 +409,40 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
     def update_infos(self, childs):
         self.setText(0, f"{self.stage} ({childs})")
 
+class custom_group_tree_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, parent=None):
+        super(custom_group_tree_item, self).__init__(parent)
+        self.setFlags(QtCore.Qt.ItemIsEnabled)
+        self.setExpanded(1)
+        self.setText(0, 'Groups')
+        self.setIcon(0, QtGui.QIcon(ressources._group_icon_))
+
+class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, referenced_group_row, group_row, parent=None):
+        super(custom_referenced_group_tree_item, self).__init__(parent)
+        self.type = 'group'
+        self.referenced_group_row = referenced_group_row
+        self.group_row = group_row
+        self.fill_ui()
+
+    def fill_ui(self):
+        self.setText(0, self.referenced_group_row['group_name'])
+        self.setText(1, self.referenced_group_row['namespace'])
+        bold_font=QtGui.QFont()
+        bold_font.setBold(True)
+        self.setFont(1, bold_font)
+        self.setIcon(0, gui_utils.QIcon_from_svg(ressources._group_icon_,
+                                                    self.group_row['color']))
+
+    def update(self, group_row):
+        self.group_row = group_row
+        self.fill_ui()
+
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
-    def __init__(self, reference_row, parent=None):
+    def __init__(self, reference_row, context, parent=None):
         super(custom_reference_tree_item, self).__init__(parent)
+        self.context = context
+        self.type = 'reference'
         self.reference_row = reference_row
         self.fill_ui()
         self.connect_functions()
@@ -323,7 +451,6 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.reference_row['namespace'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
-
         self.setFont(1, bold_font)
         self.variant_widget = editable_data_widget()
         self.treeWidget().setItemWidget(self, 2, self.variant_widget)
@@ -331,6 +458,9 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.treeWidget().setItemWidget(self, 3, self.export_widget)
         self.version_widget = editable_data_widget(bold=True)
         self.treeWidget().setItemWidget(self, 4, self.version_widget)
+        self.auto_update_checkbox = QtWidgets.QCheckBox()
+        self.auto_update_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 5, self.auto_update_checkbox)
 
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
 
@@ -338,6 +468,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.variant_widget.setText(infos_list[1])
         self.export_widget.setText(infos_list[2])
         self.version_widget.setText(infos_list[3])
+        self.set_auto_update(infos_list[5])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
@@ -347,6 +478,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_widget.button_clicked.connect(self.version_modification_requested)
         self.export_widget.button_clicked.connect(self.export_modification_requested)
         self.variant_widget.button_clicked.connect(self.variant_modification_requested)
+        self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
 
     def variant_modification_requested(self, point):
         variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
@@ -388,16 +520,41 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             if action is not None:
                 self.modify_version(action.id)
 
+    def set_auto_update(self, auto_update):
+        self.apply_auto_update_change = False
+        self.auto_update_checkbox.setChecked(auto_update)
+        if auto_update:
+            self.version_widget.hide_button()
+        else:
+            self.version_widget.unhide_button()
+        self.apply_auto_update_change = True
+
+    def modify_auto_update(self, auto_update):
+        if self.context == 'work_env':
+            project.modify_reference_auto_update(self.reference_row['id'], auto_update)
+        else:
+            project.modify_grouped_reference_auto_update(self.reference_row['id'], auto_update)
+        gui_server.refresh_ui()
+
     def modify_version(self, export_version_id):
-        project.update_reference(self.reference_row['id'], export_version_id)
+        if self.context == 'work_env':
+            project.update_reference(self.reference_row['id'], export_version_id)
+        else:
+            project.update_grouped_reference(self.reference_row['id'], export_version_id)
         gui_server.refresh_ui()
 
     def modify_export(self, export_id):
-        project.modify_reference_export(self.reference_row['id'], export_id)
+        if self.context == 'work_env':
+            project.modify_reference_export(self.reference_row['id'], export_id)
+        else:
+            project.modify_grouped_reference_export(self.reference_row['id'], export_id)
         gui_server.refresh_ui()
 
     def modify_variant(self, variant_id):
-        project.modify_reference_variant(self.reference_row['id'], variant_id)
+        if self.context == 'work_env':
+            project.modify_reference_variant(self.reference_row['id'], variant_id)
+        else:
+            project.modify_grouped_reference_variant(self.reference_row['id'], variant_id)
         gui_server.refresh_ui()
 
 class editable_data_widget(QtWidgets.QFrame):
@@ -432,6 +589,12 @@ class editable_data_widget(QtWidgets.QFrame):
         self.main_button.setFixedSize(QtCore.QSize(14,14))
         self.main_layout.addWidget(self.main_button)
 
+    def hide_button(self):
+        self.main_button.setVisible(0)
+
+    def unhide_button(self):
+        self.main_button.setVisible(1)
+
     def setText(self, text):
         self.label.setText(text)
 
@@ -460,7 +623,12 @@ class reference_infos_thread(QtCore.QThread):
                 else:
                     up_to_date = 1
 
-                self.reference_infos_signal.emit([reference_row['id'], variant_row['name'], export_row['name'], export_version_row['name'], up_to_date])
+                self.reference_infos_signal.emit([reference_row['id'], 
+                                                    variant_row['name'], 
+                                                    export_row['name'], 
+                                                    export_version_row['name'], 
+                                                    up_to_date, 
+                                                    reference_row['auto_update']])
 
     def update_references_rows(self, reference_rows):
         self.running = False
