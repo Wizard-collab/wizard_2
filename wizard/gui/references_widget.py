@@ -415,6 +415,7 @@ class custom_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.setFlags(QtCore.Qt.ItemIsEnabled)
         self.setExpanded(1)
         self.setText(0, 'Groups')
+        self.setIcon(0, QtGui.QIcon(ressources._group_icon_))
 
 class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, referenced_group_row, group_row, parent=None):
