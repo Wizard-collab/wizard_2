@@ -378,9 +378,9 @@ def create_references_from_variant_id(work_env_id, variant_id):
         if stage == assets_vars._modeling_:
             export_rows = [export_rows[0]]
         for export_row in export_rows:
-            export_version_id = project.get_last_export_version(export_row['id'], 'id')
-            if export_version_id is not None and len(export_version_id)>=1:
-                create_reference(work_env_id, export_version_id[0])
+            export_version_id = project.get_default_export_version(export_row['id'], 'id')
+            if export_version_id:
+                create_reference(work_env_id, export_version_id)
         return 1
     else:
         return None
@@ -389,10 +389,10 @@ def create_reference(work_env_id, export_version_id):
     namespaces_list = project.get_references(work_env_id, 'namespace')
     count = 0
     namespace_raw = build_namespace(export_version_id)
-    namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+    namespace = f"{namespace_raw}"
     while namespace in namespaces_list:
         count+=1
-        namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+        namespace = f"{namespace_raw}_{str(count)}"
     return project.create_reference(work_env_id,
                                             export_version_id,
                                             namespace)
@@ -405,10 +405,10 @@ def set_reference_last_version(reference_id):
     if export_version_id is not None:
         export_version_row = project.get_export_version_data(export_version_id)
         export_row = project.get_export_data(export_version_row['export_id'])
-        last_export_version_id = project.get_last_export_version(export_row['id'], 'id')
-        if last_export_version_id is not None and len(last_export_version_id)==1:
-            if last_export_version_id[0] != export_version_id:
-                project.update_reference(reference_id, last_export_version_id[0])
+        default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
+        if default_export_version_id:
+            if default_export_version_id != export_version_id:
+                project.update_reference(reference_id, default_export_version_id)
                 return 1
             else:
                 logger.info("Reference is up to date")
@@ -430,12 +430,10 @@ def get_references_files(work_env_id):
     references_dic = dict()
     for reference_row in references_rows:
         reference_files_list = json.loads(project.get_export_version_data(reference_row['export_version_id'], 'files'))
-
         variant_id = project.get_work_env_data(reference_row['work_env_id'], 'variant_id')
         stage_id = project.get_variant_data(variant_id, 'stage_id')
         asset_id = project.get_stage_data(stage_id, 'asset_id')
         asset_name = project.get_asset_data(asset_id, 'name')
-
         reference_dic = dict()
         reference_dic['files'] = reference_files_list
         reference_dic['namespace'] = reference_row['namespace']
@@ -443,6 +441,23 @@ def get_references_files(work_env_id):
         if reference_row['stage'] not in references_dic.keys():
             references_dic[reference_row['stage']] = []
         references_dic[reference_row['stage']].append(reference_dic)
+    referenced_groups_rows = project.get_referenced_groups(work_env_id)
+    for referenced_group_row in referenced_groups_rows:
+        grouped_references_rows = project.get_grouped_references(referenced_group_row['group_id'])
+        for grouped_reference_row in grouped_references_rows:
+            reference_files_list = json.loads(project.get_export_version_data(grouped_reference_row['export_version_id'], 'files'))
+            variant_id = project.get_work_env_data(referenced_group_row['work_env_id'], 'variant_id')
+            stage_id = project.get_variant_data(variant_id, 'stage_id')
+            asset_id = project.get_stage_data(stage_id, 'asset_id')
+            asset_name = project.get_asset_data(asset_id, 'name')
+            reference_dic = dict()
+            reference_dic['files'] = reference_files_list
+            reference_dic['namespace'] = f"{referenced_group_row['namespace']}_{grouped_reference_row['namespace']}"
+            reference_dic['asset_name'] = asset_name
+            if grouped_reference_row['stage'] not in references_dic.keys():
+                references_dic[grouped_reference_row['stage']] = []
+            references_dic[grouped_reference_row['stage']].append(reference_dic)
+
     return references_dic
 
 def merge_file_as_export_version(export_name, files, variant_id, comment='', execute_xp=True):
@@ -476,10 +491,9 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
         if variant_row:
             export_id = get_or_add_export(export_name, variant_id)
             if export_id:
-                last_version_list = project.get_last_export_version(export_id, 'name')
-                if last_version_list is not None and len(last_version_list) == 1:
-                    last_version = last_version_list[0]
-                    new_version =  str(int(last_version)+1).zfill(4)
+                last_version_name = project.get_last_export_version(export_id, 'name')
+                if last_version_name:
+                    new_version =  str(int(last_version_name)+1).zfill(4)
                 else:
                     new_version = '0001'
                 export_path = get_export_path(export_id)
@@ -719,10 +733,10 @@ def create_referenced_group(work_env_id, group_id):
     namespaces_list = project.get_referenced_groups(work_env_id, 'namespace')
     count = 0
     namespace_raw = project.get_group_data(group_id, 'name')
-    namespace = f"{namespace_raw}_{str(count).zfill(1)}"
+    namespace = f"{namespace_raw}"
     while namespace in namespaces_list:
         count+=1
-        namespace = f"{namespace_raw}_{str(count).zfill(1)}"
+        namespace = f"{namespace_raw}_{str(count)}"
     return project.create_referenced_group(work_env_id,
                                             group_id,
                                             namespace)
@@ -738,9 +752,9 @@ def create_grouped_references_from_variant_id(group_id, variant_id):
         if stage == assets_vars._modeling_:
             export_rows = [export_rows[0]]
         for export_row in export_rows:
-            export_version_id = project.get_last_export_version(export_row['id'], 'id')
-            if export_version_id is not None and len(export_version_id)>=1:
-                create_grouped_reference(group_id, export_version_id[0])
+            export_version_id = project.get_default_export_version(export_row['id'], 'id')
+            if export_version_id:
+                create_grouped_reference(group_id, export_version_id)
         return 1
     else:
         return None
@@ -749,10 +763,10 @@ def create_grouped_reference(group_id, export_version_id):
     namespaces_list = project.get_grouped_references(group_id, 'namespace')
     count = 0
     namespace_raw = build_namespace(export_version_id)
-    namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+    namespace = f"{namespace_raw}"
     while namespace in namespaces_list:
         count+=1
-        namespace = f"{namespace_raw}_{str(count).zfill(4)}"
+        namespace = f"{namespace_raw}_{str(count)}"
     return project.create_grouped_reference(group_id,
                                             export_version_id,
                                             namespace)
@@ -765,10 +779,10 @@ def set_grouped_reference_last_version(grouped_reference_id):
     if export_version_id is not None:
         export_version_row = project.get_export_version_data(export_version_id)
         export_row = project.get_export_data(export_version_row['export_id'])
-        last_export_version_id = project.get_last_export_version(export_row['id'], 'id')
-        if last_export_version_id is not None and len(last_export_version_id)==1:
-            if last_export_version_id[0] != export_version_id:
-                project.update_grouped_reference(grouped_reference_id, last_export_version_id[0])
+        default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
+        if default_export_version_id:
+            if default_export_version_id != export_version_id:
+                project.update_grouped_reference(grouped_reference_id, default_export_version_id)
                 return 1
             else:
                 logger.info("Grouped reference is up to date")

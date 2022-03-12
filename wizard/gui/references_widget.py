@@ -616,9 +616,9 @@ class reference_infos_thread(QtCore.QThread):
                 export_version_row = project.get_export_version_data(reference_row['export_version_id'])
                 export_row = project.get_export_data(export_version_row['export_id'])
                 variant_row = project.get_variant_data(export_row['variant_id'])
-                last_export_version_id = project.get_last_export_version(export_row['id'], 'id')
+                default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
 
-                if last_export_version_id[0] != reference_row['export_version_id']:
+                if default_export_version_id  != reference_row['export_version_id']:
                     up_to_date = 0
                 else:
                     up_to_date = 1
