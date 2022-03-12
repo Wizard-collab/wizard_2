@@ -9,34 +9,73 @@ import os
 # Wizard modules
 from wizard.vars import ressources
 
-class image_viewer_widget(QtWidgets.QWidget):
-    def __init__(self, image):
-        super(image_viewer_widget, self).__init__()
+class image_viewer_widget(QtWidgets.QGraphicsView):
+    def __init__(self, image, parent=None):
+        super(image_viewer_widget, self).__init__(parent)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Image viewer")
+        self.setObjectName('dark_widget')
 
-        self.image = image
-        self.build_ui()
+        self.zoom = 0
+        self.empty = True
+        self.scene = QtWidgets.QGraphicsScene(self)
+        self.photo = QtWidgets.QGraphicsPixmapItem()
+        self.scene.addItem(self.photo)
+        self.setScene(self.scene)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
-    def build_ui(self):
-        self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(0)
-        self.setLayout(self.main_layout)
+        self.setPhoto(QtGui.QPixmap(image))
+        rect = QtCore.QRectF(self.photo.pixmap().rect())
+        self.resize(rect.width(), rect.height())
 
-        self.main_image_label = QtWidgets.QLabel()
-        self.main_image_label.setPixmap(QtGui.QPixmap(self.image).scaled(1600,100,
-                    QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
-        self.main_layout.addWidget(self.main_image_label)
+    def hasPhoto(self):
+        return not self.empty
 
-    def showEvent(self, event):
-        self.center()
-        event.accept()
+    def fitInView(self, scale=True):
+        rect = QtCore.QRectF(self.photo.pixmap().rect())
+        if not rect.isNull():
+            self.setSceneRect(rect)
+            if self.hasPhoto():
+                unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
+                if (unity.width() != 0) and (unity.height() != 0):
+                    self.scale(1 / unity.width(), 1 / unity.height())
+                    viewrect = self.viewport().rect()
+                    scenerect = self.transform().mapRect(rect)
+                    factor = min(viewrect.width() / scenerect.width(),
+                                 viewrect.height() / scenerect.height())
+                    #self.scale(factor, factor)
+            self.zoom = 0
 
-    def center(self):
-        frameGm = self.frameGeometry()
-        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
-        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
-        frameGm.moveCenter(centerPoint)
-        self.move(frameGm.topLeft())
+    def setPhoto(self, pixmap=None):
+        self.zoom = 0
+        if pixmap and not pixmap.isNull():
+            self.empty = False
+            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+            self.photo.setPixmap(pixmap)
+        else:
+            self.empty = True
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+            self.photo.setPixmap(QtGui.QPixmap())
+        self.fitInView()
+
+    def wheelEvent(self, event):
+        if self.hasPhoto():
+            if event.angleDelta().y() > 0:
+                factor = 1.05
+                self.zoom += 1
+            else:
+                factor = 0.95
+                self.zoom -= 1
+            if self.zoom != 0:
+                self.scale(factor, factor)
+            elif self.zoom == 0:
+                self.fitInView()
+            '''
+            else:
+                self.zoom = 0
+            '''

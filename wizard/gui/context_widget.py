@@ -21,7 +21,6 @@ from wizard.core import launch
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
-from wizard.gui import image_viewer_widget
 
 class context_widget(QtWidgets.QFrame):
 

@@ -1,136 +1,119 @@
-# coding: utf-8
-# Author: Leo BRUNEL
-# Contact: contact@leobrunel.com
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-# Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
-import colorsys
+class PhotoViewer(QtWidgets.QGraphicsView):
+    photoClicked = QtCore.pyqtSignal(QtCore.QPoint)
 
-class color_picker(QtWidgets.QWidget):
+    def __init__(self, parent):
+        super(PhotoViewer, self).__init__(parent)
+        self._zoom = 0
+        self._empty = True
+        self._scene = QtWidgets.QGraphicsScene(self)
+        self._photo = QtWidgets.QGraphicsPixmapItem()
+        self._scene.addItem(self._photo)
+        self.setScene(self._scene)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(30, 30, 30)))
+        self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
-    validate_signal = pyqtSignal(int)
-    color_signal = pyqtSignal(str)
+    def hasPhoto(self):
+        return not self._empty
 
-    def __init__(self, parent=None):
-        super(color_picker, self).__init__(parent)
+    def fitInView(self, scale=True):
+        rect = QtCore.QRectF(self._photo.pixmap().rect())
+        if not rect.isNull():
+            self.setSceneRect(rect)
+            if self.hasPhoto():
+                unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
+                self.scale(1 / unity.width(), 1 / unity.height())
+                viewrect = self.viewport().rect()
+                scenerect = self.transform().mapRect(rect)
+                factor = min(viewrect.width() / scenerect.width(),
+                             viewrect.height() / scenerect.height())
+                self.scale(factor, factor)
+            self._zoom = 0
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+    def setPhoto(self, pixmap=None):
+        self._zoom = 0
+        if pixmap and not pixmap.isNull():
+            self._empty = False
+            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+            self._photo.setPixmap(pixmap)
+        else:
+            self._empty = True
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+            self._photo.setPixmap(QtGui.QPixmap())
+        self.fitInView()
 
-        self.build_ui()
-        self.connect_functions()
+    def wheelEvent(self, event):
+        if self.hasPhoto():
+            if event.angleDelta().y() > 0:
+                factor = 1.25
+                self._zoom += 1
+            else:
+                factor = 0.8
+                self._zoom -= 1
+            if self._zoom > 0:
+                self.scale(factor, factor)
+            elif self._zoom == 0:
+                self.fitInView()
+            else:
+                self._zoom = 0
 
-    def leaveEvent(self, event):
-        self.validate_signal.emit(1)
-        self.close()
+    def toggleDragMode(self):
+        if self.dragMode() == QtWidgets.QGraphicsView.ScrollHandDrag:
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+        elif not self._photo.pixmap().isNull():
+            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
 
-    def connect_functions(self):
-        self.hue.mouseMoveEvent = self.moveHueSelector
-        self.black_overlay.mouseMoveEvent = self.moveSVSelector
-        self.black_overlay.mousePressEvent = self.moveSVSelector
+    def mousePressEvent(self, event):
+        if self._photo.isUnderMouse():
+            self.photoClicked.emit(QtCore.QPoint(event.pos()))
+        super(PhotoViewer, self).mousePressEvent(event)
 
-    def moveSVSelector(self, event):
-        if event.buttons() == QtCore.Qt.LeftButton:
-            pos = event.pos()
-            if pos.x() < 0: pos.setX(0)
-            if pos.y() < 0: pos.setY(0)
-            if pos.x() > 200: pos.setX(200)
-            if pos.y() > 200: pos.setY(200)
-            self.selector.move(pos - QtCore.QPoint(6,6))
-            self.hsvChanged()
 
-    def moveHueSelector(self, event):
-        if event.buttons() == QtCore.Qt.LeftButton:
-            pos = event.pos().y()
-            if pos < 0: pos = 0
-            if pos > 185: pos = 185
-            self.hue_selector.move(QtCore.QPoint(0,pos))
-            self.hsvChanged()
+class Window(QtWidgets.QWidget):
+    def __init__(self):
+        super(Window, self).__init__()
+        self.viewer = PhotoViewer(self)
+        # 'Load image' button
+        self.btnLoad = QtWidgets.QToolButton(self)
+        self.btnLoad.setText('Load image')
+        self.btnLoad.clicked.connect(self.loadImage)
+        # Button to change from drag/pan to getting pixel info
+        self.btnPixInfo = QtWidgets.QToolButton(self)
+        self.btnPixInfo.setText('Enter pixel info mode')
+        self.btnPixInfo.clicked.connect(self.pixInfo)
+        self.editPixInfo = QtWidgets.QLineEdit(self)
+        self.editPixInfo.setReadOnly(True)
+        self.viewer.photoClicked.connect(self.photoClicked)
+        # Arrange layout
+        VBlayout = QtWidgets.QVBoxLayout(self)
+        VBlayout.addWidget(self.viewer)
+        HBlayout = QtWidgets.QHBoxLayout()
+        HBlayout.setAlignment(QtCore.Qt.AlignLeft)
+        HBlayout.addWidget(self.btnLoad)
+        HBlayout.addWidget(self.btnPixInfo)
+        HBlayout.addWidget(self.editPixInfo)
+        VBlayout.addLayout(HBlayout)
 
-    def hsv_to_hex(self, h, s, v):
-        r,g,b = colorsys.hsv_to_rgb(h / 100.0, s / 100.0, v / 100.0)
-        hex = '#%02x%02x%02x' % (int(r*255),int(g*255),int(b*255))
-        return hex
+    def loadImage(self):
+        self.viewer.setPhoto(QtGui.QPixmap(r"C:\Users\leo\Desktop\sorcieres\2.jpg"))
 
-    def hsvChanged(self):
-        h,s,v = (100 - self.hue_selector.y() / 1.85, (self.selector.x() + 6) / 2.0, (194 - self.selector.y()) / 2.0)
-        self.color_signal.emit(self.hsv_to_hex(h,s,v))
-        self.color_view.setStyleSheet(f"border-radius: 5px;background-color: qlineargradient(x1:1, x2:0, stop:0 hsl({h}%,100%,50%), stop:1 #fff);")
+    def pixInfo(self):
+        self.viewer.toggleDragMode()
 
-    def build_ui(self):
-        self.main_widget_layout = QtWidgets.QHBoxLayout()
-        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
-        self.setLayout(self.main_widget_layout)
+    def photoClicked(self, pos):
+        if self.viewer.dragMode()  == QtWidgets.QGraphicsView.NoDrag:
+            self.editPixInfo.setText('%d, %d' % (pos.x(), pos.y()))
 
-        self.main_widget = QtWidgets.QFrame()
-        self.main_widget.setMaximumWidth(300)
-        self.main_widget.setObjectName('black_round_frame')
-        self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.main_widget_layout.addWidget(self.main_widget)
 
-        self.color_view = QtWidgets.QFrame(self)
-        self.color_view.setMinimumSize(QtCore.QSize(200, 200))
-        self.color_view.setMaximumSize(QtCore.QSize(200, 200))
-        self.color_view.setStyleSheet("/* ALL CHANGES HERE WILL BE OVERWRITTEN */;\n"
-        "background-color: qlineargradient(x1:1, x2:0, stop:0 hsl(0%,100%,50%), stop:1 rgba(255, 255, 255, 255));border-radius:6px;\n"
-        "\n"
-        "")
-        self.color_view.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.color_view.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.color_view.setObjectName("color_view")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.color_view)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_2.setSpacing(0)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.black_overlay = QtWidgets.QFrame(self.color_view)
-        self.black_overlay.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 0), stop:1 rgba(0, 0, 0, 255));;border-radius:4px;\n"
-        "\n"
-        "\n"
-        "")
-        self.black_overlay.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.black_overlay.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.black_overlay.setObjectName("black_overlay")
-        self.selector = QtWidgets.QFrame(self.black_overlay)
-        self.selector.setGeometry(QtCore.QRect(194, 20, 12, 12))
-        self.selector.setMinimumSize(QtCore.QSize(12, 12))
-        self.selector.setMaximumSize(QtCore.QSize(12, 12))
-        self.selector.setStyleSheet("background-color:none;\n"
-        "border: 2px solid white;\n"
-        "border-radius: 6px;")
-        self.selector.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.selector.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.selector.setObjectName("selector")
-        self.verticalLayout_2.addWidget(self.black_overlay)
-        self.main_layout.addWidget(self.color_view)
-        self.frame_2 = QtWidgets.QFrame(self)
-        self.frame_2.setObjectName('transparent_widget')
-        self.frame_2.setMinimumSize(QtCore.QSize(12, 0))
-        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.hue_bg = QtWidgets.QFrame(self.frame_2)
-        self.hue_bg.setGeometry(QtCore.QRect(0, 0, 12, 200))
-        self.hue_bg.setMinimumSize(QtCore.QSize(12, 200))
-        self.hue_bg.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(255, 0, 0, 255), stop:0.166 rgba(255, 255, 0, 255), stop:0.333 rgba(0, 255, 0, 255), stop:0.5 rgba(0, 255, 255, 255), stop:0.666 rgba(0, 0, 255, 255), stop:0.833 rgba(255, 0, 255, 255), stop:1 rgba(255, 0, 0, 255));\n"
-        "border-radius: 6px;")
-        self.hue_bg.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.hue_bg.setFrameShadow(QtWidgets.QFrame.Raised)
-        #self.hue_bg.setObjectName("hue_bg")
-        self.hue_selector = QtWidgets.QLabel(self.frame_2)
-        self.hue_selector.setGeometry(QtCore.QRect(0, 185, 0, 12))
-        self.hue_selector.setMinimumSize(QtCore.QSize(12, 0))
-        self.hue_selector.setStyleSheet("background-color: none;\n"
-        "border: 2px solid white;\n"
-        "border-radius: 6px;")
-        self.hue_selector.setText("")
-        self.hue_selector.setObjectName("hue_selector")
-        self.hue = QtWidgets.QFrame(self.frame_2)
-        self.hue.setGeometry(QtCore.QRect(0, 0, 12, 200))
-        self.hue.setMinimumSize(QtCore.QSize(12, 200))
-        self.hue.setStyleSheet("background-color: none;")
-        self.hue.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.hue.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.hue.setObjectName("hue")
-        self.main_layout.addWidget(self.frame_2)
+if __name__ == '__main__':
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    window = Window()
+    window.setGeometry(500, 300, 800, 600)
+    window.show()
+    sys.exit(app.exec_())

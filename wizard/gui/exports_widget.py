@@ -93,13 +93,14 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(0)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(8)
+        self.list_view.setColumnCount(9)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Infos', 'Default'])
-        self.list_view.header().resizeSection(0, 250)
+        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Format', 'Infos', 'Default'])
+        self.list_view.header().resizeSection(0, 100)
         self.list_view.header().resizeSection(3, 150)
-        self.list_view.header().resizeSection(7, 40)
+        self.list_view.header().resizeSection(4, 250)
+        self.list_view.header().resizeSection(8, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -552,13 +553,13 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         day, hour = tools.convert_time(self.export_row['creation_time'])
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
-        self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
 
     def set_default_name(self, name):
         if self.export_row['default_export_version'] is None:
-            self.setText(7, 'Always last')
+            self.setText(8, 'Always last')
         else:
-            self.setText(7, name)
+            self.setText(8, name)
 
     def refresh(self, export_row):
         self.export_row = export_row
@@ -585,7 +586,8 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
             self.setIcon(5, QtGui.QIcon(ressources._sofwares_icons_dic_[self.export_version_row['software']]))
         else:
             self.setIcon(5, QtGui.QIcon(ressources._manual_export_))
-        self.setText(6, 'ok')
+        extension = json.loads(self.export_version_row['files'])[0].split('.')[-1]
+        self.setText(6, extension)
 
     def refresh(self, export_version_row):
         self.export_version_row = export_version_row
@@ -594,17 +596,17 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
 
     def set_default(self, default):
         if default:
-            self.setIcon(7, QtGui.QIcon(ressources._default_export_version_icon_))
+            self.setIcon(8, QtGui.QIcon(ressources._default_export_version_icon_))
         else:
-            self.setIcon(7, QtGui.QIcon(''))
+            self.setIcon(8, QtGui.QIcon(''))
 
     def set_missing(self, number):
-        self.setText(6, f'missing {number} files')
-        self.setForeground(6, QtGui.QBrush(QtGui.QColor('#f79360')))
+        self.setText(7, f'missing {number} files')
+        self.setForeground(7, QtGui.QBrush(QtGui.QColor('#f79360')))
 
     def set_not_missing(self, number):
-        self.setText(6, f'{number} files')
-        self.setForeground(6, QtGui.QBrush(QtGui.QColor('#9ce87b')))
+        self.setText(7, f'{number} files')
+        self.setForeground(7, QtGui.QBrush(QtGui.QColor('#9ce87b')))
 
 class check_existence_thread(QtCore.QThread):
 
