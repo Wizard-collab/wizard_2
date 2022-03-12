@@ -262,8 +262,8 @@ class search_thread(QtCore.QThread):
                             if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
                                 if self.running:
                                     self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
-            if self.context == 'work_env':
-                if self.group in 'group':
+            if (self.context == 'work_env') and (len(self.group)>1):
+                if self.group == 'group':
                     groups_list = project.get_groups()
                 else:
                     groups_list = project.search_group(self.group)
