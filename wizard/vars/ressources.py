@@ -231,6 +231,8 @@ _plug_icon_ = os.path.join(_icons_path_, 'plug.svg')
 _available_icons_list_.append(_plug_icon_)
 _group_icon_ = os.path.join(_icons_path_, 'group.svg')
 _available_icons_list_.append(_group_icon_)
+_default_export_version_icon_ = os.path.join(_icons_path_, 'default_export_version.svg')
+_available_icons_list_.append(_default_export_version_icon_)
 
 _references_icon_ = os.path.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = os.path.join(_icons_path_, 'work_icon.svg')

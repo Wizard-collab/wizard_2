@@ -93,12 +93,13 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(0)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(7)
+        self.list_view.setColumnCount(8)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Infos'])
+        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Infos', 'Default'])
         self.list_view.header().resizeSection(0, 250)
         self.list_view.header().resizeSection(3, 150)
+        self.list_view.header().resizeSection(7, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -319,17 +320,22 @@ class exports_widget(QtWidgets.QWidget):
                 stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
                 exports_rows = project.get_variant_export_childs(self.variant_id)
                 project_export_id = []
+
                 if exports_rows is not None:
                     if exports_rows != []:
                         self.hide_info_mode()
                         for export_row in exports_rows:
                             project_export_id.append(export_row['id'])
                             if export_row['id'] not in self.export_ids.keys():
-                                export_item = custom_export_tree_item(export_row, stage_icon, self.list_view.invisibleRootItem())
+                                export_item = custom_export_tree_item(export_row, stage_icon, 
+                                                                self.list_view.invisibleRootItem())
                                 export_item.setExpanded(1)
                                 self.export_ids[export_row['id']] = export_item
+                            else:
+                                self.export_ids[export_row['id']].refresh(export_row)
                     else:
-                        self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
+                        self.show_info_mode("No exports, create exports\nwithin softwares !", 
+                                                                ressources._empty_info_image_)
 
                     project_export_versions_id = []
                     export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
@@ -339,7 +345,8 @@ class exports_widget(QtWidgets.QWidget):
                                 project_export_versions_id.append(export_version_row['id'])
                                 if export_version_row['id'] not in self.export_versions_ids.keys():
                                     if export_version_row['export_id'] in self.export_ids.keys():
-                                        export_version_item = custom_export_version_tree_item(export_version_row, self.export_ids[export_version_row['export_id']])
+                                        export_version_item = custom_export_version_tree_item(export_version_row,
+                                                                    self.export_ids[export_version_row['export_id']])
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
                                 else:
                                     self.export_versions_ids[export_version_row['id']].refresh(export_version_row)
@@ -354,11 +361,19 @@ class exports_widget(QtWidgets.QWidget):
                     for export_version_id in export_version_list_ids:
                         if export_version_id not in project_export_versions_id:
                             self.remove_export_version(export_version_id)
+
+                    for export_id in self.export_ids.keys():
+                        default_export_version = project.get_default_export_version(export_id)
+                        self.export_ids[export_id].set_default_name(default_export_version['name'])
+                        self.export_versions_ids[default_export_version['id']].set_default(True)
+
                 else:
-                    self.show_info_mode("No exports, create exports\nwithin softwares !", ressources._empty_info_image_)
+                    self.show_info_mode("No exports, create exports\nwithin softwares !",
+                                                        ressources._empty_info_image_)
 
             else:
-                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+                self.show_info_mode("Select or create a stage\nin the project tree !",
+                                                    ressources._select_stage_info_image_)
                 self.setAcceptDrops(False)
         self.refresh_infos()
         self.update_refresh_time(start_time)
@@ -404,12 +419,17 @@ class exports_widget(QtWidgets.QWidget):
         manual_action = menu.addAction(QtGui.QIcon(ressources._tool_manually_publish_), 'Manually add a file')
         archive_action = None
         launch_action = None
+        set_default_action = None
         if len(selection)>=1:
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
             comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
             destination_action = menu.addAction(QtGui.QIcon(ressources._destination_icon_), 'Open destination manager')
+            if selection[0].type != 'export':
+                set_default_action = menu.addAction(QtGui.QIcon(ressources._default_export_version_icon_), 'Set as default')
+            else:
+                set_default_action = menu.addAction(QtGui.QIcon(ressources._default_export_version_icon_), 'Set default as always last')
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             if action == folder_action:
@@ -424,6 +444,19 @@ class exports_widget(QtWidgets.QWidget):
                 self.modify_comment()
             elif action == destination_action:
                 self.open_destination_manager()
+            elif action == set_default_action:
+                self.set_default_export_version()
+
+    def set_default_export_version(self):
+        selection = self.list_view.selectedItems()
+        if len(selection) == 1:
+            item = selection[0]
+            if item.type != 'export':
+                project.set_default_export_version(item.export_version_row['export_id'],
+                                                        item.export_version_row['id'])
+            else:
+                project.set_default_export_version(item.export_row['id'], None)
+            gui_server.refresh_ui()
 
     def open_destination_manager(self):
         selection = self.list_view.selectedItems()
@@ -520,6 +553,16 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
 
+    def set_default_name(self, name):
+        if self.export_row['default_export_version'] is None:
+            self.setText(7, 'Always last')
+        else:
+            self.setText(7, name)
+
+    def refresh(self, export_row):
+        self.export_row = export_row
+        self.fill_ui()
+
 class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, export_version_row, parent=None):
         super(custom_export_version_tree_item, self).__init__(parent)
@@ -545,7 +588,14 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
 
     def refresh(self, export_version_row):
         self.export_version_row = export_version_row
+        self.set_default(False)
         self.fill_ui()
+
+    def set_default(self, default):
+        if default:
+            self.setIcon(7, QtGui.QIcon(ressources._default_export_version_icon_))
+        else:
+            self.setIcon(7, QtGui.QIcon(''))
 
     def set_missing(self, number):
         self.setText(6, f'missing {number} files')

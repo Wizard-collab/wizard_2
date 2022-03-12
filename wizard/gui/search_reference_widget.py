@@ -194,7 +194,6 @@ class search_reference_widget(QtWidgets.QWidget):
         self.search_bar.setPlaceholderText('"asset", "category:asset"')
         self.main_widget_layout.addWidget(self.search_bar)
 
-
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)
         self.main_widget_layout.addWidget(self.info_widget)

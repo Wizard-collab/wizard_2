@@ -169,11 +169,11 @@ class fill_thread(QtCore.QThread):
 
     def run(self):
         if self.running:
-            last_export_version_id = project.get_last_export_version(self.export_id, 'id')
+            default_export_version_id = project.get_default_export_version(self.export_id, 'id')
             for reference_row in self.references_rows:
                 work_env_string = assets.instance_to_string(('work_env', reference_row['work_env_id']))
                 export_version_row = project.get_export_version_data(reference_row['export_version_id'])
-                if last_export_version_id[0] != export_version_row['id']:
+                if default_export_version_id != export_version_row['id']:
                     up_to_date = 0
                 else:
                     up_to_date = 1

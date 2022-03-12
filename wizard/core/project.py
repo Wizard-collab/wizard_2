@@ -653,11 +653,13 @@ def add_export(name, variant_id):
                             ('name',
                                 'creation_time',
                                 'creation_user',
-                                'variant_id'), 
+                                'variant_id',
+                                'default_export_version'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
-                                variant_id))
+                                variant_id,
+                                None))
         if export_id:
             logger.info(f"Export root {name} added to project")
         return export_id
@@ -695,12 +697,41 @@ def get_all_export_versions(column='*'):
                                                 column)
     return export_versions_rows
 
+def get_default_export_version(export_id, column='*'):
+    data = None
+    default_export_version = get_export_data(export_id, 'default_export_version')
+    if default_export_version:
+        data = get_export_version_data(default_export_version, column)
+    else:
+        datas = db_utils.get_last_row_by_column_data('project',
+                                                            'export_versions',
+                                                            ('export_id', export_id),
+                                                            column)
+        if datas is not None and datas != []:
+            data = datas[0]
+    return data
+
 def get_last_export_version(export_id, column='*'):
-    versions_rows = db_utils.get_last_row_by_column_data('project',
+    data = None
+    datas = db_utils.get_last_row_by_column_data('project',
                                                         'export_versions',
                                                         ('export_id', export_id),
                                                         column)
-    return versions_rows
+    if datas is not None and datas != []:
+        data = datas[0]
+    return data
+
+
+def set_default_export_version(export_id, export_version_id):
+    if db_utils.update_data('project',
+                                'exports',
+                                ('default_export_version', export_version_id),
+                                ('id', export_id)):
+        propagate_auto_update(export_id, export_version_id)
+        logger.info(f'Default export version modified')
+        return 1
+    else:
+        return None
 
 def add_export_version(name, files, export_id, work_version_id=None, comment=''):
     if not (db_utils.check_existence_by_multiple_data('project', 
@@ -753,22 +784,24 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
         return None
 
 def propagate_auto_update(export_id, export_version_id):
-    references_ids = db_utils.get_row_by_multiple_data('project', 
-                                                        'references_data', 
-                                                        ('export_id', 'auto_update'), 
-                                                        (export_id, 1),
-                                                        'id')
-    grouped_references_ids = db_utils.get_row_by_multiple_data('project', 
-                                                        'grouped_references_data', 
-                                                        ('export_id', 'auto_update'), 
-                                                        (export_id, 1),
-                                                        'id')
-    for reference_id in references_ids:
-        update_reference_data(reference_id, 
-                                ('export_version_id', export_version_id))
-    for grouped_reference_id in grouped_references_ids:
-        update_grouped_reference_data(grouped_reference_id, 
-                                ('export_version_id', export_version_id))
+    default_export_version_id = get_default_export_version(export_id, 'id')
+    if (export_version_id == default_export_version_id) or (export_version_id is None):
+        references_rows = db_utils.get_row_by_multiple_data('project', 
+                                                            'references_data', 
+                                                            ('export_id', 'auto_update'), 
+                                                            (export_id, 1))
+        grouped_references_rows = db_utils.get_row_by_multiple_data('project', 
+                                                            'grouped_references_data', 
+                                                            ('export_id', 'auto_update'), 
+                                                            (export_id, 1))
+        for reference_row in references_rows:
+            if reference_row['export_version_id'] != default_export_version_id:
+                update_reference_data(reference_row['id'], 
+                                        ('export_version_id', default_export_version_id))
+        for grouped_reference_row in grouped_references_rows:
+            if grouped_reference_row['export_version_id'] != default_export_version_id:
+                update_grouped_reference_data(grouped_reference_row['id'], 
+                                        ('export_version_id', default_export_version_id))
 
 def get_export_version_destinations(export_version_id, column='*'):
     references_rows = db_utils.get_row_by_column_data('project',
@@ -789,6 +822,9 @@ def remove_export_version(export_version_id):
     if site.is_admin():
         for reference_id in get_export_version_destinations(export_version_id, 'id'):
             remove_reference(reference_id)
+        export_row = get_export_data(export_version_id)
+        if export_row['default_export_version'] == export_version_id:
+            set_default_export_version(export_row['id'], None)
         success = db_utils.delete_row('project', 'export_versions', export_version_id)
         if success:
             logger.info("Export version removed from project")
@@ -947,16 +983,18 @@ def modify_reference_variant(reference_id, variant_id):
     exports_list = get_variant_export_childs(variant_id, 'id')
     if exports_list is not None and exports_list != []:
         export_id = exports_list[0]
-        export_version_id = get_last_export_version(export_id, 'id')
-        update_reference_data(reference_id, ('export_id', export_id))
-        update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
+        export_version_id = get_default_export_version(export_id, 'id')
+        if export_version_id:
+            update_reference_data(reference_id, ('export_id', export_id))
+            update_reference_data(reference_id, ('export_version_id', export_version_id))
     else:
         logger.warning("No export found")
 
 def modify_reference_export(reference_id, export_id):
-    export_version_id = get_last_export_version(export_id, 'id')
-    update_reference_data(reference_id, ('export_id', export_id))
-    update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
+    export_version_id = get_default_export_version(export_id, 'id')
+    if export_version_id:
+        update_reference_data(reference_id, ('export_id', export_id))
+        update_reference_data(reference_id, ('export_version_id', export_version_id))
 
 def modify_reference_auto_update(reference_id, auto_update):
     if auto_update:
@@ -964,8 +1002,9 @@ def modify_reference_auto_update(reference_id, auto_update):
     update_reference_data(reference_id, ('auto_update', auto_update))
     if auto_update:
         export_id = get_reference_data(reference_id, 'export_id')
-        export_version_id = get_last_export_version(export_id, 'id')
-        update_reference_data(reference_id, ('export_version_id', export_version_id[0]))
+        export_version_id = get_default_export_version(export_id, 'id')
+        if export_version_id:
+            update_reference_data(reference_id, ('export_version_id', export_version_id))
 
 def update_reference_data(reference_id, data_tuple):
     success = db_utils.update_data('project',
@@ -1863,17 +1902,19 @@ def update_grouped_reference(grouped_reference_id, export_version_id):
     return success
 
 def modify_grouped_reference_export(grouped_reference_id, export_id):
-    export_version_id = get_last_export_version(export_id, 'id')
-    update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
-    update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
+    export_version_id = get_default_export_version(export_id, 'id')
+    if export_version_id:
+        update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
+        update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
 
 def modify_grouped_reference_variant(grouped_reference_id, variant_id):
     exports_list = get_variant_export_childs(variant_id, 'id')
     if exports_list is not None and exports_list != []:
         export_id = exports_list[0]
-        export_version_id = get_last_export_version(export_id, 'id')
-        update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
-        update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
+        export_version_id = get_default_export_version(export_id, 'id')
+        if export_version_id:
+            update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
+            update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
     else:
         logger.warning("No export found")
 
@@ -1883,8 +1924,9 @@ def modify_grouped_reference_auto_update(grouped_reference_id, auto_update):
     update_grouped_reference_data(grouped_reference_id, ('auto_update', auto_update))
     if auto_update:
         export_id = get_grouped_reference_data(grouped_reference_id, 'export_id')
-        export_version_id = get_last_export_version(export_id, 'id')
-        update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id[0]))
+        export_version_id = get_default_export_version(export_id, 'id')
+        if export_version_id:
+            update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
 
 def search_group(name, column='*'):
     groups_rows = db_utils.get_row_by_column_part_data('project',
@@ -2135,6 +2177,7 @@ def create_exports_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         variant_id integer NOT NULL,
+                                        default_export_version integer,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):

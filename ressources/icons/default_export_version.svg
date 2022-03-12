@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="500mm"
+   height="500mm"
+   viewBox="0 0 499.99999 500"
+   version="1.1"
+   id="svg1031"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="default_export_version.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1033"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="50"
+     lock-margins="true"
+     fit-margin-left="50"
+     fit-margin-right="50"
+     fit-margin-bottom="50"
+     inkscape:zoom="0.26051305"
+     inkscape:cx="1015.3042"
+     inkscape:cy="946.2098"
+     inkscape:window-width="1920"
+     inkscape:window-height="1121"
+     inkscape:window-x="-7"
+     inkscape:window-y="-7"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1031" />
+  <defs
+     id="defs1028" />
+  <path
+     id="rect15832"
+     style="fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:49.9999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:186.406;stroke-opacity:1;paint-order:markers fill stroke"
+     d="m 206.06574,391.96108 c 8.94667,0 17.89348,-3.42769 24.74888,-10.28309 l 1.49138,-1.4919 c 13.7108,-13.7108 13.7108,-35.78644 0,-49.49724 L 183.96012,282.34348 H 393.0104 c 19.39,0 34.99993,-15.60993 34.99993,-34.99993 v -2.10943 c 0,-19.38999 -15.60993,-34.99993 -34.99993,-34.99993 H 184.97606 L 232.306,162.90425 c 13.7108,-13.71079 13.7108,-35.78693 0,-49.49775 l -1.49138,-1.49137 c -13.71081,-13.71079 -35.78696,-13.71079 -49.49774,0 L 74.26191,218.97009 c -7.642357,7.64236 -11.019314,17.88325 -10.142035,27.82621 -0.877279,9.94296 2.499678,20.18386 10.142035,27.82621 l 107.05497,107.05548 c 6.85538,6.8554 15.80218,10.28309 24.74886,10.28309 z"
+     inkscape:label="view_arrow" />
+</svg>
