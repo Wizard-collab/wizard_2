@@ -820,11 +820,11 @@ def get_export_versions_by_variant(variant_id, column='*'):
 def remove_export_version(export_version_id):
     success = None
     if site.is_admin():
-        for reference_id in get_export_version_destinations(export_version_id, 'id'):
-            remove_reference(reference_id)
-        export_row = get_export_data(export_version_id)
+        export_row = get_export_data(get_export_version_data(export_version_id, 'export_id'))
         if export_row['default_export_version'] == export_version_id:
             set_default_export_version(export_row['id'], None)
+        for reference_id in get_export_version_destinations(export_version_id, 'id'):
+            remove_reference(reference_id)
         success = db_utils.delete_row('project', 'export_versions', export_version_id)
         if success:
             logger.info("Export version removed from project")

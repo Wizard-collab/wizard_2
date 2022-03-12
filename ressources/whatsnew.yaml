@@ -4,3 +4,6 @@ Batch exports:
 Project preferences:
   comment: You can now modify your project settings
   type: new
+References groups:
+  comment: Create references in custom groups and reference groups in scenes
+  type: new

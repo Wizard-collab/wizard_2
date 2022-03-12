@@ -552,6 +552,7 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         day, hour = tools.convert_time(self.export_row['creation_time'])
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
 
     def set_default_name(self, name):
         if self.export_row['default_export_version'] is None:

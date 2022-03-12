@@ -5,6 +5,9 @@ whats_new_dic['Project preferences']['comment'] = 'You can now modify your proje
 whats_new_dic['Batch exports'] = dict()
 whats_new_dic['Batch exports']['type'] = 'new'
 whats_new_dic['Batch exports']['comment'] = 'You can now export data from the work versions tab'
+whats_new_dic['References groups'] = dict()
+whats_new_dic['References groups']['type'] = 'new'
+whats_new_dic['References groups']['comment'] = 'Create references in custom groups and reference groups in scenes'
 
 import yaml
 with open('ressources/whatsnew.yaml', 'w') as f:
