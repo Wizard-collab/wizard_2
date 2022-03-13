@@ -35,6 +35,8 @@ class tree_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(tree_widget, self).__init__(parent)
 
+        self.creation_items_visibility = False
+
         self.domain_ids=dict()
         self.category_ids=dict()
         self.asset_ids=dict()
@@ -216,7 +218,16 @@ class tree_widget(QtWidgets.QFrame):
         self.refresh_datas()
         if hard:
             self.get_context()
+        self.update_creation_items_visibility()
         self.update_refresh_time(start_time)
+
+    def update_creation_items_visibility(self):
+        for creation_item in self.creation_items:
+            creation_item.setHidden(not self.creation_items_visibility)
+
+    def toggle_creation_items_visibility(self):
+        self.creation_items_visibility = not self.creation_items_visibility
+        self.update_creation_items_visibility()
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
@@ -339,7 +350,8 @@ class tree_widget(QtWidgets.QFrame):
         if not string or len(string)<2:
             for id in self.asset_ids.keys():
                 for i in range(self.asset_ids[id].childCount()):
-                    self.asset_ids[id].child(i).setHidden(0)
+                    if self.asset_ids[id].child(i) not in self.creation_items:
+                        self.asset_ids[id].child(i).setHidden(0)
         else:
             for id in self.asset_ids.keys():
                 for i in range(self.asset_ids[id].childCount()):
@@ -485,6 +497,13 @@ class tree_widget(QtWidgets.QFrame):
                 menu.addSeparator()
                 open_sandbox_folder_action = menu.addAction(QtGui.QIcon(ressources._sandbox_icon_), 'Open Sandbox folder')
                 launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type} (Double click)')
+        menu.addSeparator()
+
+        creation_items_visibility_icon = ressources._uncheck_icon_
+        if not self.creation_items_visibility:
+            creation_items_visibility_icon = ressources._check_icon_
+
+        hide_creation_items = menu.addAction(QtGui.QIcon(creation_items_visibility_icon), f'Hide creation items')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -500,6 +519,8 @@ class tree_widget(QtWidgets.QFrame):
                 self.isolate_item(item)
             elif action == open_sandbox_folder_action:
                 self.open_sandbox_folder(item)
+            elif action == hide_creation_items:
+                self.toggle_creation_items_visibility()
 
     def open_folder(self, item):
         if item.instance_type == 'domain':
