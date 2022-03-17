@@ -20,6 +20,7 @@ from wizard.core import environment
 from wizard.core import communicate
 from wizard.core import launch
 from wizard.core import team_client
+from wizard.core import path_utils
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -197,7 +198,7 @@ class main_widget(QtWidgets.QWidget):
         if sys.argv[0].endswith('.py'):
             subprocess.Popen('python PyWizard.py', creationflags=subprocess.CREATE_NEW_CONSOLE)
         elif sys.argv[0].endswith('.exe'):
-            os.startfile('PyWizard.exe')
+            path_utils.startfile('PyWizard.exe')
 
     def restart(self):
         self.close()

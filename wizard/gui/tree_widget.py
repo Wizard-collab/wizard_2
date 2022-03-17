@@ -15,6 +15,7 @@ from wizard.core import project
 from wizard.core import assets
 from wizard.core import environment
 from wizard.core import user
+from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.vars import user_vars
 from wizard.vars import assets_vars
@@ -531,15 +532,15 @@ class tree_widget(QtWidgets.QFrame):
             path = assets.get_asset_path(item.instance_id)
         elif item.instance_type== 'stage':
             path = assets.get_stage_path(item.instance_id)
-        if os.path.isdir(path):
-            os.startfile(path)
+        if path_utils.isdir(path):
+            path_utils.startfile(path)
         else:
             logger.error(f"{path} not found")
 
     def open_sandbox_folder(self, item):
         variant_id = project.get_stage_data(item.instance_id, 'default_variant_id')
-        sandbox_path = os.path.join(assets.get_variant_path(variant_id), '_SANDBOX')
-        os.startfile(sandbox_path)
+        sandbox_path = path_utils.join(assets.get_variant_path(variant_id), '_SANDBOX')
+        path_utils.startfile(sandbox_path)
 
     def archive_instance(self, item):
         self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)

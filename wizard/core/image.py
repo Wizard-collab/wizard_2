@@ -40,6 +40,7 @@ import os
 
 # Wizard modules
 from wizard.core import tools
+from wizard.core import path_utils
 
 def screenshot(file, thumbnail_file):
     # Capture the screen
@@ -57,7 +58,7 @@ def screenshot(file, thumbnail_file):
     return save_file, save_thumbnail_file
 
 def resize_preview(file, destination, size=200):
-    if os.path.isfile(file):
+    if path_utils.isfile(file):
         image = Image.open(file)
         preview, null, null = resize_image_with_fixed_width(image, size)
         preview_file = tools.get_filename_without_override(destination)
@@ -154,7 +155,7 @@ def project_random_image(project_name):
     w, h = draw.textsize(letter, font=font)
     draw.text(((500-w)/2,(282-h-30)/2), letter, (255, 255, 255), font=font)
 
-    img_file = os.path.join(tools.temp_dir(),'temp_img.png')
+    img_file = path_utils.join(tools.temp_dir(),'temp_img.png')
     img.save(img_file)
     return img_file
 
@@ -172,6 +173,6 @@ def user_random_image(user_name):
     w, h = draw.textsize(letter, font=font)
     draw.text(((100-w)/2,(100-h-10)/2), letter, (255, 255, 255), font=font)
 
-    img_file = os.path.join(tools.temp_dir(),'temp_img.png')
+    img_file = path_utils.join(tools.temp_dir(),'temp_img.png')
     img.save(img_file)
     return img_file

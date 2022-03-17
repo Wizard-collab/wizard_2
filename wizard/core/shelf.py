@@ -44,6 +44,7 @@ from wizard.core import project
 from wizard.core import subtask
 from wizard.core import user
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.vars import ressources
 from wizard.vars import user_vars
 
@@ -71,7 +72,7 @@ def create_project_script(name,
 	if execute:
 		scripts_folder = project.get_scripts_folder()
 		file_name = f"{name}.py"
-		file = tools.get_filename_without_override(os.path.normpath(os.path.join(scripts_folder, file_name)))
+		file = tools.get_filename_without_override(path_utils.join(scripts_folder, file_name))
 		if project.add_shelf_script(name, file, help, only_subprocess, icon):
 			with open(file, 'w') as f:
 				f.write(script)

@@ -37,6 +37,9 @@ import tempfile
 import time
 import logging
 
+# Wizard modules
+from wizard.core import path_utils
+
 logger = logging.getLogger(__name__)
 
 def flushed_input(placeholder):
@@ -124,9 +127,9 @@ def make_archive(source):
     # The root of the archive is folder/
     try:
         format = 'zip'
-        root_dir = os.path.dirname(source)
+        root_dir = path_utils.dirname(source)
         base_dir = os.path.basename(source.strip(os.sep))
-        base_name = get_filename_without_override(os.path.join(root_dir,
+        base_name = get_filename_without_override(path_utils.join(root_dir,
                                                     f"{base_dir}_archive.zip"))
         shutil.make_archive(os.path.splitext(base_name)[0],
                                                 format,
@@ -142,14 +145,14 @@ def get_filename_without_override(file):
     # Check if a given file exists
     # While it exists, increment the filename 
     # as /path/to/filename_#.extension
-    folder = os.path.dirname(file)
+    folder = path_utils.dirname(file)
     basename = os.path.basename(file)
     extension = os.path.splitext(basename)[-1]
     filename = os.path.splitext(basename)[0]
     index = 1
-    while os.path.isfile(file):
+    while path_utils.isfile(file):
         new_filename = "{}_{}{}".format(filename, index, extension)
-        file = os.path.join(folder, new_filename)
+        file = path_utils.join(folder, new_filename)
         index+=1
     return file
 
@@ -160,19 +163,19 @@ def copy_files(files_list, destination):
     # if not, return None
     sanity = 1
     for file in files_list:
-        if not os.path.isfile(file):
+        if not path_utils.isfile(file):
             sanity = 0
             logger.warning(f"{file} doesn't exists")
-    if not os.path.isdir(destination):
+    if not path_utils.isdir(destination):
         logger.warning(f"{destination} doesn't exists")
         sanity=0
     if sanity:
         new_files = []
         for file in files_list:
             file_name = os.path.split(file)[-1]
-            destination_file = get_filename_without_override(os.path.join(destination, 
+            destination_file = get_filename_without_override(path_utils.join(destination, 
                                                                             file_name))
-            shutil.copyfile(file, destination_file)
+            path_utils.copyfile(file, destination_file)
             new_files.append(destination_file)
             logger.info(f"{destination_file} copied")
         return new_files
@@ -183,7 +186,7 @@ def copy_files(files_list, destination):
 def temp_dir():
     # Return a temp directory
     tempdir = tempfile.mkdtemp()
-    return tempdir
+    return path_utils.clean_path(tempdir)
 
 def create_folder(dir_name):
     # Tries to create a folder
@@ -191,11 +194,11 @@ def create_folder(dir_name):
     # log the corresponding error
     success = None
     try:
-        os.mkdir(dir_name)
+        path_utils.mkdir(dir_name)
         logger.debug(f'{dir_name} created')
         success = 1
     except FileNotFoundError:
-        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{dir_name} doesn't exists")
     except FileExistsError:
         logger.error(f"{dir_name} already exists on filesystem")
     except PermissionError:
@@ -208,12 +211,12 @@ def create_folder_if_not_exist(dir_name):
     # log the corresponding error
     success = None
     try:
-        if not os.path.isdir(dir_name):
-            os.mkdir(dir_name)
+        if not path_utils.isdir(dir_name):
+            path_utils.mkdir(dir_name)
             logger.debug(f'{dir_name} created')
             success = 1
     except FileNotFoundError:
-        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{dir_name} doesn't exists")
     except FileExistsError:
         logger.error(f"{dir_name} already exists on filesystem")
     except PermissionError:
@@ -226,11 +229,11 @@ def remove_folder(dir_name):
     # log the corresponding error
     success = None
     try:
-        os.rmdir(dir_name)
+        path_utils.rmdir(dir_name)
         logger.info(f'{dir_name} removed')
         success = 1
     except FileNotFoundError:
-        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{path_utils.dirname(dir_name)} doesn't exists")
     except PermissionError:
         logger.error(f"{dir_name} access denied")
     return success
@@ -241,11 +244,11 @@ def remove_tree(dir_name):
     # log the corresponding error
     success = None
     try:
-        os.rmtree(dir_name)
+        path_utils.rmtree(dir_name)
         logger.info(f'{dir_name} removed')
         success = 1
     except FileNotFoundError:
-        logger.error(f"{os.path.dirname(dir_name)} doesn't exists")
+        logger.error(f"{path_utils.dirname(dir_name)} doesn't exists")
     except PermissionError:
         logger.error(f"{dir_name} access denied")
     return success
@@ -256,11 +259,11 @@ def remove_file(file):
     # log the corresponding error
     success = None
     try:
-        os.remove(file)
+        path_utils.remove(file)
         logger.info(f'{file} deleted')
         success = 1
     except FileNotFoundError:
-        logger.error(f"{os.path.dirname(file)} doesn't exists")
+        logger.error(f"{path_utils.dirname(file)} doesn't exists")
     except PermissionError:
         logger.error(f"{file} access denied")
     return success
@@ -268,8 +271,8 @@ def remove_file(file):
 def temp_file_from_pycmd(pycmd):
     # return a .py temporary file 
     # from given script ( as string )
-    tempdir = os.path.normpath(tempfile.mkdtemp())
-    temporary_python_file = os.path.join(tempdir, 'wizard_temp_script.py')
+    tempdir = path_utils.clean_path(tempfile.mkdtemp())
+    temporary_python_file = path_utils.join(tempdir, 'wizard_temp_script.py')
     with open(temporary_python_file, 'w') as f:
         f.write(pycmd)
-    return os.path.normpath(temporary_python_file)
+    return path_utils.clean_path(temporary_python_file)

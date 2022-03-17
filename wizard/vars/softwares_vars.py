@@ -29,6 +29,9 @@
 # Python modules
 import os
 
+# Wizard modules
+from wizard.core import path_utils
+
 # Available softwares
 _maya_ = 'maya'
 _guerilla_render_ = 'guerilla_render'
@@ -109,25 +112,25 @@ _script_env_dic_[_houdini_]='PYTHONPATH'
 _script_env_dic_[_blender_]='PYTHONPATH'
 
 # Plugins path
-_main_script_path_ = os.path.normpath(os.path.abspath('softwares'))
+_main_script_path_ = path_utils.clean_path(path_utils.abspath('softwares'))
 _plugins_path_ = dict()
-_plugins_path_[_maya_] = os.path.normpath(os.path.abspath(os.path.join('softwares', 'maya_wizard')))
-_plugins_path_[_guerilla_render_] = os.path.normpath(os.path.abspath(os.path.join('softwares', 'guerilla_render_wizard')))
-_plugins_path_[_substance_painter_] = os.path.normpath(os.path.abspath(os.path.join('softwares', 'substance_painter_wizard')))
-_plugins_path_[_substance_designer_] = os.path.normpath(os.path.abspath(os.path.join('softwares', 'substance_designer_wizard')))
-_plugins_path_[_nuke_] = os.path.normpath(os.path.abspath(os.path.join('softwares', 'nuke_wizard')))
-_plugins_path_[_houdini_] = os.path.normpath(os.path.abspath(os.path.join('softwares', 'houdini_wizard')))
-_plugins_path_[_blender_]  = os.path.normpath(os.path.abspath(os.path.join('softwares', 'blender_wizard')))
+_plugins_path_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'maya_wizard')))
+_plugins_path_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'guerilla_render_wizard')))
+_plugins_path_[_substance_painter_] = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'substance_painter_wizard')))
+_plugins_path_[_substance_designer_] = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'substance_designer_wizard')))
+_plugins_path_[_nuke_] = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'nuke_wizard')))
+_plugins_path_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'houdini_wizard')))
+_plugins_path_[_blender_]  = path_utils.clean_path(path_utils.abspath(path_utils.join('softwares', 'blender_wizard')))
 
 # Scripts files
 _scripts_dic_ = dict()
-_scripts_dic_[_maya_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_maya_], 'startup.mel'))).replace('\\', '/')
-_scripts_dic_[_guerilla_render_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_guerilla_render_], 'startup.py'))).replace('\\', '/')
-_scripts_dic_[_blender_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_blender_], 'startup.py'))).replace('\\', '/')
-_scripts_dic_[_houdini_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_houdini_], 'startup.py'))).replace('\\', '/')
+_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_maya_], 'startup.mel'))).replace('\\', '/')
+_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'startup.py'))).replace('\\', '/')
+_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'startup.py'))).replace('\\', '/')
+_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'startup.py'))).replace('\\', '/')
 
 _batch_scripts_dic_ = dict()
-_batch_scripts_dic_[_maya_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_maya_], 'batch_startup.mel'))).replace('\\', '/')
-_batch_scripts_dic_[_guerilla_render_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_guerilla_render_], 'batch_startup.py'))).replace('\\', '/')
-_batch_scripts_dic_[_blender_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_blender_], 'batch_startup.py'))).replace('\\', '/')
-_batch_scripts_dic_[_houdini_] = os.path.normpath(os.path.abspath(os.path.join(_plugins_path_[_houdini_], 'batch_startup.py'))).replace('\\', '/')
+_batch_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_maya_], 'batch_startup.mel'))).replace('\\', '/')
+_batch_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'batch_startup.py'))).replace('\\', '/')
+_batch_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'batch_startup.py'))).replace('\\', '/')
+_batch_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'batch_startup.py'))).replace('\\', '/')

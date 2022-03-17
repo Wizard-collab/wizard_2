@@ -42,6 +42,7 @@ import logging
 # Wizard modules
 from wizard.vars import user_vars
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import socket_utils
 
 logger = logging.getLogger(__name__)
@@ -176,7 +177,7 @@ class subtask(Thread):
 
     def write_log(self):
         log_name = f"subtask_{self.process_id}.log"
-        log_file = os.path.join(user_vars._subtasks_logs_, log_name)
+        log_file = path_utils.join(user_vars._subtasks_logs_, log_name)
         tools.create_folder_if_not_exist(user_vars._subtasks_logs_)
         with open(log_file, 'w') as f:
             f.write(self.out)
@@ -184,7 +185,7 @@ class subtask(Thread):
 
     def build_pycmd(self):
         if self.pycmd is not None:
-            if self.pycmd.endswith('.py') and os.path.isfile(self.pycmd):
+            if self.pycmd.endswith('.py') and path_utils.isfile(self.pycmd):
                 py_file = self.pycmd
             else:
                 py_file = tools.temp_file_from_pycmd(self.pycmd)

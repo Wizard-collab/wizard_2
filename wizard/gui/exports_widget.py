@@ -1,3 +1,4 @@
+
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
@@ -16,6 +17,7 @@ from wizard.core import assets
 from wizard.core import project
 from wizard.core import tools
 from wizard.core import subtasks_library
+from wizard.core import path_utils
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -238,12 +240,12 @@ class exports_widget(QtWidgets.QWidget):
                         files = json.loads(selection[0].export_version_row['files'])
                         if files != [] and files != None:
                             file = files[0]
-                            folder = os.path.dirname(file)
+                            folder = path_utils.dirname(file)
                     elif selection[0].type == 'export':
                         export_id = selection[0].export_row['id']
                         folder = assets.get_export_path(export_id)
-            if os.path.isdir(folder):
-                os.startfile(folder)
+            if path_utils.isdir(folder):
+                path_utils.startfile(folder)
             else:
                 logger.warning(f"{folder} not found")
 
@@ -624,7 +626,7 @@ class check_existence_thread(QtCore.QThread):
                 files_list = json.loads(export_version_row['files'])
                 missing_files = 0
                 for file in files_list:
-                    if not os.path.isfile(file):
+                    if not path_utils.isfile(file):
                         missing_files += 1
                     if not self.running:
                         break

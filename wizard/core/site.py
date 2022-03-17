@@ -44,6 +44,7 @@ import logging
 # Wizard modules
 from wizard.core import db_utils
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import environment
 from wizard.core import image
 from wizard.vars import site_vars
@@ -169,7 +170,7 @@ def modify_project_password(project_name,
 
 def modify_project_image(project_name, project_image):
     if project_image:
-        if os.path.isfile(project_image):
+        if path_utils.isfile(project_image):
             project_image_ascii = process_project_image(project_image)
             if db_utils.update_data('site',
                                     'projects',
@@ -216,7 +217,7 @@ def create_user(user_name,
                                     administrator_pass):
                 administrator = 1
             if profile_picture:
-                if not os.path.isfile(profile_picture):
+                if not path_utils.isfile(profile_picture):
                     profile_picture = image.user_random_image(user_name)
             else:
                 profile_picture = image.user_random_image(user_name)
@@ -257,7 +258,7 @@ def create_user(user_name,
 
 def modify_user_profile_picture(user_name, profile_picture):
     if profile_picture:
-        if os.path.isfile(profile_picture):
+        if path_utils.isfile(profile_picture):
             profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
             if db_utils.update_data('site',
                                     'users',

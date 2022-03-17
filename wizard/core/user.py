@@ -50,6 +50,7 @@ from wizard.vars import user_vars
 from wizard.vars import ressources
 from wizard.core import image
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import environment
 from wizard.core import project
 from wizard.core import site
@@ -63,11 +64,11 @@ def create_user_folders():
     # Init the user folders
     # ~/Documets/wizard/icons
     # ~/Documets/wizard/scripts
-    if not os.path.isdir(user_vars._script_path_):
-        os.makedirs(user_vars._script_path_)
+    if not path_utils.isdir(user_vars._script_path_):
+        path_utils.makedirs(user_vars._script_path_)
     sys.path.append(user_vars._script_path_)
-    if not os.path.isdir(user_vars._icons_path_):
-        os.makedirs(user_vars._icons_path_)
+    if not path_utils.isdir(user_vars._icons_path_):
+        path_utils.makedirs(user_vars._icons_path_)
 
 def init_user_session():
     # Init the session.py file
@@ -177,7 +178,7 @@ class user:
         self.write_prefs_dic()
 
     def set_local_path(self, path):
-        if path != '' and os.path.isdir(path):
+        if path != '' and path_utils.isdir(path):
             self.prefs_dic[user_vars._local_path_] = path
             self.write_prefs_dic()
             logger.info("Local path modified")
@@ -218,9 +219,9 @@ class user:
         # or init it if not found
         # return the preferences dictionnary
         self.user_prefs_file = user_vars._user_prefs_file_
-        if not os.path.isdir(user_vars._user_path_):
-            os.mkdir(user_vars._user_path_)
-        if not os.path.isfile(self.user_prefs_file):
+        if not path_utils.isdir(user_vars._user_path_):
+            path_utils.mkdir(user_vars._user_path_)
+        if not path_utils.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
             self.prefs_dic[user_vars._site_] = None
@@ -265,7 +266,7 @@ class user:
     def execute_py(self, file):
         # Read a .py file and execute the data
         # with "execute_session()"
-        if os.path.isfile(file):
+        if path_utils.isfile(file):
             with open(file, 'r') as f:
                 data = f.read()
             self.execute_session(data)

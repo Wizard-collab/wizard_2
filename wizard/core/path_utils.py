@@ -27,21 +27,65 @@
 # SOFTWARE.
 
 # Python modules
-import yaml
 import os
-import logging
+import shutil
 
 # Wizard modules
-from wizard.core import path_utils
+from wizard.core import environment
+from wizard.vars import env_vars
 
-logger = logging.getLogger(__name__)
+def mkdir(path):
+	path = clean_path(path)
+	return os.mkdir(path)
 
-def get_version():
-	version_file = 'version.yaml'
-	if path_utils.isfile(version_file):
-		with open(version_file, 'r') as f:
-			version_dic = yaml.load(f, Loader=yaml.Loader)
-		return version_dic
-	else:
-		logger.error(f'{version_file} not found')
-		return None
+def makedirs(path):
+	path = clean_path(path)
+	return os.makedirs(path)
+
+def remove(path):
+	path = clean_path(path)
+	return os.remove(path)
+
+def copyfile(base, destination):
+	base = clean_path(base)
+	destination = clean_path(destination)
+	return shutil.copyfile(base, destination)
+
+def rmtree(path):
+	path = clean_path(path)
+	return shutil.rmtree(path)
+
+def rmdir(path):
+	path = clean_path(path)
+	return os.rmdir(path)
+
+def isdir(path):
+	path = clean_path(path)
+	return os.path.isdir(path)
+
+def isfile(path):
+	path = clean_path(path)
+	return os.path.isfile(path)
+
+def join(*args):
+	path = os.path.join(*args)
+	path = clean_path(path)
+	return path
+
+def abspath(path):
+	path = os.path.abspath(path)
+	path = clean_path(path)
+	return path
+
+def dirname(path):
+	path = os.path.dirname(path)
+	path = clean_path(path)
+	return path
+
+def clean_path(path):
+	path = path.replace('\\', '/')
+	return path
+
+def startfile(path):
+	path = clean_path(path)
+	return os.startfile(path)

@@ -9,6 +9,7 @@ import logging
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class log_viewer(QtWidgets.QWidget):
 
     def refresh(self):
         if self.file is not None:
-            if os.path.isfile(self.file):
+            if path_utils.isfile(self.file):
                 self.file_name_label.setText(self.file)
                 with open(self.file, 'r') as f:
                     data = f.read()

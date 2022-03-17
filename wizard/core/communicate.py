@@ -50,6 +50,7 @@ from wizard.core import environment
 from wizard.core import socket_utils
 from wizard.core import assets
 from wizard.core import project
+from wizard.core import path_utils
 from wizard.vars import user_vars
 logger = logging.getLogger(__name__)
 

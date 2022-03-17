@@ -32,18 +32,21 @@
 import os
 import logging
 
+# Wizard modules
+from wizard.core import path_utils
+
 logger = logging.getLogger(__name__)
 
 program_files = os.environ.get("PROGRAMFILES")
 
 def get_blender():
-	to_list = os.path.join(program_files, 'Blender Foundation')
+	to_list = path_utils.join(program_files, 'Blender Foundation')
 	executables_dic = dict()
-	if os.path.isdir(to_list):
+	if path_utils.isdir(to_list):
 		versions = os.listdir(to_list)
 		for version_folder in versions:
-			executable = os.path.join(to_list, version_folder, 'blender.exe')
-			if os.path.isfile(executable):
+			executable = path_utils.join(to_list, version_folder, 'blender.exe')
+			if path_utils.isfile(executable):
 				executables_dic[version_folder] = executable.replace('\\', '/')
 
 	if executables_dic != dict():
@@ -52,13 +55,13 @@ def get_blender():
 		return None
 
 def get_maya():
-	to_list = os.path.join(program_files, 'Autodesk')
+	to_list = path_utils.join(program_files, 'Autodesk')
 	executables_dic = dict()
-	if os.path.isdir(to_list):
+	if path_utils.isdir(to_list):
 		versions = os.listdir(to_list)
 		for version_folder in versions:
-			executable = os.path.join(to_list, version_folder, 'bin/maya.exe')
-			if os.path.isfile(executable):
+			executable = path_utils.join(to_list, version_folder, 'bin/maya.exe')
+			if path_utils.isfile(executable):
 				executables_dic[version_folder] = executable.replace('\\', '/')
 
 	if executables_dic != dict():
@@ -67,20 +70,20 @@ def get_maya():
 		return None
 
 def get_guerilla():
-	executable = os.path.join(program_files,
+	executable = path_utils.join(program_files,
 								'Guerilla Render',
 								'guerilla.exe')
-	if os.path.isfile(executable):
+	if path_utils.isfile(executable):
 		return {'Guerilla Render':executable.replace('\\', '/')}
 	else:
 		return None
 
 def get_substance_painter():
-	executable = os.path.join(program_files,
+	executable = path_utils.join(program_files,
 								'Allegorithmic',
 								'Adobe Substance 3D Painter',
 								'Adobe Substance 3D Painter.exe')
-	if os.path.isfile(executable):
+	if path_utils.isfile(executable):
 		return {'Adobe Substance 3D Painter':executable.replace('\\', '/')}
 	else:
 		return None

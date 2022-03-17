@@ -15,6 +15,7 @@ from wizard.core import assets
 from wizard.core import user
 from wizard.core import project
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.vars import user_vars
@@ -600,7 +601,7 @@ class versions_widget(QtWidgets.QWidget):
 
     def open_folder(self):
         if self.work_env_id is not None:
-            os.startfile(assets.get_work_env_path(self.work_env_id))
+            path_utils.startfile(assets.get_work_env_path(self.work_env_id))
 
 class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, version_row, software_icon, parent=None):
@@ -644,7 +645,7 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
         pixmap = QtGui.QPixmap(self.version_row['thumbnail_path'])
         icon.addPixmap(pixmap, QtGui.QIcon.Normal)
         icon.addPixmap(pixmap, QtGui.QIcon.Selected)
-        if not os.path.isfile(self.version_row['thumbnail_path']):
+        if not path_utils.isfile(self.version_row['thumbnail_path']):
             default_icon = QtGui.QIcon(ressources._no_screenshot_small_)
             icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Normal)
             icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Selected)
@@ -672,7 +673,7 @@ class check_existence_thread(QtCore.QThread):
     def run(self):
         if self.versions_rows is not None:
             for version_row in self.versions_rows:
-                if not os.path.isfile(version_row['file_path']):
+                if not path_utils.isfile(version_row['file_path']):
                     self.missing_file_signal.emit(version_row['id'])
                 else:
                     self.not_missing_file_signal.emit(version_row['id'])

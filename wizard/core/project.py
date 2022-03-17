@@ -54,11 +54,13 @@ import logging
 # Wizard modules
 from wizard.core import db_utils
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import site
 from wizard.core import environment
 from wizard.core import image
 from wizard.vars import softwares_vars
 from wizard.vars import project_vars
+from wizard.vars import env_vars
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -1286,7 +1288,7 @@ def get_softwares_names_list():
     return softwares_rows
 
 def set_software_path(software_id, path):
-    if os.path.isfile(path):
+    if path_utils.isfile(path):
         if db_utils.update_data('project',
                             'softwares',
                             ('path', path),
@@ -1300,7 +1302,7 @@ def set_software_path(software_id, path):
         return None
 
 def set_software_batch_path(software_id, path):
-    if os.path.isfile(path):
+    if path_utils.isfile(path):
         if db_utils.update_data('project',
                             'softwares',
                             ('batch_path', path),
@@ -1499,15 +1501,15 @@ def update_users_list(users_ids_list):
         return None
 
 def get_shared_files_folder():
-    shared_files_folder = os.path.join(environment.get_project_path(), project_vars._shared_files_folder_)
+    shared_files_folder = path_utils.join(environment.get_project_path(), project_vars._shared_files_folder_)
     return shared_files_folder
 
 def get_scripts_folder():
-    shared_files_folder = os.path.join(environment.get_project_path(), project_vars._scripts_folder_)
+    shared_files_folder = path_utils.join(environment.get_project_path(), project_vars._scripts_folder_)
     return shared_files_folder
 
 def get_hooks_folder():
-    hooks_folder = os.path.join(environment.get_project_path(), project_vars._hooks_folder_)
+    hooks_folder = path_utils.join(environment.get_project_path(), project_vars._hooks_folder_)
     return hooks_folder
 
 def add_event(event_type, title, message, data, additional_message=None, image_path=None):
@@ -1596,12 +1598,12 @@ def add_shelf_script(name,
         only_subprocess = True
     shelf_script_id = None
     if not db_utils.check_existence('project', 'shelf_scripts', 'name', name):
-        if not os.path.isfile(icon):
+        if not path_utils.isfile(icon):
             icon = ressources._default_script_shelf_icon_
         
-        shared_icon = tools.get_filename_without_override(os.path.join(get_shared_files_folder(),
+        shared_icon = tools.get_filename_without_override(path_utils.join(get_shared_files_folder(),
                                                             os.path.basename(icon)))
-        shutil.copyfile(icon, shared_icon)
+        path_utils.copyfile(icon, shared_icon)
         image.resize_image_file(shared_icon, 60)
 
         rows = get_all_shelf_scripts()
@@ -1644,12 +1646,12 @@ def edit_shelf_script(script_id, help, icon, only_subprocess):
         else:
             success = False
     if script_row['icon'] != icon:
-        if not os.path.isfile(icon):
+        if not path_utils.isfile(icon):
             icon = ressources._default_script_shelf_icon_
         
-        shared_icon = tools.get_filename_without_override(os.path.join(get_shared_files_folder(), 
+        shared_icon = tools.get_filename_without_override(path_utils.join(get_shared_files_folder(), 
                                                             os.path.basename(icon)))
-        shutil.copyfile(icon, shared_icon)
+        path_utils.copyfile(icon, shared_icon)
         image.resize_image_file(shared_icon, 60)
         
         if db_utils.update_data('project',
@@ -1964,8 +1966,8 @@ def create_project(project_name, project_path, project_password, project_image =
         return None
 
 def init_project(project_path, project_name):
-    if not os.path.isdir(project_path):
-        os.mkdir(project_path)
+    if not path_utils.isdir(project_path):
+        path_utils.mkdir(project_path)
     if not db_utils.check_database_existence(project_name):
         if db_utils.create_database(project_name):
             create_settings_table(project_name)

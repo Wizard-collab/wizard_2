@@ -21,6 +21,7 @@ from wizard.core import project
 from wizard.core import launch
 from wizard.core import environment
 from wizard.core import image
+from wizard.core import path_utils
 from wizard.vars import ressources
 from wizard.vars import assets_vars
 

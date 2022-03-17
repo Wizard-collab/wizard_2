@@ -16,6 +16,7 @@ from wizard.gui import gui_utils
 # Wizard modules
 from wizard.core import project
 from wizard.core import shelf
+from wizard.core import path_utils
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ class create_tool_widget(QtWidgets.QWidget):
             self.name_field.setEnabled(False)
             self.help_textEdit.setText(self.script_row['help'])
             self.only_subtask_checkBox.setChecked(self.script_row['only_subprocess'])
-            if os.path.isfile(self.script_row['py_file']):
+            if path_utils.isfile(self.script_row['py_file']):
                 with open(self.script_row['py_file']) as f:
                     script_data = f.read()
                 self.script_editor_widget.setText(script_data)

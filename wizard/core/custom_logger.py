@@ -33,6 +33,7 @@ import sys
 
 # Wizard modules
 from wizard.vars import user_vars
+from wizard.core import path_utils
 
 def get_root_logger():
     create_prefs_folder()
@@ -49,5 +50,5 @@ def get_root_logger():
     root_logger.addHandler(stream_handler)
 
 def create_prefs_folder():
-    if not os.path.isdir(user_vars._user_path_):
-        os.makedirs(user_vars._user_path_)
+    if not path_utils.isdir(user_vars._user_path_):
+        path_utils.makedirs(user_vars._user_path_)

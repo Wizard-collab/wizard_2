@@ -18,6 +18,7 @@ from wizard.core import user
 from wizard.core import site
 from wizard.core import environment
 from wizard.core import image
+from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ class general_widget(QtWidgets.QWidget):
         self.enable_popups_checkbox.setChecked(popups_enabled)
         self.popups_duration_spinBox.setValue(popups_duration)
 
-        self.install_dir_data.setText(os.path.abspath(''))
+        self.install_dir_data.setText(path_utils.abspath(''))
         version_dic = application.get_version()
         self.version_data.setText(f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
         self.build_data.setText(str(version_dic['builds']))

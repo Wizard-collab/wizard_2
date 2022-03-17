@@ -18,6 +18,7 @@ from wizard.core import image
 from wizard.core import game
 from wizard.core import project
 from wizard.core import environment
+from wizard.core import path_utils
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -311,9 +312,9 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def action(self):
         if self.event_row['type'] == 'archive':
-            path = os.path.normpath(json.loads(self.event_row['data']))
-            if os.path.isfile(path):
-                os.startfile(path)
+            path = path_utils.clean_path(json.loads(self.event_row['data']))
+            if path_utils.isfile(path):
+                path_utils.startfile(path)
         elif self.event_row['type'] == 'creation':
             data = json.loads(self.event_row['data'])
             gui_server.focus_instance(data)

@@ -51,6 +51,7 @@ from wizard.core import assets
 from wizard.core import project
 from wizard.core import environment
 from wizard.core import socket_utils
+from wizard.core import path_utils
 from wizard.vars import softwares_vars
 
 # Wizard gui modules
@@ -114,7 +115,7 @@ def core_launch_version(version_id):
 def build_command(file_path, software_row, version_id):
     software_path = software_row['path']
     if software_path != '':
-        if os.path.isfile(file_path):
+        if path_utils.isfile(file_path):
             raw_command = software_row['file_command']
         else:
             raw_command = software_row['no_file_command']
@@ -157,7 +158,7 @@ def build_env(work_env_id, software_row, version_id):
 
     # Substance Painter specific env
     if software_row['name'] == softwares_vars._substance_painter_:
-        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + os.path.join(softwares_vars._main_script_path_,
+        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + path_utils.join(softwares_vars._main_script_path_,
                                                                                     'substance_painter_wizard')
     
     # Getting the project software additionnal environment
@@ -202,7 +203,7 @@ class software_thread(Thread):
         self.start_time = time.time()
  
     def run(self):
-        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=os.path.abspath('softwares'))
+        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=path_utils.abspath('softwares'))
         self.process.wait()
         died(self.work_env_id)
         if not self.killed:

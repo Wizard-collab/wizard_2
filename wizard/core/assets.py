@@ -63,10 +63,12 @@ from wizard.core import events
 from wizard.core import project
 from wizard.core import site
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import image
 from wizard.core import game
 from wizard.core import asset_tracking
 from wizard.vars import assets_vars
+from wizard.vars import env_vars
 from wizard.vars import softwares_vars
 
 logger = logging.getLogger(__name__)
@@ -74,7 +76,7 @@ logger = logging.getLogger(__name__)
 def create_domain(name):
     domain_id = None
     if tools.is_safe(name):
-        dir_name = os.path.normpath(os.path.join(environment.get_project_path(),
+        dir_name = path_utils.clean_path(path_utils.join(environment.get_project_path(),
                                     name))
         domain_id = project.add_domain(name)
         if domain_id:
@@ -90,9 +92,9 @@ def archive_domain(domain_id):
         domain_row = project.get_domain_data(domain_id)
         if domain_row:
             dir_name = get_domain_path(domain_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 if tools.make_archive(dir_name):
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
             else:
                 logger.warning(f"{dir_name} not found")
@@ -107,7 +109,7 @@ def create_category(name, domain_id):
     if tools.is_safe(name):
         domain_path = get_domain_path(domain_id)
         if domain_path:
-            dir_name = os.path.normpath(os.path.join(domain_path, name))
+            dir_name = path_utils.clean_path(path_utils.join(domain_path, name))
             category_id = project.add_category(name, domain_id)
             if category_id:
                 if not tools.create_folder(dir_name):
@@ -127,10 +129,10 @@ def archive_category(category_id):
         category_row = project.get_category_data(category_id)
         if category_row:
             dir_name = get_category_path(category_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 archive_file = tools.make_archive(dir_name)
                 if archive_file:
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
             else:
                 logger.warning(f"{dir_name} not found")
@@ -150,7 +152,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     if tools.is_safe(name):
         category_path = get_category_path(category_id)
         if category_path:
-            dir_name = os.path.normpath(os.path.join(category_path, name))
+            dir_name = path_utils.clean_path(path_utils.join(category_path, name))
             asset_id = project.add_asset(name, category_id, inframe, outframe, preroll, postroll)
             if asset_id:
                 if not tools.create_folder(dir_name):
@@ -170,10 +172,10 @@ def archive_asset(asset_id):
         asset_row = project.get_asset_data(asset_id)
         if asset_row:
             dir_name = get_asset_path(asset_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 archive_file = tools.make_archive(dir_name)
                 if archive_file:
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
                     
             else:
@@ -228,7 +230,7 @@ def create_stage(name, asset_id):
     if allowed:
         asset_path = get_asset_path(asset_id)
         if asset_path:
-            dir_name = os.path.normpath(os.path.join(asset_path, name))
+            dir_name = path_utils.clean_path(path_utils.join(asset_path, name))
             stage_id = project.add_stage(name, asset_id)
             if stage_id:
                 if not tools.create_folder(dir_name):
@@ -251,10 +253,10 @@ def archive_stage(stage_id):
         stage_row = project.get_stage_data(stage_id)
         if stage_row:
             dir_name = get_stage_path(stage_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 archive_file = tools.make_archive(dir_name)
                 if archive_file:
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
             else:
                 logger.warning(f"{dir_name} not found")
@@ -273,7 +275,7 @@ def create_variant(name, stage_id, comment=''):
     if tools.is_safe(name):
         stage_path = get_stage_path(stage_id)
         if stage_path:
-            dir_name = os.path.normpath(os.path.join(stage_path, name))
+            dir_name = path_utils.clean_path(path_utils.join(stage_path, name))
             variant_id = project.add_variant(name, stage_id, comment)
             if variant_id:
                 if not tools.create_folder(dir_name):
@@ -281,8 +283,8 @@ def create_variant(name, stage_id, comment=''):
                     variant_id = None
                 else:
                     # Add other folders
-                    tools.create_folder(os.path.normpath(os.path.join(dir_name, '_EXPORTS')))
-                    tools.create_folder(os.path.normpath(os.path.join(dir_name, '_SANDBOX')))
+                    tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
+                    tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_SANDBOX')))
                     events.add_creation_event('variant', variant_id)
                     game.add_xps(2)
         else:
@@ -296,10 +298,10 @@ def archive_variant(variant_id):
         variant_row = project.get_variant_data(variant_id)
         if variant_row:
             dir_name = get_variant_path(variant_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 archive_file = tools.make_archive(dir_name)
                 if archive_file:
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
             else:
                 logger.warning(f"{dir_name} not found")
@@ -352,8 +354,8 @@ def create_work_env(software_id, variant_id):
                 export_extension = assets_vars._ext_dic_[assets_vars._custom_stage_][name][0]
             else:
                 export_extension = None
-            dir_name = os.path.normpath(os.path.join(variant_path, name))
-            screenshots_dir_name = os.path.normpath(os.path.join(dir_name, 'screenshots'))
+            dir_name = path_utils.clean_path(path_utils.join(variant_path, name))
+            screenshots_dir_name = path_utils.clean_path(path_utils.join(dir_name, 'screenshots'))
             work_env_id = project.add_work_env(name,
                                                 software_id,
                                                 variant_id,
@@ -498,7 +500,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                     new_version = '0001'
                 export_path = get_export_path(export_id)
                 if export_path:
-                    dir_name = os.path.normpath(os.path.join(export_path, new_version))
+                    dir_name = path_utils.clean_path(path_utils.join(export_path, new_version))
                     if not tools.create_folder(dir_name):
                         project.remove_export_version(export_version_id)
                         export_version_id = None
@@ -534,7 +536,7 @@ def request_export(work_env_id, export_name, multiple=None, only_dir=None):
     logger.info(f"Temporary directory created : {dir_name}, if something goes wrong in the export please go there to find your temporary export file")
     file_name = build_export_file_name(work_env_id, export_name, multiple)
     if file_name and not only_dir:
-        return os.path.normpath(os.path.join(dir_name, file_name))
+        return path_utils.clean_path(path_utils.join(dir_name, file_name))
     elif file_name and only_dir:
         return dir_name
     else:
@@ -545,10 +547,10 @@ def archive_export(export_id):
         export_row = project.get_export_data(export_id)
         if export_row:
             dir_name = get_export_path(export_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 archive_file = tools.make_archive(dir_name)
                 if archive_file:
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
             else:
                 logger.warning(f"{dir_name} not found")
@@ -572,7 +574,7 @@ def get_or_add_export(name, variant_id):
     if tools.is_safe(name):
         variant_path = get_variant_path(variant_id)
         if variant_path:
-            dir_name = os.path.normpath(os.path.join(variant_path, '_EXPORTS', name))
+            dir_name = path_utils.clean_path(path_utils.join(variant_path, '_EXPORTS', name))
             is_export = project.is_export(name, variant_id)
             if not is_export:
                 export_id = project.add_export(name, variant_id)
@@ -593,10 +595,10 @@ def archive_export_version(export_version_id):
         export_id = export_version_row['export_id']
         if export_version_row:
             dir_name = get_export_version_path(export_version_id)
-            if os.path.isdir(dir_name):
+            if path_utils.isdir(dir_name):
                 archive_file = tools.make_archive(dir_name)
                 if archive_file:
-                    shutil.rmtree(dir_name)
+                    path_utils.rmtree(dir_name)
                     logger.info(f"{dir_name} deleted")
             else:
                 logger.warning(f"{dir_name} not found")
@@ -625,16 +627,16 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
             new_version = '0001'
 
     dirname = get_work_env_path(work_env_id)
-    screenshot_dir_name = os.path.join(dirname, 'screenshots')
+    screenshot_dir_name = path_utils.join(dirname, 'screenshots')
 
-    file_name = os.path.normpath(os.path.join(dirname, 
+    file_name = path_utils.clean_path(path_utils.join(dirname, 
                             build_version_file_name(work_env_id, new_version)))
     file_name_ext = os.path.splitext(file_name)[-1]
 
     basename = os.path.basename(file_name)
-    screenshot_file = os.path.join(screenshot_dir_name, 
+    screenshot_file = path_utils.join(screenshot_dir_name, 
                     basename.replace(file_name_ext, '.jpg'))
-    thumbnail_file = os.path.join(screenshot_dir_name, 
+    thumbnail_file = path_utils.join(screenshot_dir_name, 
                     basename.replace(file_name_ext, '.thumbnail.jpg'))
 
 
@@ -658,23 +660,23 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
 
 def set_asset_preview(asset_id, image_file):
     if image_file is not None:
-        preview_path = os.path.join(get_asset_path(asset_id), 'preview')
-        if not os.path.isdir(preview_path):
-            os.mkdir(preview_path)
-        destination = os.path.join(preview_path, f"{project.get_asset_data(asset_id, 'name')}.jpg")
+        preview_path = path_utils.join(get_asset_path(asset_id), 'preview')
+        if not path_utils.isdir(preview_path):
+            path_utils.mkdir(preview_path)
+        destination = path_utils.join(preview_path, f"{project.get_asset_data(asset_id, 'name')}.jpg")
         preview_file = image.resize_preview(image_file, destination)
     else:
         preview_file = None
     project.modify_asset_manual_preview(asset_id, preview_file)
 
 def merge_file(file, work_env_id, comment="", do_screenshot=1):
-    if os.path.isfile(file):
+    if path_utils.isfile(file):
         software_extension = project.get_software_data(project.get_work_env_data(work_env_id, 'software_id'), 'extension')
         file_extension = os.path.splitext(file)[-1].replace('.', '')
         if software_extension == file_extension:
             version_id = add_version(work_env_id, comment, do_screenshot)
             version_row = project.get_version_data(version_id)
-            shutil.copyfile(file, version_row['file_path'])
+            path_utils.copyfile(file, version_row['file_path'])
             logger.info(f"{file} merged in new version {version_row['name']}")
             return version_id
         else:
@@ -694,10 +696,10 @@ def duplicate_version(version_id, comment=None):
                                     version_row['work_env_id'],
                                     comment, 0)
         new_version_row = project.get_version_data(new_version_id)
-        if os.path.isfile(version_row['screenshot_path']):
-            shutil.copyfile(version_row['screenshot_path'], new_version_row['screenshot_path'])
-        if os.path.isfile(version_row['thumbnail_path']):
-            shutil.copyfile(version_row['thumbnail_path'], new_version_row['thumbnail_path'])
+        if path_utils.isfile(version_row['screenshot_path']):
+            path_utils.copyfile(version_row['screenshot_path'], new_version_row['screenshot_path'])
+        if path_utils.isfile(version_row['thumbnail_path']):
+            path_utils.copyfile(version_row['thumbnail_path'], new_version_row['thumbnail_path'])
     return new_version_id
 
 def archive_version(version_id):
@@ -705,11 +707,11 @@ def archive_version(version_id):
         version_row = project.get_version_data(version_id)
         if version_row['name'] != '0001':
             if version_row:
-                if os.path.isfile(version_row['file_path']):
-                    zip_file = os.path.join(os.path.split(version_row['file_path'])[0], 
+                if path_utils.isfile(version_row['file_path']):
+                    zip_file = path_utils.join(os.path.split(version_row['file_path'])[0], 
                                 'archives.zip')
                     if tools.zip_files([version_row['file_path']], zip_file):
-                        os.remove(version_row['file_path'])
+                        path_utils.remove(version_row['file_path'])
                         logger.info(f"{version_row['file_path']} deleted")
                 else:
                     logger.warning(f"{version_row['file_path']} not found")
@@ -792,7 +794,7 @@ def get_domain_path(domain_id):
     dir_name = None
     domain_name = project.get_domain_data(domain_id, 'name')
     if domain_name:
-        dir_name = os.path.join(environment.get_project_path(), domain_name)
+        dir_name = path_utils.join(environment.get_project_path(), domain_name)
     return dir_name
 
 def get_category_path(category_id):
@@ -802,7 +804,7 @@ def get_category_path(category_id):
         category_name = category_row['name']
         domain_path = get_domain_path(category_row['domain_id'])
         if category_name and domain_path:
-            dir_name = os.path.join(domain_path, category_name)
+            dir_name = path_utils.join(domain_path, category_name)
     return dir_name
 
 def get_asset_path(asset_id):
@@ -812,7 +814,7 @@ def get_asset_path(asset_id):
         asset_name = asset_row['name']
         category_path = get_category_path(asset_row['category_id'])
         if asset_name and category_path:
-            dir_name = os.path.join(category_path, asset_name)
+            dir_name = path_utils.join(category_path, asset_name)
     return dir_name
 
 def get_stage_path(stage_id):
@@ -822,7 +824,7 @@ def get_stage_path(stage_id):
         stage_name = stage_row['name']
         asset_path = get_asset_path(stage_row['asset_id'])
         if stage_name and asset_path:
-            dir_name = os.path.join(asset_path, stage_name)
+            dir_name = path_utils.join(asset_path, stage_name)
     return dir_name
 
 def get_variant_path(variant_id):
@@ -832,7 +834,7 @@ def get_variant_path(variant_id):
         variant_name = variant_row['name']
         stage_path = get_stage_path(variant_row['stage_id'])
         if variant_name and stage_path:
-            dir_name = os.path.join(stage_path, variant_name)
+            dir_name = path_utils.join(stage_path, variant_name)
     return dir_name
 
 def get_variant_export_path(variant_id):
@@ -842,7 +844,7 @@ def get_variant_export_path(variant_id):
         variant_name = variant_row['name']
         stage_path = get_stage_path(variant_row['stage_id'])
         if variant_name and stage_path:
-            dir_name = os.path.join(stage_path, variant_name, '_EXPORTS')
+            dir_name = path_utils.join(stage_path, variant_name, '_EXPORTS')
     return dir_name
 
 def get_work_env_path(work_env_id):
@@ -852,7 +854,7 @@ def get_work_env_path(work_env_id):
         work_env_name = work_env_row['name']
         variant_path = get_variant_path(work_env_row['variant_id'])
         if work_env_name and variant_path:
-            dir_name = os.path.join(variant_path, work_env_name)
+            dir_name = path_utils.join(variant_path, work_env_name)
     return dir_name
 
 def get_export_path(export_id):
@@ -862,7 +864,7 @@ def get_export_path(export_id):
         export_name = export_row['name']
         variant_path = get_variant_path(export_row['variant_id'])
         if export_name and variant_path:
-            dir_name = os.path.join(variant_path, '_EXPORTS', export_name)
+            dir_name = path_utils.join(variant_path, '_EXPORTS', export_name)
     return dir_name
 
 def get_export_version_path(export_version_id):
@@ -872,7 +874,7 @@ def get_export_version_path(export_version_id):
         export_version_name = export_version_row['name']
         export_path = get_export_path(export_version_row['export_id'])
         if export_version_name and export_path:
-            dir_name = os.path.join(export_path, export_version_name)
+            dir_name = path_utils.join(export_path, export_version_name)
     return dir_name
 
 def build_version_file_name(work_env_id, name):

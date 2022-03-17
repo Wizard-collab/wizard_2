@@ -20,6 +20,7 @@ from wizard.gui import submit_log_widget
 # Wizard modules
 from wizard.core import socket_utils
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -236,7 +237,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.log_viewer.show()
 
     def send_to_support(self):
-        if os.path.isfile(self.log_file):
+        if path_utils.isfile(self.log_file):
             with open(self.log_file, 'r') as f:
                 data = f.read()
             self.submit_log_widget = submit_log_widget.submit_log_widget(data, 'subtask')

@@ -39,6 +39,7 @@ from wizard.core import launch
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import environment
+from wizard.core import path_utils
 from wizard.core import socket_utils
 from wizard.vars import softwares_vars
 
@@ -57,7 +58,7 @@ def batch_export(version_id):
         command = build_command(file_path, software_row, version_id)
         env = launch.build_env(work_env_id, software_row, version_id)
         if command :
-            process = subprocess.Popen(args = shlex.split(command), env=env, cwd=os.path.abspath('softwares'))
+            process = subprocess.Popen(args = shlex.split(command), env=env, cwd=path_utils.abspath('softwares'))
             logger.info(f"{software_row['name']} launched")
             process.wait()
             logger.info(f"{software_row['name']} closed")
@@ -65,7 +66,7 @@ def batch_export(version_id):
 def build_command(file_path, software_row, version_id):
     software_batch_path = software_row['batch_path']
     if software_batch_path != '':
-        if os.path.isfile(file_path):
+        if path_utils.isfile(file_path):
             raw_command = software_row['batch_file_command']
         else:
             raw_command = software_row['batch_no_file_command']

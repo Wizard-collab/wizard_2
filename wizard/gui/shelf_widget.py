@@ -12,6 +12,7 @@ from wizard.vars import ressources
 from wizard.core import shelf
 from wizard.core import project
 from wizard.core import tools
+from wizard.core import path_utils
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -95,7 +96,7 @@ class shelf_widget(QtWidgets.QFrame):
         self.move_right_button.clicked.connect(self.move_checked_right)
 
     def open_script_folder(self):
-        os.startfile(project.get_scripts_folder())
+        path_utils.startfile(project.get_scripts_folder())
 
     def create_script(self):
         menu = gui_utils.QMenu()

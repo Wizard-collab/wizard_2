@@ -16,6 +16,7 @@ from wizard.core import assets
 from wizard.core import project
 from wizard.core import image
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.core import launch
 
 # Wizard gui modules
@@ -117,7 +118,7 @@ class launcher_widget(QtWidgets.QFrame):
             self.hide_kill_button()
 
     def refresh_screenshot(self, screenshot_path):
-        if os.path.isfile(screenshot_path):
+        if path_utils.isfile(screenshot_path):
             image_bytes, width, height = image.convert_screenshot(screenshot_path)
             self.screenshot_button.setFixedSize(width, height)
             pm = gui_utils.round_corners_image_button(image_bytes, (width, height), 10)
@@ -168,7 +169,7 @@ class launcher_widget(QtWidgets.QFrame):
     def show_screen_shot(self):
         if self.version_row is not None:
             screenshot_path = self.version_row['screenshot_path']
-            if os.path.isfile(screenshot_path):
+            if path_utils.isfile(screenshot_path):
                 self.image_viewer_widget = image_viewer_widget.image_viewer_widget(screenshot_path)
                 self.image_viewer_widget.show()
 

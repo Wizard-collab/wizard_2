@@ -17,6 +17,7 @@ from wizard.core import project
 from wizard.core import image
 from wizard.core import tools
 from wizard.core import launch
+from wizard.core import path_utils
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -180,14 +181,14 @@ class context_widget(QtWidgets.QFrame):
     def open_work_env_folder(self):
         if self.work_env_row is not None and self.variant_row is not None:
             work_env_path = assets.get_work_env_path(self.work_env_row['id'])
-            if os.path.isdir(work_env_path):
-                os.startfile(work_env_path)
+            if path_utils.isdir(work_env_path):
+                path_utils.startfile(work_env_path)
 
     def open_sandbox_folder(self):
         if self.variant_row is not None:
-            sandbox_path = os.path.join(assets.get_variant_path(self.variant_row['id']), '_SANDBOX')
-            if os.path.isdir(sandbox_path):
-                os.startfile(sandbox_path)
+            sandbox_path = path_utils.join(assets.get_variant_path(self.variant_row['id']), '_SANDBOX')
+            if path_utils.isdir(sandbox_path):
+                path_utils.startfile(sandbox_path)
 
     def create_variant(self):
         if self.stage_row is not None:
