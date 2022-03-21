@@ -36,7 +36,7 @@ class tree_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(tree_widget, self).__init__(parent)
 
-        self.creation_items_visibility = False
+        self.creation_items_visibility = user.user().get_creation_items_visibility()
 
         self.domain_ids=dict()
         self.category_ids=dict()
@@ -90,6 +90,7 @@ class tree_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.search_frame)
 
         self.tree = QtWidgets.QTreeWidget()
+        self.tree.setObjectName('transparent_widget')
         self.tree.setAnimated(1)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -152,6 +153,7 @@ class tree_widget(QtWidgets.QFrame):
                 context_dic['selected_instance'] = (selected_item.instance_type,
                                                             selected_item.instance_id)
         user.user().add_context(user_vars._tree_context_, context_dic)
+        user.user().set_creation_items_visibility(self.creation_items_visibility)
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._tree_context_)
