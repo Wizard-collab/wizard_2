@@ -16,13 +16,28 @@ import maya.cmds as cmds
 import wizard_communicate
 from maya_wizard import wizard_tools
 
+# Hook modules
+try:
+    import maya_hook
+except:
+    maya_hook = None
+    logger.error(str(traceback.format_exc()))
+    logger.warning("Can't import maya_hook")
+
 def export(stage_name):
+    export_dir = None
+    
+    trigger_before_export_hook()
+
     if stage_name == 'modeling':
-        export_modeling()
+        export_dir = export_modeling()
     if stage_name == 'rigging':
-        export_rigging()
+        export_dir = export_rigging()
+
+    trigger_after_export_hook(export_dir)
 
 def export_modeling():
+    export_dir = None
     groups_dic = {'modeling_GRP_LOD1':'LOD1',
                     'modeling_GRP_LOD2':'LOD2',
                     'modeling_GRP_LOD3':'LOD3'}
@@ -40,13 +55,15 @@ def export_modeling():
             export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                                                 export_name)
             export_by_extension([grp_obj], export_file)
-            wizard_communicate.add_export_version(export_name,
+            export_dir = wizard_communicate.add_export_version(export_name,
                                                     [export_file],
                                                     int(os.environ['wizard_version_id']))
             # Reassign old names to objects ( _LOD# )
             wizard_tools.reassign_old_name_to_objects(objects_dic)
+    return export_dir
 
 def export_rigging():
+    export_dir = None
     export_name = 'main'
     process = check_obj_list_existence(['rigging_GRP', 'render_set'])
     if process:
@@ -54,9 +71,10 @@ def export_rigging():
         export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                                                     export_name)
         export_by_extension(export_GRP_list, export_file)
-        wizard_communicate.add_export_version(export_name,
+        export_dir = wizard_communicate.add_export_version(export_name,
                                                 [export_file],
                                                 int(os.environ['wizard_version_id']))
+    return export_dir
 
 def check_obj_list_existence(object_list):
     success = True
@@ -91,3 +109,19 @@ def export_abc(export_GRP, export_file, range=[0,1]):
     command += " -dataFormat ogawa -file "
     command += export_file
     cmds.AbcExport(j=command)
+
+def trigger_before_export_hook():
+    # Trigger the before export hook
+    if maya_hook:
+        try:
+            maya_hook.before_export()
+        except:
+            logger.error(str(traceback.format_exc()))
+
+def trigger_after_export_hook(export_dir):
+    # Trigger the after export hook
+    if maya_hook:
+        try:
+            maya_hook.after_export(export_dir)
+        except:
+            logger.error(str(traceback.format_exc()))

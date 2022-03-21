@@ -51,7 +51,7 @@ class wall_widget(QtWidgets.QWidget):
         self.setMaximumWidth(300)
         self.setMinimumWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(1)
+        self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 

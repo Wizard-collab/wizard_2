@@ -107,7 +107,7 @@ def get_team_dns():
 	if env_vars._team_dns_ in os.environ.keys():
 		return json.loads(os.environ[env_vars._team_dns_])
 	else:
-		logger.info('No team DNS defined')
+		logger.debug('No team DNS defined')
 		return None
 
 def get_user():

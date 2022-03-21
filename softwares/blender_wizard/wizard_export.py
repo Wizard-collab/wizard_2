@@ -25,8 +25,14 @@ except:
     logger.warning("Can't import blender_hook")
 
 def export(stage_name):
+    export_dir = None
+
+    trigger_before_export_hook()
+
     if stage_name == 'modeling':
         export_dir = export_modeling(stage_name)
+
+    trigger_after_export_hook(export_dir)
 
 def export_modeling(stage_name):
     export_dir = None
@@ -37,12 +43,6 @@ def export_modeling(stage_name):
         # Check group existence
         GRP_OBJ = bpy.context.scene.objects.get(GRP_NAME)
         if GRP_OBJ:
-            # Trigger the before export hook
-            if blender_hook:
-                try:
-                    blender_hook.before_export()
-                except:
-                    logger.error(str(traceback.format_exc()))
             # Remove _LOD# fro all objects names 
             object_list = [GRP_OBJ] + wizard_tools.get_all_children(GRP_OBJ)
             objects_dic = wizard_tools.remove_LOD_from_names(object_list)
@@ -58,12 +58,6 @@ def export_modeling(stage_name):
                                                                 int(os.environ['wizard_version_id']))
             # Reassign old names to objects ( _LOD# )
             wizard_tools.reassign_old_name_to_objects(objects_dic)
-            # Trigger the after export hook
-            if blender_hook:
-                try:
-                    blender_hook.after_export(export_dir)
-                except:
-                    logger.error(str(traceback.format_exc()))
         else:
             logger.warning(f"{GRP_NAME} not found")
     return export_dir
@@ -73,3 +67,18 @@ def export_abc(export_GRP, export_file):
     bpy.ops.wm.alembic_export(filepath=export_file, 
                       selected=True)
 
+def trigger_before_export_hook():
+    # Trigger the before export hook
+    if blender_hook:
+        try:
+            blender_hook.before_export()
+        except:
+            logger.error(str(traceback.format_exc()))
+
+def trigger_after_export_hook(export_dir):
+    # Trigger the after export hook
+    if blender_hook:
+        try:
+            blender_hook.after_export(export_dir)
+        except:
+            logger.error(str(traceback.format_exc()))

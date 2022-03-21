@@ -104,7 +104,7 @@ _batch_no_file_command_[_blender_] = '"{}" -b --python "{}"'.format(_executable_
 # Environments
 _script_env_dic_=dict()
 _script_env_dic_[_maya_]='PYTHONPATH'
-_script_env_dic_[_guerilla_render_]='GUERILLA_CONF'
+_script_env_dic_[_guerilla_render_]='PYTHONPATH'
 _script_env_dic_[_substance_painter_]='SUBSTANCE_PAINTER_PLUGINS_PATH'
 _script_env_dic_[_substance_designer_]='SBS_DESIGNER_PYTHON_PATH'
 _script_env_dic_[_nuke_]='NUKE_PATH'

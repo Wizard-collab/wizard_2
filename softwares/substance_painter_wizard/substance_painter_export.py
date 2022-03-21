@@ -39,36 +39,9 @@ def export_textures(material, size, file_type) :
     else:
         bitdepth = '16'
 
-    '''
-    export_preset = substance_painter.resource.ResourceID(
-                        context="allegorithmic",
-                        name=material )
-    '''
-
     export_name = 'main'
     temp_export_path = os.path.dirname(wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                         export_name)).replace('\\', '/')
-
-    # Build the configuration
-    '''
-    config = dict()
-    config["exportShaderParams"] = False
-    config["exportPath"] = temp_export_path
-
-    config["exportList"] = []
-    texture_sets_list = substance_painter.textureset.all_texture_sets()
-    for texture_set in texture_sets_list :
-        config["exportList"].append( { "rootPath" : texture_set.name() } )
-
-    config["exportPresets"] = [ { "name" : "default", "maps" : [] } ]
-    config["defaultExportPreset"] = export_preset.url()
-    config["exportParameters"] = [{"parameters":{"paddingAlgorithm": "infinite",
-                                        "fileFormat" : file_type,
-                                        "bitDepth" : bitdepth,
-                                        "sizeLog2" : math.log2(int(size))}}]
-
-    export_result = substance_painter.export.export_project_textures(config)
-    '''
 
     js_code = 'alg.mapexport.exportDocumentMaps("%s", "%s", "%s", {resolution:[%s,%s], bitDepth:[%s]})' % ( material, temp_export_path, file_type, size, size, bitdepth )
     try:
