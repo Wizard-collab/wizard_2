@@ -50,6 +50,7 @@ from wizard.core import db_utils
 from wizard.core import assets
 from wizard.core import environment
 from wizard.core import tools
+from wizard.core import path_utils
 from wizard.vars import assets_vars
 from wizard.vars import project_vars
 from wizard.vars import softwares_vars
@@ -126,6 +127,17 @@ def init_project(project_name,
 
         tools.create_folder(project.get_shared_files_folder())
         tools.create_folder(project.get_scripts_folder())
+        tools.create_folder(project.get_hooks_folder())
+
+        init_hooks()
+
         return 1
     else:
         return None
+
+def init_hooks():
+    hooks_dir = 'ressources/hooks'
+    for file in os.listdir(hooks_dir):
+        base = path_utils.join(hooks_dir, file)
+        destination = path_utils.join(project.get_hooks_folder(), file) 
+        path_utils.copyfile(base, destination)

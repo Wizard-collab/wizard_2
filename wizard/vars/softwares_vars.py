@@ -134,3 +134,9 @@ _batch_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_util
 _batch_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'batch_startup.py'))).replace('\\', '/')
 _batch_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'batch_startup.py'))).replace('\\', '/')
 _batch_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'batch_startup.py'))).replace('\\', '/')
+
+_hooks_files_ = dict()
+_hooks_files_[_maya_] = 'maya_hook.py'
+_hooks_files_[_blender_] = 'blender_hook.py'
+_hooks_files_[_substance_painter_] = 'substance_painter_hook.py'
+_hooks_files_[_guerilla_render_] = 'guerilla_render_hook.py'
