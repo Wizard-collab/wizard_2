@@ -24,61 +24,55 @@ except:
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import blender_hook")
 
-def export(stage_name):
+def main(stage_name):
     export_dir = None
-
-    trigger_before_export_hook()
-
     if stage_name == 'modeling':
-        export_dir = export_modeling(stage_name)
+        export_modeling(stage_name)
 
-    trigger_after_export_hook(export_dir)
+def export(stage_name, export_name, export_GRP_list):
+    trigger_before_export_hook(stage_name)
+    export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
+                                                                export_name)
+    if export_file.endswith('.abc'):
+        export_abc(export_GRP_list, export_file)
+    export_dir = wizard_communicate.add_export_version(export_name,
+                                                        [export_file],
+                                                        int(os.environ['wizard_version_id']))
+    trigger_after_export_hook(stage_name, export_dir)
 
 def export_modeling(stage_name):
-    export_dir = None
-    GROUPS_DIC = {'modeling_GRP_LOD1':'LOD1',
+    groups_dic = {'modeling_GRP_LOD1':'LOD1',
                     'modeling_GRP_LOD2':'LOD2',
                     'modeling_GRP_LOD3':'LOD3'}
-    for GRP_NAME in GROUPS_DIC.keys():
+    for grp_name in groups_dic.keys():
         # Check group existence
-        GRP_OBJ = bpy.context.scene.objects.get(GRP_NAME)
-        if GRP_OBJ:
-            # Remove _LOD# fro all objects names 
-            object_list = [GRP_OBJ] + wizard_tools.get_all_children(GRP_OBJ)
+        grp_obj = bpy.context.scene.objects.get(grp_name)
+        if grp_obj:
+            object_list = [grp_obj] + wizard_tools.get_all_children(grp_obj)
             objects_dic = wizard_tools.remove_LOD_from_names(object_list)
-            # Assign a LOD# export name
-            export_name = GROUPS_DIC[GRP_NAME]
-            # Export
-            export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
-                                                                export_name)
-            if export_file.endswith('.abc'):
-                export_abc(GRP_OBJ, export_file)
-            export_dir = wizard_communicate.add_export_version(export_name,
-                                                                [export_file],
-                                                                int(os.environ['wizard_version_id']))
-            # Reassign old names to objects ( _LOD# )
+            export_name = groups_dic[grp_name]
+            export('modeling', export_name, [grp_obj])
             wizard_tools.reassign_old_name_to_objects(objects_dic)
         else:
-            logger.warning(f"{GRP_NAME} not found")
-    return export_dir
+            logger.warning(f"{grp_name} not found")
 
-def export_abc(export_GRP, export_file):
-    wizard_tools.select_GRP_and_all_children(export_GRP)
+def export_abc(export_GRP_list, export_file):
+    wizard_tools.select_GRP_and_all_children(export_GRP_list)
     bpy.ops.wm.alembic_export(filepath=export_file, 
                       selected=True)
 
-def trigger_before_export_hook():
+def trigger_before_export_hook(stage_name):
     # Trigger the before export hook
     if blender_hook:
         try:
-            blender_hook.before_export()
+            blender_hook.before_export(stage_name)
         except:
             logger.error(str(traceback.format_exc()))
 
-def trigger_after_export_hook(export_dir):
+def trigger_after_export_hook(stage_name, export_dir):
     # Trigger the after export hook
     if blender_hook:
         try:
-            blender_hook.after_export(export_dir)
+            blender_hook.after_export(stage_name, export_dir)
         except:
             logger.error(str(traceback.format_exc()))

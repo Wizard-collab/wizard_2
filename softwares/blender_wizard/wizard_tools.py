@@ -25,12 +25,13 @@ def get_all_children(object):
                 break
     return(children)
 
-def select_GRP_and_all_children(GRP):
+def select_GRP_and_all_children(GRP_list):
     bpy.ops.object.select_all(action='DESELECT')
-    GRP.select_set(True)
-    for object in get_all_children(GRP):
-        object.select_set(True)
-    bpy.context.view_layer.objects.active = GRP
+    for GRP in GRP_list:
+        GRP.select_set(True)
+        for object in get_all_children(GRP):
+            object.select_set(True)
+        bpy.context.view_layer.objects.active = GRP
 
 def clear_all_materials_of_selection():
     selection = bpy.context.selected_objects

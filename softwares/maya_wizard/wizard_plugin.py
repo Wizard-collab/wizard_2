@@ -20,7 +20,7 @@ def save_increment(*args):
 
 def export(*args):
     stage_name = os.environ['wizard_stage_name']
-    wizard_export.export(stage_name)
+    wizard_export.main(stage_name)
 
 def reference_modeling(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))

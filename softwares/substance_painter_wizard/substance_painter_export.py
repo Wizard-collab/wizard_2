@@ -30,7 +30,7 @@ def export_textures(material, size, file_type) :
     # Trigger the before export hook
     if substance_painter_hook:
         try:
-            substance_painter_hook.before_export()
+            substance_painter_hook.before_export('texturing')
         except:
             logging.error(str(traceback.format_exc()))
 
@@ -63,6 +63,6 @@ def export_textures(material, size, file_type) :
         # Trigger the after export hook
         if substance_painter_hook:
             try:
-                substance_painter_hook.after_export(export_dir)
+                substance_painter_hook.after_export('texturing', export_dir)
             except:
                 logging.error(str(traceback.format_exc()))

@@ -24,7 +24,7 @@ def save_increment():
 
 def export():
 	stage_name = os.environ['wizard_stage_name']
-	wizard_export.export(stage_name)
+	wizard_export.main(stage_name)
 
 def set_image_size():
 	image_format = wizard_communicate.get_image_format()

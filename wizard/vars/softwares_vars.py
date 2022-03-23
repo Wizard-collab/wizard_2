@@ -139,4 +139,7 @@ _hooks_files_ = dict()
 _hooks_files_[_maya_] = 'maya_hook.py'
 _hooks_files_[_blender_] = 'blender_hook.py'
 _hooks_files_[_substance_painter_] = 'substance_painter_hook.py'
+_hooks_files_[_substance_designer_] = 'substance_designer_hook.py'
 _hooks_files_[_guerilla_render_] = 'guerilla_render_hook.py'
+_hooks_files_[_houdini_] = 'houdini_hook.py'
+_hooks_files_[_nuke_] = 'nuke_hook.py'

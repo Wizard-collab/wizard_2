@@ -24,43 +24,37 @@ except:
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import maya_hook")
 
-def export(stage_name):
+def main(stage_name):
     export_dir = None
-    
-    trigger_before_export_hook()
-
     if stage_name == 'modeling':
-        export_dir = export_modeling()
+        export_modeling()
     if stage_name == 'rigging':
-        export_dir = export_rigging()
+        export_rigging()
 
-    trigger_after_export_hook(export_dir)
+def export(stage_name, export_name, export_GRP_list):
+    trigger_before_export_hook(stage_name)
+    export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
+                                                                export_name)
+    export_by_extension(export_GRP_list, export_file)
+    export_dir = wizard_communicate.add_export_version(export_name,
+                                            [export_file],
+                                            int(os.environ['wizard_version_id']))
+    trigger_after_export_hook(stage_name, export_dir)
 
 def export_modeling():
-    export_dir = None
     groups_dic = {'modeling_GRP_LOD1':'LOD1',
                     'modeling_GRP_LOD2':'LOD2',
                     'modeling_GRP_LOD3':'LOD3'}
     for grp_name in groups_dic.keys():
         process = check_obj_list_existence([grp_name])
         if process:
-            # Remove _LOD# fro all objects names 
             grp_obj = pm.PyNode(grp_name)
             object_list = [grp_obj] + pm.listRelatives(grp_name,
                                                         allDescendents=True)
             objects_dic = wizard_tools.remove_LOD_from_names(object_list)
-            # Assign a LOD# export name
             export_name = groups_dic[grp_name]
-            # Export
-            export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
-                                                                export_name)
-            export_by_extension([grp_obj], export_file)
-            export_dir = wizard_communicate.add_export_version(export_name,
-                                                    [export_file],
-                                                    int(os.environ['wizard_version_id']))
-            # Reassign old names to objects ( _LOD# )
+            export('modeling', export_name, [grp_obj])
             wizard_tools.reassign_old_name_to_objects(objects_dic)
-    return export_dir
 
 def export_rigging():
     export_dir = None
@@ -68,12 +62,7 @@ def export_rigging():
     process = check_obj_list_existence(['rigging_GRP', 'render_set'])
     if process:
         export_GRP_list = ['rigging_GRP', 'render_set']
-        export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
-                                                                    export_name)
-        export_by_extension(export_GRP_list, export_file)
-        export_dir = wizard_communicate.add_export_version(export_name,
-                                                [export_file],
-                                                int(os.environ['wizard_version_id']))
+        export('rigging', export_name, export_GRP_list)
     return export_dir
 
 def check_obj_list_existence(object_list):
@@ -110,18 +99,18 @@ def export_abc(export_GRP, export_file, range=[0,1]):
     command += export_file
     cmds.AbcExport(j=command)
 
-def trigger_before_export_hook():
+def trigger_before_export_hook(stage_name):
     # Trigger the before export hook
     if maya_hook:
         try:
-            maya_hook.before_export()
+            maya_hook.before_export(stage_name)
         except:
             logger.error(str(traceback.format_exc()))
 
-def trigger_after_export_hook(export_dir):
+def trigger_after_export_hook(stage_name, export_dir):
     # Trigger the after export hook
     if maya_hook:
         try:
-            maya_hook.after_export(export_dir)
+            maya_hook.after_export(stage_name, export_dir)
         except:
             logger.error(str(traceback.format_exc()))

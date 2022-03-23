@@ -76,7 +76,8 @@ class script_editor_widget(QsciScintilla):
         self.setMinimumSize(0, 200)
 
     def text(self):
-        return str(super(script_editor_widget, self).text())
+        text = str(super(script_editor_widget, self).text()).replace('\r\n', '\n')
+        return text
 
     def selectedText(self):
         return str(super(script_editor_widget, self).selectedText())
@@ -154,7 +155,8 @@ class python_lexer(QsciLexerCustom):
                             "<",
                             ">",
                             "@",
-                            '__name__']
+                            '__name__',
+                            'pass']
 
         self.function_key_list = ['def', 'class', 'wapi']
         self.class_keys_list = ['self', 'parent']
