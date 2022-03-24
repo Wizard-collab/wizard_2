@@ -10,8 +10,13 @@ from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard import wizard_reference
 
 def update_texturing(namespace, files_list, asset_name):
+    old_objects = wizard_tools.get_all_nodes()
     if namespace in wizard_tools.get_all_nodes():
         plug_texturing(namespace, files_list, asset_name, update=True)
+        wizard_reference.trigger_after_reference_hook('texturing',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
 
 def import_texturing(namespace, files_list, asset_name):
     old_objects = wizard_tools.get_all_nodes()

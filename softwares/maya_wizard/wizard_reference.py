@@ -31,8 +31,13 @@ def reference_modeling(namespace, files_list):
                                     wizard_tools.get_new_objects(old_objects))
 
 def update_modeling(namespace, files_list):
+    old_objects = pm.ls()
     if pm.namespace(exists=namespace):
         update_reference(namespace, files_list)
+        trigger_after_reference_hook('modeling',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
 
 def reference_rigging(namespace, files_list):
     old_objects = pm.ls()
@@ -44,8 +49,13 @@ def reference_rigging(namespace, files_list):
                                     wizard_tools.get_new_objects(old_objects))
 
 def update_rigging(namespace, files_list):
+    old_objects = pm.ls()
     if pm.namespace(exists=namespace):
         update_reference(namespace, files_list)
+        trigger_after_reference_hook('rigging',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
 
 def create_reference(file, namespace, group):
     if not pm.objExists(group):

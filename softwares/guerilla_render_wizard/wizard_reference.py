@@ -25,19 +25,19 @@ def reference_modeling(namespace, files_list):
     import_file(namespace, files_list, 'MODELING', 'modeling')
 
 def update_modeling(namespace, files_list):
-    update_file(namespace, files_list, 'MODELING')
+    update_file(namespace, files_list, 'MODELING', 'modeling')
 
 def reference_shading(namespace, files_list):
     import_file(namespace, files_list, 'SHADING', 'shading')
 
 def update_shading(namespace, files_list):
-    update_file(namespace, files_list, 'SHADING')
+    update_file(namespace, files_list, 'SHADING', 'shading')
 
 def reference_custom(namespace, files_list):
     import_file(namespace, files_list, 'CUSTOM', 'custom')
 
 def update_custom(namespace, files_list):
-    update_file(namespace, files_list, 'CUSTOM')
+    update_file(namespace, files_list, 'CUSTOM', 'custom')
 
 def import_file(namespace, files_list, parent_GRP_name, stage_name):
     old_objects = wizard_tools.get_all_nodes()
@@ -53,7 +53,8 @@ def import_file(namespace, files_list, parent_GRP_name, stage_name):
                                         namespace,
                                         wizard_tools.get_new_objects(old_objects))
 
-def update_file(namespace, files_list, parent_GRP_name):
+def update_file(namespace, files_list, parent_GRP_name, stage_name):
+    old_objects = wizard_tools.get_all_nodes()
     if namespace in wizard_tools.get_all_nodes():
         GRP = wizard_tools.add_GRP(parent_GRP_name)
         extension = files_list[0].split('.')[-1]
@@ -61,6 +62,10 @@ def update_file(namespace, files_list, parent_GRP_name):
             update_ref(namespace, files_list, GRP)
         elif extension == 'gnode':
             update_merge(namespace, files_list, GRP)
+        trigger_after_reference_hook(stage_name,
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
 
 def create_ref(namespace, files_list, GRP):
     with Modifier() as mod:

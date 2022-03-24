@@ -35,10 +35,15 @@ def reference_texturing(namespace, files_list):
                                 wizard_tools.get_new_objects(old_objects))
 
 def update_texturing(namespace, files_list):
+    old_objects = wizard_tools.get_all_nodes()
     if bpy.context.scene.render.engine == 'REDSHIFT':
         redshift_shader.plug_textures(namespace, files_list, update=True)
     elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':
         cycles_shader.plug_textures(namespace, files_list, update=True)
+    trigger_after_reference_hook('texturing',
+                                files_list,
+                                namespace,
+                                wizard_tools.get_new_objects(old_objects))
 
 def import_modeling_hard(namespace, files_list):
     old_objects = wizard_tools.get_all_nodes()
