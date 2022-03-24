@@ -27,12 +27,7 @@ except:
 
 def export_textures(material, size, file_type) :
 
-    # Trigger the before export hook
-    if substance_painter_hook:
-        try:
-            substance_painter_hook.before_export('texturing')
-        except:
-            logging.error(str(traceback.format_exc()))
+    trigger_before_export_hook('texturing')
 
     if file_type == 'exr':
         bitdepth = '32'
@@ -60,9 +55,24 @@ def export_textures(material, size, file_type) :
 
         export_dir = wizard_communicate.add_export_version(export_name, exported_files, int(os.environ['wizard_version_id']))
 
-        # Trigger the after export hook
-        if substance_painter_hook:
-            try:
-                substance_painter_hook.after_export('texturing', export_dir)
-            except:
-                logging.error(str(traceback.format_exc()))
+        trigger_after_export_hook('texturing', export_dir)
+
+def trigger_before_export_hook(stage_name):
+    # Trigger the after export hook
+    if substance_painter_hook:
+        try:
+            logging.info("Trigger before export hook")
+            substance_painter_hook.before_export(stage_name)
+        except:
+            logging.info("Can't trigger before export hook")
+            logging.error(str(traceback.format_exc()))
+
+def trigger_after_export_hook(stage_name, export_dir):
+    # Trigger the after export hook
+    if substance_painter_hook:
+        try:
+            logging.info("Trigger after export hook")
+            substance_painter_hook.after_export(stage_name, export_dir)
+        except:
+            logging.info("Can't trigger after export hook")
+            logging.error(str(traceback.format_exc()))

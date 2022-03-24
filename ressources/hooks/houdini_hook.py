@@ -49,3 +49,4 @@ def after_reference(stage_name, referenced_stage_name, new_objects):
 		The "new_objects" argument is a list of the new objects added
 		to the current scene after the reference '''
 	pass
+	

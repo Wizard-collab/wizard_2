@@ -503,7 +503,7 @@ class exports_widget(QtWidgets.QWidget):
             stage_row = project.get_stage_data(variant_row['stage_id'])
             asset_row = project.get_asset_data(stage_row['asset_id'])
 
-            self.manual_export_widget.set_export_name(f"{asset_row['name']}_{stage_row['name']}_{variant_row['name']}")
+            self.manual_export_widget.set_export_name('main')
 
             if self.manual_export_widget.exec_() == QtWidgets.QDialog.Accepted:
                 files = self.manual_export_widget.files

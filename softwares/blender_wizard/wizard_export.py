@@ -24,55 +24,81 @@ except:
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import blender_hook")
 
-def main(stage_name):
-    export_dir = None
-    if stage_name == 'modeling':
-        export_modeling(stage_name)
-
 def export(stage_name, export_name, export_GRP_list):
-    trigger_before_export_hook(stage_name)
-    export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
-                                                                export_name)
-    if export_file.endswith('.abc'):
-        export_abc(export_GRP_list, export_file)
-    export_dir = wizard_communicate.add_export_version(export_name,
-                                                        [export_file],
-                                                        int(os.environ['wizard_version_id']))
-    trigger_after_export_hook(stage_name, export_dir)
-
-def export_modeling(stage_name):
-    groups_dic = {'modeling_GRP_LOD1':'LOD1',
-                    'modeling_GRP_LOD2':'LOD2',
-                    'modeling_GRP_LOD3':'LOD3'}
-    for grp_name in groups_dic.keys():
-        # Check group existence
-        grp_obj = bpy.context.scene.objects.get(grp_name)
-        if grp_obj:
-            object_list = [grp_obj] + wizard_tools.get_all_children(grp_obj)
-            objects_dic = wizard_tools.remove_LOD_from_names(object_list)
-            export_name = groups_dic[grp_name]
-            export('modeling', export_name, [grp_obj])
-            wizard_tools.reassign_old_name_to_objects(objects_dic)
-        else:
-            logger.warning(f"{grp_name} not found")
+    if trigger_sanity_hook(stage_name):
+        additionnal_objects = trigger_before_export_hook(stage_name)
+        export_GRP_list += additionnal_objects
+        export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
+                                                                    export_name)
+        if export_file.endswith('.abc'):
+            export_abc(export_GRP_list, export_file)
+        export_dir = wizard_communicate.add_export_version(export_name,
+                                                            [export_file],
+                                                            int(os.environ['wizard_version_id']))
+        trigger_after_export_hook(stage_name, export_dir)
 
 def export_abc(export_GRP_list, export_file):
-    wizard_tools.select_GRP_and_all_children(export_GRP_list)
+    wizard_tools.select_GRP_list_and_all_children(export_GRP_list)
     bpy.ops.wm.alembic_export(filepath=export_file, 
                       selected=True)
+
+def reopen(scene):
+    bpy.ops.wm.open_mainfile(filepath=scene)
+    logger.info("Opening file {}".format(scene))
+
+def save_or_save_increment():
+    scene = bpy.data.filepath
+    if scene == '':
+        wizard_tools.save_increment()
+        scene = bpy.data.filepath
+    else:
+        bpy.ops.wm.save_as_mainfile(filepath=scene)
+        logger.info("Saving file {}".format(scene))
+    return scene
+
+def trigger_sanity_hook(stage_name):
+    # Trigger the before export hook
+    if blender_hook:
+        try:
+            logger.info("Trigger sanity hook")
+            sanity = blender_hook.sanity(stage_name)
+            if not sanity:
+                logger.info("Exporting cancelled due to sanity hook")
+            return sanity
+        except:
+            logger.info("Can't trigger sanity hook")
+            logger.error(str(traceback.format_exc()))
+            return True
+    else:
+        return True
 
 def trigger_before_export_hook(stage_name):
     # Trigger the before export hook
     if blender_hook:
         try:
-            blender_hook.before_export(stage_name)
+            logger.info("Trigger before export hook")
+            additionnal_objects = []
+            objects = blender_hook.before_export(stage_name)
+            if type(objects) is list:
+                for object in objects:
+                    if wizard_tools.check_obj_list_existence([object]):
+                        additionnal_objects.append(bpy.context.scene.objects.get(object))
+                    else:
+                        logger.warning("{} doesn't exists".format(object))
+            else:
+                logger.warning("The before export hook should return an object list")
+            return additionnal_objects
         except:
+            logger.info("Can't trigger before export hook")
             logger.error(str(traceback.format_exc()))
+            return []
 
 def trigger_after_export_hook(stage_name, export_dir):
     # Trigger the after export hook
     if blender_hook:
         try:
+            logger.info("Trigger after export hook")
             blender_hook.after_export(stage_name, export_dir)
         except:
+            logger.info("Can't trigger after export hook")
             logger.error(str(traceback.format_exc()))

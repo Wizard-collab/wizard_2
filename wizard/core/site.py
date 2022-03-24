@@ -332,7 +332,7 @@ def modify_user_password(user_name, password, new_password):
             return None
 
 def get_users_list():
-    users_rows = db_utils.get_rows('site', 'users', order='level DESC, xp ASC;')
+    users_rows = db_utils.get_rows('site', 'users', order='level DESC, xp DESC;')
     return users_rows
 
 def get_user_names_list():
