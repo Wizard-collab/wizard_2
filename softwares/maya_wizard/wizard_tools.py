@@ -5,6 +5,14 @@
 # Maya modules
 import pymel.core as pm
 
+# Wizard modules
+import wizard_communicate
+
+# Python modules
+import os
+import logging
+logger = logging.getLogger(__name__)
+
 def remove_LOD_from_names(object_list):
     objects_dic = dict()
     for object in object_list:
@@ -27,3 +35,20 @@ def get_selection_nspace_list():
         if object.namespace() not in namespaces_list:
             namespaces_list.append(object.namespace().replace(':', ''))
     return namespaces_list
+
+def check_obj_list_existence(object_list):
+    success = True
+    for obj_name in object_list:
+        if not pm.objExists(obj_name):
+            logger.warning("'{}' not found".format(obj_name))
+            success = False
+    return success
+
+def save_increment(*args):
+    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
+    if file_path and version_id:
+        logger.info("Saving file {}".format(file_path))
+        pm.saveAs(file_path)
+        os.environ['wizard_version_id'] = str(version_id)
+    else:
+        logger.warning("Can't save increment")

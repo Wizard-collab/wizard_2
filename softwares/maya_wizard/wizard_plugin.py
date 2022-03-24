@@ -13,10 +13,7 @@ from maya_wizard import wizard_export
 from maya_wizard import wizard_tools
 
 def save_increment(*args):
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
-    print(file_path)
-    if file_path:
-        pm.saveAs(file_path)
+    wizard_tools.save_increment()
 
 def export(*args):
     stage_name = os.environ['wizard_stage_name']

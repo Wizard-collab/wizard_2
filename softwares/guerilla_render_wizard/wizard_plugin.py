@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
+from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard import wizard_export
 from guerilla_render_wizard import wizard_reference
 from guerilla_render_wizard import guerilla_shader
@@ -17,13 +18,7 @@ from guerilla_render_wizard import guerilla_shader
 from guerilla import Document, pynode
 
 def save_increment():
-	file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
-	if file_path:
-		Document().save(file_path)
-	else:
-		logger.error('Saving failed')
-	if version_id is not None:
-		os.environ['wizard_version_id'] = str(version_id)
+	wizard_tools.save_increment()
 
 def export():
 	stage_name = os.environ['wizard_stage_name']
