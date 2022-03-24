@@ -15,8 +15,6 @@ from guerilla import Document, pynode
 # Wizard modules
 import wizard_communicate
 from guerilla_render_wizard import wizard_tools
-from guerilla_render_wizard.export import shading
-from guerilla_render_wizard.export import custom
 
 # Hook modules
 try:
@@ -26,20 +24,8 @@ except:
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import guerilla_render_hook")
 
-def main(stage_name):
-    scene = save_or_save_increment()
-
-    if stage_name == 'shading':
-        export_dic = shading.main()
-    if stage_name == 'custom':
-        export_dic = custom.main()
-
-    for export_name in export_dic.keys():
-        export(export_dic[export_name]['stage_name'],
-                    export_name,
-                    export_dic[export_name]['export_GRP_list'])
-
-    reopen(scene)
+def __init__():
+    pass
 
 def export(stage_name, export_name, export_GRP_list):
     if trigger_sanity_hook(stage_name):

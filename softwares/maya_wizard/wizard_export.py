@@ -15,8 +15,6 @@ import maya.cmds as cmds
 # Wizard modules
 import wizard_communicate
 from maya_wizard import wizard_tools
-from maya_wizard.export import modeling
-from maya_wizard.export import rigging
 
 # Hook modules
 try:
@@ -25,21 +23,6 @@ except:
     maya_hook = None
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import maya_hook")
-
-def main(stage_name):
-    scene = save_or_save_increment()
-
-    if stage_name == 'modeling':
-        export_dic = modeling.main()
-    if stage_name == 'rigging':
-        export_dic = rigging.main()
-
-    for export_name in export_dic.keys():
-        export(export_dic[export_name]['stage_name'],
-                    export_name,
-                    export_dic[export_name]['export_GRP_list'])
-
-    reopen(scene)
 
 def export(stage_name, export_name, export_GRP_list):
     if trigger_sanity_hook(stage_name):

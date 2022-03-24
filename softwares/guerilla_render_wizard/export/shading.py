@@ -4,15 +4,10 @@
 
 # Wizard modules
 from guerilla_render_wizard import wizard_tools
+from guerilla_render_wizard import wizard_export
 
 def main():
-    export_dic = dict()
-
+    export_name = 'main'
     export_GRP = 'shading_GRP'
     if wizard_tools.check_obj_list_existence([export_GRP]):
-        export_name = 'main'
-        export_dic[export_name] = dict()
-        export_dic[export_name]['stage_name'] = 'shading'
-        export_dic[export_name]['export_GRP_list'] = [export_GRP]
-
-    return export_dic
+        wizard_export.export('shading', export_name, [export_GRP])

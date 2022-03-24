@@ -5,19 +5,30 @@
 # Python modules
 import os
 import pymel.core as pm
+import logging
+logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
 from maya_wizard import wizard_reference
 from maya_wizard import wizard_export
 from maya_wizard import wizard_tools
+from maya_wizard.export import modeling
+from maya_wizard.export import rigging
 
 def save_increment(*args):
     wizard_tools.save_increment()
 
 def export(*args):
+    scene = wizard_export.save_or_save_increment()
     stage_name = os.environ['wizard_stage_name']
-    wizard_export.main(stage_name)
+    if stage_name == 'modeling':
+        modeling.main()
+    elif stage_name == 'rigging':
+        rigging.main()
+    else:
+        logger.warning("Unplugged stage : {}".format(stage_name))
+    wizard_export.reopen(scene)
 
 def reference_modeling(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
@@ -34,8 +45,11 @@ def update_modeling(*args):
 def modify_modeling_reference_LOD(LOD):
     work_env_id = int(os.environ['wizard_work_env_id'])
     namespaces_list = wizard_tools.get_selection_nspace_list()
-    wizard_communicate.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
-    update_modeling()
+    if namespaces_list == []:
+        logger.warning("Select a referenced mesh to switch LOD")
+    else:
+        wizard_communicate.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
+        update_modeling()
 
 def LOD1(*args):
     modify_modeling_reference_LOD('LOD1')
