@@ -2,8 +2,34 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# Wizard modules
+import wizard_communicate
+
 # Blender modules
 import bpy
+
+# Python modules
+import os
+import logging
+logger = logging.getLogger(__name__)
+
+def save_increment():
+    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
+    if file_path and version_id:
+        logger.info("Saving file {}".format(file_path))
+        bpy.ops.wm.save_as_mainfile(filepath=file_path)
+        os.environ['wizard_version_id'] = str(version_id)
+    else:
+        logger.warning("Can't save increment")
+
+def check_obj_list_existence(object_list):
+    success = True
+    for obj_name in object_list:
+        obj = bpy.context.scene.objects.get(obj_name)
+        if not obj:
+            logger.warning("'{}' not found".format(obj_name))
+            success = False
+    return success
 
 def get_direct_children(object): 
     children = [] 
@@ -25,7 +51,7 @@ def get_all_children(object):
                 break
     return(children)
 
-def select_GRP_and_all_children(GRP_list):
+def select_GRP_list_and_all_children(GRP_list):
     bpy.ops.object.select_all(action='DESELECT')
     for GRP in GRP_list:
         GRP.select_set(True)

@@ -10,17 +10,12 @@ import bpy
 
 # Wizard modules
 import wizard_communicate
+from blender_wizard import wizard_tools
 from blender_wizard import wizard_export
 from blender_wizard import wizard_reference
 
 def save_increment():
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
-    if file_path:
-        bpy.ops.wm.save_as_mainfile(filepath=file_path)
-    else:
-    	print('Saving failed')
-    if version_id is not None:
-    	os.environ['wizard_version_id'] = str(version_id)
+    wizard_tools.save_increment()
 
 def export():
 	stage_name = os.environ['wizard_stage_name']

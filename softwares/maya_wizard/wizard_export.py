@@ -131,6 +131,7 @@ def trigger_before_export_hook(stage_name):
         except:
             logger.info("Can't trigger before export hook")
             logger.error(str(traceback.format_exc()))
+            return []
 
 def trigger_after_export_hook(stage_name, export_dir):
     # Trigger the after export hook

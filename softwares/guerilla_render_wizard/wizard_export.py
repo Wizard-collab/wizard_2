@@ -106,17 +106,22 @@ def trigger_sanity_hook(stage_name):
 def trigger_before_export_hook(stage_name):
     # Trigger the before export hook
     if guerilla_render_hook:
-        additionnal_objects = []
-        objects = guerilla_render_hook.before_export(stage_name)
-        if type(objects) is list:
-            for object in objects:
-                if wizard_tools.node_exists(object):
-                    additionnal_objects.append(object)
-                else:
-                    logger.warning("{0} doesn't exists".format(object))
-        else:
-            logger.warning("The before export hook should return an object list")
-        return additionnal_objects
+        try:
+            additionnal_objects = []
+            objects = guerilla_render_hook.before_export(stage_name)
+            if type(objects) is list:
+                for object in objects:
+                    if wizard_tools.node_exists(object):
+                        additionnal_objects.append(object)
+                    else:
+                        logger.warning("{0} doesn't exists".format(object))
+            else:
+                logger.warning("The before export hook should return an object list")
+            return additionnal_objects
+        except:
+            logger.info("Can't trigger before export hook")
+            logger.error(str(traceback.format_exc()))
+            return []
 
 def trigger_after_export_hook(stage_name, export_dir):
     # Trigger the after export hook
