@@ -4,21 +4,44 @@
 
 # Python modules
 import os
+import logging
+logger = logging.getLogger(__name__)
+
+# Wizard modules
+from maya_wizard import wizard_tools
 
 # Maya modules
 import pymel.core as pm
 
+# Hook modules
+try:
+    import maya_hook
+except:
+    maya_hook = None
+    logger.error(str(traceback.format_exc()))
+    logger.warning("Can't import maya_hook")
+
 def reference_modeling(namespace, files_list):
+    old_objects = pm.ls()
     if not pm.namespace(exists=namespace):
         create_reference(files_list[0], namespace, 'MODELING')
+        trigger_after_reference_hook('modeling',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
 
 def update_modeling(namespace, files_list):
     if pm.namespace(exists=namespace):
         update_reference(namespace, files_list)
 
 def reference_rigging(namespace, files_list):
+    old_objects = pm.ls()
     if not pm.namespace(exists=namespace):
         create_reference(files_list[0], namespace, 'RIGGING')
+        trigger_after_reference_hook('rigging',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
 
 def update_rigging(namespace, files_list):
     if pm.namespace(exists=namespace):
@@ -41,3 +64,24 @@ def update_reference(namespace, files_list):
         if reference[0] == namespace:
             if os.path.normpath(files_list[0]) != os.path.normpath(reference[1].path):
                 reference[1].load(files_list[0])
+
+def trigger_after_reference_hook(referenced_stage_name,
+                                    files_list,
+                                    namespace,
+                                    new_objects):
+    stage_name = os.environ['wizard_stage_name']
+    referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
+    # Trigger the after export hook
+    if maya_hook:
+        try:
+            logger.info("Trigger after reference hook")
+            maya_hook.after_reference(stage_name,
+                                        referenced_stage_name,
+                                        referenced_files_dir,
+                                        namespace,
+                                        new_objects)
+        except:
+            logger.info("Can't trigger after reference hook")
+            logger.error(str(traceback.format_exc()))
+
+    

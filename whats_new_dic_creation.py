@@ -8,6 +8,9 @@ whats_new_dic['Batch exports']['comment'] = 'You can now export data from the wo
 whats_new_dic['References groups'] = dict()
 whats_new_dic['References groups']['type'] = 'new'
 whats_new_dic['References groups']['comment'] = 'Create references in custom groups and reference groups in scenes'
+whats_new_dic['Hooks'] = dict()
+whats_new_dic['Hooks']['type'] = 'new'
+whats_new_dic['Hooks']['comment'] = 'Use script hooks to add features to your exports and imports'
 
 import yaml
 with open('ressources/whatsnew.yaml', 'w') as f:

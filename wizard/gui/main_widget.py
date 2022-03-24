@@ -320,6 +320,7 @@ class main_widget(QtWidgets.QWidget):
         self.production_manager_widget.refresh()
         self.shelf_widget.refresh()
         self.groups_manager_widget.refresh()
+        self.project_preferences_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

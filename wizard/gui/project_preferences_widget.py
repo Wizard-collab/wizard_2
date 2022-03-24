@@ -59,6 +59,7 @@ class project_preferences_widget(QtWidgets.QWidget):
             self.project_general_preferences_widget.refresh()
             self.softwares_preferences_widget.refresh()
             self.export_preferences_widget.refresh()
+            self.project_hooks_widget.refresh()
 
     def build_ui(self):
         self.resize(600,800)

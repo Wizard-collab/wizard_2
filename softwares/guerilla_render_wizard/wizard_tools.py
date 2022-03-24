@@ -13,6 +13,11 @@ import wizard_communicate
 # Guerilla modules
 from guerilla import Document, Modifier, pynode, Node, Plug
 
+def get_file_dir(file):
+    directory = os.path.dirname(file)
+    directory.replace('\\', '/')
+    return directory
+
 def node_exists(node):
     try:
         pynode(node)
@@ -25,6 +30,14 @@ def get_all_nodes():
     for node in Document().children(recursive=True):
         nodes_list.append(node.getname())
     return nodes_list
+
+def get_new_objects(old_objects):
+    all_objects = get_all_nodes()
+    new_objects = []
+    for object in all_objects:
+        if object not in old_objects:
+            new_objects.append(object)
+    return new_objects
 
 def delete_all_but_list(object_list):
     for object in get_all_nodes():
