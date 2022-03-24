@@ -13,6 +13,11 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
+def get_file_dir(file):
+    directory = os.path.dirname(file)
+    directory.replace('\\', '/')
+    return directory
+
 def save_increment():
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
     if file_path and version_id:
@@ -37,6 +42,24 @@ def get_direct_children(object):
         if ob.parent == object: 
             children.append(ob) 
     return children
+
+def get_all_nodes():
+    all_objects = []
+    for node in bpy.data.objects:
+        all_objects.append(node)
+    for material in bpy.data.materials:
+        all_objects.append(material)
+    for image in bpy.data.images:
+        all_objects.append(image)
+    return all_objects
+
+def get_new_objects(old_objects):
+    all_objects = get_all_nodes()
+    new_objects = []
+    for object in all_objects:
+        if object not in old_objects:
+            new_objects.append(object)
+    return new_objects
 
 def get_all_children(object):
     children = []

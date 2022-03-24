@@ -36,13 +36,12 @@ def get_new_objects(old_objects):
     new_objects = []
     for object in all_objects:
         if object not in old_objects:
-            new_objects.append(object)
+            new_objects.append(get_node_from_name(object))
     return new_objects
 
 def delete_all_but_list(object_list):
     for object in get_all_nodes():
         if object not in object_list:
-            print(object)
             try:
                 pynode(object).delete()
             except:

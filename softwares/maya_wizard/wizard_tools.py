@@ -23,7 +23,7 @@ def get_new_objects(old_objects):
     all_objects = pm.ls()
     for object in all_objects:
         if object not in old_objects:
-            new_objects.append(object.name())
+            new_objects.append(object)
     return new_objects
 
 def remove_LOD_from_names(object_list):
