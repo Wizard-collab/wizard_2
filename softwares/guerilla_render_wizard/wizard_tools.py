@@ -25,10 +25,13 @@ def node_exists(node):
     except ValueError:
         return False
 
-def get_all_nodes():
+def get_all_nodes(name=True):
     nodes_list = []
     for node in Document().children(recursive=True):
-        nodes_list.append(node.getname())
+        if name:
+            nodes_list.append(node.getname())
+        else:
+            nodes_list.append(node)
     return nodes_list
 
 def get_new_objects(old_objects):

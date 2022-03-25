@@ -530,11 +530,12 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.apply_auto_update_change = True
 
     def modify_auto_update(self, auto_update):
-        if self.context == 'work_env':
-            project.modify_reference_auto_update(self.reference_row['id'], auto_update)
-        else:
-            project.modify_grouped_reference_auto_update(self.reference_row['id'], auto_update)
-        gui_server.refresh_ui()
+        if self.apply_auto_update_change:
+            if self.context == 'work_env':
+                project.modify_reference_auto_update(self.reference_row['id'], auto_update)
+            else:
+                project.modify_grouped_reference_auto_update(self.reference_row['id'], auto_update)
+            gui_server.refresh_ui()
 
     def modify_version(self, export_version_id):
         if self.context == 'work_env':

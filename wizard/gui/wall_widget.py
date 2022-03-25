@@ -401,6 +401,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_layout.addWidget(self.event_additional_content_label)
 
         self.image_label = QtWidgets.QLabel()
+        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.content_layout.addWidget(self.image_label)
 
         self.buttons_widget = QtWidgets.QWidget()

@@ -24,9 +24,11 @@ except:
 
 def reference_modeling(namespace, files_list):
     import_file(namespace, files_list, 'MODELING', 'modeling')
+    append_wizardTags_to_guerillaTags(namespace)
 
 def update_modeling(namespace, files_list):
     update_file(namespace, files_list, 'MODELING', 'modeling')
+    append_wizardTags_to_guerillaTags(namespace)
 
 def reference_shading(namespace, files_list):
     import_file(namespace, files_list, 'SHADING', 'shading')
@@ -87,6 +89,19 @@ def update_ref(namespace, files_list, GRP):
     with Modifier() as mod:
         refNode.ReferenceFileName.set(files_list[0])
         refNode.reload(files_list[0])
+
+def append_wizardTags_to_guerillaTags(namespace):
+    refNode = wizard_tools.get_node_from_name(namespace)
+    all_objects = wizard_tools.get_all_nodes(name=False)
+    for node in all_objects:
+        if node.belongstoreference(refNode):
+            if node.hasAttr('wizardTags', 'Plug'):
+                wizard_tags = node.wizardTags.get().split(',')
+                guerilla_tags = node.Membership.get().split(',')
+                tags_list = set(wizard_tags + guerilla_tags)
+                if '' in tags_list:
+                    tags_list.remove('')
+                node.Membership.set((',').join(tags_list))
 
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
