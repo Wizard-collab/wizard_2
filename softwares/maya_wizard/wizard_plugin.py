@@ -4,6 +4,7 @@
 
 # Python modules
 import os
+import traceback
 import pymel.core as pm
 import logging
 logger = logging.getLogger(__name__)
@@ -15,20 +16,27 @@ from maya_wizard import wizard_export
 from maya_wizard import wizard_tools
 from maya_wizard.export import modeling
 from maya_wizard.export import rigging
+from maya_wizard.export import layout
 
 def save_increment(*args):
     wizard_tools.save_increment()
 
 def export(*args):
     scene = wizard_export.save_or_save_increment()
-    stage_name = os.environ['wizard_stage_name']
-    if stage_name == 'modeling':
-        modeling.main()
-    elif stage_name == 'rigging':
-        rigging.main()
-    else:
-        logger.warning("Unplugged stage : {}".format(stage_name))
-    wizard_export.reopen(scene)
+    try:
+        stage_name = os.environ['wizard_stage_name']
+        if stage_name == 'modeling':
+            modeling.main()
+        elif stage_name == 'rigging':
+            rigging.main()
+        elif stage_name == 'layout':
+            layout.main()
+        else:
+            logger.warning("Unplugged stage : {}".format(stage_name))
+    except:
+        logger.error(str(traceback.format_exc()))
+    finally:
+        wizard_export.reopen(scene)
 
 def reference_modeling(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
@@ -42,24 +50,6 @@ def update_modeling(*args):
         for modeling_reference in references['modeling']:
             wizard_reference.update_modeling(modeling_reference['namespace'], modeling_reference['files'])
 
-def modify_modeling_reference_LOD(LOD):
-    work_env_id = int(os.environ['wizard_work_env_id'])
-    namespaces_list = wizard_tools.get_selection_nspace_list()
-    if namespaces_list == []:
-        logger.warning("Select a referenced mesh to switch LOD")
-    else:
-        wizard_communicate.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
-        update_modeling()
-
-def LOD1(*args):
-    modify_modeling_reference_LOD('LOD1')
-
-def LOD2(*args):
-    modify_modeling_reference_LOD('LOD2')
-
-def LOD3(*args):
-    modify_modeling_reference_LOD('LOD3')
-
 def reference_rigging(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'rigging' in references.keys():
@@ -71,6 +61,37 @@ def update_rigging(*args):
     if 'rigging' in references.keys():
         for modeling_reference in references['rigging']:
             wizard_reference.update_rigging(modeling_reference['namespace'], modeling_reference['files'])
+
+def reference_layout(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'layout' in references.keys():
+        for layout_reference in references['layout']:
+            wizard_reference.reference_layout(layout_reference['namespace'], layout_reference['files'])
+
+def update_layout(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'layout' in references.keys():
+        for layout_reference in references['layout']:
+            wizard_reference.update_layout(layout_reference['namespace'], layout_reference['files'])
+
+def modify_reference_LOD(LOD):
+    work_env_id = int(os.environ['wizard_work_env_id'])
+    namespaces_list = wizard_tools.get_selection_nspace_list()
+    if namespaces_list == []:
+        logger.warning("Select a referenced mesh to switch LOD")
+    else:
+        wizard_communicate.modify_reference_LOD(work_env_id, LOD, namespaces_list)
+        update_modeling()
+        update_layout()
+
+def LOD1(*args):
+    modify_reference_LOD('LOD1')
+
+def LOD2(*args):
+    modify_reference_LOD('LOD2')
+
+def LOD3(*args):
+    modify_reference_LOD('LOD3')
 
 def set_frame_range(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))

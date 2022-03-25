@@ -47,6 +47,8 @@ def get_all_nodes():
     all_objects = []
     for node in bpy.data.objects:
         all_objects.append(node)
+    for node in bpy.data.meshes:
+        all_objects.append(node)
     for material in bpy.data.materials:
         all_objects.append(material)
     for image in bpy.data.images:
@@ -61,8 +63,9 @@ def get_new_objects(old_objects):
             new_objects.append(object)
     return new_objects
 
-def get_all_children(object):
+def get_all_children(object, meshes=0):
     children = []
+    all_objects = []
     for ob in bpy.data.objects:
         ancestor = ob
         while 1:
@@ -71,6 +74,8 @@ def get_all_children(object):
                 break
             if ancestor == object:
                 children.append(ob)
+                if meshes:
+                    children.append(ob.data)
                 break
     return(children)
 
@@ -104,3 +109,18 @@ def remove_LOD_from_names(object_list):
 def reassign_old_name_to_objects(objects_dic):
     for object in objects_dic.keys():
         object.name = objects_dic[object]
+
+def apply_tags(object_list):
+    all_objects = []
+    for object in object_list:
+        all_objects.append(object)
+        all_objects += get_all_children(object, meshes=1)
+    for object in all_objects:
+        if 'wizardTags' not in object.keys():
+            existing_tags = []
+        else:
+            existing_tags = object['wizardTags'].split(',')
+        asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+        to_tag = [os.environ['wizard_category_name'], asset_tag, object.name]
+        tags = existing_tags + to_tag
+        object['wizardTags'] = (',').join(set(tags))

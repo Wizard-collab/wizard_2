@@ -23,15 +23,19 @@ def save_increment():
     wizard_tools.save_increment()
 
 def export():
-    stage_name = os.environ['wizard_stage_name']
     scene = wizard_export.save_or_save_increment()
-    if stage_name == 'shading':
-        shading.main()
-    elif stage_name == 'custom':
-        custom.main()
-    else:
-        logger.warning("Unplugged stage : {0}".format(stage_name))
-    wizard_export.reopen(scene)
+    try:
+        stage_name = os.environ['wizard_stage_name']
+        if stage_name == 'shading':
+            shading.main()
+        elif stage_name == 'custom':
+            custom.main()
+        else:
+            logger.warning("Unplugged stage : {0}".format(stage_name))
+    except:
+        logger.error(str(traceback.format_exc()))
+    finally:
+        wizard_export.reopen(scene)
 
 def reference_modeling():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))

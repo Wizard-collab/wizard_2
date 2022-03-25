@@ -94,6 +94,7 @@ def trigger_before_export_hook(stage_name):
     if guerilla_render_hook:
         try:
             additionnal_objects = []
+            logger.info("Trigger before export hook")
             objects = guerilla_render_hook.before_export(stage_name)
             if type(objects) is list:
                 for object in objects:

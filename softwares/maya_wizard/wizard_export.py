@@ -26,8 +26,6 @@ except:
 
 def export(stage_name, export_name, export_GRP_list):
     if trigger_sanity_hook(stage_name):
-        additionnal_objects = trigger_before_export_hook(stage_name)
-        export_GRP_list += additionnal_objects
         export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                                                     export_name)
         export_by_extension(export_GRP_list, export_file)
@@ -58,7 +56,7 @@ def export_abc(export_GRP_list, export_file, range=[0,1]):
     command += " "
     command += end
     command += " -step 1"
-    command += " -frameRelativeSample -0.2 -frameRelativeSample 0 -frameRelativeSample 0.2 -attr GuerillaTags -writeVisibility -writeUVSets -uvWrite -worldSpace "
+    command += " -frameRelativeSample -0.2 -frameRelativeSample 0 -frameRelativeSample 0.2 -attr wizardTags -writeVisibility -writeUVSets -uvWrite -worldSpace "
     for object in export_GRP_list:
         command += " -root {}".format(object)
     command += " -dataFormat ogawa -file "

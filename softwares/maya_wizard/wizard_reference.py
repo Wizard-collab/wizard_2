@@ -3,6 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+import traceback
 import os
 import logging
 logger = logging.getLogger(__name__)
@@ -53,6 +54,24 @@ def update_rigging(namespace, files_list):
     if pm.namespace(exists=namespace):
         update_reference(namespace, files_list)
         trigger_after_reference_hook('rigging',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def reference_layout(namespace, files_list):
+    old_objects = pm.ls()
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'LAYOUT')
+        trigger_after_reference_hook('layout',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def update_layout(namespace, files_list):
+    old_objects = pm.ls()
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+        trigger_after_reference_hook('layout',
                                     files_list,
                                     namespace,
                                     wizard_tools.get_new_objects(old_objects))

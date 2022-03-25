@@ -44,6 +44,7 @@ def delete_all_but_list(object_list):
         if object not in object_list:
             try:
                 pynode(object).delete()
+                print(object)
             except:
                 pass
                 

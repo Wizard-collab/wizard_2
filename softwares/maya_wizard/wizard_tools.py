@@ -33,13 +33,16 @@ def remove_LOD_from_names(object_list):
         for NUM in range(1,4):
             LOD = '_LOD{}'.format(str(NUM))
             if object.name().endswith(LOD):
-            	object = pm.rename(object.name(), old_name.replace(LOD, ''))
-        objects_dic[object] = old_name
+                try:
+                    object = pm.rename(object.name(), old_name.replace(LOD, ''))
+                    objects_dic[object] = old_name
+                except:
+                    logger.warning("Can't rename {}".format(object.name()))
     return objects_dic
 
 def reassign_old_name_to_objects(objects_dic):
     for object in objects_dic.keys():
-    	pm.rename(object.name(), objects_dic[object])
+        pm.rename(object.name(), objects_dic[object])
 
 def get_selection_nspace_list():
     namespaces_list = []
@@ -65,3 +68,19 @@ def save_increment(*args):
         os.environ['wizard_version_id'] = str(version_id)
     else:
         logger.warning("Can't save increment")
+
+def apply_tags(object_list):
+    all_objects = []
+    for object in object_list:
+        all_objects.append(object)
+        all_objects += pm.listRelatives(object, allDescendents=True)
+    for object in all_objects:
+        if pm.attributeQuery('wizardTags', node=object, exists=1) == 0:
+            pm.addAttr(object, ln="wizardTags", dt="string")
+        existing_tags = []
+        if pm.getAttr(object + '.wizardTags'):
+            existing_tags = pm.getAttr(object + '.wizardTags').split(',')
+        asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+        to_tag = [os.environ['wizard_category_name'], asset_tag, object.name().split(':')[-1].split('|')[-1]]
+        tags = existing_tags + to_tag
+        pm.setAttr(object + '.wizardTags', (',').join(set(tags)), type="string")

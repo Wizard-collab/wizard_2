@@ -150,8 +150,12 @@ def build_env(work_env_id, software_row, version_id):
 
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     stage_id = project.get_variant_data(variant_id, 'stage_id')
-    stage_name = project.get_stage_data(stage_id, 'name')
-    env['wizard_stage_name'] = str(stage_name)
+    stage_row = project.get_stage_data(stage_id)
+    asset_row = project.get_asset_data(stage_row['asset_id'])
+    category_row = project.get_category_data(asset_row['category_id'])
+    env['wizard_stage_name'] = str(stage_row['name'])
+    env['wizard_asset_name'] = str(asset_row['name'])
+    env['wizard_category_name'] = str(category_row['name'])
 
     env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
     env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + project.get_hooks_folder()

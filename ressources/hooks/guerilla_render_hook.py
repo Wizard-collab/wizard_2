@@ -36,7 +36,11 @@ def after_export(stage_name, export_dir):
 		file as string '''
 	pass
 
-def after_reference(stage_name, referenced_stage_name, new_objects):
+def after_reference(stage_name, 
+						referenced_stage_name, 
+						referenced_files_dir,
+						namespace, 
+ 						new_objects):
 	''' This function is triggered
 		before the import
 
@@ -49,4 +53,3 @@ def after_reference(stage_name, referenced_stage_name, new_objects):
 		The "new_objects" argument is a list of the new objects added
 		to the current scene after the reference '''
 	pass
-	

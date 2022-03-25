@@ -11,6 +11,7 @@ from blender_wizard import cycles_shader
 from blender_wizard import wizard_tools
 
 # Python modules
+import traceback
 import os
 import logging
 logger = logging.getLogger(__name__)

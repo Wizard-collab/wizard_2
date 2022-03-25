@@ -13,9 +13,9 @@ from maya_wizard import wizard_export
 import pymel.core as pm
 
 def main():
-    groups_dic = {'modeling_GRP_LOD1':'LOD1',
-                    'modeling_GRP_LOD2':'LOD2',
-                    'modeling_GRP_LOD3':'LOD3'}
+    groups_dic = {'layout_GRP_LOD1':'LOD1',
+                    'layout_GRP_LOD2':'LOD2',
+                    'layout_GRP_LOD3':'LOD3'}
     for grp_name in groups_dic.keys():
         if wizard_tools.check_obj_list_existence([grp_name]):
             grp_obj = pm.PyNode(grp_name)
@@ -27,11 +27,10 @@ def main():
             export_name = groups_dic[grp_name]
 
             export_GRP_list = [grp_obj]
-            additionnal_objects = wizard_export.trigger_before_export_hook('modeling')
+            additionnal_objects = wizard_export.trigger_before_export_hook('layout')
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
 
-            wizard_export.export('modeling', export_name, export_GRP_list)
+            wizard_export.export('layout', export_name, [grp_obj])
             grp_obj.rename(grp_name)
             wizard_tools.reassign_old_name_to_objects(objects_dic)
-

@@ -104,10 +104,10 @@ class communicate_server(Thread):
             returned = get_user_folder()
         elif signal_dic['function'] == 'get_references':
             returned = get_references(signal_dic['work_env_id'])
-        elif signal_dic['function'] == 'modify_modeling_reference_LOD':
-            returned = modify_modeling_reference_LOD(signal_dic['work_env_id'],
-                                                        signal_dic['LOD'],
-                                                        signal_dic['namespaces_list'])
+        elif signal_dic['function'] == 'modify_reference_LOD':
+            returned = modify_reference_LOD(signal_dic['work_env_id'],
+                                                    signal_dic['LOD'],
+                                                    signal_dic['namespaces_list'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -151,8 +151,8 @@ def get_frame_range(work_env_id):
     else:
         return None
 
-def modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list):
-    assets.modify_modeling_reference_LOD(work_env_id, LOD, namespaces_list)
+def modify_reference_LOD(work_env_id, LOD, namespaces_list):
+    assets.modify_reference_LOD(work_env_id, LOD, namespaces_list)
     gui_server.refresh_ui()
     return None
 

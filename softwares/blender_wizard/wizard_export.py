@@ -26,8 +26,6 @@ except:
 
 def export(stage_name, export_name, export_GRP_list):
     if trigger_sanity_hook(stage_name):
-        additionnal_objects = trigger_before_export_hook(stage_name)
-        export_GRP_list += additionnal_objects
         export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                                                     export_name)
         if export_file.endswith('.abc'):
@@ -40,7 +38,7 @@ def export(stage_name, export_name, export_GRP_list):
 def export_abc(export_GRP_list, export_file):
     wizard_tools.select_GRP_list_and_all_children(export_GRP_list)
     bpy.ops.wm.alembic_export(filepath=export_file, 
-                      selected=True)
+                      selected=True, export_custom_properties=True)
 
 def reopen(scene):
     bpy.ops.wm.open_mainfile(filepath=scene)
@@ -76,8 +74,8 @@ def trigger_before_export_hook(stage_name):
     # Trigger the before export hook
     if blender_hook:
         try:
-            logger.info("Trigger before export hook")
             additionnal_objects = []
+            logger.info("Trigger before export hook")
             objects = blender_hook.before_export(stage_name)
             if type(objects) is list:
                 for object in objects:

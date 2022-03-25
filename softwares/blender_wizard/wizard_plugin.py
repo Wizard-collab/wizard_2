@@ -4,6 +4,7 @@
 
 # Python modules
 import os
+import traceback
 import logging
 logger = logging.getLogger(__name__)
 
@@ -22,12 +23,16 @@ def save_increment():
 
 def export():
     scene = wizard_export.save_or_save_increment()
-    stage_name = os.environ['wizard_stage_name']
-    if stage_name == 'modeling':
-        modeling.main()
-    else:
-        logger.warning("Unplugged stage : {}".format(stage_name))
-    wizard_export.reopen(scene)
+    try:
+        stage_name = os.environ['wizard_stage_name']
+        if stage_name == 'modeling':
+            modeling.main()
+        else:
+            logger.warning("Unplugged stage : {}".format(stage_name))
+    except:
+        logger.error(str(traceback.format_exc()))
+    finally:
+        wizard_export.reopen(scene)
 
 def set_image_size():
     image_format = wizard_communicate.get_image_format()
