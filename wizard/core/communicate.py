@@ -94,6 +94,7 @@ class communicate_server(Thread):
         elif signal_dic['function'] == 'add_export_version':
             returned = add_export_version(signal_dic['export_name'],
                                         signal_dic['files'],
+                                        signal_dic['work_env_id'], 
                                         signal_dic['version_id'], 
                                         signal_dic['comment'])
         elif signal_dic['function'] == 'get_frame_range':
@@ -108,6 +109,8 @@ class communicate_server(Thread):
             returned = modify_reference_LOD(signal_dic['work_env_id'],
                                                     signal_dic['LOD'],
                                                     signal_dic['namespaces_list'])
+        elif signal_dic['function'] == 'create_or_get_camera_work_env':
+            returned = create_or_get_camera_work_env(signal_dic['work_env_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -129,10 +132,11 @@ def request_export(work_env_id, export_name):
     file_path = assets.request_export(work_env_id, export_name)
     return file_path
 
-def add_export_version(export_name, files, version_id, comment):
+def add_export_version(export_name, files, work_env_id, version_id, comment):
     # Add an export version using the 'assets' module and return the export_version_id 
     # of the new export version
-    export_version_id = assets.add_export_version_from_version_id(export_name, files, version_id, comment, execute_xp=False)
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    export_version_id = assets.add_export_version(export_name, files, variant_id, version_id, comment, execute_xp=False)
     export_dir = assets.get_export_version_path(export_version_id)
     gui_server.refresh_ui()
     return export_dir
@@ -161,3 +165,6 @@ def get_image_format():
 
 def get_user_folder():
     return user_vars._user_path_
+
+def create_or_get_camera_work_env(work_env_id):
+    return assets.create_or_get_camera_work_env(work_env_id)

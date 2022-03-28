@@ -16,7 +16,11 @@ from maya_wizard import wizard_export
 from maya_wizard import wizard_tools
 from maya_wizard.export import modeling
 from maya_wizard.export import rigging
+from maya_wizard.export import custom
+from maya_wizard.export import camrig
 from maya_wizard.export import layout
+from maya_wizard.export import animation
+from maya_wizard.export import camera
 
 def save_increment(*args):
     wizard_tools.save_increment()
@@ -29,10 +33,27 @@ def export(*args):
             modeling.main()
         elif stage_name == 'rigging':
             rigging.main()
+        elif stage_name == 'custom':
+            custom.main()
+        elif stage_name == 'camrig':
+            camrig.main()
         elif stage_name == 'layout':
             layout.main()
+        elif stage_name == 'animation':
+            animation.main()
+        elif stage_name == 'camera':
+            camera.main()
         else:
             logger.warning("Unplugged stage : {}".format(stage_name))
+    except:
+        logger.error(str(traceback.format_exc()))
+    finally:
+        wizard_export.reopen(scene)
+
+def export_camera(*args):
+    scene = wizard_export.save_or_save_increment()
+    try:
+        camera.main()
     except:
         logger.error(str(traceback.format_exc()))
     finally:
@@ -53,14 +74,38 @@ def update_modeling(*args):
 def reference_rigging(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'rigging' in references.keys():
-        for modeling_reference in references['rigging']:
-            wizard_reference.reference_rigging(modeling_reference['namespace'], modeling_reference['files'])
+        for rigging_reference in references['rigging']:
+            wizard_reference.reference_rigging(rigging_reference['namespace'], rigging_reference['files'])
 
 def update_rigging(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'rigging' in references.keys():
-        for modeling_reference in references['rigging']:
-            wizard_reference.update_rigging(modeling_reference['namespace'], modeling_reference['files'])
+        for rigging_reference in references['rigging']:
+            wizard_reference.update_rigging(rigging_reference['namespace'], rigging_reference['files'])
+
+def reference_custom(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'custom' in references.keys():
+        for custom_reference in references['custom']:
+            wizard_reference.reference_custom(custom_reference['namespace'], custom_reference['files'])
+
+def update_custom(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'custom' in references.keys():
+        for custom_reference in references['custom']:
+            wizard_reference.update_custom(custom_reference['namespace'], custom_reference['files'])
+
+def reference_camrig(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'camrig' in references.keys():
+        for camrig_reference in references['camrig']:
+            wizard_reference.reference_camrig(camrig_reference['namespace'], camrig_reference['files'])
+
+def update_camrig(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'camrig' in references.keys():
+        for camrig_reference in references['camrig']:
+            wizard_reference.update_camrig(camrig_reference['namespace'], camrig_reference['files'])
 
 def reference_layout(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
@@ -73,6 +118,18 @@ def update_layout(*args):
     if 'layout' in references.keys():
         for layout_reference in references['layout']:
             wizard_reference.update_layout(layout_reference['namespace'], layout_reference['files'])
+
+def reference_animation(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'animation' in references.keys():
+        for animation_reference in references['animation']:
+            wizard_reference.reference_layout(animation_reference['namespace'], animation_reference['files'])
+
+def update_animation(*args):
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'animation' in references.keys():
+        for animation_reference in references['animation']:
+            wizard_reference.update_layout(animation_reference['namespace'], animation_reference['files'])
 
 def modify_reference_LOD(LOD):
     work_env_id = int(os.environ['wizard_work_env_id'])

@@ -909,7 +909,7 @@ def add_work_env(name, software_id, variant_id, export_extension=None):
         logger.warning(f"{name} already exists")
         return None
 
-def create_reference(work_env_id, export_version_id, namespace):
+def create_reference(work_env_id, export_version_id, namespace, count=None):
     reference_id = None
 
     export_id = get_export_version_data(export_version_id, 'export_id')
@@ -924,6 +924,7 @@ def create_reference(work_env_id, export_version_id, namespace):
                                 ('creation_time',
                                     'creation_user',
                                     'namespace',
+                                    'count',
                                     'stage',
                                     'work_env_id',
                                     'export_id',
@@ -932,6 +933,7 @@ def create_reference(work_env_id, export_version_id, namespace):
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
+                                    count,
                                     stage_name,
                                     work_env_id,
                                     export_id,
@@ -1769,7 +1771,7 @@ def remove_group(group_id):
         logger.info(f"Group removed from project")
     return success
 
-def create_referenced_group(work_env_id, group_id, namespace):
+def create_referenced_group(work_env_id, group_id, namespace, count=None):
     referenced_group_id = None
     group_name = get_group_data(group_id, 'name')
     if not (db_utils.check_existence_by_multiple_data('project', 
@@ -1781,12 +1783,14 @@ def create_referenced_group(work_env_id, group_id, namespace):
                                 ('creation_time',
                                     'creation_user',
                                     'namespace',
+                                    'count',
                                     'group_id',
                                     'group_name',
                                     'work_env_id'),
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
+                                    count,
                                     group_id,
                                     group_name,
                                     work_env_id))
@@ -1827,7 +1831,7 @@ def get_referenced_group_data(referenced_group_id, column='*'):
         logger.error("Referenced group not found")
         return None
 
-def create_grouped_reference(group_id, export_version_id, namespace):
+def create_grouped_reference(group_id, export_version_id, namespace, count=None):
     reference_id = None
 
     export_id = get_export_version_data(export_version_id, 'export_id')
@@ -1842,6 +1846,7 @@ def create_grouped_reference(group_id, export_version_id, namespace):
                                 ('creation_time',
                                     'creation_user',
                                     'namespace',
+                                    'count',
                                     'stage',
                                     'group_id',
                                     'export_id',
@@ -1850,6 +1855,7 @@ def create_grouped_reference(group_id, export_version_id, namespace):
                                 (time.time(),
                                     environment.get_user(),
                                     namespace,
+                                    count,
                                     stage_name,
                                     group_id,
                                     export_id,
@@ -2116,6 +2122,7 @@ def create_references_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
+                                        count integer,
                                         stage text NOT NULL,
                                         work_env_id integer NOT NULL,
                                         export_id integer NOT NULL,
@@ -2134,6 +2141,7 @@ def create_referenced_groups_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
+                                        count integer,
                                         group_id integer NOT NULL,
                                         group_name text NOT NULL,
                                         work_env_id integer NOT NULL,
@@ -2149,6 +2157,7 @@ def create_grouped_references_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
+                                        count integer,
                                         stage text NOT NULL,
                                         group_id integer NOT NULL,
                                         export_id integer NOT NULL,

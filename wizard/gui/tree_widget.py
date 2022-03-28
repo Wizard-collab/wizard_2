@@ -69,6 +69,7 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_)
         self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
         self.icons_dic['stage']['custom'] = QtGui.QIcon(ressources._custom_icon_)
+        self.icons_dic['stage']['camrig'] = QtGui.QIcon(ressources._camera_rig_icon_)
 
         self.setFixedWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -295,8 +296,6 @@ class tree_widget(QtWidgets.QFrame):
                 stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
                 self.stage_ids[row['id']] = stage_item
 
-                #index = assets_vars._stages_indexes_[row['name']]
-                #parent_widget.insertChild(index, stage_item)
                 parent_widget.addChild(stage_item)
 
                 stage_item.set_item_widget()

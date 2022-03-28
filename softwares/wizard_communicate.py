@@ -45,10 +45,9 @@ def request_export(work_env_id, export_name):
     signal_dic['work_env_id'] = work_env_id
     signal_dic['export_name'] = export_name
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
-    print(file_path)
     return file_path
 
-def add_export_version(export_name, files, version_id, comment=''):
+def add_export_version(export_name, files, work_env_id, version_id, comment=''):
     # Send a new export version request to wizard
     # Wizard return the export version id 
     signal_dic=dict()
@@ -56,6 +55,7 @@ def add_export_version(export_name, files, version_id, comment=''):
     signal_dic['export_name'] = export_name
     signal_dic['files'] = files
     signal_dic['version_id'] = version_id
+    signal_dic['work_env_id'] = work_env_id
     signal_dic['comment'] = comment
     export_dir = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return export_dir
@@ -99,5 +99,12 @@ def modify_reference_LOD(work_env_id, LOD, namespaces_list):
     signal_dic['work_env_id'] = work_env_id
     signal_dic['LOD'] = LOD
     signal_dic['namespaces_list'] = namespaces_list
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+
+def create_or_get_camera_work_env(work_env_id):
+    signal_dic=dict()
+    signal_dic['function'] = 'create_or_get_camera_work_env'
+    signal_dic['work_env_id'] = work_env_id
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned

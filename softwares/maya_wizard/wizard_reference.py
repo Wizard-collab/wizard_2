@@ -58,6 +58,42 @@ def update_rigging(namespace, files_list):
                                     namespace,
                                     wizard_tools.get_new_objects(old_objects))
 
+def reference_custom(namespace, files_list):
+    old_objects = pm.ls()
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'CUSTOM')
+        trigger_after_reference_hook('custom',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def update_custom(namespace, files_list):
+    old_objects = pm.ls()
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+        trigger_after_reference_hook('custom',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def reference_camrig(namespace, files_list):
+    old_objects = pm.ls()
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'CAMRIG')
+        trigger_after_reference_hook('camrig',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def update_camrig(namespace, files_list):
+    old_objects = pm.ls()
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+        trigger_after_reference_hook('camrig',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
 def reference_layout(namespace, files_list):
     old_objects = pm.ls()
     if not pm.namespace(exists=namespace):
@@ -72,6 +108,24 @@ def update_layout(namespace, files_list):
     if pm.namespace(exists=namespace):
         update_reference(namespace, files_list)
         trigger_after_reference_hook('layout',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def reference_animation(namespace, files_list):
+    old_objects = pm.ls()
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'ANIMATION')
+        trigger_after_reference_hook('animation',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def update_animation(namespace, files_list):
+    old_objects = pm.ls()
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+        trigger_after_reference_hook('animation',
                                     files_list,
                                     namespace,
                                     wizard_tools.get_new_objects(old_objects))

@@ -43,6 +43,16 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.import_custom()
 
+    class import_layout(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.import_layout()
+
+    class import_animation(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.import_animation()
+
     class update_modeling(command):
         @staticmethod
         def action(luaObj, window, x, y, suffix):
@@ -63,6 +73,31 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.update_custom()
 
+    class update_layout(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.update_layout()
+
+    class update_animation(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.update_animation()
+
+    class set_image_format(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.set_image_format()
+
+    class set_frame_range(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.set_frame_range()
+
+    class set_frame_range_with_rolls(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.set_frame_range_with_rolls()
+
     cmd = save_increment('Save', 'icons/save_increment.png')
     cmd.install('Wizard')
     cmd = export_data('Export data', 'icons/export.png')
@@ -76,6 +111,10 @@ class menu():
     cmd.install('Wizard', ' Import')
     cmd = import_custom('Import custom', 'icons/custom.png')
     cmd.install('Wizard', ' Import')
+    cmd = import_layout('Import layout', 'icons/layout.png')
+    cmd.install('Wizard', ' Import')
+    cmd = import_animation('Import animation', 'icons/animation.png')
+    cmd.install('Wizard', ' Import')
     cmd = update_modeling('Update modeling', 'icons/modeling.png')
     cmd.install('Wizard', ' Update')
     cmd = update_texturing('Update texturing', 'icons/texturing.png')
@@ -84,4 +123,14 @@ class menu():
     cmd.install('Wizard', ' Update')
     cmd = update_custom('Update custom', 'icons/custom.png')
     cmd.install('Wizard', ' Update')
-    
+    cmd = update_layout('Update layout', 'icons/layout.png')
+    cmd.install('Wizard', ' Update')
+    cmd = update_animation('Update animation', 'icons/animation.png')
+    cmd.install('Wizard', ' Update')
+    command.addseparator ('Wizard')
+    cmd = set_image_format('Set image size', 'icons/set_image_size.png')
+    cmd.install('Wizard')
+    cmd = set_frame_range('Set frame range', 'icons/set_frame_range.png')
+    cmd.install('Wizard')
+    cmd = set_frame_range_with_rolls('Set frame range with rolls', 'icons/set_frame_range.png')
+    cmd.install('Wizard')

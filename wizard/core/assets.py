@@ -397,7 +397,8 @@ def create_reference(work_env_id, export_version_id):
         namespace = f"{namespace_raw}_{str(count)}"
     return project.create_reference(work_env_id,
                                             export_version_id,
-                                            namespace)
+                                            namespace,
+                                            count)
 
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)
@@ -431,14 +432,17 @@ def get_references_files(work_env_id):
     references_dic = dict()
     for reference_row in references_rows:
         reference_files_list = json.loads(project.get_export_version_data(reference_row['export_version_id'], 'files'))
-        variant_id = project.get_work_env_data(reference_row['work_env_id'], 'variant_id')
-        stage_id = project.get_variant_data(variant_id, 'stage_id')
-        asset_id = project.get_stage_data(stage_id, 'asset_id')
+        variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
+        variant_row = project.get_variant_data(variant_id)
+        variant_name = variant_row['name']
+        asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
         asset_name = project.get_asset_data(asset_id, 'name')
         reference_dic = dict()
         reference_dic['files'] = reference_files_list
         reference_dic['namespace'] = reference_row['namespace']
+        reference_dic['count'] = reference_row['count']
         reference_dic['asset_name'] = asset_name
+        reference_dic['variant_name'] = variant_name
         if reference_row['stage'] not in references_dic.keys():
             references_dic[reference_row['stage']] = []
         references_dic[reference_row['stage']].append(reference_dic)
@@ -447,14 +451,17 @@ def get_references_files(work_env_id):
         grouped_references_rows = project.get_grouped_references(referenced_group_row['group_id'])
         for grouped_reference_row in grouped_references_rows:
             reference_files_list = json.loads(project.get_export_version_data(grouped_reference_row['export_version_id'], 'files'))
-            variant_id = project.get_work_env_data(referenced_group_row['work_env_id'], 'variant_id')
-            stage_id = project.get_variant_data(variant_id, 'stage_id')
-            asset_id = project.get_stage_data(stage_id, 'asset_id')
+            variant_id = project.get_export_data(grouped_reference_row['export_id'], 'variant_id')
+            variant_row = project.get_variant_data(variant_id)
+            variant_name = variant_row['name']
+            asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
             asset_name = project.get_asset_data(asset_id, 'name')
             reference_dic = dict()
             reference_dic['files'] = reference_files_list
             reference_dic['namespace'] = f"{referenced_group_row['namespace']}_{grouped_reference_row['namespace']}"
+            reference_dic['count'] = grouped_reference_row['count']
             reference_dic['asset_name'] = asset_name
+            reference_dic['variant_name'] = variant_name
             if grouped_reference_row['stage'] not in references_dic.keys():
                 references_dic[grouped_reference_row['stage']] = []
             references_dic[grouped_reference_row['stage']].append(reference_dic)
@@ -740,7 +747,8 @@ def create_referenced_group(work_env_id, group_id):
         namespace = f"{namespace_raw}_{str(count)}"
     return project.create_referenced_group(work_env_id,
                                             group_id,
-                                            namespace)
+                                            namespace,
+                                            count)
 
 def remove_referenced_group(referenced_group_id):
     return project.remove_referenced_group(referenced_group_id)
@@ -770,7 +778,8 @@ def create_grouped_reference(group_id, export_version_id):
         namespace = f"{namespace_raw}_{str(count)}"
     return project.create_grouped_reference(group_id,
                                             export_version_id,
-                                            namespace)
+                                            namespace,
+                                            count)
 
 def remove_grouped_reference(grouped_reference_id):
     return project.remove_grouped_reference(grouped_reference_id)
@@ -788,6 +797,25 @@ def set_grouped_reference_last_version(grouped_reference_id):
             else:
                 logger.info("Grouped reference is up to date")
                 return None
+
+def create_or_get_camera_work_env(work_env_id):
+    work_env_row = project.get_work_env_data(work_env_id)
+    software = work_env_row['name']
+    stage_id = project.get_variant_data(work_env_row['variant_id'], 'stage_id')
+    asset_id = project.get_stage_data(stage_id, 'asset_id')
+    stages = project.get_asset_childs(asset_id, 'name')
+    if 'camera' in stages:
+        camera_stage_id = project.get_asset_child_by_name(asset_id, 'camera', 'id')
+    else:
+        camera_stage_id = create_stage('camera', asset_id)
+    camera_default_variant_id = project.get_stage_data(camera_stage_id, 'default_variant_id')
+    work_envs = project.get_variant_work_envs_childs(camera_default_variant_id, 'name')
+    if software in work_envs:
+        camera_work_env_id = project.get_variant_work_env_child_by_name(camera_default_variant_id, software, 'id')
+    else:
+        software_id = project.get_software_data_by_name(software, 'id')
+        camera_work_env_id = create_work_env(software_id, camera_default_variant_id)
+    return camera_work_env_id
 
 def get_domain_path(domain_id):
     dir_name = None
@@ -931,6 +959,8 @@ def build_namespace(export_version_id):
     domain_row = project.get_domain_data(category_row['domain_id'])
     namespace = f"{category_row['name']}" 
     namespace += f"_{asset_row['name']}" 
+    if stage_row['name'] == 'animation':
+        namespace += f"_{export_row['name']}"
     namespace += f"_{stage_row['name'][:3]}"
     return namespace
 

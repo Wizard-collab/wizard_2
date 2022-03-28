@@ -24,19 +24,24 @@ except:
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import maya_hook")
 
-def export(stage_name, export_name, export_GRP_list):
+def export(stage_name, export_name, export_GRP_list, frange=[0,0], custom_work_env_id = None):
     if trigger_sanity_hook(stage_name):
-        export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
-                                                                    export_name)
-        export_by_extension(export_GRP_list, export_file)
+        if custom_work_env_id:
+            work_env_id = custom_work_env_id
+        else:
+            work_env_id = int(os.environ['wizard_work_env_id'])
+        export_file = wizard_communicate.request_export(work_env_id,
+                                                                export_name)
+        export_by_extension(export_GRP_list, export_file, frange)
         export_dir = wizard_communicate.add_export_version(export_name,
                                                 [export_file],
+                                                work_env_id,
                                                 int(os.environ['wizard_version_id']))
         trigger_after_export_hook(stage_name, export_dir)
 
-def export_by_extension(export_GRP_list, export_file):
+def export_by_extension(export_GRP_list, export_file, frange):
     if export_file.endswith('.abc'):
-        export_abc(export_GRP_list, export_file)
+        export_abc(export_GRP_list, export_file, frange)
     elif export_file.endswith('.ma'):
         export_ma(export_GRP_list, export_file)
     else:
@@ -47,10 +52,10 @@ def export_ma(export_GRP_list, export_file):
     pm.select(export_GRP_list, replace=True, noExpand=True)
     pm.exportSelected(export_file, type='mayaAscii', pr=0)
 
-def export_abc(export_GRP_list, export_file, range=[0,1]):
+def export_abc(export_GRP_list, export_file, frange):
     logger.info("Exporting .abc")
-    start = str(range[0])
-    end = str(range[1])
+    start = str(frange[0])
+    end = str(frange[1])
     command = "-frameRange "
     command += start
     command += " "

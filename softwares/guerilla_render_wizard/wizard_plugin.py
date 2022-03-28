@@ -88,3 +88,48 @@ def update_custom():
     if 'custom' in references.keys():
         for modeling_reference in references['custom']:
             wizard_reference.update_custom(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_layout():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'layout' in references.keys():
+        for layout_reference in references['layout']:
+            wizard_reference.reference_modeling(layout_reference['namespace'], layout_reference['files'])
+
+def update_layout():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'layout' in references.keys():
+        for layout_reference in references['layout']:
+            wizard_reference.update_modeling(layout_reference['namespace'], layout_reference['files'])
+
+def import_animation():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'animation' in references.keys():
+        for animation_reference in references['animation']:
+            wizard_reference.reference_modeling(animation_reference['namespace'], animation_reference['files'])
+
+def update_animation():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'animation' in references.keys():
+        for animation_reference in references['animation']:
+            wizard_reference.update_modeling(animation_reference['namespace'], animation_reference['files'])
+
+def set_frame_range(*args):
+    frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
+    Document().FirstFrame.set(frame_range[1])
+    Document().LastFrame.set(frame_range[2])
+
+def set_frame_range_with_rolls(*args):
+    frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
+    inframe = frame_range[1] - frame_range[0]
+    outframe = frame_range[2] + frame_range[3]
+    Document().FirstFrame.set(inframe)
+    Document().LastFrame.set(outframe)
+
+def set_image_format(*args):
+    image_format = wizard_communicate.get_image_format()
+    width=float(image_format[0])
+    height=float(image_format[1])
+    dar=width/height
+    Document().ProjectWidth.set(width)
+    Document().ProjectHeight.set(height)
+    Document().ProjectAspectRatio.set(1)

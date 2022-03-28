@@ -42,6 +42,22 @@ def reference_custom(namespace, files_list):
 def update_custom(namespace, files_list):
     update_file(namespace, files_list, 'CUSTOM', 'custom')
 
+def reference_layout(namespace, files_list):
+    import_file(namespace, files_list, 'LAYOUT', 'layout')
+    append_wizardTags_to_guerillaTags(namespace)
+
+def update_layout(namespace, files_list):
+    update_file(namespace, files_list, 'LAYOUT', 'layout')
+    append_wizardTags_to_guerillaTags(namespace)
+
+def reference_animation(namespace, files_list):
+    import_file(namespace, files_list, 'ANIMATION', 'animation')
+    append_wizardTags_to_guerillaTags(namespace)
+
+def update_animation(namespace, files_list):
+    update_file(namespace, files_list, 'ANIMATION', 'animation')
+    append_wizardTags_to_guerillaTags(namespace)
+
 def import_file(namespace, files_list, parent_GRP_name, stage_name):
     old_objects = wizard_tools.get_all_nodes()
     if namespace not in wizard_tools.get_all_nodes():

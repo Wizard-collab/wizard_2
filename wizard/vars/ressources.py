@@ -290,6 +290,8 @@ _available_icons_list_.append(_camera_icon_)
 
 _custom_icon_ = path_utils.join(_icons_path_, 'custom.svg')
 _available_icons_list_.append(_custom_icon_)
+_camera_rig_icon_ = path_utils.join(_icons_path_, 'camera_rig.svg')
+_available_icons_list_.append(_camera_rig_icon_)
 
 _stage_icons_dic_ = dict()
 _stage_icons_dic_['modeling'] = _modeling_icon_
@@ -305,6 +307,7 @@ _stage_icons_dic_['lighting'] = _lighting_icon_
 _stage_icons_dic_['compositing'] = _compositing_icon_
 _stage_icons_dic_['camera'] = _camera_icon_
 _stage_icons_dic_['custom'] = _custom_icon_
+_stage_icons_dic_['camrig'] = _camera_rig_icon_
 
 # Softwares icons
 _sofwares_icons_dic_ = dict()
