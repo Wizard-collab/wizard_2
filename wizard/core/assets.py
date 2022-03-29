@@ -191,13 +191,33 @@ def archive_asset(asset_id):
     else:
         return None
 
-def get_asset_data_from_work_env_id(work_env_id):
+def get_asset_data_from_work_env_id(work_env_id, column='*'):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     asset_id = project.get_stage_data(stage_id, 'asset_id')
     if asset_id:
-        asset_row = project.get_asset_data(asset_id)
+        asset_row = project.get_asset_data(asset_id, column)
         return asset_row
+    else:
+        return None
+
+def get_stage_data_from_work_env_id(work_env_id, column='*'):
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
+    if stage_id:
+        stage_row = project.get_stage_data(stage_id, column)
+        return stage_row
+    else:
+        return None
+
+
+def get_domain_data_from_work_env_id(work_env_id, column='*'):
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
+    domain_id = project.get_stage_data(stage_id, 'domain_id')
+    if domain_id:
+        domain_row = project.get_domain_data(domain_id, column)
+        return domain_row
     else:
         return None
 

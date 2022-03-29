@@ -142,7 +142,7 @@ def build_command(file_path, software_row, version_id):
         logger.warning(f"{software_row['name']} path not defined")
         return None
 
-def build_env(work_env_id, software_row, version_id):
+def build_env(work_env_id, software_row, version_id, settings_dic=None):
     # Building the default software environment for wizard workflow
     env = os.environ.copy()
     env['wizard_work_env_id'] = str(work_env_id)
@@ -190,6 +190,9 @@ def build_env(work_env_id, software_row, version_id):
         del env['QML2_IMPORT_PATH']
     if 'QT_AUTO_SCREEN_SCALE_FACTOR' in env.keys():
         del env['QT_AUTO_SCREEN_SCALE_FACTOR']
+
+    if settings_dic:
+        env['wizard_json_settings'] = json.dumps(settings_dic)
 
     return env
 

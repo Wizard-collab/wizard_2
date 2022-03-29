@@ -3,6 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+import json
 import os
 import logging
 
@@ -17,12 +18,17 @@ from maya_wizard import wizard_export
 import pymel.core as pm
 
 def main():
-    frange = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
-    frange = [frange[1], frange[2]]
+    if 'wizard_json_settings' in os.environ.keys():
+        settings_dic = json.loads(os.environ['wizard_json_settings'])
+        frange = settings_dic['frange']
+        refresh_assets = settings_dic['refresh_assets']
+        nspace_list = settings_dic['nspace_list']
+
     camrig_references = get_camrig_nspaces()
     if camrig_references:
         for camrig_reference in camrig_references:
-            export_camera(camrig_reference, frange)
+            if camrig_reference in nspace_list:
+                export_camera(camrig_reference, frange)
 
 def export_camera(camrig_reference, frange):
     camrig_nspace = camrig_reference['namespace']

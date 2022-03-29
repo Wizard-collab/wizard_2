@@ -19,6 +19,7 @@ from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.vars import user_vars
+from wizard.vars import assets_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -26,6 +27,7 @@ from wizard.gui import gui_server
 from wizard.gui import confirm_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
+from wizard.gui import batch_settings_widget
 
 logger = logging.getLogger(__name__)
 
@@ -263,7 +265,15 @@ class versions_widget(QtWidgets.QWidget):
             if last_version_id:
                 version_id = last_version_id[0]
         if version_id:
-            subtasks_library.batch_export(version_id)
+            domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
+            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
+            self.batch_settings_widget = batch_settings_widget.batch_settings_widget(self.work_env_id, stage)
+            if self.batch_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
+                settings_dic = dict()
+                settings_dic['frange'] = self.batch_settings_widget.frange
+                settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
+                settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
+                subtasks_library.batch_export(version_id, settings_dic)
 
     def build_ui(self):
         self.setObjectName('dark_widget')

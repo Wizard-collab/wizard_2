@@ -48,7 +48,7 @@ from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
-def batch_export(version_id):
+def batch_export(version_id, settings_dic=None):
     work_version_row = project.get_version_data(version_id)
     if work_version_row:
         file_path = work_version_row['file_path']
@@ -56,7 +56,7 @@ def batch_export(version_id):
         software_id = project.get_work_env_data(work_env_id, 'software_id')
         software_row = project.get_software_data(software_id)
         command = build_command(file_path, software_row, version_id)
-        env = launch.build_env(work_env_id, software_row, version_id)
+        env = launch.build_env(work_env_id, software_row, version_id, settings_dic)
         if command :
             process = subprocess.Popen(args = shlex.split(command), env=env, cwd=path_utils.abspath('softwares'))
             logger.info(f"{software_row['name']} launched")

@@ -1044,6 +1044,8 @@ def remove_work_env(work_env_id):
             remove_version(version_id)
         for reference_id in get_references(work_env_id, 'id'):
             remove_reference(reference_id)
+        for referenced_group_id in get_referenced_groups(work_env_id, 'id'):
+            remove_referenced_group(referenced_group_id)
         success = db_utils.delete_row('project', 'work_envs', work_env_id)
         if success:
             logger.info("Work env removed from project")

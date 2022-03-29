@@ -4,6 +4,7 @@
 
 # Python modules
 import os
+import json
 import traceback
 import pymel.core as pm
 import logging
@@ -28,6 +29,11 @@ def save_increment(*args):
 def export(*args):
     scene = wizard_export.save_or_save_increment()
     try:
+        if 'wizard_json_settings' in os.environ.keys():
+            settings_dic = json.loads(os.environ['wizard_json_settings'])
+            if settings_dic['refresh_assets']:
+                update_all()
+
         stage_name = os.environ['wizard_stage_name']
         if stage_name == 'modeling':
             modeling.main()

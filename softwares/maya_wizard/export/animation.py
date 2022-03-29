@@ -4,6 +4,7 @@
 
 # Python modules
 import os
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,12 +18,16 @@ from maya_wizard import wizard_export
 import pymel.core as pm
 
 def main():
-    frange = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
-    frange = [frange[1], frange[2]]
+    if 'wizard_json_settings' in os.environ.keys():
+        settings_dic = json.loads(os.environ['wizard_json_settings'])
+        frange = settings_dic['frange']
+        nspace_list = settings_dic['nspace_list']
+
     rigging_references = get_rig_nspaces()
     if rigging_references:
         for rigging_reference in rigging_references:
-            export_animation(rigging_reference, frange)
+            if rigging_reference['namespace'] in nspace_list:
+                export_animation(rigging_reference, frange)
 
 def export_animation(rigging_reference, frange):
     rig_nspace = rigging_reference['namespace']

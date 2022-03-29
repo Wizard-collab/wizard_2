@@ -106,12 +106,13 @@ QListView {
 	show-decoration-selected: 0;
 	outline:none;
 	padding:2px;
-	border-radius:0px;
+	border-radius:5px;
 }
  
 QListView::item {
 	padding:2px;
 	border-radius:5px;
+	margin-bottom: 1px;
 }
  
 QListView::item:hover {
@@ -201,6 +202,10 @@ QTreeView::branch:selected:!active {
 
 QTreeView::branch:hover {
    background: none;
+}
+
+QsciScintilla{
+	border-radius: 5px;
 }
 
 QScrollBar:vertical{
