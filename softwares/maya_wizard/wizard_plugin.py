@@ -59,77 +59,124 @@ def export_camera(*args):
     finally:
         wizard_export.reopen(scene)
 
-def reference_modeling(*args):
+def reference_and_update_all(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    reference_all(references=references)
+    update_all(references=references)
+
+def reference_all(*args, **kwargs):
+    references = get_references(kwargs)
+    reference_modeling(references=references)
+    reference_rigging(references=references)
+    reference_custom(references=references)
+    reference_camrig(references=references)
+    reference_layout(references=references)
+    reference_animation(references=references)
+    reference_camera(references=references)
+
+def update_all(*args, **kwargs):
+    references = get_references(kwargs)
+    update_modeling(references=references)
+    update_rigging(references=references)
+    update_custom(references=references)
+    update_camrig(references=references)
+    update_layout(references=references)
+    update_animation(references=references)
+    update_camera(references=references)
+
+def reference_modeling(*args, **kwargs):
+    references = get_references(kwargs)
     if 'modeling' in references.keys():
         for modeling_reference in references['modeling']:
             wizard_reference.reference_modeling(modeling_reference['namespace'], modeling_reference['files'])
 
-def update_modeling(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def update_modeling(*args, **kwargs):
+    references = get_references(kwargs)
     if 'modeling' in references.keys():
         for modeling_reference in references['modeling']:
             wizard_reference.update_modeling(modeling_reference['namespace'], modeling_reference['files'])
 
-def reference_rigging(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def reference_rigging(*args, **kwargs):
+    references = get_references(kwargs)
     if 'rigging' in references.keys():
         for rigging_reference in references['rigging']:
             wizard_reference.reference_rigging(rigging_reference['namespace'], rigging_reference['files'])
 
-def update_rigging(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def update_rigging(*args, **kwargs):
+    references = get_references(kwargs)
     if 'rigging' in references.keys():
         for rigging_reference in references['rigging']:
             wizard_reference.update_rigging(rigging_reference['namespace'], rigging_reference['files'])
 
-def reference_custom(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def reference_custom(*args, **kwargs):
+    references = get_references(kwargs)
     if 'custom' in references.keys():
         for custom_reference in references['custom']:
             wizard_reference.reference_custom(custom_reference['namespace'], custom_reference['files'])
 
-def update_custom(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def update_custom(*args, **kwargs):
+    references = get_references(kwargs)
     if 'custom' in references.keys():
         for custom_reference in references['custom']:
             wizard_reference.update_custom(custom_reference['namespace'], custom_reference['files'])
 
-def reference_camrig(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def reference_camrig(*args, **kwargs):
+    references = get_references(kwargs)
     if 'camrig' in references.keys():
         for camrig_reference in references['camrig']:
             wizard_reference.reference_camrig(camrig_reference['namespace'], camrig_reference['files'])
 
-def update_camrig(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def update_camrig(*args, **kwargs):
+    references = get_references(kwargs)
     if 'camrig' in references.keys():
         for camrig_reference in references['camrig']:
             wizard_reference.update_camrig(camrig_reference['namespace'], camrig_reference['files'])
 
-def reference_layout(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def reference_layout(*args, **kwargs):
+    references = get_references(kwargs)
     if 'layout' in references.keys():
         for layout_reference in references['layout']:
             wizard_reference.reference_layout(layout_reference['namespace'], layout_reference['files'])
 
-def update_layout(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def update_layout(*args, **kwargs):
+    references = get_references(kwargs)
     if 'layout' in references.keys():
         for layout_reference in references['layout']:
             wizard_reference.update_layout(layout_reference['namespace'], layout_reference['files'])
 
-def reference_animation(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def reference_animation(*args, **kwargs):
+    references = get_references(kwargs)
     if 'animation' in references.keys():
         for animation_reference in references['animation']:
-            wizard_reference.reference_layout(animation_reference['namespace'], animation_reference['files'])
+            wizard_reference.reference_animation(animation_reference['namespace'], animation_reference['files'])
 
-def update_animation(*args):
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+def update_animation(*args, **kwargs):
+    references = get_references(kwargs)
     if 'animation' in references.keys():
         for animation_reference in references['animation']:
-            wizard_reference.update_layout(animation_reference['namespace'], animation_reference['files'])
+            wizard_reference.update_animation(animation_reference['namespace'], animation_reference['files'])
+
+def reference_camera(*args, **kwargs):
+    references = get_references(kwargs)
+    if 'camera' in references.keys():
+        for camera_reference in references['camera']:
+            wizard_reference.reference_camera(camera_reference['namespace'], camera_reference['files'])
+
+def update_camera(*args, **kwargs):
+    references = get_references(kwargs)
+    if 'camera' in references.keys():
+        for camera_reference in references['camera']:
+            wizard_reference.update_camera(camera_reference['namespace'], camera_reference['files'])
+
+def get_references(kwargs):
+    references = None
+    for key, value in kwargs.items():
+        if key == 'references':
+            references = value
+            break
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    return references
 
 def modify_reference_LOD(LOD):
     work_env_id = int(os.environ['wizard_work_env_id'])

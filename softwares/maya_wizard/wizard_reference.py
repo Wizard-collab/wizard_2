@@ -130,6 +130,24 @@ def update_animation(namespace, files_list):
                                     namespace,
                                     wizard_tools.get_new_objects(old_objects))
 
+def reference_camera(namespace, files_list):
+    old_objects = pm.ls()
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'CAMERA')
+        trigger_after_reference_hook('camera',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def update_camera(namespace, files_list):
+    old_objects = pm.ls()
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+        trigger_after_reference_hook('camera',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
 def create_reference(file, namespace, group):
     if not pm.objExists(group):
         pm.group( em=True, name=group )

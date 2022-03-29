@@ -30,8 +30,12 @@ class menu():
         
         pm.menuItem( divider=True )
         
+        pm.menuItem(l='Import and update all', c=wizard_plugin.reference_and_update_all, i='icons/all.png', parent=mainMenu)
+
         import_menu = pm.menuItem(l='Import', subMenu=True, parent=mainMenu, i='icons/import.png')
         
+        pm.menuItem(l='Import all', c=wizard_plugin.reference_all, i='icons/all.png')
+        pm.setParent(import_menu, menu=True)
         pm.menuItem(l='Import modeling', c=wizard_plugin.reference_modeling, i='icons/modeling.png')
         pm.setParent(import_menu, menu=True)
         pm.menuItem(l='Import rigging', c=wizard_plugin.reference_rigging, i='icons/rigging.png')
@@ -44,9 +48,13 @@ class menu():
         pm.setParent(import_menu, menu=True)
         pm.menuItem(l='Import animation', c=wizard_plugin.reference_animation, i='icons/animation.png')
         pm.setParent(import_menu, menu=True)
+        pm.menuItem(l='Import camera', c=wizard_plugin.reference_camera, i='icons/camera.png')
+        pm.setParent(import_menu, menu=True)
 
         update_menu = pm.menuItem(l='Update', subMenu=True, parent=mainMenu, i='icons/update.png')
         
+        pm.menuItem(l='Update all', c=wizard_plugin.update_all, i='icons/all.png')
+        pm.setParent(update_menu, menu=True)
         pm.menuItem(l='Update modeling', c=wizard_plugin.update_modeling, i='icons/modeling.png')
         pm.setParent(update_menu, menu=True)
         pm.menuItem(l='Update rigging', c=wizard_plugin.update_rigging, i='icons/rigging.png')
@@ -59,6 +67,8 @@ class menu():
         pm.setParent(update_menu, menu=True)
         pm.menuItem(l='Update animation', c=wizard_plugin.update_animation, i='icons/animation.png')
         pm.setParent(update_menu, menu=True)
+        pm.menuItem(l='Update camera', c=wizard_plugin.update_camera, i='icons/camera.png')
+        pm.setParent(import_menu, menu=True)
 
         pm.menuItem(divider=True, parent=mainMenu)
 

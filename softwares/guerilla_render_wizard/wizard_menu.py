@@ -23,10 +23,20 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.export()
 
+    class import_and_update_all(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.reference_and_update_all()
+
+    class import_all(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.reference_all()
+
     class import_modeling(command):
         @staticmethod
         def action(luaObj, window, x, y, suffix):
-            wizard_plugin.reference_modeling()
+            wizard_plugin.import_modeling()
 
     class import_texturing(command):
         @staticmethod
@@ -52,6 +62,16 @@ class menu():
         @staticmethod
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.import_animation()
+
+    class import_camera(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.import_camera()
+
+    class update_all(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.update_all()
 
     class update_modeling(command):
         @staticmethod
@@ -83,6 +103,11 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.update_animation()
 
+    class update_camera(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.update_camera()
+
     class set_image_format(command):
         @staticmethod
         def action(luaObj, window, x, y, suffix):
@@ -103,6 +128,10 @@ class menu():
     cmd = export_data('Export data', 'icons/export.png')
     cmd.install('Wizard')
     command.addseparator ('Wizard')
+    cmd = import_and_update_all('Import and update all', 'icons/all.png')
+    cmd.install('Wizard')
+    cmd = import_modeling('Import all', 'icons/all.png')
+    cmd.install('Wizard', ' Import')
     cmd = import_modeling('Import modeling', 'icons/modeling.png')
     cmd.install('Wizard', ' Import')
     cmd = import_texturing('Import texturing', 'icons/texturing.png')
@@ -115,6 +144,10 @@ class menu():
     cmd.install('Wizard', ' Import')
     cmd = import_animation('Import animation', 'icons/animation.png')
     cmd.install('Wizard', ' Import')
+    cmd = import_camera('Import camera', 'icons/camera.png')
+    cmd.install('Wizard', ' Import')
+    cmd = update_all('Update all', 'icons/all.png')
+    cmd.install('Wizard', ' Update')
     cmd = update_modeling('Update modeling', 'icons/modeling.png')
     cmd.install('Wizard', ' Update')
     cmd = update_texturing('Update texturing', 'icons/texturing.png')
@@ -126,6 +159,8 @@ class menu():
     cmd = update_layout('Update layout', 'icons/layout.png')
     cmd.install('Wizard', ' Update')
     cmd = update_animation('Update animation', 'icons/animation.png')
+    cmd.install('Wizard', ' Update')
+    cmd = update_camera('Update camera', 'icons/camera.png')
     cmd.install('Wizard', ' Update')
     command.addseparator ('Wizard')
     cmd = set_image_format('Set image size', 'icons/set_image_size.png')

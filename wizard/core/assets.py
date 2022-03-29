@@ -459,7 +459,7 @@ def get_references_files(work_env_id):
             reference_dic = dict()
             reference_dic['files'] = reference_files_list
             reference_dic['namespace'] = f"{referenced_group_row['namespace']}_{grouped_reference_row['namespace']}"
-            reference_dic['count'] = grouped_reference_row['count']
+            reference_dic['count'] = f"{referenced_group_row['count']}_{grouped_reference_row['count']}"
             reference_dic['asset_name'] = asset_name
             reference_dic['variant_name'] = variant_name
             if grouped_reference_row['stage'] not in references_dic.keys():
