@@ -299,14 +299,14 @@ class tree_widget(QtWidgets.QFrame):
                 parent_widget.addChild(stage_item)
 
                 stage_item.set_item_widget()
-                self.remove_stage_creation_item(parent_widget, row['name'])
+                self.remove_stage_creation_item(parent_widget)
 
             if self.all_export_versions_stage_ids is not None and row['id'] in self.all_export_versions_stage_ids:
                 self.stage_ids[row['id']].publish_indicator.setVisible(1)
             else:
                 self.stage_ids[row['id']].publish_indicator.setVisible(0)
 
-    def remove_stage_creation_item(self, parent_widget, stage_name):
+    def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
         domain_name = parent_widget.parent().parent().instance_name
         if child_count == len(assets_vars._stages_list_[domain_name]) + 1:
@@ -315,6 +315,17 @@ class tree_widget(QtWidgets.QFrame):
                     self.creation_items.remove(parent_widget.child(i))
                     parent_widget.takeChild(i)
                     break
+
+    def remove_creation_item(self, parent_widget):
+        child_count = parent_widget.childCount()
+        print(self.creation_items)
+        for i in range(child_count):
+            if (parent_widget.child(i).instance_type == 'stage_creation') or\
+                    (parent_widget.child(i).instance_type == 'asset_creation'):
+                self.creation_items.remove(parent_widget.child(i))
+                print(self.creation_items)
+                parent_widget.takeChild(i)
+                break
 
     def add_creation_item(self, parent_widget, text, item_type, use_index=False):
         creation_item = custom_treeWidgetItem( None,
@@ -568,6 +579,7 @@ class tree_widget(QtWidgets.QFrame):
 
     def remove_category(self, id):
         item = self.category_ids[id]
+        self.remove_creation_item(item)
         is_selected = item.isSelected()
         item.parent().removeChild(item)
         del self.category_ids[id]
@@ -576,6 +588,7 @@ class tree_widget(QtWidgets.QFrame):
 
     def remove_asset(self, id):
         item = self.asset_ids[id]
+        self.remove_creation_item(item)
         is_selected = item.isSelected()
         item.parent().removeChild(item)
         del self.asset_ids[id]

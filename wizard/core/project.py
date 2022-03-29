@@ -812,6 +812,13 @@ def get_export_version_destinations(export_version_id, column='*'):
                                                         column)
     return references_rows
 
+def get_grouped_export_version_destination(export_version_id, column='*'):
+    grouped_references_rows = db_utils.get_row_by_column_data('project',
+                                                        'grouped_references_data',
+                                                        ('export_version_id', export_version_id),
+                                                        column)
+    return grouped_references_rows
+
 def get_export_versions_by_variant(variant_id, column='*'):
     export_versions_rows = db_utils.get_row_by_column_data('project',
                                                         'export_versions',
@@ -827,6 +834,8 @@ def remove_export_version(export_version_id):
             set_default_export_version(export_row['id'], None)
         for reference_id in get_export_version_destinations(export_version_id, 'id'):
             remove_reference(reference_id)
+        for grouped_reference_id in get_grouped_export_version_destination(export_version_id, 'id'):
+            remove_grouped_reference(grouped_reference_id)
         success = db_utils.delete_row('project', 'export_versions', export_version_id)
         if success:
             logger.info("Export version removed from project")
