@@ -18,16 +18,29 @@ from maya_wizard import wizard_export
 import pymel.core as pm
 
 def main():
+    nspace_list = None
+    frange = None
+
     if 'wizard_json_settings' in os.environ.keys():
         settings_dic = json.loads(os.environ['wizard_json_settings'])
         frange = settings_dic['frange']
         nspace_list = settings_dic['nspace_list']
+    else:
+        from PySide2 import QtWidgets, QtCore, QtGui
+        from maya_wizard.widgets import export_settings_widget
+        export_settings_widget_win = export_settings_widget.export_settings_widget('animation')
+        if export_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+            frange = export_settings_widget_win.frange
+            nspace_list = export_settings_widget_win.nspace_list
 
-    rigging_references = get_rig_nspaces()
-    if rigging_references:
-        for rigging_reference in rigging_references:
-            if rigging_reference['namespace'] in nspace_list:
-                export_animation(rigging_reference, frange)
+    if nspace_list and frange:
+        rigging_references = get_rig_nspaces()
+        if rigging_references:
+            for rigging_reference in rigging_references:
+                if rigging_reference['namespace'] in nspace_list:
+                    export_animation(rigging_reference, frange)
+    else:
+        logger.warning("Export settings not found")
 
 def export_animation(rigging_reference, frange):
     rig_nspace = rigging_reference['namespace']

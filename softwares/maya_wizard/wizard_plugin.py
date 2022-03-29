@@ -33,7 +33,6 @@ def export(*args):
             settings_dic = json.loads(os.environ['wizard_json_settings'])
             if settings_dic['refresh_assets']:
                 update_all()
-
         stage_name = os.environ['wizard_stage_name']
         if stage_name == 'modeling':
             modeling.main()
