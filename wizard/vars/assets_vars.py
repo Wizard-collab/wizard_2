@@ -107,6 +107,8 @@ _sequences_stages_list_ = [_layout_,
 
 _library_stages_list_ = _assets_stages_list_ + _sequences_stages_list_ + [_custom_stage_, _camera_rig_]
 
+_camera_export_stages_ = [_animation_, _layout_]
+
 _stages_list_ = dict()
 _stages_list_[_assets_] = _assets_stages_list_
 _stages_list_[_library_] = _library_stages_list_

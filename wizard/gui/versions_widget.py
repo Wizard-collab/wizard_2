@@ -90,7 +90,18 @@ class versions_widget(QtWidgets.QWidget):
         self.list_view.clear()
         self.icon_view.clear()
         self.work_env_id = work_env_id
+        self.refresh_camera_button()
         self.refresh()
+
+    def refresh_camera_button(self):
+        if self.work_env_id:
+            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
+            if stage in assets_vars._camera_export_stages_:
+                self.batch_camera_button.setVisible(True)
+            else:
+                self.batch_camera_button.setVisible(False)
+        else:
+            self.batch_camera_button.setVisible(False)
 
     def show_info_mode(self, text, image):
         self.views_widget.setVisible(0)
@@ -402,7 +413,7 @@ class versions_widget(QtWidgets.QWidget):
         gui_utils.application_tooltip(self.batch_camera_button, "Batch export cameras")
         self.batch_camera_button.setFixedSize(35,35)
         self.batch_camera_button.setIconSize(QtCore.QSize(25,25))
-        self.batch_camera_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
+        self.batch_camera_button.setIcon(QtGui.QIcon(ressources._tool_batch_camera_))
         self.buttons_layout.addWidget(self.batch_camera_button)
 
         self.comment_button = QtWidgets.QPushButton()

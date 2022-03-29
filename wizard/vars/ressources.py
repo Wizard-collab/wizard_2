@@ -93,6 +93,8 @@ _tool_manually_publish_ = path_utils.join(_icons_path_, 'tool_manually_publish.s
 _available_icons_list_.append(_tool_manually_publish_)
 _tool_batch_publish_ = path_utils.join(_icons_path_, 'tool_batch_publish.svg')
 _available_icons_list_.append(_tool_batch_publish_)
+_tool_batch_camera_ = path_utils.join(_icons_path_, 'tool_batch_camera.svg')
+_available_icons_list_.append(_tool_batch_camera_)
 _tool_update_ = path_utils.join(_icons_path_, 'tool_update.svg')
 _available_icons_list_.append(_tool_update_)
 _tool_comment_ = path_utils.join(_icons_path_, 'tool_comment.svg')
