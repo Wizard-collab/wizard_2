@@ -285,6 +285,7 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['frange'] = self.batch_settings_widget.frange
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
+                settings_dic['stage_to_export'] = stage
                 subtasks_library.batch_export(version_id, settings_dic)
 
     def batch_export_camera(self):
@@ -305,7 +306,7 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['frange'] = self.batch_settings_widget.frange
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
-                settings_dic['camera'] = True
+                settings_dic['stage_to_export'] = 'camera'
                 subtasks_library.batch_export(version_id, settings_dic)
 
     def build_ui(self):

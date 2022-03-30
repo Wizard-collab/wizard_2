@@ -56,12 +56,17 @@ def batch_export(version_id, settings_dic=None):
         software_id = project.get_work_env_data(work_env_id, 'software_id')
         software_row = project.get_software_data(software_id)
         command = build_command(file_path, software_row, version_id)
-        env = launch.build_env(work_env_id, software_row, version_id, settings_dic)
+        env = launch.build_env(work_env_id, software_row, version_id)
+        env = add_settings_dic_to_env(env, settings_dic)
         if command :
             process = subprocess.Popen(args = shlex.split(command), env=env, cwd=path_utils.abspath('softwares'))
             logger.info(f"{software_row['name']} launched")
             process.wait()
             logger.info(f"{software_row['name']} closed")
+
+def add_settings_dic_to_env(env, settings_dic):
+    env['wizard_json_settings'] = json.dumps(settings_dic)
+    return env
 
 def build_command(file_path, software_row, version_id):
     software_batch_path = software_row['batch_path']

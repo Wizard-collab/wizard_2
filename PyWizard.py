@@ -133,7 +133,7 @@ if len(sys.argv) == 2:
     try:
         exec(open(sys.argv[1]).read())
     except:
-        print(str(traceback.format_exc()))
+        logger.error(str(traceback.format_exc()))
     finally:
         db_server.stop()
         softwares_server.stop()

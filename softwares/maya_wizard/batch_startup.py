@@ -4,16 +4,50 @@
 
 # Python modules
 import os
+import logging
 import json
+
+logger = logging.getLogger(__name__)
 
 # Wizard modules
 from maya_wizard import wizard_plugin
+from maya_wizard.export import modeling
+from maya_wizard.export import rigging
+from maya_wizard.export import custom
+from maya_wizard.export import camrig
+from maya_wizard.export import layout
+from maya_wizard.export import animation
+from maya_wizard.export import camera
 
-process = True
+# read_settings
 if 'wizard_json_settings' in os.environ.keys():
     settings_dic = json.loads(os.environ['wizard_json_settings'])
-    if 'camera' in settings_dic.keys():
-        wizard_plugin.export_camera()
-        process = False
+    frange = settings_dic['frange']
+    refresh_assets = settings_dic['refresh_assets']
+    nspace_list = settings_dic['nspace_list']
+    stage_name = settings_dic['stage_to_export']
 
-wizard_plugin.export()
+    if refresh_assets:
+        wizard_plugin.update_all()
+
+    if stage_name == 'modeling':
+        modeling.main()
+    elif stage_name == 'rigging':
+        rigging.main()
+    elif stage_name == 'custom':
+        custom.main()
+    elif stage_name == 'camrig':
+        camrig.main()
+    elif stage_name == 'layout':
+        layout.main()
+    elif stage_name == 'animation':
+        animation.main(nspace_list=nspace_list,
+                            frange=frange)
+    elif stage_name == 'camera':
+        camera.main(nspace_list=nspace_list,
+                            frange=frange)
+    else:
+        logger.warning("Unplugged stage : {}".format(stage_name))
+
+else:
+    logger.error("Batch settings not found")

@@ -32,6 +32,7 @@ def export(stage_name, export_name, export_GRP_list):
             export_abc(export_GRP_list, export_file)
         export_dir = wizard_communicate.add_export_version(export_name,
                                                             [export_file],
+                                                            int(os.environ['wizard_work_env_id']),
                                                             int(os.environ['wizard_version_id']))
         trigger_after_export_hook(stage_name, export_dir)
 

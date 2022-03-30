@@ -43,9 +43,7 @@ from wizard.core import path_utils
 logger = logging.getLogger(__name__)
 
 def flushed_input(placeholder):
-    #print(placeholder+'\r')
     user_input = input(placeholder)
-    #print(f'\r>>>{user_input}')
     return user_input
 
 def convert_time(time_float):

@@ -27,42 +27,26 @@ def save_increment(*args):
     wizard_tools.save_increment()
 
 def export(*args):
-    scene = wizard_export.save_or_save_increment()
-    try:
-        if 'wizard_json_settings' in os.environ.keys():
-            settings_dic = json.loads(os.environ['wizard_json_settings'])
-            if settings_dic['refresh_assets']:
-                update_all()
-        stage_name = os.environ['wizard_stage_name']
-        if stage_name == 'modeling':
-            modeling.main()
-        elif stage_name == 'rigging':
-            rigging.main()
-        elif stage_name == 'custom':
-            custom.main()
-        elif stage_name == 'camrig':
-            camrig.main()
-        elif stage_name == 'layout':
-            layout.main()
-        elif stage_name == 'animation':
-            animation.main()
-        elif stage_name == 'camera':
-            camera.main()
-        else:
-            logger.warning("Unplugged stage : {}".format(stage_name))
-    except:
-        logger.error(str(traceback.format_exc()))
-    finally:
-        wizard_export.reopen(scene)
+    stage_name = os.environ['wizard_stage_name']
+    if stage_name == 'modeling':
+        modeling.main()
+    elif stage_name == 'rigging':
+        rigging.main()
+    elif stage_name == 'custom':
+        custom.main()
+    elif stage_name == 'camrig':
+        camrig.main()
+    elif stage_name == 'layout':
+        layout.main()
+    elif stage_name == 'animation':
+        animation.invoke_settings_widget()
+    elif stage_name == 'camera':
+        camera.invoke_settings_widget()
+    else:
+        logger.warning("Unplugged stage : {}".format(stage_name))
 
 def export_camera(*args):
-    scene = wizard_export.save_or_save_increment()
-    try:
-        camera.main()
-    except:
-        logger.error(str(traceback.format_exc()))
-    finally:
-        wizard_export.reopen(scene)
+    camera.invoke_settings_widget()
 
 def reference_and_update_all(*args):
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))

@@ -217,7 +217,6 @@ class server(threading.Thread):
                 raw_data = recvall(client_dic['conn'])
                 if raw_data is not None:
                     data = json.loads(raw_data)
-                    print(data)
                     self.broadcast(data, client_dic)
                 else:
                     if conn is not None:

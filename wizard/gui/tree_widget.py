@@ -318,12 +318,10 @@ class tree_widget(QtWidgets.QFrame):
 
     def remove_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
-        print(self.creation_items)
         for i in range(child_count):
             if (parent_widget.child(i).instance_type == 'stage_creation') or\
                     (parent_widget.child(i).instance_type == 'asset_creation'):
                 self.creation_items.remove(parent_widget.child(i))
-                print(self.creation_items)
                 parent_widget.takeChild(i)
                 break
 

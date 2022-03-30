@@ -5,6 +5,7 @@
 # Python modules
 import json
 import os
+import traceback
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,31 +18,27 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main():
-    nspace_list = None
-    frange = None
-
-    if 'wizard_json_settings' in os.environ.keys():
-        settings_dic = json.loads(os.environ['wizard_json_settings'])
-        frange = settings_dic['frange']
-        refresh_assets = settings_dic['refresh_assets']
-        nspace_list = settings_dic['nspace_list']
-    else:
-        from PySide2 import QtWidgets, QtCore, QtGui
-        from maya_wizard.widgets import export_settings_widget
-        export_settings_widget_win = export_settings_widget.export_settings_widget('camera')
-        if export_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
-            frange = export_settings_widget_win.frange
-            nspace_list = export_settings_widget_win.nspace_list
-
-    if nspace_list and frange:
+def main(nspace_list, frange):
+    scene = wizard_export.save_or_save_increment()
+    try:
         camrig_references = get_camrig_nspaces()
         if camrig_references:
             for camrig_reference in camrig_references:
                 if camrig_reference['namespace'] in nspace_list:
                     export_camera(camrig_reference, frange)
-    else:
-        logger.warning("Export settings not found")
+    except:
+        logger.error(str(traceback.format_exc()))
+    finally:
+        wizard_export.reopen(scene)
+
+def invoke_settings_widget():
+    from PySide2 import QtWidgets, QtCore, QtGui
+    from maya_wizard.widgets import export_settings_widget
+    export_settings_widget_win = export_settings_widget.export_settings_widget('camera')
+    if export_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+        nspace_list = export_settings_widget_win.nspace_list
+        frange = export_settings_widget_win.frange
+        main(nspace_list, frange)
 
 def export_camera(camrig_reference, frange):
     camrig_nspace = camrig_reference['namespace']

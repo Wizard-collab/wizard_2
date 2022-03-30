@@ -53,7 +53,10 @@ def export_textures(material, size, file_type) :
                 if export_result[udim][template] != '':
                     exported_files.append(export_result[udim][template])
 
-        export_dir = wizard_communicate.add_export_version(export_name, exported_files, int(os.environ['wizard_version_id']))
+        export_dir = wizard_communicate.add_export_version(export_name,
+                                                                exported_files,
+                                                                int(os.environ['wizard_work_env_id']),
+                                                                int(os.environ['wizard_version_id']))
 
         trigger_after_export_hook('texturing', export_dir)
 
