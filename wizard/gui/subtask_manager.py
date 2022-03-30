@@ -30,7 +30,6 @@ _DNS_ = ('localhost', 10231)
 class subtask_manager(QtWidgets.QWidget):
 
     global_status_signal = pyqtSignal(object)
-    new_task_signal = pyqtSignal(int)
 
     def __init__(self, parent = None):
         super(subtask_manager, self).__init__(parent)
@@ -102,8 +101,7 @@ class subtask_manager(QtWidgets.QWidget):
             self.tasks_ids[process_id].remove_task_signal.connect(self.remove_task)
             self.tasks_ids[process_id].update_status_signal.connect(self.check_global_status)
             self.tasks_scrollArea_layout.addWidget(task_widget)
-            if not self.isVisible():
-                self.new_task_signal.emit(1)
+            gui_server.custom_popup('Subtask started !', 'Open the subtask manager to see details', ressources._tasks_icon_)
             self.refresh()
             self.check_global_status()
 

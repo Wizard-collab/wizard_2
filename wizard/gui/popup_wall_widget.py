@@ -165,8 +165,10 @@ class popup_save_widget(QtWidgets.QFrame):
         self.timer.timeout.connect(lambda: self.time_out.emit(self.version_id))
     
     def start_clock(self):
-        duration = user.user().get_popups_duration()
-        self.timer.start(duration*1000)
+        keep_until_comment = user.user().get_keep_until_comment()
+        if not keep_until_comment:
+            duration = user.user().get_popups_duration()
+            self.timer.start(duration*1000)
 
     def fill_ui(self):
         version_row = project.get_version_data(self.version_id)
@@ -266,8 +268,13 @@ class popup_event_widget(QtWidgets.QFrame):
         self.timer.timeout.connect(lambda: self.time_out.emit(self.event_row['id']))
     
     def start_clock(self):
-        duration = user.user().get_popups_duration()
-        self.timer.start(duration*1000)
+        keep_until_comment = user.user().get_keep_until_comment()
+        start_timer = True
+        if self.is_comment and keep_until_comment:
+            start_timer = False
+        if start_timer:
+            duration = user.user().get_popups_duration()
+            self.timer.start(duration*1000)
 
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')

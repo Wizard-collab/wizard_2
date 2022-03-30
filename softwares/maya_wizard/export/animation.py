@@ -58,7 +58,7 @@ def buid_export_name(asset_name, variant_name, count):
         export_name = asset_name
     else:
         export_name = "{}_{}".format(asset_name, variant_name)
-    if count:
+    if count != '0':
         export_name += "_{}".format(count)
     return export_name
 

@@ -23,9 +23,6 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Batch settings")
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
         self.stages_relations_dic = dict()
         self.stages_relations_dic['animation'] = ['rigging']
         self.stages_relations_dic['camera'] = ['camrig']
@@ -43,9 +40,6 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.fill_ui()
         self.connect_functions()
         self.refresh()
-
-    def showEvent(self, event):
-        gui_utils.move_ui(self)
 
     def apply(self):
         self.frange = [self.inrollframe_spinBox.value(), self.outrollframe_spinBox.value()]
@@ -77,6 +71,9 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.reject_button.clicked.connect(self.reject)
 
     def fill_ui(self):
+        self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage_to_export]).pixmap(22))
+        self.header_text.setText(f"Please set the {self.stage_to_export} export settings")
+
         if self.stage_to_export in self.stages_relations_dic:
             self.need_nspace_list=True
             stages_list = self.stages_relations_dic[self.stage_to_export]
@@ -110,23 +107,29 @@ class batch_settings_widget(QtWidgets.QDialog):
 
     def build_ui(self):
         self.setMinimumWidth(400)
-        self.main_widget_layout = QtWidgets.QHBoxLayout()
-        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
-        self.setLayout(self.main_widget_layout)
-
-        self.main_widget = QtWidgets.QFrame()
-        self.main_widget.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(12)
-        self.main_widget.setLayout(self.main_layout)
-        self.main_widget_layout.addWidget(self.main_widget)
+        self.setLayout(self.main_layout)
 
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(12)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 190))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.main_widget.setGraphicsEffect(self.shadow)
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('transparent_widget')
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(8)
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.stage_icon_label = QtWidgets.QLabel()
+        self.header_layout.addWidget(self.stage_icon_label)
+
+        self.header_text = QtWidgets.QLabel()
+        self.header_layout.addWidget(self.header_text)
+
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.refresh_assets_label = QtWidgets.QLabel('References settings')
+        self.refresh_assets_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.refresh_assets_label)
         
         self.refresh_assets_checkbox = QtWidgets.QCheckBox('Refresh assets in scene')
         self.refresh_assets_checkbox.setObjectName('transparent_widget')
@@ -139,7 +142,6 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.range_setup_layout.setSpacing(8)
         self.range_setup_widget.setLayout(self.range_setup_layout)
         self.main_layout.addWidget(self.range_setup_widget)
-
 
         self.frame_range_label = QtWidgets.QLabel('Frame range')
         self.frame_range_label.setObjectName('gray_label')

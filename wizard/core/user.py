@@ -187,15 +187,19 @@ class user:
             logger.warning('Please enter a valid local path')
             return None
 
-    def set_popups_settings(self, enabled=1, sound_enabled=1, duration=3):
+    def set_popups_settings(self, enabled=1, duration=3, keep_until_comment=True):
         popups_settings_dic = dict()
         popups_settings_dic['enabled'] = enabled
         popups_settings_dic['duration'] = duration
+        popups_settings_dic['keep_until_comment'] = keep_until_comment
         self.prefs_dic[user_vars._popups_settings_] = popups_settings_dic
         self.write_prefs_dic()
 
     def get_popups_enabled(self):
         return self.prefs_dic[user_vars._popups_settings_]['enabled']
+
+    def get_keep_until_comment(self):
+        return self.prefs_dic[user_vars._popups_settings_]['keep_until_comment']
 
     def get_popups_duration(self):
         return self.prefs_dic[user_vars._popups_settings_]['duration']
@@ -246,7 +250,7 @@ class user:
             self.prefs_dic[user_vars._local_path_] = None
             self.prefs_dic[user_vars._popups_settings_] = dict()
             self.prefs_dic[user_vars._popups_settings_]['enabled'] = 1
-            self.prefs_dic[user_vars._popups_settings_]['sound_enabled'] = 1
+            self.prefs_dic[user_vars._popups_settings_]['keep_until_comment'] = True
             self.prefs_dic[user_vars._popups_settings_]['duration'] = 3
             self.prefs_dic[user_vars._show_whatsnew_] = True
             self.prefs_dic[user_vars._user_build_] = None
