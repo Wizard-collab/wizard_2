@@ -194,6 +194,7 @@ class tree_widget(QtWidgets.QFrame):
         self.project_stage_ids = []
 
         self.all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
+        self.all_variants_rows = project.get_all_variants()
 
         for domain_row in project.get_domains():
             self.add_domain(domain_row)
@@ -218,6 +219,9 @@ class tree_widget(QtWidgets.QFrame):
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
+        for variant_row in self.all_variants_rows:
+            self.stage_ids[variant_row['stage_id']].set_state_indicator(variant_row)
+
         self.apply_search()
         self.refresh_datas()
         if hard:
@@ -300,11 +304,6 @@ class tree_widget(QtWidgets.QFrame):
 
                 stage_item.set_item_widget()
                 self.remove_stage_creation_item(parent_widget)
-
-            if self.all_export_versions_stage_ids is not None and row['id'] in self.all_export_versions_stage_ids:
-                self.stage_ids[row['id']].publish_indicator.setVisible(1)
-            else:
-                self.stage_ids[row['id']].publish_indicator.setVisible(0)
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
@@ -635,6 +634,8 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
                                                 instance_type,
                                                 instance_id,
                                                 parent_id)
+
+        self.state_ids = dict()
         
         self.widget = QtWidgets.QWidget()
         self.widget.setStyleSheet('background:transparent;')
@@ -643,21 +644,29 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
         self.widget.setLayout(self.widget_layout)
         self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Fixed)
         self.widget_layout.addSpacerItem(self.spaceItem)
-        self.publish_indicator = indicator('#83cc56')
-        self.publish_indicator.setVisible(0)
-        self.widget_layout.addWidget(self.publish_indicator)
         self.spaceItem = QtWidgets.QSpacerItem(150,10,QtWidgets.QSizePolicy.Expanding)
         self.widget_layout.addSpacerItem(self.spaceItem)
 
     def set_item_widget(self):
         self.treeWidget().setItemWidget(self, 0, self.widget)
 
+    def set_state_indicator(self, variant_row):
+        if variant_row['id'] not in self.state_ids.keys():
+            state_indicator = indicator(assets_vars._state_colors_dic_[variant_row['state']])
+            self.widget_layout.addWidget(state_indicator)
+            self.state_ids[variant_row['id']] = state_indicator
+        else:
+            self.state_ids[variant_row['id']].update(assets_vars._state_colors_dic_[variant_row['state']])
+
 class indicator(QtWidgets.QFrame):
     def __init__(self, color):
         super(indicator, self).__init__()
         self.setFixedSize(8,8)
         self.setStyleSheet(f'background-color:{color};border-radius:4px;')
- 
+
+    def update(self, color):
+        self.setStyleSheet(f'background-color:{color};border-radius:4px;')
+
 class instance_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, request_frames=1, title=''):
         super(instance_creation_widget, self).__init__(parent)
