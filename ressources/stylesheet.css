@@ -446,6 +446,21 @@ QSlider::handle:horizontal {
     margin: -3px 0;
 }
 
+#locked_button{
+	border: 2px solid #f0605b;
+	background-color: #f0605b;
+}
+
+#locked_button::hover{
+	border: 2px solid #ff817d;
+	background-color: #ff817d;
+}
+
+#locked_button:pressed{
+	border: 2px solid #ab4946;
+	background-color: #ab4946;
+}
+
 #color_button{
 	background-color: transparent;
 }

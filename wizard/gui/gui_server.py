@@ -46,6 +46,7 @@ class gui_server(QThread):
     tooltip_signal = pyqtSignal(str)
     stdout_signal = pyqtSignal(tuple)
     export_version_focus_signal = pyqtSignal(object)
+    work_version_focus_signal = pyqtSignal(object)
     focus_instance_signal = pyqtSignal(object)
     save_popup_signal = pyqtSignal(int)
     raise_ui_signal = pyqtSignal(int)
@@ -100,6 +101,9 @@ class gui_server(QThread):
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'export_version_focus':
             self.export_version_focus_signal.emit(signal_dic['export_version_id'])
+            self.raise_ui_signal.emit(1)
+        elif signal_dic['function'] == 'work_version_focus':
+            self.work_version_focus_signal.emit(signal_dic['work_version_id'])
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'refresh_team':
             self.refresh_team_signal.emit(1)
@@ -165,6 +169,12 @@ def focus_export_version(export_version_id):
     signal_dic = dict()
     signal_dic['function'] = 'export_version_focus'
     signal_dic['export_version_id'] = export_version_id
+    send_signal(signal_dic)
+
+def focus_work_version(work_version_id):
+    signal_dic = dict()
+    signal_dic['function'] = 'work_version_focus'
+    signal_dic['work_version_id'] = work_version_id
     send_signal(signal_dic)
 
 def raise_ui():

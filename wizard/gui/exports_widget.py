@@ -230,7 +230,6 @@ class exports_widget(QtWidgets.QWidget):
                     if len(export_version_ids) > 0:
                         subtasks_library.archive_export_versions(export_version_ids)
 
-
     def open_folder(self):
         if self.variant_id is not None:
             folder = assets.get_variant_export_path(self.variant_id)
@@ -249,6 +248,15 @@ class exports_widget(QtWidgets.QWidget):
                 path_utils.startfile(folder)
             else:
                 logger.warning(f"{folder} not found")
+
+    def focus_on_work_version(self):
+        selection = self.list_view.selectedItems()
+        if len(selection)==1:
+            if selection[0].type == 'export_version':
+                if selection[0].export_version_row['work_version_id']:
+                    gui_server.focus_work_version(selection[0].export_version_row['work_version_id'])
+                else:
+                    logger.warning(f"Export version {selection[0].export_version_row['name']}\nis not related to any work version")
 
     def update_search(self):
         search_data = self.search_bar.text()
@@ -424,12 +432,14 @@ class exports_widget(QtWidgets.QWidget):
         archive_action = None
         launch_action = None
         set_default_action = None
+        focus_version_action = None
         if len(selection)>=1:
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
             comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
             destination_action = menu.addAction(QtGui.QIcon(ressources._destination_icon_), 'Open destination manager')
+            focus_version_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on work version')
             if selection[0].type != 'export':
                 set_default_action = menu.addAction(QtGui.QIcon(ressources._default_export_version_icon_), 'Set as default')
             else:
@@ -450,6 +460,8 @@ class exports_widget(QtWidgets.QWidget):
                 self.open_destination_manager()
             elif action == set_default_action:
                 self.set_default_export_version()
+            elif action == focus_version_action:
+                self.focus_on_work_version()
 
     def set_default_export_version(self):
         selection = self.list_view.selectedItems()

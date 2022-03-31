@@ -12,6 +12,7 @@ import logging
 from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import comment_widget
 
 # Wizard modules
 from wizard.core import assets
@@ -232,6 +233,17 @@ class references_widget(QtWidgets.QWidget):
             if selected_item.type == 'reference':
                 self.focus_export.emit(selected_item.reference_row['export_version_id'])
 
+    def declare_error(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            if selected_item.type == 'reference':
+                export_id = selected_item.reference_row['export_id']
+                variant_id = project.get_export_data(export_id, 'variant_id')
+                self.comment_widget = comment_widget.comment_widget()
+                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                    assets.modify_variant_state(variant_id, 'error', self.comment_widget.comment)
+                    gui_server.refresh_ui()
+
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():
             item = self.reference_ids[reference_id]
@@ -280,6 +292,7 @@ class references_widget(QtWidgets.QWidget):
         update_action = None
         launch_action = None
         focus_action = None
+        declare_error_action = None
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         if len(selection)>=1:
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
@@ -288,6 +301,7 @@ class references_widget(QtWidgets.QWidget):
                 if selection[0].type == 'reference':
                     launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
                     focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
+                    declare_error_action = menu.addAction(QtGui.QIcon(ressources._tool_error_), 'Declare error on this asset')
         add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
 
         action = menu.exec_(QtGui.QCursor().pos())
@@ -304,6 +318,8 @@ class references_widget(QtWidgets.QWidget):
                 self.launch_work_version()
             elif action == focus_action:
                 self.focus_on_export_version()
+            elif action == declare_error_action:
+                self.declare_error()
 
     def item_double_clicked(self, item):
         if item.type == 'group':
@@ -469,6 +485,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.export_widget.setText(infos_list[2])
         self.version_widget.setText(infos_list[3])
         self.set_auto_update(infos_list[5])
+        self.setText(0, infos_list[6])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
@@ -617,6 +634,8 @@ class reference_infos_thread(QtCore.QThread):
                 export_version_row = project.get_export_version_data(reference_row['export_version_id'])
                 export_row = project.get_export_data(export_version_row['export_id'])
                 variant_row = project.get_variant_data(export_row['variant_id'])
+                stage_row = project.get_stage_data(variant_row['stage_id'])
+                asset_name = project.get_asset_data(stage_row['asset_id'], 'name')
                 default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
 
                 if default_export_version_id  != reference_row['export_version_id']:
@@ -629,7 +648,8 @@ class reference_infos_thread(QtCore.QThread):
                                                     export_row['name'], 
                                                     export_version_row['name'], 
                                                     up_to_date, 
-                                                    reference_row['auto_update']])
+                                                    reference_row['auto_update'],
+                                                    asset_name])
 
     def update_references_rows(self, reference_rows):
         self.running = False

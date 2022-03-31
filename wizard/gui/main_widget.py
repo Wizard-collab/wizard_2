@@ -45,6 +45,7 @@ from wizard.gui import popup_wall_widget
 from wizard.gui import user_preferences_widget
 from wizard.gui import project_preferences_widget
 from wizard.gui import softwares_widget
+from wizard.gui import locks_widget
 from wizard.gui import asset_tracking_widget
 from wizard.gui import championship_widget
 from wizard.gui import license_widget
@@ -87,6 +88,7 @@ class main_widget(QtWidgets.QWidget):
         self.communicate_server = communicate.communicate_server()
         self.softwares_server = launch.softwares_server()
         self.softwares_widget = softwares_widget.softwares_widget()
+        self.locks_widget = locks_widget.locks_widget()
         self.championship_widget = championship_widget.championship_widget()
         self.license_widget = license_widget.license_widget()
         self.whatsnew_widget = whatsnew_widget.whatsnew_widget()
@@ -169,6 +171,7 @@ class main_widget(QtWidgets.QWidget):
         self.footer_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
         self.footer_widget.refresh_signal.connect(self.refresh)
         self.footer_widget.show_softwares_widget.connect(self.softwares_widget.toggle)
+        self.footer_widget.show_locks_widget.connect(self.locks_widget.toggle)
         self.console_widget.notification.connect(self.footer_widget.update_console_button)
         self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
@@ -189,6 +192,7 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.stdout_signal.connect(self.update_stdout)
         self.gui_server.focus_instance_signal.connect(self.focus_instance)
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
+        self.gui_server.work_version_focus_signal.connect(self.focus_work_version)
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
         self.gui_server.popup_signal.connect(self.popup_wall_widget.add_custom_popup)
@@ -217,6 +221,18 @@ class main_widget(QtWidgets.QWidget):
             self.tree_widget.focus_instance(('stage', export_version_row['stage_id']))
             self.tabs_widget.setCurrentIndex(self.exports_tab_index)
             self.exports_widget.focus_export_version(export_version_id)
+
+    def focus_work_version(self, work_version_id):
+        work_version_row = project.get_version_data(work_version_id)
+        work_env_row = project.get_work_env_data(work_version_row['work_env_id'])
+        variant_row = project.get_variant_data(work_env_row['variant_id'])
+        stage_row = project.get_stage_data(variant_row['stage_id'])
+        if stage_row is not None:
+            self.tree_widget.focus_instance(('stage', stage_row['id']))
+            self.tabs_widget.setCurrentIndex(self.work_versions_tab_index)
+            self.context_widget.focus_variant(variant_row['id'])
+            self.context_widget.focus_work_env(work_env_row['id'])
+            self.versions_widget.focus_work_version(work_version_id)
 
     def focus_on_group(self, group_id):
         self.groups_manager_widget.toggle()
@@ -315,6 +331,7 @@ class main_widget(QtWidgets.QWidget):
         self.exports_widget.refresh()
         self.wall_widget.refresh()
         self.softwares_widget.refresh()
+        self.locks_widget.refresh()
         self.asset_tracking_widget.refresh()
         self.production_manager_widget.refresh()
         self.shelf_widget.refresh()

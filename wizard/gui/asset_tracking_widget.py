@@ -145,7 +145,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.add_comment_button = QtWidgets.QPushButton('Add comment')
         self.add_comment_button.setMaximumHeight(24)
-        self.add_comment_button.setStyleSheet('padding:2px;')
+        self.add_comment_button.setStyleSheet('padding:3px;')
         self.separation_layout.addWidget(self.add_comment_button)
 
         self.events_scrollArea = QtWidgets.QScrollArea()

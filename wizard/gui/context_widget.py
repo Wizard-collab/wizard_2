@@ -58,6 +58,14 @@ class context_widget(QtWidgets.QFrame):
         self.refresh_variant_changed = 1
         self.variant_changed(by_user=None)
 
+    def focus_work_env(self, work_env_id):
+        self.refresh_work_env_changed = None
+        work_env_row = project.get_work_env_data(work_env_id)
+        if work_env_row is not None:
+            self.work_env_comboBox.setCurrentText(work_env_row['name'])
+        self.refresh_work_env_changed = 1
+        self.work_env_changed(by_user=None)
+
     def refresh_variants(self, apply_default=None):
         self.refresh_variant_changed = None
         if self.stage_id is not None:

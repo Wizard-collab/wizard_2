@@ -147,7 +147,7 @@ class launcher_widget(QtWidgets.QFrame):
     def toggle_lock(self):
         if self.work_env_id:
             project.toggle_lock(self.work_env_id)
-            self.refresh_lock_button()
+            gui_server.refresh_ui()
 
     def launch(self):
         if self.work_env_id:

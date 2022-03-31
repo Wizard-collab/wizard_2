@@ -71,6 +71,18 @@ class versions_widget(QtWidgets.QWidget):
         if len(files) != 0:
             self.merge_files(files)
 
+    def focus_work_version(self, work_version_id):
+        if self.icon_mode:
+            ids = self.version_icon_ids
+            view = self.icon_view
+        else:
+            ids = self.version_list_ids
+            view = self.list_view
+        if work_version_id in ids.keys():
+            item = ids[work_version_id]
+            view.scrollToItem(item)
+            view.setCurrentItem(item)
+
     def open_files(self):
         options = QtWidgets.QFileDialog.Options()
         fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select files", "",

@@ -20,9 +20,9 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
-class softwares_widget(QtWidgets.QWidget):
+class locks_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
-        super(softwares_widget, self).__init__(parent)
+        super(locks_widget, self).__init__(parent)
 
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
@@ -32,7 +32,7 @@ class softwares_widget(QtWidgets.QWidget):
         self.connect_functions()
 
     def connect_functions(self):
-        self.kill_all_button.clicked.connect(self.kill_all)
+        self.unlock_all_button.clicked.connect(self.unlock_all)
 
     def leaveEvent(self, event):
         self.hide()
@@ -68,15 +68,15 @@ class softwares_widget(QtWidgets.QWidget):
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
 
-        self.title = QtWidgets.QLabel('Running work environments')
+        self.title = QtWidgets.QLabel('Locked work environments')
         self.header_layout.addWidget(self.title)
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.kill_all_button = QtWidgets.QPushButton('Kill all')
-        self.kill_all_button.setStyleSheet('padding:3px;')
-        self.kill_all_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
-        self.header_layout.addWidget(self.kill_all_button)
+        self.unlock_all_button = QtWidgets.QPushButton('Unlock all')
+        self.unlock_all_button.setStyleSheet('padding:3px;')
+        self.unlock_all_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
+        self.header_layout.addWidget(self.unlock_all_button)
 
         self.main_layout.addWidget(self.header_widget)
 
@@ -104,20 +104,25 @@ class softwares_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.work_envs_scrollArea)
 
     def refresh(self):
-        running_work_env_ids = launch.get()
-        for work_env_id in running_work_env_ids:
-            if work_env_id not in self.work_env_ids.keys():
-                widget = work_env_widget(work_env_id, self)
+        user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+        work_env_rows = project.get_user_locks(user_id)
+        project_work_env_ids = []
+        for work_env_row in work_env_rows:
+            project_work_env_ids.append(work_env_row['id'])
+            if work_env_row['id'] not in self.work_env_ids.keys():
+                widget = work_env_widget(work_env_row, self)
                 self.work_envs_scrollArea_layout.addWidget(widget)
-                self.work_env_ids[work_env_id] = widget
+                self.work_env_ids[work_env_row['id']] = widget
         work_env_id_list = list(self.work_env_ids.keys())
         for work_env_id in work_env_id_list:
-            if work_env_id not in running_work_env_ids:
+            if work_env_id not in project_work_env_ids:
+                print(work_env_id)
                 self.remove_work_env(work_env_id)
         self.refresh_info_widget()
 
-    def kill_all(self):
-        launch.kill_all()
+    def unlock_all(self):
+        user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+        project.unlock_all_by_user(user_id)
         gui_server.refresh_ui()
 
     def remove_work_env(self, work_env_id):
@@ -150,26 +155,25 @@ class softwares_widget(QtWidgets.QWidget):
             gui_utils.move_ui(self)
 
 class work_env_widget(QtWidgets.QFrame):
-    def __init__(self, work_env_id, parent=None):
+    def __init__(self, work_env_row, parent=None):
         super(work_env_widget, self).__init__(parent)
-        self.work_env_id = work_env_id
+        self.work_env_row = work_env_row
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
 
     def fill_ui(self):
-        work_env_row = project.get_work_env_data(self.work_env_id)
-        software = project.get_software_data(work_env_row['software_id'], 'name')
+        software = project.get_software_data(self.work_env_row['software_id'], 'name')
         icon = ressources._sofwares_icons_dic_[software]
         self.software_icon.setPixmap(QtGui.QIcon(icon).pixmap(26))
-        work_env_label = assets.instance_to_string(('work_env', self.work_env_id))
+        work_env_label = assets.instance_to_string(('work_env', self.work_env_row['id']))
         self.work_env_label.setText(work_env_label)
 
     def connect_functions(self):
-        self.kill_button.clicked.connect(self.kill)
+        self.unlock_button.clicked.connect(self.unlock)
 
-    def kill(self):
-        launch.kill(self.work_env_id)
+    def unlock(self):
+        project.toggle_lock(self.work_env_row['id'])
         gui_server.refresh_ui()
 
     def build_ui(self):
@@ -186,8 +190,9 @@ class work_env_widget(QtWidgets.QFrame):
         self.work_env_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.work_env_label)
 
-        self.kill_button = QtWidgets.QPushButton()
-        self.kill_button.setFixedSize(26,26)
-        self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
-        gui_utils.application_tooltip(self.kill_button, "Kill work env software instance")
-        self.main_layout.addWidget(self.kill_button)
+        self.unlock_button = QtWidgets.QPushButton()
+        self.unlock_button.setObjectName('locked_button')
+        self.unlock_button.setFixedSize(26,26)
+        self.unlock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
+        gui_utils.application_tooltip(self.unlock_button, "Unlock software instance")
+        self.main_layout.addWidget(self.unlock_button)

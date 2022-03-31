@@ -397,7 +397,7 @@ def create_references_from_variant_id(work_env_id, variant_id):
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     stage = project.get_stage_data(stage_id, 'name')
     if export_rows is not None:
-        if stage == assets_vars._modeling_:
+        if stage in [assets_vars._modeling_, assets_vars._layout_]:
             export_rows = [export_rows[0]]
         for export_row in export_rows:
             export_version_id = project.get_default_export_version(export_row['id'], 'id')

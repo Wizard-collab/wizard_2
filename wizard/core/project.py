@@ -1116,6 +1116,13 @@ def set_work_env_extension(work_env_id, export_extension):
     else:
         return None
 
+def get_user_locks(user_id, column='*'):
+    work_env_rows = db_utils.get_row_by_column_data('project',
+                                                        'work_envs',
+                                                        ('lock_id', user_id),
+                                                        column)
+    return work_env_rows
+
 def get_lock(work_env_id):
     current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
     work_env_lock_id = get_work_env_data(work_env_id, 'lock_id')
@@ -1145,6 +1152,11 @@ def set_work_env_lock(work_env_id, lock=1):
             return None
     else:
         return None
+
+def unlock_all_by_user(user_id):
+    work_env_ids = get_user_locks(user_id, 'id')
+    for work_env_id in work_env_ids:
+        set_work_env_lock(work_env_id, 0)
 
 def toggle_lock(work_env_id):
     current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')

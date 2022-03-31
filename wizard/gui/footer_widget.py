@@ -28,6 +28,7 @@ class footer_widget(QtWidgets.QFrame):
     show_team_widget = pyqtSignal(int)
     show_user_preferences = pyqtSignal(int)
     show_softwares_widget = pyqtSignal(int)
+    show_locks_widget = pyqtSignal(int)
     refresh_signal = pyqtSignal(int)
 
     def __init__(self, parent=None):
@@ -96,6 +97,12 @@ class footer_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.settings_button, "Settings")
         self.settings_button.setIcon(QtGui.QIcon(ressources._settings_icon_))
         self.buttons_layout.addWidget(self.settings_button)
+        
+        self.locks_button = QtWidgets.QPushButton()
+        self.locks_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.locks_button, "Show locked work environments")
+        self.locks_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
+        self.buttons_layout.addWidget(self.locks_button)
 
         self.softwares_button = QtWidgets.QPushButton()
         self.softwares_button.setFixedSize(QtCore.QSize(30, 30))
@@ -140,6 +147,7 @@ class footer_widget(QtWidgets.QFrame):
         self.team_connection_button.clicked.connect(self.show_team_widget.emit)
         self.settings_button.clicked.connect(self.show_user_preferences.emit)
         self.softwares_button.clicked.connect(self.show_softwares_widget.emit)
+        self.locks_button.clicked.connect(self.show_locks_widget.emit)
 
     def update_tooltip(self, tooltip):
         self.tooltip_widget.setText(tooltip)
