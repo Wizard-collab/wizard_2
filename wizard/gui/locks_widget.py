@@ -135,7 +135,7 @@ class locks_widget(QtWidgets.QWidget):
         if len(self.work_env_ids) == 0:
             self.work_envs_scrollArea.setVisible(0)
             self.info_widget.setVisible(1)
-            self.info_widget.setText("You need to get to work !")
+            self.info_widget.setText("No locked\nwork environments !")
             self.info_widget.setImage(ressources._nothing_info_)
         else:
             self.info_widget.setVisible(0)

@@ -427,7 +427,6 @@ class exports_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu(self)
         selection = self.list_view.selectedItems()
         folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
-        batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export')
         manual_action = menu.addAction(QtGui.QIcon(ressources._tool_manually_publish_), 'Manually add a file')
         archive_action = None
         launch_action = None
