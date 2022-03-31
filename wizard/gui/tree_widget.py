@@ -657,6 +657,10 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
             self.state_ids[variant_row['id']] = state_indicator
         else:
             self.state_ids[variant_row['id']].update(assets_vars._state_colors_dic_[variant_row['state']])
+        if variant_row['state'] != 'error':
+            self.state_ids[variant_row['id']].setVisible(0)
+        else:
+            self.state_ids[variant_row['id']].setVisible(1)
 
 class indicator(QtWidgets.QFrame):
     def __init__(self, color):
