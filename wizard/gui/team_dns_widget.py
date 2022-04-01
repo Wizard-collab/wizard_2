@@ -39,7 +39,7 @@ class team_dns_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel('Contact your IT to get thoses informations')
+        self.infos_label = QtWidgets.QLabel('Contact your IT to get those informations')
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
