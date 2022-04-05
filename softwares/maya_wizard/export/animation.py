@@ -5,9 +5,8 @@
 # Python modules
 import os
 import json
-import logging
 import traceback
-
+import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules

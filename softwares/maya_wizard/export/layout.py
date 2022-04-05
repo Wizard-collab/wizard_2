@@ -5,6 +5,8 @@
 # Python modules
 import traceback
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 # Wizard modules
 from maya_wizard import wizard_tools
