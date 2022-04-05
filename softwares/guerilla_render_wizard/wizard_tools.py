@@ -70,9 +70,14 @@ def add_GRP(grp_name, parent = None):
     return node
 
 def get_node_from_name(name):
-    nodes_list = []
     for node in Document().children(recursive=True):
         if node.getname() == name:
+            break
+    return node
+
+def get_node_from_path(path):
+    for node in Document().children(recursive=True):
+        if node.getpath() == path:
             break
     return node
 
