@@ -29,7 +29,7 @@
 # This module is used to manage images in wizard
 
 # Python modules
-import pyautogui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from PIL import Image, ImageCms, ImageFont, ImageDraw
 import io
 import base64
@@ -43,9 +43,15 @@ from wizard.core import tools
 from wizard.core import path_utils
 
 def screenshot(file, thumbnail_file):
-    # Capture the screen
-    # Divide the image size by ≈3
-    base_image = pyautogui.screenshot()
+    screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+    rect = screen.availableGeometry()
+    x=rect.x()
+    y=rect.y()
+    width=rect.width()
+    height=rect.height()
+    pixmap = screen.grabWindow(QtWidgets.QApplication.desktop().winId(), x=x, y=y, width=width, height=height)
+    base_image = pixmap_to_PIL(pixmap)
+
     image = resize_image(base_image, 1000)
 
     thumbnail, null, null = resize_image_with_fixed_width(base_image, 200)
@@ -56,6 +62,13 @@ def screenshot(file, thumbnail_file):
     image.save(save_file, format="PNG")
     thumbnail.save(save_thumbnail_file, format="JPEG")
     return save_file, save_thumbnail_file
+
+def pixmap_to_PIL(pixmap):
+    buffer = QtCore.QBuffer()
+    buffer.open(QtCore.QBuffer.ReadWrite)
+    pixmap.save(buffer, "PNG")
+    PIL_image = Image.open(io.BytesIO(buffer.data()))
+    return PIL_image
 
 def resize_preview(file, destination, size=200):
     if path_utils.isfile(file):
