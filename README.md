@@ -18,7 +18,6 @@ http://93.19.210.30/
 	* PyQt5
 	* PyYaml
 	* pillow
-	* pyautogui
 	* psycopg2
 	* psutil
 	* QScintilla
