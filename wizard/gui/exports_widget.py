@@ -9,6 +9,8 @@ from PyQt5.QtCore import pyqtSignal
 import json
 import time
 import os
+import traceback
+import copy
 import logging
 
 # Wizard modules
@@ -54,6 +56,7 @@ class exports_widget(QtWidgets.QWidget):
         self.icons_dic['camrig'] = QtGui.QIcon(ressources._camera_rig_icon_)
 
         self.variant_id = None
+        self.export_versions_rows = None
         self.export_ids = dict()
         self.export_versions_ids = dict()
         self.check_existence_thread = check_existence_thread()
@@ -142,7 +145,7 @@ class exports_widget(QtWidgets.QWidget):
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
-        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye", "from:houdini"')
+        self.search_bar.setPlaceholderText('"0023", "j.smith", "retake eye", "houdini"')
         self.buttons_layout.addWidget(self.search_bar)
 
         self.manual_publish_button = QtWidgets.QPushButton()
@@ -261,19 +264,7 @@ class exports_widget(QtWidgets.QWidget):
     def update_search(self):
         search_data = self.search_bar.text()
         if search_data != '':
-            self.hide_all()
-            search_column = 'name'
-            if ':' in search_data:
-                if search_data.split(':')[0] == 'comment':
-                    search_column = 'comment'
-                    search_data = search_data.split(':')[-1]
-                elif search_data.split(':')[0] == 'user':
-                    search_column = 'creation_user'
-                    search_data = search_data.split(':')[-1]
-                elif search_data.split(':')[0] == 'from':
-                    search_column = 'software'
-                    search_data = search_data.split(':')[-1]
-            self.search_thread.update_search(self.variant_id, search_data, search_column)
+            self.search_thread.update_search(search_data, self.export_versions_rows)
         else:
             self.show_all()
 
@@ -289,12 +280,25 @@ class exports_widget(QtWidgets.QWidget):
         for export_version_id in self.export_versions_ids.keys():
             self.export_versions_ids[export_version_id].setHidden(0)
 
-    def add_search_version(self, export_version_id):
+    def show_search_version(self, export_version_id):
         if export_version_id in self.export_versions_ids.keys():
             export_id = self.export_versions_ids[export_version_id].export_version_row['export_id']
             if export_id in self.export_ids.keys():
-                self.export_ids[export_id].setHidden(0)
-            self.export_versions_ids[export_version_id].setHidden(0)
+                self.export_ids[export_id].setHidden(False)
+            self.export_versions_ids[export_version_id].setHidden(False)
+
+    def hide_search_version(self, export_version_id):
+        if export_version_id in self.export_versions_ids.keys():
+            self.export_versions_ids[export_version_id].setHidden(True)
+            export_id = self.export_versions_ids[export_version_id].export_version_row['export_id']
+            if export_id in self.export_ids.keys():
+                children_visibility_list = []
+                for index in range(0, self.export_ids[export_id].childCount()-1):
+                    children_visibility_list.append(self.export_ids[export_id].child(index).isHidden())
+                if all(children_visibility_list):
+                    self.export_ids[export_id].setHidden(True)
+                else:
+                    self.export_ids[export_id].setHidden(False)
 
     def connect_functions(self):
         self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
@@ -306,7 +310,8 @@ class exports_widget(QtWidgets.QWidget):
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
 
         self.search_bar.textChanged.connect(self.update_search)
-        self.search_thread.id_signal.connect(self.add_search_version)
+        self.search_thread.show_id_signal.connect(self.show_search_version)
+        self.search_thread.hide_id_signal.connect(self.hide_search_version)
 
         self.archive_button.clicked.connect(self.archive)
         self.manual_publish_button.clicked.connect(lambda:self.merge_files())
@@ -350,10 +355,10 @@ class exports_widget(QtWidgets.QWidget):
                                                                 ressources._empty_info_image_)
 
                     project_export_versions_id = []
-                    export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
-                    if export_versions_rows is not None:
-                        if export_versions_rows != []:
-                            for export_version_row in export_versions_rows:
+                    self.export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
+                    if self.export_versions_rows is not None:
+                        if self.export_versions_rows != []:
+                            for export_version_row in self.export_versions_rows:
                                 project_export_versions_id.append(export_version_row['id'])
                                 if export_version_row['id'] not in self.export_versions_ids.keys():
                                     if export_version_row['export_id'] in self.export_ids.keys():
@@ -362,7 +367,7 @@ class exports_widget(QtWidgets.QWidget):
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
                                 else:
                                     self.export_versions_ids[export_version_row['id']].refresh(export_version_row)
-                            self.check_existence_thread.update_versions_rows(export_versions_rows)
+                            self.check_existence_thread.update_versions_rows(self.export_versions_rows)
 
 
                     export_list_ids = list(self.export_ids.keys())
@@ -658,26 +663,44 @@ class check_existence_thread(QtCore.QThread):
 
 class search_thread(QtCore.QThread):
 
-    id_signal = pyqtSignal(int)
+    show_id_signal = pyqtSignal(int)
+    hide_id_signal = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
         self.running = True
 
-    def update_search(self, variant_id, search_data, search_column):
+    def update_search(self, search_data, export_versions_rows):
         self.running = False
-        self.variant_id = variant_id
         self.search_data = search_data
-        self.search_column = search_column
+        self.export_versions_rows = copy.deepcopy(export_versions_rows)
         self.running = True
         self.start()
 
     def run(self):
-        versions_ids = project.search_export_version(self.search_data, 
-                                                self.variant_id, 
-                                                column_to_search=self.search_column,
-                                                column='id')
-        for version_id in versions_ids:
-            if not self.running:
-                break
-            self.id_signal.emit(version_id)
+        try:
+            keywords = self.search_data.split('&')
+            for export_version_row in self.export_versions_rows:
+
+                export_version_id = export_version_row['id']
+                del export_version_row['id']
+                del export_version_row['creation_time']
+                del export_version_row['variant_id']
+                del export_version_row['stage_id']
+                del export_version_row['work_version_id']
+                del export_version_row['work_version_thumbnail_path']
+                del export_version_row['export_id']
+
+                values = list(export_version_row.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
+
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.show_id_signal.emit(export_version_id)
+                else:
+                    self.hide_id_signal.emit(export_version_id)
+        except:
+            logger.debug(str(traceback.format_exc()))
+

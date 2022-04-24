@@ -402,7 +402,7 @@ class versions_widget(QtWidgets.QWidget):
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
-        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye"')
+        self.search_bar.setPlaceholderText('"0023", "j.smith&maya", "retake eye"')
         self.buttons_layout.addWidget(self.search_bar)
 
         self.toggle_view_button = QtWidgets.QPushButton()

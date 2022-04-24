@@ -250,7 +250,8 @@ class wall_time_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(4,4,4,4)
+        self.main_layout.setContentsMargins(12,12,12,12)
+        self.main_layout.setAlignment(QtCore.Qt.AlignCenter)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -284,7 +285,7 @@ class wall_event_widget(QtWidgets.QFrame):
     
     def fill_ui(self):
         profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 40)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
@@ -314,7 +315,7 @@ class wall_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 
-        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
+        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
 
     def connect_functions(self):
         self.action_button_button.clicked.connect(self.action)
@@ -338,13 +339,12 @@ class wall_event_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.widget_layout = QtWidgets.QVBoxLayout()
-        self.widget_layout.setContentsMargins(8,2,8,2)
+        self.widget_layout.setContentsMargins(8,1,8,1)
         self.widget_layout.setSpacing(1)
         self.setLayout(self.widget_layout)
 
         self.event_frame = QtWidgets.QFrame()
         self.event_frame.setObjectName('wall_event_frame')
-        #self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(9,9,9,9)
         self.main_layout.setSpacing(6)
@@ -364,11 +364,11 @@ class wall_event_widget(QtWidgets.QFrame):
         self.profile_layout = QtWidgets.QHBoxLayout()
         self.profile_layout.setContentsMargins(0,0,0,0)
         self.profile_frame.setLayout(self.profile_layout)
-        self.profile_frame.setFixedSize(44,44)
+        self.profile_frame.setFixedSize(34,34)
         self.header_layout.addWidget(self.profile_frame)
 
         self.profile_picture = QtWidgets.QLabel()
-        self.profile_picture.setFixedSize(40,40)
+        self.profile_picture.setFixedSize(30,30)
         self.profile_layout.addWidget(self.profile_picture)
 
         self.title_widget = QtWidgets.QWidget()

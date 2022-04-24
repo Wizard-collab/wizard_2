@@ -938,20 +938,14 @@ QSlider::handle:horizontal {
 	border-radius: 5px;
 }
 
-
 #wall_event_frame{
-	border-radius: 10px;
+	border-radius: 5px;
 	background-color: #373740;
 }
 
 #popup_event_frame{
 	border-radius: 10px;
 	background-color: #19191f;
-}
-
-#wall_event_frame{
-	border-radius: 10px;
-	background-color: #373740;
 }
 
 #drop_files_button{
