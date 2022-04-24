@@ -66,6 +66,7 @@ from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import image
 from wizard.core import game
+from wizard.core import tags
 from wizard.core import asset_tracking
 from wizard.vars import assets_vars
 from wizard.vars import env_vars
@@ -555,6 +556,12 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
         for file in extension_errors:
             logger.warning(f"{file} format doesn't math the stage export rules ( {(', ').join(extensions_rules)} )")
 
+def modify_export_version_comment(export_version_id, comment):
+    success = project.modify_export_version_comment(export_version_id, comment)
+    if success:
+        tags.analyse_comment(comment, 'export_version', export_version_id)
+    return success
+
 def request_export(work_env_id, export_name, multiple=None, only_dir=None):
     # Gives a temporary ( and local ) export file name
     # for the softwares
@@ -682,7 +689,16 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
     if (analyse_comment or fresh) and version_id:
         game.add_xps(1)
         game.analyse_comment(comment, 2)
+
+    tags.analyse_comment(comment, 'work_version', version_id)
+
     return version_id
+
+def modify_version_comment(version_id, comment=''):
+    success = project.modify_version_comment(version_id, comment)
+    if success:
+        tags.analyse_comment(comment, 'work_version', version_id)
+    return success
 
 def set_asset_preview(asset_id, image_file):
     if image_file is not None:

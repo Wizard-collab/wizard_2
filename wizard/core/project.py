@@ -58,6 +58,7 @@ from wizard.core import path_utils
 from wizard.core import site
 from wizard.core import environment
 from wizard.core import image
+from wizard.core import tags
 from wizard.vars import softwares_vars
 from wizard.vars import project_vars
 from wizard.vars import env_vars
@@ -779,6 +780,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 export_id))
         if export_version_id:
             logger.info(f"Export version {name} added to project")
+            tags.analyse_comment(comment, 'export_version', export_version_id)
             propagate_auto_update(export_id, export_version_id)
         return export_version_id
     else:
@@ -1218,6 +1220,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
                                 thumbnail_path,
                                 work_env_id))
         if version_id:
+            tags.analyse_comment(comment, 'work_version', version_id)
             logger.info(f"Version {name} added to project")
     else:
         logger.warning(f"Version {name} already exists")

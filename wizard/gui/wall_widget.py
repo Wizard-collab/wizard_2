@@ -205,7 +205,12 @@ class wall_widget(QtWidgets.QWidget):
                     if not self.isVisible() and self.first_refresh != 1:
                         self.notification.emit(1)
                     if self.first_refresh != 1:
-                        self.popup.emit(event_row)
+                        if event_row['type'] == 'tag':
+                            if environment.get_user() in event_row['title']:
+                                self.popup.emit(event_row)
+                        else:
+                            self.popup.emit(event_row)
+                            
             self.remove_useless_events(event_number)
 
         self.update_search()
@@ -306,6 +311,8 @@ class wall_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
             gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
+        elif self.event_row['type'] == 'tag':
+            profile_color = '#f0d969'
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:22px;}'%profile_color)
 

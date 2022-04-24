@@ -8,6 +8,8 @@ from PyQt5.QtCore import pyqtSignal
 import os
 import time
 import logging
+import traceback
+import copy
 
 # Wizard modules
 from wizard.core import launch
@@ -39,6 +41,7 @@ class versions_widget(QtWidgets.QWidget):
         super(versions_widget, self).__init__(parent)
 
         self.work_env_id = None
+        self.versions_rows = None
         self.version_list_ids = dict()
         self.version_icon_ids = dict()
         self.check_existence_thread = check_existence_thread()
@@ -145,11 +148,11 @@ class versions_widget(QtWidgets.QWidget):
                 software_name = project.get_work_env_data(self.work_env_id, 'name')
                 software_icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
 
-                versions_rows = project.get_work_versions(self.work_env_id)
+                self.versions_rows = project.get_work_versions(self.work_env_id)
                 project_versions_id = []
-                if versions_rows is not None:
+                if self.versions_rows is not None:
                     self.hide_info_mode()
-                    for version_row in versions_rows:
+                    for version_row in self.versions_rows:
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_list_ids.keys():
                             version_item = custom_version_tree_item(version_row, software_icon, self.list_view.invisibleRootItem())
@@ -161,7 +164,7 @@ class versions_widget(QtWidgets.QWidget):
                 for version_id in version_list_ids:
                     if version_id not in project_versions_id:
                         self.remove_tree_version(version_id)
-                self.check_existence_thread.update_versions_rows(versions_rows)
+                self.check_existence_thread.update_versions_rows(self.versions_rows)
             elif self.work_env_id is None:
                 self.show_info_mode("Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
             else:
@@ -171,11 +174,11 @@ class versions_widget(QtWidgets.QWidget):
     def refresh_icons_view(self):
         if self.icon_mode:
             if self.work_env_id is not None and self.work_env_id != 0:
-                versions_rows = project.get_work_versions(self.work_env_id)
+                self.versions_rows = project.get_work_versions(self.work_env_id)
                 project_versions_id = []
-                if versions_rows is not None:
+                if self.versions_rows is not None:
                     self.hide_info_mode()
-                    for version_row in versions_rows:
+                    for version_row in self.versions_rows:
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_icon_ids.keys():
                             version_item = custom_version_icon_item(version_row)
@@ -185,7 +188,7 @@ class versions_widget(QtWidgets.QWidget):
                 for version_id in version_icon_ids:
                     if version_id not in project_versions_id:
                         self.remove_icon_version(version_id)
-                self.check_existence_thread.update_versions_rows(versions_rows)
+                self.check_existence_thread.update_versions_rows(self.versions_rows)
             elif self.work_env_id is None:
                 self.show_info_mode("Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
             else:
@@ -227,26 +230,26 @@ class versions_widget(QtWidgets.QWidget):
     def update_search(self):
         search_data = self.search_bar.text()
         if search_data != '':
-            self.hide_all()
-            search_column = 'name'
-            if ':' in search_data:
-                if search_data.split(':')[0] == 'comment':
-                    search_column = 'comment'
-                    search_data = search_data.split(':')[-1]
-                elif search_data.split(':')[0] == 'user':
-                    search_column = 'creation_user'
-                    search_data = search_data.split(':')[-1]
-            self.search_thread.update_search(self.work_env_id, search_data, search_column)
+            self.search_thread.update_search(self.versions_rows, search_data)
         else:
             self.show_all()
 
-    def add_search_version(self, version_id):
+    def show_search_version(self, version_id):
         if self.list_mode:
             if version_id in self.version_list_ids.keys():
                 self.version_list_ids[version_id].setHidden(False)
         elif self.icon_mode:
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].setHidden(False)
+
+    def hide_search_version(self, version_id):
+        if self.list_mode:
+            if version_id in self.version_list_ids.keys():
+                self.version_list_ids[version_id].setHidden(True)
+        elif self.icon_mode:
+            if version_id in self.version_icon_ids.keys():
+                self.version_icon_ids[version_id].setHidden(True)
+
 
     def connect_functions(self):
         self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
@@ -277,7 +280,8 @@ class versions_widget(QtWidgets.QWidget):
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
 
         self.search_bar.textChanged.connect(self.update_search)
-        self.search_thread.id_signal.connect(self.add_search_version)
+        self.search_thread.show_id_signal.connect(self.show_search_version)
+        self.search_thread.hide_id_signal.connect(self.hide_search_version)
 
     def batch_export(self):
         selection = self.get_selection()
@@ -521,7 +525,7 @@ class versions_widget(QtWidgets.QWidget):
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     for item in items:
-                        project.modify_version_comment(item.version_row['id'], comment)
+                        assets.modify_version_comment(item.version_row['id'], comment)
                     gui_server.refresh_ui()
 
     def version_changed(self):
@@ -751,26 +755,42 @@ class check_existence_thread(QtCore.QThread):
 
 class search_thread(QtCore.QThread):
 
-    id_signal = pyqtSignal(int)
+    show_id_signal = pyqtSignal(int)
+    hide_id_signal = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
         self.running = True
 
-    def update_search(self, work_env_id, search_data, search_column):
+    def update_search(self, versions_rows, search_data):
         self.running = False
-        self.work_env_id = work_env_id
         self.search_data = search_data
-        self.search_column = search_column
+        self.versions_rows = copy.deepcopy(versions_rows)
         self.running = True
         self.start()
 
     def run(self):
-        versions_ids = project.search_version(self.search_data, 
-                                                self.work_env_id, 
-                                                column_to_search=self.search_column,
-                                                column='id')
-        for version_id in versions_ids:
-            if not self.running:
-                break
-            self.id_signal.emit(version_id)
+        try:
+            keywords = self.search_data.split('&')
+            for version_row in self.versions_rows:
+
+                version_id = version_row['id']
+                del version_row['id']
+                del version_row['creation_time']
+                del version_row['file_path']
+                del version_row['screenshot_path']
+                del version_row['thumbnail_path']
+                del version_row['work_env_id']
+
+                values = list(version_row.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
+
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.show_id_signal.emit(version_id)
+                else:
+                    self.hide_id_signal.emit(version_id)
+        except:
+            logger.debug(str(traceback.format_exc()))

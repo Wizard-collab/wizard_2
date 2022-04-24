@@ -492,7 +492,7 @@ class exports_widget(QtWidgets.QWidget):
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     for item in selection:
-                        project.modify_export_version_comment(item.export_version_row['id'], comment)
+                        assets.modify_export_version_comment(item.export_version_row['id'], comment)
                     gui_server.refresh_ui()
 
     def launch_work_version(self):

@@ -181,7 +181,7 @@ class popup_save_widget(QtWidgets.QFrame):
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
-        project.modify_version_comment(self.version_id, comment)
+        assets.modify_version_comment(self.version_id, comment)
         gui_server.refresh_ui()
         self.time_out.emit(self.version_id)
 
@@ -303,6 +303,9 @@ class popup_event_widget(QtWidgets.QFrame):
 
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
+
+        elif self.event_row['type'] == 'tag':
+            profile_color = '#f0d969'
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
 
