@@ -7,6 +7,9 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import time
 import logging
+import copy
+import traceback
+import json
 
 # Wizard gui modules
 from wizard.gui import search_reference_widget
@@ -30,12 +33,15 @@ class references_widget(QtWidgets.QWidget):
     def __init__(self, context='work_env', parent=None):
         super(references_widget, self).__init__(parent)
         self.reference_infos_thread = reference_infos_thread()
+        self.search_thread = search_thread()
+
         self.context = context
         self.group_item = None
         self.parent_instance_id = None
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
+
         self.build_ui()
         self.connect_functions()
         self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
@@ -61,6 +67,67 @@ class references_widget(QtWidgets.QWidget):
         self.remove_selection_button.clicked.connect(self.remove_selection)
         self.update_button.clicked.connect(self.update_selection)
         self.add_reference_button.clicked.connect(self.search_reference)
+
+        self.search_bar.textChanged.connect(self.update_search)
+        self.search_thread.show_ref_signal.connect(self.show_search_reference)
+        self.search_thread.hide_ref_signal.connect(self.hide_search_reference)
+        self.search_thread.show_group_signal.connect(self.show_search_referenced_group)
+        self.search_thread.hide_group_signal.connect(self.hide_search_referenced_group)
+
+    def update_search(self):
+        search_data = self.search_bar.text()
+        if search_data != '':
+            self.search_thread.update_search(self.reference_rows, self.referenced_groups_rows, search_data)
+        else:
+            self.show_all()
+
+    def show_search_reference(self, reference_id):
+        if reference_id in self.reference_ids.keys():
+            self.reference_ids[reference_id].setHidden(False)
+            self.reference_ids[reference_id].parent().setHidden(False)
+
+    def show_search_referenced_group(self, referenced_group_id):
+        if referenced_group_id in self.referenced_group_ids.keys():
+            self.referenced_group_ids[referenced_group_id].setHidden(False)
+            self.referenced_group_ids[referenced_group_id].parent().setHidden(False)
+
+    def hide_search_reference(self, reference_id):
+        if reference_id in self.reference_ids.keys():
+            self.reference_ids[reference_id].setHidden(True)
+
+            parent_item = self.reference_ids[reference_id].parent()
+
+            children_visibility_list = []
+            for index in range(0, parent_item.childCount()-1):
+                children_visibility_list.append(parent_item.child(index).isHidden())
+            if all(children_visibility_list):
+                parent_item.setHidden(True)
+            else:
+                parent_item.setHidden(False)
+
+    def hide_search_referenced_group(self, referenced_group_id):
+        if referenced_group_id in self.referenced_group_ids.keys():
+            self.referenced_group_ids[referenced_group_id].setHidden(True)
+
+            parent_item = self.referenced_group_ids[referenced_group_id].parent()
+
+            children_visibility_list = []
+            for index in range(0, parent_item.childCount()-1):
+                children_visibility_list.append(parent_item.child(index).isHidden())
+            if all(children_visibility_list):
+                parent_item.setHidden(True)
+            else:
+                parent_item.setHidden(False)
+
+    def show_all(self):
+        for reference_id in self.reference_ids.keys():
+            self.reference_ids[reference_id].setHidden(False)
+        for stage in self.stage_dic.keys():
+            self.stage_dic[stage].setHidden(False)
+        for referenced_group_id in self.referenced_group_ids.keys():
+            self.referenced_group_ids[referenced_group_id].setHidden(False)
+        if self.group_item:
+            self.group_item.setHidden(False)
 
     def update_item_infos(self, infos_list):
         reference_id = infos_list[0]
@@ -113,16 +180,16 @@ class references_widget(QtWidgets.QWidget):
         if self.isVisible():
             if self.parent_instance_id is not None and self.parent_instance_id != 0:
                 if self.context == 'work_env':
-                    reference_rows = project.get_references(self.parent_instance_id)
-                    referenced_groups_rows = project.get_referenced_groups(self.parent_instance_id)
+                    self.reference_rows = project.get_references(self.parent_instance_id)
+                    self.referenced_groups_rows = project.get_referenced_groups(self.parent_instance_id)
                 else:
-                    reference_rows = project.get_grouped_references(self.parent_instance_id)
-                    referenced_groups_rows = []
-                if (reference_rows is not None) or (referenced_groups_rows is not None):
+                    self.reference_rows = project.get_grouped_references(self.parent_instance_id)
+                    self.referenced_groups_rows = []
+                if (self.reference_rows is not None) or (self.referenced_groups_rows is not None):
                     self.hide_info_mode()
-                    if (len(reference_rows) >=1) or (len(referenced_groups_rows) >=1):
-                        self.add_references_rows(reference_rows)
-                        self.add_referenced_groups_rows(referenced_groups_rows)
+                    if (len(self.reference_rows) >=1) or (len(self.referenced_groups_rows) >=1):
+                        self.add_references_rows(self.reference_rows)
+                        self.add_referenced_groups_rows(self.referenced_groups_rows)
                     else:
                         self.show_info_mode("No references\nPress Tab to create a reference !", ressources._references_info_image_)
             elif self.parent_instance_id is None:
@@ -264,7 +331,6 @@ class references_widget(QtWidgets.QWidget):
         if self.group_item is not None:
             childs = self.group_item.childCount()
             if childs == 0:
-                pass
                 self.list_view.invisibleRootItem().removeChild(self.group_item)
                 self.group_item = None
 
@@ -339,15 +405,16 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(6)
+        self.list_view.setColumnCount(7)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Export version', 'Auto update'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Version', 'Format', 'Auto update'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
         self.list_view.header().resizeSection(3, 250)
-        self.list_view.header().resizeSection(4, 250)
-        self.list_view.header().resizeSection(5, 20)
+        self.list_view.header().resizeSection(4, 100)
+        self.list_view.header().resizeSection(5, 100)
+        self.list_view.header().resizeSection(6, 20)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -386,7 +453,7 @@ class references_widget(QtWidgets.QWidget):
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
-        self.search_bar.setPlaceholderText('"0023", "user:j.smith", "comment:retake eye", "from:houdini"')
+        self.search_bar.setPlaceholderText('"modeling", "props", "Joe"')
         self.buttons_layout.addWidget(self.search_bar)
 
         self.remove_selection_button = QtWidgets.QPushButton()
@@ -476,9 +543,10 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.treeWidget().setItemWidget(self, 4, self.version_widget)
         self.auto_update_checkbox = QtWidgets.QCheckBox()
         self.auto_update_checkbox.setStyleSheet('background-color:transparent;')
-        self.treeWidget().setItemWidget(self, 5, self.auto_update_checkbox)
+        self.treeWidget().setItemWidget(self, 6, self.auto_update_checkbox)
 
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
+        self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
         self.variant_widget.setText(infos_list[1])
@@ -486,6 +554,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_widget.setText(infos_list[3])
         self.set_auto_update(infos_list[5])
         self.setText(0, infos_list[6])
+        self.setText(5, infos_list[7])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
@@ -632,6 +701,7 @@ class reference_infos_thread(QtCore.QThread):
         if self.reference_rows is not None:
             for reference_row in self.reference_rows:
                 export_version_row = project.get_export_version_data(reference_row['export_version_id'])
+                format = json.loads(export_version_row['files'])[0].split('.')[-1]
                 export_row = project.get_export_data(export_version_row['export_id'])
                 variant_row = project.get_variant_data(export_row['variant_id'])
                 stage_row = project.get_stage_data(variant_row['stage_id'])
@@ -649,10 +719,79 @@ class reference_infos_thread(QtCore.QThread):
                                                     export_version_row['name'], 
                                                     up_to_date, 
                                                     reference_row['auto_update'],
-                                                    asset_name])
+                                                    asset_name,
+                                                    format])
 
     def update_references_rows(self, reference_rows):
         self.running = False
         self.reference_rows = reference_rows
         self.running = True
         self.start()
+
+class search_thread(QtCore.QThread):
+
+    show_ref_signal = pyqtSignal(int)
+    hide_ref_signal = pyqtSignal(int)
+    show_group_signal = pyqtSignal(int)
+    hide_group_signal = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def update_search(self, reference_rows, referenced_groups_rows, search_data):
+        self.running = False
+        self.search_data = search_data
+        self.reference_rows = copy.deepcopy(reference_rows)
+        self.referenced_groups_rows = copy.deepcopy(referenced_groups_rows)
+        self.running = True
+        self.start()
+
+    def run(self):
+        try:
+            keywords = self.search_data.split('&')
+            for reference_row in self.reference_rows:
+
+                reference_id = reference_row['id']
+                del reference_row['id']
+                del reference_row['creation_time']
+                del reference_row['count']
+                if 'work_env_id' in reference_row.keys():
+                    del reference_row['work_env_id']
+                if 'group_id' in reference_row.keys():
+                    del reference_row['group_id']
+                del reference_row['export_id']
+                del reference_row['export_version_id']
+                del reference_row['auto_update']
+
+                values = list(reference_row.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
+
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.show_ref_signal.emit(reference_id)
+                else:
+                    self.hide_ref_signal.emit(reference_id)
+
+            for referenced_group_row in self.referenced_groups_rows:
+
+                referenced_group_id = referenced_group_row['id']
+                del referenced_group_row['id']
+                del referenced_group_row['creation_time']
+                del referenced_group_row['count']
+
+                values = list(referenced_group_row.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data_list.append('groups')
+                data = (' ').join(data_list)
+
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.show_group_signal.emit(referenced_group_id)
+                else:
+                    self.hide_group_signal.emit(referenced_group_id)
+        except:
+            logger.info(str(traceback.format_exc()))
