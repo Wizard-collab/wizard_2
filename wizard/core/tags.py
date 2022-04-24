@@ -35,7 +35,7 @@ from wizard.core import project
 from wizard.core import events
 
 def analyse_comment(comment, instance_type, instance_id):
-	comment_words = comment.split(' ')
+	comment_words = comment.replace('\n', ' ').replace('\r', ' ').split(' ')
 	for word in comment_words:
 		if word.startswith('@'):
 			user = word.replace('@', '')

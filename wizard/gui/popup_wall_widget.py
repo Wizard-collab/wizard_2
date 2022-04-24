@@ -312,6 +312,7 @@ class popup_event_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
+        self.action_button.clicked.connect(self.action)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -331,6 +332,17 @@ class popup_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'export':
             export_version_id = json.loads(self.event_row['data'])
             gui_server.focus_export_version(export_version_id)
+        elif self.event_row['type'] == 'tag':
+            data = json.loads(self.event_row['data'])
+            instance_type = data['instance'][0]
+            if instance_type == 'export_version':
+                export_version_id = data['instance'][1]
+                gui_server.focus_export_version(export_version_id)
+            if instance_type == 'work_version':
+                work_version_id = data['instance'][1]
+                gui_server.focus_work_version(work_version_id)
+            else:
+                gui_server.focus_instance(data['instance'])
 
     def build_ui(self):
         self.setLayoutDirection(QtCore.Qt.LeftToRight)
@@ -388,11 +400,25 @@ class popup_event_widget(QtWidgets.QFrame):
         self.decoration_content.setLayout(self.decoration_content_layout)
         self.header_layout.addWidget(self.decoration_content)
 
+        self.decoration_content_2 = QtWidgets.QWidget()
+        self.decoration_content_2.setObjectName('transparent_widget')
+        self.decoration_content_layout_2 = QtWidgets.QHBoxLayout()
+        self.decoration_content_layout_2.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout_2.setSpacing(0)
+        self.decoration_content_2.setLayout(self.decoration_content_layout_2)
+        self.decoration_content_layout.addWidget(self.decoration_content_2)
+
+        self.action_button = gui_utils.transparent_button(ressources._rigth_arrow_transparent_icon_, 
+                                                            ressources._rigth_arrow_icon_)
+        self.action_button.setIconSize(QtCore.QSize(18,18))
+        self.action_button.setFixedSize(16, 16)
+        self.decoration_content_layout_2.addWidget(self.action_button)
+
         self.quit_button = gui_utils.close_button()
         self.quit_button.setIconSize(QtCore.QSize(12,12))
         self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
-        self.decoration_content_layout.addWidget(self.quit_button)
+        self.decoration_content_layout_2.addWidget(self.quit_button)
         
         self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
@@ -400,7 +426,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.content_widget.setVisible(0)
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_layout.setContentsMargins(11,0,11,11)
+        self.content_layout.setContentsMargins(56,0,11,11)
         self.content_layout.setSpacing(12)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -419,7 +445,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_widget = QtWidgets.QWidget()
         self.comment_widget.setObjectName('transparent_widget')
         self.comment_widget_layout = QtWidgets.QVBoxLayout()
-        self.comment_widget_layout.setContentsMargins(11,0,11,11)
+        self.comment_widget_layout.setContentsMargins(56,0,11,11)
         self.comment_widget_layout.setSpacing(4)
         self.comment_widget.setLayout(self.comment_widget_layout)
         self.main_layout.addWidget(self.comment_widget)

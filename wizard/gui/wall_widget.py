@@ -8,6 +8,8 @@ from PyQt5.QtCore import pyqtSignal
 import time
 import os
 import json
+import copy
+import traceback
 
 # Wizard modules
 from wizard.core import environment
@@ -33,6 +35,7 @@ class wall_widget(QtWidgets.QWidget):
         super(wall_widget, self).__init__(parent)
 
         self.last_time = 0
+        self.event_rows = None
         self.event_ids = dict()
         self.time_widgets = []
         self.first_refresh = 1
@@ -44,8 +47,10 @@ class wall_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
         self.search_bar.textChanged.connect(self.update_search)
-        self.search_thread.id_signal.connect(self.add_search_event)
         self.event_count_spinBox.valueChanged.connect(self.change_events_count)
+
+        self.search_thread.show_id_signal.connect(self.show_search_event)
+        self.search_thread.hide_id_signal.connect(self.hide_search_event)
 
     def build_ui(self):
         self.setMaximumWidth(300)
@@ -62,7 +67,7 @@ class wall_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_frame)
 
         self.search_bar = gui_utils.search_bar()
-        self.search_bar.setPlaceholderText('"playblast", "user:j.smith", "content:shot_0021"')
+        self.search_bar.setPlaceholderText('"tag", "@j.smith&export", "shot_0021", "creation"')
         self.header_layout.addWidget(self.search_bar)
 
         self.wall_scrollArea = QtWidgets.QScrollArea()
@@ -170,31 +175,26 @@ class wall_widget(QtWidgets.QWidget):
     def update_search(self):
         search_data = self.search_bar.text()
         if search_data != '':
-            self.hide_all()
-            search_column = 'title'
-            if ':' in search_data:
-                if search_data.split(':')[0] == 'content':
-                    search_column = 'message'
-                    search_data = search_data.split(':')[-1]
-                elif search_data.split(':')[0] == 'user':
-                    search_column = 'creation_user'
-                    search_data = search_data.split(':')[-1]
-            self.search_thread.update_search(search_data, search_column)
+            self.search_thread.update_search(search_data, self.event_rows)
         else:
             self.show_all()
 
-    def add_search_event(self, event_id):
+    def show_search_event(self, event_id):
         if event_id in self.event_ids.keys():
             self.event_ids[event_id].setVisible(True)
 
+    def hide_search_event(self, event_id):
+        if event_id in self.event_ids.keys():
+            self.event_ids[event_id].setVisible(False)
+
     def refresh(self):
         start_time = time.time()
-        event_rows = project.get_all_events()
-        if event_rows is not None:
+        self.event_rows = project.get_all_events()
+        if self.event_rows is not None:
 
             event_number = self.event_count_spinBox.value()
 
-            for event_row in event_rows[-event_number:]:
+            for event_row in self.event_rows[-event_number:]:
                 if event_row['id'] not in self.event_ids.keys():
                     event_widget = wall_event_widget(event_row)
                     if event_row['creation_time']-self.last_time > 350:
@@ -331,6 +331,17 @@ class wall_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'export':
             export_version_id = json.loads(self.event_row['data'])
             gui_server.focus_export_version(export_version_id)
+        elif self.event_row['type'] == 'tag':
+            data = json.loads(self.event_row['data'])
+            instance_type = data['instance'][0]
+            if instance_type == 'export_version':
+                export_version_id = data['instance'][1]
+                gui_server.focus_export_version(export_version_id)
+            if instance_type == 'work_version':
+                work_version_id = data['instance'][1]
+                gui_server.focus_work_version(work_version_id)
+            else:
+                gui_server.focus_instance(data['instance'])
 
     def add_time(self):
         if self.time_widget == None:
@@ -393,7 +404,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_layout.setContentsMargins(0,0,0,0)
+        self.content_layout.setContentsMargins(41,0,0,0)
         self.content_layout.setSpacing(6)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -408,7 +419,6 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_layout.addWidget(self.event_additional_content_label)
 
         self.image_label = QtWidgets.QLabel()
-        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.content_layout.addWidget(self.image_label)
 
         self.buttons_widget = QtWidgets.QWidget()
@@ -431,24 +441,40 @@ class wall_event_widget(QtWidgets.QFrame):
 
 class search_thread(QtCore.QThread):
 
-    id_signal = pyqtSignal(int)
+    show_id_signal = pyqtSignal(int)
+    hide_id_signal = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
         self.running = True
 
-    def update_search(self, search_data, search_column):
+    def update_search(self, search_data, event_rows):
         self.running = False
         self.search_data = search_data
-        self.search_column = search_column
+        self.event_rows = copy.deepcopy(event_rows)
         self.running = True
         self.start()
 
     def run(self):
-        events_ids = project.search_event(self.search_data, 
-                                                column_to_search=self.search_column,
-                                                column='id')
-        for event_id in events_ids:
-            if not self.running:
-                break
-            self.id_signal.emit(event_id)
+        try:
+            keywords = self.search_data.split('&')
+            for event_row in self.event_rows:
+
+                event_id = event_row['id']
+                del event_row['id']
+                del event_row['creation_time']
+                del event_row['data']
+                del event_row['image_path']
+
+                values = list(event_row.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
+
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.show_id_signal.emit(event_id)
+                else:
+                    self.hide_id_signal.emit(event_id)
+        except:
+            logger.debug(str(traceback.format_exc()))

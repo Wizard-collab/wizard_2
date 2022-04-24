@@ -853,6 +853,12 @@ def create_or_get_camera_work_env(work_env_id):
         camera_work_env_id = create_work_env(software_id, camera_default_variant_id)
     return camera_work_env_id
 
+def add_asset_tracking_event(variant_id, event_type, data, comment=''):
+    success = project.add_asset_tracking_event(variant_id, event_type, data, comment)
+    if success:
+        tags.analyse_comment(comment, 'variant', variant_id)
+    return success
+
 def get_domain_path(domain_id):
     dir_name = None
     domain_name = project.get_domain_data(domain_id, 'name')
