@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 import logging
+import webbrowser
 
 # Wizard modules
 from wizard.vars import ressources
@@ -156,6 +157,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_pywizard.connect(self.show_pywizard)
         self.header_widget.show_license.connect(self.license_widget.toggle)
         self.header_widget.show_whatsnew.connect(self.whatsnew_widget.toggle)
+        self.header_widget.show_documentation.connect(self.show_documentation)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
@@ -196,6 +198,9 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
         self.gui_server.popup_signal.connect(self.popup_wall_widget.add_custom_popup)
+
+    def show_documentation(self):
+        webbrowser.open_new_tab(ressources._documentation_url_)
 
     def show_pywizard(self):
         if sys.argv[0].endswith('.py'):

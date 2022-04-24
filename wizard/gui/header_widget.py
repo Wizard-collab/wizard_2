@@ -30,6 +30,7 @@ class header_widget(QtWidgets.QFrame):
     show_pywizard = pyqtSignal(object)
     show_license = pyqtSignal(object)
     show_whatsnew = pyqtSignal(object)
+    show_documentation = pyqtSignal(object)
     close_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -101,6 +102,7 @@ class header_widget(QtWidgets.QFrame):
         self.project_preferences_action.triggered.connect(self.show_project_preferences.emit)
         self.production_manager_action.triggered.connect(self.show_production_manager.emit)
         self.groups_manager_action.triggered.connect(self.show_groups_manager.emit)
+        self.documentation_action.triggered.connect(self.show_documentation.emit)
 
     def change_user(self):
         self.user_log_widget = user_log_widget.user_log_widget()

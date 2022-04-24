@@ -32,6 +32,8 @@ import os
 # Wizard modules
 from wizard.core import path_utils
 
+_documentation_url_ = 'http://93.19.210.30/documentation_2/index.html'
+
 # Softwares
 _maya_ = 'maya'
 _guerilla_render_ = 'guerilla_render'
