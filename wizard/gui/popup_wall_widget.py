@@ -17,6 +17,7 @@ from wizard.core import site
 from wizard.core import image
 from wizard.core import game
 from wizard.core import project
+from wizard.core import assets
 from wizard.core import environment
 from wizard.core import path_utils
 from wizard.vars import ressources
