@@ -397,14 +397,21 @@ def create_references_from_variant_id(work_env_id, variant_id):
     export_rows = project.get_variant_export_childs(variant_id)
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     stage = project.get_stage_data(stage_id, 'name')
+
     if export_rows is not None:
         if stage in [assets_vars._modeling_, assets_vars._layout_]:
             export_rows = [export_rows[0]]
+        at_least_one = False
         for export_row in export_rows:
             export_version_id = project.get_default_export_version(export_row['id'], 'id')
             if export_version_id:
+                at_least_one = True
                 create_reference(work_env_id, export_version_id)
-        return 1
+        if at_least_one:
+            return 1
+        else:
+            logger.warning('No export found')
+            return None
     else:
         return None
 
@@ -1109,6 +1116,8 @@ def string_to_instance(string):
     return (instance_type, instance_id)
 
 def string_to_work_instance(string):
+    instance_type = None
+    instance_id = None
     instances_list = string.split('/')
     if len(instances_list) == 6:
         instance_type = 'work_env'
@@ -1122,5 +1131,7 @@ def string_to_work_instance(string):
         _, variant_id = string_to_instance(('/').join(instances_list))
         work_env_id = project.get_variant_work_env_child_by_name(variant_id, work_env_name, 'id')
         instance_id = project.get_work_version_by_name(work_env_id, work_version_name, 'id')
+    else:
+        logger.warning('The given string is not a work instance')
 
     return (instance_type, instance_id)

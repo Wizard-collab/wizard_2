@@ -187,6 +187,7 @@ class groups_manager_widget(QtWidgets.QWidget):
                 self.current_group_changed()
             else:
                 self.references_widget.refresh()
+                self.update_color()
 
 class group_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):

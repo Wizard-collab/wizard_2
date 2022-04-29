@@ -34,6 +34,7 @@ import logging
 
 # Wizard modules
 from wizard import core
+from wizard import gui
 logger = logging.getLogger(__name__)
 
 class site:
@@ -62,7 +63,8 @@ class user:
 
 	def set(self, user_name, password):
 		# Log a user
-		return core.user.log_user(user_name, password)
+		if core.user.log_user(user_name, password):
+			gui.gui_server.restart_ui()
 
 	def get(self):
 		# Return the current user
@@ -83,7 +85,8 @@ class project:
 
 	def set(self, project_name, project_password):
 		# Log a project
-		return core.user.log_project(project_name, project_password)
+		if core.user.log_project(project_name, project_password):
+			gui.gui_server.restart_ui()
 
 	def name(self):
 		# Return the current project name
@@ -156,6 +159,77 @@ class assets:
 					string_work_env = core.assets.instance_to_string(('work_env',
 																		work_env_id))
 		return string_work_env
+
+	# Group commands
+
+	def create_group(self, name):
+		# Create a new group with the given name
+		return core.assets.create_group(name)
+
+	def modify_group_color(self, group_name, color):
+		# Modify the given group color with the given color
+		success = None
+		group_id = core.project.get_group_by_name(group_name, 'id')
+		if group_id:
+			success = core.project.modify_group_color(group_id, color)
+		return success
+
+	def delete_group(self, group_name):
+		# Delete the given group
+		success = None
+		group_id = core.project.get_group_by_name(group_name, 'id')
+		if group_id:
+			success = core.assets.remove_group(group_id)
+		return success
+
+	# References commands
+
+	def create_reference(self, destination_work_env, variant_to_reference):
+		# Reference the given variant in the given work env
+		new_references = None
+		dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
+		orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+		if work_env_id and variant_id:
+			old_references = core.project.get_references(work_env_id, 'namespace')
+			core.assets.create_references_from_variant_id(work_env_id, variant_id)
+			new_references = list(set(core.project.get_references(work_env_id, 'namespace')) - set(old_references))
+		return new_references
+
+	def get_references(self, work_env):
+		# Return the work environment references as a list of namespaces
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			return core.project.get_references(work_env_id, 'namespace')
+		else:
+			return None
+
+	def remove_reference(self, work_env, reference):
+		# Remove the given reference from the work environment
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
+			if reference_id:
+				return core.assets.remove_reference(reference_id)
+
+	def set_reference_as_default(self, work_env, reference):
+		# Modify the given reference to match the default export version
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
+			if reference_id:
+				return core.assets.set_reference_last_version(reference_id)
+
+	def modify_reference_auto_update(self, work_env, reference, auto_update=True):
+		# Modify the auto update option of the given reference
+		if auto_update:
+			auto_update = 1
+		else:
+			auto_update = 0
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
+			if reference_id:
+				return core.project.modify_reference_auto_update(reference_id, auto_update)
 
 	# Archive commands
 
@@ -273,6 +347,22 @@ class launch:
 			if last_work_version_id:
 				core.launch.launch_work_version(last_work_version_id[0])
 
+	def lock_work_env(self, work_env):
+		# Lock the given work environment for the current user
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			core.project.set_work_env_lock(work_env_id, 1)
+
+	def unlock_work_env(self, work_env):
+		# Unlock the given work environment if it is locked by the current user
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			core.project.set_work_env_lock(work_env_id, 0)
+
+	def unlock_all(self):
+		# Unlock all the work environments locked by the current user
+		core.project.unlock_all()
+
 	def work_version(self, work_version):
 		# Run the given work version related software
 		instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
@@ -303,9 +393,50 @@ class team:
 		# Refresh the project team interfaces
 		core.team_client.refresh_team(core.environment.get_team_dns())
 
+class ui:
+	def __init__(self):
+		pass
+
+	def raise_ui(self):
+		# Raise the wizard window
+		gui.gui_server.raise_ui()
+
+	def restart_ui(self):
+		# Restart wizard
+		gui.gui_server.restart_ui()
+
+	def refresh_ui(self):
+		# Refresh the interface
+		gui.gui_server.refresh_ui()
+
+	def focus_asset(self, asset):
+		# Focus on the given asset in the project tree
+		instance_type, instance_id = core.assets.string_to_instance(asset)
+		if instance_type == 'asset':
+			gui.gui_server.focus_instance((instance_type, instance_id))
+
+	def focus_stage(self, stage):
+		# Focus on the given stage in the project tree
+		instance_type, instance_id = core.assets.string_to_instance(stage)
+		if instance_type == 'stage':
+			gui.gui_server.focus_instance((instance_type, instance_id))
+
+	def focus_variant(self, variant):
+		# Focus on the given variant in wizard
+		instance_type, instance_id = core.assets.string_to_instance(variant)
+		if instance_type == 'variant':
+			gui.gui_server.focus_instance((instance_type, instance_id))
+
+	def focus_work_version(self, work_version):
+		# Focus on the given work version in the work versions tab
+		instance_type, instance_id = core.assets.string_to_work_instance(work_version)
+		if instance_type == 'work_version':
+			gui.gui_server.focus_work_version(instance_id)
+
 site = site()
 user = user()
 project = project()
 assets = assets()
 launch = launch()
 team = team()
+ui = ui()

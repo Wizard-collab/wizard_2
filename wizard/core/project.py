@@ -45,6 +45,7 @@
 #                              the additionnal scripts paths)
 
 # Python modules
+import re
 import os
 import time
 import json
@@ -994,6 +995,18 @@ def get_reference_data(reference_id, column='*'):
         logger.error("Reference not found")
         return None
 
+def get_reference_by_namespace(work_env_id, namespace, column='*'):
+    reference_rows = db_utils.get_row_by_multiple_data('project',
+                                                        'references_data',
+                                                        ('work_env_id', 'namespace'),
+                                                        (work_env_id, namespace),
+                                                        column)
+    if reference_rows and len(reference_rows) >= 1:
+        return reference_rows[0]
+    else:
+        logger.error("Reference not found")
+        return None
+
 def modify_reference_variant(reference_id, variant_id):
     exports_list = get_variant_export_childs(variant_id, 'id')
     if exports_list is not None and exports_list != []:
@@ -1155,7 +1168,8 @@ def set_work_env_lock(work_env_id, lock=1):
     else:
         return None
 
-def unlock_all_by_user(user_id):
+def unlock_all():
+    user_id = site.get_user_row_by_name(environment.get_user(), 'id')
     work_env_ids = get_user_locks(user_id, 'id')
     for work_env_id in work_env_ids:
         set_work_env_lock(work_env_id, 0)
@@ -1777,13 +1791,29 @@ def get_group_data(group_id, column='*'):
         logger.error("Group not found")
         return None
 
+def get_group_by_name(name, column='*'):
+    groups_rows = db_utils.get_row_by_column_data('project', 
+                                                    'groups', 
+                                                    ('name', name), 
+                                                    column)
+    if groups_rows and len(groups_rows) >= 1:
+        return groups_rows[0]
+    else:
+        logger.error("Group not found")
+        return None
+
 def modify_group_color(group_id, color):
-    success = db_utils.update_data('project',
-                        'groups',
-                        ('color', color),
-                        ('id', group_id))
-    if success:
-        logger.info('Group color modified')
+    success = None
+    match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', color)
+    if match:                      
+        success = db_utils.update_data('project',
+                            'groups',
+                            ('color', color),
+                            ('id', group_id))
+        if success:
+            logger.info('Group color modified')
+    else:
+        logger.warning(f"{color} is not a valid hex color code")
     return success
 
 def remove_group(group_id):

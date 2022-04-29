@@ -121,8 +121,7 @@ class locks_widget(QtWidgets.QWidget):
         self.refresh_info_widget()
 
     def unlock_all(self):
-        user_id = site.get_user_row_by_name(environment.get_user(), 'id')
-        project.unlock_all_by_user(user_id)
+        project.unlock_all()
         gui_server.refresh_ui()
 
     def remove_work_env(self, work_env_id):
