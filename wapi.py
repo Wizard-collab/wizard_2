@@ -93,11 +93,6 @@ class project:
 		# Return the current project path
 		return core.environment.get_project_path()
 
-	def set_software_path(self, software, path):
-		software_id = core.assets.get_software_id_by_name(software)
-		if software_id:
-			core.project.set_software_path(software_id, path)
-
 class assets:
 	def __init__(self):
 		pass
@@ -123,11 +118,6 @@ class assets:
 				string_asset = core.assets.instance_to_string(('asset',
 																asset_id))
 		return string_asset
-
-	def create_shot(self, parent, name):
-		# The parent argument should look like
-		# "sequences/Intro"
-		return self.create_asset(parent, name)
 
 	def create_stage(self, parent, stage):
 		# The parent argument should look like
