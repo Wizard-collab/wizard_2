@@ -50,7 +50,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         if self.estimation_widget.exec_() == QtWidgets.QDialog.Accepted:
             seconds = self.estimation_widget.hours*3600
             assets.modify_variant_estimation(self.variant_id, seconds)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -325,13 +325,13 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     assets.modify_variant_state(self.variant_id, state, comment)
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
 
     def modify_assignment(self, user_name):
         if self.variant_id is not None:
             if self.apply_assignment_modification:
                 assets.modify_variant_assignment(self.variant_id, user_name)
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
 
     def add_comment(self):
         if self.variant_id is not None:
@@ -339,7 +339,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                 comment = self.comment_widget.comment
                 assets.add_variant_comment(self.variant_id, comment)
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
 
     def change_count(self):
         self.clear_all_tracking_events()

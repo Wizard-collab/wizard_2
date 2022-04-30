@@ -60,7 +60,7 @@ def archive_versions(version_ids):
 	command += "	assets.archive_version(version_id)\n"
 	command += "	percent+=percent_step\n"
 	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_ui()\n"
+	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
@@ -78,7 +78,7 @@ def archive_export_versions(export_version_ids):
 	command += "	assets.archive_export_version(export_version_id)\n"
 	command += "	percent+=percent_step\n"
 	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_ui()\n"
+	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
@@ -96,7 +96,7 @@ def archive_exports(export_ids):
 	command += "	assets.archive_export(export_id)\n"
 	command += "	percent+=percent_step\n"
 	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_ui()\n"
+	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
@@ -110,7 +110,7 @@ def archive_asset(asset_id):
 	command += "print('wizard_task_percent:0')\n"
 	command += f"assets.archive_asset({asset_id})\n"
 	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_ui()\n"
+	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
@@ -124,7 +124,7 @@ def archive_category(category_id):
 	command += "print('wizard_task_percent:0')\n"
 	command += f"assets.archive_category({category_id})\n"
 	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_ui()\n"
+	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
@@ -138,7 +138,7 @@ def archive_stage(stage_id):
 	command += "print('wizard_task_percent:0')\n"
 	command += f"assets.archive_stage({stage_id})\n"
 	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_ui()\n"
+	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()

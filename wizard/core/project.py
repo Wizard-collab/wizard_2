@@ -1887,6 +1887,18 @@ def get_referenced_group_data(referenced_group_id, column='*'):
         logger.error("Referenced group not found")
         return None
 
+def get_referenced_group_by_namespace(work_env_id, namespace, column='*'):
+    referenced_groups_rows = db_utils.get_row_by_multiple_data('project', 
+                                                    'referenced_groups_data', 
+                                                    ('work_env_id', 'namespace'), 
+                                                    (work_env_id, namespace), 
+                                                    column)
+    if referenced_groups_rows and len(referenced_groups_rows) >= 1:
+        return referenced_groups_rows[0]
+    else:
+        logger.error("Referenced group not found")
+        return None
+
 def create_grouped_reference(group_id, export_version_id, namespace, count=None):
     reference_id = None
 
@@ -1940,6 +1952,18 @@ def get_grouped_reference_data(grouped_reference_id, column='*'):
     grouped_references_rows = db_utils.get_row_by_column_data('project', 
                                                     'grouped_references_data', 
                                                     ('id', grouped_reference_id), 
+                                                    column)
+    if grouped_references_rows and len(grouped_references_rows) >= 1:
+        return grouped_references_rows[0]
+    else:
+        logger.error("Grouped reference not found")
+        return None
+
+def get_grouped_reference_by_namespace(group_id, namespace, column='*'):
+    grouped_references_rows = db_utils.get_row_by_multiple_data('project', 
+                                                    'grouped_references_data', 
+                                                    ('group_id', 'namespace'), 
+                                                    (group_id, namespace), 
                                                     column)
     if grouped_references_rows and len(grouped_references_rows) >= 1:
         return grouped_references_rows[0]

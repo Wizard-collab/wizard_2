@@ -125,7 +125,7 @@ class groups_manager_widget(QtWidgets.QWidget):
 
     def modify_group_color(self, color):
         project.modify_group_color(self.group_id, color)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def update_button_color(self, color):
         self.color_button.setStyleSheet(f'background-color:{color};')
@@ -145,7 +145,7 @@ class groups_manager_widget(QtWidgets.QWidget):
         if self.group_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
             group_name = self.group_creation_widget.name_field.text()
             new_group_id = assets.create_group(group_name)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
             self.groups_comboBox.setCurrentText(group_name)
 
     def delete_group(self):
@@ -153,7 +153,7 @@ class groups_manager_widget(QtWidgets.QWidget):
         if current_group != '':
             group_id = self.groups[current_group]['id']
             assets.remove_group(group_id)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def remove_group(self, group):
         if group in self.groups.keys():

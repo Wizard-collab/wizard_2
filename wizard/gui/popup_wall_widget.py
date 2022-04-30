@@ -183,7 +183,7 @@ class popup_save_widget(QtWidgets.QFrame):
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
         assets.modify_version_comment(self.version_id, comment)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
         self.time_out.emit(self.version_id)
 
     def build_ui(self):
@@ -319,7 +319,7 @@ class popup_event_widget(QtWidgets.QFrame):
         comment = self.comment_textEdit.toPlainText()
         export_version_id = self.event_row['data']
         project.update_export_version_data(export_version_id, ('comment', comment))
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
         self.time_out.emit(self.event_row['id'])
 
     def action(self):

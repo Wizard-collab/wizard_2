@@ -75,7 +75,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.select_all_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Ctrl+A'), self)
         self.select_all_sc.activated.connect(self.select_all)
         self.list_view.clicked.connect(self.deselect_all)
-        self.refresh_ui_button.clicked.connect(gui_server.refresh_ui)
+        self.refresh_ui_button.clicked.connect(gui_server.refresh_team_ui)
 
     def apply_search(self):
         search = self.search_bar.text()
@@ -404,7 +404,7 @@ class production_manager_widget(QtWidgets.QWidget):
             if variant_id in self.selection:
                 if (self.variant_ids[variant_id]['row']['state'] != state) and (self.variant_ids[variant_id]['widget'].isVisible()):
                     assets.modify_variant_state(variant_id, state)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def modify_selection_assignment(self, assignment):
         variant_ids = list(self.variant_ids.keys())
@@ -412,7 +412,7 @@ class production_manager_widget(QtWidgets.QWidget):
             if variant_id in self.selection:
                 if (self.variant_ids[variant_id]['row']['assignment'] != assignment) and (self.variant_ids[variant_id]['widget'].isVisible()):
                     assets.modify_variant_assignment(variant_id, assignment)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
 class custom_list_view(QtWidgets.QTreeWidget):
 
@@ -484,7 +484,7 @@ class image_widget(QtWidgets.QWidget):
         if action is not None:
             if action == default_preview_action:
                 assets.set_asset_preview(self.preview_row['asset_id'], None)
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
             elif action == custom_preview_action:
                 self.set_preview()
 
@@ -497,7 +497,7 @@ class image_widget(QtWidgets.QWidget):
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
                 assets.set_asset_preview(self.preview_row['asset_id'], image_file)
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
             else:
                 logger.warning('{} is not a valid image file...'.format(image_file))
 
@@ -650,7 +650,7 @@ class variant_widget(QtWidgets.QFrame):
         if work_versions_ids is not None:
             if len(work_versions_ids) >= 1:
                 launch.launch_work_version(work_versions_ids[-1])
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
             else:
                 logger.warning('No version to launch')
         else:

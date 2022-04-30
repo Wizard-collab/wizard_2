@@ -96,7 +96,7 @@ class versions_widget(QtWidgets.QWidget):
     def merge_files(self, files=[]):
         for file in files:
             assets.merge_file(file, self.work_env_id, "Manually merged file", 0)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def change_work_env(self, work_env_id):
         self.check_existence_thread.running = False
@@ -527,7 +527,7 @@ class versions_widget(QtWidgets.QWidget):
                     comment = self.comment_widget.comment
                     for item in items:
                         assets.modify_version_comment(item.version_row['id'], comment)
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
 
     def version_changed(self):
         selection = self.get_selection()
@@ -621,14 +621,14 @@ class versions_widget(QtWidgets.QWidget):
         if selection is not None:
             for item in selection:
                 assets.duplicate_version(item.version_row['id'], f"Duplicate from version {item.version_row['name']}")
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def launch(self):
         items = self.get_selection()
         if items is not None:
             if len(items) == 1:
                 launch.launch_work_version(items[0].version_row['id'])
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
 
     def archive(self):
         items = self.get_selection()
@@ -665,7 +665,7 @@ class versions_widget(QtWidgets.QWidget):
     def add_empty_version(self):
         if self.work_env_id is not None:
             if assets.add_version(self.work_env_id, 'Empty version', 0):
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
 
     def open_folder(self):
         if self.work_env_id is not None:

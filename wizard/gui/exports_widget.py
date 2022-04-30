@@ -476,7 +476,7 @@ class exports_widget(QtWidgets.QWidget):
                                                         item.export_version_row['id'])
             else:
                 project.set_default_export_version(item.export_row['id'], None)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def open_destination_manager(self):
         selection = self.list_view.selectedItems()
@@ -498,7 +498,7 @@ class exports_widget(QtWidgets.QWidget):
                     comment = self.comment_widget.comment
                     for item in selection:
                         assets.modify_export_version_comment(item.export_version_row['id'], comment)
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
 
     def launch_work_version(self):
         selection = self.list_view.selectedItems()
@@ -527,7 +527,7 @@ class exports_widget(QtWidgets.QWidget):
                 export_name = self.manual_export_widget.export_name
                 comment = self.manual_export_widget.comment
                 if assets.merge_file_as_export_version(export_name, files, self.variant_id, comment):
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
 
     def focus_export_version(self, export_version_id):
         if export_version_id in self.export_versions_ids.keys():

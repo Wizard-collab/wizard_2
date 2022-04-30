@@ -147,12 +147,12 @@ class launcher_widget(QtWidgets.QFrame):
     def toggle_lock(self):
         if self.work_env_id:
             project.toggle_lock(self.work_env_id)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def launch(self):
         if self.work_env_id:
             launch.launch_work_version(self.version_row['id'])
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def connect_functions(self):
         self.version_comboBox.currentTextChanged.connect(self.version_changed)
@@ -164,7 +164,7 @@ class launcher_widget(QtWidgets.QFrame):
     def kill(self):
         if self.work_env_id:
             launch.kill(self.work_env_id)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def show_screen_shot(self):
         if self.version_row is not None:

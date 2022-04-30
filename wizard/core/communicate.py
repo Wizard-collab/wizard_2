@@ -121,7 +121,7 @@ def add_version(work_env_id):
     if version_id:
         version_path = project.get_version_data(version_id,
                                                         'file_path')
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
         gui_server.save_popup(version_id)
         return (version_path, version_id)
     else:
@@ -138,7 +138,7 @@ def add_export_version(export_name, files, work_env_id, version_id, comment):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     export_version_id = assets.add_export_version(export_name, files, variant_id, version_id, comment, execute_xp=False)
     export_dir = assets.get_export_version_path(export_version_id)
-    gui_server.refresh_ui()
+    gui_server.refresh_team_ui()
     return export_dir
 
 def get_references(work_env_id):
@@ -157,7 +157,7 @@ def get_frame_range(work_env_id):
 
 def modify_reference_LOD(work_env_id, LOD, namespaces_list):
     assets.modify_reference_LOD(work_env_id, LOD, namespaces_list)
-    gui_server.refresh_ui()
+    gui_server.refresh_team_ui()
     return None
 
 def get_image_format():

@@ -108,7 +108,7 @@ class shelf_widget(QtWidgets.QFrame):
             self.create_tool_widget.show()
         elif action == separator_action:
             shelf.create_separator()
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def edit_script(self, script_id):
         self.create_tool_widget = create_tool_widget.create_tool_widget(script_id=script_id)
@@ -116,7 +116,7 @@ class shelf_widget(QtWidgets.QFrame):
 
     def delete_script(self, script_id):
         if project.delete_shelf_script(script_id):
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def toggle_edit_mode(self):
         if self.edit_mode:
@@ -137,7 +137,7 @@ class shelf_widget(QtWidgets.QFrame):
             position = self.buttons_layout.indexOf(self.scripts_ids[script_id]['widget'])
             if position != self.scripts_ids[script_id]['row']['position']:
                 project.modify_shelf_script_position(script_id, position)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def move_checked_left(self):
         positions_dic = self.get_positions()

@@ -126,12 +126,12 @@ def try_connection():
         return None
 
 def refresh_ui():
-    refresh_team_ui()
     signal_dic = dict()
     signal_dic['function'] = 'refresh'
     send_signal(signal_dic)
 
 def refresh_team_ui():
+    refresh_ui()
     signal_dic = dict()
     signal_dic['function'] = 'refresh_team'
     send_signal(signal_dic)

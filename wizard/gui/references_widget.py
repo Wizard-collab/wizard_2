@@ -155,16 +155,16 @@ class references_widget(QtWidgets.QWidget):
             for variant_id in variant_ids:
                 if self.context == 'work_env':
                     if assets.create_references_from_variant_id(self.parent_instance_id, variant_id):
-                        gui_server.refresh_ui()
+                        gui_server.refresh_team_ui()
                 else:
                     if assets.create_grouped_references_from_variant_id(self.parent_instance_id, variant_id):
-                        gui_server.refresh_ui()
+                        gui_server.refresh_team_ui()
 
     def create_referenced_groups(self, groups_ids):
         if self.context == 'work_env':
             for group_id in groups_ids:
                 assets.create_referenced_group(self.parent_instance_id, group_id)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def change_work_env(self, work_env_id):
         self.reference_ids = dict()
@@ -263,7 +263,7 @@ class references_widget(QtWidgets.QWidget):
             elif selected_item.type == 'group':
                 referenced_group_id = selected_item.referenced_group_row['id']
                 assets.remove_referenced_group(referenced_group_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def update_selection(self):
         selected_items = self.list_view.selectedItems()
@@ -274,7 +274,7 @@ class references_widget(QtWidgets.QWidget):
                     assets.set_reference_last_version(reference_id)
                 else:
                     assets.set_grouped_reference_last_version(reference_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def update_all(self):
         for reference_id in self.reference_ids.keys():
@@ -282,7 +282,7 @@ class references_widget(QtWidgets.QWidget):
                 assets.set_reference_last_version(reference_id)
             else:
                 assets.set_grouped_reference_last_version(reference_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
@@ -292,7 +292,7 @@ class references_widget(QtWidgets.QWidget):
                 export_version_row = project.get_export_version_data(export_version_id)
                 if export_version_row['work_version_id'] is not None:
                     launch.launch_work_version(export_version_row['work_version_id'])
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def focus_on_export_version(self):
         selected_items = self.list_view.selectedItems()
@@ -309,7 +309,7 @@ class references_widget(QtWidgets.QWidget):
                 self.comment_widget = comment_widget.comment_widget()
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     assets.modify_variant_state(variant_id, 'error', self.comment_widget.comment)
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
 
     def remove_reference_item(self, reference_id):
         if reference_id in self.reference_ids.keys():
@@ -621,28 +621,28 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
                 project.modify_reference_auto_update(self.reference_row['id'], auto_update)
             else:
                 project.modify_grouped_reference_auto_update(self.reference_row['id'], auto_update)
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def modify_version(self, export_version_id):
         if self.context == 'work_env':
             project.update_reference(self.reference_row['id'], export_version_id)
         else:
             project.update_grouped_reference(self.reference_row['id'], export_version_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def modify_export(self, export_id):
         if self.context == 'work_env':
             project.modify_reference_export(self.reference_row['id'], export_id)
         else:
             project.modify_grouped_reference_export(self.reference_row['id'], export_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def modify_variant(self, variant_id):
         if self.context == 'work_env':
             project.modify_reference_variant(self.reference_row['id'], variant_id)
         else:
             project.modify_grouped_reference_variant(self.reference_row['id'], variant_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
 class editable_data_widget(QtWidgets.QFrame):
 

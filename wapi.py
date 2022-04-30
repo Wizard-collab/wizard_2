@@ -195,11 +195,43 @@ class assets:
 			new_references = list(set(core.project.get_references(work_env_id, 'namespace')) - set(old_references))
 		return new_references
 
+	def create_grouped_reference(self, destination_group, variant_to_reference):
+		# Reference the given variant in the given group
+		new_references = None
+		group_id = core.project.get_group_by_name(destination_group, 'id')
+		orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+		if group_id and variant_id:
+			core.assets.create_grouped_references_from_variant_id(group_id, variant_id)
+		return new_references
+
+	def create_referenced_group(self, destination_work_env, group):
+		# Reference the given group in the given destination work environment
+		dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
+		group_id = core.project.get_group_by_name(group, 'id')
+		if work_env_id and group_id:
+			core.assets.create_referenced_group(work_env_id, group_id)
+
 	def get_references(self, work_env):
 		# Return the work environment references as a list of namespaces
 		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
 		if work_env_id:
 			return core.project.get_references(work_env_id, 'namespace')
+		else:
+			return None
+
+	def get_references_from_group(self, group):
+		# Return the group references as a list of namespaces
+		group_id = core.project.get_group_by_name(group, 'id')
+		if group_id:
+			return core.project.get_grouped_references(group_id, 'namespace')
+		else:
+			return None
+
+	def get_referenced_groups(self, work_env):
+		# Return the work environment referenced groups as a list of namespaces
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			return core.project.get_referenced_groups(work_env_id, 'namespace')
 		else:
 			return None
 
@@ -211,6 +243,22 @@ class assets:
 			if reference_id:
 				return core.assets.remove_reference(reference_id)
 
+	def remove_reference_from_group(self, group, reference):
+		# Remove the given reference from the group
+		group_id = core.project.get_group_by_name(group, 'id')
+		if group_id:
+			grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
+			if grouped_reference_id:
+				return core.assets.remove_grouped_reference(grouped_reference_id)
+
+	def remove_referenced_group(self, work_env, referenced_group):
+		# Remove the given referenced group from the work environment
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			referenced_group_id = core.project.get_referenced_group_by_namespace(work_env_id, referenced_group, 'id')
+			if referenced_group_id:
+				return core.assets.remove_referenced_group(referenced_group_id)
+
 	def set_reference_as_default(self, work_env, reference):
 		# Modify the given reference to match the default export version
 		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
@@ -218,6 +266,14 @@ class assets:
 			reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
 			if reference_id:
 				return core.assets.set_reference_last_version(reference_id)
+
+	def set_grouped_reference_as_default(self, group, reference):
+		# Modify the given reference to match the default export version
+		group_id = core.project.get_group_by_name(group, 'id')
+		if group_id:
+			grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
+			if grouped_reference_id:
+				return core.assets.set_grouped_reference_last_version(grouped_reference_id)
 
 	def modify_reference_auto_update(self, work_env, reference, auto_update=True):
 		# Modify the auto update option of the given reference
@@ -230,6 +286,18 @@ class assets:
 			reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
 			if reference_id:
 				return core.project.modify_reference_auto_update(reference_id, auto_update)
+
+	def modify_grouped_reference_auto_update(self, group, reference, auto_update=True):
+		# Modify the auto update option of the given reference
+		if auto_update:
+			auto_update = 1
+		else:
+			auto_update = 0
+		group_id = core.project.get_group_by_name(group, 'id')
+		if group_id:
+			grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
+			if grouped_reference_id:
+				return core.project.modify_grouped_reference_auto_update(grouped_reference_id, auto_update)
 
 	# Archive commands
 
@@ -347,22 +415,6 @@ class launch:
 			if last_work_version_id:
 				core.launch.launch_work_version(last_work_version_id[0])
 
-	def lock_work_env(self, work_env):
-		# Lock the given work environment for the current user
-		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
-		if work_env_id:
-			core.project.set_work_env_lock(work_env_id, 1)
-
-	def unlock_work_env(self, work_env):
-		# Unlock the given work environment if it is locked by the current user
-		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
-		if work_env_id:
-			core.project.set_work_env_lock(work_env_id, 0)
-
-	def unlock_all(self):
-		# Unlock all the work environments locked by the current user
-		core.project.unlock_all()
-
 	def work_version(self, work_version):
 		# Run the given work version related software
 		instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
@@ -384,6 +436,22 @@ class launch:
 				running_work_envs.append(core.assets.instance_to_string(('work_env',
 																			work_env_id)))
 		return running_work_envs
+
+	def lock_work_env(self, work_env):
+		# Lock the given work environment for the current user
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			core.project.set_work_env_lock(work_env_id, 1)
+
+	def unlock_work_env(self, work_env):
+		# Unlock the given work environment if it is locked by the current user
+		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+		if work_env_id:
+			core.project.set_work_env_lock(work_env_id, 0)
+
+	def unlock_all(self):
+		# Unlock all the work environments locked by the current user
+		core.project.unlock_all()
 
 class team:
 	def __init__(self):

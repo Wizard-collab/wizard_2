@@ -70,13 +70,13 @@ class create_tool_widget(QtWidgets.QWidget):
         if self.script_id is None:
             if shelf.create_project_script(name, script, help, icon=self.icon, only_subprocess=only_subprocess):
                 self.close()
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
         else:
             with open(self.script_row['py_file'], 'w') as f:
                 f.write(script)
             if shelf.edit_project_script(self.script_id, help, icon=self.icon, only_subprocess=only_subprocess):
                 self.close()
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
 
     def modify_icon(self):
         menu = gui_utils.QMenu()

@@ -122,14 +122,14 @@ class destination_manager(QtWidgets.QWidget):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
             project.remove_reference(selected_item.reference_row['id'])
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def update_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
             reference_id = selected_item.reference_row['id']
             assets.set_reference_last_version(reference_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def update_reference(self, data_tuple):
         if data_tuple[0] in self.references_ids.keys():

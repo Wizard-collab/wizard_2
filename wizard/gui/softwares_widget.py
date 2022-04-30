@@ -118,7 +118,7 @@ class softwares_widget(QtWidgets.QWidget):
 
     def kill_all(self):
         launch.kill_all()
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def remove_work_env(self, work_env_id):
         if work_env_id in self.work_env_ids.keys():
@@ -170,7 +170,7 @@ class work_env_widget(QtWidgets.QFrame):
 
     def kill(self):
         launch.kill(self.work_env_id)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def build_ui(self):
         self.setObjectName('item_widget_frame')

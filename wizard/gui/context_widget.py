@@ -205,7 +205,7 @@ class context_widget(QtWidgets.QFrame):
                 variant_name = self.variant_creation_widget.name_field.text()
                 new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
                 project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
-                gui_server.refresh_ui()
+                gui_server.refresh_team_ui()
 
     def init_work_env(self):
         if self.work_env_row is None:
@@ -214,7 +214,7 @@ class context_widget(QtWidgets.QFrame):
             work_env_id = assets.create_work_env(software_id, self.variant_row['id'])
             project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
             self.refresh_work_envs_hard()
-            gui_server.refresh_ui()
+            gui_server.refresh_team_ui()
 
     def show_init_work_env_button(self):
         if not self.init_work_env_button.isVisible():

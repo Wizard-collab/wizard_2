@@ -450,7 +450,7 @@ class tree_widget(QtWidgets.QFrame):
                 new_stage_id = assets.create_stage(stage_name, parent_id)
                 if new_stage_id:
                     self.refresh()
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
 
         elif item.instance_type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self, title='Create asset')
@@ -464,7 +464,7 @@ class tree_widget(QtWidgets.QFrame):
                 new_asset_id = assets.create_asset(asset_name, parent_id, inframe, outframe, preroll, postroll)
                 if new_asset_id is not None:
                     self.refresh()
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
         elif item.instance_type == 'category_creation':
             self.instance_creation_widget = instance_creation_widget(self, request_frames=None, title='Create category')
             if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
@@ -473,7 +473,7 @@ class tree_widget(QtWidgets.QFrame):
                 new_category_id = assets.create_category(category_name, parent_id)
                 if new_category_id is not None:
                     self.refresh()
-                    gui_server.refresh_ui()
+                    gui_server.refresh_team_ui()
         elif item.instance_type == 'stage':
             self.launch_stage_signal.emit(1)
 
