@@ -338,22 +338,32 @@ def archive_variant(variant_id):
         return None
 
 def modify_variant_state(variant_id, state, comment=''):
-    project.set_variant_data(variant_id, 'state', state)
-    if comment is not None and comment != '':
-        project.set_variant_data(variant_id, 'tracking_comment', comment)
-    asset_tracking.add_state_switch_event(variant_id, state, comment)
+    if state in assets_vars._asset_states_list_:
+        project.set_variant_data(variant_id, 'state', state)
+        if comment is not None and comment != '':
+            project.set_variant_data(variant_id, 'tracking_comment', comment)
+        asset_tracking.add_state_switch_event(variant_id, state, comment)
+    else:
+        logger.warning(f"Unknown state {state}")
 
 def add_variant_comment(variant_id, comment):
     project.set_variant_data(variant_id, 'tracking_comment', comment)
     asset_tracking.add_comment_event(variant_id, comment)
 
 def modify_variant_assignment(variant_id, user_name):
-    project.set_variant_data(variant_id, 'assignment', user_name)
-    asset_tracking.add_assignment_event(variant_id, user_name)
+    user_id = site.get_user_row_by_name(user_name, 'id')
+    if user_id in project.get_users_ids_list():
+        project.set_variant_data(variant_id, 'assignment', user_name)
+        asset_tracking.add_assignment_event(variant_id, user_name)
+    else:
+        logger.warning(f"{user_name} never logged into project")
 
 def modify_variant_estimation(variant_id, seconds):
-    project.set_variant_data(variant_id, 'estimated_time', seconds)
-    asset_tracking.add_estimation_event(variant_id, seconds)
+    if type(seconds) == int:
+        project.set_variant_data(variant_id, 'estimated_time', seconds)
+        asset_tracking.add_estimation_event(variant_id, seconds)
+    else:
+        logger.warning(f'{seconds} is not a int')
 
 def add_work_time(work_env_id, work_time):
     project.add_work_time(work_env_id, work_time)

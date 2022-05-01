@@ -201,7 +201,9 @@ class assets:
 		group_id = core.project.get_group_by_name(destination_group, 'id')
 		orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
 		if group_id and variant_id:
+			old_references = core.project.get_grouped_references(group_id, 'namespace')
 			core.assets.create_grouped_references_from_variant_id(group_id, variant_id)
+			new_references = list(set(core.project.get_grouped_references(group_id, 'namespace')) - set(old_references))
 		return new_references
 
 	def create_referenced_group(self, destination_work_env, group):
@@ -403,6 +405,51 @@ class assets:
 			work_versions = core.project.get_work_versions(work_env_id, 'name')
 		return work_versions
 
+class tracking:
+	def __init__(self):
+		pass
+
+	def get_task_assignment(self, variant):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			return core.project.get_variant_data(variant_id, 'assignment')
+
+	def get_task_state(self, variant):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			return core.project.get_variant_data(variant_id, 'state')
+
+	def get_task_work_time(self, variant):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			return core.project.get_variant_data(variant_id, 'work_time')
+
+	def get_task_estimated_time(self, variant):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			return core.project.get_variant_data(variant_id, 'estimated_time')
+
+	def assign_task(self, variant, user):
+		user_id = core.site.get_user_row_by_name(user, 'id')
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if user_id and variant_id:
+			core.assets.modify_variant_assignment(variant_id, user)
+
+	def set_task_state(self, variant, state, comment=''):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			core.assets.modify_variant_state(variant_id, state, comment)
+
+	def estimate_task_time(self, variant, time):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			core.assets.modify_variant_estimation(variant_id, time)	
+
+	def add_task_comment(self, variant, comment):
+		instance_type, variant_id = core.assets.string_to_instance(variant)
+		if variant_id:
+			core.assets.add_variant_comment(variant_id, comment)	
+
 class launch:
 	def __init__(self):
 		pass
@@ -426,6 +473,10 @@ class launch:
 		instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
 		if work_env_id:
 			core.launch.kill(work_env_id)
+
+	def kill_all(self):
+		# Terminate all the running work environments
+		core.launch.kill_all()
 
 	def get_running_work_envs(self):
 		# Return the running work environments related softwares instances
@@ -505,6 +556,7 @@ site = site()
 user = user()
 project = project()
 assets = assets()
+tracking = tracking()
 launch = launch()
 team = team()
 ui = ui()
