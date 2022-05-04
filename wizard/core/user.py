@@ -151,6 +151,7 @@ class user:
                 return 1
             else:
                 environment.set_team_dns(self.prefs_dic[user_vars._team_dns_])
+                logger.info(f"Can't reach team server with this DNS : {self.prefs_dic[user_vars._team_dns_]}")
                 return None
         else:
             logger.info("No team DNS set")

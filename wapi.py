@@ -544,7 +544,19 @@ class team:
 
     def refresh_ui(self):
         # Refresh the project team interfaces
-        core.team_client.refresh_team(core.environment.get_team_dns())
+        if core.user.user().get_team_dns():
+            core.team_client.refresh_team(core.environment.get_team_dns())
+
+    def set_team_DNS(self, host, port):
+        # Set a team server DNS for wizard
+        core.user.user().set_team_dns(host, port)
+
+    def get_team_dns(self):
+        # Return the setted wizard team DNS
+        if core.user.user().get_team_dns():
+            return core.environment.get_team_dns()
+        else:
+            return None
 
 class ui:
     def __init__(self):
