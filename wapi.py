@@ -207,13 +207,35 @@ class assets:
                 if rolls:
                     frange[0] = frange[0]-asset_row['preroll']
                     frange[1] = frange[1]+asset_row['postroll']
-                logger.info(version_id)
 
                 settings_dic = dict()
                 settings_dic['frange'] = frange
                 settings_dic['refresh_assets'] = refresh_assets_in_scene
                 settings_dic['nspace_list'] = namespaces_list
                 settings_dic['stage_to_export'] = stage
+                core.subtasks_library.batch_export(version_id, settings_dic)
+
+    def batch_export_camera(self, work_env, namespaces_list=[], rolls=False, custom_frame_range=None, refresh_assets_in_scene=False):
+        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        if work_env_id and instance_type == 'work_env':
+            version_id = core.project.get_last_work_version(work_env_id, 'id')
+            if version_id:
+                version_id = version_id[0]
+                #stage = core.assets.get_stage_data_from_work_env_id(work_env_id, 'name')
+                asset_row = core.assets.get_asset_data_from_work_env_id(work_env_id)
+                if not custom_frame_range:
+                    frange = [asset_row['inframe'], asset_row['outframe']]
+                else:
+                    frange = custom_frame_range
+                if rolls:
+                    frange[0] = frange[0]-asset_row['preroll']
+                    frange[1] = frange[1]+asset_row['postroll']
+
+                settings_dic = dict()
+                settings_dic['frange'] = frange
+                settings_dic['refresh_assets'] = refresh_assets_in_scene
+                settings_dic['nspace_list'] = namespaces_list
+                settings_dic['stage_to_export'] = 'camera'
                 core.subtasks_library.batch_export(version_id, settings_dic)
 
     # References commands

@@ -20,11 +20,17 @@ import pymel.core as pm
 def main(nspace_list, frange):
     scene = wizard_export.save_or_save_increment()
     try:
+        at_least_one = False
         camrig_references = get_camrig_nspaces()
         if camrig_references:
             for camrig_reference in camrig_references:
                 if camrig_reference['namespace'] in nspace_list:
+                    at_least_one = True
                     export_camera(camrig_reference, frange)
+            if not at_least_one:
+                logger.warning(f"Nothing to export from namespace list : {nspace_list}")
+        else:
+            logger.warning("No camrig references found in wizard description")
     except:
         logger.error(str(traceback.format_exc()))
     finally:
@@ -51,10 +57,13 @@ def export_camera(camrig_reference, frange):
             camera_work_env_id = int(os.environ['wizard_work_env_id'])
         export_GRP_list = get_objects_to_export(camrig_nspace)
         if export_GRP_list:
+            logger.info(f"Exporting {camrig_nspace}")
             additionnal_objects = wizard_export.trigger_before_export_hook('camera')
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
             wizard_export.export('camera', export_name, export_GRP_list, frange, custom_work_env_id = camera_work_env_id)
+        else:
+            logger.warning(f"No objects to export in '{camrig_nspace}:render_set'")
 
 def buid_export_name(asset_name, variant_name, count):
     if variant_name == 'main':

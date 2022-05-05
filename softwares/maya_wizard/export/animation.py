@@ -20,11 +20,17 @@ import pymel.core as pm
 def main(nspace_list, frange):
     scene = wizard_export.save_or_save_increment()
     try:
+        at_least_one = False
         rigging_references = get_rig_nspaces()
         if rigging_references:
             for rigging_reference in rigging_references:
                 if rigging_reference['namespace'] in nspace_list:
+                    at_least_one = True
                     export_animation(rigging_reference, frange)
+            if not at_least_one:
+                logger.warning(f"Nothing to export from namespace list : {nspace_list}")
+        else:
+            logger.warning("No rigging references found in wizard description")
     except:
         logger.error(str(traceback.format_exc()))
     finally:
@@ -47,10 +53,13 @@ def export_animation(rigging_reference, frange):
     if is_referenced(rig_nspace):
         export_GRP_list = get_objects_to_export(rig_nspace)
         if export_GRP_list:
+            logger.info(f"Exporting {rig_nspace}")
             additionnal_objects = wizard_export.trigger_before_export_hook('animation')
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
             wizard_export.export('animation', export_name, export_GRP_list, frange)
+        else:
+            logger.warning(f"No objects to export in '{rig_nspace}:render_set'")
 
 def buid_export_name(asset_name, variant_name, count):
     if variant_name == 'main':
