@@ -160,28 +160,6 @@ class assets:
                                                                         work_env_id))
         return string_work_env
 
-    # Group commands
-
-    def create_group(self, name):
-        # Create a new group with the given name
-        return core.assets.create_group(name)
-
-    def modify_group_color(self, group_name, color):
-        # Modify the given group color with the given color
-        success = None
-        group_id = core.project.get_group_by_name(group_name, 'id')
-        if group_id:
-            success = core.project.modify_group_color(group_id, color)
-        return success
-
-    def delete_group(self, group_name):
-        # Delete the given group
-        success = None
-        group_id = core.project.get_group_by_name(group_name, 'id')
-        if group_id:
-            success = core.assets.remove_group(group_id)
-        return success
-
     # Exports commands
 
     def create_export(self, variant, export_name, files_list, comment=''):
@@ -237,6 +215,28 @@ class assets:
                 settings_dic['nspace_list'] = namespaces_list
                 settings_dic['stage_to_export'] = 'camera'
                 core.subtasks_library.batch_export(version_id, settings_dic)
+
+    # Group commands
+
+    def create_group(self, name):
+        # Create a new group with the given name
+        return core.assets.create_group(name)
+
+    def modify_group_color(self, group_name, color):
+        # Modify the given group color with the given color
+        success = None
+        group_id = core.project.get_group_by_name(group_name, 'id')
+        if group_id:
+            success = core.project.modify_group_color(group_id, color)
+        return success
+
+    def delete_group(self, group_name):
+        # Delete the given group
+        success = None
+        group_id = core.project.get_group_by_name(group_name, 'id')
+        if group_id:
+            success = core.assets.remove_group(group_id)
+        return success
 
     # References commands
 
