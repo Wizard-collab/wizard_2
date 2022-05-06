@@ -315,7 +315,19 @@ class wall_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 
-        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
+        day, hour = tools.convert_time(self.event_row['creation_time'])
+        self.time_label.setText(f"{day} - {hour}")
+
+        if self.event_row['creation_user'] == environment.get_user():
+            self.setLayoutDirection(QtCore.Qt.RightToLeft)
+            self.content_layout.setContentsMargins(0,0,41,0)
+            self.event_title_label.setAlignment(QtCore.Qt.AlignRight)
+            self.user_name_label.setAlignment(QtCore.Qt.AlignRight)
+            self.event_content_label.setAlignment(QtCore.Qt.AlignRight)
+            self.event_additional_content_label.setAlignment(QtCore.Qt.AlignRight)
+            self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-left-radius:6px;}'%profile_color)
+        else:
+            self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-right-radius:6px;}'%profile_color)
 
     def connect_functions(self):
         self.action_button_button.clicked.connect(self.action)
@@ -347,8 +359,11 @@ class wall_event_widget(QtWidgets.QFrame):
         if self.time_widget == None:
             self.time_widget = wall_time_widget(self.event_row['creation_time'])
             self.widget_layout.insertWidget(0, self.time_widget)
+            if self.event_row['creation_user'] == environment.get_user():
+                self.time_widget.setLayoutDirection(QtCore.Qt.LeftToRight)
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.widget_layout = QtWidgets.QVBoxLayout()
         self.widget_layout.setContentsMargins(8,1,8,1)
         self.widget_layout.setSpacing(1)
@@ -370,17 +385,27 @@ class wall_event_widget(QtWidgets.QFrame):
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
+        self.profile_subwidget = QtWidgets.QWidget()
+        self.profile_subwidget.setObjectName('transparent_widget')
+        self.profile_subwidget_layout = QtWidgets.QVBoxLayout()
+        self.profile_subwidget_layout.setContentsMargins(0,0,0,0)
+        self.profile_subwidget_layout.setSpacing(0)
+        self.profile_subwidget.setLayout(self.profile_subwidget_layout)
+        self.header_layout.addWidget(self.profile_subwidget)
+
         self.profile_frame = QtWidgets.QFrame()
         self.profile_frame.setObjectName('wall_profile_frame')
         self.profile_layout = QtWidgets.QHBoxLayout()
         self.profile_layout.setContentsMargins(0,0,0,0)
         self.profile_frame.setLayout(self.profile_layout)
         self.profile_frame.setFixedSize(34,34)
-        self.header_layout.addWidget(self.profile_frame)
+        self.profile_subwidget_layout.addWidget(self.profile_frame)
 
         self.profile_picture = QtWidgets.QLabel()
         self.profile_picture.setFixedSize(30,30)
         self.profile_layout.addWidget(self.profile_picture)
+
+        self.profile_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.title_widget = QtWidgets.QWidget()
         self.title_widget.setObjectName('transparent_widget')
@@ -402,6 +427,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
         self.content_layout.setContentsMargins(41,0,0,0)
@@ -428,6 +454,10 @@ class wall_event_widget(QtWidgets.QFrame):
         self.buttons_layout.setSpacing(2)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.content_layout.addWidget(self.buttons_widget)
+
+        self.time_label = QtWidgets.QLabel()
+        self.time_label.setObjectName('gray_label')
+        self.buttons_layout.addWidget(self.time_label)
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
         

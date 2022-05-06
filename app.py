@@ -60,7 +60,7 @@ from wizard.core import db_utils
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wizard')
 
 class app():
     def __init__(self, project_manager):
@@ -118,6 +118,8 @@ class app():
 
         db_utils.modify_db_name('project', environment.get_project_name())
 
+        start_time = time.time()
+        
         self.loading_widget = loading_widget.loading_widget()
         self.loading_widget.show()
         QtWidgets.QApplication.processEvents()
@@ -131,6 +133,7 @@ class app():
         self.loading_widget.close()
 
         self.main_widget.whatsnew()
+        logger.info(f"Wizard start time : {str(round((time.time()-start_time), 1))}s")
 
     def quit(self):
         if self.db_server:
