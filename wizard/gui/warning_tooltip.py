@@ -71,6 +71,8 @@ class warning_tooltip(QtWidgets.QWidget):
         self.log_msg.setWordWrap(True)
         self.main_layout.addWidget(self.log_msg)
 
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
         self.open_console_label = QtWidgets.QLabel('Open console for more informations')
         self.open_console_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.open_console_label)
@@ -106,9 +108,11 @@ class warning_tooltip(QtWidgets.QWidget):
                 new_label = QtWidgets.QLabel(record_msg)
                 new_label.setWordWrap(True)
                 self.additional_labels.append(new_label)
-                self.main_layout.insertWidget(self.main_layout.count()-1, new_label)
+                self.main_layout.insertWidget(self.main_layout.count()-2, new_label)
                 QtWidgets.QApplication.processEvents()
+                gui_utils.move_ui(self, 4)
                 gui_utils.move_ui(self, 5)
+                QtWidgets.QApplication.processEvents()
 
 class custom_leave_thread(QtCore.QThread):
 

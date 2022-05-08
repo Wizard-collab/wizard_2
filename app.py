@@ -68,6 +68,7 @@ class app():
         self.db_server = None
 
         self.app = gui_utils.get_app()
+        QtCore.qInstallMessageHandler(customQtMsgHandler)
 
         self.warning_tooltip = warning_tooltip.warning_tooltip()
         self.custom_handler = logging_widget.custom_handler(long_formatter=False, parent=None)
@@ -142,6 +143,11 @@ class app():
         QtWidgets.QApplication.quit()
         sys.exit()
 
+def customQtMsgHandler(msg_type, msg_log_context, msg_string):
+    if msg_string.startswith('QWindowsWindow::setGeometry:'):
+        pass
+    else:
+        print(msg_string)
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
@@ -156,6 +162,7 @@ def main(project_manager=False):
     sys.excepthook = excepthook
     wizard_app = app(project_manager)
     ret = wizard_app.app.exec_()
+
     sys.exit(ret)
 
 if __name__ == '__main__':

@@ -45,13 +45,13 @@ def get_connection(DNS, timeout=5.0, only_debug=False):
         if only_debug:
             logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         else:
-            logger.error(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+            logger.info(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return None
     except socket.timeout:
         if only_debug:
             logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
         else:    
-            logger.error(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+            logger.info(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
         return None
     except:
         if only_debug:
