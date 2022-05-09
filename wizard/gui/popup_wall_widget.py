@@ -21,6 +21,7 @@ from wizard.core import assets
 from wizard.core import environment
 from wizard.core import path_utils
 from wizard.vars import ressources
+from wizard.vars import game_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -111,11 +112,6 @@ class popup_wall_widget(QtWidgets.QWidget):
             widget = self.popup_ids[popup_id]
             del self.popup_ids[popup_id]
 
-            if widget.is_comment:
-                comment = widget.comment_textEdit.toPlainText()
-                game.add_xps(3)
-                game.analyse_comment(comment, 10)
-
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
@@ -124,10 +120,6 @@ class popup_wall_widget(QtWidgets.QWidget):
         if popup_id in self.popup_save_ids.keys():
             widget = self.popup_save_ids[popup_id]
             del self.popup_save_ids[popup_id]
-
-            comment = widget.comment_textEdit.toPlainText()
-            game.add_xps(1)
-            game.analyse_comment(comment, 2)
 
             widget.setVisible(0)
             widget.setParent(None)
@@ -183,6 +175,7 @@ class popup_save_widget(QtWidgets.QFrame):
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
         assets.modify_version_comment(self.version_id, comment)
+        game.analyse_comment(comment, game_vars._save_penalty_)
         gui_server.refresh_team_ui()
         self.time_out.emit(self.version_id)
 
@@ -319,6 +312,7 @@ class popup_event_widget(QtWidgets.QFrame):
         comment = self.comment_textEdit.toPlainText()
         export_version_id = self.event_row['data']
         project.update_export_version_data(export_version_id, ('comment', comment))
+        game.analyse_comment(comment, game_vars._export_penalty_)
         gui_server.refresh_team_ui()
         self.time_out.emit(self.event_row['id'])
 

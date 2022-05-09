@@ -116,7 +116,6 @@ class locks_widget(QtWidgets.QWidget):
         work_env_id_list = list(self.work_env_ids.keys())
         for work_env_id in work_env_id_list:
             if work_env_id not in project_work_env_ids:
-                print(work_env_id)
                 self.remove_work_env(work_env_id)
         self.refresh_info_widget()
 

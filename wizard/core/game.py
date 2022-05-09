@@ -82,6 +82,7 @@ def remove_life(amount):
 def analyse_comment(comment, life_amount):
 	# Analyse if a comment length is 10 characters 
 	# minimum, if not, removes life_amount from the user
-	if len(comment) < 10:
+	if len(comment) < 5:
 		remove_life(life_amount)
 		logger.info(f"Warning, bad commenting just made you loose {life_amount}% of life")
+		logger.info(f"Comment with more than 5 characters to avoid loosing life.")

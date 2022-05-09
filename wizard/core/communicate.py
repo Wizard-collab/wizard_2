@@ -117,7 +117,7 @@ class communicate_server(Thread):
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 
     # of the new version
-    version_id = assets.add_version(work_env_id, analyse_comment=1)
+    version_id = assets.add_version(work_env_id, analyse_comment=False)
     if version_id:
         version_path = project.get_version_data(version_id,
                                                         'file_path')

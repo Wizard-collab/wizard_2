@@ -71,6 +71,7 @@ from wizard.core import asset_tracking
 from wizard.vars import assets_vars
 from wizard.vars import env_vars
 from wizard.vars import softwares_vars
+from wizard.vars import game_vars
 
 logger = logging.getLogger(__name__)
 
@@ -118,7 +119,7 @@ def create_category(name, domain_id):
                     category_id = None
                 else:
                     events.add_creation_event('category', category_id)
-                    game.add_xps(2)
+                    game.add_xps(game_vars._creation_xp_)
         else:
             logger.error("Can't create category")
     else:
@@ -161,7 +162,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
                     asset_id = None
                 else:
                     events.add_creation_event('asset', asset_id)
-                    game.add_xps(2)
+                    game.add_xps(game_vars._creation_xp_)
         else:
             logger.error("Can't create asset")
     else:
@@ -307,7 +308,7 @@ def create_variant(name, stage_id, comment=''):
                     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
                     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_SANDBOX')))
                     events.add_creation_event('variant', variant_id)
-                    game.add_xps(2)
+                    game.add_xps(game_vars._creation_xp_)
         else:
             logger.error("Can't create variant")
     else:
@@ -560,9 +561,9 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                                                                             export_id,
                                                                             version_id,
                                                                             comment)
+                            game.add_xps(game_vars._export_xp_)
                             if execute_xp:
-                                game.add_xps(3)
-                                game.analyse_comment(comment, 10)
+                                game.analyse_comment(comment, game_vars._export_penalty_)
                             events.add_export_event(export_version_id)
                 return export_version_id
             else:
@@ -703,9 +704,10 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
                                                 comment,
                                                 screenshot_file,
                                                 thumbnail_file)
+    if version_id:
+        game.add_xps(game_vars._save_xp_)
     if (analyse_comment or fresh) and version_id:
-        game.add_xps(1)
-        game.analyse_comment(comment, 2)
+        game.analyse_comment(comment, game_vars._save_penalty_)
 
     tags.analyse_comment(comment, 'work_version', version_id)
 
