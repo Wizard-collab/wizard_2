@@ -21,6 +21,34 @@ from wizard.gui import submit_log_widget
 
 logger = logging.getLogger(__name__)
 
+class custom_stdout(QtCore.QObject):
+
+    stdout_signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(custom_stdout, self).__init__(parent)
+
+    def write(self, buf):
+        self.stdout_signal.emit(buf)
+        sys.__stdout__.write(buf)
+
+    def flush(self):
+        sys.__stdout__.flush()
+
+class custom_stderr(QtCore.QObject):
+
+    stderr_signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(custom_stderr, self).__init__(parent)
+
+    def write(self, buf):
+        self.stderr_signal.emit(buf)
+        sys.__stderr__.write(buf)
+
+    def flush(self):
+        sys.__stderr__.flush()
+
 class console_widget(QtWidgets.QWidget):
 
     notification = pyqtSignal(str)
@@ -36,6 +64,7 @@ class console_widget(QtWidgets.QWidget):
         root_logger.addHandler(self.custom_handler)
         self.script_editor_widget = script_editor_widget.script_editor_widget()
         self.build_ui()
+        self.redirect_stdout()
         self.connect_functions()
 
     def toggle(self):
@@ -48,6 +77,10 @@ class console_widget(QtWidgets.QWidget):
         else:
             self.show()
             self.raise_()
+
+    def redirect_stdout(self):
+        sys.stdout = custom_stdout()
+        sys.stderr = custom_stderr()
 
     def changeEvent(self, event):
         if self.isActiveWindow():
@@ -100,6 +133,9 @@ class console_widget(QtWidgets.QWidget):
 
         self.execute_action.triggered.connect(self.execute_script)
         self.clear_script_action.triggered.connect(self.script_editor_widget.clear)
+        
+        sys.stdout.stdout_signal.connect(self.handle_stdout)
+        sys.stderr.stderr_signal.connect(self.handle_stderr)
 
     def send_to_support(self):
         log = self.console_viewer.toPlainText()
@@ -123,6 +159,17 @@ class console_widget(QtWidgets.QWidget):
         if context_dic is not None and context_dic != dict():
             data = context_dic['content']
             self.script_editor_widget.setText(data)
+
+    def handle_stdout(self, buf):
+        if buf!='\n' and buf != '\r' and buf != '\r\n':
+            self.console_viewer.insertHtml(buf)
+            self.console_viewer.insertHtml('<br>')
+
+    def handle_stderr(self, buf):
+        if buf!='\n' and buf != '\r' and buf != '\r\n':
+            buf = f'<strong><span style="color:#f0605b;">{buf}</strong>'
+            self.console_viewer.insertHtml(buf)
+            self.console_viewer.insertHtml('<br>')
 
     def handle_record(self, record_tuple):
         level = record_tuple[0]
