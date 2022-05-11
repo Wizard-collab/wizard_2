@@ -1,25 +1,16 @@
 import sys
-import logging
+import subprocess
 
-class custom_stdout:
-	def __init__(self):
-		pass
+deadline = "C:\\Program Files\\Thinkbox\\Deadline10\\bin\\deadlinecommand.exe"
 
-	def write(self, buf):
-		sys.__stdout__.write(buf)
+pywi = "C:\\Program Files\\wizard\\pywizard.exe"
+file = "D:\\SCRIPT\\wizard_2\\benchmark.py"
 
-	def flush(self):
-		sys.__stdout__.flush()
+command = f'"{deadline}" -SubmitCommandLineJob -executable "{pywi}" -arguments "<QUOTE>D:/SCRIPT/wizard_2/benchmark.py<QUOTE>" -name "PyWizard batch export"'
+#command = f'"{deadline}" "job_info.job" "plugin_info.job"'
 
-class custom_stderr:
-	def __init__(self):
-		pass
-
-	def write(self, buf):
-		sys.__stderr__.write(buf)
-
-	def flush(self):
-		sys.__stderr__.flush()
-
-sys.stdout = custom_stdout()
-sys.stderr = custom_stderr()
+process = subprocess.Popen(command, stdout=subprocess.PIPE)
+lines_iterator = iter(process.stdout.readline, b"")
+for line in lines_iterator:
+    print(line)
+    sys.stdout.flush()

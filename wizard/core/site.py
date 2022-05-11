@@ -131,7 +131,11 @@ def get_project_row_by_name(name):
     projects_rows = db_utils.get_row_by_column_data('site',
                                                     'projects',
                                                     ('project_name', name))
-    return projects_rows[0]
+    if len(projects_rows) >= 1:
+        return projects_rows[0]
+    else:
+        logger.error("Project not found")
+        return None
 
 def get_project_row(project_id, column='*'):
     projects_rows = db_utils.get_row_by_column_data('site',
