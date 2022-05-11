@@ -1554,6 +1554,12 @@ def get_hooks_folder():
     hooks_folder = path_utils.join(environment.get_project_path(), project_vars._hooks_folder_)
     return hooks_folder
 
+def get_temp_scripts_folder():
+    shared_files_folder = path_utils.join(environment.get_project_path(), project_vars._scripts_folder_, 'temp')
+    if not os.path.isdir(shared_files_folder):
+        path_utils.makedirs(shared_files_folder)
+    return shared_files_folder
+
 def add_event(event_type, title, message, data, additional_message=None, image_path=None):
     event_id = db_utils.create_row('project',
                                             'events',

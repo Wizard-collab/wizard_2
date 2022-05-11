@@ -274,3 +274,9 @@ def temp_file_from_pycmd(pycmd):
     with open(temporary_python_file, 'w') as f:
         f.write(pycmd)
     return path_utils.clean_path(temporary_python_file)
+
+def shared_temp_file_from_pycmd(pycmd, directory):
+    dunno, temporary_python_file = tempfile.mkstemp(suffix='.py', dir=directory)
+    with open(temporary_python_file, 'w') as f:
+        f.write(pycmd)
+    return path_utils.clean_path(temporary_python_file)

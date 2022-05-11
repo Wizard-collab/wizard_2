@@ -113,7 +113,9 @@ def remove_project_row(project_id):
         return None
 
 def get_administrator_pass():
-    return get_user_row_by_name('admin')['pass']
+    user_row = get_user_row_by_name('admin')
+    if user_row:
+        return user_row['pass']
 
 def get_projects_list():
     projects_rows = db_utils.get_rows('site', 'projects')

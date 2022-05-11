@@ -91,6 +91,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller wizard_cmd.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			command_line = "PyInstaller server.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
@@ -118,6 +122,8 @@ class compile():
 							'wapi.py',
 							'dist/PyWizard/PyWizard.exe',
 							'dist/PyWizard/PyWizard.exe.manifest',
+							'dist/wizard_cmd/wizard_cmd.exe',
+							'dist/wizard_cmd/wizard_cmd.exe.manifest',
 							'dist/server/server.exe',
 							'dist/server/server.exe.manifest',
 							'dist/uninstall.exe',
