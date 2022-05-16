@@ -3,11 +3,13 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+import os
 import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
 from guerilla_render_wizard import wizard_plugin
+from guerilla_render_wizard import wizard_render
 
 # Guerilla modules
 from guerilla import command
@@ -123,10 +125,38 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.set_frame_range_with_rolls()
 
+    class setup_render_FML(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.setup_render('FML')
+
+    class setup_render_LD(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.setup_render('LD')
+
+    class setup_render_HD(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.setup_render('HD')
+
     cmd = save_increment('Save', 'icons/save_increment.png')
     cmd.install('Wizard')
-    cmd = export_data('Export data', 'icons/export.png')
-    cmd.install('Wizard')
+    
+    if os.environ['wizard_stage_name'] not in ['lighting']:
+        cmd = export_data('Export data', 'icons/export.png')
+        cmd.install('Wizard')
+
+    if os.environ['wizard_stage_name'] in ['shading', 'lighting']:
+        command.addseparator ('Wizard')
+        cmd = setup_render_FML('Setup render FML', 'icons/export.png')
+        cmd.install('Wizard')
+        cmd = setup_render_LD('Setup render LD', 'icons/export.png')
+        cmd.install('Wizard')
+        cmd = setup_render_HD('Setup render HD', 'icons/export.png')
+        cmd.install('Wizard')
+        command.addseparator ('Wizard')
+
     command.addseparator ('Wizard')
     cmd = import_and_update_all('Import and update all', 'icons/all.png')
     cmd.install('Wizard')

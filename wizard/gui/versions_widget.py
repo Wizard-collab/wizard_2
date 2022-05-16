@@ -302,6 +302,8 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
                 settings_dic['stage_to_export'] = stage
+                if self.batch_settings_widget.need_render_type:
+                    settings_dic['render_type'] = self.batch_settings_widget.render_type
                 subtasks_library.batch_export(version_id, settings_dic)
 
     def batch_export_camera(self):

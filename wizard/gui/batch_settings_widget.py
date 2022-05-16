@@ -45,6 +45,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.frange = [self.inrollframe_spinBox.value(), self.outrollframe_spinBox.value()]
         self.refresh_assets = self.refresh_assets_checkbox.isChecked()
         self.nspace_list = self.get_selected_nspaces()
+        self.render_type = self.render_type_combo.currentText()
         if (len(self.nspace_list) > 0) and self.need_nspace_list:
             self.accept()
         elif not self.need_nspace_list:
@@ -86,8 +87,14 @@ class batch_settings_widget(QtWidgets.QDialog):
                                                                     reference_row['namespace'])
                         self.assets_list.addItem(item)
         else:
-            self.need_nspace_list=False
+            self.need_nspace_list = False
             self.nspace_list_widget.setVisible(False)
+
+        if self.stage_to_export == 'lighting':
+            self.need_render_type = True
+        else:
+            self.need_render_type = False
+            self.render_type_widget.setVisible(False)
 
         asset_row = assets.get_asset_data_from_work_env_id(self.work_env_id)
         self.inframe_spinBox.setValue(asset_row['inframe'])
@@ -181,6 +188,22 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.outrollframe_spinBox.setRange(-1000000, 1000000)
         self.outrollframe_spinBox.setButtonSymbols(2)
         self.range_layout.addWidget(self.outrollframe_spinBox)
+
+        self.render_type_widget = QtWidgets.QWidget()
+        self.render_type_widget.setObjectName('transparent_widget')
+        self.render_type_layout = QtWidgets.QVBoxLayout()
+        self.render_type_layout.setContentsMargins(0,0,0,0)
+        self.render_type_layout.setSpacing(8)
+        self.render_type_widget.setLayout(self.render_type_layout)
+        self.main_layout.addWidget(self.render_type_widget)
+
+        self.render_type_label = QtWidgets.QLabel('Render type')
+        self.render_type_label.setObjectName('gray_label')
+        self.render_type_layout.addWidget(self.render_type_label)
+
+        self.render_type_combo = gui_utils.QComboBox()
+        self.render_type_layout.addWidget(self.render_type_combo)
+        self.render_type_combo.addItems(['HD', 'LD', 'FML'])
 
         self.nspace_list_widget = QtWidgets.QWidget()
         self.nspace_list_widget.setObjectName('transparent_widget')

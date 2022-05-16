@@ -29,8 +29,13 @@ def export():
         shading.main()
     elif stage_name == 'custom':
         custom.main()
-    elif stage_name == 'lighting':
-        lighting.main()
+    else:
+        logger.warning("Unplugged stage : {0}".format(stage_name))
+
+def setup_render(render_type):
+    stage_name = os.environ['wizard_stage_name']
+    if stage_name == 'lighting':
+        lighting.setup_render_directory(render_type)
     else:
         logger.warning("Unplugged stage : {0}".format(stage_name))
 

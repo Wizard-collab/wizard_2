@@ -20,7 +20,6 @@ if 'WIZARD_JSON_SETTINGS' in os.environ.keys():
     settings_dic = json.loads(os.environ['wizard_json_settings'])
     frange = settings_dic['frange']
     refresh_assets = settings_dic['refresh_assets']
-    nspace_list = settings_dic['nspace_list']
     stage_name = settings_dic['stage_to_export']
 
     if refresh_assets:
@@ -31,7 +30,8 @@ if 'WIZARD_JSON_SETTINGS' in os.environ.keys():
     elif stage_name == 'custom':
         custom.main()
     elif stage_name == 'lighting':
-        lighting.main()
+        render_type = settings_dic['render_type']
+        lighting.main(render_type, frange)
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
 

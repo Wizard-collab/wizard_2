@@ -14,24 +14,36 @@ logger = logging.getLogger(__name__)
 # Wizard modules
 from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard import wizard_export
+from guerilla_render_wizard import wizard_render
 import wizard_communicate
 
-def main():
+def main(render_type, frange, farm=0):
     scene = wizard_export.save_or_save_increment()
     try:
-        export_name = 'main'
-        render_directory = wizard_export.prepare_render('lighting', export_name)
-        if render_directory:
-            file_pattern = "$L_$n_$o.$05f.$x"
-            render_pass_list = wizard_tools.get_all_render_passes()
-            for render_pass in render_pass_list:
-                render_pass.FileName.set(os.path.join(render_directory, file_pattern))
+        if render_type in ['FML', 'LD', 'HD']:
 
-            frame_range = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
-            preferences_node = wizard_tools.get_node_from_name('Preferences')
-            preferences_node.RenderRange.set('{0}-{1}'.format(frame_range[1], frame_range[2]))
+            export_name = "render_{0}".format(render_type)
 
-            guerilla.render('batch', None)
+            wizard_render.setup_frame_range(render_type, frange)
+            wizard_render.setup_image_format(render_type)
 
+            if wizard_export.trigger_sanity_hook('lighting'):
+                wizard_export.trigger_before_export_hook('lighting')
+                render_directory = wizard_render.setup_render_directory('lighting', export_name)
+                wizard_export.trigger_after_export_hook('lighting', render_directory)
+                if not farm:
+                    batch()
+
+        else:
+            logger.warning("Unkown render type : {0}".format(render_type))
     except:
         logger.error(str(traceback.format_exc()))
+
+def setup_render_directory(render_type):
+    if render_type in ['FML', 'LD', 'HD']:
+        export_name = "render_{0}".format(render_type)
+        render_directory = wizard_render.setup_render_directory('lighting', export_name)
+        return render_directory
+
+def batch():
+    guerilla.render('batch', None)
