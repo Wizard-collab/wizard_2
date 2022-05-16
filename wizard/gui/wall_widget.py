@@ -206,7 +206,7 @@ class wall_widget(QtWidgets.QWidget):
                         self.notification.emit(1)
                     if self.first_refresh != 1:
                         if event_row['type'] == 'tag':
-                            if environment.get_user() in event_row['title']:
+                            if (environment.get_user() in event_row['title']) or ('all' in event_row['title']):
                                 self.popup.emit(event_row)
                         else:
                             self.popup.emit(event_row)

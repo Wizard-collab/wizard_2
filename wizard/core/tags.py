@@ -45,4 +45,5 @@ def analyse_comment(comment, instance_type, instance_id):
 				user_id = site.get_user_row_by_name(user, 'id')
 				if user_id in project.get_users_ids_list():
 					events.add_tag_event(instance_type, instance_id, comment, user)
-
+			elif user == 'all':
+				events.add_tag_event(instance_type, instance_id, comment, user)
