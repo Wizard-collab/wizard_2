@@ -119,6 +119,7 @@ def append_wizardTags_to_guerillaTags(namespace):
     all_objects = wizard_tools.get_all_nodes(name=False)
     for node in all_objects:
         if node.belongstoreference(refNode):
+            print(node.name)
             if node.hasAttr('wizardTags', 'Plug'):
                 wizard_tags = node.wizardTags.get().split(',')
                 guerilla_tags = node.Membership.get().split(',')
@@ -126,6 +127,7 @@ def append_wizardTags_to_guerillaTags(namespace):
                 if '' in tags_list:
                     tags_list.remove('')
                 node.Membership.set((',').join(tags_list))
+                print((',').join(tags_list))
 
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,

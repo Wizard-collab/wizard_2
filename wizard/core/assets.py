@@ -561,6 +561,10 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                                                                             export_id,
                                                                             version_id,
                                                                             comment)
+                            if len(copied_files) == len(files):
+                                tools.remove_tree(os.path.dirname(files[0]))
+                            else:
+                                logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
                             game.add_xps(game_vars._export_xp_)
                             if execute_xp:
                                 game.analyse_comment(comment, game_vars._export_penalty_)
@@ -583,15 +587,19 @@ def modify_export_version_comment(export_version_id, comment):
 def request_export(work_env_id, export_name, multiple=None, only_dir=None):
     # Gives a temporary ( and local ) export file name
     # for the softwares
-    dir_name = tools.temp_dir()
-    logger.info(f"Temporary directory created : {dir_name}, if something goes wrong in the export please go there to find your temporary export file")
-    file_name = build_export_file_name(work_env_id, export_name, multiple)
-    if file_name and not only_dir:
-        return path_utils.clean_path(path_utils.join(dir_name, file_name))
-    elif file_name and only_dir:
-        return dir_name
-    else:
-        return None
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    if variant_id:
+        export_id = get_or_add_export(export_name, variant_id)
+        if export_id:
+            export_path = get_temp_export_path(export_id)
+            path_utils.makedirs(export_path)
+            dir_name = tools.temp_dir_in_dir(export_path)
+            logger.info(f"Temporary directory created : {dir_name}, if something goes wrong in the export please go there to find your temporary export file")
+            file_name = build_export_file_name(work_env_id, export_name, multiple)
+            if file_name and not only_dir:
+                return path_utils.clean_path(path_utils.join(dir_name, file_name))
+            elif file_name and only_dir:
+                return dir_name
 
 def archive_export(export_id):
     if site.is_admin():
@@ -953,6 +961,16 @@ def get_export_path(export_id):
         variant_path = get_variant_path(export_row['variant_id'])
         if export_name and variant_path:
             dir_name = path_utils.join(variant_path, '_EXPORTS', export_name)
+    return dir_name
+
+def get_temp_export_path(export_id):
+    dir_name = None
+    export_row = project.get_export_data(export_id)
+    if export_row:
+        export_name = export_row['name']
+        variant_path = get_variant_path(export_row['variant_id'])
+        if export_name and variant_path:
+            dir_name = path_utils.join(variant_path, '_EXPORTS', export_name, 'temp')
     return dir_name
 
 def get_export_version_path(export_version_id):

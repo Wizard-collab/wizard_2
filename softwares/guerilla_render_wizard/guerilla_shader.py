@@ -2,6 +2,9 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# Python modules
+import os
+
 # Guerilla modules
 from guerilla import Document, Modifier, pynode, Node, Plug
 
@@ -104,8 +107,9 @@ def create_shader(namespace, asset_name):
     render_graph.move(shaders_GRP)
 
     tag_node = render_graph.loadfile('$(LIBRARY)/rendergraph/tag.gnode')[0]
-    tag_node.Tag.set(asset_name)
-    tag_node.rename(asset_name)
+    asset_tag = "{0}_{1}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+    tag_node.Tag.set(asset_tag)
+    tag_node.rename(asset_tag)
 
     attribute_node = render_graph.loadfile('$(LIBRARY)/rendergraph/attributes.gnode')[0]
     attribute_node.overrideinheritedattr('RaytraceSubdivLevel',2)

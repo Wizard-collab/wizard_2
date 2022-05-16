@@ -40,7 +40,10 @@ def mkdir(path):
 
 def makedirs(path):
 	path = clean_path(path)
-	return os.makedirs(path)
+	if not os.path.isdir(path):
+		return os.makedirs(path)
+	else:
+		return True
 
 def remove(path):
 	path = clean_path(path)

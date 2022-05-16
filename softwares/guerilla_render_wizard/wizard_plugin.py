@@ -15,6 +15,7 @@ from guerilla_render_wizard import wizard_reference
 from guerilla_render_wizard import guerilla_shader
 from guerilla_render_wizard.export import shading
 from guerilla_render_wizard.export import custom
+from guerilla_render_wizard.export import lighting
 
 # Guerilla modules
 from guerilla import Document, pynode
@@ -28,6 +29,8 @@ def export():
         shading.main()
     elif stage_name == 'custom':
         custom.main()
+    elif stage_name == 'lighting':
+        lighting.main()
     else:
         logger.warning("Unplugged stage : {0}".format(stage_name))
 

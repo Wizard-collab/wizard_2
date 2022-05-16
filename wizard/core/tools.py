@@ -175,8 +175,14 @@ def copy_files(files_list, destination):
                                                                             file_name))
             path_utils.copyfile(file, destination_file)
             new_files.append(destination_file)
-            logger.info(f"{destination_file} copied")
-        return new_files
+        valid_files = []
+        for file in new_files:
+            if os.path.isfile(file):
+                logger.info(f"{destination_file} copied")
+                valid_files.append(file)
+            else:
+                logger.info(f"Can't copy {destination_file}")
+        return valid_files
     else:
         logger.warning("Can't execute copy")
         return None
@@ -184,6 +190,11 @@ def copy_files(files_list, destination):
 def temp_dir():
     # Return a temp directory
     tempdir = tempfile.mkdtemp()
+    return path_utils.clean_path(tempdir)
+
+def temp_dir_in_dir(directory):
+    # Return a temp directory
+    tempdir = tempfile.mkdtemp(dir=directory)
     return path_utils.clean_path(tempdir)
 
 def create_folder(dir_name):
@@ -250,6 +261,10 @@ def remove_tree(dir_name):
     except PermissionError:
         logger.error(f"{dir_name} access denied")
     return success
+
+def remove_files(files):
+    for file in files:
+        remove_file(file)
 
 def remove_file(file):
     # Tries to remove a folder tree
