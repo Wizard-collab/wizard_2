@@ -25,6 +25,12 @@ def node_exists(node):
     except ValueError:
         return False
 
+def get_all_render_passes():
+    rp_list = []
+    for rp in Document().children(recursive=True, type="RenderPass"):
+        rp_list.append(rp)
+    return rp_list
+
 def get_all_nodes(name=True):
     nodes_list = []
     for node in Document().children(recursive=True):

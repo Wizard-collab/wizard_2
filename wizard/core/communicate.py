@@ -91,6 +91,9 @@ class communicate_server(Thread):
         elif signal_dic['function'] == 'request_export':
             returned = request_export(signal_dic['work_env_id'],
                                         signal_dic['export_name'])
+        elif signal_dic['function'] == 'request_render':
+            returned = request_render(signal_dic['version_id'],
+                                        signal_dic['export_name'])
         elif signal_dic['function'] == 'add_export_version':
             returned = add_export_version(signal_dic['export_name'],
                                         signal_dic['files'],
@@ -131,6 +134,12 @@ def request_export(work_env_id, export_name):
     # Just return a temporary file name using the 'assets' module
     file_path = assets.request_export(work_env_id, export_name)
     return file_path
+
+def request_render(version_id, export_name):
+    # Just return a temporary file name using the 'assets' module
+    render_directory = assets.request_render(version_id, export_name)
+    gui_server.refresh_team_ui()
+    return render_directory
 
 def add_export_version(export_name, files, work_env_id, version_id, comment):
     # Add an export version using the 'assets' module and return the export_version_id 

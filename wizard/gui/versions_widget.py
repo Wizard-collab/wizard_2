@@ -346,14 +346,16 @@ class versions_widget(QtWidgets.QWidget):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(6)
+        self.list_view.setColumnCount(7)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File'])
+        self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File', 'id'])
         self.list_view.header().resizeSection(3, 150)
         self.list_view.header().resizeSection(4, 250)
+        self.list_view.header().resizeSection(5, 400)
+        self.list_view.header().resizeSection(6, 50)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.views_layout.addWidget(self.list_view)
 
@@ -690,6 +692,8 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.setText(4, self.version_row['comment'])
         self.setText(5, os.path.basename(self.version_row['file_path']))
+        self.setText(6, str(self.version_row['id']))
+        self.setForeground(6, QtGui.QBrush(QtGui.QColor('gray')))
 
     def set_missing(self):
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('#f79360')))

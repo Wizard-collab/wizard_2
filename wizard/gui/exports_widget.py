@@ -240,10 +240,8 @@ class exports_widget(QtWidgets.QWidget):
             if selection is not None:
                 if len(selection)==1:
                     if selection[0].type == 'export_version':
-                        files = json.loads(selection[0].export_version_row['files'])
-                        if files != [] and files != None:
-                            file = files[0]
-                            folder = path_utils.dirname(file)
+                        export_version_id = selection[0].export_version_row['id']
+                        folder = assets.get_export_version_path(export_version_id)
                     elif selection[0].type == 'export':
                         export_id = selection[0].export_row['id']
                         folder = assets.get_export_path(export_id)
@@ -605,7 +603,11 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
             self.setIcon(5, QtGui.QIcon(ressources._sofwares_icons_dic_[self.export_version_row['software']]))
         else:
             self.setIcon(5, QtGui.QIcon(ressources._manual_export_))
-        extension = json.loads(self.export_version_row['files'])[0].split('.')[-1]
+        files = json.loads(self.export_version_row['files'])
+        if len(files) > 0:
+            extension = files[0].split('.')[-1]
+        else:
+            extension = '?'
         self.setText(6, extension)
 
     def refresh(self, export_version_row):
@@ -624,7 +626,10 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(7, QtGui.QBrush(QtGui.QColor('#f79360')))
 
     def set_not_missing(self, number):
-        self.setText(7, f'{number} files')
+        if number > 0:
+            self.setText(7, f'{number} files')
+        else:
+            self.setText(7, '')
         self.setForeground(7, QtGui.QBrush(QtGui.QColor('#9ce87b')))
 
 class check_existence_thread(QtCore.QThread):
@@ -641,12 +646,17 @@ class check_existence_thread(QtCore.QThread):
         if self.export_versions_rows is not None:
             for export_version_row in self.export_versions_rows:
                 files_list = json.loads(export_version_row['files'])
-                missing_files = 0
-                for file in files_list:
-                    if not path_utils.isfile(file):
-                        missing_files += 1
-                    if not self.running:
-                        break
+                if files_list == []:
+                    missing_files = 0
+                    export_version_dir = assets.get_export_version_path(export_version_row['id'])
+                    files_list = os.listdir(export_version_dir)
+                else:
+                    missing_files = 0
+                    for file in files_list:
+                        if not path_utils.isfile(file):
+                            missing_files += 1
+                if not self.running:
+                    break
 
                 if missing_files:
                     self.missing_file_signal.emit((export_version_row['id'], missing_files))

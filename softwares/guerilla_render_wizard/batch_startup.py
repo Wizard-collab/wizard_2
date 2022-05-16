@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from guerilla_render_wizard import wizard_plugin
 from guerilla_render_wizard.export import shading
 from guerilla_render_wizard.export import custom
+from guerilla_render_wizard.export import lighting
 
 # read_settings
 if 'WIZARD_JSON_SETTINGS' in os.environ.keys():
@@ -29,6 +30,8 @@ if 'WIZARD_JSON_SETTINGS' in os.environ.keys():
         shading.main()
     elif stage_name == 'custom':
         custom.main()
+    elif stage_name == 'lighting':
+        lighting.main()
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
 

@@ -551,7 +551,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                         export_version_id = None
                     else:
                         copied_files = tools.copy_files(files, dir_name)
-                        if not copied_files:
+                        if copied_files is None:
                             if not tools.remove_folder(dir_name):
                                 logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
                             export_version_id = None
@@ -561,10 +561,12 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                                                                             export_id,
                                                                             version_id,
                                                                             comment)
-                            if len(copied_files) == len(files):
+                            if len(copied_files) == len(files) and len(files) > 0:
                                 tools.remove_tree(os.path.dirname(files[0]))
-                            else:
+                            elif len(copied_files) != len(files):
                                 logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
+                            else:
+                                pass
                             game.add_xps(game_vars._export_xp_)
                             if execute_xp:
                                 game.analyse_comment(comment, game_vars._export_penalty_)
@@ -600,6 +602,16 @@ def request_export(work_env_id, export_name, multiple=None, only_dir=None):
                 return path_utils.clean_path(path_utils.join(dir_name, file_name))
             elif file_name and only_dir:
                 return dir_name
+
+def request_render(export_name, version_id, comment=''):
+    work_env_id = project.get_version_data(version_id, 'work_env_id')
+    if work_env_id:
+        variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+        if variant_id:
+            export_version_id = add_export_version(export_name, [], variant_id, version_id, comment)
+            if export_version_id:
+                export_version_path = get_export_version_path(export_version_id)
+                return export_version_path
 
 def archive_export(export_id):
     if site.is_admin():
