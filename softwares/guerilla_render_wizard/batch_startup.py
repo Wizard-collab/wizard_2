@@ -31,7 +31,8 @@ if 'WIZARD_JSON_SETTINGS' in os.environ.keys():
         custom.main()
     elif stage_name == 'lighting':
         render_type = settings_dic['render_type']
-        lighting.main(render_type, frange)
+        farm = settings_dic['farm']
+        lighting.main(render_type, frange, farm)
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
 

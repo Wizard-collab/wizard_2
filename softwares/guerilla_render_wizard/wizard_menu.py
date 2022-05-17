@@ -147,7 +147,7 @@ class menu():
         cmd = export_data('Export data', 'icons/export.png')
         cmd.install('Wizard')
 
-    if os.environ['wizard_stage_name'] in ['shading', 'lighting']:
+    if os.environ['wizard_stage_name'] in ['lighting']:
         command.addseparator ('Wizard')
         cmd = setup_render_FML('Setup render FML', 'icons/export.png')
         cmd.install('Wizard')

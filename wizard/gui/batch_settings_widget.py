@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
+from wizard.core import project
 from wizard.core import assets
 from wizard.vars import assets_vars
 from wizard.vars import ressources
@@ -46,6 +47,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.refresh_assets = self.refresh_assets_checkbox.isChecked()
         self.nspace_list = self.get_selected_nspaces()
         self.render_type = self.render_type_combo.currentText()
+        self.guerilla_deadline = self.guerilla_deadline_checkbox.isChecked()
         if (len(self.nspace_list) > 0) and self.need_nspace_list:
             self.accept()
         elif not self.need_nspace_list:
@@ -92,9 +94,12 @@ class batch_settings_widget(QtWidgets.QDialog):
 
         if self.stage_to_export == 'lighting':
             self.need_render_type = True
+            if project.get_work_env_data(self.work_env_id, 'name') != 'guerilla_render':
+                self.guerilla_deadline_widget.setVisible(False)
         else:
             self.need_render_type = False
             self.render_type_widget.setVisible(False)
+            self.guerilla_deadline_widget.setVisible(False)
 
         asset_row = assets.get_asset_data_from_work_env_id(self.work_env_id)
         self.inframe_spinBox.setValue(asset_row['inframe'])
@@ -134,6 +139,8 @@ class batch_settings_widget(QtWidgets.QDialog):
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
+        # Refresh assets section
+
         self.refresh_assets_label = QtWidgets.QLabel('References settings')
         self.refresh_assets_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.refresh_assets_label)
@@ -141,6 +148,8 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.refresh_assets_checkbox = QtWidgets.QCheckBox('Refresh assets in scene')
         self.refresh_assets_checkbox.setObjectName('transparent_widget')
         self.main_layout.addWidget(self.refresh_assets_checkbox)
+
+        # Frame range section
 
         self.range_setup_widget = QtWidgets.QWidget()
         self.range_setup_widget.setObjectName('transparent_widget')
@@ -189,6 +198,8 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.outrollframe_spinBox.setButtonSymbols(2)
         self.range_layout.addWidget(self.outrollframe_spinBox)
 
+        # Render section
+
         self.render_type_widget = QtWidgets.QWidget()
         self.render_type_widget.setObjectName('transparent_widget')
         self.render_type_layout = QtWidgets.QVBoxLayout()
@@ -205,6 +216,27 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.render_type_layout.addWidget(self.render_type_combo)
         self.render_type_combo.addItems(['HD', 'LD', 'FML'])
 
+        # Guerilla render - Deadline section
+
+        self.guerilla_deadline_widget = QtWidgets.QWidget()
+        self.guerilla_deadline_widget.setObjectName('transparent_widget')
+        self.guerilla_deadline_layout = QtWidgets.QVBoxLayout()
+        self.guerilla_deadline_layout.setContentsMargins(0,0,0,0)
+        self.guerilla_deadline_layout.setSpacing(8)
+        self.guerilla_deadline_widget.setLayout(self.guerilla_deadline_layout)
+        self.main_layout.addWidget(self.guerilla_deadline_widget)
+
+        self.deadline_label = QtWidgets.QLabel('Guerilla - Deadline')
+        self.deadline_label.setObjectName('gray_label')
+        self.guerilla_deadline_layout.addWidget(self.deadline_label)
+
+        self.guerilla_deadline_checkbox = QtWidgets.QCheckBox('Submit to deadline')
+        self.guerilla_deadline_checkbox.setObjectName('transparent_widget')
+        self.guerilla_deadline_checkbox.setChecked(True)
+        self.guerilla_deadline_layout.addWidget(self.guerilla_deadline_checkbox)
+
+        # Namespaces selection section
+
         self.nspace_list_widget = QtWidgets.QWidget()
         self.nspace_list_widget.setObjectName('transparent_widget')
         self.nspace_list_layout = QtWidgets.QVBoxLayout()
@@ -220,6 +252,8 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.assets_list = QtWidgets.QListWidget()
         self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.nspace_list_layout.addWidget(self.assets_list)
+
+        # Buttons sections
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')

@@ -33,7 +33,8 @@ def main(render_type, frange, farm=0):
                 wizard_export.trigger_after_export_hook('lighting', render_directory)
                 if not farm:
                     batch()
-
+                else:
+                    deadline()
         else:
             logger.warning("Unkown render type : {0}".format(render_type))
     except:
@@ -47,3 +48,9 @@ def setup_render_directory(render_type):
 
 def batch():
     guerilla.render('batch', None)
+
+def deadline():
+    settings_dic = dict()
+    settings_dic['Name'] = "test"
+    settings_dic['DeferredRibGen '] = True
+    guerilla.render('farm', settings_dic)
