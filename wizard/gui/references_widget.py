@@ -405,16 +405,17 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(7)
+        self.list_view.setColumnCount(8)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Version', 'Format', 'Auto update'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Version', 'Format', 'Auto update', 'ID'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
         self.list_view.header().resizeSection(3, 250)
         self.list_view.header().resizeSection(4, 100)
         self.list_view.header().resizeSection(5, 100)
-        self.list_view.header().resizeSection(6, 20)
+        self.list_view.header().resizeSection(6, 100)
+        self.list_view.header().resizeSection(7, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -547,6 +548,9 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
 
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))
+        
+        self.setText(7, str(self.reference_row['id']))
+        self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
         self.variant_widget.setText(infos_list[1])
@@ -698,29 +702,36 @@ class reference_infos_thread(QtCore.QThread):
         self.running = True
 
     def run(self):
-        if self.reference_rows is not None:
-            for reference_row in self.reference_rows:
-                export_version_row = project.get_export_version_data(reference_row['export_version_id'])
-                format = json.loads(export_version_row['files'])[0].split('.')[-1]
-                export_row = project.get_export_data(export_version_row['export_id'])
-                variant_row = project.get_variant_data(export_row['variant_id'])
-                stage_row = project.get_stage_data(variant_row['stage_id'])
-                asset_name = project.get_asset_data(stage_row['asset_id'], 'name')
-                default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
+        try:
+            if self.reference_rows is not None:
+                for reference_row in self.reference_rows:
+                    export_version_row = project.get_export_version_data(reference_row['export_version_id'])
+                    files = json.loads(export_version_row['files'])
+                    if len(files)>0:
+                        format = files[0].split('.')[-1]
+                    else:
+                        format = '?'
+                    export_row = project.get_export_data(export_version_row['export_id'])
+                    variant_row = project.get_variant_data(export_row['variant_id'])
+                    stage_row = project.get_stage_data(variant_row['stage_id'])
+                    asset_name = project.get_asset_data(stage_row['asset_id'], 'name')
+                    default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
 
-                if default_export_version_id  != reference_row['export_version_id']:
-                    up_to_date = 0
-                else:
-                    up_to_date = 1
+                    if default_export_version_id  != reference_row['export_version_id']:
+                        up_to_date = 0
+                    else:
+                        up_to_date = 1
 
-                self.reference_infos_signal.emit([reference_row['id'], 
-                                                    variant_row['name'], 
-                                                    export_row['name'], 
-                                                    export_version_row['name'], 
-                                                    up_to_date, 
-                                                    reference_row['auto_update'],
-                                                    asset_name,
-                                                    format])
+                    self.reference_infos_signal.emit([reference_row['id'], 
+                                                        variant_row['name'], 
+                                                        export_row['name'], 
+                                                        export_version_row['name'], 
+                                                        up_to_date, 
+                                                        reference_row['auto_update'],
+                                                        asset_name,
+                                                        format])
+        except:
+            logger.error(str(traceback.format_exc()))
 
     def update_references_rows(self, reference_rows):
         self.running = False

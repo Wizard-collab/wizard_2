@@ -353,7 +353,7 @@ class versions_widget(QtWidgets.QWidget):
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File', 'id'])
+        self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File', 'ID'])
         self.list_view.header().resizeSection(3, 150)
         self.list_view.header().resizeSection(4, 250)
         self.list_view.header().resizeSection(5, 400)

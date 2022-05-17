@@ -99,14 +99,17 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(0)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(9)
+        self.list_view.setColumnCount(10)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Format', 'Infos', 'Default'])
-        self.list_view.header().resizeSection(0, 100)
+        self.list_view.setHeaderLabels(['Export name', 'Version', 'User', 'Date', 'Comment', 'From', 'Format', 'Infos', 'Default', 'ID'])
+        self.list_view.header().resizeSection(0, 150)
         self.list_view.header().resizeSection(3, 150)
         self.list_view.header().resizeSection(4, 250)
-        self.list_view.header().resizeSection(8, 40)
+        self.list_view.header().resizeSection(5, 60)
+        self.list_view.header().resizeSection(6, 60)
+        self.list_view.header().resizeSection(8, 100)
+        self.list_view.header().resizeSection(9, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -571,6 +574,8 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setText(9, str(self.export_row['id']))
+        self.setForeground(9, QtGui.QBrush(QtGui.QColor('gray')))
 
     def set_default_name(self, name):
         if self.export_row['default_export_version'] is None:
@@ -609,6 +614,8 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         else:
             extension = '?'
         self.setText(6, extension)
+        self.setText(9, str(self.export_version_row['id']))
+        self.setForeground(9, QtGui.QBrush(QtGui.QColor('gray')))
 
     def refresh(self, export_version_row):
         self.export_version_row = export_version_row
