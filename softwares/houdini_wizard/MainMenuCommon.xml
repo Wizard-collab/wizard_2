@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+  <menuBar>
+    <subMenu id="my_submenu">
+      <label>Wizard</label>
+
+      <scriptItem>
+        <label>Save</label>
+         <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.save_increment()]]>
+        </scriptCode>
+      </scriptItem>
+
+      <scriptItem>
+        <label>Export data</label>
+        <scriptPath>$HOME/scripts/first_script.py</scriptPath>
+      </scriptItem>
+
+      <separatorItem/>
+
+      <scriptItem>
+        <label>Import and update all</label>
+        <scriptPath>$HOME/scripts/first_script.py</scriptPath>
+      </scriptItem>
+
+      <separatorItem/>
+
+      <scriptItem>
+        <label>Set frame range</label>
+         <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.set_frame_range()]]>
+        </scriptCode>
+      </scriptItem>
+
+      <scriptItem>
+        <label>Set frame range with rolls</label>
+         <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.set_frame_range(rolls=1)]]>
+        </scriptCode>
+      </scriptItem>
+
+
+      
+    </subMenu>
+  </menuBar>
+</mainMenu>

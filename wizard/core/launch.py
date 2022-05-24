@@ -162,9 +162,17 @@ def build_env(work_env_id, software_row, version_id):
 
     # Substance Painter specific env
     if software_row['name'] == softwares_vars._substance_painter_:
-        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + path_utils.join(softwares_vars._main_script_path_,
-                                                                                    'substance_painter_wizard')
-    
+        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + _plugins_path_[software_row['name']]
+
+    # Houdini specific env
+    if software_row['name'] == softwares_vars._houdini_:
+        env['HOUDINI_MENU_PATH'] = f"{softwares_vars._plugins_path_[software_row['name']]};&"
+
+    # Nuke specific env
+    if software_row['name'] == softwares_vars._nuke_:
+        if 'NUKE_PATH' in env.keys():
+            env['NUKE_PATH'] += os.pathsep + softwares_vars._plugins_path_[software_row['name']]
+
     # Getting the project software additionnal environment
     additionnal_script_paths = []
     if software_row['additionnal_scripts']:
@@ -190,6 +198,9 @@ def build_env(work_env_id, software_row, version_id):
         del env['QML2_IMPORT_PATH']
     if 'QT_AUTO_SCREEN_SCALE_FACTOR' in env.keys():
         del env['QT_AUTO_SCREEN_SCALE_FACTOR']
+
+    for key in env.keys():
+        print(f"{key} = {env[key]}")
 
     return env
 
