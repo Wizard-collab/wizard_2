@@ -45,6 +45,7 @@ sys.path.append(os.path.abspath(''))
 from wizard.gui import gui_server
 
 # Wizard modules
+from wizard.core import application
 from wizard.core import user
 from wizard.core import project
 from wizard.core import site
@@ -58,6 +59,9 @@ from wizard.core import db_core
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
+
+application.log_app_infos()
+print('PyWizard')
 
 while not user.user().get_psql_dns():
     psql_host = tools.flushed_input("PostgreSQL host : ")
@@ -129,18 +133,8 @@ communicate_server.start()
 softwares_server = launch.softwares_server()
 softwares_server.start()
 
-if len(sys.argv) == 2:
-    try:
-        exec(open(sys.argv[1]).read())
-    except:
-        logger.error(str(traceback.format_exc()))
-    finally:
-        db_server.stop()
-        softwares_server.stop()
-        communicate_server.stop()
-else:
-    console = code.InteractiveConsole()
-    console.interact(banner=None, exitmsg=None)
-    db_server.stop()
-    softwares_server.stop()
-    communicate_server.stop()
+console = code.InteractiveConsole()
+console.interact(banner=None, exitmsg=None)
+db_server.stop()
+softwares_server.stop()
+communicate_server.stop()

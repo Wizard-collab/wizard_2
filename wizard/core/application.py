@@ -29,6 +29,7 @@
 # Python modules
 import yaml
 import os
+import time
 import logging
 
 # Wizard modules
@@ -37,11 +38,26 @@ from wizard.core import path_utils
 logger = logging.getLogger(__name__)
 
 def get_version():
-	version_file = 'version.yaml'
-	if path_utils.isfile(version_file):
-		with open(version_file, 'r') as f:
-			version_dic = yaml.load(f, Loader=yaml.Loader)
-		return version_dic
-	else:
-		logger.error(f'{version_file} not found')
-		return None
+    version_file = 'version.yaml'
+    if path_utils.isfile(version_file):
+        with open(version_file, 'r') as f:
+            version_dic = yaml.load(f, Loader=yaml.Loader)
+        return version_dic
+    else:
+        logger.error(f'{version_file} not found')
+        return None
+
+def log_app_infos():
+	print('')
+	log_version()
+	print('')
+	log_license()
+	print('')
+
+def log_version():
+    version_dic = get_version()
+    print(f"Wizard {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']} build {version_dic['builds']}, {time.ctime(version_dic['date'])}")
+
+def log_license():
+    with open('LICENSE', 'r') as f:
+        print(f.read())

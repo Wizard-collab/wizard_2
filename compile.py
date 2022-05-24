@@ -1,6 +1,7 @@
 import subprocess
 import os
 import shutil
+import time
 import yaml
 import sys
 import logging
@@ -64,6 +65,7 @@ class compile():
 				compil_data_dic['MINOR'] = MINOR
 				compil_data_dic['PATCH'] = PATCH
 				compil_data_dic['builds'] = build_no
+				compil_data_dic['date'] = time.time()
 				with open(compil_data_file, 'w') as f:
 					yaml.dump(compil_data_dic, f)
 				logger.info(f"Release name : {release_name}")
@@ -80,10 +82,6 @@ class compile():
 				shutil.rmtree('build')
 				
 			command_line = "PyInstaller wizard.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller wizard_console.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
@@ -127,8 +125,6 @@ class compile():
 							'dist/server/server.exe',
 							'dist/server/server.exe.manifest',
 							'dist/uninstall.exe',
-							'dist/Wizard console/Wizard console.exe',
-							'dist/Wizard console/Wizard console.exe.manifest',
 							'dist/Project Manager/Project Manager.exe',
 							'dist/Project Manager/Project Manager.exe.manifest',
 							'dist/error_handler/error_handler.exe',

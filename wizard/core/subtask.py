@@ -41,6 +41,7 @@ import logging
 
 # Wizard modules
 from wizard.vars import user_vars
+from wizard.core import environment
 from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import socket_utils
@@ -186,11 +187,25 @@ class subtask(Thread):
                 py_file = self.pycmd
             else:
                 py_file = tools.temp_file_from_pycmd(self.pycmd)
-                
+            
             if sys.argv[0].endswith('.py'):
-                self.command = f'python PyWizard.py "{py_file}"'
+                executable = 'python wizard_cmd.py'
             else:
-                self.command = f'PyWizard "{py_file}"'
+                executable = 'wizard_cmd'
+
+            psql_dns = environment.get_psql_dns()
+            site_name = environment.get_site()[5:]
+            user_name = environment.get_user()
+            project_name = environment.get_project_name()
+            team_dns = environment.get_team_dns()
+
+            self.command = f'{executable} '
+            self.command += f'-psqlDns "{psql_dns}" '
+            self.command += f'-site "{site_name}" '
+            self.command += f'-user "{user_name}" '
+            self.command += f'-project "{project_name}" '
+            self.command += f'-teamDns "{team_dns}" '
+            self.command += f'-pyfile "{py_file}"'
 
     def run(self):
         try:

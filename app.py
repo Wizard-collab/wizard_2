@@ -52,6 +52,7 @@ from wizard.gui import logging_widget
 import error_handler
 
 # Wizard modules
+from wizard.core import application
 from wizard.core import user
 from wizard.core import environment
 from wizard.core import site
@@ -160,6 +161,7 @@ def excepthook(exc_type, exc_value, exc_tb):
 
 def main(project_manager=False):
     sys.excepthook = excepthook
+    application.log_app_infos()
     wizard_app = app(project_manager)
     ret = wizard_app.app.exec_()
 

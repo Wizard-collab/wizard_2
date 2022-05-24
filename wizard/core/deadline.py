@@ -42,6 +42,7 @@ def submit_job(pycmd, name, priority=50):
 	site_name = environment.get_site()[5:]
 	user_name = environment.get_user()
 	project_name = environment.get_project_name()
+	team_dns = environment.get_team_dns()
 	pyfile = tools.shared_temp_file_from_pycmd(pycmd, project.get_temp_scripts_folder())
 
 	command = f"{deadline_path} "
@@ -52,6 +53,8 @@ def submit_job(pycmd, name, priority=50):
 	command += f'-site <QUOTE>{site_name}<QUOTE> '
 	command += f'-user <QUOTE>{user_name}<QUOTE> '
 	command += f'-project <QUOTE>{project_name}<QUOTE> '
+	if team_dns:
+		command += f'-teamDns <QUOTE>{team_dns}<QUOTE> '
 	command += f'-pyfile <QUOTE>{pyfile}<QUOTE>"'
 
 	process = subprocess.Popen(command, stdout=subprocess.PIPE)

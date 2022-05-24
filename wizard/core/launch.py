@@ -199,9 +199,6 @@ def build_env(work_env_id, software_row, version_id):
     if 'QT_AUTO_SCREEN_SCALE_FACTOR' in env.keys():
         del env['QT_AUTO_SCREEN_SCALE_FACTOR']
 
-    for key in env.keys():
-        print(f"{key} = {env[key]}")
-
     return env
 
 class software_thread(Thread):
