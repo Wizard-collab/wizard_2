@@ -13,14 +13,18 @@ wizard_plugin.save_increment()]]>
 
       <scriptItem>
         <label>Export data</label>
-        <scriptPath>$HOME/scripts/first_script.py</scriptPath>
+        <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.export()]]>
+        </scriptCode>
       </scriptItem>
 
       <separatorItem/>
 
       <scriptItem>
         <label>Import and update all</label>
-        <scriptPath>$HOME/scripts/first_script.py</scriptPath>
+        <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.reference_and_update_all()]]>
+        </scriptCode>
       </scriptItem>
 
       <separatorItem/>

@@ -48,6 +48,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.nspace_list = self.get_selected_nspaces()
         self.render_type = self.render_type_combo.currentText()
         self.guerilla_deadline = self.guerilla_deadline_checkbox.isChecked()
+        self.deadline = self.deadline_checkbox.isChecked()
         if (len(self.nspace_list) > 0) and self.need_nspace_list:
             self.accept()
         elif not self.need_nspace_list:
@@ -96,6 +97,9 @@ class batch_settings_widget(QtWidgets.QDialog):
             self.need_render_type = True
             if project.get_work_env_data(self.work_env_id, 'name') != 'guerilla_render':
                 self.guerilla_deadline_widget.setVisible(False)
+                self.deadline_widget.setVisible(True)
+            else:
+                self.deadline_widget.setVisible(False)
         else:
             self.need_render_type = False
             self.render_type_widget.setVisible(False)
@@ -226,9 +230,9 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.guerilla_deadline_widget.setLayout(self.guerilla_deadline_layout)
         self.main_layout.addWidget(self.guerilla_deadline_widget)
 
-        self.deadline_label = QtWidgets.QLabel('Guerilla - Deadline')
-        self.deadline_label.setObjectName('gray_label')
-        self.guerilla_deadline_layout.addWidget(self.deadline_label)
+        self.guerilla_deadline_label = QtWidgets.QLabel('Guerilla - Deadline')
+        self.guerilla_deadline_label.setObjectName('gray_label')
+        self.guerilla_deadline_layout.addWidget(self.guerilla_deadline_label)
 
         self.guerilla_deadline_checkbox = QtWidgets.QCheckBox('Submit to deadline')
         self.guerilla_deadline_checkbox.setObjectName('transparent_widget')
@@ -252,6 +256,24 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.assets_list = QtWidgets.QListWidget()
         self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.nspace_list_layout.addWidget(self.assets_list)
+
+        # Deadline section
+
+        self.deadline_widget = QtWidgets.QWidget()
+        self.deadline_widget.setObjectName('transparent_widget')
+        self.deadline_layout = QtWidgets.QVBoxLayout()
+        self.deadline_layout.setContentsMargins(0,0,0,0)
+        self.deadline_layout.setSpacing(8)
+        self.deadline_widget.setLayout(self.deadline_layout)
+        self.main_layout.addWidget(self.deadline_widget)
+
+        self.deadline_label = QtWidgets.QLabel('Deadline')
+        self.deadline_label.setObjectName('gray_label')
+        self.deadline_layout.addWidget(self.deadline_label)
+
+        self.deadline_checkbox = QtWidgets.QCheckBox('Submit to deadline')
+        self.deadline_checkbox.setObjectName('transparent_widget')
+        self.deadline_layout.addWidget(self.deadline_checkbox)
 
         # Buttons sections
 

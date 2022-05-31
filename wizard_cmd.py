@@ -1,5 +1,6 @@
 import argparse
 import traceback
+import json
 import logging
 from wizard.core import application
 from wizard.core import environment

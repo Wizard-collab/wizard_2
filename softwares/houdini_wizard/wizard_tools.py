@@ -21,4 +21,48 @@ def save_increment():
         hou.hipFile.save(file_name=file_path)
         os.environ['wizard_version_id'] = str(version_id)
     else:
-        logger.warning("Can't save increment")
+        logger.warning("Can't save increment") 
+
+def create_node_without_duplicate(type, name, parent = None):
+    if not parent:
+        parent = hou.node('/obj')
+
+    node_path = "{}/{}".format(parent.path(), name)
+    node = hou.node(node_path)
+    if node not in parent.children():
+        node = parent.createNode(type, node_name = name)
+        node = hou.node(node_path)
+
+    return node
+
+def get_all_nodes():
+    return hou.node('/').allSubChildren() 
+
+def node_exists(name, parent = None):
+    if not parent:
+        parent = hou.node('/obj')
+    node_path = "{}/{}".format(parent.path(), name)
+    node = hou.node(node_path)
+    return node
+
+def get_file_dir(file):
+    directory = os.path.dirname(file)
+    directory.replace('\\', '/')
+    return directory
+
+def get_new_objects(old_objects):
+    all_objects = get_all_nodes()
+    new_objects = []
+    for object in all_objects:
+        if object not in old_objects:
+            new_objects.append(object)
+    return new_objects
+
+def get_wizard_ref_node():
+    wizard_ref_node_name = "wizard_references"
+    obj_node = hou.node("/obj")
+    wizard_ref_node = hou.node("/obj/" + wizard_ref_node_name)
+    if wizard_ref_node not in obj_node.children():
+         obj_node.createNode("geo", node_name = wizard_ref_node_name)
+         wizard_ref_node = hou.node("/obj/" + wizard_ref_node_name)
+    return wizard_ref_node

@@ -34,6 +34,8 @@ import logging
 # Wizard modules
 from wizard.core import assets
 from wizard.core import subtask
+from wizard.core import deadline
+from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +43,27 @@ def batch_export(version_id, settings_dic=None):
 	asset_string = assets.instance_to_string(('work_version', version_id))
 	command =  "# coding: utf-8\n"
 	command += "from wizard.core import launch_batch\n"
+	command += "from wizard.core import team_client\n"
+	command += "from wizard.core import environment\n"
 	command += f"print('wizard_task_name:Exporting {asset_string}')\n"
 	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+	command += "team_client.refresh_team(environment.get_team_dns())\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=True)
 	task.start()
 	logger.info('Export started as subtask, open the subtask manager to get more informations')
+
+def deadline_batch_export(version_id, settings_dic=None):
+	asset_string = assets.instance_to_string(('work_version', version_id))
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import launch_batch\n"
+	command += "from wizard.core import team_client\n"
+	command += "from wizard.core import environment\n"
+	command += f"print('wizard_task_name:Exporting {asset_string}')\n"
+	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+	command += "team_client.refresh_team(environment.get_team_dns())\n"
+	command += "print('wizard_task_status:done')\n"
+	deadline.submit_job(pycmd=command, name=f'{environment.get_project_name()} - {asset_string} export')
 
 def archive_versions(version_ids):
 	command =  "# coding: utf-8\n"

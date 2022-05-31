@@ -197,7 +197,7 @@ class subtask(Thread):
             site_name = environment.get_site()[5:]
             user_name = environment.get_user()
             project_name = environment.get_project_name()
-            team_dns = environment.get_team_dns()
+            team_dns = json.dumps(environment.get_team_dns())
 
             self.command = f'{executable} '
             self.command += f'-psqlDns "{psql_dns}" '

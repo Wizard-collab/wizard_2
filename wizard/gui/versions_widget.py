@@ -311,7 +311,10 @@ class versions_widget(QtWidgets.QWidget):
                     else:
                         settings_dic['farm'] = False
 
-                subtasks_library.batch_export(version_id, settings_dic)
+                if self.batch_settings_widget.deadline:
+                    subtasks_library.deadline_batch_export(version_id, settings_dic)
+                else:
+                    subtasks_library.batch_export(version_id, settings_dic)
 
     def batch_export_camera(self):
         selection = self.get_selection()
@@ -332,7 +335,11 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
                 settings_dic['stage_to_export'] = 'camera'
-                subtasks_library.batch_export(version_id, settings_dic)
+
+                if self.batch_settings_widget.deadline:
+                    subtasks_library.deadline_batch_export(version_id, settings_dic)
+                else:
+                    subtasks_library.batch_export(version_id, settings_dic)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
