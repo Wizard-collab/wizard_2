@@ -34,7 +34,9 @@ def reference_all(references=None):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     import_modeling(references)
     import_custom(references)
+    import_layout(references)
     import_animation(references)
+    import_camera(references)
 
 def import_modeling(references=None):
     if not references:
@@ -43,19 +45,33 @@ def import_modeling(references=None):
         for modeling_reference in references['modeling']:
             wizard_reference.reference_modeling(modeling_reference['namespace'], modeling_reference['files'])
 
-def import_animation(references=None):
-    if not references:
-        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
-    if 'animation' in references.keys():
-        for modeling_reference in references['animation']:
-            wizard_reference.reference_modeling(modeling_reference['namespace'], modeling_reference['files'])
-
 def import_custom(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for modeling_reference in references['custom']:
             wizard_reference.reference_custom(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_layout(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'layout' in references.keys():
+        for modeling_reference in references['layout']:
+            wizard_reference.reference_layout(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_animation(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'animation' in references.keys():
+        for modeling_reference in references['animation']:
+            wizard_reference.reference_animation(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_camera(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'camera' in references.keys():
+        for modeling_reference in references['camera']:
+            wizard_reference.reference_camera(modeling_reference['namespace'], modeling_reference['files'])
 
 def set_frame_range(rolls=0):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))

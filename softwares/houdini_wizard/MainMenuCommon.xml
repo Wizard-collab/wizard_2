@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mainMenu>
   <menuBar>
-    <subMenu id="my_submenu">
+    <subMenu id="Wizard">
       <label>Wizard</label>
 
       <scriptItem>
@@ -26,6 +26,46 @@ wizard_plugin.export()]]>
 wizard_plugin.reference_and_update_all()]]>
         </scriptCode>
       </scriptItem>
+
+      <subMenu id="import_submenu">
+                <label>Import</label>
+                <scriptItem>
+                  <label>Import all</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.reference_all()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Import modeling</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_modeling()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Import custom</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_custom()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Import layout</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_layout()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Import animation</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_animation()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Import camera</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_camera()]]>
+                  </scriptCode>
+                </scriptItem>
+      </subMenu>
 
       <separatorItem/>
 

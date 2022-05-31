@@ -26,14 +26,28 @@ def save_increment():
 def create_node_without_duplicate(type, name, parent = None):
     if not parent:
         parent = hou.node('/obj')
-
     node_path = "{}/{}".format(parent.path(), name)
     node = hou.node(node_path)
     if node not in parent.children():
         node = parent.createNode(type, node_name = name)
         node = hou.node(node_path)
-
     return node
+
+def connect_to_input_item(node, parent, no):
+    input_item_path = "{}/{}".format(parent.path(), str(no))
+    input_item = hou.item(input_item_path)
+    node.setInput(0, input_item)
+
+def get_new_nodes_in_parent(parent, old_nodes_in_parent):
+    parent_children = get_children(parent)
+    new_nodes_in_parent = []
+    for child in parent_children:
+        if child not in old_nodes_in_parent:
+            new_nodes_in_parent.append(child)
+    return new_nodes_in_parent
+
+def get_children(parent):
+    return parent.children() 
 
 def get_all_nodes():
     return hou.node('/').allSubChildren() 
