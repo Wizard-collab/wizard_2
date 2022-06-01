@@ -162,7 +162,7 @@ def build_env(work_env_id, software_row, version_id):
 
     # Substance Painter specific env
     if software_row['name'] == softwares_vars._substance_painter_:
-        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + _plugins_path_[software_row['name']]
+        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + softwares_vars._plugins_path_[software_row['name']]
 
     # Houdini specific env
     if software_row['name'] == softwares_vars._houdini_:

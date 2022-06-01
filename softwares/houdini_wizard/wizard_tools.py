@@ -59,6 +59,15 @@ def node_exists(name, parent = None):
     node = hou.node(node_path)
     return node
 
+def look_for_node(name):
+    root = hou.node('/')
+    found = None
+    for node in root.allSubChildren():
+        if node.name() == name:
+            found = node
+            break
+    return found
+
 def get_file_dir(file):
     directory = os.path.dirname(file)
     directory.replace('\\', '/')
@@ -80,3 +89,20 @@ def get_wizard_ref_node():
          obj_node.createNode("geo", node_name = wizard_ref_node_name)
          wizard_ref_node = hou.node("/obj/" + wizard_ref_node_name)
     return wizard_ref_node
+
+def apply_tags(out_node):
+    out_node_parent = out_node.parent()
+    out_node_input = out_node.inputs()[0]
+
+    tags_node = create_node_without_duplicate('attribcreate', 'wizardTags', out_node_parent)
+    tags_node.parm('name1').set('wizardTags')
+    tags_node.parm('class1').set('detail')
+    tags_node.parm('type1').set('index')
+
+    asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+    to_tag = [os.environ['wizard_category_name'], asset_tag]
+
+    tags_node.parm('string1').set((',').join(to_tag))
+
+    tags_node.setInput(0, out_node_input)
+    out_node.setInput(0, tags_node)

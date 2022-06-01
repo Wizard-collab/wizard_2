@@ -16,6 +16,10 @@ import wizard_communicate
 from houdini_wizard import wizard_tools
 from houdini_wizard import wizard_reference
 from houdini_wizard.export import custom
+from houdini_wizard.export import modeling
+from houdini_wizard.export import layout
+from houdini_wizard.export import cfx
+from houdini_wizard.export import fx
 
 def save_increment():
     wizard_tools.save_increment()
@@ -24,6 +28,16 @@ def export():
     stage_name = os.environ['wizard_stage_name']
     if stage_name == 'custom':
         custom.main()
+    elif stage_name == 'modeling':
+        modeling.main()
+    elif stage_name == 'layout':
+        layout.main()
+    elif stage_name == 'cfx':
+        cfx.main()
+    elif stage_name == 'fx':
+        fx.main()
+    else:
+        logger.warning(f"Unplugged stage : {stage_name}")
 
 def reference_and_update_all():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
