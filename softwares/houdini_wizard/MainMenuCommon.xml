@@ -42,6 +42,12 @@ wizard_plugin.import_modeling()]]>
                   </scriptCode>
                 </scriptItem>
                 <scriptItem>
+                  <label>Import rigging</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_rigging()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
                   <label>Import custom</label>
                   <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
 wizard_plugin.import_custom()]]>

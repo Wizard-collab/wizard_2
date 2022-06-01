@@ -17,6 +17,7 @@ from houdini_wizard import wizard_tools
 from houdini_wizard import wizard_reference
 from houdini_wizard.export import custom
 from houdini_wizard.export import modeling
+from houdini_wizard.export import rigging
 from houdini_wizard.export import layout
 from houdini_wizard.export import cfx
 from houdini_wizard.export import fx
@@ -30,6 +31,8 @@ def export():
         custom.main()
     elif stage_name == 'modeling':
         modeling.main()
+    elif stage_name == 'rigging':
+        rigging.main()
     elif stage_name == 'layout':
         layout.main()
     elif stage_name == 'cfx':
@@ -47,6 +50,7 @@ def reference_all(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     import_modeling(references)
+    import_rigging(references)
     import_custom(references)
     import_layout(references)
     import_animation(references)
@@ -58,6 +62,13 @@ def import_modeling(references=None):
     if 'modeling' in references.keys():
         for modeling_reference in references['modeling']:
             wizard_reference.reference_modeling(modeling_reference['namespace'], modeling_reference['files'])
+
+def import_rigging(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'rigging' in references.keys():
+        for modeling_reference in references['rigging']:
+            wizard_reference.reference_rigging(modeling_reference['namespace'], modeling_reference['files'])
 
 def import_custom(references=None):
     if not references:

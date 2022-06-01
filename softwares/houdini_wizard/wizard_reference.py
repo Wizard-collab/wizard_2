@@ -24,6 +24,9 @@ except:
 def reference_modeling(namespace, files_list):
     import_from_extension(namespace, files_list, 'MODELING', 'modeling')
 
+def reference_rigging(namespace, files_list):
+    import_from_extension(namespace, files_list, 'RIGGING', 'rigging')
+
 def reference_custom(namespace, files_list):
     import_from_extension(namespace, files_list, 'CUSTOM', 'custom')
 
