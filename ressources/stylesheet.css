@@ -565,7 +565,7 @@ QSlider::handle:horizontal {
 }
 
 #loading_widget_frame{
-	border-radius: 5px;
+	border-radius: 0px;
 }
 
 #drop_widget{

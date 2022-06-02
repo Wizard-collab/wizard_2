@@ -51,7 +51,7 @@ class loading_widget(QtWidgets.QWidget):
 
         self.main_frame.setObjectName('loading_widget_frame')
         self.frame_layout = QtWidgets.QVBoxLayout()
-        self.frame_layout.setContentsMargins(4,4,4,4)
+        self.frame_layout.setContentsMargins(0,0,0,0)
         self.frame_layout.setSpacing(6)
         self.main_frame.setLayout(self.frame_layout)
         self.main_layout.addWidget(self.main_frame)
@@ -63,8 +63,8 @@ class loading_widget(QtWidgets.QWidget):
         self.datas_widget = QtWidgets.QWidget()
         self.datas_widget.setObjectName('transparent_widget')
         self.datas_layout = QtWidgets.QVBoxLayout()
-        self.datas_layout.setContentsMargins(4,4,4,4)
-        self.datas_layout.setSpacing(6)
+        self.datas_layout.setContentsMargins(12,12,12,12)
+        self.datas_layout.setSpacing(4)
         self.datas_widget.setLayout(self.datas_layout)
         self.frame_layout.addWidget(self.datas_widget)
 
@@ -103,5 +103,5 @@ class loading_widget(QtWidgets.QWidget):
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(project_image)
         icon = QtGui.QIcon(pixmap)
-        pm = gui_utils.round_corners_image_button(project_image, (350,197), 4)
+        pm = gui_utils.round_corners_image_button(project_image, (350,197), 0)
         self.image_label.setPixmap(pm)
