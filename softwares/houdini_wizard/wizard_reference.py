@@ -24,20 +24,44 @@ except:
 def reference_modeling(namespace, files_list):
     import_from_extension(namespace, files_list, 'MODELING', 'modeling')
 
+def update_modeling(namespace, files_list):
+    update_from_extension(namespace, files_list, 'MODELING', 'modeling')
+
 def reference_rigging(namespace, files_list):
     import_from_extension(namespace, files_list, 'RIGGING', 'rigging')
+
+def update_rigging(namespace, files_list):
+    update_from_extension(namespace, files_list, 'RIGGING', 'rigging')
 
 def reference_custom(namespace, files_list):
     import_from_extension(namespace, files_list, 'CUSTOM', 'custom')
 
+def update_custom(namespace, files_list):
+    update_from_extension(namespace, files_list, 'CUSTOM', 'custom')
+
 def reference_layout(namespace, files_list):
     import_from_extension(namespace, files_list, 'LAYOUT', 'layout')
+
+def update_layout(namespace, files_list):
+    update_from_extension(namespace, files_list, 'LAYOUT', 'layout')
 
 def reference_animation(namespace, files_list):
     import_from_extension(namespace, files_list, 'ANIMATION', 'animation')
 
+def update_animation(namespace, files_list):
+    update_from_extension(namespace, files_list, 'ANIMATION', 'animation')
+
+def reference_cfx(namespace, files_list):
+    import_from_extension(namespace, files_list, 'CFX', 'cfx')
+
+def update_cfx(namespace, files_list):
+    update_from_extension(namespace, files_list, 'CFX', 'cfx')
+
 def reference_camera(namespace, files_list):
     import_from_extension(namespace, files_list, 'CAMERA', 'camera')
+
+def update_camera(namespace, files_list):
+    update_from_extension(namespace, files_list, 'CAMERA', 'camera')
 
 def import_from_extension(namespace, files_list, parent_GRP_name, stage_name):
     old_nodes = wizard_tools.get_all_nodes()
@@ -49,6 +73,21 @@ def import_from_extension(namespace, files_list, parent_GRP_name, stage_name):
             reference_abc_camera(namespace, files_list)
     elif extension == 'hip':
         merge(namespace, files_list)
+    trigger_after_reference_hook(stage_name,
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_nodes))
+
+def update_from_extension(namespace, files_list, parent_GRP_name, stage_name):
+    old_nodes = wizard_tools.get_all_nodes()
+    extension = files_list[0].split('.')[-1]
+    if extension == 'abc':
+        if stage_name != 'camera':
+            update_abc(namespace, files_list)
+        else:
+            update_abc_camera(namespace, files_list)
+    elif extension == 'hip':
+        update_hip(namespace, files_list)
     trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
@@ -67,6 +106,22 @@ def reference_abc(namespace, files_list):
             wizard_ref_node.layoutChildren()
     else:
         logger.warning("Can't reference multiple abc files")
+
+def update_abc(namespace, files_list):
+    if len(files_list) == 1:
+        wizard_ref_node = wizard_tools.get_wizard_ref_node()
+        abc_node = wizard_tools.node_exists(namespace, parent=wizard_ref_node)
+        if abc_node:
+            abc_node.parm("fileName").set(files_list[0])
+        else:
+            logger.warning(f"{namespace} not found")
+    else:
+        logger.warning("Can't reference multiple abc files")
+
+def update_hip(namespace, files_list):
+    root = hou.node('/obj')
+    if wizard_tools.node_exists(namespace, parent=root):
+        logger.info(f"Can't update {files_list[0]} since it is merged")
 
 def merge(namespace, files_list):
     if len(files_list) == 1:
@@ -93,6 +148,20 @@ def reference_abc_camera(namespace, files_list):
         wizard_tools.connect_to_input_item(hou_camera_node, abc_xform_node, 1)
         cam_main_node.layoutChildren()
         abc_xform_node.layoutChildren()
+    else:
+        logger.warning("Can't merge multiple files")
+
+def update_abc_camera(namespace, files_list):
+    if len(files_list) == 1:
+        cam_main_node = wizard_tools.node_exists(namespace, parent=None)
+        if cam_main_node:
+            abc_xform_node = wizard_tools.node_exists(namespace+'_xform', parent=cam_main_node)
+            if abc_xform_node:
+                abc_xform_node.parm("fileName").set(files_list[0])
+            else:
+                logger.warning(f"{namespace+'_xform'} not found")
+        else:
+            logger.warning(f"{namespace} not found")
     else:
         logger.warning("Can't merge multiple files")
 

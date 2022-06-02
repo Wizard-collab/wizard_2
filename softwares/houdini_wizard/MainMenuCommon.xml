@@ -66,9 +66,67 @@ wizard_plugin.import_animation()]]>
                   </scriptCode>
                 </scriptItem>
                 <scriptItem>
+                  <label>Import cfx</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_cfx()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
                   <label>Import camera</label>
                   <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
 wizard_plugin.import_camera()]]>
+                  </scriptCode>
+                </scriptItem>
+      </subMenu>
+
+      <subMenu id="update_submenu">
+                <label>Update</label>
+                <scriptItem>
+                  <label>Update all</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_all()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update modeling</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_modeling()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update rigging</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_rigging()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update custom</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_custom()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update layout</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_layout()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update animation</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_animation()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update cfx</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_cfx()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update camera</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_camera()]]>
                   </scriptCode>
                 </scriptItem>
       </subMenu>
