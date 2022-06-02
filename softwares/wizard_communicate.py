@@ -117,3 +117,10 @@ def create_or_get_camera_work_env(work_env_id):
     signal_dic['work_env_id'] = work_env_id
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
+
+def get_file(version_id):
+    signal_dic=dict()
+    signal_dic['function'] = 'get_file'
+    signal_dic['version_id'] = version_id
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned

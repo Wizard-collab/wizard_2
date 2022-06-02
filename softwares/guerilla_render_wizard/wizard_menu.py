@@ -65,6 +65,11 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.import_animation()
 
+    class import_cfx(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.import_cfx()
+
     class import_camera(command):
         @staticmethod
         def action(luaObj, window, x, y, suffix):
@@ -104,6 +109,11 @@ class menu():
         @staticmethod
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.update_animation()
+
+    class update_cfx(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.update_cfx()
 
     class update_camera(command):
         @staticmethod
@@ -174,6 +184,8 @@ class menu():
     cmd.install('Wizard', ' Import')
     cmd = import_animation('Import animation', 'icons/animation.png')
     cmd.install('Wizard', ' Import')
+    cmd = import_cfx('Import cfx', 'icons/cfx.png')
+    cmd.install('Wizard', ' Import')
     cmd = import_camera('Import camera', 'icons/camera.png')
     cmd.install('Wizard', ' Import')
     cmd = update_all('Update all', 'icons/all.png')
@@ -189,6 +201,8 @@ class menu():
     cmd = update_layout('Update layout', 'icons/layout.png')
     cmd.install('Wizard', ' Update')
     cmd = update_animation('Update animation', 'icons/animation.png')
+    cmd.install('Wizard', ' Update')
+    cmd = update_cfx('Update cfx', 'icons/cfx.png')
     cmd.install('Wizard', ' Update')
     cmd = update_camera('Update camera', 'icons/camera.png')
     cmd.install('Wizard', ' Update')

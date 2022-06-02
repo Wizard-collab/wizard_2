@@ -61,6 +61,7 @@ def reference_all(*args, **kwargs):
     reference_camrig(references=references)
     reference_layout(references=references)
     reference_animation(references=references)
+    reference_cfx(references=references)
     reference_camera(references=references)
 
 def update_all(*args, **kwargs):
@@ -71,6 +72,7 @@ def update_all(*args, **kwargs):
     update_camrig(references=references)
     update_layout(references=references)
     update_animation(references=references)
+    update_cfx(references=references)
     update_camera(references=references)
 
 def reference_modeling(*args, **kwargs):
@@ -144,6 +146,18 @@ def update_animation(*args, **kwargs):
     if 'animation' in references.keys():
         for animation_reference in references['animation']:
             wizard_reference.update_animation(animation_reference['namespace'], animation_reference['files'])
+
+def reference_cfx(*args, **kwargs):
+    references = get_references(kwargs)
+    if 'cfx' in references.keys():
+        for animation_reference in references['cfx']:
+            wizard_reference.reference_cfx(animation_reference['namespace'], animation_reference['files'])
+
+def update_cfx(*args, **kwargs):
+    references = get_references(kwargs)
+    if 'cfx' in references.keys():
+        for animation_reference in references['cfx']:
+            wizard_reference.update_cfx(animation_reference['namespace'], animation_reference['files'])
 
 def reference_camera(*args, **kwargs):
     references = get_references(kwargs)

@@ -89,7 +89,7 @@ _batch_file_command_[_guerilla_render_] = '''"{}" "{}" --nogui --pycmd "execfile
 _batch_file_command_[_substance_painter_] = ''
 _batch_file_command_[_substance_designer_] = ''
 _batch_file_command_[_nuke_] = ''
-_batch_file_command_[_houdini_] = ''
+_batch_file_command_[_houdini_] = '"{}" "{}" "{}" '.format(_executable_key_, _file_key_, _script_key_)
 _batch_file_command_[_blender_] = '"{}" "{}" -b --python "{}"'.format(_executable_key_, _file_key_, _script_key_)
 
 _batch_no_file_command_ = dict()

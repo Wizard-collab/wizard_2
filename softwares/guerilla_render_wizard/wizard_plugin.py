@@ -53,6 +53,7 @@ def reference_all(references=None):
     import_custom(references)
     import_layout(references)
     import_animation(references)
+    import_cfx(references)
     import_camera(references)
 
 def update_all(references=None):
@@ -64,6 +65,7 @@ def update_all(references=None):
     update_custom(references)
     update_layout(references)
     update_animation(references)
+    update_cfx(references)
     update_camera(references)
 
 def import_modeling(references=None):
@@ -153,6 +155,20 @@ def update_animation(references=None):
     if 'animation' in references.keys():
         for animation_reference in references['animation']:
             wizard_reference.update_animation(animation_reference['namespace'], animation_reference['files'])
+
+def import_cfx(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'cfx' in references.keys():
+        for animation_reference in references['cfx']:
+            wizard_reference.reference_cfx(animation_reference['namespace'], animation_reference['files'])
+
+def update_cfx(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'cfx' in references.keys():
+        for animation_reference in references['cfx']:
+            wizard_reference.update_cfx(animation_reference['namespace'], animation_reference['files'])
 
 def import_camera(references=None):
     if not references:

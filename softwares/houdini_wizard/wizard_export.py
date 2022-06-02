@@ -23,7 +23,7 @@ except:
     logger.error(str(traceback.format_exc()))
     logger.warning("Can't import houdini_hook")
 
-def export(stage_name, export_name, frange=[0,0], custom_work_env_id = None):
+def export(stage_name, export_name, frange=[0,0], custom_work_env_id = None, parent=None):
     if trigger_sanity_hook(stage_name):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
@@ -31,18 +31,18 @@ def export(stage_name, export_name, frange=[0,0], custom_work_env_id = None):
             work_env_id = int(os.environ['wizard_work_env_id'])
         export_file = wizard_communicate.request_export(work_env_id,
                                                                 export_name)
-        export_by_extension(export_file, frange)
+        export_by_extension(export_file, frange, parent)
         export_dir = wizard_communicate.add_export_version(export_name,
                                                 [export_file],
                                                 work_env_id,
                                                 int(os.environ['wizard_version_id']))
         trigger_after_export_hook(stage_name, export_dir)
 
-def export_by_extension(export_file, frange):
+def export_by_extension(export_file, frange, parent):
     if export_file.endswith('.hip'):
         export_hip(export_file, frange)
     elif export_file.endswith('.abc'):
-        export_abc(export_file, frange)
+        export_abc(export_file, frange, parent)
     else:
         logger.info("{} extension is unkown".format(export_file))
 
@@ -64,22 +64,17 @@ def export_hip(export_file, frange):
     logger.info("Exporting .ma")
     hou.hipFile.save(file_name=export_file)
 
-def export_abc(export_file, frange):
-    wizard_abc_output = wizard_tools.look_for_node('wizard_abc_output')
+def export_abc(export_file, frange, parent):
+    wizard_abc_output = wizard_tools.look_for_node('wizard_abc_output', parent)
     if wizard_abc_output:
         wizard_tools.apply_tags(wizard_abc_output)
-
         wizard_abc_output.parm("trange").set('normal')
-
         hou.playbar.setFrameRange(frange[0], frange[1])
-            
         wizard_abc_output.parm("f1").setExpression('$FSTART')
         wizard_abc_output.parm("f2").setExpression('$FEND')
-
         wizard_abc_output.parm("motionBlur").set(1)
         wizard_abc_output.parm("shutter1").set(-0.2)
         wizard_abc_output.parm("shutter2").set(0.2)
-
         wizard_abc_output.parm("filename").set(export_file)
         wizard_abc_output.parm("execute").pressButton()
     else:

@@ -58,6 +58,14 @@ def update_animation(namespace, files_list):
     update_file(namespace, files_list, 'ANIMATION', 'animation')
     append_wizardTags_to_guerillaTags(namespace)
 
+def reference_cfx(namespace, files_list):
+    import_file(namespace, files_list, 'CFX', 'cfx')
+    append_wizardTags_to_guerillaTags(namespace)
+
+def update_cfx(namespace, files_list):
+    update_file(namespace, files_list, 'CFX', 'cfx')
+    append_wizardTags_to_guerillaTags(namespace)
+
 def reference_camera(namespace, files_list):
     import_file(namespace, files_list, 'CAMERA', 'camera')
     append_wizardTags_to_guerillaTags(namespace)

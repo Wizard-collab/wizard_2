@@ -88,6 +88,8 @@ class communicate_server(Thread):
 
         if signal_dic['function'] == 'add_version':
             returned = add_version(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'get_file':
+            returned = get_file(signal_dic['version_id'])
         elif signal_dic['function'] == 'request_export':
             returned = request_export(signal_dic['work_env_id'],
                                         signal_dic['export_name'])
@@ -116,6 +118,10 @@ class communicate_server(Thread):
             returned = create_or_get_camera_work_env(signal_dic['work_env_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
+
+def get_file(version_id):
+    version_path = project.get_version_data(version_id, 'file_path')
+    return version_path
 
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 

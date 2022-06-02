@@ -36,7 +36,7 @@ def export():
     elif stage_name == 'layout':
         layout.main()
     elif stage_name == 'cfx':
-        cfx.main()
+        cfx.invoke_settings_widget()
     elif stage_name == 'fx':
         fx.main()
     else:

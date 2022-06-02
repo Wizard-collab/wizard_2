@@ -42,6 +42,8 @@ class log_viewer(QtWidgets.QWidget):
             logger.warning("No valid file given")
 
     def build_ui(self):
+        self.resize(QtCore.QSize(1400,1000))
+
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(12, 12, 12, 12)
         self.main_layout.setSpacing(6)

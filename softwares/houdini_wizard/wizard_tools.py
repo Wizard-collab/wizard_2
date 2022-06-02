@@ -59,10 +59,16 @@ def node_exists(name, parent = None):
     node = hou.node(node_path)
     return node
 
-def look_for_node(name):
-    root = hou.node('/')
+def look_for_node(name, parent=None):
+    if parent is not None:
+        for node in hou.node('/').allSubChildren():
+            if node.name() == parent:
+                parent = node
+                break
+    else:
+        parent = hou.node('/')
     found = None
-    for node in root.allSubChildren():
+    for node in parent.allSubChildren():
         if node.name() == name:
             found = node
             break

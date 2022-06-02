@@ -48,6 +48,8 @@ class menu():
         pm.setParent(import_menu, menu=True)
         pm.menuItem(l='Import animation', c=wizard_plugin.reference_animation, i='icons/animation.png')
         pm.setParent(import_menu, menu=True)
+        pm.menuItem(l='Import cfx', c=wizard_plugin.reference_cfx, i='icons/cfx.png')
+        pm.setParent(import_menu, menu=True)
         pm.menuItem(l='Import camera', c=wizard_plugin.reference_camera, i='icons/camera.png')
         pm.setParent(import_menu, menu=True)
 
@@ -66,6 +68,8 @@ class menu():
         pm.menuItem(l='Update layout', c=wizard_plugin.update_layout, i='icons/layout.png')
         pm.setParent(update_menu, menu=True)
         pm.menuItem(l='Update animation', c=wizard_plugin.update_animation, i='icons/animation.png')
+        pm.setParent(update_menu, menu=True)
+        pm.menuItem(l='Update cfx', c=wizard_plugin.update_cfx, i='icons/cfx.png')
         pm.setParent(update_menu, menu=True)
         pm.menuItem(l='Update camera', c=wizard_plugin.update_camera, i='icons/camera.png')
         pm.setParent(import_menu, menu=True)
