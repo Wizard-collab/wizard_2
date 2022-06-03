@@ -38,7 +38,7 @@ def export():
     elif stage_name == 'cfx':
         cfx.invoke_settings_widget()
     elif stage_name == 'fx':
-        fx.main()
+        fx.invoke_settings_widget()
     else:
         logger.warning(f"Unplugged stage : {stage_name}")
 

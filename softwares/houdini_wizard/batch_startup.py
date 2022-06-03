@@ -16,6 +16,7 @@ from houdini_wizard.export import rigging
 from houdini_wizard.export import custom
 from houdini_wizard.export import layout
 from houdini_wizard.export import cfx
+from houdini_wizard.export import fx
 
 # read_settings
 if 'wizard_json_settings' in os.environ.keys():
@@ -39,6 +40,8 @@ if 'wizard_json_settings' in os.environ.keys():
     elif stage_name == 'cfx':
         cfx.main(nspace_list=nspace_list,
                             frange=frange)
+    elif stage_name == 'fx':
+        fx.main(frange=frange)
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
 

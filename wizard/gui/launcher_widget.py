@@ -58,16 +58,29 @@ class launcher_widget(QtWidgets.QFrame):
     def refresh_versions(self, set_last=None):
         if self.work_env_id:
             version_rows = project.get_work_versions(self.work_env_id)
+            versions_names = []
             if (version_rows is not None) and (version_rows != []):
                 new=0
                 for version_row in version_rows:
+                    versions_names.append(version_row['name'])
                     if version_row['name'] not in self.versions.keys():
                         self.version_comboBox.addItem(version_row['name'])
                         self.versions[version_row['name']] = version_row['id']
                         new=1
+
+                current_version = self.version_comboBox.currentText()
+                combobox_all_items = [self.version_comboBox.itemText(i) for i in range(self.version_comboBox.count())]
+                for version_name in combobox_all_items:
+                    if version_name not in versions_names:
+                        version_index = self.version_comboBox.findData(version_name)
+                        self.version_comboBox.removeItem(version_index)
+                        if version_name == current_version:
+                            set_last = True
+
                 if new or set_last:
                     self.version_comboBox.setCurrentText(version_rows[-1]['name'])
                     self.version_row = version_rows[-1]
+
         self.refresh_version_changed = True
 
     def refresh_versions_hard(self):
