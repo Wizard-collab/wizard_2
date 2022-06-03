@@ -7,7 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.core import image
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import environment
 from wizard.core import application
 from wizard.vars import ressources
@@ -98,7 +98,7 @@ class loading_widget(QtWidgets.QWidget):
         self.version_label.setText(f"version {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
         self.build_label.setText(f"- build {version_dic['builds']}")
 
-        project_row = site.get_project_row_by_name(environment.get_project_name())
+        project_row = repository.get_project_row_by_name(environment.get_project_name())
         project_image = image.convert_str_data_to_image_bytes(project_row['project_image'])
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(project_image)

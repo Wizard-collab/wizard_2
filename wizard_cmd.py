@@ -4,7 +4,7 @@ import json
 import logging
 from wizard.core import application
 from wizard.core import environment
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import user
 from wizard.core import project
 from wizard.core import assets
@@ -22,7 +22,7 @@ print('Wizard CMD')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-psqlDns', dest='psql_dns', type=str, help='PostgreSQL connection DNS')
-parser.add_argument('-site', dest='site', type=str, help='Wizard site')
+parser.add_argument('-repository', dest='repository', type=str, help='Wizard repository')
 parser.add_argument('-user', dest='user', type=str, help='Wizard user')
 parser.add_argument('-project', dest='project', type=str, help='Wizard project')
 parser.add_argument('-teamDns', dest='team_dns', type=str, help='Wizard team connection DNS')
@@ -34,10 +34,10 @@ if not args.psql_dns:
 else:
 	logger.info(f"PostgreSQL DNS : {args.psql_dns}")
 
-if not args.site:
-	logger.error("Please provide a site")
+if not args.repository:
+	logger.error("Please provide a repository")
 else:
-	logger.info(f"Site : {args.site}")
+	logger.info(f"repository : {args.repository}")
 
 if not args.user:
 	logger.error("Please provide a user")
@@ -63,13 +63,13 @@ environment.set_psql_dns(args.psql_dns)
 db_server = db_core.db_server()
 db_server.start()
 
-environment.set_site(args.site)
-db_server.site=environment.get_site()
+environment.set_repository(args.repository)
+db_server.repository=environment.get_repository()
 
-user_row = site.get_user_row_by_name(args.user)
+user_row = repository.get_user_row_by_name(args.user)
 environment.build_user_env(user_row)
 
-project_row = site.get_project_row_by_name(args.project)
+project_row = repository.get_project_row_by_name(args.project)
 environment.build_project_env(project_row['project_name'], project_row['project_path'])
 
 db_server.project_name = environment.get_project_name()

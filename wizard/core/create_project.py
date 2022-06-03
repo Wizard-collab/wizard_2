@@ -28,7 +28,7 @@
 
 # Main wizard module to create a project
 # This module basically store the new project
-# in the site database, create the project database
+# in the repository database, create the project database
 # and create the intial instances :
 # - assets
 #    - characters

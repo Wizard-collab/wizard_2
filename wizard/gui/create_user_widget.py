@@ -11,7 +11,7 @@ from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.core import image
-from wizard.core import site
+from wizard.core import repository
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -117,7 +117,7 @@ class create_user_widget(QtWidgets.QDialog):
         email = self.email_lineEdit.text()
         admin_password = self.admin_password_lineEdit.text()
         if confirm_password == password:
-            if site.create_user(user_name,
+            if repository.create_user(user_name,
                                     password,
                                     email,
                                     admin_password,

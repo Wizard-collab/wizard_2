@@ -28,13 +28,13 @@
 
 # This wizard module is used to build the user environment
 # when launching the application
-# It can get the site path and some user
+# It can get the repository path and some user
 # preferences from $Documents/preferences.yaml
 
-# If a site path is defined this module
+# If a repository path is defined this module
 # is used to get the current machine user and project
 # The user logs are wrapped to the machine ip
-# The machine ips are stored in the site database file
+# The machine ips are stored in the repository database file
 
 # Python modules
 import yaml
@@ -53,7 +53,7 @@ from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import environment
 from wizard.core import project
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import team_client
@@ -110,26 +110,26 @@ class user:
             logger.info("No postgreSQL DNS set")
             return None
 
-    def get_site(self):
-        if self.prefs_dic[user_vars._site_]:
-            environment.set_site(self.prefs_dic[user_vars._site_])
+    def get_repository(self):
+        if self.prefs_dic[user_vars._repository_]:
+            environment.set_repository(self.prefs_dic[user_vars._repository_])
             return 1
         else:
-            logger.info("No site defined")
+            logger.info("No repository defined")
             return None
 
-    def set_site(self, site):
-        if (site is not None) and (site != ''):
-            if tools.is_dbname_safe(site):
-                self.prefs_dic[user_vars._site_] = site
-                environment.set_site(self.prefs_dic[user_vars._site_])
+    def set_repository(self, repository):
+        if (repository is not None) and (repository != ''):
+            if tools.is_dbname_safe(repository):
+                self.prefs_dic[user_vars._repository_] = repository
+                environment.set_repository(self.prefs_dic[user_vars._repository_])
                 self.write_prefs_dic()
                 return 1
             else:
-                logger.warning(f'Please enter a site name with only lowercase characters, numbers and "_"')
+                logger.warning(f'Please enter a repository name with only lowercase characters, numbers and "_"')
                 return None
         else:
-            logger.warning(f'Please provide a site name')
+            logger.warning(f'Please provide a repository name')
             return None
 
     def set_team_dns(self, host, port):
@@ -240,7 +240,7 @@ class user:
         if not path_utils.isfile(self.user_prefs_file):
             self.prefs_dic = dict()
             self.prefs_dic[user_vars._psql_dns_] = None
-            self.prefs_dic[user_vars._site_] = None
+            self.prefs_dic[user_vars._repository_] = None
             self.prefs_dic[user_vars._team_dns_] = None
             self.prefs_dic[user_vars._tree_context_] = dict()
             self.prefs_dic[user_vars._tabs_context_] = dict()
@@ -291,11 +291,11 @@ class user:
             logger.warning(f"{file} doesn't exists")
 
 def log_user(user_name, password):
-    if user_name in site.get_user_names_list():
-        user_row = site.get_user_row_by_name(user_name)
+    if user_name in repository.get_user_names_list():
+        user_row = repository.get_user_row_by_name(user_name)
         if tools.decrypt_string(user_row['pass'],
                                 password):
-            site.update_current_ip_data('user_id', user_row['id'])
+            repository.update_current_ip_data('user_id', user_row['id'])
             environment.build_user_env(user_row)
             logger.info(f'{user_name} signed in')
             return 1
@@ -307,28 +307,28 @@ def log_user(user_name, password):
         return None
 
 def disconnect_user():
-    site.update_current_ip_data('user_id', None)
+    repository.update_current_ip_data('user_id', None)
     logger.info('You are now disconnected')
 
 def get_user():
-    user_id = site.get_current_ip_data('user_id')
+    user_id = repository.get_current_ip_data('user_id')
     if user_id:
-        environment.build_user_env(user_row=site.get_user_data(user_id))
+        environment.build_user_env(user_row=repository.get_user_data(user_id))
         return 1
     else:
         return None
 
 def log_project(project_name, password, wait_for_restart=False):
-    if project_name in site.get_projects_names_list():
-        project_row = site.get_project_row_by_name(project_name)
+    if project_name in repository.get_projects_names_list():
+        project_row = repository.get_project_row_by_name(project_name)
         if tools.decrypt_string(project_row['project_password'],
                                 password):
-            site.update_current_ip_data('project_id', project_row['id'])
+            repository.update_current_ip_data('project_id', project_row['id'])
             logger.info(f'Successfully signed in {project_name} project')
             if not wait_for_restart:
                 environment.build_project_env(project_name, project_row['project_path'])
                 db_utils.modify_db_name('project', project_name)
-            project.add_user(site.get_user_row_by_name(environment.get_user(),
+            project.add_user(repository.get_user_row_by_name(environment.get_user(),
                                                             'id'))
             return 1
         else:
@@ -339,13 +339,13 @@ def log_project(project_name, password, wait_for_restart=False):
         return None
 
 def log_project_without_cred(project_name):
-    if project_name in site.get_projects_names_list():
-        project_row = site.get_project_row_by_name(project_name)
-        site.update_current_ip_data('project_id', project_row['id'])
+    if project_name in repository.get_projects_names_list():
+        project_row = repository.get_project_row_by_name(project_name)
+        repository.update_current_ip_data('project_id', project_row['id'])
         environment.build_project_env(project_name, project_row['project_path'])
         db_utils.modify_db_name('project', project_name)
         logger.info(f'Successfully signed in {project_name} project')
-        project.add_user(site.get_user_row_by_name(environment.get_user(),
+        project.add_user(repository.get_user_row_by_name(environment.get_user(),
                                                             'id'))
         return 1
     else:
@@ -354,13 +354,13 @@ def log_project_without_cred(project_name):
 
 
 def disconnect_project():
-    site.update_current_ip_data('project_id', None)
+    repository.update_current_ip_data('project_id', None)
     logger.info('Successfully disconnect from project')
 
 def get_project():
-    project_id = site.get_current_ip_data('project_id')
+    project_id = repository.get_current_ip_data('project_id')
     if project_id:
-        project_row = site.get_project_row(project_id) 
+        project_row = repository.get_project_row(project_id) 
         environment.build_project_env(project_name=project_row['project_name'],
                                         project_path=project_row['project_path'])
         return 1

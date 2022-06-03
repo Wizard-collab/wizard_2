@@ -47,6 +47,14 @@ def request_export(work_env_id, export_name):
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return file_path
 
+def get_export_format(work_env_id):
+    # Get a temporary export dir and file from wizard
+    signal_dic=dict()
+    signal_dic['function'] = 'get_export_format'
+    signal_dic['work_env_id'] = work_env_id
+    file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return file_path
+
 def request_render(version_id, export_name):
     # Get a temporary export dir and file from wizard
     signal_dic=dict()

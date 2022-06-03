@@ -14,7 +14,7 @@ from wizard.gui import gui_utils
 from wizard.gui import logging_widget
 
 # Wizard modules
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import tools
 from wizard.core import assets
 from wizard.core import project
@@ -738,7 +738,7 @@ class variant_widget(QtWidgets.QFrame):
         self.state_label.setText(self.variant_row['state'])
         if self.variant_row['tracking_comment'] is not None:
             self.comment_label.setText(self.variant_row['tracking_comment'])
-        user_image =  site.get_user_row_by_name(self.variant_row['assignment'], 'profile_picture')
+        user_image =  repository.get_user_row_by_name(self.variant_row['assignment'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
         self.user_image_label.setPixmap(pm)
 
@@ -793,7 +793,7 @@ class variant_widget(QtWidgets.QFrame):
         menu = gui_utils.QMenu(self)
         users_ids = project.get_users_ids_list()
         for user_id in users_ids:
-            user_row = site.get_user_data(user_id)
+            user_row = repository.get_user_data(user_id)
             icon = QtGui.QIcon()
             pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 22)
             icon.addPixmap(pm)

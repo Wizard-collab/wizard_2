@@ -27,9 +27,9 @@
 # SOFTWARE.
 
 # This module is used to manage and access 
-# the site database
+# the repository database
 
-# The site database stores the following informations:
+# The repository database stores the following informations:
 #       - The users list ( name, hashed password, email )
 #       - The projects list ( name, path, hashed password )
 #       - The ip wraps ( roughly looks like cookies in web )
@@ -47,7 +47,7 @@ from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import environment
 from wizard.core import image
-from wizard.vars import site_vars
+from wizard.vars import repository_vars
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ def create_project(project_name, project_path, project_password, project_image =
         if project_name not in get_projects_names_list():
             if project_path not in get_projects_paths_list():
                 if get_user_row_by_name(environment.get_user())['administrator']:
-                    project_id = db_utils.create_row('site',
+                    project_id = db_utils.create_row('repository',
                                     'projects', 
                                     ('project_name',
                                         'project_path',
@@ -89,7 +89,7 @@ def create_project(project_name, project_path, project_password, project_image =
                                     environment.get_user(),
                                     time.time()))
                     if project_id:
-                        logger.info(f'Project {project_name} added to site')
+                        logger.info(f'Project {project_name} added to repository')
                         return project_id
                     else:
                         return None
@@ -106,7 +106,7 @@ def create_project(project_name, project_path, project_password, project_image =
         return None
 
 def remove_project_row(project_id):
-    if db_utils.delete_row('site', 'projects', project_id):
+    if db_utils.delete_row('repository', 'projects', project_id):
         logger.info('Project row removed')
         return 1
     else:
@@ -118,19 +118,19 @@ def get_administrator_pass():
         return user_row['pass']
 
 def get_projects_list():
-    projects_rows = db_utils.get_rows('site', 'projects')
+    projects_rows = db_utils.get_rows('repository', 'projects')
     return projects_rows
 
 def get_projects_names_list():
-    projects_rows = db_utils.get_rows('site', 'projects', 'project_name')
+    projects_rows = db_utils.get_rows('repository', 'projects', 'project_name')
     return projects_rows
 
 def get_projects_paths_list():
-    projects_rows = db_utils.get_rows('site', 'projects', 'project_path')
+    projects_rows = db_utils.get_rows('repository', 'projects', 'project_path')
     return projects_rows
 
 def get_project_row_by_name(name):
-    projects_rows = db_utils.get_row_by_column_data('site',
+    projects_rows = db_utils.get_row_by_column_data('repository',
                                                     'projects',
                                                     ('project_name', name))
     if len(projects_rows) >= 1:
@@ -140,7 +140,7 @@ def get_project_row_by_name(name):
         return None
 
 def get_project_row(project_id, column='*'):
-    projects_rows = db_utils.get_row_by_column_data('site',
+    projects_rows = db_utils.get_row_by_column_data('repository',
                                                     'projects',
                                                     ('id', project_id),
                                                     column)
@@ -159,7 +159,7 @@ def modify_project_password(project_name,
             if tools.decrypt_string(
                     get_project_row_by_name(project_name)['project_password'],
                     project_password):
-                if db_utils.update_data('site',
+                if db_utils.update_data('repository',
                             'projects',
                             ('project_password', tools.encrypt_string(new_password)),
                             ('project_name', project_name)):
@@ -178,7 +178,7 @@ def modify_project_image(project_name, project_image):
     if project_image:
         if path_utils.isfile(project_image):
             project_image_ascii = process_project_image(project_image)
-            if db_utils.update_data('site',
+            if db_utils.update_data('repository',
                                     'projects',
                                     ('project_image', project_image_ascii),
                                     ('project_name', project_name)):
@@ -228,7 +228,7 @@ def create_user(user_name,
             else:
                 profile_picture = image.user_random_image(user_name)
             profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
-            if db_utils.create_row('site',
+            if db_utils.create_row('repository',
                         'users', 
                         ('user_name',
                             'pass',
@@ -266,7 +266,7 @@ def modify_user_profile_picture(user_name, profile_picture):
     if profile_picture:
         if path_utils.isfile(profile_picture):
             profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
-            if db_utils.update_data('site',
+            if db_utils.update_data('repository',
                                     'users',
                                     ('profile_picture', profile_picture_ascii),
                                     ('user_name', user_name)):
@@ -286,7 +286,7 @@ def upgrade_user_privilege(user_name, administrator_pass):
         if not user_row['administrator']:
             if tools.decrypt_string(get_administrator_pass(),
                                         administrator_pass):
-                if db_utils.update_data('site',
+                if db_utils.update_data('repository',
                                         'users',
                                         ('administrator',1),
                                         ('user_name', user_name)):
@@ -304,7 +304,7 @@ def downgrade_user_privilege(user_name, administrator_pass):
         if user_row['administrator']:
             if tools.decrypt_string(get_administrator_pass(),
                                         administrator_pass):
-                if db_utils.update_data('site',
+                if db_utils.update_data('repository',
                                         'users',
                                         ('administrator',0),
                                         ('user_name', user_name)):
@@ -324,7 +324,7 @@ def modify_user_password(user_name, password, new_password):
     user_row = get_user_row_by_name(user_name)
     if user_row:
         if tools.decrypt_string(user_row['pass'], password):
-            if db_utils.update_data('site',
+            if db_utils.update_data('repository',
                                     'users',
                                     ('pass',
                                         tools.encrypt_string(new_password)),
@@ -338,15 +338,15 @@ def modify_user_password(user_name, password, new_password):
             return None
 
 def get_users_list():
-    users_rows = db_utils.get_rows('site', 'users', order='level DESC, xp DESC;')
+    users_rows = db_utils.get_rows('repository', 'users', order='level DESC, xp DESC;')
     return users_rows
 
 def get_user_names_list():
-    users_rows = db_utils.get_rows('site', 'users', 'user_name')
+    users_rows = db_utils.get_rows('repository', 'users', 'user_name')
     return users_rows
 
 def get_user_row_by_name(name, column='*'):
-    users_rows = db_utils.get_row_by_column_data('site',
+    users_rows = db_utils.get_row_by_column_data('repository',
                                                     'users',
                                                     ('user_name', name),
                                                     column)
@@ -357,7 +357,7 @@ def get_user_row_by_name(name, column='*'):
         return None
 
 def get_user_data(user_id, column='*'):
-    users_rows = db_utils.get_row_by_column_data('site',
+    users_rows = db_utils.get_row_by_column_data('repository',
                                                     'users',
                                                     ('id', user_id),
                                                     column)
@@ -368,7 +368,7 @@ def get_user_data(user_id, column='*'):
         return None
 
 def modify_user_xp(user_name, xp):
-    if db_utils.update_data('site',
+    if db_utils.update_data('repository',
                                 'users',
                                 ('xp', xp),
                                 ('user_name', user_name)):
@@ -378,7 +378,7 @@ def modify_user_xp(user_name, xp):
         return None
 
 def modify_user_total_xp(user_name, total_xp):
-    if db_utils.update_data('site',
+    if db_utils.update_data('repository',
                                 'users',
                                 ('total_xp', total_xp),
                                 ('user_name', user_name)):
@@ -387,7 +387,7 @@ def modify_user_total_xp(user_name, total_xp):
         return None
 
 def modify_user_level(user_name, new_level):
-    if db_utils.update_data('site',
+    if db_utils.update_data('repository',
                             'users',
                             ('level', new_level),
                             ('user_name', user_name)):
@@ -397,7 +397,7 @@ def modify_user_level(user_name, new_level):
         return None
 
 def modify_user_life(user_name, life):
-    if db_utils.update_data('site',
+    if db_utils.update_data('repository',
                                     'users',
                                     ('life', life),
                                     ('user_name', user_name)):
@@ -408,7 +408,7 @@ def modify_user_life(user_name, life):
 
 def modify_user_email(user_name, email):
     if email != '':
-        if db_utils.update_data('site',
+        if db_utils.update_data('repository',
                                         'users',
                                         ('email', email),
                                         ('user_name', user_name)):
@@ -429,7 +429,7 @@ def add_quote(content):
     quote_id = None
     if content and content != '':
         if len(content)<=100:
-            quote_id = db_utils.create_row('site',
+            quote_id = db_utils.create_row('repository',
                                     'quotes', 
                                     ('creation_user',
                                         'content',
@@ -456,7 +456,7 @@ def add_quote_score(quote_id, score):
         logger.warning(f"{score} is not an integer")
         sanity = 0
     if sanity:
-        current_quote_row = db_utils.get_row_by_column_data('site',
+        current_quote_row = db_utils.get_row_by_column_data('repository',
                                                         'quotes',
                                                         ('id', quote_id))
 
@@ -467,14 +467,14 @@ def add_quote_score(quote_id, score):
                     current_scores_list = json.loads(current_quote_row[0]['score'])
                     current_scores_list.append(score)
                     voters_list.append(environment.get_user())
-                    if db_utils.update_data('site',
+                    if db_utils.update_data('repository',
                                                     'quotes',
                                                     ('score',
                                                         json.dumps(current_scores_list)),
                                                     ('id',
                                                         quote_id)):
                         logger.info("Quote score updated")
-                    if db_utils.update_data('site',
+                    if db_utils.update_data('repository',
                                                     'quotes',
                                                     ('voters',
                                                         json.dumps(voters_list)),
@@ -487,7 +487,7 @@ def add_quote_score(quote_id, score):
                 logger.warning("You can't vote for your own quote")
 
 def get_quote_data(quote_id, column='*'):
-    quotes_rows = db_utils.get_row_by_column_data('site',
+    quotes_rows = db_utils.get_row_by_column_data('repository',
                                                     'quotes',
                                                     ('id', quote_id),
                                                     column)
@@ -498,11 +498,11 @@ def get_quote_data(quote_id, column='*'):
         return None
 
 def get_all_quotes(column='*'):
-    quotes_rows = db_utils.get_rows('site', 'quotes', column)
+    quotes_rows = db_utils.get_rows('repository', 'quotes', column)
     return quotes_rows
 
 def get_ips(column='*'):
-    ip_rows = db_utils.get_rows('site', 'ips_wrap', column)
+    ip_rows = db_utils.get_rows('repository', 'ips_wrap', column)
     return ip_rows
 
 def add_ip_user():
@@ -511,7 +511,7 @@ def add_ip_user():
     if not ip_rows:
         ip_rows=[]
     if ip not in ip_rows:
-        if db_utils.create_row('site',
+        if db_utils.create_row('repository',
                             'ips_wrap', 
                             ('ip', 'user_id', 'project_id'), 
                             (ip, None, None)):
@@ -520,12 +520,12 @@ def add_ip_user():
 def update_current_ip_data(column, data):
     ip = socket.gethostbyname(socket.gethostname())
     
-    if db_utils.update_data('site',
+    if db_utils.update_data('repository',
                                 'ips_wrap',
                                 (column, data),
                                 ('ip', ip)):
         if column == 'user_id':
-            db_utils.update_data('site',
+            db_utils.update_data('repository',
                                     'ips_wrap',
                                     ('project_id', None),
                                     ('ip', ip))
@@ -533,23 +533,23 @@ def update_current_ip_data(column, data):
 
 def unlog_project():
     ip = socket.gethostbyname(socket.gethostname())
-    db_utils.update_data('site',
+    db_utils.update_data('repository',
                             'ips_wrap',
                             ('project_id', None),
                             ('ip', ip))
 
 def get_current_ip_data(column='*'):
     ip = socket.gethostbyname(socket.gethostname())
-    ip_rows = db_utils.get_row_by_column_data('site',
+    ip_rows = db_utils.get_row_by_column_data('repository',
                                                     'ips_wrap',
                                                     ('ip', ip),
                                                     column)
     return ip_rows[0]
 
-def init_site(admin_password, admin_email):
+def init_repository(admin_password, admin_email):
     create_admin_user(admin_password, admin_email)
-    for quote in site_vars._default_quotes_list_:
-        db_utils.create_row('site',
+    for quote in repository_vars._default_quotes_list_:
+        db_utils.create_row('repository',
                             'quotes', 
                             ('creation_user',
                                 'content',
@@ -561,8 +561,8 @@ def init_site(admin_password, admin_email):
                                 json.dumps([])))
     return 1
 
-def create_site_database():
-    if db_utils.create_database(environment.get_site()):
+def create_repository_database():
+    if db_utils.create_database(environment.get_repository()):
         create_users_table()
         create_projects_table()
         create_ip_wrap_table()
@@ -571,12 +571,16 @@ def create_site_database():
     else:
         return None
 
-def is_site_database():
-    return db_utils.check_database_existence(environment.get_site())
+def is_repository_database(repository_name = None):
+    if not repository_name:
+        repository_name = environment.get_repository()
+    else:
+        repository_name = f"repository_{repository_name}"
+    return db_utils.check_database_existence(repository_name)
 
 def create_admin_user(admin_password, admin_email):
     profile_picture = image.convert_image_to_str_data(image.user_random_image('admin'), 100)
-    if db_utils.create_row('site',
+    if db_utils.create_row('repository',
                             'users', 
                             ('user_name', 
                                 'pass', 
@@ -611,7 +615,7 @@ def create_users_table():
                                         life integer NOT NULL,
                                         administrator integer NOT NULL
                                     );"""
-    if db_utils.create_table(environment.get_site(), sql_cmd):
+    if db_utils.create_table(environment.get_repository(), sql_cmd):
         logger.info("Users table created")
 
 def create_projects_table():
@@ -624,7 +628,7 @@ def create_projects_table():
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL
                                     );"""
-    if db_utils.create_table(environment.get_site(), sql_cmd):
+    if db_utils.create_table(environment.get_repository(), sql_cmd):
         logger.info("Projects table created")
 
 def create_ip_wrap_table():
@@ -636,7 +640,7 @@ def create_ip_wrap_table():
                                         FOREIGN KEY (user_id) REFERENCES users (id),
                                         FOREIGN KEY (project_id) REFERENCES projects (id)
                                     );"""
-    if db_utils.create_table(environment.get_site(), sql_cmd):
+    if db_utils.create_table(environment.get_repository(), sql_cmd):
         logger.info("Ips wrap table created")
 
 def create_quotes_table():
@@ -647,5 +651,5 @@ def create_quotes_table():
                                         score text NOT NULL,
                                         voters text NOT NULL
                                     );"""
-    if db_utils.create_table(environment.get_site(), sql_cmd):
+    if db_utils.create_table(environment.get_repository(), sql_cmd):
         logger.info("Quotes table created")

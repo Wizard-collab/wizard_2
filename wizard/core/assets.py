@@ -61,7 +61,7 @@ import logging
 from wizard.core import environment
 from wizard.core import events
 from wizard.core import project
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import image
@@ -90,7 +90,7 @@ def create_domain(name):
     return domain_id
 
 def archive_domain(domain_id):
-    if site.is_admin():
+    if repository.is_admin():
         domain_row = project.get_domain_data(domain_id)
         if domain_row:
             dir_name = get_domain_path(domain_id)
@@ -127,7 +127,7 @@ def create_category(name, domain_id):
     return category_id
 
 def archive_category(category_id):
-    if site.is_admin():
+    if repository.is_admin():
         category_row = project.get_category_data(category_id)
         if category_row:
             dir_name = get_category_path(category_id)
@@ -170,7 +170,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     return asset_id
 
 def archive_asset(asset_id):
-    if site.is_admin():
+    if repository.is_admin():
         asset_row = project.get_asset_data(asset_id)
         if asset_row:
             dir_name = get_asset_path(asset_id)
@@ -271,7 +271,7 @@ def create_stage(name, asset_id):
         return None
 
 def archive_stage(stage_id):
-    if site.is_admin():
+    if repository.is_admin():
         stage_row = project.get_stage_data(stage_id)
         if stage_row:
             dir_name = get_stage_path(stage_id)
@@ -316,7 +316,7 @@ def create_variant(name, stage_id, comment=''):
     return variant_id
 
 def archive_variant(variant_id):
-    if site.is_admin():
+    if repository.is_admin():
         variant_row = project.get_variant_data(variant_id)
         if variant_row:
             dir_name = get_variant_path(variant_id)
@@ -352,7 +352,7 @@ def add_variant_comment(variant_id, comment):
     asset_tracking.add_comment_event(variant_id, comment)
 
 def modify_variant_assignment(variant_id, user_name):
-    user_id = site.get_user_row_by_name(user_name, 'id')
+    user_id = repository.get_user_row_by_name(user_name, 'id')
     if user_id in project.get_users_ids_list():
         project.set_variant_data(variant_id, 'assignment', user_name)
         asset_tracking.add_assignment_event(variant_id, user_name)
@@ -603,7 +603,7 @@ def request_export(work_env_id, export_name, multiple=None, only_dir=None):
             elif file_name and only_dir:
                 return dir_name
 
-def request_render(export_name, version_id, comment=''):
+def request_render(version_id, export_name, comment=''):
     work_env_id = project.get_version_data(version_id, 'work_env_id')
     if work_env_id:
         variant_id = project.get_work_env_data(work_env_id, 'variant_id')
@@ -614,7 +614,7 @@ def request_render(export_name, version_id, comment=''):
                 return export_version_path
 
 def archive_export(export_id):
-    if site.is_admin():
+    if repository.is_admin():
         export_row = project.get_export_data(export_id)
         if export_row:
             dir_name = get_export_path(export_id)
@@ -661,7 +661,7 @@ def get_or_add_export(name, variant_id):
     return export_id
 
 def archive_export_version(export_version_id):
-    if site.is_admin():
+    if repository.is_admin():
         export_version_row = project.get_export_version_data(export_version_id)
         export_id = export_version_row['export_id']
         if export_version_row:
@@ -784,7 +784,7 @@ def duplicate_version(version_id, comment=None):
     return new_version_id
 
 def archive_version(version_id):
-    if site.is_admin():
+    if repository.is_admin():
         version_row = project.get_version_data(version_id)
         if version_row['name'] != '0001':
             if version_row:
@@ -897,6 +897,16 @@ def add_asset_tracking_event(variant_id, event_type, data, comment=''):
     if success:
         tags.analyse_comment(comment, 'variant', variant_id)
     return success
+
+def get_default_extension(work_env_id):
+    work_env_row = project.get_work_env_data(work_env_id)
+    variant_row = project.get_variant_data(work_env_row['variant_id'])
+    stage_name = project.get_stage_data(variant_row['stage_id'])
+    if not work_env_row['export_extension']:
+        extension = project.get_default_extension(stage_name, work_env_row['software_id'])
+    else:
+        extension = work_env_row['export_extension']
+    return extension
 
 def get_domain_path(domain_id):
     dir_name = None

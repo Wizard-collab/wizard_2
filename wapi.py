@@ -37,24 +37,24 @@ from wizard import core
 from wizard import gui
 logger = logging.getLogger(__name__)
 
-class site:
+class repository:
     def __init__(self):
         pass
 
     def projects(self):
-        # Return a list of the existing projects in the site database
-        return core.site.get_projects_names_list()
+        # Return a list of the existing projects in the repository database
+        return core.repository.get_projects_names_list()
 
     def users(self):
-        # Return a list of the existing users in the site database
-        return core.site.get_user_names_list()
+        # Return a list of the existing users in the repository database
+        return core.repository.get_user_names_list()
 
     def upgrade_user_privilege(self, user_name, administrator_pass):
-        return core.site.upgrade_user_privilege(user_name,
+        return core.repository.upgrade_user_privilege(user_name,
                                                         administrator_pass)
 
     def downgrade_user_privilege(self, user_name, administrator_pass):
-        return core.site.downgrade_user_privilege(user_name,
+        return core.repository.downgrade_user_privilege(user_name,
                                                         administrator_pass)
 
 class user:
@@ -71,13 +71,13 @@ class user:
         return core.environment.get_user()
 
     def change_password(self, old_password, new_password):
-        return core.site.modify_user_password(core.environment.get_user(),
+        return core.repository.modify_user_password(core.environment.get_user(),
                                                     old_password,
                                                     new_password)
 
     def is_admin(self):
         # Return the current user privilege
-        return core.site.is_admin()
+        return core.repository.is_admin()
 
 class project:
     def __init__(self):
@@ -486,7 +486,7 @@ class tracking:
             return core.project.get_variant_data(variant_id, 'estimated_time')
 
     def assign_task(self, variant, user):
-        user_id = core.site.get_user_row_by_name(user, 'id')
+        user_id = core.repository.get_user_row_by_name(user, 'id')
         instance_type, variant_id = core.assets.string_to_instance(variant)
         if user_id and variant_id:
             core.assets.modify_variant_assignment(variant_id, user)
@@ -620,7 +620,7 @@ class ui:
         if instance_type == 'work_version':
             gui.gui_server.focus_work_version(instance_id)
 
-site = site()
+repository = repository()
 user = user()
 project = project()
 assets = assets()

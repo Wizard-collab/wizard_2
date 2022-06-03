@@ -14,7 +14,7 @@ from wizard.gui import gui_server
 from wizard.core import user
 from wizard.core import image
 from wizard.core import project
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import environment
 from wizard.core import create_project
 from wizard.core import db_utils
@@ -202,7 +202,7 @@ class create_project_widget(QtWidgets.QDialog):
                 logger.warning('{} is not a valid image file...'.format(image_file))
 
     def update_image(self):
-        str_image = site.process_project_image(self.image)
+        str_image = repository.process_project_image(self.image)
         image_bytes = image.convert_str_data_to_image_bytes(str_image)
         pm = gui_utils.round_corners_image_button(image_bytes, (250, 141), 5)
         self.image_label.setPixmap(pm)

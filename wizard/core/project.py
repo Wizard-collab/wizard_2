@@ -56,7 +56,7 @@ import logging
 from wizard.core import db_utils
 from wizard.core import tools
 from wizard.core import path_utils
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import environment
 from wizard.core import image
 from wizard.core import tags
@@ -123,7 +123,7 @@ def get_domain_by_name(name, column='*'):
 
 def remove_domain(domain_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for category_id in get_domain_childs(domain_id, 'id'):
             remove_category(category_id)
         success = db_utils.delete_row('project', 'domains', domain_id)
@@ -159,7 +159,7 @@ def add_category(name, domain_id):
 
 def remove_category(category_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for asset_id in get_category_childs(category_id, 'id'):
             remove_asset(asset_id)
         success = db_utils.delete_row('project', 'categories', category_id)
@@ -310,7 +310,7 @@ def search_asset(name, category_id=None, column='*'):
 
 def remove_asset(asset_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for stage_id in get_asset_childs(asset_id, 'id'):
             remove_stage(stage_id)
         remove_asset_preview(asset_id)
@@ -384,7 +384,7 @@ def get_all_stages(column='*'):
 
 def remove_stage(stage_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for variant_id in get_stage_childs(stage_id, 'id'):
             remove_variant(variant_id)
         success = db_utils.delete_row('project', 'stages', stage_id)
@@ -508,7 +508,7 @@ def get_variant_work_env_child_by_name(variant_id, work_env_name, column='*'):
 
 def remove_variant(variant_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for export_id in get_variant_export_childs(variant_id, 'id'):
             remove_export(export_id)
         for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
@@ -562,7 +562,7 @@ def add_asset_tracking_event(variant_id, event_type, data, comment=''):
 
 def remove_asset_tracking_event(asset_tracking_event_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         success = db_utils.delete_row('project', 'asset_tracking_events', asset_tracking_event_id)
         if success:
             logger.info(f"Asset tracking event removed from project")
@@ -673,7 +673,7 @@ def add_export(name, variant_id):
 
 def remove_export(export_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for export_version_id in get_export_childs(export_id, 'id'):
             remove_export_version(export_version_id)
         success = db_utils.delete_row('project', 'exports', export_id)
@@ -831,7 +831,7 @@ def get_export_versions_by_variant(variant_id, column='*'):
 
 def remove_export_version(export_version_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         export_row = get_export_data(get_export_version_data(export_version_id, 'export_id'))
         if export_row['default_export_version'] == export_version_id:
             set_default_export_version(export_row['id'], None)
@@ -1054,7 +1054,7 @@ def update_reference(reference_id, export_version_id):
 
 def remove_work_env(work_env_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for version_id in get_work_versions(work_env_id, 'id'):
             remove_version(version_id)
         for reference_id in get_references(work_env_id, 'id'):
@@ -1139,18 +1139,18 @@ def get_user_locks(user_id, column='*'):
     return work_env_rows
 
 def get_lock(work_env_id):
-    current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+    current_user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
     work_env_lock_id = get_work_env_data(work_env_id, 'lock_id')
     if (not work_env_lock_id) or (work_env_lock_id == current_user_id):
         return None
     else:
-        lock_user_name = site.get_user_data(work_env_lock_id, 'user_name')
+        lock_user_name = repository.get_user_data(work_env_lock_id, 'user_name')
         logger.warning(f"Work env locked by {lock_user_name}")
         return lock_user_name
 
 def set_work_env_lock(work_env_id, lock=1):
     if lock:
-        user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+        user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
     else:
         user_id = None
     if not get_lock(work_env_id):
@@ -1169,20 +1169,20 @@ def set_work_env_lock(work_env_id, lock=1):
         return None
 
 def unlock_all():
-    user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+    user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
     work_env_ids = get_user_locks(user_id, 'id')
     for work_env_id in work_env_ids:
         set_work_env_lock(work_env_id, 0)
 
 def toggle_lock(work_env_id):
-    current_user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+    current_user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
     lock_id = get_work_env_data(work_env_id, 'lock_id')
     if lock_id == None:
         return set_work_env_lock(work_env_id)
     elif lock_id == current_user_id:
         return set_work_env_lock(work_env_id, 0)
     else:
-        lock_user_name = site.get_user_data(lock_id, 'user_name')
+        lock_user_name = repository.get_user_data(lock_id, 'user_name')
         logger.warning(f"Work env locked by {lock_user_name}")
         return None
 
@@ -1267,7 +1267,7 @@ def modify_version_comment(version_id, comment=''):
 
 def remove_version(version_id):
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         for export_version_id in get_export_versions_by_work_version_id(version_id, 'id'):
             update_export_version_data(export_version_id, ('work_version_id', None))
             update_export_version_data(export_version_id, ('software', None))
@@ -1733,7 +1733,7 @@ def modify_shelf_script_position(script_id, position):
 def delete_shelf_script(script_id):
     script_row = get_shelf_script_data(script_id)
     success = None
-    if site.is_admin():
+    if repository.is_admin():
         success = db_utils.delete_row('project', 'shelf_scripts', script_id)
         if success:
             if script_row['type'] == 'tool':
@@ -2043,14 +2043,14 @@ def create_project(project_name, project_path, project_password, project_image =
         do_creation = 0
 
     if do_creation:
-        project_id = site.create_project(project_name, project_path, project_password, project_image)
+        project_id = repository.create_project(project_name, project_path, project_password, project_image)
         if project_id:
             if init_project(project_path, project_name):
                 logger.info(f"{project_name} created")
                 environment.build_project_env(project_name, project_path)
                 return 1
             else:
-                site.remove_project_row(project_id)
+                repository.remove_project_row(project_id)
                 return None
         else:
             return None

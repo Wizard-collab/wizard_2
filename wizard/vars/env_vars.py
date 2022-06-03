@@ -26,7 +26,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-_site_env_ = 'wizard_site'
+_repository_env_ = 'wizard_repository'
 _username_env_ = 'wizard_user'
 _useremail_env_ = 'wizard_user_email'
 _project_name_env_ = 'wizard_project'

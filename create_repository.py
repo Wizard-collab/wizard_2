@@ -39,13 +39,7 @@ import logging
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import message_widget
-from wizard.gui import psql_widget
-from wizard.gui import repository_widget
-from wizard.gui import team_dns_widget
-from wizard.gui import user_log_widget
-from wizard.gui import project_manager_widget
-from wizard.gui import loading_widget
-from wizard.gui import main_widget
+from wizard.gui import create_repository_widget
 from wizard.gui import warning_tooltip
 from wizard.gui import logging_widget
 import error_handler
@@ -75,61 +69,17 @@ class app():
         self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
         logging.getLogger().addHandler(self.custom_handler)
 
-        '''
-        if gui_server.try_connection():
-            gui_server.raise_ui()
-            self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
-                                                                "You're already running an instance of Wizard.")
-            self.instance_running_info_widget.exec_()
-            sys.exit()
-        '''
-        
         if not user.user().get_psql_dns():
             self.psql_widget = psql_widget.psql_widget()
             if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:
                 self.quit()
 
-        while not user.user().get_repository():
-            self.repository_widget = repository_widget.repository_widget()
-            if self.repository_widget.exec_() != QtWidgets.QDialog.Accepted:
-                self.quit()
-
         self.db_server = db_core.db_server()
         self.db_server.start()
 
-        user.user().get_team_dns()
-
-        db_utils.modify_db_name('repository', environment.get_repository())
-        repository.add_ip_user()
-
-        if not user.get_user():
-            self.user_log_widget = user_log_widget.user_log_widget()
-            if self.user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
-                self.quit()
-
-        if (not user.get_project()) or project_manager:
-            self.project_manager_widget = project_manager_widget.project_manager_widget()
-            if self.project_manager_widget.exec_() != QtWidgets.QDialog.Accepted:
-                self.quit()
-
-        db_utils.modify_db_name('project', environment.get_project_name())
-
-        start_time = time.time()
-        
-        self.loading_widget = loading_widget.loading_widget()
-        self.loading_widget.show()
-        QtWidgets.QApplication.processEvents()
-
-        self.main_widget = main_widget.main_widget()
-        self.main_widget.stop_threads.connect(self.db_server.stop)
-        self.main_widget.refresh()
-        self.main_widget.showMaximized()
-        QtWidgets.QApplication.processEvents()
-        self.main_widget.init_contexts()
-        self.loading_widget.close()
-
-        self.main_widget.whatsnew()
-        logger.info(f"Wizard start time : {str(round((time.time()-start_time), 1))}s")
+        self.create_repository_widget = create_repository_widget.create_repository_widget()
+        if self.create_repository_widget.exec_() == QtWidgets.QDialog.Accepted:
+            self.quit()
 
     def quit(self):
         if self.db_server:

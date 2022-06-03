@@ -29,13 +29,18 @@ def export(stage_name, export_name, frange=[0,0], custom_work_env_id = None, par
             work_env_id = custom_work_env_id
         else:
             work_env_id = int(os.environ['wizard_work_env_id'])
-        export_file = wizard_communicate.request_export(work_env_id,
-                                                                export_name)
-        export_by_extension(export_file, frange, parent)
-        export_dir = wizard_communicate.add_export_version(export_name,
-                                                [export_file],
-                                                work_env_id,
-                                                int(os.environ['wizard_version_id']))
+
+        if wizard_communicate.get_export_format(work_env_id) == 'vdb':
+            export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']), export_name)
+            export_vdb(export_dir, frange, parent)
+        else:
+            export_file = wizard_communicate.request_export(work_env_id,
+                                                                    export_name)
+            export_by_extension(export_file, frange, parent)
+            export_dir = wizard_communicate.add_export_version(export_name,
+                                                    [export_file],
+                                                    work_env_id,
+                                                    int(os.environ['wizard_version_id']))
         trigger_after_export_hook(stage_name, export_dir)
 
 def export_by_extension(export_file, frange, parent):
@@ -43,6 +48,8 @@ def export_by_extension(export_file, frange, parent):
         export_hip(export_file, frange)
     elif export_file.endswith('.abc'):
         export_abc(export_file, frange, parent)
+    elif export_file.endswith('.vdb'):
+        export_vdb(export_file, frange, parent)
     else:
         logger.info("{} extension is unkown".format(export_file))
 
@@ -79,6 +86,19 @@ def export_abc(export_file, frange, parent):
         wizard_abc_output.parm("execute").pressButton()
     else:
         logger.warning('"wizard_abc_output" node not found')
+
+def export_vdb(export_dir, frange, parent):
+    wizard_vdb_output = wizard_tools.look_for_node('wizard_vdb_output', parent)
+    if wizard_vdb_output:
+        file = f"{export_dir}/$F4.vdb"
+        wizard_vdb_output.parm('sopoutput').set(file)
+        wizard_vdb_output.parm("trange").set('normal')
+        hou.playbar.setFrameRange(frange[0], frange[1])
+        wizard_vdb_output.parm("f1").setExpression('$FSTART')
+        wizard_vdb_output.parm("f2").setExpression('$FEND')
+        wizard_vdb_output.parm("execute").pressButton()
+    else:
+        logger.warning('"wizard_vdb_output" node not found')
 
 def trigger_sanity_hook(stage_name):
     # Trigger the before export hook

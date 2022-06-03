@@ -13,7 +13,7 @@ import logging
 
 # Wizard modules
 from wizard.core import user
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import image
 from wizard.core import game
 from wizard.core import project
@@ -277,7 +277,7 @@ class popup_event_widget(QtWidgets.QFrame):
             self.timer.start(duration*1000)
 
     def fill_ui(self):
-        profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
+        profile_image = repository.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
@@ -506,7 +506,7 @@ class popup_custom_widget(QtWidgets.QFrame):
         if self.icon:
             self.icon_picture.setPixmap(QtGui.QIcon(self.icon).pixmap(30))
         if self.profile_picture:
-            profile_image = site.get_user_row_by_name(self.profile_picture, 'profile_picture')
+            profile_image = repository.get_user_row_by_name(self.profile_picture, 'profile_picture')
             pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
             self.icon_picture.setPixmap(pm)
         self.event_title_label.setText(self.title)

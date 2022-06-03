@@ -6,7 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import tools
 from wizard.core import user
 from wizard.core import image
@@ -86,7 +86,7 @@ class project_manager_widget(QtWidgets.QDialog):
 
         self.icon_view.clear()
 
-        project_rows = site.get_projects_list()
+        project_rows = repository.get_projects_list()
         for project_row in project_rows:
             item = QtWidgets.QListWidgetItem()
             widget = project_icon_widget(project_row)

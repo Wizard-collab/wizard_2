@@ -20,7 +20,7 @@ from wizard.gui import project_hooks_widget
 from wizard.vars import ressources
 from wizard.core import application
 from wizard.core import user
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import environment
 from wizard.core import image
 

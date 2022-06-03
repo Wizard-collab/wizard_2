@@ -9,6 +9,7 @@ import logging
 # Wizard modules
 from wizard.core import environment
 from wizard.core import user
+from wizard.core import repository
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -16,12 +17,12 @@ from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
-class site_widget(QtWidgets.QDialog):
+class repository_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        super(site_widget, self).__init__()
+        super(repository_widget, self).__init__()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
-        self.setWindowTitle(f"Wizard - Enter site")
+        self.setWindowTitle(f"Wizard - Enter repository")
 
         self.build_ui()
         self.connect_functions()
@@ -31,13 +32,13 @@ class site_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel('Enter the wizard site')
+        self.infos_label = QtWidgets.QLabel('Enter the wizard repository')
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.site_lineEdit = QtWidgets.QLineEdit()
-        self.site_lineEdit.setPlaceholderText('Site name')
-        self.main_layout.addWidget(self.site_lineEdit)
+        self.repository_lineEdit = QtWidgets.QLineEdit()
+        self.repository_lineEdit.setPlaceholderText('repository name')
+        self.main_layout.addWidget(self.repository_lineEdit)
 
         self.button_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -65,6 +66,9 @@ class site_widget(QtWidgets.QDialog):
         self.quit_button.clicked.connect(self.reject)
 
     def apply(self):
-        site = self.site_lineEdit.text()
-        if user.user().set_site(site):
-            self.accept()
+        repository_name = self.repository_lineEdit.text()
+        if repository.is_repository_database(repository_name):
+            if user.user().set_repository(repository_name):
+                self.accept()
+        else:
+            logger.warning(f"repository {repository_name} does not exists")

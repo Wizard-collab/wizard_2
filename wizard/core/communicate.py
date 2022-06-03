@@ -93,6 +93,8 @@ class communicate_server(Thread):
         elif signal_dic['function'] == 'request_export':
             returned = request_export(signal_dic['work_env_id'],
                                         signal_dic['export_name'])
+        elif signal_dic['function'] == 'get_export_format':
+            returned = get_export_format(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'request_render':
             returned = request_render(signal_dic['version_id'],
                                         signal_dic['export_name'])
@@ -140,6 +142,10 @@ def request_export(work_env_id, export_name):
     # Just return a temporary file name using the 'assets' module
     file_path = assets.request_export(work_env_id, export_name)
     return file_path
+
+def get_export_format(work_env_id):
+    extension = assets.get_default_extension(work_env_id)
+    return extension
 
 def request_render(version_id, export_name):
     # Just return a temporary file name using the 'assets' module

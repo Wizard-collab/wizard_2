@@ -9,7 +9,7 @@ import time
 
 # Wizard modules
 from wizard.core import environment
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import launch
 from wizard.core import image
 from wizard.core import assets

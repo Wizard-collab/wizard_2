@@ -30,7 +30,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import project
 from wizard.core import events
 
@@ -41,8 +41,8 @@ def analyse_comment(comment, instance_type, instance_id):
 			user = word.replace('@', '')
 			user = user.replace('\r', '')
 			user = user.replace('\n', '')
-			if user in site.get_user_names_list():
-				user_id = site.get_user_row_by_name(user, 'id')
+			if user in repository.get_user_names_list():
+				user_id = repository.get_user_row_by_name(user, 'id')
 				if user_id in project.get_users_ids_list():
 					events.add_tag_event(instance_type, instance_id, comment, user)
 			elif user == 'all':

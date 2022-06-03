@@ -9,7 +9,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from wizard.gui import gui_utils
 
 # Wizard modules
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import image
 from wizard.vars import ressources
 
@@ -65,7 +65,7 @@ class championship_widget(QtWidgets.QWidget):
 
     def refresh(self):
         self.clear()
-        all_user_rows = site.get_users_list()
+        all_user_rows = repository.get_users_list()
         if all_user_rows is not None:
             for user_row in all_user_rows:
                 if user_row['id'] not in self.user_ids.keys():

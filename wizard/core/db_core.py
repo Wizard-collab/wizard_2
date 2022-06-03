@@ -52,8 +52,8 @@ class db_server(threading.Thread):
         self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
         self.running = True
         self.project_name = None
-        self.site = None
-        self.site_conn = None
+        self.repository = None
+        self.repository_conn = None
         self.project_conn = None
 
     def run(self):
@@ -72,8 +72,8 @@ class db_server(threading.Thread):
                 logger.error(str(traceback.format_exc()))
                 continue
                 
-        if self.site_conn is not None:
-            self.site_conn.close()
+        if self.repository_conn is not None:
+            self.repository_conn.close()
         if self.project_conn is not None:
             self.project_conn.close()
 
@@ -85,11 +85,11 @@ class db_server(threading.Thread):
             signal_dic = json.loads(signal_as_str)
             if signal_dic['request'] == 'sql_cmd':
                 try:
-                    if signal_dic['level'] == 'site':
-                        if not self.site_conn:
-                            if self.site:
-                                self.site_conn = create_connection(self.site)
-                        conn = self.site_conn
+                    if signal_dic['level'] == 'repository':
+                        if not self.repository_conn:
+                            if self.repository:
+                                self.repository_conn = create_connection(self.repository)
+                        conn = self.repository_conn
                     else:
                         if not self.project_conn:
                             if self.project_name:
@@ -122,11 +122,11 @@ class db_server(threading.Thread):
                     logger.error(error)
                     return None
             elif signal_dic['request'] == 'modify_database_name':
-                if signal_dic['level'] == 'site':
-                    self.site = signal_dic['db_name']
-                    if self.site_conn:
-                        self.site_conn.close()
-                    self.site_conn = create_connection(self.site)
+                if signal_dic['level'] == 'repository':
+                    self.repository = signal_dic['db_name']
+                    if self.repository_conn:
+                        self.repository_conn.close()
+                    self.repository_conn = create_connection(self.repository)
                 else:
                     self.project_name = signal_dic['db_name']
                     if self.project_conn:

@@ -43,7 +43,7 @@ _session_file_ = path_utils.join(_script_path_, 'session.py')
 
 # Dictionary keys
 _user_ = 'user'
-_site_ = 'site'
+_repository_ = 'repository'
 _project_ = 'project'
 _scripts_ = 'scripts'
 _psql_dns_ = 'psql_dns'

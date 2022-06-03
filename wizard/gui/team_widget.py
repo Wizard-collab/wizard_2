@@ -8,7 +8,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 # Wizard modules
 from wizard.core import environment
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import image
 from wizard.vars import ressources
 
@@ -169,7 +169,7 @@ class user_widget(QtWidgets.QFrame):
         self.fill_ui()
 
     def fill_ui(self):
-        profile_image = site.get_user_row_by_name(self.user_name, 'profile_picture')
+        profile_image = repository.get_user_row_by_name(self.user_name, 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 26)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.user_name)

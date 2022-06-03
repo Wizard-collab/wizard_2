@@ -40,7 +40,7 @@ def submit_job(pycmd, name, priority=50):
 	wizard_cmd = "C:/Program files/wizard/wizard_cmd.exe"
 
 	psql_dns = environment.get_psql_dns()
-	site_name = environment.get_site()[5:]
+	repository_name = environment.get_repository()[11:]
 	user_name = environment.get_user()
 	project_name = environment.get_project_name()
 	team_dns = json.dumps(environment.get_team_dns())
@@ -51,7 +51,7 @@ def submit_job(pycmd, name, priority=50):
 	command += f'-executable "{wizard_cmd}" '
 	command += f'-name "{name}" '
 	command += f'-arguments "-psqlDns <QUOTE>{psql_dns}<QUOTE> '
-	command += f'-site <QUOTE>{site_name}<QUOTE> '
+	command += f'-repository <QUOTE>{repository_name}<QUOTE> '
 	command += f'-user <QUOTE>{user_name}<QUOTE> '
 	command += f'-project <QUOTE>{project_name}<QUOTE> '
 	if team_dns:

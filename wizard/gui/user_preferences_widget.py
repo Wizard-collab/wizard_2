@@ -15,7 +15,7 @@ from wizard.gui import custom_tab_widget
 from wizard.vars import ressources
 from wizard.core import application
 from wizard.core import user
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import environment
 from wizard.core import image
 from wizard.core import path_utils
@@ -108,8 +108,8 @@ class general_widget(QtWidgets.QWidget):
         self.psql_port_data.setText(psql_port)
         self.psql_user_data.setText(psql_user)
 
-        site_db = environment.get_site()[5:]
-        self.site_data.setText(site_db)
+        repository_db = environment.get_repository()[11:]
+        self.repository_data.setText(repository_db)
 
     def apply_popups_settings(self):
         popups_enabled = self.enable_popups_checkbox.isChecked()
@@ -375,30 +375,30 @@ class general_widget(QtWidgets.QWidget):
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
-        self.site_frame = QtWidgets.QFrame()
-        self.site_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.site_layout = QtWidgets.QVBoxLayout()
-        self.site_layout.setContentsMargins(0,0,0,0)
-        self.site_layout.setSpacing(6)
-        self.site_frame.setLayout(self.site_layout)
-        self.scrollArea_layout.addWidget(self.site_frame)
+        self.repository_frame = QtWidgets.QFrame()
+        self.repository_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.repository_layout = QtWidgets.QVBoxLayout()
+        self.repository_layout.setContentsMargins(0,0,0,0)
+        self.repository_layout.setSpacing(6)
+        self.repository_frame.setLayout(self.repository_layout)
+        self.scrollArea_layout.addWidget(self.repository_frame)
 
-        self.site_title = QtWidgets.QLabel('Site Database')
-        self.site_title.setObjectName('bold_label')
-        self.site_layout.addWidget(self.site_title)
+        self.repository_title = QtWidgets.QLabel('repository Database')
+        self.repository_title.setObjectName('bold_label')
+        self.repository_layout.addWidget(self.repository_title)
 
-        self.site_subwidget = QtWidgets.QWidget()
-        self.site_sublayout = QtWidgets.QFormLayout()
-        self.site_sublayout.setContentsMargins(0,0,0,0)
-        self.site_sublayout.setSpacing(6)
-        self.site_subwidget.setLayout(self.site_sublayout)
-        self.site_layout.addWidget(self.site_subwidget)
+        self.repository_subwidget = QtWidgets.QWidget()
+        self.repository_sublayout = QtWidgets.QFormLayout()
+        self.repository_sublayout.setContentsMargins(0,0,0,0)
+        self.repository_sublayout.setSpacing(6)
+        self.repository_subwidget.setLayout(self.repository_sublayout)
+        self.repository_layout.addWidget(self.repository_subwidget)
 
-        self.site_label = QtWidgets.QLabel('Site')
-        self.site_label.setObjectName('gray_label')
-        self.site_data = QtWidgets.QLabel()
-        self.site_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.site_sublayout.addRow(self.site_label, self.site_data)
+        self.repository_label = QtWidgets.QLabel('repository')
+        self.repository_label.setObjectName('gray_label')
+        self.repository_data = QtWidgets.QLabel()
+        self.repository_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.repository_sublayout.addRow(self.repository_label, self.repository_data)
 
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
@@ -413,7 +413,7 @@ class user_account_widget(QtWidgets.QWidget):
     def refresh(self):
         self.ignore_admin_toggle = 1
         user_name = environment.get_user()
-        user_row = site.get_user_row_by_name(user_name)
+        user_row = repository.get_user_row_by_name(user_name)
         self.user_name_label.setText(user_name)
         self.user_email_label.setText(user_row['email'])
 
@@ -440,7 +440,7 @@ class user_account_widget(QtWidgets.QWidget):
 
     def apply_new_email(self):
         new_email = self.email_lineEdit.text()
-        if site.modify_user_email(environment.get_user(), new_email):
+        if repository.modify_user_email(environment.get_user(), new_email):
             self.refresh()
 
     def change_password(self):
@@ -455,7 +455,7 @@ class user_account_widget(QtWidgets.QWidget):
             logger.warning("Please enter a new password")
             process = 0
         if process:
-            if site.modify_user_password(environment.get_user(), old_password, new_password):
+            if repository.modify_user_password(environment.get_user(), old_password, new_password):
                 self.refresh()
 
     def modify_user_privileges(self):
@@ -463,9 +463,9 @@ class user_account_widget(QtWidgets.QWidget):
             requested_privilege = self.admin_checkBox.isChecked()
             admin_pwd = self.admin_password_lineEdit.text()
             if requested_privilege:
-                site.upgrade_user_privilege(environment.get_user(), admin_pwd)
+                repository.upgrade_user_privilege(environment.get_user(), admin_pwd)
             else:
-                site.downgrade_user_privilege(environment.get_user(), admin_pwd)
+                repository.downgrade_user_privilege(environment.get_user(), admin_pwd)
             self.refresh()
 
     def update_profile_picture(self):
@@ -476,7 +476,7 @@ class user_account_widget(QtWidgets.QWidget):
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
-                site.modify_user_profile_picture(environment.get_user(), image_file)
+                repository.modify_user_profile_picture(environment.get_user(), image_file)
                 self.refresh()
             else:
                 logger.warning('{} is not a valid image file...'.format(image_file))

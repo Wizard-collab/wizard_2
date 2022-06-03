@@ -138,12 +138,12 @@ def get_project_path():
 		logger.info('No project defined')
 		return None
 
-def get_site():
-	if env_vars._site_env_ in os.environ.keys():
-		return os.environ[env_vars._site_env_]
+def get_repository():
+	if env_vars._repository_env_ in os.environ.keys():
+		return os.environ[env_vars._repository_env_]
 	else:
-		logger.error('No site defined')
+		logger.error('No repository defined')
 		return None
 
-def set_site(site):
-	os.environ[env_vars._site_env_] = f"site_{site}"
+def set_repository(repository):
+	os.environ[env_vars._repository_env_] = f"repository_{repository}"

@@ -42,13 +42,14 @@ import logging
 sys.path.append(os.path.abspath(''))
 
 # Wizard gui modules
+from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import application
 from wizard.core import user
 from wizard.core import project
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import tools
 from wizard.core import create_project
 from wizard.core import communicate
@@ -62,6 +63,8 @@ logger = logging.getLogger(__name__)
 
 application.log_app_infos()
 print('PyWizard')
+
+app = gui_utils.get_app()
 
 while not user.user().get_psql_dns():
     psql_host = tools.flushed_input("PostgreSQL host : ")
@@ -78,22 +81,22 @@ while not user.user().get_psql_dns():
 db_server = db_core.db_server()
 db_server.start()
 
-if not user.user().get_site():
-    input_site = tools.flushed_input("Site : ")
-    user.user().set_site(input_site)
+if not user.user().get_repository():
+    input_repository = tools.flushed_input("repository : ")
+    user.user().set_repository(input_repository)
 
-if not site.is_site_database():
-    while not site.is_site_database():
-        init_site = tools.flushed_input("Warning, site database doesn't exists, init database (y/n) ? : ")
-        if init_site == 'y':
+if not repository.is_repository_database():
+    while not repository.is_repository_database():
+        init_repository = tools.flushed_input("Warning, repository database doesn't exists, init database (y/n) ? : ")
+        if init_repository == 'y':
             admin_password = tools.flushed_input('Administator password : ')
             admin_email = tools.flushed_input('Administator email : ')
-            site.create_site_database()
-            db_server.site='site'
-            site.init_site(admin_password, admin_email)
+            repository.create_repository_database()
+            db_server.repository='repository'
+            repository.init_repository(admin_password, admin_email)
 
-db_server.site=environment.get_site()
-site.add_ip_user()
+db_server.repository=environment.get_repository()
+repository.add_ip_user()
 
 while not user.get_user():
     do_create_user = tools.flushed_input('Create user (y/n) ? : ')
@@ -103,7 +106,7 @@ while not user.get_user():
         email = tools.flushed_input('Email : ')
         profile_picture = tools.flushed_input('Profile picture ( without any "\\" ) ( Optional ) : ')
         administrator_pass = tools.flushed_input('Administrator pass ( Optional ) : ')
-        site.create_user(user_name,
+        repository.create_user(user_name,
                                 password,
                                 email,
                                 administrator_pass,
@@ -135,6 +138,7 @@ softwares_server.start()
 
 console = code.InteractiveConsole()
 console.interact(banner=None, exitmsg=None)
+    
 db_server.stop()
 softwares_server.stop()
 communicate_server.stop()

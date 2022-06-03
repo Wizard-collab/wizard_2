@@ -194,14 +194,14 @@ class subtask(Thread):
                 executable = 'wizard_cmd'
 
             psql_dns = environment.get_psql_dns()
-            site_name = environment.get_site()[5:]
+            repository_name = environment.get_repository()[11:]
             user_name = environment.get_user()
             project_name = environment.get_project_name()
             team_dns = json.dumps(environment.get_team_dns())
 
             self.command = f'{executable} '
             self.command += f'-psqlDns "{psql_dns}" '
-            self.command += f'-site "{site_name}" '
+            self.command += f'-repository "{repository_name}" '
             self.command += f'-user "{user_name}" '
             self.command += f'-project "{project_name}" '
             self.command += f'-teamDns "{team_dns}" '

@@ -11,14 +11,14 @@ from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import environment
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import image
 from wizard.vars import ressources
 
 class user_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(user_widget, self).__init__(parent)
-        user_row = site.get_user_row_by_name(environment.get_user())
+        user_row = repository.get_user_row_by_name(environment.get_user())
         self.old_level = user_row['level']
         self.build_ui()
 
@@ -102,7 +102,7 @@ class user_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.profile_picture)
 
     def refresh(self):
-        user_row = site.get_user_row_by_name(environment.get_user())
+        user_row = repository.get_user_row_by_name(environment.get_user())
         self.xp_progress_bar.setValue(user_row['xp'])
         self.life_progress_bar.setValue(user_row['life'])
         self.level_label.setText(str(user_row['level']))
@@ -121,7 +121,7 @@ class user_widget(QtWidgets.QFrame):
 
 
     def crown_check(self, user_row):
-        user_rows = site.get_users_list()
+        user_rows = repository.get_users_list()
         icon = None
         if user_row['id'] == user_rows[0]['id']:
             icon = ressources._gold_icon_

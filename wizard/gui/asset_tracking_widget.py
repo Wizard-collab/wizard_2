@@ -9,7 +9,7 @@ import time
 # Wizard modules
 from wizard.core import tools
 from wizard.core import user
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import assets
 from wizard.core import project
 from wizard.vars import ressources
@@ -42,7 +42,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         users_ids = project.get_users_ids_list()
         for user_id in users_ids:
             if user_id not in self.users_ids.keys():
-                self.users_ids[user_id] = site.get_user_data(user_id, 'user_name')
+                self.users_ids[user_id] = repository.get_user_data(user_id, 'user_name')
                 self.assignment_comboBox.addItem(self.users_ids[user_id])
 
     def edit_estimation(self):

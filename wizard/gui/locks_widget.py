@@ -9,7 +9,7 @@ import time
 
 # Wizard modules
 from wizard.core import environment
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import launch
 from wizard.core import image
 from wizard.core import assets
@@ -104,7 +104,7 @@ class locks_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.work_envs_scrollArea)
 
     def refresh(self):
-        user_id = site.get_user_row_by_name(environment.get_user(), 'id')
+        user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
         work_env_rows = project.get_user_locks(user_id)
         project_work_env_ids = []
         for work_env_row in work_env_rows:

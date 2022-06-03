@@ -85,6 +85,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller create_repository.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			command_line = "PyInstaller PyWizard.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
@@ -120,6 +124,8 @@ class compile():
 							'wapi.py',
 							'dist/PyWizard/PyWizard.exe',
 							'dist/PyWizard/PyWizard.exe.manifest',
+							'dist/Create Repository/Create Repository.exe',
+							'dist/Create Repository/Create Repository.exe.manifest',
 							'dist/wizard_cmd/wizard_cmd.exe',
 							'dist/wizard_cmd/wizard_cmd.exe.manifest',
 							'dist/server/server.exe',

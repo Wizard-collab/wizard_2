@@ -9,7 +9,7 @@ import json
 import statistics
 
 # Wizard modules
-from wizard.core import site
+from wizard.core import repository
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -84,17 +84,17 @@ class quotes_widget(QtWidgets.QFrame):
 
     def vote(self):
         score = self.score_slider.value()
-        site.add_quote_score(self.quote_row['id'], score)
+        repository.add_quote_score(self.quote_row['id'], score)
 
     def get_new_random_quote(self, without_anim=0):
         self.animation_handler_widget.setVisible(0)
         QtWidgets.QApplication.processEvents()
-        quotes_ids = site.get_all_quotes('id')
+        quotes_ids = repository.get_all_quotes('id')
         self.random_index = random.randint(0, len(quotes_ids)-1)
         while self.random_index == self.previous_quote_id:
             self.random_index = random.randint(0, len(quotes_ids)-1)
         self.previous_quote_id = self.random_index
-        self.quote_row = site.get_quote_data(quotes_ids[self.random_index])
+        self.quote_row = repository.get_quote_data(quotes_ids[self.random_index])
         content = self.quote_row['content']
         content = content.replace('\n', ' ')
         content = content.replace('\r\n', ' ')

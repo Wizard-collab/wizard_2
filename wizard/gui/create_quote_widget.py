@@ -6,7 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
-from wizard.core import site
+from wizard.core import repository
 from wizard.vars import ressources
 
 class create_quote_widget(QtWidgets.QDialog):
@@ -34,7 +34,7 @@ class create_quote_widget(QtWidgets.QDialog):
 
     def create_quote(self):
         content = self.quote_field.toPlainText()
-        if site.add_quote(content):
+        if repository.add_quote(content):
             self.accept()
 
     def build_ui(self):

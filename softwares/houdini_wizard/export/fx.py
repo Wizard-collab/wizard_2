@@ -26,5 +26,3 @@ def main():
         wizard_export.export('fx', export_name, frange)
     except:
         logger.error(str(traceback.format_exc()))
-    finally:
-        wizard_export.reopen(scene)

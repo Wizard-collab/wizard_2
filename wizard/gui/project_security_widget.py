@@ -12,7 +12,7 @@ from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.vars import ressources
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import environment
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class project_security_widget(QtWidgets.QWidget):
             logger.warning("Please enter the administrator password")
             process = 0
         if process:
-            if site.modify_project_password(environment.get_project_name(), old_password, new_password, admin_password):
+            if repository.modify_project_password(environment.get_project_name(), old_password, new_password, admin_password):
                 self.clear_pwds()
 
     def build_ui(self):

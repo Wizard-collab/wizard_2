@@ -13,7 +13,7 @@ import traceback
 
 # Wizard modules
 from wizard.core import environment
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import user
 from wizard.core import project
 from wizard.core import image
@@ -284,7 +284,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.connect_functions()
     
     def fill_ui(self):
-        profile_image = site.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
+        profile_image = repository.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])

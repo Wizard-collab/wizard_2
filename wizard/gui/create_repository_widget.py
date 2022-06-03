@@ -7,7 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import db_utils
 from wizard.core import environment
 from wizard.vars import ressources
@@ -18,12 +18,12 @@ from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
-class create_db_widget(QtWidgets.QDialog):
+class create_repository_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        super(create_db_widget, self).__init__()
+        super(create_repository_widget, self).__init__()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
-        self.setWindowTitle(f"Wizard - Init {environment.get_site()[5:]} database")
+        self.setWindowTitle(f"Wizard - Create repository")
 
         self.build_ui()
         self.connect_functions()
@@ -33,19 +33,23 @@ class create_db_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel(f'Warning, {environment.get_site()[5:]} database does not exists')
-        self.main_layout.addWidget(self.infos_label)
-
-        self.infos_label = QtWidgets.QLabel('You need to init the database')
-        self.infos_label.setObjectName('gray_label')
+        self.infos_label = QtWidgets.QLabel('New repository')
         self.main_layout.addWidget(self.infos_label)
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
+        self.repository_name_lineEdit = QtWidgets.QLineEdit()
+        self.repository_name_lineEdit.setPlaceholderText('Repository name')
+        self.main_layout.addWidget(self.repository_name_lineEdit)
+
         self.password_lineEdit = gui_utils.password_lineEdit()
         self.password_lineEdit.setPlaceholderText('Administrator password')
         self.main_layout.addWidget(self.password_lineEdit)
+
+        self.confirm_password_lineEdit = gui_utils.password_lineEdit()
+        self.confirm_password_lineEdit.setPlaceholderText('Confirm password')
+        self.main_layout.addWidget(self.confirm_password_lineEdit)
 
         self.email_lineEdit = QtWidgets.QLineEdit()
         self.email_lineEdit.setPlaceholderText('Administrator email')
@@ -80,9 +84,16 @@ class create_db_widget(QtWidgets.QDialog):
         self.quit_button.clicked.connect(self.reject)
 
     def apply(self):
+        repository_name = self.repository_name_lineEdit.text()
         admin_password = self.password_lineEdit.text()
+        confirm_password = self.confirm_password_lineEdit.text()
         admin_email = self.email_lineEdit.text()
-        site.create_site_database()
-        db_utils.modify_db_name('site', environment.get_site())
-        site.init_site(admin_password, admin_email)
-        self.accept()
+
+        if admin_password == confirm_password:
+            environment.set_repository(repository_name)
+            repository.create_repository_database()
+            db_utils.modify_db_name('repository', environment.get_repository())
+            repository.init_repository(admin_password, admin_email)
+            self.accept()
+        else:
+            logger.warning("Administrator passwords doesn't matches")

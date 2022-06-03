@@ -8,7 +8,7 @@ import logging
 
 # Wizard modules
 from wizard.core import image
-from wizard.core import site
+from wizard.core import repository
 from wizard.core import project
 from wizard.core import environment
 from wizard.vars import ressources
@@ -36,7 +36,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.project_name_data.setText(project_name)
         self.project_path_data.setText(project_path)
 
-        project_row = site.get_project_row_by_name(environment.get_project_name())
+        project_row = repository.get_project_row_by_name(environment.get_project_name())
         project_image = image.convert_str_data_to_image_bytes(project_row['project_image'])
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(project_image)
@@ -62,7 +62,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
     def get_random_image(self):
         project_name = environment.get_project_name()
         image_file = image.project_random_image(project_name)
-        site.modify_project_image(environment.get_project_name(), image_file)
+        repository.modify_project_image(environment.get_project_name(), image_file)
         self.refresh()
 
     def open_image(self):
@@ -73,7 +73,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
-                site.modify_project_image(environment.get_project_name(), image_file)
+                repository.modify_project_image(environment.get_project_name(), image_file)
                 self.refresh()
             else:
                 logger.warning('{} is not a valid image file...'.format(image_file))
