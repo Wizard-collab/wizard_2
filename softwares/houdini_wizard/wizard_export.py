@@ -96,6 +96,10 @@ def export_vdb(export_dir, frange, parent):
         hou.playbar.setFrameRange(frange[0], frange[1])
         wizard_vdb_output.parm("f1").setExpression('$FSTART')
         wizard_vdb_output.parm("f2").setExpression('$FEND')
+
+        wizard_vdb_output.parm('lpostframe').set("python")
+        wizard_vdb_output.parm('postframe').set(wizard_tools.by_frame_progress_script())
+
         wizard_vdb_output.parm("execute").pressButton()
     else:
         logger.warning('"wizard_vdb_output" node not found')

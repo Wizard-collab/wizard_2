@@ -235,13 +235,16 @@ class subtask_widget(QtWidgets.QFrame):
         self.log_viewer.show()
 
     def send_to_support(self):
-        if path_utils.isfile(self.log_file):
-            with open(self.log_file, 'r') as f:
-                data = f.read()
-            self.submit_log_widget = submit_log_widget.submit_log_widget(data, 'subtask')
-            self.submit_log_widget.show()
+        if self.log_file:
+            if path_utils.isfile(self.log_file):
+                with open(self.log_file, 'r') as f:
+                    data = f.read()
+                self.submit_log_widget = submit_log_widget.submit_log_widget(data, 'subtask')
+                self.submit_log_widget.show()
+            else:
+                logger.warning(f"{self.log_file} not found")
         else:
-            logger.warning(f"{self.log_file} not found")
+            logger.warning("No valid file given")
 
     def update_current_task(self, task):
         self.current_task_data_label.setText(task)

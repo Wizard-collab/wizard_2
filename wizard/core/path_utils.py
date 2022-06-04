@@ -35,40 +35,48 @@ from wizard.core import environment
 from wizard.vars import env_vars
 
 def mkdir(path):
-	path = clean_path(path)
-	return os.mkdir(path)
+	if path is not None:
+		path = clean_path(path)
+		return os.mkdir(path)
 
 def makedirs(path):
-	path = clean_path(path)
-	if not os.path.isdir(path):
-		return os.makedirs(path)
-	else:
-		return True
+	if path is not None:
+		path = clean_path(path)
+		if not os.path.isdir(path):
+			return os.makedirs(path)
+		else:
+			return True
 
 def remove(path):
-	path = clean_path(path)
-	return os.remove(path)
+	if path is not None:
+		path = clean_path(path)
+		return os.remove(path)
 
 def copyfile(base, destination):
-	base = clean_path(base)
-	destination = clean_path(destination)
-	return shutil.copyfile(base, destination)
+	if base is not None and destination is not None:
+		base = clean_path(base)
+		destination = clean_path(destination)
+		return shutil.copyfile(base, destination)
 
 def rmtree(path):
-	path = clean_path(path)
-	return shutil.rmtree(path)
+	if path is not None:
+		path = clean_path(path)
+		return shutil.rmtree(path)
 
 def rmdir(path):
-	path = clean_path(path)
-	return os.rmdir(path)
+	if path is not None:
+		path = clean_path(path)
+		return os.rmdir(path)
 
 def isdir(path):
-	path = clean_path(path)
-	return os.path.isdir(path)
+	if path is not None:
+		path = clean_path(path)
+		return os.path.isdir(path)
 
 def isfile(path):
-	path = clean_path(path)
-	return os.path.isfile(path)
+	if path is not None:
+		path = clean_path(path)
+		return os.path.isfile(path)
 
 def join(*args):
 	path = os.path.join(*args)
@@ -76,19 +84,23 @@ def join(*args):
 	return path
 
 def abspath(path):
-	path = os.path.abspath(path)
-	path = clean_path(path)
-	return path
+	if path is not None:
+		path = os.path.abspath(path)
+		path = clean_path(path)
+		return path
 
 def dirname(path):
-	path = os.path.dirname(path)
-	path = clean_path(path)
-	return path
+	if path is not None:
+		path = os.path.dirname(path)
+		path = clean_path(path)
+		return path
 
 def clean_path(path):
-	path = path.replace('\\', '/')
-	return path
+	if path is not None:
+		path = path.replace('\\', '/')
+		return path
 
 def startfile(path):
-	path = clean_path(path)
-	return os.startfile(path)
+	if path is not None:
+		path = clean_path(path)
+		return os.startfile(path)

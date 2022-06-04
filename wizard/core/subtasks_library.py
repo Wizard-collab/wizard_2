@@ -49,7 +49,7 @@ def batch_export(version_id, settings_dic=None):
 	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
 	command += "team_client.refresh_team(environment.get_team_dns())\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Export started as subtask, open the subtask manager to get more informations')
 
@@ -79,7 +79,7 @@ def archive_versions(version_ids):
 	command += "	print(f'wizard_task_percent:{percent}')\n"
 	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
@@ -97,7 +97,7 @@ def archive_export_versions(export_version_ids):
 	command += "	print(f'wizard_task_percent:{percent}')\n"
 	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
@@ -115,7 +115,7 @@ def archive_exports(export_ids):
 	command += "	print(f'wizard_task_percent:{percent}')\n"
 	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
@@ -129,7 +129,7 @@ def archive_asset(asset_id):
 	command += "print('wizard_task_percent:100')\n"
 	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
@@ -143,7 +143,7 @@ def archive_category(category_id):
 	command += "print('wizard_task_percent:100')\n"
 	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
@@ -157,6 +157,6 @@ def archive_stage(stage_id):
 	command += "print('wizard_task_percent:100')\n"
 	command += "gui_server.refresh_team_ui()\n"
 	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=True)
+	task = subtask.subtask(pycmd=command, print_stdout=False)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')

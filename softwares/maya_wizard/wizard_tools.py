@@ -84,3 +84,13 @@ def apply_tags(object_list):
         to_tag = [os.environ['wizard_category_name'], asset_tag, object.name().split(':')[-1].split('|')[-1]]
         tags = existing_tags + to_tag
         pm.setAttr(object + '.wizardTags', (',').join(set(tags)), type="string")
+
+def by_frame_progress_script(frange, percent_factor):
+    command = f'range = {frange[1]} - {frange[0]}\\n'
+    command+= f'if range != 0:\\n'
+    command+= f'    frame = #FRAME#-{frange[0]}\\n'
+    command+= f'    to_add = ({percent_factor[0]}/{percent_factor[1]})*100\\n'
+    command+= f'    factor = 1/{percent_factor[1]}\\n'
+    command+= f'    percent = (frame/range)*100.0*factor+to_add\\n'
+    command+= '    print("wizard_task_percent:{}".format(percent))\\n'
+    return command

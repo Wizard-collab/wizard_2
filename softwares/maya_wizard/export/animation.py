@@ -24,9 +24,10 @@ def main(nspace_list, frange):
         rigging_references = get_rig_nspaces()
         if rigging_references:
             for rigging_reference in rigging_references:
+                percent_factor = (rigging_references.index(rigging_reference), len(rigging_references))
                 if rigging_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_animation(rigging_reference, frange)
+                    export_animation(rigging_reference, frange, percent_factor)
             if not at_least_one:
                 logger.warning(f"Nothing to export from namespace list : {nspace_list}")
         else:
@@ -45,7 +46,7 @@ def invoke_settings_widget():
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
 
-def export_animation(rigging_reference, frange):
+def export_animation(rigging_reference, frange, percent_factor):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
@@ -57,7 +58,7 @@ def export_animation(rigging_reference, frange):
             additionnal_objects = wizard_export.trigger_before_export_hook('animation')
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
-            wizard_export.export('animation', export_name, export_GRP_list, frange)
+            wizard_export.export('animation', export_name, export_GRP_list, frange, percent_factor=percent_factor)
         else:
             logger.warning(f"No objects to export in '{rig_nspace}:render_set'")
 

@@ -112,3 +112,13 @@ def apply_tags(out_node):
 
     tags_node.setInput(0, out_node_input)
     out_node.setInput(0, tags_node)
+
+def by_frame_progress_script(percent_factor=100):
+    command = "import hou\n"
+    command+= "frame=hou.frame()\n"
+    command+= "range=hou.playbar.playbackRange()\n"
+    command+= "inframe=range[0]\n"
+    command+= "outframe=range[1]\n"
+    command+= "percent={}*((frame-inframe)/(outframe-inframe))\n".format(percent_factor)
+    command+= 'print("wizard_task_percent:{}".format(percent))\n'
+    return command

@@ -32,6 +32,7 @@
 from threading import Thread
 import subprocess
 import time
+import psutil
 import json
 import shlex
 import os
@@ -169,6 +170,8 @@ class subtask(Thread):
     def kill(self):
         if self.running == True:
             if self.process is not None:
+                for child in psutil.Process(self.process.pid).children(recursive=True):
+                    child.kill()
                 self.process.kill()
                 self.communicate_thread.send_signal([self.process_id, 'status', 'Killed'])
             self.running = False

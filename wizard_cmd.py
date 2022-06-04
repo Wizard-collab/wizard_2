@@ -82,7 +82,6 @@ softwares_server.start()
 
 if args.team_dns:
 	environment.set_team_dns(args.team_dns)
-
 try:
     exec(open(args.pyfile).read())
 except:
