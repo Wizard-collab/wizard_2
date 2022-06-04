@@ -21,8 +21,8 @@ def __init__():
     pass
 
 def setup_render_directory(stage_name, export_name):
-    render_directory = wizard_communicate.request_render(export_name,
-                                                int(os.environ['wizard_version_id']))
+    render_directory = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
+                                                        export_name)
     if render_directory:
         file_pattern = "$L_$n_$o.$05f.$x"
         render_pass_list = wizard_tools.get_all_render_passes()

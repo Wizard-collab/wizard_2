@@ -73,6 +73,11 @@ def isdir(path):
 		path = clean_path(path)
 		return os.path.isdir(path)
 
+def listdir(path):
+	if path is not None:
+		path = clean_path(path)
+		return os.listdir(path)
+
 def isfile(path):
 	if path is not None:
 		path = clean_path(path)

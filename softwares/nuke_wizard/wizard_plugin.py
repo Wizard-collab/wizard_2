@@ -14,9 +14,17 @@ import nuke
 # Wizard modules
 import wizard_communicate
 from nuke_wizard import wizard_tools
+from nuke_wizard import wizard_reference
 
 def save_increment():
     wizard_tools.save_increment()
+
+def reference_lighting(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'lighting' in references.keys():
+        for reference in references['lighting']:
+            wizard_reference.reference_lighting(reference['namespace'], reference['files'])
 
 def set_frame_range(rolls=0):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
