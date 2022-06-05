@@ -142,9 +142,10 @@ def build_command(file_path, software_row, version_id):
         logger.warning(f"{software_row['name']} path not defined")
         return None
 
-def build_env(work_env_id, software_row, version_id):
+def build_env(work_env_id, software_row, version_id, mode='gui'):
     # Building the default software environment for wizard workflow
     env = os.environ.copy()
+    env['wizard_launch_mode'] = mode
     env['wizard_work_env_id'] = str(work_env_id)
     env['wizard_version_id'] = str(version_id)
 

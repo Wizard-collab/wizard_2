@@ -66,40 +66,40 @@ _script_key_ = '[startup_script]'
 _reference_key_ = '[reference]'
 
 _file_command_ = dict()
-_file_command_[_maya_] = '"{}" -file "{}" -script "{}"'.format(_executable_key_, _file_key_, _script_key_)
-_file_command_[_guerilla_render_] = '''"{}" "{}" --pycmd "execfile('{}')"'''.format(_executable_key_, _file_key_, _script_key_)
-_file_command_[_substance_painter_] = '"{}" --mesh {} --split-by-udim "{}"'.format(_executable_key_, _reference_key_, _file_key_)
-_file_command_[_substance_designer_] = '"{}" "{}"'.format(_executable_key_, _file_key_)
-_file_command_[_nuke_] = '"{}" --nukex "{}"'.format(_executable_key_, _file_key_)
-_file_command_[_houdini_] = '"{}" "{}" waitforui "{}" '.format(_executable_key_, _file_key_, _script_key_)
-_file_command_[_blender_] = '"{}" "{}" --python "{}"'.format(_executable_key_, _file_key_, _script_key_)
+_file_command_[_maya_] = f'"{_executable_key_}" -file "{_file_key_}" -script "{_script_key_}"'
+_file_command_[_guerilla_render_] = f'''"{_executable_key_}" "{_file_key_}" --pycmd "execfile('{_script_key_}')"'''
+_file_command_[_substance_painter_] = f'"{_executable_key_}" --mesh {_reference_key_} --split-by-udim "{_file_key_}"'
+_file_command_[_substance_designer_] = f'"{_executable_key_}" "{_file_key_}"'
+_file_command_[_nuke_] = f'"{_executable_key_}" --nukex "{_file_key_}"'
+_file_command_[_houdini_] = f'"{_executable_key_}" "{_file_key_}" waitforui "{_script_key_}" '
+_file_command_[_blender_] = f'"{_executable_key_}" "{_file_key_}" --python "{_script_key_}"'
 
 _no_file_command_ = dict()
-_no_file_command_[_maya_] = '"{}" -script "{}"'.format(_executable_key_, _script_key_)
-_no_file_command_[_guerilla_render_] = '''"{}" --pycmd "execfile('{}')"'''.format(_executable_key_, _script_key_)
-_no_file_command_[_substance_painter_] = '"{}" --mesh {} --split-by-udim'.format(_executable_key_, _reference_key_)
-_no_file_command_[_substance_designer_] = '"{}"'.format(_executable_key_)
-_no_file_command_[_nuke_] = '"{}" --nukex'.format(_executable_key_)
-_no_file_command_[_houdini_] = '"{}" waitforui "{}" '.format(_executable_key_, _script_key_)
-_no_file_command_[_blender_] = '"{}" --python "{}"'.format(_executable_key_, _script_key_)
+_no_file_command_[_maya_] = f'"{_executable_key_}" -script "{_script_key_}"'
+_no_file_command_[_guerilla_render_] = f'''"{_executable_key_}" --pycmd "execfile('{_script_key_}')"'''
+_no_file_command_[_substance_painter_] = f'"{_executable_key_}" --mesh {_reference_key_} --split-by-udim'
+_no_file_command_[_substance_designer_] = f'"{_executable_key_}"'
+_no_file_command_[_nuke_] = f'"{_executable_key_}" --nukex'
+_no_file_command_[_houdini_] = f'"{_executable_key_}" waitforui "{_script_key_}" '
+_no_file_command_[_blender_] = f'"{_executable_key_}" --python "{_script_key_}"'
 
 _batch_file_command_ = dict()
-_batch_file_command_[_maya_] = '"{}" -file "{}" -script "{}"'.format(_executable_key_, _file_key_, _script_key_)
-_batch_file_command_[_guerilla_render_] = '''"{}" "{}" --nogui --pycmd "execfile('{}')"'''.format(_executable_key_, _file_key_, _script_key_)
+_batch_file_command_[_maya_] = f'"{_executable_key_}" -file "{_file_key_}" -script "{_script_key_}"'
+_batch_file_command_[_guerilla_render_] = f'''"{_executable_key_}" "{_file_key_}" --nogui --pycmd "execfile('{_script_key_}')"'''
 _batch_file_command_[_substance_painter_] = ''
 _batch_file_command_[_substance_designer_] = ''
-_batch_file_command_[_nuke_] = ''
-_batch_file_command_[_houdini_] = '"{}" "{}" "{}" '.format(_executable_key_, _file_key_, _script_key_)
-_batch_file_command_[_blender_] = '"{}" "{}" -b --python "{}"'.format(_executable_key_, _file_key_, _script_key_)
+_batch_file_command_[_nuke_] = f'"{_executable_key_}" -t "{_script_key_}" --nukex -i'
+_batch_file_command_[_houdini_] = f'"{_executable_key_}" "{_file_key_}" "{_script_key_}" '
+_batch_file_command_[_blender_] = f'"{_executable_key_}" "{_file_key_}" -b --python "{_script_key_}"'
 
 _batch_no_file_command_ = dict()
-_batch_no_file_command_[_maya_] = '"{}" -script "{}"'.format(_executable_key_, _script_key_)
-_batch_no_file_command_[_guerilla_render_] = '''"{}" --nogui --pycmd "execfile('{}')"'''.format(_executable_key_, _script_key_)
+_batch_no_file_command_[_maya_] = f'"{_executable_key_}" -script "{_script_key_}"'
+_batch_no_file_command_[_guerilla_render_] = f'''"{_executable_key_}" --nogui --pycmd "execfile('{_script_key_}')"'''
 _batch_no_file_command_[_substance_painter_] = ''
 _batch_no_file_command_[_substance_designer_] = ''
 _batch_no_file_command_[_nuke_] = ''
 _batch_no_file_command_[_houdini_] = ''
-_batch_no_file_command_[_blender_] = '"{}" -b --python "{}"'.format(_executable_key_, _script_key_)
+_batch_no_file_command_[_blender_] = f'"{_executable_key_}" -b --python "{_script_key_}"'
 
 # Environments
 _script_env_dic_=dict()
@@ -124,16 +124,17 @@ _plugins_path_[_blender_]  = path_utils.clean_path(path_utils.abspath(path_utils
 
 # Scripts files
 _scripts_dic_ = dict()
-_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_maya_], 'startup.mel'))).replace('\\', '/')
-_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'startup.py'))).replace('\\', '/')
-_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'startup.py'))).replace('\\', '/')
-_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'startup.py'))).replace('\\', '/')
+_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_maya_], 'startup.mel')))
+_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'startup.py')))
+_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'startup.py')))
+_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'startup.py')))
 
 _batch_scripts_dic_ = dict()
-_batch_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_maya_], 'batch_startup.mel'))).replace('\\', '/')
-_batch_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'batch_startup.py'))).replace('\\', '/')
-_batch_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'batch_startup.py'))).replace('\\', '/')
-_batch_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'batch_startup.py'))).replace('\\', '/')
+_batch_scripts_dic_[_maya_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_maya_], 'batch_startup.mel')))
+_batch_scripts_dic_[_guerilla_render_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_guerilla_render_], 'batch_startup.py')))
+_batch_scripts_dic_[_blender_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_blender_], 'batch_startup.py')))
+_batch_scripts_dic_[_houdini_] = path_utils.clean_path(path_utils.abspath(path_utils.join(_plugins_path_[_houdini_], 'batch_startup.py')))
+_batch_scripts_dic_[_nuke_] = path_utils.clean_path(path_utils.join('nuke_wizard', 'batch_startup.py'))
 
 _hooks_files_ = dict()
 _hooks_files_[_maya_] = 'maya_hook.py'

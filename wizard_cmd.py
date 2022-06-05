@@ -2,6 +2,7 @@ import argparse
 import traceback
 import json
 import logging
+from wizard.gui import gui_utils
 from wizard.core import application
 from wizard.core import environment
 from wizard.core import repository
@@ -19,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 application.log_app_infos()
 print('Wizard CMD')
+
+app = gui_utils.get_app()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-psqlDns', dest='psql_dns', type=str, help='PostgreSQL connection DNS')

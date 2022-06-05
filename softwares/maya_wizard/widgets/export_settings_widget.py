@@ -24,7 +24,7 @@ class export_settings_widget(QtWidgets.QDialog):
         self.stages_relations_dic['camera'] = ['camrig']
         self.stages_relations_dic['cfx'] = ['rigging', 'grooming']
 
-        self.stages_with_frange = ['animation', 'cfx', 'fx', 'lighting', 'camera']
+        self.stages_with_frange = ['animation', 'cfx', 'fx', 'lighting', 'camera', 'compositing']
 
         self.work_env_id = int(os.environ['wizard_work_env_id'])
         self.stage_to_export = stage_to_export
