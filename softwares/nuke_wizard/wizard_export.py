@@ -55,7 +55,6 @@ def export_exr(export_dir, frange):
         render_node = nuke.toNode(render_node_name)
         file = f"{export_dir}/%05d.exr"
         render_node['file'].setValue(file)
-        #render_node['colorspace'].setValue('compositing_linear')
         render_node['compression'].setValue('PIZ Wavelet')
         nuke.execute(render_node_name,frange[0],frange[1],1)
     else:

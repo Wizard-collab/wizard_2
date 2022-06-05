@@ -144,5 +144,6 @@ def backdrop_nodes(nodes_list, namespace, namespace_knob=False):
     backdrop.setXYpos(int(x0-50), int(y0-50))
     backdrop['bdwidth'].setValue(width)
     backdrop['bdheight'].setValue(height)
+    backdrop['tile_color'].setValue(2325008641)
     if namespace_knob:
         add_namespace_knob(backdrop, namespace)
