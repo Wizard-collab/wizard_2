@@ -20,6 +20,7 @@ from wizard.gui import comment_widget
 # Wizard modules
 from wizard.core import assets
 from wizard.core import launch
+from wizard.core import path_utils
 from wizard.core import project
 from wizard.vars import ressources
 
@@ -708,9 +709,14 @@ class reference_infos_thread(QtCore.QThread):
                     export_version_row = project.get_export_version_data(reference_row['export_version_id'])
                     files = json.loads(export_version_row['files'])
                     if len(files)>0:
-                        format = files[0].split('.')[-1]
+                        extension = files[0].split('.')[-1]
                     else:
-                        format = '?'
+                        files_dir = assets.get_export_version_path(reference_row['export_version_id'])
+                        files_list = path_utils.listdir(files_dir)
+                        if len(files_list) > 0:
+                            extension = files_list[0].split('.')[-1]
+                        else:
+                            extension = '?'
                     export_row = project.get_export_data(export_version_row['export_id'])
                     variant_row = project.get_variant_data(export_row['variant_id'])
                     stage_row = project.get_stage_data(variant_row['stage_id'])
@@ -729,7 +735,7 @@ class reference_infos_thread(QtCore.QThread):
                                                         up_to_date, 
                                                         reference_row['auto_update'],
                                                         asset_name,
-                                                        format])
+                                                        extension])
         except:
             logger.error(str(traceback.format_exc()))
 

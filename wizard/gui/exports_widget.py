@@ -309,6 +309,7 @@ class exports_widget(QtWidgets.QWidget):
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
+        self.check_existence_thread.extension_signal.connect(self.extension_signal)
 
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.show_id_signal.connect(self.show_search_version)
@@ -401,6 +402,12 @@ class exports_widget(QtWidgets.QWidget):
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.time()-start_time), 3))
         self.refresh_label.setText(f"- refresh : {refresh_time}s")
+
+    def extension_signal(self, tuple_signal):
+        export_version_id = tuple_signal[0]
+        extension = tuple_signal[-1]
+        if export_version_id in self.export_versions_ids.keys():
+            self.export_versions_ids[export_version_id].set_extension(extension)
 
     def missing_file(self, tuple_signal):
         export_version_id = tuple_signal[0]
@@ -612,7 +619,7 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         if len(files) > 0:
             extension = files[0].split('.')[-1]
         else:
-            extension = '?'
+            extension = ''
         self.setText(6, extension)
         self.setText(9, str(self.export_version_row['id']))
         self.setForeground(9, QtGui.QBrush(QtGui.QColor('gray')))
@@ -627,6 +634,9 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
             self.setIcon(8, QtGui.QIcon(ressources._default_export_version_icon_))
         else:
             self.setIcon(8, QtGui.QIcon(''))
+
+    def set_extension(self, extension):
+        self.setText(6, extension)
 
     def set_missing(self, number):
         self.setText(7, f'missing {number} files')
@@ -643,6 +653,7 @@ class check_existence_thread(QtCore.QThread):
 
     missing_file_signal = pyqtSignal(tuple)
     not_missing_file_signal = pyqtSignal(tuple)
+    extension_signal = pyqtSignal(tuple)
 
     def __init__(self, parent=None):
         super(check_existence_thread, self).__init__(parent)
@@ -657,6 +668,8 @@ class check_existence_thread(QtCore.QThread):
                     missing_files = 0
                     export_version_dir = assets.get_export_version_path(export_version_row['id'])
                     files_list = os.listdir(export_version_dir)
+                    if len(files_list) > 0:
+                        self.extension_signal.emit((export_version_row['id'], files_list[0].split('.')[-1]))
                 else:
                     missing_files = 0
                     for file in files_list:
