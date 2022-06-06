@@ -74,6 +74,13 @@ def look_for_node(name, parent=None):
             break
     return found
 
+def check_out_node_existence(out_node, parent=None):
+    if look_for_node(out_node, parent):
+        return True
+    else:
+        logger.warning("'{}' not found".format(out_node))
+        return False
+
 def get_file_dir(file):
     directory = os.path.dirname(file)
     directory.replace('\\', '/')

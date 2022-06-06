@@ -177,7 +177,7 @@ class export_settings_widget(QtWidgets.QDialog):
         self.reject_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.reject_button)
 
-        self.batch_button = QtWidgets.QPushButton('Batch')
+        self.batch_button = QtWidgets.QPushButton('Export')
         self.batch_button.setObjectName('blue_button')
         self.batch_button.setDefault(True)
         self.batch_button.setAutoDefault(True)

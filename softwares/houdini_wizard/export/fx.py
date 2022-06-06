@@ -19,13 +19,7 @@ def main(frange):
         export_name = 'main'
         asset_name = os.environ['wizard_asset_name']
         wizard_export.trigger_before_export_hook('fx')
-
-        '''
-        frange = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
-        frange = [frange[1], frange[2]]
-        '''
-
-        wizard_export.export('fx', export_name, frange)
+        wizard_export.export(stage_name='fx', export_name=export_name, out_node='wizard_fx_output', frange=frange)
     except:
         logger.error(str(traceback.format_exc()))
 

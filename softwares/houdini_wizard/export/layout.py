@@ -21,7 +21,7 @@ def main():
         export_name = 'main'
         asset_name = os.environ['wizard_asset_name']
         wizard_export.trigger_before_export_hook('layout')
-        wizard_export.export('layout', export_name)
+        wizard_export.export(stage_name='layout', export_name=export_name, out_node='wizard_layout_output')
     except:
         logger.error(str(traceback.format_exc()))
     finally:

@@ -50,7 +50,7 @@ def export_cfx(rigging_reference, frange):
         logger.info(f"Exporting {rig_nspace}")
         wizard_export.trigger_before_export_hook('cfx')
         export_name = buid_export_name(asset_name, variant_name, count)
-        wizard_export.export('cfx', export_name, frange, parent=rig_nspace)
+        wizard_export.export(stage_name='cfx', export_name=export_name, out_node='wizard_cfx_output', frange=frange, parent=rig_nspace)
     else:
         logger.warning("{} not found in current scene".format(rig_nspace))
 
