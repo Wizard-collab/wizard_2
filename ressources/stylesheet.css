@@ -713,6 +713,21 @@ QSlider::handle:horizontal {
 	border-radius: 0px;
 }
 
+#tree_as_list_widget_no_hover{
+	padding: 0px;
+	alternate-background-color: rgba(0,0,0,30);
+}
+
+#tree_as_list_widget_no_hover::item{
+	margin: 0px;
+	border-radius: 0px;
+}
+
+#tree_as_list_widget_no_hover::item:hover{
+	background-color:rgba(255,255,255,0);
+}
+
+
 #production_manager_list_widget{
 	margin: 0px;
 	alternate-background-color: rgba(0,0,0,50);

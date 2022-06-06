@@ -28,7 +28,7 @@ def main(nspace_list, frange):
                     at_least_one = True
                     export_camera(camrig_reference, frange)
             if not at_least_one:
-                logger.warning(f"Nothing to export from namespace list : {nspace_list}")
+                logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
         else:
             logger.warning("No camrig references found in wizard description")
     except:
@@ -57,13 +57,13 @@ def export_camera(camrig_reference, frange):
             camera_work_env_id = int(os.environ['wizard_work_env_id'])
         export_GRP_list = get_objects_to_export(camrig_nspace)
         if export_GRP_list:
-            logger.info(f"Exporting {camrig_nspace}")
+            logger.info("Exporting {}".format(camrig_nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('camera')
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
             wizard_export.export('camera', export_name, export_GRP_list, frange, custom_work_env_id = camera_work_env_id)
         else:
-            logger.warning(f"No objects to export in '{camrig_nspace}:render_set'")
+            logger.warning("No objects to export in '{}:render_set'".format(camrig_nspace))
 
 def buid_export_name(asset_name, variant_name, count):
     if variant_name == 'main':

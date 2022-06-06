@@ -29,7 +29,7 @@ def main(nspace_list, frange):
                     at_least_one = True
                     export_animation(rigging_reference, frange, percent_factor)
             if not at_least_one:
-                logger.warning(f"Nothing to export from namespace list : {nspace_list}")
+                logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
         else:
             logger.warning("No rigging references found in wizard description")
     except:
@@ -54,13 +54,13 @@ def export_animation(rigging_reference, frange, percent_factor):
     if is_referenced(rig_nspace):
         export_GRP_list = get_objects_to_export(rig_nspace)
         if export_GRP_list:
-            logger.info(f"Exporting {rig_nspace}")
+            logger.info("Exporting {}".format(rig_nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('animation')
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
             wizard_export.export('animation', export_name, export_GRP_list, frange, percent_factor=percent_factor)
         else:
-            logger.warning(f"No objects to export in '{rig_nspace}:render_set'")
+            logger.warning("No objects to export in '{}:render_set'".format(rig_nspace))
 
 def buid_export_name(asset_name, variant_name, count):
     if variant_name == 'main':

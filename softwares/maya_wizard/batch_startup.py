@@ -20,7 +20,7 @@ from maya_wizard.export import animation
 from maya_wizard.export import camera
 
 # read_settings
-if 'wizard_json_settings' in os.environ.keys():
+if 'wizard_json_settings'.upper() in os.environ.keys():
     settings_dic = json.loads(os.environ['wizard_json_settings'])
     frange = settings_dic['frange']
     refresh_assets = settings_dic['refresh_assets']

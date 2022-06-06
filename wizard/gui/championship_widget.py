@@ -36,12 +36,12 @@ class championship_widget(QtWidgets.QWidget):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.list_view.setObjectName('tree_as_list_widget')
+        self.list_view.setObjectName('tree_as_list_widget_no_hover')
         self.list_view.setColumnCount(5)
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
         self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Administrator'])
         self.main_layout.addWidget(self.list_view)

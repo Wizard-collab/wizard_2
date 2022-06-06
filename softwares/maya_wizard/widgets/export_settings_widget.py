@@ -17,7 +17,7 @@ class export_settings_widget(QtWidgets.QDialog):
     def __init__(self, stage_to_export, parent=ui_tools.maya_main_window()):
         super(export_settings_widget, self).__init__(parent)
 
-        self.setWindowTitle(f"Wizard - Batch settings")
+        self.setWindowTitle("Wizard - Batch settings")
 
         self.stages_relations_dic = dict()
         self.stages_relations_dic['animation'] = ['rigging']

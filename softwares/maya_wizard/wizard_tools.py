@@ -86,11 +86,11 @@ def apply_tags(object_list):
         pm.setAttr(object + '.wizardTags', (',').join(set(tags)), type="string")
 
 def by_frame_progress_script(frange, percent_factor):
-    command = f'range = {frange[1]} - {frange[0]}\\n'
-    command+= f'if range != 0:\\n'
-    command+= f'    frame = #FRAME#-{frange[0]}\\n'
-    command+= f'    to_add = ({percent_factor[0]}/{percent_factor[1]})*100\\n'
-    command+= f'    factor = 1/{percent_factor[1]}\\n'
-    command+= f'    percent = (frame/range)*100.0*factor+to_add\\n'
+    command = 'range = {} - {}\\n'.format(frange[1], frange[0])
+    command+= 'if range != 0:\\n'
+    command+= '    frame = #FRAME#-{}\\n'.format(frange[0])
+    command+= '    to_add = ({}/{})*100\\n'.format(percent_factor[0], percent_factor[1])
+    command+= '    factor = 1/{}\\n'.format(percent_factor[1])
+    command+= '    percent = (frame/range)*100.0*factor+to_add\\n'
     command+= '    print("wizard_task_percent:{}".format(percent))\\n'
     return command

@@ -911,7 +911,7 @@ def add_asset_tracking_event(variant_id, event_type, data, comment=''):
 def get_default_extension(work_env_id):
     work_env_row = project.get_work_env_data(work_env_id)
     variant_row = project.get_variant_data(work_env_row['variant_id'])
-    stage_name = project.get_stage_data(variant_row['stage_id'])
+    stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
     if not work_env_row['export_extension']:
         extension = project.get_default_extension(stage_name, work_env_row['software_id'])
     else:

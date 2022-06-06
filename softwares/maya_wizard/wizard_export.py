@@ -66,7 +66,7 @@ def export_abc(export_GRP_list, export_file, frange, percent_factor):
         command += " -root {}".format(object)
     command += " -dataFormat ogawa -file "
     command += export_file
-    command += f" -pythonPerFrameCallback '{wizard_tools.by_frame_progress_script(frange, percent_factor)}'"
+    command += " -pythonPerFrameCallback '{}'".format(wizard_tools.by_frame_progress_script(frange, percent_factor))
     cmds.AbcExport(j=command)
 
 def reopen(scene):
