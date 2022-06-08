@@ -43,6 +43,7 @@ import logging
 
 # Wizard modules
 from wizard.core import db_utils
+from wizard.core import support
 from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import environment
@@ -441,6 +442,7 @@ def add_quote(content):
                                         json.dumps([])))
             if quote_id:
                 logger.info("Quote added")
+                support.send_quote(content)
         else:
             logger.warning("Your quote needs to be under 100 characters")
     else:

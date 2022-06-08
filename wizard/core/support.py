@@ -28,6 +28,7 @@
 
 # Python modules
 import requests
+import traceback
 import json
 import logging
 
@@ -37,9 +38,9 @@ from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
-URL = "http://93.19.210.30/support/"
 
 def send_log(log, type, additionnal_message=''):
+    URL = "http://93.19.210.30/support/"
     contact_dic = dict()
     contact_dic['username'] = environment.get_user()
     contact_dic['log'] = log
@@ -61,3 +62,29 @@ def send_log(log, type, additionnal_message=''):
         logger.error('Connection timed out')
     except requests.ConnectionError:
         logger.error('No network connection')
+    except:
+        logger.error(str(traceback.format_exc()))
+
+def send_quote(quote):
+    URL = "http://93.19.210.30/quotes/"
+    contact_dic = dict()
+    contact_dic['username'] = environment.get_user()
+    contact_dic['quote_content'] = quote
+    contact_dic['user_email'] = environment.get_user_email()
+    contact_dic['repository'] = environment.get_repository()
+
+    try:
+        response = requests.post(URL, data=contact_dic)
+        response_dic = response.json()
+        if response_dic['success']:
+            logger.info(response_dic['messages_list'][0])
+        else:
+            for message in response_dic['messages_list']:
+                logger.error(message)
+    except requests.Timeout:
+        logger.error('Connection timed out')
+    except requests.ConnectionError:
+        logger.error('No network connection')
+    except:
+        logger.error(str(traceback.format_exc()))
+
