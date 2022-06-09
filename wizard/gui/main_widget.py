@@ -54,6 +54,7 @@ from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
 from wizard.gui import whatsnew_widget
 from wizard.gui import groups_manager_widget
+from wizard.gui import quotes_manager
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ class main_widget(QtWidgets.QWidget):
         self.whatsnew_widget = whatsnew_widget.whatsnew_widget()
         self.production_manager_widget = production_manager_widget.production_manager_widget()
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
+        self.quotes_manager = quotes_manager.quotes_manager()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -149,6 +151,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_console.connect(self.console_widget.toggle)
         self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
         self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
+        self.header_widget.show_quotes_manager.connect(self.quotes_manager.toggle)
         self.header_widget.show_project_preferences.connect(self.project_preferences_widget.toggle)
         self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
         self.header_widget.show_groups_manager.connect(self.groups_manager_widget.toggle)
@@ -342,6 +345,7 @@ class main_widget(QtWidgets.QWidget):
         self.shelf_widget.refresh()
         self.groups_manager_widget.refresh()
         self.project_preferences_widget.refresh()
+        self.quotes_manager.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

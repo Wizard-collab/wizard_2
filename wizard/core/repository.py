@@ -462,7 +462,7 @@ def add_quote_score(quote_id, score):
                                                         'quotes',
                                                         ('id', quote_id))
 
-        if current_quote_row is not None:
+        if current_quote_row is not None and current_quote_row != []:
             if current_quote_row[0]['creation_user'] != environment.get_user():
                 voters_list = json.loads(current_quote_row[0]['voters'])
                 if environment.get_user() not in voters_list:
@@ -487,6 +487,8 @@ def add_quote_score(quote_id, score):
                     logger.warning("You already voted for this quote")
             else:
                 logger.warning("You can't vote for your own quote")
+        else:
+            logger.warning("Quote not found")
 
 def get_quote_data(quote_id, column='*'):
     quotes_rows = db_utils.get_row_by_column_data('repository',
@@ -499,8 +501,23 @@ def get_quote_data(quote_id, column='*'):
         logger.error("Quote not found")
         return None
 
+def remove_quote(quote_id):
+    quote_row = get_quote_data(quote_id)
+    if quote_row:
+        if environment.get_user() == quote_row['creation_user']:
+            success = db_utils.delete_row('repository', 'quotes', quote_id)
+            if success:
+                logger.info("Quote removed from repository")
+            return success
+        else:
+            logger.warning("You did not created this quote")
+
 def get_all_quotes(column='*'):
     quotes_rows = db_utils.get_rows('repository', 'quotes', column)
+    return quotes_rows
+
+def get_user_quotes(column='*'):
+    quotes_rows = db_utils.get_row_by_column_data('repository', 'quotes', ('creation_user', environment.get_user()))
     return quotes_rows
 
 def get_ips(column='*'):

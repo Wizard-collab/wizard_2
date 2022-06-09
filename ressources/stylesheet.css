@@ -446,6 +446,10 @@ QSlider::handle:horizontal {
     margin: -3px 0;
 }
 
+#user_quote_widget_frame{
+	border-radius: 4px;
+}
+
 #locked_button{
 	border: 2px solid #f0605b;
 	background-color: #f0605b;

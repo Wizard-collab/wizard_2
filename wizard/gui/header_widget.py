@@ -22,6 +22,7 @@ class header_widget(QtWidgets.QFrame):
 
     show_subtask_manager = pyqtSignal(object)
     show_production_manager = pyqtSignal(object)
+    show_quotes_manager = pyqtSignal(object)
     show_groups_manager = pyqtSignal(object)
     show_console = pyqtSignal(object)
     show_user_preferences = pyqtSignal(object)
@@ -66,6 +67,7 @@ class header_widget(QtWidgets.QFrame):
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
         self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
         self.championship_action = self.window_action.addAction(QtGui.QIcon(ressources._ranking_icon_), "Championship")
+        self.quotes_action = self.window_action.addAction(QtGui.QIcon(ressources._quote_icon_), "Quotes")
         self.pywizard_action = self.window_action.addAction(QtGui.QIcon(ressources._python_icon_), "PyWizard")
 
         self.user_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='User')
@@ -93,6 +95,7 @@ class header_widget(QtWidgets.QFrame):
         self.subtask_manager_action.triggered.connect(self.show_subtask_manager.emit)
         self.console_action.triggered.connect(self.show_console.emit)
         self.championship_action.triggered.connect(self.show_championship.emit)
+        self.quotes_action.triggered.connect(self.show_quotes_manager.emit)
         self.pywizard_action.triggered.connect(self.show_pywizard.emit)
         self.user_log_action.triggered.connect(self.change_user)
         self.user_create_action.triggered.connect(self.create_user)
