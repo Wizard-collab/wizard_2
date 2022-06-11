@@ -446,6 +446,21 @@ QSlider::handle:horizontal {
     margin: -3px 0;
 }
 
+QTableWidget{
+	background-color:#24242b;
+	gridline-color: rgba(255,255,255,40);
+	alternate-background-color: rgba(0,0,0,30);
+}
+
+QTableWidget::item:selected{
+	background-color: rgba(255,255,255,40);
+}
+
+QTableCornerButton::section {
+	background-color: rgba(0,0,0,30);
+}
+
+
 #user_quote_widget_frame{
 	border-radius: 4px;
 }

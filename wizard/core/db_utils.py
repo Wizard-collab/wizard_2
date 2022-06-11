@@ -178,6 +178,14 @@ def check_database_existence(database):
             logger.debug("'{}' Database doesn't exist.".format(database))
             return None
 
+def get_table_description(level, table):
+    sql_cmd = f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{table}' order by ORDINAL_POSITION;"
+    return execute_sql(sql_cmd, level, 1)
+
+def get_tables(level):
+    sql_cmd = "SELECT table_name FROM information_schema.tables WHERE (table_schema = 'public')"
+    return execute_sql(sql_cmd, level, 1)
+
 def execute_sql(sql, level, as_dict, data=None, fetch=2):
     signal_dic = dict()
     signal_dic['request'] = 'sql_cmd'

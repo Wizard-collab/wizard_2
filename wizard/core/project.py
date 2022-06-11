@@ -69,7 +69,7 @@ logger = logging.getLogger(__name__)
 
 def add_domain(name):
     domain_id = db_utils.create_row('project',
-                        'domains', 
+                        'domains_data', 
                         ('name', 'creation_time', 'creation_user'), 
                         (name, time.time(), environment.get_user()))
     if domain_id:
@@ -77,12 +77,12 @@ def add_domain(name):
     return domain_id
 
 def get_domains(column='*'):
-    domain_rows = db_utils.get_rows('project', 'domains', column=column)
+    domain_rows = db_utils.get_rows('project', 'domains_data', column=column)
     return domain_rows
 
 def get_domain_data(domain_id, column='*'):
     domain_rows = db_utils.get_row_by_column_data('project',
-                                                    'domains',
+                                                    'domains_data',
                                                     ('id', domain_id),
                                                     column)
     if len(domain_rows) >= 1:
@@ -112,7 +112,7 @@ def get_domain_child_by_name(domain_id, category_name, column='*'):
 
 def get_domain_by_name(name, column='*'):
     domain_rows = db_utils.get_row_by_column_data('project',
-                                                    'domains',
+                                                    'domains_data',
                                                     ('name', name),
                                                     column)
     if domain_rows and len(domain_rows) >= 1:
@@ -126,7 +126,7 @@ def remove_domain(domain_id):
     if repository.is_admin():
         for category_id in get_domain_childs(domain_id, 'id'):
             remove_category(category_id)
-        success = db_utils.delete_row('project', 'domains', domain_id)
+        success = db_utils.delete_row('project', 'domains_data', domain_id)
         if success:
             logger.info(f"Domain removed from project")
     return success
@@ -2088,7 +2088,7 @@ def init_project(project_path, project_name):
         return None
 
 def create_domains_table(database):
-    sql_cmd = """ CREATE TABLE IF NOT EXISTS domains (
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS domains_data (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL UNIQUE,
                                         creation_time real NOT NULL,
@@ -2104,7 +2104,7 @@ def create_categories_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         domain_id integer NOT NULL,
-                                        FOREIGN KEY (domain_id) REFERENCES domains (id)
+                                        FOREIGN KEY (domain_id) REFERENCES domains_data (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Categories table created")
@@ -2146,7 +2146,7 @@ def create_stages_table(database):
                                         asset_id integer NOT NULL,
                                         domain_id integer NOT NULL,
                                         FOREIGN KEY (asset_id) REFERENCES assets (id),
-                                        FOREIGN KEY (domain_id) REFERENCES domains (id)
+                                        FOREIGN KEY (domain_id) REFERENCES domains_data (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Stages table created")
