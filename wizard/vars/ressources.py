@@ -252,6 +252,8 @@ _star_icon_ = path_utils.join(_icons_path_, 'star.svg')
 _available_icons_list_.append(_star_icon_)
 _quote_icon_ = path_utils.join(_icons_path_, 'quote.svg')
 _available_icons_list_.append(_quote_icon_)
+_table_viewer_icon_ = path_utils.join(_icons_path_, 'table_viewer.svg')
+_available_icons_list_.append(_table_viewer_icon_)
 
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')

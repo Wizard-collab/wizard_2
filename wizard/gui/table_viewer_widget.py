@@ -91,6 +91,17 @@ class table_viewer_widget(QtWidgets.QWidget):
         self.list_view.itemSelectionChanged.connect(self.change_table)
         self.table_widget.cellChanged.connect(self.cell_modified)
 
+    def toggle(self):
+        if self.isVisible():
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+            else:
+                self.hide()
+        else:
+            self.show()
+            self.raise_()
+
     def cell_modified(self, row, column):
         if self.apply_change:
             item = self.table_widget.item(row, column)

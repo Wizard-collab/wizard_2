@@ -1,5 +1,5 @@
 import wapi
-for a in range(12,13):
+for a in range(13,50):
 	asset_path=wapi.assets.create_asset("assets/props", f"benchmark_{str(a)}")
 	for stage in ['modeling', 'rigging', 'texturing', 'grooming', 'shading']:
 		wapi.assets.create_stage(asset_path, stage)

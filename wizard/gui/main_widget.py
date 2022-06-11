@@ -55,6 +55,7 @@ from wizard.gui import confirm_widget
 from wizard.gui import whatsnew_widget
 from wizard.gui import groups_manager_widget
 from wizard.gui import quotes_manager
+from wizard.gui import table_viewer_widget
 
 logger = logging.getLogger(__name__)
 
@@ -97,6 +98,7 @@ class main_widget(QtWidgets.QWidget):
         self.production_manager_widget = production_manager_widget.production_manager_widget()
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.quotes_manager = quotes_manager.quotes_manager()
+        self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -155,6 +157,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_project_preferences.connect(self.project_preferences_widget.toggle)
         self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
         self.header_widget.show_groups_manager.connect(self.groups_manager_widget.toggle)
+        self.header_widget.show_tables_viewer.connect(self.table_viewer_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
         self.header_widget.show_championship.connect(self.championship_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
@@ -342,6 +345,7 @@ class main_widget(QtWidgets.QWidget):
         self.locks_widget.refresh()
         self.asset_tracking_widget.refresh()
         self.production_manager_widget.refresh()
+        self.table_viewer_widget.refresh()
         self.shelf_widget.refresh()
         self.groups_manager_widget.refresh()
         self.project_preferences_widget.refresh()
