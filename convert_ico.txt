@@ -1,0 +1,1 @@
+"C:\Program Files\ImageMagick-7.1.0-Q16\magick.exe" convert 16.png 32.png 48.png 128.png 256.png wizard_icon.ico

@@ -86,3 +86,5 @@ def analyse_comment(comment, life_amount):
 		remove_life(life_amount)
 		logger.info(f"Warning, bad commenting just made you loose {life_amount}% of life")
 		logger.info(f"Comment with more than 5 characters to avoid loosing life.")
+	else:
+		repository.increase_user_comments_count(environment.get_user())

@@ -20,6 +20,11 @@ class user_widget(QtWidgets.QFrame):
         super(user_widget, self).__init__(parent)
         user_row = repository.get_user_row_by_name(environment.get_user())
         self.old_level = user_row['level']
+        self.old_icon = None
+        self.is_first_comments_count = None
+        self.is_first_work_time = None
+        self.is_first_xp = None
+        self.first_refresh = 1
         self.build_ui()
 
     def build_ui(self):
@@ -38,14 +43,20 @@ class user_widget(QtWidgets.QFrame):
         self.items_widget.setLayout(self.items_layout)
         self.main_layout.addWidget(self.items_widget)
 
+        self.comment_item_label = QtWidgets.QLabel()
+        self.comment_item_label.setPixmap(QtGui.QIcon(ressources._green_item_icon_).pixmap(22))
+        self.items_layout.addWidget(self.comment_item_label)
+
+        self.worker_item_label = QtWidgets.QLabel()
+        self.worker_item_label.setPixmap(QtGui.QIcon(ressources._red_item_icon_).pixmap(22))
+        self.items_layout.addWidget(self.worker_item_label)
+
+        self.xp_item_label = QtWidgets.QLabel()
+        self.xp_item_label.setPixmap(QtGui.QIcon(ressources._yellow_item_icon_).pixmap(22))
+        self.items_layout.addWidget(self.xp_item_label)
+
         self.crown_label = QtWidgets.QLabel()
         self.items_layout.addWidget(self.crown_label)
-
-        self.ranking_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.ranking_button, "Wizard cup")
-        self.ranking_button.setFixedSize(28,28)
-        self.ranking_button.setIcon(QtGui.QIcon(ressources._ranking_icon_))
-        #self.items_layout.addWidget(self.ranking_button)
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('transparent_widget')
@@ -110,6 +121,7 @@ class user_widget(QtWidgets.QFrame):
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 28)
         self.profile_picture.setPixmap(pm)
         self.crown_check(user_row)
+        self.items_check(user_row)
 
         if user_row['level'] != self.old_level:
             if user_row['level'] > self.old_level:
@@ -118,22 +130,60 @@ class user_widget(QtWidgets.QFrame):
                 gui_server.custom_popup(f"You are now level {user_row['level']}", 'You just lost a level, take care of your comments')
 
             self.old_level = user_row['level']
+        self.first_refresh = 0
 
+    def items_check(self, user_row):
+        user_rows = repository.get_users_list_by_xp_order()
+        if user_row['id'] != user_rows[0]['id']:
+            self.xp_item_label.setVisible(0)
+            self.is_first_xp = 0
+        else:
+            self.xp_item_label.setVisible(1)
+            if not self.is_first_xp and not (self.first_refresh):
+                gui_server.custom_popup("You have earned so much experience !", 'Congratulation', ressources._yellow_item_icon_)
+            self.is_first_xp = 1
+
+        user_rows = repository.get_users_list_by_comments_count_order()
+        if user_row['id'] != user_rows[0]['id']:
+            self.comment_item_label.setVisible(0)
+            self.is_first_comments_count = 0
+        else:
+            self.comment_item_label.setVisible(1)
+            if not self.is_first_comments_count and not (self.first_refresh):
+                gui_server.custom_popup("You are really good at commenting !", 'Congratulation', ressources._green_item_icon_)
+            self.is_first_comments_count = 1
+
+        user_rows = repository.get_users_list_by_work_time_order()
+        if user_row['id'] != user_rows[0]['id']:
+            self.worker_item_label.setVisible(0)
+            self.is_first_work_time = 0
+        else:
+            self.worker_item_label.setVisible(1)
+            if not self.is_first_work_time and not (self.first_refresh):
+                gui_server.custom_popup("You worked so much time !", 'Congratulation', ressources._red_item_icon_)
+            self.is_first_work_time = 1
 
     def crown_check(self, user_row):
         user_rows = repository.get_users_list()
         icon = None
+        message = None
         if user_row['id'] == user_rows[0]['id']:
             icon = ressources._gold_icon_
+            message = "You just won the golden crown !"
         if len(user_rows)>=2:
             if (user_row['id'] ==  user_rows[1]['id']):
                 icon = ressources._silver_icon_
+                message = "You just won the silver crown !"
         if len(user_rows)>=3:
             if (user_row['id'] == user_rows[2]['id']):
                 icon = ressources._bronze_icon_
+                message = "You just won the bronze crown !"
         if icon is not None:
             self.crown_label.setVisible(1)
             self.crown_label.setPixmap(QtGui.QIcon(icon).pixmap(22))
+            if icon != self.old_icon and not (self.first_refresh):
+                gui_server.custom_popup(message, 'Congratulation', icon)
+            self.old_icon = icon
         else:
             self.crown_label.setVisible(0)
     

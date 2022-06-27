@@ -11,6 +11,7 @@ from wizard.gui import gui_utils
 # Wizard modules
 from wizard.core import repository
 from wizard.core import image
+from wizard.core import tools
 from wizard.vars import ressources
 
 class championship_widget(QtWidgets.QWidget):
@@ -37,13 +38,13 @@ class championship_widget(QtWidgets.QWidget):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget_no_hover')
-        self.list_view.setColumnCount(5)
+        self.list_view.setColumnCount(6)
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
-        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Administrator'])
+        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time'])
         self.main_layout.addWidget(self.list_view)
 
     def toggle(self):
@@ -80,6 +81,13 @@ class championship_widget(QtWidgets.QWidget):
                 self.user_ids[all_user_rows[1]['id']].set_crown(2)
             if len(all_user_rows)>=3:
                 self.user_ids[all_user_rows[2]['id']].set_crown(3)
+        first_xp_user_id = repository.get_users_list_by_xp_order()[0]['id']
+        self.user_ids[first_xp_user_id].set_xp_item()
+        first_comment_user_id = repository.get_users_list_by_comments_count_order()[0]['id']
+        self.user_ids[first_comment_user_id].set_comment_item()
+        first_worker_user_id = repository.get_users_list_by_work_time_order()[0]['id']
+        self.user_ids[first_worker_user_id].set_work_time_item()
+
 
 class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, user_row, parent=None):
@@ -102,6 +110,15 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         elif crown == 3:
             self.setIcon(2, QtGui.QIcon(ressources._bronze_icon_))
 
+    def set_xp_item(self):
+        self.setIcon(3, QtGui.QIcon(ressources._yellow_item_icon_))
+
+    def set_comment_item(self):
+        self.setIcon(4, QtGui.QIcon(ressources._green_item_icon_))
+
+    def set_work_time_item(self):
+        self.setIcon(5, QtGui.QIcon(ressources._red_item_icon_))
+
     def fill_ui(self):
         user_icon = QtGui.QIcon()
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(self.user_row['profile_picture']), 'png', 30)
@@ -111,7 +128,6 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.setIcon(2, QtGui.QIcon())
         self.setText(2, str(self.user_row['level']))
         self.setText(3, f"{str(self.user_row['total_xp'])}")
-        if self.user_row['administrator']:
-            self.setIcon(4, QtGui.QIcon(ressources._admin_badge_))
-        else:
-            self.setIcon(4, QtGui.QIcon())
+        self.setText(4, f"{str(self.user_row['comments_count'])}")
+        string_time = tools.convert_seconds_to_string_time(float(self.user_row['work_time']))
+        self.setText(5, string_time)

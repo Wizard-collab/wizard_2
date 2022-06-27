@@ -237,6 +237,8 @@ def create_user(user_name,
                             'profile_picture',
                             'xp',
                             'total_xp',
+                            'work_time',
+                            'comments_count',
                             'level',
                             'life',
                             'administrator'), 
@@ -244,6 +246,8 @@ def create_user(user_name,
                             tools.encrypt_string(password),
                             email,
                             profile_picture_ascii,
+                            0,
+                            0,
                             0,
                             0,
                             0,
@@ -339,8 +343,21 @@ def modify_user_password(user_name, password, new_password):
             return None
 
 def get_users_list():
-    users_rows = db_utils.get_rows('repository', 'users', order='level DESC, xp DESC;')
+    users_rows = db_utils.get_rows('repository', 'users', order='level DESC, total_xp DESC;')
     return users_rows
+
+def get_users_list_by_xp_order():
+    users_rows = db_utils.get_rows('repository', 'users', order='total_xp DESC;')
+    return users_rows
+
+def get_users_list_by_work_time_order():
+    users_rows = db_utils.get_rows('repository', 'users', order='work_time DESC;')
+    return users_rows
+
+def get_users_list_by_comments_count_order():
+    users_rows = db_utils.get_rows('repository', 'users', order='comments_count DESC;')
+    return users_rows
+
 
 def get_user_names_list():
     users_rows = db_utils.get_rows('repository', 'users', 'user_name')
@@ -382,6 +399,42 @@ def modify_user_total_xp(user_name, total_xp):
     if db_utils.update_data('repository',
                                 'users',
                                 ('total_xp', total_xp),
+                                ('user_name', user_name)):
+        return 1
+    else:
+        return None
+
+def increase_user_comments_count(user_name):
+    old_comments_count = db_utils.get_row_by_column_data('repository',
+                                                        'users',
+                                                        ('user_name', user_name), 
+                                                        'comments_count')
+    if old_comments_count and old_comments_count != []:
+        comments_count = old_comments_count[0] + 1
+    else:
+        comments_count = 1
+
+    if db_utils.update_data('repository',
+                                'users',
+                                ('comments_count', comments_count),
+                                ('user_name', user_name)):
+        return 1
+    else:
+        return None
+
+def add_user_work_time(user_name, work_time_to_add):
+    old_work_time = db_utils.get_row_by_column_data('repository',
+                                                        'users',
+                                                        ('user_name', user_name), 
+                                                        'work_time')
+    if old_work_time and old_work_time != []:
+        work_time = old_work_time[0] + work_time_to_add
+    else:
+        work_time = work_time_to_add
+
+    if db_utils.update_data('repository',
+                                'users',
+                                ('work_time', work_time),
                                 ('user_name', user_name)):
         return 1
     else:
@@ -607,6 +660,8 @@ def create_admin_user(admin_password, admin_email):
                                 'profile_picture',
                                 'xp',
                                 'total_xp',
+                                'work_time',
+                                'comments_count',
                                 'level',
                                 'life', 
                                 'administrator'), 
@@ -614,6 +669,8 @@ def create_admin_user(admin_password, admin_email):
                                 tools.encrypt_string(admin_password),
                                 admin_email,
                                 profile_picture,
+                                0,
+                                0,
                                 0,
                                 0,
                                 0,
@@ -630,6 +687,8 @@ def create_users_table():
                                         profile_picture text NOT NULL,
                                         xp integer NOT NULL,
                                         total_xp integer NOT NULL,
+                                        work_time real NOT NULL,
+                                        comments_count integer NOT NULL,
                                         level integer NOT NULL,
                                         life integer NOT NULL,
                                         administrator integer NOT NULL
