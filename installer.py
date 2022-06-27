@@ -129,6 +129,8 @@ def delete_reg_keys():
 
 def create_shortcuts():
     create_shortcut('Wizard', 'Wizard.exe')
+    create_shortcut('Server', 'server.exe')
+    create_shortcut('PyWizard', 'PyWizard.exe')
 
 def delete_shortcuts():
     delete_shortcut('Wizard')
@@ -209,7 +211,7 @@ class installer(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-        self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.svg')))
+        self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.png')))
         self.setWindowTitle(f"Wizard installer")
         self.build_ui()
 
@@ -316,7 +318,7 @@ class installer(QtWidgets.QWidget):
 
         self.image_label = QtWidgets.QLabel()
         self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.svg')).pixmap(34))
+        self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.png')).pixmap(34))
         self.datas_layout.addWidget(self.image_label)
 
         self.infos_widget = QtWidgets.QWidget()

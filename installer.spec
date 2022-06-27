@@ -18,7 +18,7 @@ a = Analysis(['installer.py'],
 
 a.datas += [ ('__wizard__.zip', '.\\__wizard__.zip', 'DATA')]
 a.datas += [ ('version.yaml', '.\\version.yaml', 'DATA')]
-a.datas += [ ('ressources\\icons\\wizard_setup.svg', '.\\ressources\\icons\\wizard_setup.svg', 'DATA')]
+a.datas += [ ('ressources\\icons\\wizard_setup.png', '.\\ressources\\icons\\wizard_setup.png', 'DATA')]
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)

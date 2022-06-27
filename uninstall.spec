@@ -16,7 +16,7 @@ a = Analysis(['uninstall.py'],
              cipher=block_cipher,
              noarchive=False)
 
-a.datas += [ ('ressources\\icons\\wizard_setup.svg', '.\\ressources\\icons\\wizard_setup.svg', 'DATA')]
+a.datas += [ ('ressources\\icons\\wizard_setup.png', '.\\ressources\\icons\\wizard_setup.png', 'DATA')]
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)

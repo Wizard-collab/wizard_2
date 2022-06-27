@@ -113,6 +113,10 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller table_viewer.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			folders_list = ['ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
@@ -134,7 +138,9 @@ class compile():
 							'dist/Project Manager/Project Manager.exe',
 							'dist/Project Manager/Project Manager.exe.manifest',
 							'dist/error_handler/error_handler.exe',
-							'dist/error_handler/error_handler.exe.manifest']
+							'dist/error_handler/error_handler.exe.manifest',
+							'dist/Table Viewer/Table Viewer.exe',
+							'dist/Table Viewer/Table Viewer.exe.manifest']
 							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))

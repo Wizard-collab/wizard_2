@@ -28,7 +28,7 @@ exe = EXE(pyz,
           upx=True,
           console=True,
           version = 'compile\\version.rc',
-          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\wizard_icon.ico")
+          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\wizard_server.ico")
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

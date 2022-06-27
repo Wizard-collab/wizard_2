@@ -10,6 +10,7 @@ import statistics
 
 # Wizard gui modules
 from wizard.gui import confirm_widget
+from wizard.gui import gui_utils
 
 # Wizard modules
 from wizard.core import repository
@@ -33,8 +34,7 @@ class table_viewer_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.setObjectName('main_widget')
-        self.setMinimumWidth(700)
-        self.setMinimumHeight(500)
+        self.resize(1200,800)
 
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -82,14 +82,27 @@ class table_viewer_widget(QtWidgets.QWidget):
         self.table_widget.setAlternatingRowColors(True)
         self.table_widget.verticalHeader().setVisible(False)
         self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.table_widget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.content_layout.addWidget(self.table_widget)
+
+    def context_menu_requested(self, point):
+        menu = gui_utils.QMenu(self)
+        
+        item = self.table_widget.itemAt(point)
+        delete_row = menu.addAction(QtGui.QIcon(ressources._archive_icon_), 'Delete row')
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == delete_row:
+                self.delete_row(item)
 
     def connect_functions(self):
         self.refresh_button.clicked.connect(self.refresh)
         self.push_button.clicked.connect(self.push_all)
         self.list_view.itemSelectionChanged.connect(self.change_table)
         self.table_widget.cellChanged.connect(self.cell_modified)
+        self.table_widget.customContextMenuRequested.connect(self.context_menu_requested)
 
     def toggle(self):
         if self.isVisible():
@@ -102,11 +115,24 @@ class table_viewer_widget(QtWidgets.QWidget):
             self.show()
             self.raise_()
 
+    def delete_row(self, item):
+        self.apply_change = False
+        if item:
+            row_index = item.row()
+            column_count = self.table_widget.columnCount()
+            for column_index in range(0, column_count):
+                item = self.table_widget.item(row_index, column_index)
+                item.deleted = True
+                item.new_data = None
+                item.setData(QtCore.Qt.ForegroundRole, QtGui.QColor(255, 89, 89, 250))
+        self.apply_change = True
+
     def cell_modified(self, row, column):
         if self.apply_change:
             item = self.table_widget.item(row, column)
-            item.setData(QtCore.Qt.ForegroundRole, QtGui.QColor(255, 175, 89, 250))
-            item.new_data = item.text()
+            if not item.deleted:
+                item.setData(QtCore.Qt.ForegroundRole, QtGui.QColor(255, 175, 89, 250))
+                item.new_data = item.text()
 
     def change_table(self):
         item = self.list_view.selectedItems()[0]
@@ -145,6 +171,8 @@ class table_viewer_widget(QtWidgets.QWidget):
                 for item in all_items:
                     if item.new_data is not None:
                         self.push_item_data(item)
+                    if item.deleted:
+                        self.push_delete_row(item)
                 self.refresh()
 
     def push_item_data(self, item):
@@ -155,6 +183,11 @@ class table_viewer_widget(QtWidgets.QWidget):
                                 self.table,
                                 (item.column, data),
                                 ('id', item.id))
+
+    def push_delete_row(self, item):
+        db_utils.delete_row('project',
+                            self.table,
+                            item.id)
 
     def fill_table(self, table):
         self.apply_change = False
@@ -192,6 +225,7 @@ class custom_table_item(QtWidgets.QTableWidgetItem):
         self.data = data
         self.new_data = None
         self.data_type = data
+        self.deleted = False
         self.fill_ui()
 
     def fill_ui(self):
