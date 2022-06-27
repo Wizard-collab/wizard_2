@@ -65,6 +65,7 @@ def remove_levels(amount):
 	if new_level <= 0:
 		new_level = 0
 	repository.modify_user_level(user_row['user_name'], new_level)
+	repository.add_death(user_row['user_name'])
 
 def remove_life(amount):
 	# Remove the given amount of life of

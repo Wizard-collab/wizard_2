@@ -24,6 +24,7 @@ class user_widget(QtWidgets.QFrame):
         self.is_first_comments_count = None
         self.is_first_work_time = None
         self.is_first_xp = None
+        self.is_first_deaths = None
         self.first_refresh = 1
         self.build_ui()
 
@@ -42,6 +43,10 @@ class user_widget(QtWidgets.QFrame):
         self.items_layout.setSpacing(6)
         self.items_widget.setLayout(self.items_layout)
         self.main_layout.addWidget(self.items_widget)
+
+        self.deaths_item_label = QtWidgets.QLabel()
+        self.deaths_item_label.setPixmap(QtGui.QIcon(ressources._skull_item_icon_).pixmap(22))
+        self.items_layout.addWidget(self.deaths_item_label)
 
         self.comment_item_label = QtWidgets.QLabel()
         self.comment_item_label.setPixmap(QtGui.QIcon(ressources._green_item_icon_).pixmap(22))
@@ -142,6 +147,16 @@ class user_widget(QtWidgets.QFrame):
             if not self.is_first_xp and not (self.first_refresh):
                 gui_server.custom_popup("You have earned so much experience !", 'Congratulation', ressources._yellow_item_icon_)
             self.is_first_xp = 1
+
+        user_rows = repository.get_users_list_by_deaths_order()
+        if user_row['id'] != user_rows[0]['id']:
+            self.deaths_item_label.setVisible(0)
+            self.is_first_deaths = 0
+        else:
+            self.deaths_item_label.setVisible(1)
+            if not self.is_first_deaths and not (self.first_refresh):
+                gui_server.custom_popup("You are the one who die the most !", 'Try to comment your work mor often', ressources._skull_item_icon_)
+            self.is_first_deaths = 1
 
         user_rows = repository.get_users_list_by_comments_count_order()
         if user_row['id'] != user_rows[0]['id']:

@@ -38,13 +38,13 @@ class championship_widget(QtWidgets.QWidget):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget_no_hover')
-        self.list_view.setColumnCount(6)
+        self.list_view.setColumnCount(7)
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
-        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time'])
+        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time', 'Deaths'])
         self.main_layout.addWidget(self.list_view)
 
     def toggle(self):
@@ -87,7 +87,8 @@ class championship_widget(QtWidgets.QWidget):
         self.user_ids[first_comment_user_id].set_comment_item()
         first_worker_user_id = repository.get_users_list_by_work_time_order()[0]['id']
         self.user_ids[first_worker_user_id].set_work_time_item()
-
+        first_deaths_user_id = repository.get_users_list_by_deaths_order()[0]['id']
+        self.user_ids[first_deaths_user_id].set_death_item()
 
 class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, user_row, parent=None):
@@ -119,6 +120,9 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
     def set_work_time_item(self):
         self.setIcon(5, QtGui.QIcon(ressources._red_item_icon_))
 
+    def set_death_item(self):
+        self.setIcon(6, QtGui.QIcon(ressources._skull_item_icon_))
+
     def fill_ui(self):
         user_icon = QtGui.QIcon()
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(self.user_row['profile_picture']), 'png', 30)
@@ -131,3 +135,4 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(4, f"{str(self.user_row['comments_count'])}")
         string_time = tools.convert_seconds_to_string_time(float(self.user_row['work_time']))
         self.setText(5, string_time)
+        self.setText(6, f"{str(self.user_row['deaths'])}")

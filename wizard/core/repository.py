@@ -239,6 +239,7 @@ def create_user(user_name,
                             'total_xp',
                             'work_time',
                             'comments_count',
+                            'deaths',
                             'level',
                             'life',
                             'administrator'), 
@@ -246,6 +247,7 @@ def create_user(user_name,
                             tools.encrypt_string(password),
                             email,
                             profile_picture_ascii,
+                            0,
                             0,
                             0,
                             0,
@@ -348,6 +350,10 @@ def get_users_list():
 
 def get_users_list_by_xp_order():
     users_rows = db_utils.get_rows('repository', 'users', order='total_xp DESC;')
+    return users_rows   
+
+def get_users_list_by_deaths_order():
+    users_rows = db_utils.get_rows('repository', 'users', order='deaths DESC;')
     return users_rows
 
 def get_users_list_by_work_time_order():
@@ -435,6 +441,24 @@ def add_user_work_time(user_name, work_time_to_add):
     if db_utils.update_data('repository',
                                 'users',
                                 ('work_time', work_time),
+                                ('user_name', user_name)):
+        return 1
+    else:
+        return None
+
+def add_death(user_name):
+    old_deaths = db_utils.get_row_by_column_data('repository',
+                                                        'users',
+                                                        ('user_name', user_name), 
+                                                        'deaths')
+    if old_deaths and old_deaths != []:
+        deaths = old_deaths[0] + 1
+    else:
+        deaths = 1
+
+    if db_utils.update_data('repository',
+                                'users',
+                                ('deaths', deaths),
                                 ('user_name', user_name)):
         return 1
     else:
@@ -662,6 +686,7 @@ def create_admin_user(admin_password, admin_email):
                                 'total_xp',
                                 'work_time',
                                 'comments_count',
+                                'deaths',
                                 'level',
                                 'life', 
                                 'administrator'), 
@@ -669,6 +694,7 @@ def create_admin_user(admin_password, admin_email):
                                 tools.encrypt_string(admin_password),
                                 admin_email,
                                 profile_picture,
+                                0,
                                 0,
                                 0,
                                 0,
@@ -689,6 +715,7 @@ def create_users_table():
                                         total_xp integer NOT NULL,
                                         work_time real NOT NULL,
                                         comments_count integer NOT NULL,
+                                        deaths integer NOT NULL,
                                         level integer NOT NULL,
                                         life integer NOT NULL,
                                         administrator integer NOT NULL

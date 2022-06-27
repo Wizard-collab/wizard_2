@@ -90,20 +90,22 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation_handler_widget.setVisible(0)
         QtWidgets.QApplication.processEvents()
         quotes_ids = repository.get_all_quotes('id')
-        self.random_index = random.randint(0, len(quotes_ids)-1)
-        while self.random_index == self.previous_quote_id:
+        if len(quotes_ids) > 0:
             self.random_index = random.randint(0, len(quotes_ids)-1)
-        self.previous_quote_id = self.random_index
-        self.quote_row = repository.get_quote_data(quotes_ids[self.random_index])
-        content = self.quote_row['content']
-        content = content.replace('\n', ' ')
-        content = content.replace('\r\n', ' ')
-        content = content.replace('\r', ' ')
-        self.quote_label.setText(content)
-        self.update_score_slider()
-        if not without_anim:
-            self.new_anim()
-        QtWidgets.QApplication.processEvents()
+            if len(quotes_ids) > 1:
+                while self.random_index == self.previous_quote_id:
+                    self.random_index = random.randint(0, len(quotes_ids)-1)
+                self.previous_quote_id = self.random_index
+            self.quote_row = repository.get_quote_data(quotes_ids[self.random_index])
+            content = self.quote_row['content']
+            content = content.replace('\n', ' ')
+            content = content.replace('\r\n', ' ')
+            content = content.replace('\r', ' ')
+            self.quote_label.setText(content)
+            self.update_score_slider()
+            if not without_anim:
+                self.new_anim()
+            QtWidgets.QApplication.processEvents()
         self.animation_handler_widget.setVisible(1)
         self.start_timer()
 

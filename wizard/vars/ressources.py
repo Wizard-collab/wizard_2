@@ -260,6 +260,8 @@ _green_item_icon_ = path_utils.join(_icons_path_, 'green.png')
 _available_icons_list_.append(_green_item_icon_)
 _yellow_item_icon_ = path_utils.join(_icons_path_, 'yellow.png')
 _available_icons_list_.append(_yellow_item_icon_)
+_skull_item_icon_ = path_utils.join(_icons_path_, 'skull.png')
+_available_icons_list_.append(_skull_item_icon_)
 
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')
