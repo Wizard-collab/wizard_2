@@ -338,38 +338,39 @@ def archive_variant(variant_id):
     else:
         return None
 
-def modify_variant_state(variant_id, state, comment=''):
+def modify_stage_state(stage_id, state, comment=''):
     if state in assets_vars._asset_states_list_:
-        project.set_variant_data(variant_id, 'state', state)
+        project.set_stage_data(stage_id, 'state', state)
         if comment is not None and comment != '':
-            project.set_variant_data(variant_id, 'tracking_comment', comment)
-        asset_tracking.add_state_switch_event(variant_id, state, comment)
+            project.set_stage_data(stage_id, 'tracking_comment', comment)
+        asset_tracking.add_state_switch_event(stage_id, state, comment)
     else:
         logger.warning(f"Unknown state {state}")
 
-def add_variant_comment(variant_id, comment):
-    project.set_variant_data(variant_id, 'tracking_comment', comment)
-    asset_tracking.add_comment_event(variant_id, comment)
+def add_stage_comment(stage_id, comment):
+    project.set_stage_data(stage_id, 'tracking_comment', comment)
+    asset_tracking.add_comment_event(stage_id, comment)
 
-def modify_variant_assignment(variant_id, user_name):
+def modify_stage_assignment(stage_id, user_name):
     user_id = repository.get_user_row_by_name(user_name, 'id')
     if user_id in project.get_users_ids_list():
-        project.set_variant_data(variant_id, 'assignment', user_name)
-        asset_tracking.add_assignment_event(variant_id, user_name)
+        project.set_stage_data(stage_id, 'assignment', user_name)
+        asset_tracking.add_assignment_event(stage_id, user_name)
     else:
         logger.warning(f"{user_name} never logged into project")
 
-def modify_variant_estimation(variant_id, seconds):
+def modify_stage_estimation(stage_id, seconds):
     if type(seconds) == int:
-        project.set_variant_data(variant_id, 'estimated_time', seconds)
-        asset_tracking.add_estimation_event(variant_id, seconds)
+        project.set_stage_data(stage_id, 'estimated_time', seconds)
+        asset_tracking.add_estimation_event(stage_id, seconds)
     else:
         logger.warning(f'{seconds} is not a int')
 
 def add_work_time(work_env_id, work_time):
     project.add_work_time(work_env_id, work_time)
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
-    project.add_variant_work_time(variant_id, work_time)
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
+    project.add_stage_work_time(stage_id, work_time)
     asset_tracking.add_work_session_event(variant_id, work_time)
 
 def get_software_id_by_name(software):

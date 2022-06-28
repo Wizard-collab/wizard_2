@@ -194,7 +194,6 @@ class tree_widget(QtWidgets.QFrame):
         self.project_stage_ids = []
 
         self.all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
-        self.all_variants_rows = project.get_all_variants()
 
         for domain_row in project.get_domains():
             self.add_domain(domain_row)
@@ -219,8 +218,6 @@ class tree_widget(QtWidgets.QFrame):
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
-        for variant_row in self.all_variants_rows:
-            self.stage_ids[variant_row['stage_id']].set_state_indicator(variant_row)
 
         self.apply_search()
         self.refresh_datas()

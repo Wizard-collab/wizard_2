@@ -362,11 +362,19 @@ def add_stage(name, asset_id):
                             ('name',
                                 'creation_time',
                                 'creation_user',
+                                'state',
+                                'assignment',
+                                'work_time',
+                                'estimated_time',
                                 'asset_id',
                                 'domain_id'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
+                                'todo',
+                                environment.get_user(),
+                                0.0,
+                                None,
                                 asset_id,
                                 domain_id))
         if stage_id:
@@ -387,6 +395,8 @@ def remove_stage(stage_id):
     if repository.is_admin():
         for variant_id in get_stage_childs(stage_id, 'id'):
             remove_variant(variant_id)
+        for asset_tracking_event_id in get_asset_tracking_events(stage_id, 'id'):
+            remove_asset_tracking_event(asset_tracking_event_id)
         success = db_utils.delete_row('project', 'stages', stage_id)
         if success:
             logger.info(f"Stage removed from project")
@@ -444,20 +454,12 @@ def add_variant(name, stage_id, comment):
                                     'creation_time',
                                     'creation_user',
                                     'comment',
-                                    'state',
-                                    'assignment',
-                                    'work_time',
-                                    'estimated_time',
                                     'default_work_env_id',
                                     'stage_id'), 
                                 (name,
                                     time.time(),
                                     environment.get_user(),
                                     comment,
-                                    'todo',
-                                    environment.get_user(),
-                                    0.0,
-                                    None,
                                     None,
                                     stage_id))
             if variant_id:
@@ -513,8 +515,6 @@ def remove_variant(variant_id):
             remove_export(export_id)
         for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
             remove_work_env(work_env_id)
-        for asset_tracking_event_id in get_asset_tracking_events(variant_id, 'id'):
-            remove_asset_tracking_event(asset_tracking_event_id)
         success = db_utils.delete_row('project', 'variants', variant_id)
         if success:
             logger.info(f"Variant removed from project")
@@ -541,7 +541,17 @@ def set_variant_data(variant_id, column, data):
     else:
         return None
 
-def add_asset_tracking_event(variant_id, event_type, data, comment=''):
+def set_stage_data(stage_id, column, data):
+    if db_utils.update_data('project',
+                            'stages',
+                            (column, data),
+                            ('id', stage_id)):
+        logger.debug('Stage modified')
+        return 1
+    else:
+        return None
+
+def add_asset_tracking_event(stage_id, event_type, data, comment=''):
     asset_tracking_event_id = db_utils.create_row('project',
                                     'asset_tracking_events',
                                     ('creation_user',
@@ -549,13 +559,13 @@ def add_asset_tracking_event(variant_id, event_type, data, comment=''):
                                         'event_type',
                                         'data',
                                         'comment',
-                                        'variant_id'),
+                                        'stage_id'),
                                     (environment.get_user(),
                                         time.time(),
                                         event_type,
                                         data,
                                         comment,
-                                        variant_id))
+                                        stage_id))
     if asset_tracking_event_id:
         logger.debug("Asset tracking event added")
     return asset_tracking_event_id
@@ -579,10 +589,10 @@ def get_asset_tracking_event_data(asset_tracking_event_id, column='*'):
         logger.error("Asset tracking event not found")
         return None
 
-def get_asset_tracking_events(variant_id, column='*'):
+def get_asset_tracking_events(stage_id, column='*'):
     asset_tracking_events_rows = db_utils.get_row_by_column_data('project', 
                                                         'asset_tracking_events', 
-                                                        ('variant_id', variant_id), 
+                                                        ('stage_id', stage_id), 
                                                         column)
     return asset_tracking_events_rows
 
@@ -1196,14 +1206,14 @@ def add_work_time(work_env_id, time_to_add):
                             ('id', work_env_id))
     return success
 
-def add_variant_work_time(variant_id, time_to_add):
-    variant_row = get_variant_data(variant_id)
-    work_time = variant_row['work_time']
+def add_stage_work_time(stage_id, time_to_add):
+    stage_row = get_stage_data(stage_id)
+    work_time = stage_row['work_time']
     new_work_time = work_time + time_to_add
     success = db_utils.update_data('project',
-                            'variants',
+                            'stages',
                             ('work_time', new_work_time),
-                            ('id', variant_id))
+                            ('id', stage_id))
     return success
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
@@ -2142,6 +2152,11 @@ def create_stages_table(database):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
+                                        state text NOT NULL,
+                                        assignment text,
+                                        work_time real NOT NULL,
+                                        estimated_time real,
+                                        tracking_comment text,
                                         default_variant_id integer,
                                         asset_id integer NOT NULL,
                                         domain_id integer NOT NULL,
@@ -2158,11 +2173,6 @@ def create_variants_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
-                                        state text NOT NULL,
-                                        assignment text,
-                                        work_time real NOT NULL,
-                                        estimated_time real,
-                                        tracking_comment text,
                                         default_work_env_id integer,
                                         stage_id integer NOT NULL,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
@@ -2178,8 +2188,8 @@ def create_asset_tracking_events_table(database):
                                         event_type text NOT NULL,
                                         data text NOT NULL,
                                         comment text,
-                                        variant_id integer NOT NULL,
-                                        FOREIGN KEY (variant_id) REFERENCES variants (id)
+                                        stage_id integer NOT NULL,
+                                        FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Asset tracking events table created")

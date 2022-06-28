@@ -26,8 +26,8 @@ class asset_tracking_widget(QtWidgets.QFrame):
         super(asset_tracking_widget, self).__init__(parent)
 
         self.last_time = 0
-        self.variant_id = None
-        self.variant_row = None
+        self.stage_id = None
+        self.stage_row = None
         self.users_ids = dict()
         self.tracking_event_ids = dict()
 
@@ -49,7 +49,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.estimation_widget = estimation_widget()
         if self.estimation_widget.exec_() == QtWidgets.QDialog.Accepted:
             seconds = self.estimation_widget.hours*3600
-            assets.modify_variant_estimation(self.variant_id, seconds)
+            assets.modify_stage_estimation(self.stage_id, seconds)
             gui_server.refresh_team_ui()
 
     def build_ui(self):
@@ -194,16 +194,16 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(300,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
-    def change_variant(self, variant_id):
-        self.variant_id = variant_id
+    def change_stage(self, stage_id):
+        self.stage_id = stage_id
         self.refresh()
 
     def refresh(self):
         start_time = time.time()
-        if self.variant_id is not None:
-            self.variant_row = project.get_variant_data(self.variant_id)
+        if self.stage_id is not None:
+            self.stage_row = project.get_stage_data(self.stage_id)
         else:
-            self.variant_row = None
+            self.stage_row = None
         self.refresh_tracking_events()
         self.refresh_state()
         self.refresh_users_dic()
@@ -216,20 +216,20 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_time(self):
-        if self.variant_id is not None:
-            string_time = tools.convert_seconds_to_string_time(float(self.variant_row['work_time']))
+        if self.stage_id is not None:
+            string_time = tools.convert_seconds_to_string_time(float(self.stage_row['work_time']))
             self.work_time_label.setText(string_time)
-            if self.variant_row['estimated_time'] is not None:
-                self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.variant_row['estimated_time'])))
-                percent = (float(self.variant_row['work_time'])/float(self.variant_row['estimated_time']))*100
+            if self.stage_row['estimated_time'] is not None:
+                self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.stage_row['estimated_time'])))
+                percent = (float(self.stage_row['work_time'])/float(self.stage_row['estimated_time']))*100
                 self.percent_label.setText(f"{str(int(percent))}%")
                 if percent > 100:
                     percent = 100
-                    if self.variant_row['state'] != 'done':
+                    if self.stage_row['state'] != 'done':
                         self.time_progress_bar.setStyleSheet('::chunk{background-color:#ff5d5d;}')
                 else:
                     self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
-                if self.variant_row['state'] == 'done':
+                if self.stage_row['state'] == 'done':
                     self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
                 self.time_progress_bar.setValue(percent)
             else:
@@ -256,9 +256,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
     def refresh_tracking_events(self):
         project_tracking_events_ids = []
-        if self.variant_id is not None:
+        if self.stage_id is not None:
             event_number = self.event_count_spinBox.value()
-            tracking_event_rows = project.get_asset_tracking_events(self.variant_id)
+            tracking_event_rows = project.get_asset_tracking_events(self.stage_id)
             for tracking_event_row in tracking_event_rows[-event_number:]:
                 project_tracking_events_ids.append(tracking_event_row['id'])
                 if tracking_event_row['id'] not in self.tracking_event_ids.keys():
@@ -276,7 +276,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             if event_id not in project_tracking_events_ids:
                 self.remove_tracking_event(event_id)
         
-        if self.variant_id is not None:
+        if self.stage_id is not None:
             self.remove_useless_events(event_number)
 
     def remove_useless_events(self, event_number):
@@ -305,40 +305,40 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
     def refresh_user(self):
         self.apply_assignment_modification = None
-        if self.variant_row is not None:
-            if self.variant_row['assignment'] is not None:
-                self.assignment_comboBox.setCurrentText(self.variant_row['assignment'])
+        if self.stage_row is not None:
+            if self.stage_row['assignment'] is not None:
+                self.assignment_comboBox.setCurrentText(self.stage_row['assignment'])
         self.apply_assignment_modification = 1
 
     def refresh_state(self):
         self.apply_state_modification = None
-        if self.variant_row is not None:
-            self.state_comboBox.setCurrentText(self.variant_row['state'])
+        if self.stage_row is not None:
+            self.state_comboBox.setCurrentText(self.stage_row['state'])
         else:
             self.state_comboBox.setCurrentText('todo')
         self.apply_state_modification = 1
 
     def modify_state(self, state):
-        if self.variant_id is not None:
+        if self.stage_id is not None:
             if self.apply_state_modification:
                 self.comment_widget = comment_widget.comment_widget()
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
-                    assets.modify_variant_state(self.variant_id, state, comment)
+                    assets.modify_stage_state(self.stage_id, state, comment)
                     gui_server.refresh_team_ui()
 
     def modify_assignment(self, user_name):
-        if self.variant_id is not None:
+        if self.stage_id is not None:
             if self.apply_assignment_modification:
-                assets.modify_variant_assignment(self.variant_id, user_name)
+                assets.modify_stage_assignment(self.stage_id, user_name)
                 gui_server.refresh_team_ui()
 
     def add_comment(self):
-        if self.variant_id is not None:
+        if self.stage_id is not None:
             self.comment_widget = comment_widget.comment_widget()
             if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                 comment = self.comment_widget.comment
-                assets.add_variant_comment(self.variant_id, comment)
+                assets.add_stage_comment(self.stage_id, comment)
                 gui_server.refresh_team_ui()
 
     def change_count(self):

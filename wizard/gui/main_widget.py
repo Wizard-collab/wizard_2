@@ -285,10 +285,10 @@ class main_widget(QtWidgets.QWidget):
 
     def stage_changed(self, stage_id):
         self.context_widget.change_stage(stage_id)
+        self.asset_tracking_widget.change_stage(stage_id)
 
     def variant_changed(self, variant_id):
         self.exports_widget.change_variant(variant_id)
-        self.asset_tracking_widget.change_variant(variant_id)
 
     def work_env_changed(self, work_env_id):
         self.versions_widget.change_work_env(work_env_id)
