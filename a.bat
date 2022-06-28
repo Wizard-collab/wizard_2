@@ -1,1 +1,0 @@
-python3_wizard_venv\Scripts\activate

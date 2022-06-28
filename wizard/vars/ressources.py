@@ -341,3 +341,10 @@ _sofwares_icons_dic_[_houdini_] = path_utils.join(_icons_path_, 'houdini.svg')
 _sofwares_icons_dic_[_blender_] = path_utils.join(_icons_path_, 'blender.svg')
 for key in _sofwares_icons_dic_.keys():
 	_available_icons_list_.append(_sofwares_icons_dic_[key])
+
+# Production manager state colors
+_states_colors_ = dict()
+_states_colors_['todo'] = '#3a3a41'
+_states_colors_['wip'] = '#ffbc6d'
+_states_colors_['done'] = '#a6db76'
+_states_colors_['error'] = '#e66f6f'
