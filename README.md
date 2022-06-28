@@ -1,4 +1,4 @@
-![alt text](http://93.19.210.30/Documentation/build/html/_images/wizard_icon.png)
+![alt text](http://93.19.210.30/Documentation/build/html/_images/wizard_icon_256.png)
 
 # Wizard
 
