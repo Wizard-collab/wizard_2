@@ -1,3 +1,5 @@
+![alt text](http://93.19.210.30/Documentation/build/html/_images/wizard_icon.png)
+
 # Wizard
 
 Wizard is an autonomous software for managing CGI productions.
