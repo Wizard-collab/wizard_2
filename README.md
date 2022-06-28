@@ -1,3 +1,5 @@
+![alt text](http://93.19.210.30/Documentation/build/html/_images/wizard_icon_256.png)
+
 # Wizard
 
 Wizard is an autonomous software for managing CGI productions.
@@ -8,7 +10,6 @@ http://93.19.210.30/
 	* This repository :
 		* Clone the repository
 		* Install `python 3.9.5`
-		* Launch `setup_python3.bat` if you want venv for python and activate it ( with `a.bat` )
 		* Launch `install_python3_modules.bat`
 		* Launch `app.bat` or `python app.py`
 
@@ -25,11 +26,3 @@ http://93.19.210.30/
 
 * Database dependency:
 	* PostgreSQL
-
-* Ports used by wizard application:
-	* 11111 - localhost
-	* 11112 - localhost
-	* 11113 - localhost
-	* 11114 - localhost
-	* 10231 - localhost
-	* 50333 - team server ip
