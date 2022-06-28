@@ -155,7 +155,7 @@ class user_widget(QtWidgets.QFrame):
         else:
             self.deaths_item_label.setVisible(1)
             if not self.is_first_deaths and not (self.first_refresh):
-                gui_server.custom_popup("You are the one who die the most !", 'Try to comment your work mor often', ressources._skull_item_icon_)
+                gui_server.custom_popup("You are the one who die the most !", 'Try to comment your work more often', ressources._skull_item_icon_)
             self.is_first_deaths = 1
 
         user_rows = repository.get_users_list_by_comments_count_order()

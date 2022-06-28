@@ -27,8 +27,8 @@ class championship_widget(QtWidgets.QWidget):
 
     def build_ui(self):
 
-        self.setMinimumWidth(700)
-        self.setMinimumHeight(500)
+        self.setMinimumWidth(1000)
+        self.setMinimumHeight(900)
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -98,7 +98,6 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.fill_ui()
 
     def setup_ui(self):
-        self.setForeground(3, QtGui.QBrush(QtGui.QColor('#f79360')))
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)

@@ -60,13 +60,27 @@ class loading_widget(QtWidgets.QWidget):
         #self.image_label.setFixedSize(400,226)
         self.frame_layout.addWidget(self.image_label)
 
+        self.content_widget = QtWidgets.QWidget()
+        self.content_widget.setObjectName('transparent_widget')
+        self.content_layout = QtWidgets.QHBoxLayout()
+        self.content_layout.setContentsMargins(12,12,12,12)
+        self.content_layout.setSpacing(4)
+        self.content_widget.setLayout(self.content_layout)
+        self.frame_layout.addWidget(self.content_widget)
+
+        self.wizard_logo = QtWidgets.QLabel()
+        self.wizard_logo.setPixmap(QtGui.QIcon(ressources._wizard_ico_).pixmap(40))
+        self.content_layout.addWidget(self.wizard_logo)
+
         self.datas_widget = QtWidgets.QWidget()
         self.datas_widget.setObjectName('transparent_widget')
         self.datas_layout = QtWidgets.QVBoxLayout()
-        self.datas_layout.setContentsMargins(12,12,12,12)
+        self.datas_layout.setContentsMargins(8,0,0,0)
         self.datas_layout.setSpacing(4)
         self.datas_widget.setLayout(self.datas_layout)
-        self.frame_layout.addWidget(self.datas_widget)
+        self.content_layout.addWidget(self.datas_widget)
+
+        self.datas_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.user_label = QtWidgets.QLabel()
         self.user_label.setObjectName('gray_label')
