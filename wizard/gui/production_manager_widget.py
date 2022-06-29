@@ -33,10 +33,16 @@ class production_manager_widget(QtWidgets.QWidget):
         self.asset_ids = dict()
         self.stage_ids = dict()
         self.variant_ids = dict()
-        self.coords_dic = dict()
+        self.update_categories = True
+        self.update_assets = True
+        self.domain = None
+        self.category = None
+        self.domain_ids = []
+        self.category_ids = []
+        self.first_refresh = 1
         self.init_users_images()
         self.build_ui()
-        self.refresh()
+        self.connect_functions()
 
     def toggle(self):
         if self.isVisible():
@@ -60,8 +66,25 @@ class production_manager_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.resize(1000,800)
-        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.main_layout)
+
+        self.header_widget = QtWidgets.QWidget()
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_widget.setLayout(self.header_layout)
+        self.main_layout.addWidget(self.header_widget)
+
+        self.domain_comboBox = gui_utils.QComboBox()
+        self.domain_comboBox.setMinimumHeight(36)
+        self.header_layout.addWidget(self.domain_comboBox)
+        self.category_comboBox = gui_utils.QComboBox()
+        self.category_comboBox.setMinimumHeight(36)
+        self.header_layout.addWidget(self.category_comboBox)
+
+        self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43, alpha=255)
+        self.header_layout.addWidget(self.search_bar)
+
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setAlternatingRowColors(True)
@@ -71,68 +94,181 @@ class production_manager_widget(QtWidgets.QWidget):
 
     def update_state(self, state):
         for modelIndex in self.table_widget.selectedIndexes():
-            coord = (modelIndex.row(), modelIndex.column())
-            if coord in self.coords_dic.keys():
-                stage_id = self.coords_dic[coord]
-                stage_row = self.stage_ids[stage_id]['row']
+            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            if widget and widget.type == 'stage':
+                stage_row = widget.stage_row
+                stage_id = stage_row['id']
                 if stage_row['state'] != state:
                     assets.modify_stage_state(stage_id, state)
         gui_server.refresh_ui()
 
+    def update_assignment(self, assignment):
+        for modelIndex in self.table_widget.selectedIndexes():
+            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            if widget and widget.type == 'stage':
+                stage_row = widget.stage_row
+                stage_id = stage_row['id']
+                if stage_row['assignment'] != assignment:
+                    assets.modify_stage_assignment(stage_id, assignment)
+        gui_server.refresh_ui()
+
+    def connect_functions(self):
+        self.domain_comboBox.currentTextChanged.connect(self.refresh_categories)
+        self.category_comboBox.currentTextChanged.connect(self.refresh_assets)
+
     def refresh(self):
+        self.update_categories = False
+        domain_rows = project.get_domains()
+        for domain_row in domain_rows:
+            if (domain_row['id'] not in self.domain_ids) and (domain_row['name'] != 'library'):
+                self.domain_comboBox.addItem(QtGui.QIcon(ressources._domains_icons_dic_[domain_row['name']]), domain_row['name'])
+                self.domain_ids.append(domain_row['id'])
+        self.update_categories = True
+        self.refresh_categories()
+
+    def clear_categories(self):
+        self.category_ids = []
+        self.category_comboBox.clear()
+
+    def refresh_categories(self):
+        if self.update_categories:
+            self.update_assets = False
+            current_domain = self.domain_comboBox.currentText()
+            if current_domain != self.domain:
+                self.clear_categories()
+                self.domain = current_domain
+            domain_id = project.get_domain_by_name(current_domain, 'id')
+            category_rows = project.get_domain_childs(domain_id)
+            for category_row in category_rows:
+                if category_row['id'] not in self.category_ids:
+                    self.category_comboBox.addItem(category_row['name'])
+                    self.category_ids.append(category_row['id'])
+            self.update_assets = True
+            self.refresh_assets()
+
+    def clear_assets(self):
+        self.table_widget.clear()
+        self.asset_ids = dict()
+        self.stage_ids = dict()
+        self.first_refresh = 1
+
+    def refresh_assets(self):
         start_time = time.time()
 
-        # Props context (to modify)
-        asset_rows = project.get_category_childs(2)
-        assets_preview_rows = project.get_all_assets_preview()
-        assets_preview = dict()
-        for assets_preview_row in assets_preview_rows:
-            assets_preview[assets_preview_row['asset_id']] = assets_preview_row
-        
-        # Modify table
-        self.table_widget.setColumnCount(6)
-        self.table_widget.setHorizontalHeaderLabels(["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading"])
-        stages_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
-        self.table_widget.setRowCount(len(asset_rows))
+        category = self.category_comboBox.currentText()
+        if category != self.category:
+            self.clear_assets()
+        self.category = category
 
-        for asset_row in asset_rows:
+        if category != "":
+            category_id = project.get_category_data_by_name(category, 'id')
+            asset_rows = project.get_category_childs(category_id)
 
-            if asset_row['id'] not in self.asset_ids.keys():
-                index = asset_rows.index(asset_row)
-                widget = asset_widget(asset_row['name'], assets_preview[asset_row['id']])
-                self.table_widget.setCellWidget(index, 0, widget)
-                self.asset_ids[asset_row['id']] = dict()
-                self.asset_ids[asset_row['id']]['table_row_index'] = index
-                self.asset_ids[asset_row['id']]['row'] = asset_row
-                self.asset_ids[asset_row['id']]['widget'] = widget
+            project_asset_ids = []
+            assets_preview_rows = project.get_all_assets_preview()
+            assets_preview = dict()
+            for assets_preview_row in assets_preview_rows:
+                assets_preview[assets_preview_row['asset_id']] = assets_preview_row
+            
+            # Modify table
+            if self.domain == assets_vars._assets_:
+                labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading"]
+                stages_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
+            elif self.domain == assets_vars._sequences_:
+                labels_names = ["Name", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Compositing"]
+                stages_list = ["", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
 
-        stage_rows = project.get_all_stages()
+            self.table_widget.setColumnCount(len(labels_names))
+            self.table_widget.setHorizontalHeaderLabels(labels_names)
+            self.table_widget.setRowCount(len(asset_rows))
 
-        for stage_row in stage_rows:
-            if stage_row['asset_id'] in self.asset_ids.keys():
-                if stage_row['id'] not in self.stage_ids.keys():
-                    row_index = self.asset_ids[stage_row['asset_id']]['table_row_index']
-                    widget = stage_widget(stage_row, self.users_images_dic)
-                    widget.state_signal.connect(self.update_state)
-                    self.table_widget.setCellWidget(row_index, stages_list.index(stage_row['name']), widget)
-                    coord = (row_index, stages_list.index(stage_row['name']))
-                    self.coords_dic[coord] = stage_row['id']
-                    self.stage_ids[stage_row['id']] = dict()
-                    self.stage_ids[stage_row['id']]['row'] = stage_row
-                    self.stage_ids[stage_row['id']]['widget'] = widget
+            for asset_row in asset_rows:
+                project_asset_ids.append(asset_row['id'])
+                if asset_row['id'] not in self.asset_ids.keys():
+                    index = asset_rows.index(asset_row)
+                    widget = asset_widget(asset_row, assets_preview[asset_row['id']])
+                    self.table_widget.setCellWidget(index, 0, widget)
+                    self.asset_ids[asset_row['id']] = dict()
+                    self.asset_ids[asset_row['id']]['row'] = asset_row
+                    self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
+                    self.asset_ids[asset_row['id']]['widget'] = widget
                 else:
-                    if stage_row != self.stage_ids[stage_row['id']]['row']:
-                        self.stage_ids[stage_row['id']]['widget'].refresh(stage_row)
-                        self.stage_ids[stage_row['id']]['row'] = stage_row
+                    if assets_preview[asset_row['id']] != self.asset_ids[asset_row['id']]['preview_row']:
+                        self.asset_ids[asset_row['id']]['widget'].refresh(asset_row, assets_preview[asset_row['id']])
+                        self.asset_ids[asset_row['id']]['row'] = asset_row
+                        self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
 
-        self.table_widget.resizeColumnsToContents()
-        self.table_widget.resizeRowsToContents()
+
+            stage_rows = project.get_all_stages()
+            project_stage_ids = []
+
+            for stage_row in stage_rows:
+                project_stage_ids.append(stage_row['id'])
+                if stage_row['asset_id'] in self.asset_ids.keys():
+                    if stage_row['id'] not in self.stage_ids.keys():
+                        row_index = self.get_asset_coord(stage_row['asset_id']).row()
+                        widget = stage_widget(stage_row, self.users_images_dic)
+                        widget.state_signal.connect(self.update_state)
+                        widget.assignment_signal.connect(self.update_assignment)
+                        self.table_widget.setCellWidget(row_index, stages_list.index(stage_row['name']), widget)
+                        self.stage_ids[stage_row['id']] = dict()
+                        self.stage_ids[stage_row['id']]['row'] = stage_row
+                        self.stage_ids[stage_row['id']]['widget'] = widget
+                    else:
+                        if stage_row != self.stage_ids[stage_row['id']]['row']:
+                            self.stage_ids[stage_row['id']]['widget'].refresh(stage_row)
+                            self.stage_ids[stage_row['id']]['row'] = stage_row
+
+            stage_ids = list(self.stage_ids.keys())
+            for stage_id in stage_ids:
+                if stage_id not in project_stage_ids:
+                    self.remove_stage(stage_id)
+
+            asset_ids = list(self.asset_ids.keys())
+            for asset_id in asset_ids:
+                if asset_id not in project_asset_ids:
+                    self.remove_asset(asset_id)
+
+            if self.first_refresh:
+                self.table_widget.resizeColumnsToContents()
+                self.table_widget.resizeRowsToContents()
+                self.first_refresh = 0
+        else:
+            self.clear_assets()
+
         print(time.time() - start_time)
 
+    def get_asset_coord(self, asset_id):
+        if asset_id in self.asset_ids.keys():
+            widget = self.asset_ids[asset_id]['widget']
+            model_index = self.table_widget.indexAt(widget.pos())
+            return model_index
+
+    def get_stage_coord(self, stage_id):
+        if stage_id in self.stage_ids.keys():
+            widget = self.stage_ids[stage_id]['widget']
+            model_index = self.table_widget.indexAt(widget.pos())
+            return model_index
+
+    def remove_stage(self, stage_id):
+        if stage_id in self.stage_ids.keys():
+            model_index = self.get_stage_coord(stage_id)
+            print(model_index.row())
+            print(model_index.column())
+            self.table_widget.removeCellWidget(model_index.row(), model_index.column())
+            del self.stage_ids[stage_id]
+
+    def remove_asset(self, asset_id):
+        if asset_id in self.asset_ids.keys():
+            row_index = self.get_asset_coord(asset_id).row()
+            self.table_widget.removeRow(row_index)
+            del self.asset_ids[asset_id]
+
 class asset_widget(QtWidgets.QWidget):
-    def __init__(self, asset_name, preview_row, parent=None):
+    def __init__(self, asset_row, preview_row, parent=None):
         super(asset_widget, self).__init__(parent)
-        self.asset_name = asset_name
+        self.type = 'asset'
+        self.asset_row = asset_row
         self.preview_row = preview_row
         self.build_ui()
         self.fill_ui()
@@ -153,7 +289,7 @@ class asset_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.asset_name_label)
 
     def fill_ui(self):
-        self.asset_name_label.setText(self.asset_name)
+        self.asset_name_label.setText(self.asset_row['name'])
 
         image = ressources._no_preview_
         if self.preview_row['manual_override'] is None:
@@ -163,12 +299,48 @@ class asset_widget(QtWidgets.QWidget):
             image = self.preview_row['manual_override']
         self.image_label.setPixmap(QtGui.QIcon(image).pixmap(72, 40))
 
+    def show_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        custom_preview_action = menu.addAction(QtGui.QIcon(ressources._add_icon_), 'Add custom preview')
+        default_preview_action = menu.addAction(QtGui.QIcon(ressources._refresh_icon_), 'Set preview to auto')
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == default_preview_action:
+                assets.set_asset_preview(self.preview_row['asset_id'], None)
+                gui_server.refresh_team_ui()
+            elif action == custom_preview_action:
+                self.set_preview()
+
+    def set_preview(self):
+        options = QtWidgets.QFileDialog.Options()
+        image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select preview image", "",
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
+                            options=options)
+        if image_file:
+            extension = image_file.split('.')[-1].upper()
+            if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
+                assets.set_asset_preview(self.preview_row['asset_id'], image_file)
+                gui_server.refresh_team_ui()
+            else:
+                logger.warning('{} is not a valid image file...'.format(image_file))
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.show_context_menu()
+
+    def refresh(self, asset_row, preview_row):
+        self.asset_row = asset_row
+        self.preview_row = preview_row
+        self.fill_ui()
+
 class stage_widget(QtWidgets.QWidget):
 
     state_signal = pyqtSignal(str)
+    assignment_signal = pyqtSignal(str)
 
     def __init__(self, stage_row, users_images_dic, parent=None):
         super(stage_widget, self).__init__(parent)
+        self.type = 'stage'
         self.stage_row = stage_row
         self.users_images_dic = users_images_dic
         self.build_ui()
@@ -177,6 +349,7 @@ class stage_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.state_label.state_signal.connect(self.state_signal.emit)
+        self.user_image_label.assignment_signal.connect(self.assignment_signal.emit)
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -198,14 +371,23 @@ class stage_widget(QtWidgets.QWidget):
         self.state_label.setMinimumHeight(22)
         self.data_layout.addWidget(self.state_label)
 
-        self.user_image_label = QtWidgets.QLabel()
+        self.user_image_label = assignment_widget()
         self.user_image_label.setFixedSize(QtCore.QSize(22,22))
         self.data_layout.addWidget(self.user_image_label)
+
+        self.percent_label = QtWidgets.QLabel()
+        self.data_layout.addWidget(self.percent_label)
 
     def fill_ui(self):
         self.state_label.setText(self.stage_row['state'])
         self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:11px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
         self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])
+
+        if self.stage_row['estimated_time'] is not None:
+            percent = int((float(self.stage_row['work_time'])/float(self.stage_row['estimated_time']))*100)
+            self.percent_label.setText(f"{percent} %")
+        else:
+            self.percent_label.setText(f"0 %")
 
     def refresh(self, stage_row):
         self.stage_row = stage_row
@@ -234,3 +416,27 @@ class state_widget(QtWidgets.QLabel):
         if action is not None:
             self.state_signal.emit(action.text())
 
+class assignment_widget(QtWidgets.QLabel):
+
+    assignment_signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(assignment_widget, self).__init__(parent)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.users_menu_requested()
+
+    def users_menu_requested(self):
+        users_actions = []
+        menu = gui_utils.QMenu(self)
+        users_ids = project.get_users_ids_list()
+        for user_id in users_ids:
+            user_row = repository.get_user_data(user_id)
+            icon = QtGui.QIcon()
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 22)
+            icon.addPixmap(pm)
+            menu.addAction(icon, user_row['user_name'])
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            self.assignment_signal.emit(action.text())

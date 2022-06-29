@@ -345,6 +345,6 @@ for key in _sofwares_icons_dic_.keys():
 # Production manager state colors
 _states_colors_ = dict()
 _states_colors_['todo'] = '#3a3a41'
-_states_colors_['wip'] = '#ffbc6d'
-_states_colors_['done'] = '#a6db76'
-_states_colors_['error'] = '#e66f6f'
+_states_colors_['wip'] = '#b6864e'
+_states_colors_['done'] = '#7ca657'
+_states_colors_['error'] = '#d16666'
