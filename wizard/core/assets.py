@@ -343,6 +343,7 @@ def modify_stage_state(stage_id, state, comment=''):
         project.set_stage_data(stage_id, 'state', state)
         if comment is not None and comment != '':
             project.set_stage_data(stage_id, 'tracking_comment', comment)
+        project.update_stage_progress(stage_id)
         asset_tracking.add_state_switch_event(stage_id, state, comment)
     else:
         logger.warning(f"Unknown state {state}")
@@ -362,6 +363,7 @@ def modify_stage_assignment(stage_id, user_name):
 def modify_stage_estimation(stage_id, seconds):
     if type(seconds) == int:
         project.set_stage_data(stage_id, 'estimated_time', seconds)
+        project.update_stage_progress(stage_id)
         asset_tracking.add_estimation_event(stage_id, seconds)
     else:
         logger.warning(f'{seconds} is not a int')
@@ -371,6 +373,7 @@ def add_work_time(work_env_id, work_time):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     project.add_stage_work_time(stage_id, work_time)
+    project.update_stage_progress(stage_id)
     asset_tracking.add_work_session_event(variant_id, work_time)
 
 def get_software_id_by_name(software):

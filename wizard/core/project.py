@@ -366,6 +366,7 @@ def add_stage(name, asset_id):
                                 'assignment',
                                 'work_time',
                                 'estimated_time',
+                                'progress',
                                 'asset_id',
                                 'domain_id'), 
                             (name,
@@ -375,6 +376,7 @@ def add_stage(name, asset_id):
                                 environment.get_user(),
                                 0.0,
                                 None,
+                                0.0,
                                 asset_id,
                                 domain_id))
         if stage_id:
@@ -1208,13 +1210,29 @@ def add_work_time(work_env_id, time_to_add):
 
 def add_stage_work_time(stage_id, time_to_add):
     stage_row = get_stage_data(stage_id)
-    work_time = stage_row['work_time']
-    new_work_time = work_time + time_to_add
     success = db_utils.update_data('project',
                             'stages',
                             ('work_time', new_work_time),
                             ('id', stage_id))
     return success
+
+def update_stage_progress(stage_id):
+    stage_row = get_stage_data(stage_id)
+
+    progress = 0
+    if stage_row['state'] != 'done':
+        if stage_row['estimated_time'] is not None and stage_row['estimated_time'] > 0:
+            progress = (stage_row['work_time']/float(stage_row['estimated_time']))*100
+            if progress > 100:
+                progress = 100
+    else:
+        progress = 100
+
+    if progress != stage_row['progress']:
+        db_utils.update_data('project',
+                            'stages',
+                            ('progress', progress),
+                            ('id', stage_id))
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
 
@@ -2156,6 +2174,7 @@ def create_stages_table(database):
                                         assignment text,
                                         work_time real NOT NULL,
                                         estimated_time real,
+                                        progress real NOT NULL,
                                         tracking_comment text,
                                         default_variant_id integer,
                                         asset_id integer NOT NULL,

@@ -221,21 +221,15 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.work_time_label.setText(string_time)
             if self.stage_row['estimated_time'] is not None:
                 self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.stage_row['estimated_time'])))
-                percent = (float(self.stage_row['work_time'])/float(self.stage_row['estimated_time']))*100
-                self.percent_label.setText(f"{str(int(percent))}%")
-                if percent > 100:
-                    percent = 100
-                    if self.stage_row['state'] != 'done':
-                        self.time_progress_bar.setStyleSheet('::chunk{background-color:#ff5d5d;}')
-                else:
-                    self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
-                if self.stage_row['state'] == 'done':
-                    self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
-                self.time_progress_bar.setValue(percent)
+            percent = self.stage_row['progress']
+            self.percent_label.setText(f"{str(int(percent))}%")
+            if self.stage_row['state'] != 'done':
+                self.time_progress_bar.setStyleSheet('::chunk{background-color:#ff5d5d;}')
             else:
-                self.estimated_time_label.setText('No estimation')
-                self.time_progress_bar.setValue(0)
-                self.percent_label.setText("0%")
+                self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
+            if self.stage_row['state'] == 'done':
+                self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
+            self.time_progress_bar.setValue(percent)
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')

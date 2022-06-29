@@ -448,8 +448,8 @@ QSlider::handle:horizontal {
 
 QTableWidget{
 	background-color:#24242b;
-	gridline-color: rgba(255,255,255,40);
-	alternate-background-color: rgba(0,0,0,30);
+	gridline-color: rgba(0,0,0,80);
+	alternate-background-color: rgba(0,0,0,50);
 }
 
 QTableWidget::item:selected{
@@ -458,8 +458,20 @@ QTableWidget::item:selected{
 
 QTableCornerButton::section {
 	background-color: rgba(0,0,0,30);
+	border: 1px solid rgba(0,0,0,80);
 }
 
+#table_widget_horizontal_header_view::section{
+	border-top: 1px solid rgba(0,0,0,80);
+	border-bottom: 1px solid rgba(0,0,0,80);
+	border-right: 1px solid rgba(0,0,0,80);
+}
+
+#table_widget_vertical_header_view::section{
+	border-left: 1px solid rgba(0,0,0,80);
+	border-bottom: 1px solid rgba(0,0,0,80);
+	border-right: 1px solid rgba(0,0,0,80);
+}
 
 #user_quote_widget_frame{
 	border-radius: 4px;

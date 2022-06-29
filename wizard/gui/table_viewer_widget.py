@@ -82,6 +82,8 @@ class table_viewer_widget(QtWidgets.QWidget):
         self.table_widget.setAlternatingRowColors(True)
         self.table_widget.verticalHeader().setVisible(False)
         self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
+        self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
         self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.table_widget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.content_layout.addWidget(self.table_widget)

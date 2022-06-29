@@ -27,6 +27,21 @@ from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
+stages_colors = dict()
+stages_colors['modeling'] = 'rgba(255,81,81,ALPHA)'
+stages_colors['rigging'] = 'rgba(81,255,121,ALPHA)'
+stages_colors['grooming'] = 'rgba(255,209,81,ALPHA)'
+stages_colors['texturing'] = 'rgba(81,90,255,ALPHA)'
+stages_colors['shading'] = 'rgba(214,81,255,ALPHA)'
+
+stages_colors['layout'] = 'rgba(255,81,81,ALPHA)'
+stages_colors['animation'] = 'rgba(81,255,121,ALPHA)'
+stages_colors['cfx'] = 'rgba(255,209,81,ALPHA)'
+stages_colors['fx'] = 'rgba(55,220,255,ALPHA)'
+stages_colors['camera'] = 'rgba(255,138,44,ALPHA)'
+stages_colors['lighting'] = 'rgba(214,81,255,ALPHA)'
+stages_colors['compositing'] = 'rgba(81,90,255,ALPHA)'
+
 class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(production_manager_widget, self).__init__(parent)
@@ -65,8 +80,11 @@ class production_manager_widget(QtWidgets.QWidget):
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def build_ui(self):
-        self.resize(1000,800)
+        self.resize(1400,800)
+        self.setObjectName('dark_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
@@ -81,16 +99,30 @@ class production_manager_widget(QtWidgets.QWidget):
         self.category_comboBox.setMinimumHeight(36)
         self.header_layout.addWidget(self.category_comboBox)
 
-        self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43, alpha=255)
-        self.header_layout.addWidget(self.search_bar)
-
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.table_widget = QtWidgets.QTableWidget()
+        self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.table_widget.setAlternatingRowColors(True)
         self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
+        self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
         self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.main_layout.addWidget(self.table_widget)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('dark_widget')
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(11,11,11,11)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.refresh_label)
 
     def update_state(self, state):
         for modelIndex in self.table_widget.selectedIndexes():
@@ -100,7 +132,7 @@ class production_manager_widget(QtWidgets.QWidget):
                 stage_id = stage_row['id']
                 if stage_row['state'] != state:
                     assets.modify_stage_state(stage_id, state)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def update_assignment(self, assignment):
         for modelIndex in self.table_widget.selectedIndexes():
@@ -110,7 +142,7 @@ class production_manager_widget(QtWidgets.QWidget):
                 stage_id = stage_row['id']
                 if stage_row['assignment'] != assignment:
                     assets.modify_stage_assignment(stage_id, assignment)
-        gui_server.refresh_ui()
+        gui_server.refresh_team_ui()
 
     def connect_functions(self):
         self.domain_comboBox.currentTextChanged.connect(self.refresh_categories)
@@ -170,7 +202,6 @@ class production_manager_widget(QtWidgets.QWidget):
             for assets_preview_row in assets_preview_rows:
                 assets_preview[assets_preview_row['asset_id']] = assets_preview_row
             
-            # Modify table
             if self.domain == assets_vars._assets_:
                 labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading"]
                 stages_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
@@ -197,7 +228,6 @@ class production_manager_widget(QtWidgets.QWidget):
                         self.asset_ids[asset_row['id']]['widget'].refresh(asset_row, assets_preview[asset_row['id']])
                         self.asset_ids[asset_row['id']]['row'] = asset_row
                         self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
-
 
             stage_rows = project.get_all_stages()
             project_stage_ids = []
@@ -236,7 +266,11 @@ class production_manager_widget(QtWidgets.QWidget):
         else:
             self.clear_assets()
 
-        print(time.time() - start_time)
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def get_asset_coord(self, asset_id):
         if asset_id in self.asset_ids.keys():
@@ -353,16 +387,19 @@ class stage_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
-        self.main_layout.setSpacing(4)
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
+
+        self.color_frame = QtWidgets.QFrame()
+        self.color_frame.setFixedWidth(4)
+        self.main_layout.addWidget(self.color_frame)
 
         self.data_widget = QtWidgets.QWidget()
         self.data_widget.setObjectName('transparent_widget')
         self.data_layout = QtWidgets.QHBoxLayout()
-        self.data_layout.setSpacing(2)
-        self.data_layout.setContentsMargins(0,0,0,0)
+        self.data_layout.setSpacing(6)
+        self.data_layout.setContentsMargins(6,6,6,6)
         self.data_widget.setLayout(self.data_layout)
         self.main_layout.addWidget(self.data_widget)
 
@@ -372,22 +409,18 @@ class stage_widget(QtWidgets.QWidget):
         self.data_layout.addWidget(self.state_label)
 
         self.user_image_label = assignment_widget()
-        self.user_image_label.setFixedSize(QtCore.QSize(22,22))
+        self.user_image_label.setFixedSize(QtCore.QSize(24,24))
         self.data_layout.addWidget(self.user_image_label)
 
         self.percent_label = QtWidgets.QLabel()
         self.data_layout.addWidget(self.percent_label)
 
     def fill_ui(self):
+        self.color_frame.setStyleSheet('background-color:%s;'%stages_colors[self.stage_row['name']].replace('ALPHA', str(120)))
         self.state_label.setText(self.stage_row['state'])
-        self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:11px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
+        self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:13px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
         self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])
-
-        if self.stage_row['estimated_time'] is not None:
-            percent = int((float(self.stage_row['work_time'])/float(self.stage_row['estimated_time']))*100)
-            self.percent_label.setText(f"{percent} %")
-        else:
-            self.percent_label.setText(f"0 %")
+        self.percent_label.setText(f"{int(self.stage_row['progress'])} %")
 
     def refresh(self, stage_row):
         self.stage_row = stage_row
@@ -434,7 +467,7 @@ class assignment_widget(QtWidgets.QLabel):
         for user_id in users_ids:
             user_row = repository.get_user_data(user_id)
             icon = QtGui.QIcon()
-            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 22)
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
             icon.addPixmap(pm)
             menu.addAction(icon, user_row['user_name'])
         action = menu.exec_(QtGui.QCursor().pos())

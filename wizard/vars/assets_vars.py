@@ -40,6 +40,7 @@ _assets_ = 'assets'
 _library_ = 'library'
 _sequences_ = 'sequences'
 _domains_list_ = [_assets_, _library_, _sequences_]
+_domains_list_no_lib_ = [_assets_, _sequences_]
 
 _assets_id_ = 1
 _library_id_ = 2

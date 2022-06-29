@@ -151,6 +151,13 @@ class separator(QtWidgets.QFrame):
         self.setMaximumHeight(1)
         self.setObjectName('separator')
 
+class vertical_separator(QtWidgets.QFrame):
+    def __init__(self, parent = None):
+        super(vertical_separator, self).__init__(parent)
+        self.setMinimumWidth(1)
+        self.setMaximumWidth(1)
+        self.setObjectName('separator')
+
 class ElidedLabel(QtWidgets.QLabel):
     _width = _text = _elided = None
 
