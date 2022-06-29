@@ -54,7 +54,6 @@ class production_manager_widget(QtWidgets.QWidget):
         self.category = None
         self.domain_ids = []
         self.category_ids = []
-        self.first_refresh = 1
         self.init_users_images()
         self.build_ui()
         self.connect_functions()
@@ -104,7 +103,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.table_widget.setAlternatingRowColors(True)
-        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
         self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
         self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -182,7 +181,6 @@ class production_manager_widget(QtWidgets.QWidget):
         self.table_widget.clear()
         self.asset_ids = dict()
         self.stage_ids = dict()
-        self.first_refresh = 1
 
     def refresh_assets(self):
         start_time = time.time()
@@ -259,10 +257,8 @@ class production_manager_widget(QtWidgets.QWidget):
                 if asset_id not in project_asset_ids:
                     self.remove_asset(asset_id)
 
-            if self.first_refresh:
-                self.table_widget.resizeColumnsToContents()
-                self.table_widget.resizeRowsToContents()
-                self.first_refresh = 0
+            self.table_widget.resizeColumnsToContents()
+            self.table_widget.resizeRowsToContents()
         else:
             self.clear_assets()
 
