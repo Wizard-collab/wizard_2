@@ -707,6 +707,13 @@ def get_export_versions_by_work_version_id(work_version_id, column='*'):
                                                         column)
     return export_versions_rows
 
+def get_export_versions_by_user_name(creation_user, column='*'):
+    export_versions_rows = db_utils.get_row_by_column_data('project',
+                                                        'export_versions',
+                                                        ('creation_user', creation_user),
+                                                        column)
+    return export_versions_rows
+
 def get_all_export_versions(column='*'):
     export_versions_rows = db_utils.get_rows('project',
                                                 'export_versions',
@@ -1096,6 +1103,13 @@ def get_work_version_by_name(work_env_id, name, column='*'):
     else:
         logger.debug("Version not found")
         return None
+
+def get_work_versions_by_user(creation_user, column='*'):
+    versions_rows = db_utils.get_row_by_column_data('project', 
+                                                        'versions', 
+                                                        ('creation_user', creation_user), 
+                                                        column)
+    return versions_rows
 
 def get_last_work_version(work_env_id, column='*'):
     versions_rows = db_utils.get_last_row_by_column_data('project',

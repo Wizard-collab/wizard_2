@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtChart import QChart, QChartView, QPieSeries
 import statistics
 import logging
 
@@ -13,11 +14,13 @@ from wizard.vars import assets_vars
 from wizard.core import environment
 from wizard.core import repository
 from wizard.core import project
+from wizard.core import tools
 from wizard.core import image
 from wizard.core import assets
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import chart_utils
 
 class overview_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -30,6 +33,7 @@ class overview_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.setObjectName('dark_widget')
+        self.resize(1400,800)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.setLayout(self.main_layout)
 
@@ -161,6 +165,73 @@ class user_progress_widget(QtWidgets.QFrame):
 
         self.main_layout.addWidget(gui_utils.separator())
 
+        self.quick_stats_label = QtWidgets.QLabel('Quick stats')
+        self.quick_stats_label.setObjectName("title_label_2")
+        self.main_layout.addWidget(self.quick_stats_label)
+
+        self.quick_stats_widget = QtWidgets.QWidget()
+        self.quick_stats_widget_layout = QtWidgets.QHBoxLayout()
+        self.quick_stats_widget_layout.setContentsMargins(0,0,0,0)
+        self.quick_stats_widget_layout.setSpacing(6)
+        self.quick_stats_widget.setLayout(self.quick_stats_widget_layout)
+        self.main_layout.addWidget(self.quick_stats_widget)
+
+        self.assignments_widget = quickstats_widget()
+        self.assignments_widget.description_label.setText("Tasks")
+        self.quick_stats_widget_layout.addWidget(self.assignments_widget)
+
+        self.total_work_time_widget = quickstats_widget()
+        self.total_work_time_widget.description_label.setText("Total work time")
+        self.quick_stats_widget_layout.addWidget(self.total_work_time_widget)
+
+        self.average_work_time_widget = quickstats_widget()
+        self.average_work_time_widget.description_label.setText("Time per asset")
+        self.quick_stats_widget_layout.addWidget(self.average_work_time_widget)
+
+        self.all_versions_widget = quickstats_widget()
+        self.all_versions_widget.description_label.setText("Work versions")
+        self.quick_stats_widget_layout.addWidget(self.all_versions_widget)
+
+        self.all_exports_widget = quickstats_widget()
+        self.all_exports_widget.description_label.setText("Exports")
+        self.quick_stats_widget_layout.addWidget(self.all_exports_widget)
+
+        self.tasks_done_widget = quickstats_widget()
+        self.tasks_done_widget.description_label.setText("Tasks done")
+        self.quick_stats_widget_layout.addWidget(self.tasks_done_widget)
+
+        self.main_layout.addWidget(gui_utils.separator())
+
+        self.assets_stats_label = QtWidgets.QLabel('Stages stats')
+        self.assets_stats_label.setObjectName("title_label_2")
+        self.main_layout.addWidget(self.assets_stats_label)
+
+        self.assets_stats_content_widget = QtWidgets.QWidget()
+        self.assets_stats_content_layout = QtWidgets.QHBoxLayout()
+        self.assets_stats_content_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.assets_stats_content_layout.setSpacing(6)
+        self.assets_stats_content_layout.setContentsMargins(0,0,0,0)
+        self.assets_stats_content_widget.setLayout(self.assets_stats_content_layout)
+        self.main_layout.addWidget(self.assets_stats_content_widget)
+
+        self.stages_piechart_widget_layout = QtWidgets.QVBoxLayout()
+        self.stages_piechart_widget_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.stages_piechart_widget = stages_piechart()
+        self.stages_piechart_widget_layout.addWidget(self.stages_piechart_widget)
+        self.assets_stats_content_layout.addLayout(self.stages_piechart_widget_layout)
+
+        self.assets_stats_widget = QtWidgets.QWidget()
+        self.assets_stats_widget_layout = gui_utils.QFlowLayout()
+        self.assets_stats_widget_layout.setSpacing(6)
+        self.assets_stats_widget.setLayout(self.assets_stats_widget_layout)
+        self.assets_stats_content_layout.addWidget(self.assets_stats_widget)
+
+        self.stages_widgets_dic = dict()
+        for stage in assets_vars._assets_stages_list_ + assets_vars._sequences_stages_list_:
+            stage_widget = stage_stats_widget(stage)
+            self.stages_widgets_dic[stage] = stage_widget
+            stage_widget.setVisible(0)
+
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
     def refresh(self):
@@ -172,6 +243,7 @@ class user_progress_widget(QtWidgets.QFrame):
         stage_rows = project.get_all_stages()
         all_progresses = []
         all_work_times = []
+        tasks_done = 0
         total_work_time = 0
 
         stages_dic = dict()
@@ -182,6 +254,8 @@ class user_progress_widget(QtWidgets.QFrame):
                     all_progresses.append(stage_row['progress'])
                     all_work_times.append(stage_row['work_time'])
                     total_work_time += stage_row['work_time']
+                    if stage_row['state'] == 'done':
+                        tasks_done+=1
 
                     if stage_row['name'] not in stages_dic.keys():
                         stages_dic[stage_row['name']] = dict()
@@ -203,24 +277,165 @@ class user_progress_widget(QtWidgets.QFrame):
         self.main_progress_label.setText(f"{round(mean, 1)} %")
 
         work_time_mean = statistics.mean(all_work_times)
+        self.assignments_widget.stat_label.setText(f"{len(all_progresses)}")
+        self.total_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
+        self.average_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(work_time_mean)}")
 
-        print(f"{len(all_progresses)} assignments")
-        print(f"{work_time_mean} work time average per asset")
-        print(f"{total_work_time} total work time")
+        all_work_versions = project.get_work_versions_by_user(environment.get_user(), 'id')
+        self.all_versions_widget.stat_label.setText(f"{len(all_work_versions)}")
 
-        print('___')
+        all_exports = project.get_export_versions_by_user_name(environment.get_user(), 'id')
+        self.all_exports_widget.stat_label.setText(f"{len(all_exports)}")
+
+        self.tasks_done_widget.stat_label.setText(f"{tasks_done}/{len(all_progresses)}")
 
         for stage in stages_dic.keys():
             mean = statistics.mean(stages_dic[stage]['all_progresses'])
             work_time_mean = statistics.mean(stages_dic[stage]['all_work_times'])
-            print(f"{stage} : {mean} percent")
-            print(f"{stage} : {work_time_mean} work time average per asset")
-            print(f"{stage} : {stages_dic[stage]['total_work_time']} total work time")
+            total_work_time = stages_dic[stage]['total_work_time']
+            self.stages_widgets_dic[stage].progress_bar.setValue(mean)
+            self.stages_widgets_dic[stage].progress_label.setText(f"{int(mean)}%")
+            self.stages_widgets_dic[stage].total_work_time.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
+            self.stages_widgets_dic[stage].tasks_count.setText(f"{len(stages_dic[stage]['all_progresses'])}")
+            self.stages_widgets_dic[stage].average_work_time.setText(f"{tools.convert_seconds_to_string_time(work_time_mean)}")
+            self.assets_stats_widget_layout.addWidget(self.stages_widgets_dic[stage])
+            self.stages_widgets_dic[stage].setVisible(1)
 
-            print('___')
+            stage_repartition_percent = (len(stages_dic[stage]['all_progresses'])/len(all_progresses))*100
+            self.stages_piechart_widget.pie_chart.add_pie(stage_repartition_percent, ressources._stages_colors_[stage])
 
+class quickstats_widget(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(quickstats_widget, self).__init__(parent)
+        self.build_ui()
 
+    def build_ui(self):
+        self.setObjectName("quickstats_widget")
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(self.main_layout)
 
+        self.stat_label = QtWidgets.QLabel()
+        self.stat_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.stat_label.setObjectName("title_label")
+        self.main_layout.addWidget(self.stat_label)
+
+        self.description_label = QtWidgets.QLabel()
+        self.description_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.description_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.description_label)
+
+class stages_piechart(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(stages_piechart, self).__init__(parent)
+        self.build_ui()
+
+    def build_ui(self):
+        self.setFixedSize(140,140)
+        self.setObjectName("quickstats_widget")
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(20,20,20,20)
+        self.setLayout(self.main_layout)
+
+        self.pie_chart = chart_utils.pie_chart()
+
+        self.main_layout.addWidget(self.pie_chart)
+
+class stage_stats_widget(QtWidgets.QWidget):
+    def __init__(self, stage, parent=None):
+        super(stage_stats_widget, self).__init__(parent)
+        self.stage = stage
+        self.build_ui()
+        self.fill_ui()
+
+    def build_ui(self):
+        self.setFixedWidth(350)
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+
+        self.content_widget = QtWidgets.QFrame()
+        self.content_widget.setObjectName("quickstats_widget")
+        self.content_widget_widget_layout = QtWidgets.QHBoxLayout()
+        self.content_widget_widget_layout.setContentsMargins(0,0,0,0)
+        self.content_widget.setLayout(self.content_widget_widget_layout)
+        self.main_layout.addWidget(self.content_widget)
+
+        self.color_frame = QtWidgets.QFrame()
+        self.color_frame.setFixedWidth(4)
+        self.content_widget_widget_layout.addWidget(self.color_frame)
+
+        self.content_1_widget = QtWidgets.QWidget()
+        self.content_1_widget.setObjectName("transparent_widget")
+        self.content_1_widget_layout = QtWidgets.QVBoxLayout()
+        self.content_1_widget.setLayout(self.content_1_widget_layout)
+        self.content_widget_widget_layout.addWidget(self.content_1_widget)
+
+        self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName("transparent_widget")
+        self.header_widget_layout = QtWidgets.QHBoxLayout()
+        self.header_widget_layout.setContentsMargins(0,0,0,0)
+        self.header_widget_layout.setSpacing(6)
+        self.header_widget.setLayout(self.header_widget_layout)
+        self.content_1_widget_layout.addWidget(self.header_widget)
+
+        self.stage_icon_label = QtWidgets.QLabel()
+        self.stage_icon_label.setFixedSize(24,24)
+        self.header_widget_layout.addWidget(self.stage_icon_label)
+
+        self.stage_name_label = QtWidgets.QLabel()
+        self.stage_name_label.setObjectName('title_label')
+        self.header_widget_layout.addWidget(self.stage_name_label)
+
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+        self.progress_label = QtWidgets.QLabel()
+        self.progress_label.setObjectName('title_label_gray')
+        self.header_widget_layout.addWidget(self.progress_label)
+
+        self.progress_bar = gui_utils.QProgressBar()
+        self.progress_bar.setStyleSheet("QProgressBar::chunk{background-color:#d7d7d7;}")
+        self.progress_bar.setFixedHeight(6)
+        self.content_1_widget_layout.addWidget(self.progress_bar)
+
+        self.additionnal_infos_widget = QtWidgets.QWidget()
+        self.additionnal_infos_widget.setObjectName("transparent_widget")
+        self.additionnal_infos_widget_layout = QtWidgets.QHBoxLayout()
+        self.additionnal_infos_widget_layout.setContentsMargins(0,0,0,0)
+        self.additionnal_infos_widget_layout.setSpacing(2)
+        self.additionnal_infos_widget.setLayout(self.additionnal_infos_widget_layout)
+        self.content_1_widget_layout.addWidget(self.additionnal_infos_widget)
+
+        self.total_work_time = QtWidgets.QLabel()
+        self.additionnal_infos_widget_layout.addWidget(self.total_work_time)
+
+        self.total_work_time_label = QtWidgets.QLabel("Total work time")
+        self.total_work_time_label.setObjectName('gray_label')
+        self.additionnal_infos_widget_layout.addWidget(self.total_work_time_label)
+
+        self.additionnal_infos_widget_layout.addWidget(gui_utils.vertical_separator())
+
+        self.average_work_time = QtWidgets.QLabel()
+        self.additionnal_infos_widget_layout.addWidget(self.average_work_time)
+
+        self.average_work_time_label = QtWidgets.QLabel("/ asset")
+        self.average_work_time_label.setObjectName('gray_label')
+        self.additionnal_infos_widget_layout.addWidget(self.average_work_time_label)
+
+        self.additionnal_infos_widget_layout.addWidget(gui_utils.vertical_separator())
+
+        self.tasks_count = QtWidgets.QLabel()
+        self.additionnal_infos_widget_layout.addWidget(self.tasks_count)
+
+        self.tasks_count_label = QtWidgets.QLabel("Tasks")
+        self.tasks_count_label.setObjectName('gray_label')
+        self.additionnal_infos_widget_layout.addWidget(self.tasks_count_label)
+
+        self.additionnal_infos_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+    def fill_ui(self):
+        self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(24))
+        self.stage_name_label.setText(self.stage.capitalize())
+        self.color_frame.setStyleSheet(f"border-top-left-radius:4px;border-bottom-left-radius:4px;background-color:{ressources._stages_colors_[self.stage]}")
 
 class progress_overview_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):

@@ -27,21 +27,6 @@ from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
-stages_colors = dict()
-stages_colors['modeling'] = 'rgba(255,81,81,ALPHA)'
-stages_colors['rigging'] = 'rgba(81,255,121,ALPHA)'
-stages_colors['grooming'] = 'rgba(255,209,81,ALPHA)'
-stages_colors['texturing'] = 'rgba(81,90,255,ALPHA)'
-stages_colors['shading'] = 'rgba(214,81,255,ALPHA)'
-
-stages_colors['layout'] = 'rgba(255,81,81,ALPHA)'
-stages_colors['animation'] = 'rgba(81,255,121,ALPHA)'
-stages_colors['cfx'] = 'rgba(255,209,81,ALPHA)'
-stages_colors['fx'] = 'rgba(55,220,255,ALPHA)'
-stages_colors['camera'] = 'rgba(255,138,44,ALPHA)'
-stages_colors['lighting'] = 'rgba(214,81,255,ALPHA)'
-stages_colors['compositing'] = 'rgba(81,90,255,ALPHA)'
-
 class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(production_manager_widget, self).__init__(parent)
@@ -412,7 +397,7 @@ class stage_widget(QtWidgets.QWidget):
         self.data_layout.addWidget(self.percent_label)
 
     def fill_ui(self):
-        self.color_frame.setStyleSheet('background-color:%s;'%stages_colors[self.stage_row['name']].replace('ALPHA', str(120)))
+        self.color_frame.setStyleSheet('background-color:%s;'%ressources._stages_colors_[self.stage_row['name']])
         self.state_label.setText(self.stage_row['state'])
         self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:13px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
         self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])

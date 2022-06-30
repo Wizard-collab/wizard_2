@@ -342,9 +342,24 @@ _sofwares_icons_dic_[_blender_] = path_utils.join(_icons_path_, 'blender.svg')
 for key in _sofwares_icons_dic_.keys():
 	_available_icons_list_.append(_sofwares_icons_dic_[key])
 
-# Production manager state colors
+# Production manager colors
 _states_colors_ = dict()
 _states_colors_['todo'] = '#3a3a41'
 _states_colors_['wip'] = '#b6864e'
 _states_colors_['done'] = '#7ca657'
 _states_colors_['error'] = '#d16666'
+
+_stages_colors_ = dict()
+_stages_colors_['modeling'] = '#f87474'
+_stages_colors_['rigging'] = '#ffb562'
+_stages_colors_['grooming'] = '#9eb23b'
+_stages_colors_['texturing'] = '#fe83c6'
+_stages_colors_['shading'] = '#e168ff'
+
+_stages_colors_['layout'] = '#3ab0ff'
+_stages_colors_['animation'] = '#fee440'
+_stages_colors_['cfx'] = '#865439'
+_stages_colors_['fx'] = '#4b8673'
+_stages_colors_['camera'] = '#94b49f'
+_stages_colors_['lighting'] = '#63f191'
+_stages_colors_['compositing'] = '#676fa3'
