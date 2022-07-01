@@ -580,6 +580,14 @@ def remove_asset_tracking_event(asset_tracking_event_id):
             logger.info(f"Asset tracking event removed from project")
     return success
 
+def remove_progress_event(progress_event_id):
+    success = None
+    if repository.is_admin():
+        success = db_utils.delete_row('project', 'progress_events', progress_event_id)
+        if success:
+            logger.info(f"Stage progress event removed from project")
+    return success
+
 def get_asset_tracking_event_data(asset_tracking_event_id, column='*'):
     asset_tracking_events_rows = db_utils.get_row_by_column_data('project',
                                                         'asset_tracking_events',
@@ -597,6 +605,19 @@ def get_asset_tracking_events(stage_id, column='*'):
                                                         ('stage_id', stage_id), 
                                                         column)
     return asset_tracking_events_rows
+
+def get_progress_events(stage_id, column='*'):
+    progress_events_rows = db_utils.get_row_by_column_data('project', 
+                                                        'progress_events', 
+                                                        ('stage_id', stage_id), 
+                                                        column)
+    return progress_events_rows
+
+def get_all_progress_events(column='*'):
+    progress_events_rows = db_utils.get_rows('project',
+                                        'progress_events',
+                                        column)
+    return progress_events_rows
 
 def get_variant_work_envs_childs(variant_id, column='*'):
     work_envs_rows = db_utils.get_row_by_column_data('project', 
@@ -1224,6 +1245,8 @@ def add_work_time(work_env_id, time_to_add):
 
 def add_stage_work_time(stage_id, time_to_add):
     stage_row = get_stage_data(stage_id)
+    work_time = stage_row['work_time']
+    new_work_time = work_time + time_to_add
     success = db_utils.update_data('project',
                             'stages',
                             ('work_time', new_work_time),
@@ -1247,6 +1270,25 @@ def update_stage_progress(stage_id):
                             'stages',
                             ('progress', progress),
                             ('id', stage_id))
+
+def add_progress_event(type, name, progress):
+    day, hour = tools.convert_time(time.time())
+    if not db_utils.check_existence_by_multiple_data('project', 
+                                    'progress_events',
+                                    ('name', 'day'),
+                                    (name, day+hour)):
+        db_utils.create_row('project',
+                                'progress_events', 
+                                ('creation_time',
+                                    'day',
+                                    'progress',
+                                    'type',
+                                    'name'),
+                                (time.time(),
+                                    day+hour,
+                                    progress,
+                                    type,
+                                    name))
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
 
@@ -2124,6 +2166,7 @@ def init_project(project_path, project_name):
             create_groups_table(project_name)
             create_referenced_groups_table(project_name)
             create_grouped_references_table(project_name)
+            create_progress_events_table(project_name)
             return project_name
     else:
         logger.warning(f"Database {project_name} already exists")
@@ -2412,6 +2455,18 @@ def create_events_table(database):
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Events table created")
+
+def create_progress_events_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS progress_events (
+                                        id serial PRIMARY KEY,
+                                        creation_time real NOT NULL,
+                                        day text NOT NULL,
+                                        progress real NOT NULL,
+                                        type text NOT NULL,
+                                        name text NOT NULL
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Progress table created")
 
 def create_shelf_scripts_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS shelf_scripts (

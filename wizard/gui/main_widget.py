@@ -67,7 +67,7 @@ class main_widget(QtWidgets.QWidget):
         super(main_widget, self).__init__(parent)
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - {environment.get_repository()[11:]} - {environment.get_project_name()}")
-
+        
         self.tree_widget = tree_widget.tree_widget(self)
         self.shelf_widget = shelf_widget.shelf_widget(self)
         self.console_widget = console_widget.console_widget()

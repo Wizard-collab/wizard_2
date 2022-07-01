@@ -67,6 +67,7 @@ from wizard.core import path_utils
 from wizard.core import image
 from wizard.core import game
 from wizard.core import tags
+from wizard.core import stats
 from wizard.core import asset_tracking
 from wizard.vars import assets_vars
 from wizard.vars import env_vars

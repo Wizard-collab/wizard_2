@@ -57,6 +57,7 @@ from wizard.core import environment
 from wizard.core import repository
 from wizard.core import db_core
 from wizard.core import db_utils
+from wizard.core import stats
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 
@@ -114,6 +115,10 @@ class app():
 
         db_utils.modify_db_name('project', environment.get_project_name())
 
+        stats.add_progress_event()
+        self.stats_schedule = stats.schedule()
+        self.stats_schedule.start()
+
         start_time = time.time()
         
         self.loading_widget = loading_widget.loading_widget()
@@ -122,6 +127,7 @@ class app():
 
         self.main_widget = main_widget.main_widget()
         self.main_widget.stop_threads.connect(self.db_server.stop)
+        self.main_widget.stop_threads.connect(self.stats_schedule.stop)
         self.main_widget.refresh()
         self.main_widget.showMaximized()
         QtWidgets.QApplication.processEvents()
@@ -134,6 +140,7 @@ class app():
     def quit(self):
         if self.db_server:
             self.db_server.stop()
+        self.stats_schedule.stop()
         QtWidgets.QApplication.closeAllWindows()
         QtWidgets.QApplication.quit()
         sys.exit()
