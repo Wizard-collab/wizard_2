@@ -35,6 +35,7 @@ import traceback
 import shutil
 import tempfile
 import time
+import datetime
 import logging
 
 # Wizard modules
@@ -50,6 +51,12 @@ def convert_time(time_float):
     day = time.strftime('%Y-%m-%d', time.localtime(time_float))
     hour = time.strftime('%H:%M', time.localtime(time_float))
     return day, hour
+
+def get_month(time_float):
+    return datetime.datetime.fromtimestamp(time_float).strftime('%b')
+
+def get_day(time_float):
+    return time.strftime('%d', time.localtime(time_float))
 
 def convert_seconds(time_float):
     hours = int(time_float/3600)

@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtChart import QChart, QChartView, QPieSeries
 import statistics
+import time
 import logging
 
 # Wizard core modules
@@ -371,8 +372,10 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.header_widget_layout.addWidget(self.title_label)
 
         self.chart = chart_utils.curves_chart()
-        self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.setObjectName('quickstats_widget')
+        self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
+        self.chart.set_margin(40)
+        self.chart.set_points_thickness(4)
         self.chart.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.main_layout.addWidget(self.chart)
 
@@ -383,6 +386,7 @@ class progress_curves_widget(QtWidgets.QFrame):
 
         start_time = all_progress_events_rows[0]['creation_time']
         end_time = all_progress_events_rows[-1]['creation_time']
+        #end_time = time.time()+3600*24*30*1
         time_range = end_time - start_time
 
         for progress_event_row in all_progress_events_rows:
@@ -394,10 +398,25 @@ class progress_curves_widget(QtWidgets.QFrame):
             if progress_event_row['type'] == 'total':
                 total_progress.append((time_percent, progress_event_row['progress']))
 
-        self.chart.add_line(total_progress, '#d7d7d7', 3, 'total', QtCore.Qt.DashLine)
+        self.chart.add_line(total_progress, 'gray', 3, 'total', QtCore.Qt.DotLine)
 
         for stage in stages_dic.keys():
             self.chart.add_line(stages_dic[stage], ressources._stages_colors_[stage], 1, stage)
+
+        month = tools.get_month(start_time)
+        day = tools.get_day(start_time)
+        abscissa_headers = [f"{month} {day}"]
+        time_step = time_range/8
+        for t in range(1, 7):
+            time_header = start_time + time_step*t
+            month = tools.get_month(time_header)
+            day = tools.get_day(time_header)
+            abscissa_headers.append(f"{month} {day}")
+        month = tools.get_month(end_time)
+        day = tools.get_day(end_time)
+        abscissa_headers.append(f"{month} {day}")
+        self.chart.set_abscissa_headers(abscissa_headers)
+
 
 class stage_stats_widget(QtWidgets.QWidget):
     def __init__(self, stage, parent=None):
@@ -580,6 +599,11 @@ class progress_overview_widget(QtWidgets.QFrame):
                 progress_bar.setFixedHeight(6)
                 main_widget_layout.addWidget(progress_bar)
                 self.stages_dic[stage]['progress_bar'] = progress_bar
+
+                color_frame = QtWidgets.QFrame()
+                color_frame.setFixedSize(8,8)
+                color_frame.setStyleSheet(f"background-color:{ressources._stages_colors_[stage]};border-radius:4px;")
+                main_widget_layout.addWidget(color_frame)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
