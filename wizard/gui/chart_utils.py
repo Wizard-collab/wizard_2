@@ -20,6 +20,11 @@ class pie_chart(QtWidgets.QWidget):
 
     def add_pie(self, percent_factor=0, color='gray'):
         self.pies_list.append([percent_factor, color])
+        self.update()
+
+    def clear(self):
+        self.pies_list = []
+        self.update()
 
     def paintEvent(self, event):
         rectangle = QtCore.QRectF(0,0,self.width(), self.height())
@@ -41,6 +46,7 @@ class curves_chart(QtWidgets.QFrame):
         self.setMouseTracking(True)
         self.lines = dict()
         self.margin = 30
+        self.prevision_visibility = True
         self.point_thickness = 5
         self.ordonea_headers = []
         self.abscissa_headers = []
@@ -52,6 +58,16 @@ class curves_chart(QtWidgets.QFrame):
         self.lines[name]['thickness'] = thickness
         self.lines[name]['style'] = style
         self.lines[name]['name'] = name
+        self.lines[name]['visibility'] = True
+
+    def set_data_visible(self, data, visibility):
+        if data in self.lines.keys():
+            self.lines[data]['visibility'] = visibility
+        self.update()
+
+    def set_prevision_visibility(self, visibility):
+        self.prevision_visibility = visibility
+        self.update()
 
     def clear(self):
         self.lines = dict()
@@ -90,68 +106,69 @@ class curves_chart(QtWidgets.QFrame):
 
     def draw_line(self, line_dic, painter, w, h, mouseRect):
         data_len = len(line_dic['data'])
-        if data_len >= 2:
-            old_point = None
+        if line_dic['visibility']:
+            if data_len >= 2:
+                old_point = None
+                pen = QtGui.QPen()
+                color =  QtGui.QColor(line_dic['color'])
+                pen.setBrush(color)
+                pen.setStyle(line_dic['style'])
+                pen.setCapStyle(QtCore.Qt.RoundCap)
+                pen.setJoinStyle(QtCore.Qt.RoundJoin)
+                path = QtGui.QPainterPath()
+                first_point = line_dic['data'][0]
+                for point in line_dic['data']:
+                    point_x = ((w-self.margin*2)*point[0])/100+self.margin
+                    point_y = h-(((h-self.margin*2)*point[1])/100+self.margin)
+                    if not old_point:
+                        old_point = point
+                    else:
+                        old_point_x = (w-self.margin*2)*old_point[0]/100+self.margin
+                        old_point_y = h-(((h-self.margin*2)*old_point[1])/100+self.margin)
+                        path.moveTo(old_point_x, old_point_y)
+                        path.lineTo(point_x, point_y)
+                        if self.point_thickness > 0:
+                            pen.setWidth(self.point_thickness)
+                            painter.setPen(pen)
+                            painter.drawPoint(point_x, point_y)
+                        old_point = point
+                last_point = point
 
-            pen = QtGui.QPen()
-            color =  QtGui.QColor(line_dic['color'])
-            pen.setBrush(color)
-            pen.setStyle(line_dic['style'])
-            pen.setCapStyle(QtCore.Qt.RoundCap)
-            pen.setJoinStyle(QtCore.Qt.RoundJoin)
-            path = QtGui.QPainterPath()
+                pen.setWidth(line_dic['thickness'])
+                painter.setPen(pen)
+                painter.drawPath(path)
+                line_dic['path'] = path
 
-            first_point = line_dic['data'][0]
-
-            for point in line_dic['data']:
-                point_x = ((w-self.margin*2)*point[0])/100+self.margin
-                point_y = h-(((h-self.margin*2)*point[1])/100+self.margin)
-                if not old_point:
-                    old_point = point
-                else:
-                    old_point_x = (w-self.margin*2)*old_point[0]/100+self.margin
-                    old_point_y = h-(((h-self.margin*2)*old_point[1])/100+self.margin)
-                    path.moveTo(old_point_x, old_point_y)
-                    path.lineTo(point_x, point_y)
-                    if self.point_thickness > 0:
-                        pen.setWidth(self.point_thickness)
+                if self.prevision_visibility:
+                    if (last_point[0]-first_point[0]) != 0:
+                        prevision_at_100_time = (last_point[1]-first_point[1])/(last_point[0]-first_point[0])*100
+                        prevision_time_at_100 = 100
+                        if prevision_at_100_time > 100:
+                            prevision_time_at_100 = (100/prevision_at_100_time)*100 + first_point[0]
+                            prevision_at_100_time = 100
+                        last_point_x = ((w-self.margin*2)*last_point[0])/100+self.margin
+                        last_point_y = h-(((h-self.margin*2)*last_point[1])/100+self.margin)
+                        point_x = ((w-self.margin*2)*prevision_time_at_100)/100+self.margin
+                        point_y = h-(((h-self.margin*2)*prevision_at_100_time)/100+self.margin)
+                        color.setAlpha(100)
+                        pen.setStyle(QtCore.Qt.DotLine)
+                        pen.setBrush(color)
                         painter.setPen(pen)
-                        painter.drawPoint(point_x, point_y)
-                    old_point = point
-
-            last_point = point
-
-            # Prevision
-                
-            pen.setWidth(line_dic['thickness'])
-            painter.setPen(pen)
-            painter.drawPath(path)
-            line_dic['path'] = path
-
-            prevision_at_100_time = (last_point[1]-first_point[1])/(last_point[0]-first_point[0])*100
-            prevision_time_at_100 = 100
-            if prevision_at_100_time > 100:
-                prevision_time_at_100 = (100/prevision_at_100_time)*100 + first_point[0]
-                prevision_at_100_time = 100
-
-            last_point_x = ((w-self.margin*2)*last_point[0])/100+self.margin
-            last_point_y = h-(((h-self.margin*2)*last_point[1])/100+self.margin)
-            point_x = ((w-self.margin*2)*prevision_time_at_100)/100+self.margin
-            point_y = h-(((h-self.margin*2)*prevision_at_100_time)/100+self.margin)
-            color.setAlpha(100)
-            pen.setStyle(QtCore.Qt.DotLine)
-            pen.setBrush(color)
-            painter.setPen(pen)
-            path = QtGui.QPainterPath()
-            path.moveTo(last_point_x, last_point_y)
-            path.lineTo(point_x, point_y)
-            painter.drawPath(path)
-            line_dic['prevision_path'] = path
+                        path = QtGui.QPainterPath()
+                        path.moveTo(last_point_x, last_point_y)
+                        path.lineTo(point_x, point_y)
+                        painter.drawPath(path)
+                        line_dic['prevision_path'] = path
 
     def check_tip(self, line_dic, painter, mouseRect, mouse):
-        if 'path' in line_dic.keys() and 'prevision_path' in line_dic.keys():
-            if line_dic['path'].intersects(mouseRect) or line_dic['prevision_path'].intersects(mouseRect):
-                self.draw_tip(mouse, line_dic, painter)
+        if line_dic['visibility']:
+            if 'path' in line_dic.keys():
+                if line_dic['path'].intersects(mouseRect):
+                    self.draw_tip(mouse, line_dic, painter)
+            if self.prevision_visibility:
+                if 'prevision_path' in line_dic.keys():
+                    if line_dic['prevision_path'].intersects(mouseRect):
+                        self.draw_tip(mouse, line_dic, painter)
 
     def draw_tip(self, point, line_dic, painter):
         if point.x() <= 0+self.margin:

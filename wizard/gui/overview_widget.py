@@ -33,6 +33,7 @@ class overview_widget(QtWidgets.QWidget):
         self.progress_curves_widget = progress_curves_widget()
         self.build_ui()
         self.refresh()
+        self.connect_functions()
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -60,11 +61,27 @@ class overview_widget(QtWidgets.QWidget):
         self.vertical_layout_2.addWidget(self.user_progress_widget)
         self.vertical_layout_2.addWidget(self.progress_curves_widget)
 
+        self.refresh_button = QtWidgets.QPushButton()
+        self.refresh_button.setFixedSize(20,20)
+        self.refresh_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
+        self.vertical_layout_2.addWidget(self.refresh_button)
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.vertical_layout_2.addWidget(self.refresh_label)
+
+    def connect_functions(self):
+        self.refresh_button.clicked.connect(self.refresh)
+
+    def update_refresh_time(self, start_time):
+        self.refresh_label.setText(f"refresh: {time.time()-start_time}")
+
     def refresh(self):
+        start_time = time.time()
         self.progress_overview_widget.refresh()
         self.main_progress_widget.refresh()
         self.user_progress_widget.refresh()
         self.progress_curves_widget.refresh()
+        self.update_refresh_time(start_time)
 
 class main_progress_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -244,6 +261,7 @@ class user_progress_widget(QtWidgets.QFrame):
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
     def refresh(self):
+        self.stages_piechart_widget.pie_chart.clear()
         user_row = repository.get_user_row_by_name(environment.get_user())
         user_image =  user_row['profile_picture']
         pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 60)
@@ -312,6 +330,14 @@ class user_progress_widget(QtWidgets.QFrame):
 
             stage_repartition_percent = (len(stages_dic[stage]['all_progresses'])/len(all_progresses))*100
             self.stages_piechart_widget.pie_chart.add_pie(stage_repartition_percent, ressources._stages_colors_[stage])
+        stages_list = list(self.stages_widgets_dic.keys())
+        for stage in stages_list:
+            if stage not in stages_dic.keys():
+                self.remove_stage(stage)
+
+    def remove_stage(self, stage):
+        self.stages_widgets_dic[stage].setVisible(0)
+        self.stages_widgets_dic[stage].setParent(self)
 
 class quickstats_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -352,7 +378,9 @@ class stages_piechart(QtWidgets.QFrame):
 class progress_curves_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(progress_curves_widget, self).__init__(parent)
+        self.data_dic = dict()
         self.build_ui()
+        self.connect_functions()
 
     def build_ui(self):
         self.setObjectName('round_frame')
@@ -371,15 +399,37 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.title_label.setObjectName("title_label")
         self.header_widget_layout.addWidget(self.title_label)
 
+        self.chart_layout = QtWidgets.QHBoxLayout()
+        self.chart_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.chart_layout)
+
         self.chart = chart_utils.curves_chart()
         self.chart.setObjectName('quickstats_widget')
         self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.set_margin(40)
         self.chart.set_points_thickness(0)
         self.chart.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.main_layout.addWidget(self.chart)
+        self.chart_layout.addWidget(self.chart)
+
+        self.settings_layout = QtWidgets.QVBoxLayout()
+        self.settings_layout.setContentsMargins(0,0,0,0)
+        self.chart_layout.addLayout(self.settings_layout)
+
+        self.settings_content_layout = QtWidgets.QVBoxLayout()
+        self.settings_content_layout.setContentsMargins(0,0,0,0)
+        self.settings_layout.addLayout(self.settings_content_layout)
+
+        self.prevision_check_box = QtWidgets.QCheckBox("Show projection")
+        self.prevision_check_box.setChecked(True)
+        self.settings_content_layout.addWidget(self.prevision_check_box)
+
+        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+    def connect_functions(self):
+        self.prevision_check_box.stateChanged.connect(self.chart.set_prevision_visibility)
 
     def refresh(self):
+        self.chart.clear()
         all_progress_events_rows = project.get_all_progress_events()
         stages_dic = dict()
         total_progress = []
@@ -399,9 +449,15 @@ class progress_curves_widget(QtWidgets.QFrame):
                 total_progress.append((time_percent, progress_event_row['progress']))
 
         self.chart.add_line(total_progress, 'gray', 2, 'total')
+        self.add_data('total', 'gray')
 
         for stage in stages_dic.keys():
             self.chart.add_line(stages_dic[stage], ressources._stages_colors_[stage], 1, stage)
+            self.add_data(stage, ressources._stages_colors_[stage])
+        data_list = list(self.data_dic.keys())
+        for data in data_list:
+            if data not in stages_dic.keys() and data != 'total':
+                self.remove_data(data)
 
         month = tools.get_month(start_time)
         day = tools.get_day(start_time)
@@ -416,7 +472,53 @@ class progress_curves_widget(QtWidgets.QFrame):
         day = tools.get_day(end_time)
         abscissa_headers.append(f"{month} {day}")
         self.chart.set_abscissa_headers(abscissa_headers)
+        self.update_data_visibility()
 
+    def add_data(self, data, color):
+        if data not in self.data_dic.keys():
+            item = data_item(data, color)
+            item.check_box.stateChanged.connect(self.update_data_visibility)
+            self.settings_content_layout.addWidget(item)
+            self.data_dic[data] = item
+
+    def clear_data(self):
+        data_list = list(self.data_dic.keys())
+        for data in data_list:
+            self.remove_data(data)
+
+    def remove_data(self, data):
+        if data in self.data_dic.keys():
+            self.data_dic[data].setVisible(False)
+            self.data_dic[data].setParent(None)
+            self.data_dic[data].deleteLater()
+            del self.data_dic[data]
+
+    def update_data_visibility(self):
+        for data in self.data_dic.keys():
+            self.chart.set_data_visible(data, self.data_dic[data].check_box.isChecked())
+
+class data_item(QtWidgets.QWidget):
+    def __init__(self, data_name, data_color, parent=None):
+        super(data_item, self).__init__(parent)
+        self.data_name = data_name
+        self.data_color = data_color
+        self.build_ui()
+        self.fill_ui()
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+        self.color_frame = QtWidgets.QFrame()
+        self.color_frame.setFixedSize(8,8)
+        self.main_layout.addWidget(self.color_frame)
+        self.check_box = QtWidgets.QCheckBox()
+        self.main_layout.addWidget(self.check_box)
+
+    def fill_ui(self):
+        self.color_frame.setStyleSheet(f"background-color:{self.data_color};border-radius:4px;")
+        self.check_box.setText(self.data_name)
+        self.check_box.setChecked(True)
 
 class stage_stats_widget(QtWidgets.QWidget):
     def __init__(self, stage, parent=None):
@@ -426,7 +528,7 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def build_ui(self):
-        self.setFixedWidth(350)
+        self.setFixedWidth(250)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
@@ -435,6 +537,7 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.content_widget.setObjectName("quickstats_widget")
         self.content_widget_widget_layout = QtWidgets.QHBoxLayout()
         self.content_widget_widget_layout.setContentsMargins(0,0,0,0)
+        self.content_widget_widget_layout.setSpacing(4)
         self.content_widget.setLayout(self.content_widget_widget_layout)
         self.main_layout.addWidget(self.content_widget)
 
@@ -457,17 +560,17 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.content_1_widget_layout.addWidget(self.header_widget)
 
         self.stage_icon_label = QtWidgets.QLabel()
-        self.stage_icon_label.setFixedSize(24,24)
+        self.stage_icon_label.setFixedSize(18,18)
         self.header_widget_layout.addWidget(self.stage_icon_label)
 
         self.stage_name_label = QtWidgets.QLabel()
-        self.stage_name_label.setObjectName('title_label')
+        self.stage_name_label.setObjectName('title_label_2')
         self.header_widget_layout.addWidget(self.stage_name_label)
 
         self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.progress_label = QtWidgets.QLabel()
-        self.progress_label.setObjectName('title_label_gray')
+        #self.progress_label.setObjectName('title_label_gray')
         self.header_widget_layout.addWidget(self.progress_label)
 
         self.progress_bar = gui_utils.QProgressBar()
@@ -486,7 +589,7 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.total_work_time = QtWidgets.QLabel()
         self.additionnal_infos_widget_layout.addWidget(self.total_work_time)
 
-        self.total_work_time_label = QtWidgets.QLabel("Total work time")
+        self.total_work_time_label = QtWidgets.QLabel("-")
         self.total_work_time_label.setObjectName('gray_label')
         self.additionnal_infos_widget_layout.addWidget(self.total_work_time_label)
 
@@ -511,7 +614,7 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.additionnal_infos_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
     def fill_ui(self):
-        self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(24))
+        self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(18))
         self.stage_name_label.setText(self.stage.capitalize())
         self.color_frame.setStyleSheet(f"border-top-left-radius:4px;border-bottom-left-radius:4px;background-color:{ressources._stages_colors_[self.stage]}")
 
