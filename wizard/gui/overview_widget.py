@@ -375,7 +375,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.chart.setObjectName('quickstats_widget')
         self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.set_margin(40)
-        self.chart.set_points_thickness(4)
+        self.chart.set_points_thickness(0)
         self.chart.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.main_layout.addWidget(self.chart)
 
@@ -385,8 +385,8 @@ class progress_curves_widget(QtWidgets.QFrame):
         total_progress = []
 
         start_time = all_progress_events_rows[0]['creation_time']
-        end_time = all_progress_events_rows[-1]['creation_time']
-        #end_time = time.time()+3600*24*30*1
+        #end_time = all_progress_events_rows[-1]['creation_time']
+        end_time = time.time()+3600*24*2
         time_range = end_time - start_time
 
         for progress_event_row in all_progress_events_rows:
@@ -398,7 +398,7 @@ class progress_curves_widget(QtWidgets.QFrame):
             if progress_event_row['type'] == 'total':
                 total_progress.append((time_percent, progress_event_row['progress']))
 
-        self.chart.add_line(total_progress, 'gray', 3, 'total', QtCore.Qt.DotLine)
+        self.chart.add_line(total_progress, 'gray', 2, 'total')
 
         for stage in stages_dic.keys():
             self.chart.add_line(stages_dic[stage], ressources._stages_colors_[stage], 1, stage)

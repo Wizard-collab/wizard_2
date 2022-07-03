@@ -69,6 +69,8 @@ class curves_chart(QtWidgets.QFrame):
         self.abscissa_headers = headers
 
     def paintEvent(self, event):
+        mouse = QtCore.QPoint(self.mapFromGlobal(QtGui.QCursor.pos()))
+        mouseRect = QtCore.QRectF(mouse.x()-3, mouse.y()-3, 6, 6)
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
@@ -78,23 +80,28 @@ class curves_chart(QtWidgets.QFrame):
         self.draw_ordonea_headers(painter, w, h)
         self.draw_abscissa_headers(painter, w, h)
         for line in self.lines.keys():
-            self.draw_line(self.lines[line], painter, w, h)
+            self.draw_line(self.lines[line], painter, w, h, mouseRect)
+        for line in self.lines.keys():
+            self.check_tip(self.lines[line], painter, mouseRect, mouse)
 
     def mouseMoveEvent(self, event):
         self.update()
         super().mouseMoveEvent(event)
 
-    def draw_line(self, line_dic, painter, w, h):
+    def draw_line(self, line_dic, painter, w, h, mouseRect):
         data_len = len(line_dic['data'])
         if data_len >= 2:
             old_point = None
 
             pen = QtGui.QPen()
-            pen.setBrush(QtGui.QColor(line_dic['color']))
+            color =  QtGui.QColor(line_dic['color'])
+            pen.setBrush(color)
             pen.setStyle(line_dic['style'])
             pen.setCapStyle(QtCore.Qt.RoundCap)
             pen.setJoinStyle(QtCore.Qt.RoundJoin)
             path = QtGui.QPainterPath()
+
+            first_point = line_dic['data'][0]
 
             for point in line_dic['data']:
                 point_x = ((w-self.margin*2)*point[0])/100+self.margin
@@ -106,30 +113,62 @@ class curves_chart(QtWidgets.QFrame):
                     old_point_y = h-(((h-self.margin*2)*old_point[1])/100+self.margin)
                     path.moveTo(old_point_x, old_point_y)
                     path.lineTo(point_x, point_y)
-                    pen.setWidth(self.point_thickness)
-                    painter.setPen(pen)
-                    painter.drawPoint(point_x, point_y)
+                    if self.point_thickness > 0:
+                        pen.setWidth(self.point_thickness)
+                        painter.setPen(pen)
+                        painter.drawPoint(point_x, point_y)
                     old_point = point
+
+            last_point = point
+
+            # Prevision
                 
             pen.setWidth(line_dic['thickness'])
             painter.setPen(pen)
             painter.drawPath(path)
+            line_dic['path'] = path
 
-            mouse = QtCore.QPoint(self.mapFromGlobal(QtGui.QCursor.pos()))
-            mouseRect = QtCore.QRectF(mouse.x()-3, mouse.y()-3, 6, 6)
-            if path.intersects(mouseRect):
-                pen.setWidth(8)
-                painter.setPen(pen)
-                painter.drawPoint(mouse)
+            prevision_at_100_time = (last_point[1]-first_point[1])/(last_point[0]-first_point[0])*100
+            prevision_time_at_100 = 100
+            if prevision_at_100_time > 100:
+                prevision_time_at_100 = (100/prevision_at_100_time)*100 + first_point[0]
+                prevision_at_100_time = 100
+
+            last_point_x = ((w-self.margin*2)*last_point[0])/100+self.margin
+            last_point_y = h-(((h-self.margin*2)*last_point[1])/100+self.margin)
+            point_x = ((w-self.margin*2)*prevision_time_at_100)/100+self.margin
+            point_y = h-(((h-self.margin*2)*prevision_at_100_time)/100+self.margin)
+            color.setAlpha(100)
+            pen.setStyle(QtCore.Qt.DotLine)
+            pen.setBrush(color)
+            painter.setPen(pen)
+            path = QtGui.QPainterPath()
+            path.moveTo(last_point_x, last_point_y)
+            path.lineTo(point_x, point_y)
+            painter.drawPath(path)
+            line_dic['prevision_path'] = path
+
+    def check_tip(self, line_dic, painter, mouseRect, mouse):
+        if 'path' in line_dic.keys() and 'prevision_path' in line_dic.keys():
+            if line_dic['path'].intersects(mouseRect) or line_dic['prevision_path'].intersects(mouseRect):
                 self.draw_tip(mouse, line_dic, painter)
 
     def draw_tip(self, point, line_dic, painter):
+        if point.x() <= 0+self.margin:
+            point.setX(self.margin)
+        if point.x() >= self.width() - self.margin:
+            point.setX(self.width() - self.margin)
+        if point.y() <= 0+self.margin:
+            point.setY(self.margin)
+        if point.y() >= self.height() - self.margin:
+            point.setY(self.height() - self.margin)
+        pen_width = 4
         pen = QtGui.QPen()
         color = QtGui.QColor(line_dic['color'])
         pen.setBrush(color)
         pen.setCapStyle(QtCore.Qt.RoundCap)
         pen.setJoinStyle(QtCore.Qt.RoundJoin)
-        pen.setWidth(4)
+        pen.setWidth(pen_width)
         painter.setPen(pen)
         painter.setBrush(QtGui.QBrush(color))
 
@@ -145,27 +184,39 @@ class curves_chart(QtWidgets.QFrame):
         margin = 3
         font = QtGui.QFont()
         font_metric = QtGui.QFontMetrics(font)
+
         width = font_metric.width(text)
         height = font_metric.height()
         text_point_x = point.x() - width/2
-        text_point_y = point.y() + height/2 - margin - 30
-        point_x = point.x()-width/2-margin
-        point_y = point.y()-margin-height/2-30
+        text_point_y = point.y() + height/2 - margin - 25
+        point_x = point.x() - width/2 - margin
+        point_y = point.y()-margin-height/2-25
+
+        if point_x <= 0:
+            point_x = 0 + pen_width
+            text_point_x = margin + pen_width
+        if point_x+width+margin*2 >= self.width():
+            point_x = self.width() - width - margin*2 - pen_width
+            text_point_x = point_x + margin
+        if point_y <= 0:
+            point_y = 0 + pen_width
+            text_point_y = margin*2 + height/2 + pen_width
+
         rect = QtCore.QRectF(point_x, point_y, width+2*margin, height+2*margin)
         painter.drawRect(rect)
-        path = QtGui.QPainterPath()
-        path.moveTo(point.x(), point.y()-10)
-        path.lineTo(point.x()+10, point.y()-20)
-        path.lineTo(point.x()-10, point.y()-20)
-        path.lineTo(point.x(), point.y()-10)
-        painter.drawPath(path)
-        painter.fillPath(path, QtGui.QBrush(color))
 
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
         painter.drawText(text_point_x, text_point_y, text)
 
-        painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1))
+        painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1, QtCore.Qt.DashLine))
         painter.drawLine(point.x(), point.y(), point.x(), self.height()-self.margin)
+
+        pen = QtGui.QPen()
+        pen.setCapStyle(QtCore.Qt.RoundCap)
+        pen.setWidth(12)
+        pen.setBrush(QtGui.QColor(line_dic['color']))
+        painter.setPen(pen)
+        painter.drawPoint(point)
 
     def draw_grid(self, painter, w, h):
         painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 2))
