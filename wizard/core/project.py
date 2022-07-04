@@ -606,13 +606,6 @@ def get_asset_tracking_events(stage_id, column='*'):
                                                         column)
     return asset_tracking_events_rows
 
-def get_progress_events(stage_id, column='*'):
-    progress_events_rows = db_utils.get_row_by_column_data('project', 
-                                                        'progress_events', 
-                                                        ('stage_id', stage_id), 
-                                                        column)
-    return progress_events_rows
-
 def get_all_progress_events(column='*'):
     progress_events_rows = db_utils.get_rows('project',
                                         'progress_events',
@@ -1271,7 +1264,7 @@ def update_stage_progress(stage_id):
                             ('progress', progress),
                             ('id', stage_id))
 
-def add_progress_event(type, name, progress):
+def add_progress_event(type, name, datas_dic):
     day, hour = tools.convert_time(time.time())
     if not db_utils.check_existence_by_multiple_data('project', 
                                     'progress_events',
@@ -1281,14 +1274,14 @@ def add_progress_event(type, name, progress):
                                 'progress_events', 
                                 ('creation_time',
                                     'day',
-                                    'progress',
                                     'type',
-                                    'name'),
+                                    'name',
+                                    'datas_dic'),
                                 (time.time(),
                                     day+hour,
-                                    progress,
                                     type,
-                                    name))
+                                    name,
+                                    datas_dic))
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
 
@@ -2461,9 +2454,9 @@ def create_progress_events_table(database):
                                         id serial PRIMARY KEY,
                                         creation_time real NOT NULL,
                                         day text NOT NULL,
-                                        progress real NOT NULL,
                                         type text NOT NULL,
-                                        name text NOT NULL
+                                        name text NOT NULL,
+                                        datas_dic text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Progress table created")

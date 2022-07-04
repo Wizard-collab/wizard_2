@@ -161,6 +161,7 @@ class general_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -170,6 +171,7 @@ class general_widget(QtWidgets.QWidget):
         self.scrollArea_widget = QtWidgets.QWidget()
         self.scrollArea_widget.setObjectName('transparent_widget')
         self.scrollArea_layout = QtWidgets.QVBoxLayout()
+        self.scrollArea_layout.setContentsMargins(24,24,24,24)
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
@@ -483,6 +485,7 @@ class user_account_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -492,6 +495,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.scrollArea_widget = QtWidgets.QWidget()
         self.scrollArea_widget.setObjectName('transparent_widget')
         self.scrollArea_layout = QtWidgets.QVBoxLayout()
+        self.scrollArea_layout.setContentsMargins(24,24,24,24)
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 

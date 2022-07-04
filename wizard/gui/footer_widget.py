@@ -258,6 +258,7 @@ class hardware_infos_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.cpu_label)
         
         self.cpu_progressBar = gui_utils.RoundProgress()
+        self.cpu_progressBar.set_line_width(6)
         self.cpu_progressBar.setValue(0)
         self.cpu_progressBar.setFixedSize(QtCore.QSize(25,25))
         self.main_layout.addWidget(self.cpu_progressBar)
@@ -266,6 +267,7 @@ class hardware_infos_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.ram_label)
 
         self.ram_progressBar = gui_utils.RoundProgress()
+        self.ram_progressBar.set_line_width(6)
         self.ram_progressBar.setValue(0)
         self.ram_progressBar.setFixedSize(QtCore.QSize(25,25))
         self.main_layout.addWidget(self.ram_progressBar)

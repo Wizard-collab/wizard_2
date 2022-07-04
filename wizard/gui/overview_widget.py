@@ -4,9 +4,12 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtChart import QChart, QChartView, QPieSeries
 import statistics
 import time
+import json
+import copy
 import logging
 
 # Wizard core modules
@@ -33,13 +36,15 @@ class overview_widget(QtWidgets.QWidget):
         self.progress_curves_widget = progress_curves_widget()
         self.build_ui()
         self.refresh()
-        self.connect_functions()
 
     def build_ui(self):
         self.setObjectName('dark_widget')
-        self.resize(1400,800)
-        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,11,11,11)
         self.setLayout(self.main_layout)
+
+        self.horizontal_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.addLayout(self.horizontal_layout)
 
         self.vertical_widget_1 = QtWidgets.QWidget()
         self.vertical_widget_1.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -47,7 +52,7 @@ class overview_widget(QtWidgets.QWidget):
         self.vertical_layout_1 = QtWidgets.QVBoxLayout()
         self.vertical_layout_1.setContentsMargins(0,0,0,0)
         self.vertical_widget_1.setLayout(self.vertical_layout_1)
-        self.main_layout.addWidget(self.vertical_widget_1)
+        self.horizontal_layout.addWidget(self.vertical_widget_1)
 
         self.vertical_layout_1.addWidget(self.main_progress_widget)
         self.vertical_layout_1.addWidget(self.progress_overview_widget)
@@ -56,32 +61,36 @@ class overview_widget(QtWidgets.QWidget):
 
         self.vertical_layout_2 = QtWidgets.QVBoxLayout()
         self.vertical_layout_2.setContentsMargins(0,0,0,0)
-        self.main_layout.addLayout(self.vertical_layout_2)
+        self.horizontal_layout.addLayout(self.vertical_layout_2)
 
         self.vertical_layout_2.addWidget(self.user_progress_widget)
         self.vertical_layout_2.addWidget(self.progress_curves_widget)
 
-        self.refresh_button = QtWidgets.QPushButton()
-        self.refresh_button.setFixedSize(20,20)
-        self.refresh_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
-        self.vertical_layout_2.addWidget(self.refresh_button)
+        self.footer_layout = QtWidgets.QHBoxLayout()
+        self.footer_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.footer_layout)
+
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.refresh_label = QtWidgets.QLabel()
-        self.vertical_layout_2.addWidget(self.refresh_label)
+        self.refresh_label.setObjectName('gray_label')
+        self.footer_layout.addWidget(self.refresh_label)
 
-    def connect_functions(self):
-        self.refresh_button.clicked.connect(self.refresh)
+    def showEvent(self, event):
+        self.refresh()
 
     def update_refresh_time(self, start_time):
-        self.refresh_label.setText(f"refresh: {time.time()-start_time}")
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def refresh(self):
-        start_time = time.time()
-        self.progress_overview_widget.refresh()
-        self.main_progress_widget.refresh()
-        self.user_progress_widget.refresh()
-        self.progress_curves_widget.refresh()
-        self.update_refresh_time(start_time)
+        if self.isVisible():
+            start_time = time.time()
+            self.progress_overview_widget.refresh()
+            self.main_progress_widget.refresh()
+            self.user_progress_widget.refresh()
+            self.progress_curves_widget.refresh()
+            self.update_refresh_time(start_time)
 
 class main_progress_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -178,7 +187,7 @@ class user_progress_widget(QtWidgets.QFrame):
 
         self.main_progress_bar = gui_utils.RoundProgress()
         self.main_progress_bar.setFixedSize(30,30)
-        self.main_progress_bar.lineWidth = 8
+        self.main_progress_bar.set_line_width(8)
         self.main_progress_bar.setValue(0)
         self.main_progress_bar.setChunckColor('#d7d7d7')
         self.main_progress_widget_layout.addWidget(self.main_progress_bar)
@@ -379,6 +388,7 @@ class progress_curves_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(progress_curves_widget, self).__init__(parent)
         self.data_dic = dict()
+        self.contexts = []
         self.build_ui()
         self.connect_functions()
 
@@ -387,6 +397,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.setMinimumHeight(400)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setSpacing(12)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
@@ -398,6 +409,12 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.title_label = QtWidgets.QLabel("Progress chart")
         self.title_label.setObjectName("title_label")
         self.header_widget_layout.addWidget(self.title_label)
+
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.context_comboBox = gui_utils.QComboBox()
+        self.context_comboBox.setFixedWidth(140)
+        self.header_widget_layout.addWidget(self.context_comboBox)
 
         self.chart_layout = QtWidgets.QHBoxLayout()
         self.chart_layout.setContentsMargins(0,0,0,0)
@@ -417,6 +434,7 @@ class progress_curves_widget(QtWidgets.QFrame):
 
         self.settings_content_layout = QtWidgets.QVBoxLayout()
         self.settings_content_layout.setContentsMargins(0,0,0,0)
+        self.settings_content_layout.setSpacing(2)
         self.settings_layout.addLayout(self.settings_content_layout)
 
         self.prevision_check_box = QtWidgets.QCheckBox("Show projection")
@@ -427,36 +445,65 @@ class progress_curves_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.prevision_check_box.stateChanged.connect(self.chart.set_prevision_visibility)
+        self.context_comboBox.currentTextChanged.connect(lambda:self.context_changed(None))
 
     def refresh(self):
-        self.chart.clear()
         all_progress_events_rows = project.get_all_progress_events()
-        stages_dic = dict()
+        self.refresh_contexts(all_progress_events_rows)
+
+    def refresh_contexts(self, all_progress_events_rows):
+        self.apply_context_changed = False
+        contexts = []
+        for progress_event_row in all_progress_events_rows:
+            contexts.append(progress_event_row['name'])
+            self.add_context(progress_event_row['name'])
+        contexts_list = copy.deepcopy(self.contexts)
+        for context in contexts_list:
+            if context not in contexts:
+                self.remove_context(context)
+        self.apply_context_changed = True
+        self.context_changed(all_progress_events_rows)
+
+    def context_changed(self, all_progress_events_rows=None):
+        if self.apply_context_changed:
+            self.context = self.context_comboBox.currentText()
+            if all_progress_events_rows is None:
+                all_progress_events_rows = project.get_all_progress_events()
+            self.refresh_datas(all_progress_events_rows)
+
+    def refresh_datas(self, all_progress_events_rows):
+        self.chart.clear()
+        datas_dic = dict()
         total_progress = []
 
         start_time = all_progress_events_rows[0]['creation_time']
-        #end_time = all_progress_events_rows[-1]['creation_time']
-        end_time = time.time()+3600*24*2
+        end_time = all_progress_events_rows[-1]['creation_time']
+        #end_time = time.time()+3600*24*2
         time_range = end_time - start_time
 
-        for progress_event_row in all_progress_events_rows:
-            time_percent = (progress_event_row['creation_time'] - start_time)/time_range*100
-            if progress_event_row['type'] == 'stage':
-                if progress_event_row['name'] not in stages_dic.keys():
-                    stages_dic[progress_event_row['name']] = []
-                stages_dic[progress_event_row['name']].append((time_percent, progress_event_row['progress']))
-            if progress_event_row['type'] == 'total':
-                total_progress.append((time_percent, progress_event_row['progress']))
+        if time_range > 0:
+            for progress_event_row in all_progress_events_rows:
+                if progress_event_row['name'] == self.context:
+                    time_percent = (progress_event_row['creation_time'] - start_time)/time_range*100
+                    project_datas_dic = json.loads(progress_event_row['datas_dic'])
+                    for data_name in project_datas_dic.keys():
+                        if data_name not in datas_dic.keys():
+                            datas_dic[data_name] = []
+                        datas_dic[data_name].append((time_percent, project_datas_dic[data_name]))
 
-        self.chart.add_line(total_progress, 'gray', 2, 'total')
-        self.add_data('total', 'gray')
-
-        for stage in stages_dic.keys():
-            self.chart.add_line(stages_dic[stage], ressources._stages_colors_[stage], 1, stage)
-            self.add_data(stage, ressources._stages_colors_[stage])
+        for data_name in datas_dic.keys():
+            if data_name == 'total':
+                color = 'gray'
+                width = 2
+            else:
+                color = ressources._stages_colors_[data_name]
+                width = 1
+            self.chart.add_line(datas_dic[data_name], color, width, data_name)
+            self.add_data(data_name, color)
+        
         data_list = list(self.data_dic.keys())
         for data in data_list:
-            if data not in stages_dic.keys() and data != 'total':
+            if data not in datas_dic.keys():
                 self.remove_data(data)
 
         month = tools.get_month(start_time)
@@ -474,10 +521,23 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.chart.set_abscissa_headers(abscissa_headers)
         self.update_data_visibility()
 
+    def add_context(self, context_name):
+        if context_name not in self.contexts:
+            self.context_comboBox.addItem(context_name)
+            self.contexts.append(context_name)
+
+    def remove_context(self, context_name):
+        if context_name in self.contexts:
+            self.contexts.remove(context_name)
+            item_index = self.context_comboBox.findText(context_name)
+            if item_index != -1:
+                self.context_comboBox.removeItem(item_index)
+
     def add_data(self, data, color):
         if data not in self.data_dic.keys():
             item = data_item(data, color)
-            item.check_box.stateChanged.connect(self.update_data_visibility)
+            item.stateChanged.connect(self.update_data_visibility)
+            item.setChecked(True)
             self.settings_content_layout.addWidget(item)
             self.data_dic[data] = item
 
@@ -494,31 +554,54 @@ class progress_curves_widget(QtWidgets.QFrame):
             del self.data_dic[data]
 
     def update_data_visibility(self):
+        pass
         for data in self.data_dic.keys():
-            self.chart.set_data_visible(data, self.data_dic[data].check_box.isChecked())
+            self.chart.set_data_visible(data, self.data_dic[data].isChecked())
 
-class data_item(QtWidgets.QWidget):
+class data_item(QtWidgets.QFrame):
+
+    stateChanged = pyqtSignal(bool)
+
     def __init__(self, data_name, data_color, parent=None):
         super(data_item, self).__init__(parent)
         self.data_name = data_name
         self.data_color = data_color
+        self.checked = False
+        self.setObjectName('quickstats_widget')
         self.build_ui()
         self.fill_ui()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(4,4,4,4)
         self.setLayout(self.main_layout)
         self.color_frame = QtWidgets.QFrame()
         self.color_frame.setFixedSize(8,8)
         self.main_layout.addWidget(self.color_frame)
-        self.check_box = QtWidgets.QCheckBox()
-        self.main_layout.addWidget(self.check_box)
+        self.data_name_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.data_name_label)
+
+    def mouseReleaseEvent(self, event):
+        self.checked = 1-self.checked
+        self.stateChanged.emit(self.checked)
+        self.update_state()
 
     def fill_ui(self):
         self.color_frame.setStyleSheet(f"background-color:{self.data_color};border-radius:4px;")
-        self.check_box.setText(self.data_name)
-        self.check_box.setChecked(True)
+        self.data_name_label.setText(self.data_name)
+
+    def update_state(self):
+        if self.checked:
+            self.setStyleSheet("#quickstats_widget{background-color:rgba(255,255,255,20);}")
+        else:
+            self.setStyleSheet("")
+
+    def setChecked(self, state):
+        self.checked = state
+        self.update_state()
+
+    def isChecked(self):
+        return self.checked
 
 class stage_stats_widget(QtWidgets.QWidget):
     def __init__(self, stage, parent=None):
@@ -622,7 +705,6 @@ class progress_overview_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(progress_overview_widget, self).__init__(parent)
         self.build_ui()
-        self.refresh()
 
     def build_ui(self):
         self.setObjectName('round_frame')
@@ -662,7 +744,7 @@ class progress_overview_widget(QtWidgets.QFrame):
             progress_bar = gui_utils.RoundProgress()
             progress_bar.setChunckColor("#d7d7d7")
             progress_bar.setFixedSize(22,22)
-            progress_bar.lineWidth = 14
+            progress_bar.set_line_width(6)
             progress_bar.setValue(0)
             domain_header_layout.addWidget(progress_bar)
             self.domains_dic[domain]['progress_bar'] = progress_bar
@@ -737,6 +819,3 @@ class progress_overview_widget(QtWidgets.QFrame):
             mean = statistics.mean(domains_progresses_dic[domain])
             self.domains_dic[domain]['progress_bar'].setValue(mean)
             self.domains_dic[domain]['progress_label'].setText(f"{round(mean, 1)} %")
-
-w=overview_widget()
-w.show()

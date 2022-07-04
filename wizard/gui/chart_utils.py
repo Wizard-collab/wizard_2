@@ -168,9 +168,9 @@ class curves_chart(QtWidgets.QFrame):
             if self.prevision_visibility:
                 if 'prevision_path' in line_dic.keys():
                     if line_dic['prevision_path'].intersects(mouseRect):
-                        self.draw_tip(mouse, line_dic, painter)
+                        self.draw_tip(mouse, line_dic, painter, projection = 1)
 
-    def draw_tip(self, point, line_dic, painter):
+    def draw_tip(self, point, line_dic, painter, projection=0):
         if point.x() <= 0+self.margin:
             point.setX(self.margin)
         if point.x() >= self.width() - self.margin:
@@ -196,7 +196,11 @@ class curves_chart(QtWidgets.QFrame):
             progress = 100
         if progress < 0:
             progress = 0
-        text = f"{line_dic['name']} {int(progress)}%"
+
+        if not projection:
+            text = f"{line_dic['name']} {int(progress)}%"
+        else:
+            text = f"{line_dic['name']} projection: {int(progress)}%"
 
         margin = 3
         font = QtGui.QFont()

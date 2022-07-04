@@ -445,44 +445,51 @@ class RoundProgress(QtWidgets.QWidget):
         super(RoundProgress, self).__init__(parent)
         self.chunck_color = '#d9d9d9'
         self.bg_color = '#24242b'
-        self.angle=90
-        self.drawAngle=self.angle
-        self.lineWidth=18
-        self.timeLine=QtCore.QTimeLine(2000,self)
-        self.timeLine.frameChanged.connect(self.updateTimeline)
+        self.percent=0
+        self.line_width=18
  
     def setValue(self, percent):
-        self.angle=percent*3.6
-        self.timeLine.setFrameRange(self.drawAngle,self.angle)
-        self.timeLine.stop()
-        self.timeLine.start()
+        self.percent=percent
+        self.update()
 
-    def updateTimeline(self,frame):
-        self.drawAngle=frame
+    def set_line_width(self, line_width):
+        self.line_width=line_width
         self.update()
 
     def setChunckColor(self, color):
         self.chunck_color = color
+        self.update()
 
     def paintEvent(self,event):
-        the_rect=QtCore.QRectF(0,0,self.width(),self.height())
-        if the_rect.isNull():
-            return
-        painter=QtGui.QPainter(self)
-        painter.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.SmoothPixmapTransform,on=True)
-        painter.setViewport(self.width(),0,-self.width(),self.height())
-        the_path=QtGui.QPainterPath()
-        the_path.addEllipse(the_rect.adjusted(1,1,-1,-1))
-        the_path.addEllipse(the_rect.adjusted(
-            1+self.lineWidth,1+self.lineWidth,-1-self.lineWidth,-1-self.lineWidth))
-        painter.fillPath(the_path,QtGui.QColor(6,79,103))
-        the_gradient=QtGui.QConicalGradient(the_rect.center(),90)
-        the_angle=self.drawAngle/360
-        the_gradient.setColorAt(0,QtGui.QColor(self.chunck_color))
-        the_gradient.setColorAt(the_angle,QtGui.QColor(self.chunck_color))
-        if the_angle+0.001<1:
-            the_gradient.setColorAt(the_angle+0.001,QtGui.QColor(self.bg_color))
-        painter.fillPath(the_path,the_gradient)
+        rect=QtCore.QRectF(self.line_width/2,
+                            self.line_width/2,
+                            self.width()-self.line_width,
+                            self.height()-self.line_width)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+        # Draw bg
+        self.draw_arc(painter, 0, 360, self.bg_color)
+        # Draw chunck
+        self.draw_arc(painter, 90, -360*(self.percent/100), self.chunck_color)
+
+    def find_ellipse_coord(self, rect, start_angle, angle):
+        coord_path = QtGui.QPainterPath()
+        coord_path.arcMoveTo(rect, start_angle)
+        coord_path.arcTo(rect, start_angle, angle)
+        return coord_path.currentPosition()
+
+    def draw_arc(self, painter, start_angle, angle, color):
+        outer_rect = QtCore.QRectF(0,0,self.width(), self.height())
+        inner_rect = QtCore.QRectF(self.line_width, self.line_width,   
+                          self.width() - self.line_width*2, self.height() - self.line_width*2)
+        path = QtGui.QPainterPath()
+        path.arcMoveTo(outer_rect, start_angle)
+        path.arcTo(outer_rect, start_angle, angle)
+        path.lineTo(self.find_ellipse_coord(inner_rect, start_angle, angle))
+        path.arcTo(inner_rect, start_angle+angle, -angle)
+        path.lineTo(self.find_ellipse_coord(outer_rect, -angle, start_angle+angle))
+        painter.fillPath(path, QtGui.QBrush(QtGui.QColor(color)))
 
 def enterEvent(self, event=None):
     gui_server.tooltip(self.application_tooltip)

@@ -19,6 +19,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 	def build_ui(self):
 		self.main_layout = QtWidgets.QHBoxLayout()
 		self.main_layout.setContentsMargins(0,0,0,0)
+		self.main_layout.setSpacing(0)
 		self.setLayout(self.main_layout)
 
 		self.buttons_widget = QtWidgets.QWidget()
@@ -26,13 +27,13 @@ class custom_tab_widget(QtWidgets.QWidget):
 		self.buttons_widget.setObjectName('dark_widget')
 		self.buttons_layout = QtWidgets.QVBoxLayout()
 		self.buttons_layout.setSpacing(0)
-		self.buttons_layout.setContentsMargins(11,11,0,11)
+		self.buttons_layout.setContentsMargins(11,11,11,11)
 		self.buttons_widget.setLayout(self.buttons_layout)
 		self.main_layout.addWidget(self.buttons_widget)
 
 		self.buttons_content_widget = QtWidgets.QWidget()
 		self.buttons_content_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-		self.buttons_content_widget.setObjectName('dark_widget')
+		self.buttons_content_widget.setObjectName('transparent_widget')
 		self.buttons_content_layout = QtWidgets.QVBoxLayout()
 		self.buttons_content_layout.setSpacing(3)
 		self.buttons_content_layout.setContentsMargins(0,0,0,0)
@@ -42,6 +43,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 		self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
 		self.widgets_area = QtWidgets.QWidget()
+		self.widgets_area.setObjectName('dark_widget')
 		self.widgets_area_layout = QtWidgets.QHBoxLayout()
 		self.widgets_area_layout.setContentsMargins(0,0,0,0)
 		self.widgets_area.setLayout(self.widgets_area_layout)
@@ -49,7 +51,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 
 	def addTab(self, widget, label, icon=''):
 		index = len(self.tabs_dic.keys())
-		button = tab_button(index, label, icon)
+		button = tab_button(index, label, icon, 40)
 		button.select_signal.connect(self.tab_selected)
 		self.buttons_content_layout.addWidget(button)
 		self.widgets_area_layout.addWidget(widget)
@@ -73,12 +75,15 @@ class tab_button(QtWidgets.QPushButton):
 
 	select_signal = pyqtSignal(int)
 
-	def __init__(self, index, label, icon, parent=None):
+	def __init__(self, index, label, icon, size, parent=None):
 		super(tab_button, self).__init__(parent)
 		self.index = index
-		self.setObjectName('tab_button')
+		self.setFixedHeight(size)
+		self.setObjectName('round_tab_button')
 		self.setIcon(QtGui.QIcon(icon))
-		self.setText(f" {label}")
+		if label == '':
+			self.setFixedWidth(size)
+		self.setText(label)
 		self.setCheckable(True)
 		self.connect_functions()
 
@@ -86,4 +91,4 @@ class tab_button(QtWidgets.QPushButton):
 		self.clicked.connect(self.emit_index)
 
 	def emit_index(self):
-		self.select_signal.emit(self.index)
+		self.select_signal.emit(self.index)	

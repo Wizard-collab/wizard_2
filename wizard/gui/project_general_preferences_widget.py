@@ -80,6 +80,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -87,8 +88,8 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.scrollBar = self.scrollArea.verticalScrollBar()
 
         self.scrollArea_widget = QtWidgets.QWidget()
-        self.scrollArea_widget.setObjectName('transparent_widget')
         self.scrollArea_layout = QtWidgets.QVBoxLayout()
+        self.scrollArea_layout.setContentsMargins(24,24,24,24)
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
