@@ -181,8 +181,8 @@ class production_table_widget(QtWidgets.QWidget):
                 labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading"]
                 stages_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
             elif self.domain == assets_vars._sequences_:
-                labels_names = ["Name", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Compositing"]
-                stages_list = ["", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
+                labels_names = ["Name", "Frame range", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Compositing"]
+                stages_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
 
             self.table_widget.setColumnCount(len(labels_names))
             self.table_widget.setHorizontalHeaderLabels(labels_names)
@@ -198,11 +198,18 @@ class production_table_widget(QtWidgets.QWidget):
                     self.asset_ids[asset_row['id']]['row'] = asset_row
                     self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
                     self.asset_ids[asset_row['id']]['widget'] = widget
+                    if self.domain == assets_vars._sequences_:
+                        frange_widget = frame_range_widget(asset_row)
+                        self.table_widget.setCellWidget(index, 1, frange_widget)
+                        self.asset_ids[asset_row['id']]['frame_range_widget'] = frange_widget
                 else:
                     if assets_preview[asset_row['id']] != self.asset_ids[asset_row['id']]['preview_row']:
                         self.asset_ids[asset_row['id']]['widget'].refresh(asset_row, assets_preview[asset_row['id']])
                         self.asset_ids[asset_row['id']]['row'] = asset_row
                         self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
+                        if self.domain == assets_vars._sequences_:
+                            self.asset_ids[asset_row['id']]['frame_range_widget'].refresh(asset_row)
+
 
             stage_rows = project.get_all_stages()
             project_stage_ids = []
@@ -339,6 +346,41 @@ class asset_widget(QtWidgets.QWidget):
     def refresh(self, asset_row, preview_row):
         self.asset_row = asset_row
         self.preview_row = preview_row
+        self.fill_ui()
+
+class frame_range_widget(QtWidgets.QWidget):
+    def __init__(self, asset_row, parent = None):
+        super(frame_range_widget, self).__init__(parent)
+        self.asset_row = asset_row
+        self.build_ui()
+        self.fill_ui()
+
+    def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(2)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+        self.frame_range_label = QtWidgets.QLabel()
+        self.frame_range_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.addWidget(self.frame_range_label)
+
+        self.details_label = QtWidgets.QLabel()
+        self.details_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.details_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.details_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+    def fill_ui(self):
+        self.frame_range_label.setText(f"{self.asset_row['inframe']} - {self.asset_row['outframe']}")
+        self.details_label.setText(f"{self.asset_row['outframe'] - self.asset_row['inframe']} frames")
+
+    def refresh(self, asset_row):
+        self.asset_row = asset_row
         self.fill_ui()
 
 class stage_widget(QtWidgets.QWidget):

@@ -100,15 +100,15 @@ def add_progress_event():
         total_progresses_dic[stage] = get_mean(total_progresses_dic[stage])
     project.add_progress_event('total', 'All project', json.dumps(total_progresses_dic))
 
-    for category in categories_progresses_dic.keys():
-        for stage in categories_progresses_dic[category].keys():
-            categories_progresses_dic[category][stage] = get_mean(categories_progresses_dic[category][stage])
-        project.add_progress_event('category', category, json.dumps(categories_progresses_dic[category]))
-
     for domain in domains_progresses_dic.keys():
         for stage in domains_progresses_dic[domain].keys():
             domains_progresses_dic[domain][stage] = get_mean(domains_progresses_dic[domain][stage])
         project.add_progress_event('domain', domain, json.dumps(domains_progresses_dic[domain]))
+
+    for category in categories_progresses_dic.keys():
+        for stage in categories_progresses_dic[category].keys():
+            categories_progresses_dic[category][stage] = get_mean(categories_progresses_dic[category][stage])
+        project.add_progress_event('category', category, json.dumps(categories_progresses_dic[category]))
 
 def get_mean(data_list):
     if data_list == []:

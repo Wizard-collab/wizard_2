@@ -609,7 +609,7 @@ def get_asset_tracking_events(stage_id, column='*'):
 def get_all_progress_events(column='*'):
     progress_events_rows = db_utils.get_rows('project',
                                         'progress_events',
-                                        column)
+                                        column, order='id')
     return progress_events_rows
 
 def get_variant_work_envs_childs(variant_id, column='*'):

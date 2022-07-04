@@ -410,11 +410,13 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.title_label.setObjectName("title_label")
         self.header_widget_layout.addWidget(self.title_label)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(30,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.context_comboBox = gui_utils.QComboBox()
         self.context_comboBox.setFixedWidth(140)
         self.header_widget_layout.addWidget(self.context_comboBox)
+
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.chart_layout = QtWidgets.QHBoxLayout()
         self.chart_layout.setContentsMargins(0,0,0,0)
@@ -478,7 +480,7 @@ class progress_curves_widget(QtWidgets.QFrame):
 
         start_time = all_progress_events_rows[0]['creation_time']
         end_time = all_progress_events_rows[-1]['creation_time']
-        #end_time = time.time()+3600*24*2
+        #end_time = time.time()+3600*12
         time_range = end_time - start_time
 
         if time_range > 0:
