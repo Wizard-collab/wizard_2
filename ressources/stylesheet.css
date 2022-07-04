@@ -451,12 +451,19 @@ QSlider::handle:horizontal {
 }
 
 QTableWidget{
+	outline: none;
 	background-color:#24242b;
 	gridline-color: rgba(0,0,0,80);
 	alternate-background-color: rgba(0,0,0,50);
 }
 
+QTableWidget::item:focus{
+	outline: none;
+	border: none;
+}
+
 QTableWidget::item:selected{
+	outline: none;
 	background-color: rgba(255,255,255,40);
 }
 

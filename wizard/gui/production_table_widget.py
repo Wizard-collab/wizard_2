@@ -39,6 +39,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.category = None
         self.domain_ids = []
         self.category_ids = []
+        self.view_comment_widget = view_comment_widget(self)
         self.init_users_images()
         self.build_ui()
         self.connect_functions()
@@ -192,6 +193,9 @@ class production_table_widget(QtWidgets.QWidget):
                 project_asset_ids.append(asset_row['id'])
                 if asset_row['id'] not in self.asset_ids.keys():
                     index = asset_rows.index(asset_row)
+                    item = QtWidgets.QTableWidgetItem()
+                    item.setFlags(item.flags() ^ QtCore.Qt.ItemIsSelectable)
+                    self.table_widget.setItem(index, 0, item)
                     widget = asset_widget(asset_row, assets_preview[asset_row['id']])
                     self.table_widget.setCellWidget(index, 0, widget)
                     self.asset_ids[asset_row['id']] = dict()
@@ -199,6 +203,9 @@ class production_table_widget(QtWidgets.QWidget):
                     self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
                     self.asset_ids[asset_row['id']]['widget'] = widget
                     if self.domain == assets_vars._sequences_:
+                        item = QtWidgets.QTableWidgetItem()
+                        item.setFlags(item.flags() ^ QtCore.Qt.ItemIsSelectable)
+                        self.table_widget.setItem(index, 1, item)
                         frange_widget = frame_range_widget(asset_row)
                         self.table_widget.setCellWidget(index, 1, frange_widget)
                         self.asset_ids[asset_row['id']]['frame_range_widget'] = frange_widget
@@ -210,7 +217,6 @@ class production_table_widget(QtWidgets.QWidget):
                         if self.domain == assets_vars._sequences_:
                             self.asset_ids[asset_row['id']]['frame_range_widget'].refresh(asset_row)
 
-
             stage_rows = project.get_all_stages()
             project_stage_ids = []
 
@@ -220,6 +226,9 @@ class production_table_widget(QtWidgets.QWidget):
                     if stage_row['id'] not in self.stage_ids.keys():
                         row_index = self.get_asset_coord(stage_row['asset_id']).row()
                         widget = stage_widget(stage_row, self.users_images_dic)
+                        widget.show_comment_signal.connect(self.show_comment)
+                        widget.hide_comment_signal.connect(self.hide_comment)
+                        widget.move_comment.connect(self.move_comment)
                         widget.state_signal.connect(self.update_state)
                         widget.assignment_signal.connect(self.update_assignment)
                         self.table_widget.setCellWidget(row_index, stages_list.index(stage_row['name']), widget)
@@ -268,8 +277,6 @@ class production_table_widget(QtWidgets.QWidget):
     def remove_stage(self, stage_id):
         if stage_id in self.stage_ids.keys():
             model_index = self.get_stage_coord(stage_id)
-            print(model_index.row())
-            print(model_index.column())
             self.table_widget.removeCellWidget(model_index.row(), model_index.column())
             del self.stage_ids[stage_id]
 
@@ -278,6 +285,58 @@ class production_table_widget(QtWidgets.QWidget):
             row_index = self.get_asset_coord(asset_id).row()
             self.table_widget.removeRow(row_index)
             del self.asset_ids[asset_id]
+
+    def show_comment(self, stage_row):
+        self.view_comment_widget.show_comment(stage_row)
+
+    def hide_comment(self):
+        self.view_comment_widget.close()
+
+    def move_comment(self):
+        self.view_comment_widget.move_ui()
+
+class view_comment_widget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(view_comment_widget, self).__init__(parent)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.build_ui()
+
+    def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_widget_layout = QtWidgets.QHBoxLayout()
+        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
+        self.setLayout(self.main_widget_layout)
+
+        self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setObjectName('black_round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(6)
+        self.main_widget.setLayout(self.main_layout)
+        self.main_widget_layout.addWidget(self.main_widget)
+
+        self.stage_state = QtWidgets.QLabel()
+        self.stage_state.setObjectName('bold_label')
+        self.main_layout.addWidget(self.stage_state)
+
+        self.line_frame = QtWidgets.QFrame()
+        self.line_frame.setFixedHeight(1)
+        self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
+        self.main_layout.addWidget(self.line_frame)
+
+        self.stage_comment = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.stage_comment)
+
+    def show_comment(self, stage_row):
+        self.stage_state.setText(stage_row['state'])
+        self.stage_state.setStyleSheet(f"color:{ressources._states_colors_[stage_row['state']]};")
+        self.stage_comment.setText(stage_row['tracking_comment'])
+        gui_utils.move_ui(self, 20)
+        self.show()
+        self.adjustSize()
+
+    def move_ui(self):
+        gui_utils.move_ui(self, 20)
 
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, preview_row, parent=None):
@@ -387,6 +446,9 @@ class stage_widget(QtWidgets.QWidget):
 
     state_signal = pyqtSignal(str)
     assignment_signal = pyqtSignal(str)
+    show_comment_signal = pyqtSignal(dict)
+    hide_comment_signal = pyqtSignal(int)
+    move_comment = pyqtSignal(int)
 
     def __init__(self, stage_row, users_images_dic, parent=None):
         super(stage_widget, self).__init__(parent)
@@ -394,11 +456,14 @@ class stage_widget(QtWidgets.QWidget):
         self.stage_row = stage_row
         self.users_images_dic = users_images_dic
         self.build_ui()
-        self.connect_functions()
         self.fill_ui()
+        self.connect_functions()
 
     def connect_functions(self):
         self.state_label.state_signal.connect(self.state_signal.emit)
+        self.state_label.enter.connect(self.show_comment)
+        self.state_label.leave.connect(self.hide_comment)
+        self.state_label.move_event.connect(self.move_comment.emit)
         self.user_image_label.assignment_signal.connect(self.assignment_signal.emit)
 
     def build_ui(self):
@@ -431,6 +496,13 @@ class stage_widget(QtWidgets.QWidget):
         self.percent_label = QtWidgets.QLabel()
         self.data_layout.addWidget(self.percent_label)
 
+    def show_comment(self):
+        if self.stage_row['tracking_comment'] and self.stage_row['tracking_comment'] != '':
+            self.show_comment_signal.emit(self.stage_row)
+
+    def hide_comment(self):
+        self.hide_comment_signal.emit(1)
+
     def fill_ui(self):
         self.color_frame.setStyleSheet('background-color:%s;'%ressources._stages_colors_[self.stage_row['name']])
         self.state_label.setText(self.stage_row['state'])
@@ -445,9 +517,13 @@ class stage_widget(QtWidgets.QWidget):
 class state_widget(QtWidgets.QLabel):
 
     state_signal = pyqtSignal(str)
+    enter = pyqtSignal(int)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(state_widget, self).__init__(parent)
+        self.setMouseTracking(True)
         self.setFixedWidth(60)
         self.setObjectName('bold_label')
 
@@ -464,6 +540,16 @@ class state_widget(QtWidgets.QLabel):
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             self.state_signal.emit(action.text())
+
+    def mouseMoveEvent(self, event):
+        self.move_event.emit(1)
+        super().mouseMoveEvent(event)
+
+    def enterEvent(self, event):
+        self.enter.emit(1)
+
+    def leaveEvent(self, event):
+        self.leave.emit(1)
 
 class assignment_widget(QtWidgets.QLabel):
 
