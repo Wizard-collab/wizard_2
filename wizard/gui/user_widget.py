@@ -118,6 +118,7 @@ class user_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.profile_picture)
 
     def refresh(self):
+        user_rows = repository.get_users_list()
         user_row = repository.get_user_row_by_name(environment.get_user())
         self.xp_progress_bar.setValue(user_row['xp'])
         self.life_progress_bar.setValue(user_row['life'])
@@ -125,8 +126,8 @@ class user_widget(QtWidgets.QFrame):
         self.admin_badge_label.setVisible(user_row['administrator'])
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 28)
         self.profile_picture.setPixmap(pm)
-        self.crown_check(user_row)
-        self.items_check(user_row)
+        self.crown_check(user_row, user_rows)
+        self.items_check(user_row, user_rows)
 
         if user_row['level'] != self.old_level:
             if user_row['level'] > self.old_level:
@@ -137,9 +138,23 @@ class user_widget(QtWidgets.QFrame):
             self.old_level = user_row['level']
         self.first_refresh = 0
 
-    def items_check(self, user_row):
-        user_rows = repository.get_users_list_by_xp_order()
-        if user_row['id'] != user_rows[0]['id']:
+    def items_check(self, user_row, user_rows):
+        xp_dic = dict()
+        comments_dic = dict()
+        work_time_dic = dict()
+        deaths_dic = dict()
+
+        for row in user_rows:
+            if row['total_xp'] not in xp_dic.keys():
+                xp_dic[row['total_xp']] = row['id']
+            if row['comments_count'] not in comments_dic.keys():
+                comments_dic[row['comments_count']] = row['id']
+            if row['work_time'] not in work_time_dic.keys():
+                work_time_dic[row['work_time']] = row['id']
+            if row['deaths'] not in deaths_dic.keys():
+                deaths_dic[row['deaths']] = row['id']
+
+        if user_row['id'] != xp_dic[sorted(list(xp_dic.keys()))[-1]]:
             self.xp_item_label.setVisible(0)
             self.is_first_xp = 0
         else:
@@ -148,8 +163,7 @@ class user_widget(QtWidgets.QFrame):
                 gui_server.custom_popup("You have earned so much experience !", 'Congratulation', ressources._yellow_item_icon_)
             self.is_first_xp = 1
 
-        user_rows = repository.get_users_list_by_deaths_order()
-        if user_row['id'] != user_rows[0]['id']:
+        if user_row['id'] != deaths_dic[sorted(list(deaths_dic.keys()))[-1]]:
             self.deaths_item_label.setVisible(0)
             self.is_first_deaths = 0
         else:
@@ -158,8 +172,7 @@ class user_widget(QtWidgets.QFrame):
                 gui_server.custom_popup("You are the one who die the most !", 'Try to comment your work more often', ressources._skull_item_icon_)
             self.is_first_deaths = 1
 
-        user_rows = repository.get_users_list_by_comments_count_order()
-        if user_row['id'] != user_rows[0]['id']:
+        if user_row['id'] != comments_dic[sorted(list(comments_dic.keys()))[-1]]:
             self.comment_item_label.setVisible(0)
             self.is_first_comments_count = 0
         else:
@@ -168,8 +181,7 @@ class user_widget(QtWidgets.QFrame):
                 gui_server.custom_popup("You are really good at commenting !", 'Congratulation', ressources._green_item_icon_)
             self.is_first_comments_count = 1
 
-        user_rows = repository.get_users_list_by_work_time_order()
-        if user_row['id'] != user_rows[0]['id']:
+        if user_row['id'] != work_time_dic[sorted(list(work_time_dic.keys()))[-1]]:
             self.worker_item_label.setVisible(0)
             self.is_first_work_time = 0
         else:
@@ -178,8 +190,7 @@ class user_widget(QtWidgets.QFrame):
                 gui_server.custom_popup("You worked so much time !", 'Congratulation', ressources._red_item_icon_)
             self.is_first_work_time = 1
 
-    def crown_check(self, user_row):
-        user_rows = repository.get_users_list()
+    def crown_check(self, user_row, user_rows):
         icon = None
         message = None
         if user_row['id'] == user_rows[0]['id']:

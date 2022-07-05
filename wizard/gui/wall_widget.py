@@ -41,8 +41,16 @@ class wall_widget(QtWidgets.QWidget):
         self.first_refresh = 1
         self.search_thread = search_thread()
         self.build_ui()
+        self.init_users_images()
         self.connect_functions()
         self.get_context()
+
+    def init_users_images(self):
+        self.users_images_dic = dict()
+        for user_row in repository.get_users_list():
+            user_image =  user_row['profile_picture']
+            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
+            self.users_images_dic[user_row['user_name']] = pixmap
 
     def connect_functions(self):
         self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
@@ -196,7 +204,7 @@ class wall_widget(QtWidgets.QWidget):
 
             for event_row in self.event_rows[-event_number:]:
                 if event_row['id'] not in self.event_ids.keys():
-                    event_widget = wall_event_widget(event_row)
+                    event_widget = wall_event_widget(event_row, self.users_images_dic)
                     if event_row['creation_time']-self.last_time > 350:
                         event_widget.add_time()
                     self.wall_scrollArea_layout.addWidget(event_widget)
@@ -273,20 +281,19 @@ class wall_event_widget(QtWidgets.QFrame):
 
     time_out = pyqtSignal(int)
 
-    def __init__(self, event_row, parent=None):
+    def __init__(self, event_row, users_images_dic, parent=None):
         super(wall_event_widget, self).__init__(parent)
 
         self.setObjectName('transparent_widget')
         self.event_row = event_row
+        self.users_images_dic = users_images_dic
         self.time_widget = None
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
     
     def fill_ui(self):
-        profile_image = repository.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
-        self.profile_picture.setPixmap(pm)
+        self.profile_picture.setPixmap(self.users_images_dic[self.event_row['creation_user']])
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         if self.event_row['message'] is not None and self.event_row['message'] != '':
@@ -377,21 +384,15 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_frame.setLayout(self.main_layout)
         self.widget_layout.addWidget(self.event_frame)
 
-        self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(0,0,0,0)
         self.header_layout.setSpacing(6)
-        self.header_widget.setLayout(self.header_layout)
-        self.main_layout.addWidget(self.header_widget)
+        self.main_layout.addLayout(self.header_layout)
 
-        self.profile_subwidget = QtWidgets.QWidget()
-        self.profile_subwidget.setObjectName('transparent_widget')
         self.profile_subwidget_layout = QtWidgets.QVBoxLayout()
         self.profile_subwidget_layout.setContentsMargins(0,0,0,0)
         self.profile_subwidget_layout.setSpacing(0)
-        self.profile_subwidget.setLayout(self.profile_subwidget_layout)
-        self.header_layout.addWidget(self.profile_subwidget)
+        self.header_layout.addLayout(self.profile_subwidget_layout)
 
         self.profile_frame = QtWidgets.QFrame()
         self.profile_frame.setObjectName('wall_profile_frame')
@@ -407,13 +408,10 @@ class wall_event_widget(QtWidgets.QFrame):
 
         self.profile_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
-        self.title_widget = QtWidgets.QWidget()
-        self.title_widget.setObjectName('transparent_widget')
         self.title_layout = QtWidgets.QVBoxLayout()
         self.title_layout.setContentsMargins(0,0,0,0)
         self.title_layout.setSpacing(2)
-        self.title_widget.setLayout(self.title_layout)
-        self.header_layout.addWidget(self.title_widget)
+        self.header_layout.addLayout(self.title_layout)
 
         self.event_title_label = QtWidgets.QLabel()
         self.event_title_label.setWordWrap(True)
@@ -447,13 +445,10 @@ class wall_event_widget(QtWidgets.QFrame):
         self.image_label = QtWidgets.QLabel()
         self.content_layout.addWidget(self.image_label)
 
-        self.buttons_widget = QtWidgets.QWidget()
-        self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(2)
-        self.buttons_widget.setLayout(self.buttons_layout)
-        self.content_layout.addWidget(self.buttons_widget)
+        self.content_layout.addLayout(self.buttons_layout)
 
         self.time_label = QtWidgets.QLabel()
         self.time_label.setObjectName('gray_label')

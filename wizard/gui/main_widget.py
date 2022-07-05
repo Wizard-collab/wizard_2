@@ -350,6 +350,7 @@ class main_widget(QtWidgets.QWidget):
         self.groups_manager_widget.refresh()
         self.project_preferences_widget.refresh()
         self.quotes_manager.refresh()
+        self.championship_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

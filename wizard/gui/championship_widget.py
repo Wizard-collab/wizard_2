@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import time
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -26,7 +27,7 @@ class championship_widget(QtWidgets.QWidget):
         self.refresh()
 
     def build_ui(self):
-
+        self.setObjectName('dark_widget')
         self.setMinimumWidth(1000)
         self.setMinimumHeight(900)
 
@@ -47,6 +48,20 @@ class championship_widget(QtWidgets.QWidget):
         self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time', 'Deaths'])
         self.main_layout.addWidget(self.list_view)
 
+        self.footer_layout = QtWidgets.QHBoxLayout()
+        self.footer_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.addLayout(self.footer_layout)
+
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.footer_layout.addWidget(self.refresh_label)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.time()-start_time), 3))
+        self.refresh_label.setText(f" refresh : {refresh_time}s")
+
     def toggle(self):
         if self.isVisible():
             if not self.isActiveWindow():
@@ -65,30 +80,60 @@ class championship_widget(QtWidgets.QWidget):
         self.user_ids = dict()
 
     def refresh(self):
-        self.clear()
-        all_user_rows = repository.get_users_list()
-        if all_user_rows is not None:
-            for user_row in all_user_rows:
-                if user_row['id'] not in self.user_ids.keys():
-                    item = custom_user_tree_item(user_row, self.list_view.invisibleRootItem())
-                    self.user_ids[user_row['id']] = item
-                else:
-                    item = self.user_ids[user_row['id']]
-                    item.user_row = user_row
-                    item.fill_ui()
+        if self.isVisible():
+            start_time = time.time()
+            all_user_rows = repository.get_users_list()
+            indexes_dic = dict()
+            xp_dic = dict()
+            comments_dic = dict()
+            work_time_dic = dict()
+            deaths_dic = dict()
+            if all_user_rows is not None:
+                user_index = 0
+                for user_row in all_user_rows:
+                    if user_index not in indexes_dic.keys():
+                        indexes_dic[user_index] = user_row['id']
+                    if user_row['total_xp'] not in xp_dic.keys():
+                        xp_dic[user_row['total_xp']] = user_row['id']
+                    if user_row['comments_count'] not in comments_dic.keys():
+                        comments_dic[user_row['comments_count']] = user_row['id']
+                    if user_row['work_time'] not in work_time_dic.keys():
+                        work_time_dic[user_row['work_time']] = user_row['id']
+                    if user_row['deaths'] not in deaths_dic.keys():
+                        deaths_dic[user_row['deaths']] = user_row['id']
+
+                    if user_row['id'] not in self.user_ids.keys():
+                        item = custom_user_tree_item(user_row, self.list_view.invisibleRootItem())
+                        index = self.list_view.invisibleRootItem().indexOfChild(item)
+                        self.list_view.invisibleRootItem().takeChild(index)
+                        self.user_ids[user_row['id']] = item
+                    else:
+                        item = self.user_ids[user_row['id']]
+                        item.user_row = user_row
+                        item.fill_ui()
+                        index = self.list_view.invisibleRootItem().indexOfChild(item)
+                        self.list_view.invisibleRootItem().takeChild(index)
+                    user_index += 1
+
+            for index in indexes_dic.keys():
+                item = self.user_ids[indexes_dic[index]]
+                self.list_view.invisibleRootItem().insertChild(index, item)
+
             self.user_ids[all_user_rows[0]['id']].set_crown(1)
             if len(all_user_rows)>=2:
                 self.user_ids[all_user_rows[1]['id']].set_crown(2)
             if len(all_user_rows)>=3:
                 self.user_ids[all_user_rows[2]['id']].set_crown(3)
-        first_xp_user_id = repository.get_users_list_by_xp_order()[0]['id']
-        self.user_ids[first_xp_user_id].set_xp_item()
-        first_comment_user_id = repository.get_users_list_by_comments_count_order()[0]['id']
-        self.user_ids[first_comment_user_id].set_comment_item()
-        first_worker_user_id = repository.get_users_list_by_work_time_order()[0]['id']
-        self.user_ids[first_worker_user_id].set_work_time_item()
-        first_deaths_user_id = repository.get_users_list_by_deaths_order()[0]['id']
-        self.user_ids[first_deaths_user_id].set_death_item()
+
+            first_xp_user_id = xp_dic[sorted(list(xp_dic.keys()))[-1]]
+            self.user_ids[first_xp_user_id].set_xp_item()
+            first_comment_user_id = comments_dic[sorted(list(comments_dic.keys()))[-1]]
+            self.user_ids[first_comment_user_id].set_comment_item()
+            first_worker_user_id = work_time_dic[sorted(list(work_time_dic.keys()))[-1]]
+            self.user_ids[first_worker_user_id].set_work_time_item()
+            first_deaths_user_id = deaths_dic[sorted(list(deaths_dic.keys()))[-1]]
+            self.user_ids[first_deaths_user_id].set_death_item()
+            self.update_refresh_time(start_time)
 
 class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, user_row, parent=None):
@@ -130,8 +175,12 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.user_row['user_name'])
         self.setIcon(2, QtGui.QIcon())
         self.setText(2, str(self.user_row['level']))
+        self.setIcon(3, QtGui.QIcon())
         self.setText(3, f"{str(self.user_row['total_xp'])}")
+        self.setIcon(4, QtGui.QIcon())
         self.setText(4, f"{str(self.user_row['comments_count'])}")
+        self.setIcon(5, QtGui.QIcon())
         string_time = tools.convert_seconds_to_string_time(float(self.user_row['work_time']))
         self.setText(5, string_time)
+        self.setIcon(6, QtGui.QIcon())
         self.setText(6, f"{str(self.user_row['deaths'])}")
