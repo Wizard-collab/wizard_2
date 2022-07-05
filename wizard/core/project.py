@@ -1125,6 +1125,12 @@ def get_work_versions_by_user(creation_user, column='*'):
                                                         column)
     return versions_rows
 
+def get_all_work_versions(column='*'):
+    work_versions_rows = db_utils.get_rows('project',
+                                                'versions',
+                                                column)
+    return work_versions_rows
+
 def get_last_work_version(work_env_id, column='*'):
     versions_rows = db_utils.get_last_row_by_column_data('project',
                                                         'versions',

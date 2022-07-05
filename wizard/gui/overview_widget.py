@@ -57,6 +57,9 @@ class overview_widget(QtWidgets.QWidget):
         self.vertical_layout_1.addWidget(self.main_progress_widget)
         self.vertical_layout_1.addWidget(self.progress_overview_widget)
 
+        self.project_quickstats_widget = project_quickstats_widget()
+        self.vertical_layout_1.addWidget(self.project_quickstats_widget)
+
         self.vertical_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.vertical_layout_2 = QtWidgets.QVBoxLayout()
@@ -90,7 +93,80 @@ class overview_widget(QtWidgets.QWidget):
             self.main_progress_widget.refresh()
             self.user_progress_widget.refresh()
             self.progress_curves_widget.refresh()
+            self.project_quickstats_widget.refresh()
             self.update_refresh_time(start_time)
+
+class project_quickstats_widget(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(project_quickstats_widget, self).__init__(parent)
+        self.build_ui()
+
+    def build_ui(self):
+        self.setObjectName('round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setSpacing(12)
+        self.setLayout(self.main_layout)
+
+        self.title_label = QtWidgets.QLabel('Project stats')
+        self.title_label.setObjectName('title_label')
+        self.main_layout.addWidget(self.title_label)
+
+        self.grid_layout = QtWidgets.QGridLayout()
+        self.grid_layout.setSpacing(6)
+        self.main_layout.addLayout(self.grid_layout)
+
+        self.assignments_widget = quickstats_widget()
+        self.assignments_widget.description_label.setText("Tasks")
+        self.grid_layout.addWidget(self.assignments_widget, 0, 0)
+
+        self.total_work_time_widget = quickstats_widget()
+        self.total_work_time_widget.description_label.setText("Total work time")
+        self.grid_layout.addWidget(self.total_work_time_widget, 0, 1)
+
+        self.average_work_time_widget = quickstats_widget()
+        self.average_work_time_widget.description_label.setText("Time per asset")
+        self.grid_layout.addWidget(self.average_work_time_widget, 1, 0)
+
+        self.all_versions_widget = quickstats_widget()
+        self.all_versions_widget.description_label.setText("Work versions")
+        self.grid_layout.addWidget(self.all_versions_widget, 1, 1)
+
+        self.all_exports_widget = quickstats_widget()
+        self.all_exports_widget.description_label.setText("Exports")
+        self.grid_layout.addWidget(self.all_exports_widget, 2, 0)
+
+        self.tasks_done_widget = quickstats_widget()
+        self.tasks_done_widget.description_label.setText("Tasks done")
+        self.grid_layout.addWidget(self.tasks_done_widget, 2, 1)
+
+    def refresh(self):
+        stage_rows = project.get_all_stages()
+        all_work_times = []
+        tasks_done = 0
+        total_work_time = 0
+
+        stages_dic = dict()
+
+        for stage_row in stage_rows:
+            if stage_row['domain_id'] != 2:
+                all_work_times.append(stage_row['work_time'])
+                total_work_time += stage_row['work_time']
+                if stage_row['state'] == 'done':
+                    tasks_done+=1
+
+        work_time_mean = statistics.mean(all_work_times)
+        self.assignments_widget.stat_label.setText(f"{len(all_work_times)}")
+        self.total_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
+        self.average_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(work_time_mean)}")
+
+        all_work_versions = project.get_all_work_versions('id')
+        self.all_versions_widget.stat_label.setText(f"{len(all_work_versions)}")
+
+        all_exports = project.get_all_export_versions('id')
+        self.all_exports_widget.stat_label.setText(f"{len(all_exports)}")
+
+        self.tasks_done_widget.stat_label.setText(f"{tasks_done}/{len(all_work_times)}")
 
 class main_progress_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -764,7 +840,10 @@ class progress_overview_widget(QtWidgets.QFrame):
                 main_widget_layout = QtWidgets.QHBoxLayout()
                 main_widget_layout.setContentsMargins(0,0,0,0)
                 main_widget.setLayout(main_widget_layout)
+                main_widget.setVisible(0)
                 domain_stages_widget_layout.addWidget(main_widget)
+                self.stages_dic[stage] = dict()
+                self.stages_dic[stage]['widget'] = main_widget
 
                 icon_label = QtWidgets.QLabel()
                 icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[stage]).pixmap(20))
@@ -778,7 +857,6 @@ class progress_overview_widget(QtWidgets.QFrame):
 
                 progress_label = QtWidgets.QLabel()
                 main_widget_layout.addWidget(progress_label)
-                self.stages_dic[stage] = dict()
                 self.stages_dic[stage]['progress_label'] = progress_label
 
                 progress_bar = gui_utils.QProgressBar()
@@ -816,6 +894,7 @@ class progress_overview_widget(QtWidgets.QFrame):
             mean = statistics.mean(stages_progresses_dic[stage])
             self.stages_dic[stage]['progress_bar'].setValue(mean)
             self.stages_dic[stage]['progress_label'].setText(f"{round(mean, 1)} %")
+            self.stages_dic[stage]['widget'].setVisible(True)
 
         for domain in domains_progresses_dic.keys():
             mean = statistics.mean(domains_progresses_dic[domain])
