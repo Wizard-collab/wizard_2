@@ -301,6 +301,7 @@ class tree_widget(QtWidgets.QFrame):
 
                 stage_item.set_item_widget()
                 self.remove_stage_creation_item(parent_widget)
+            self.stage_ids[row['id']].set_state_indicator(row['state'])
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
@@ -632,7 +633,7 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
                                                 instance_id,
                                                 parent_id)
 
-        self.state_ids = dict()
+        self.state = 'todo'
         
         self.widget = QtWidgets.QWidget()
         self.widget.setStyleSheet('background:transparent;')
@@ -643,22 +644,22 @@ class stage_treeWidgetItem(custom_treeWidgetItem):
         self.widget_layout.addSpacerItem(self.spaceItem)
         self.spaceItem = QtWidgets.QSpacerItem(150,10,QtWidgets.QSizePolicy.Expanding)
         self.widget_layout.addSpacerItem(self.spaceItem)
+        self.state_indicator = indicator(assets_vars._state_colors_dic_['todo'])
+        self.widget_layout.addWidget(self.state_indicator)
 
     def set_item_widget(self):
         self.treeWidget().setItemWidget(self, 0, self.widget)
 
-    def set_state_indicator(self, variant_row):
-        if variant_row['id'] not in self.state_ids.keys():
-            state_indicator = indicator(assets_vars._state_colors_dic_[variant_row['state']])
-            self.widget_layout.addWidget(state_indicator)
-            self.state_ids[variant_row['id']] = state_indicator
-        else:
-            self.state_ids[variant_row['id']].update(assets_vars._state_colors_dic_[variant_row['state']])
-        if variant_row['state'] != 'error':
+    def set_state_indicator(self, state):
+        if state != self.state:
+            self.state_indicator.update(assets_vars._state_colors_dic_[state])
+            self.state = state
+        '''
+        if state != 'error':
             self.state_ids[variant_row['id']].setVisible(0)
         else:
             self.state_ids[variant_row['id']].setVisible(1)
-
+        '''
 class indicator(QtWidgets.QFrame):
     def __init__(self, color):
         super(indicator, self).__init__()

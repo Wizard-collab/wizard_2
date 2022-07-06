@@ -24,6 +24,10 @@ logger = logging.getLogger(__name__)
 class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(production_manager_widget, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Production manager")
+
         self.overview_widget = overview_widget.overview_widget()
         self.production_table_widget = production_table_widget.production_table_widget()
         self.build_ui()
