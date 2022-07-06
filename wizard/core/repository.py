@@ -364,7 +364,6 @@ def get_users_list_by_comments_count_order():
     users_rows = db_utils.get_rows('repository', 'users', order='comments_count DESC;')
     return users_rows
 
-
 def get_user_names_list():
     users_rows = db_utils.get_rows('repository', 'users', 'user_name')
     return users_rows

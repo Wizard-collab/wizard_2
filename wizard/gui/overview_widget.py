@@ -502,7 +502,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.chart.setObjectName('quickstats_widget')
         self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.set_margin(40)
-        self.chart.set_points_thickness(0)
+        self.chart.set_points_thickness(4)
         self.chart.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.chart_layout.addWidget(self.chart)
 

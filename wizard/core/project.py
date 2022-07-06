@@ -1275,7 +1275,7 @@ def add_progress_event(type, name, datas_dic):
     if not db_utils.check_existence_by_multiple_data('project', 
                                     'progress_events',
                                     ('name', 'day'),
-                                    (name, day+hour)):
+                                    (name, day)):
         db_utils.create_row('project',
                                 'progress_events', 
                                 ('creation_time',
@@ -1284,7 +1284,7 @@ def add_progress_event(type, name, datas_dic):
                                     'name',
                                     'datas_dic'),
                                 (time.time(),
-                                    day+hour,
+                                    day,
                                     type,
                                     name,
                                     datas_dic))
