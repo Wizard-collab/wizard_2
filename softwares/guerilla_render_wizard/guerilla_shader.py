@@ -82,8 +82,10 @@ def plug_texturing(namespace, files_list, asset_name, update=False):
         if not update:
             displacement_node.overrideinheritedattr('Normalization',"Affine")
             displacement_node.overrideinheritedattr('Offset',0)
+            displacement_node.overrideinheritedattr('Multiplier', 0.02)
             displacement_node.overrideinheritedattr("RaytraceDisplacement", 0.02)
             displacement_node.overrideinheritedattr("DisplaceAmount", 1)
+            displacement_node.overrideinheritedattr('RaytraceDisplacement', 2)
             displacement_node.State.set("bypass")
 
         plug = get_plug(material_override_node, 'height', dataType='string')
