@@ -375,7 +375,7 @@ def add_work_time(work_env_id, work_time):
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     project.add_stage_work_time(stage_id, work_time)
     project.update_stage_progress(stage_id)
-    asset_tracking.add_work_session_event(variant_id, work_time)
+    asset_tracking.add_work_session_event(stage_id, work_time)
 
 def get_software_id_by_name(software):
     return project.get_software_data_by_name(software, 'id')
@@ -906,12 +906,6 @@ def create_or_get_camera_work_env(work_env_id):
         software_id = project.get_software_data_by_name(software, 'id')
         camera_work_env_id = create_work_env(software_id, camera_default_variant_id)
     return camera_work_env_id
-
-def add_asset_tracking_event(variant_id, event_type, data, comment=''):
-    success = project.add_asset_tracking_event(variant_id, event_type, data, comment)
-    if success:
-        tags.analyse_comment(comment, 'variant', variant_id)
-    return success
 
 def get_default_extension(work_env_id):
     work_env_row = project.get_work_env_data(work_env_id)
