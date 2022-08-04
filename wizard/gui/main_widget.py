@@ -174,6 +174,7 @@ class main_widget(QtWidgets.QWidget):
         self.footer_widget.show_console.connect(self.console_widget.toggle)
         self.footer_widget.show_wall.connect(self.wall_widget.toggle)
         self.footer_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
+        self.footer_widget.show_production_manager.connect(self.production_manager_widget.toggle)
         self.footer_widget.connect_team.connect(self.init_team_client)
         self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
         self.footer_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)

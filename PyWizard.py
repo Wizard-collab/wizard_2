@@ -57,6 +57,7 @@ from wizard.core import environment
 from wizard.core import launch
 from wizard.core import launch_batch
 from wizard.core import db_core
+from wizard.core import hook
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
@@ -135,6 +136,8 @@ communicate_server.start()
 
 softwares_server = launch.softwares_server()
 softwares_server.start()
+
+hook.init_wizard_hook()
 
 console = code.InteractiveConsole()
 console.interact(banner=None, exitmsg=None)

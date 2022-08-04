@@ -58,6 +58,7 @@ from wizard.core import repository
 from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import stats
+from wizard.core import hook
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 
@@ -114,6 +115,7 @@ class app():
                 self.quit()
 
         db_utils.modify_db_name('project', environment.get_project_name())
+        hook.init_wizard_hook()
 
         stats.add_progress_event()
         self.stats_schedule = stats.schedule()

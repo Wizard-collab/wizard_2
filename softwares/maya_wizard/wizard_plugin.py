@@ -17,6 +17,7 @@ from maya_wizard import wizard_export
 from maya_wizard import wizard_tools
 from maya_wizard.export import modeling
 from maya_wizard.export import rigging
+from maya_wizard.export import grooming
 from maya_wizard.export import custom
 from maya_wizard.export import camrig
 from maya_wizard.export import layout
@@ -32,6 +33,8 @@ def export(*args):
         modeling.main()
     elif stage_name == 'rigging':
         rigging.main()
+    elif stage_name == 'grooming':
+        grooming.main()
     elif stage_name == 'custom':
         custom.main()
     elif stage_name == 'camrig':
@@ -57,6 +60,7 @@ def reference_all(*args, **kwargs):
     references = get_references(kwargs)
     reference_modeling(references=references)
     reference_rigging(references=references)
+    reference_grooming(references=references)
     reference_custom(references=references)
     reference_camrig(references=references)
     reference_layout(references=references)
@@ -68,6 +72,7 @@ def update_all(*args, **kwargs):
     references = get_references(kwargs)
     update_modeling(references=references)
     update_rigging(references=references)
+    update_grooming(references=references)
     update_custom(references=references)
     update_camrig(references=references)
     update_layout(references=references)
@@ -98,6 +103,18 @@ def update_rigging(*args, **kwargs):
     if 'rigging' in references.keys():
         for reference in references['rigging']:
             wizard_reference.update_rigging(reference['namespace'], reference['files'])
+
+def reference_grooming(*args, **kwargs):
+    references = get_references(kwargs)
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.reference_grooming(reference['namespace'], reference['files'])
+
+def update_grooming(*args, **kwargs):
+    references = get_references(kwargs)
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.update_grooming(reference['namespace'], reference['files'])
 
 def reference_custom(*args, **kwargs):
     references = get_references(kwargs)

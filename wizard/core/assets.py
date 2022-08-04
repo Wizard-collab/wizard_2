@@ -213,7 +213,6 @@ def get_stage_data_from_work_env_id(work_env_id, column='*'):
     else:
         return None
 
-
 def get_domain_data_from_work_env_id(work_env_id, column='*'):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     stage_id = project.get_variant_data(variant_id, 'stage_id')

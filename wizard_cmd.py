@@ -13,6 +13,7 @@ from wizard.core import custom_logger
 from wizard.core import db_core
 from wizard.core import communicate
 from wizard.core import launch
+from wizard.core import hook
 from wizard.core import launch_batch
 
 custom_logger.get_root_logger()
@@ -82,6 +83,8 @@ communicate_server.start()
 
 softwares_server = launch.softwares_server()
 softwares_server.start()
+
+hook.init_wizard_hook()
 
 if args.team_dns:
 	environment.set_team_dns(args.team_dns)

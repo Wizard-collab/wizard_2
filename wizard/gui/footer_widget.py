@@ -24,6 +24,7 @@ class footer_widget(QtWidgets.QFrame):
     show_console = pyqtSignal(int)
     show_wall = pyqtSignal(int)
     show_subtask_manager = pyqtSignal(int)
+    show_production_manager = pyqtSignal(int)
     connect_team = pyqtSignal(int)
     show_team_widget = pyqtSignal(int)
     show_user_preferences = pyqtSignal(int)
@@ -116,6 +117,12 @@ class footer_widget(QtWidgets.QFrame):
         self.task_manager_button.setIcon(QtGui.QIcon(ressources._tasks_icon_))
         self.buttons_layout.addWidget(self.task_manager_button)
 
+        self.production_manager_button = QtWidgets.QPushButton()
+        self.production_manager_button.setFixedSize(QtCore.QSize(30, 30))
+        gui_utils.application_tooltip(self.production_manager_button, "Show production manager")
+        self.production_manager_button.setIcon(QtGui.QIcon(ressources._production_manager_icon_))
+        self.buttons_layout.addWidget(self.production_manager_button)
+
         self.console_button = QtWidgets.QPushButton()
         self.console_button.setFixedSize(QtCore.QSize(30, 30))
         gui_utils.application_tooltip(self.console_button, "Show console")
@@ -143,6 +150,7 @@ class footer_widget(QtWidgets.QFrame):
         self.console_button.clicked.connect(self.show_console.emit)
         self.wall_button.clicked.connect(self.show_wall.emit)
         self.task_manager_button.clicked.connect(self.show_subtask_manager.emit)
+        self.production_manager_button.clicked.connect(self.show_production_manager.emit)
         self.team_connection_button.clicked.connect(self.connect_team.emit)
         self.team_connection_button.clicked.connect(self.show_team_widget.emit)
         self.settings_button.clicked.connect(self.show_user_preferences.emit)

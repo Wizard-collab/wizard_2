@@ -58,6 +58,24 @@ def update_rigging(namespace, files_list):
                                     namespace,
                                     wizard_tools.get_new_objects(old_objects))
 
+def reference_grooming(namespace, files_list):
+    old_objects = pm.ls()
+    if not pm.namespace(exists=namespace):
+        create_reference(files_list[0], namespace, 'GROOMING')
+        trigger_after_reference_hook('grooming',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
+def update_grooming(namespace, files_list):
+    old_objects = pm.ls()
+    if pm.namespace(exists=namespace):
+        update_reference(namespace, files_list)
+        trigger_after_reference_hook('grooming',
+                                    files_list,
+                                    namespace,
+                                    wizard_tools.get_new_objects(old_objects))
+
 def reference_custom(namespace, files_list):
     old_objects = pm.ls()
     if not pm.namespace(exists=namespace):
