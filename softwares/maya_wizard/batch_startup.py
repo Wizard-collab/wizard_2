@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from maya_wizard import wizard_plugin
 from maya_wizard.export import modeling
 from maya_wizard.export import rigging
+from maya_wizard.export import grooming
 from maya_wizard.export import custom
 from maya_wizard.export import camrig
 from maya_wizard.export import layout
@@ -34,6 +35,8 @@ if 'wizard_json_settings'.upper() in os.environ.keys():
         modeling.main()
     elif stage_name == 'rigging':
         rigging.main()
+    elif stage_name == 'grooming':
+        grooming.main()
     elif stage_name == 'custom':
         custom.main()
     elif stage_name == 'camrig':

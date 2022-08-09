@@ -906,6 +906,12 @@ def create_or_get_camera_work_env(work_env_id):
         camera_work_env_id = create_work_env(software_id, camera_default_variant_id)
     return camera_work_env_id
 
+def add_asset_tracking_event(stage_id, event_type, data, comment=''):
+    success = project.add_asset_tracking_event(stage_id, event_type, data, comment)
+    if success:
+        tags.analyse_comment(comment, 'stage', stage_id)
+    return success
+
 def get_default_extension(work_env_id):
     work_env_row = project.get_work_env_data(work_env_id)
     variant_row = project.get_variant_data(work_env_row['variant_id'])
