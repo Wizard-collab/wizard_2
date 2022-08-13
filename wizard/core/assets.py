@@ -1074,7 +1074,7 @@ def build_namespace(export_version_id):
     domain_row = project.get_domain_data(category_row['domain_id'])
     namespace = f"{category_row['name']}" 
     namespace += f"_{asset_row['name']}" 
-    if stage_row['name'] == 'animation':
+    if stage_row['name'] == 'animation' or stage_row['name'] == 'cfx':
         namespace += f"_{export_row['name']}"
     namespace += f"_{stage_row['name'][:3]}"
     return namespace

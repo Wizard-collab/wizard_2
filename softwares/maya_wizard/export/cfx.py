@@ -40,7 +40,6 @@ def main_fur(nspace_list, frange):
             logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
     else:
         logger.warning("No grooming references found in wizard description")
-    
 
 def invoke_settings_widget():
     from PySide2 import QtWidgets, QtCore, QtGui

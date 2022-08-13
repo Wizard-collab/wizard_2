@@ -95,3 +95,12 @@ def save_increment():
         os.environ['wizard_version_id'] = str(version_id)
     else:
         logger.warning("Can't save increment")
+
+def get_fur_nodes_files(files_list):
+    nodes_list = []
+    for file in files_list:
+        if file.endswith('.fur'):
+            file = file.replace(file.split('.')[-2]+'.fur', '%04d.fur')
+            if file not in nodes_list:
+                nodes_list.append(file)
+    return nodes_list

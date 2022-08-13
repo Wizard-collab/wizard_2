@@ -18,6 +18,7 @@ from maya_wizard.export import custom
 from maya_wizard.export import camrig
 from maya_wizard.export import layout
 from maya_wizard.export import animation
+from maya_wizard.export import cfx
 from maya_wizard.export import camera
 
 # read_settings
@@ -45,6 +46,9 @@ if 'wizard_json_settings'.upper() in os.environ.keys():
         layout.main()
     elif stage_name == 'animation':
         animation.main(nspace_list=nspace_list,
+                            frange=frange)
+    elif stage_name == 'cfx':
+        cfx.main(nspace_list=nspace_list,
                             frange=frange)
     elif stage_name == 'camera':
         camera.main(nspace_list=nspace_list,

@@ -97,6 +97,8 @@ def import_file(namespace, files_list, parent_GRP_name, stage_name):
             create_ref(namespace, files_list, GRP)
         elif extension == 'gnode':
             merge(namespace, files_list, GRP)
+        elif extension == 'fur':
+            create_or_update_yeti_nodes(namespace, files_list, GRP)
         trigger_after_reference_hook(stage_name,
                                         files_list,
                                         namespace,
@@ -111,6 +113,8 @@ def update_file(namespace, files_list, parent_GRP_name, stage_name):
             update_ref(namespace, files_list, GRP)
         elif extension == 'gnode':
             update_merge(namespace, files_list, GRP)
+        elif extension == 'fur':
+            create_or_update_yeti_nodes(namespace, files_list, GRP)
         trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
@@ -119,6 +123,12 @@ def update_file(namespace, files_list, parent_GRP_name, stage_name):
 def create_ref(namespace, files_list, GRP):
     with Modifier() as mod:
         refNode, topNodes = mod.createref(namespace, files_list[0], GRP)
+
+def update_ref(namespace, files_list, GRP):
+    refNode = wizard_tools.get_node_from_name(namespace)
+    with Modifier() as mod:
+        refNode.ReferenceFileName.set(files_list[0])
+        refNode.reload(files_list[0])
 
 def merge(namespace, files_list, GRP):
     new_node = Document().loadfile(files_list[0])[0]
@@ -130,11 +140,20 @@ def update_merge(namespace, files_list, GRP):
         wizard_tools.get_node_from_name(namespace).delete()
         merge(namespace, files_list, GRP)
 
-def update_ref(namespace, files_list, GRP):
-    refNode = wizard_tools.get_node_from_name(namespace)
-    with Modifier() as mod:
-        refNode.ReferenceFileName.set(files_list[0])
-        refNode.reload(files_list[0])
+def create_or_update_yeti_nodes(namespace, files_list, GRP):
+    fur_nodes_files = wizard_tools.get_fur_nodes_files(files_list)
+    for fur_node_file in fur_nodes_files:
+        with Modifier() as mod:
+            namespace_GRP = wizard_tools.add_GRP(namespace, GRP)
+            fur_name = os.path.basename(fur_node_file).split('.')[-3]
+            node_name = '{0}:{1}'.format(namespace, fur_name)
+            if node_name not in wizard_tools.get_all_nodes():
+                yeti_node = mod.createnode(node_name, "Yeti", namespace_GRP)
+                yeti_node.HierarchyMode.set(2)
+                yeti_node.Membership.set(fur_name)
+            else:
+                yeti_node = wizard_tools.get_node_from_name(node_name)
+            yeti_node.File.set(fur_node_file)
 
 def append_wizardTags_to_guerillaTags(namespace):
     refNode = wizard_tools.get_node_from_name(namespace)
