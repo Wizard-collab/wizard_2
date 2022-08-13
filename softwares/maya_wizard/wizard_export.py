@@ -68,7 +68,7 @@ def export_fur(export_GRP_list, export_file, frange, percent_factor):
         file = os.path.join(export_directory, '{}.%04d.fur'.format(node_name))
         pm.select(yeti_node, r=True)
         cmds.pgYetiCommand(writeCache=file, range=(frange[0], frange[-1]), samples=3, sampleTimes= "-0.2 0.0 0.2")
-
+        
         #current_percent = float(percent) + (100.0/int(len_nspacelist))/2
         #print('percent:{}'.format(current_percent))
 

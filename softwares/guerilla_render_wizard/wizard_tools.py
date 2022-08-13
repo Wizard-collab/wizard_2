@@ -104,3 +104,16 @@ def get_fur_nodes_files(files_list):
             if file not in nodes_list:
                 nodes_list.append(file)
     return nodes_list
+
+def get_tags_for_yeti_node(namespace, node_name):
+    tags = [node_name]
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    for stage in references.keys():
+        for reference in references[stage]:
+            if reference['namespace'] == namespace:
+                asset_name = reference['asset_name']
+                category_name = reference['category_name']
+                tags.append("{0}_{1}".format(category_name, asset_name))
+                tags.append(category_name)
+                break
+    return tags
