@@ -36,3 +36,4 @@ def yeti_after_export(stage_name, export_dir):
             fur_file = '{}/{}.fur'.format(export_dir, yeti_node)
             logging.info("Exporting {}...".format(fur_file))
             cmds.pgYetiCommand(yeti_node, writeCache=fur_file, range=(0,0), samples=1)
+        
