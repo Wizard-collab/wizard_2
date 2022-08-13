@@ -30,6 +30,20 @@ def update_modeling(namespace, files_list):
     update_file(namespace, files_list, 'MODELING', 'modeling')
     append_wizardTags_to_guerillaTags(namespace)
 
+def reference_grooming(namespace, files_list):
+    trigger_after_reference_hook('grooming',
+                                    files_list,
+                                    namespace,
+                                    [])
+    append_wizardTags_to_guerillaTags(namespace)
+
+def update_grooming(namespace, files_list):
+    trigger_after_reference_hook('grooming',
+                                    files_list,
+                                    namespace,
+                                    [])
+    append_wizardTags_to_guerillaTags(namespace)
+
 def reference_shading(namespace, files_list):
     import_file(namespace, files_list, 'SHADING', 'shading')
 

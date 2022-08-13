@@ -48,6 +48,7 @@ def reference_all(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     import_modeling(references)
+    import_grooming(references)
     import_texturing(references)
     import_shading(references)
     import_custom(references)
@@ -60,6 +61,7 @@ def update_all(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     update_modeling(references)
+    update_grooming(references)
     update_texturing(references)
     update_shading(references)
     update_custom(references)
@@ -81,6 +83,20 @@ def update_modeling(references=None):
     if 'modeling' in references.keys():
         for reference in references['modeling']:
             wizard_reference.update_modeling(reference['namespace'], reference['files'])
+
+def import_grooming(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.reference_grooming(reference['namespace'], reference['files'])
+
+def update_grooming(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.update_grooming(reference['namespace'], reference['files'])
 
 def import_texturing(references=None):
     if not references:
