@@ -36,17 +36,25 @@ def after_export(stage_name, export_dir):
 		file as string '''
 	pass
 
-def after_reference(stage_name, referenced_stage_name, new_objects):
+def after_reference(stage_name, 
+						referenced_stage_name, 
+						referenced_files_dir,
+						namespace, 
+ 						new_objects):
 	''' This function is triggered
-		before the import
+		after referencing from wizard
 
 		The "stage_name" argument is the name
 		of the exported stage
 
-		The "referenced_stage" argument is the name
+		The "referenced_stage_name" argument is the name
 		of the referenced stage
+
+		The "referenced_files_dir" argument is the directory where the
+		referenced files comes from
+
+		The "namespace" argument is the namespace of the reference
 
 		The "new_objects" argument is a list of the new objects added
 		to the current scene after the reference '''
 	pass
-	

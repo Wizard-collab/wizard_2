@@ -18,7 +18,6 @@ import wizard_communicate
 from maya_wizard import wizard_tools
 
 def export(stage_name, export_name, export_GRP_list, frange=[0,0], custom_work_env_id = None, percent_factor=(0,1)):
-    reload(maya_hook)
     if trigger_sanity_hook(stage_name):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
