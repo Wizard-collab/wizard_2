@@ -6,6 +6,7 @@
 import bpy
 
 # Wizard modules
+import wizard_hooks
 from blender_wizard import redshift_shader
 from blender_wizard import cycles_shader
 from blender_wizard import wizard_tools
@@ -16,13 +17,6 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
-# Hook modules
-try:
-    import blender_hook
-except:
-    blender_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import blender_hook")
 
 def reference_texturing(namespace, files_list):
     old_objects = wizard_tools.get_all_nodes()
@@ -64,16 +58,10 @@ def trigger_after_reference_hook(referenced_stage_name,
                                     new_objects):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
-    # Trigger the after export hook
-    if blender_hook:
-        try:
-            logger.info("Trigger after reference hook")
-            blender_hook.after_reference(stage_name,
-                                        referenced_stage_name,
-                                        referenced_files_dir,
-                                        namespace,
-                                        new_objects)
-        except:
-            logger.info("Can't trigger after reference hook")
-            logger.error(str(traceback.format_exc()))
+    wizard_hooks.after_reference_hooks('blender',
+                                stage_name,
+                                referenced_stage_name,
+                                referenced_files_dir,
+                                namespace,
+                                new_objects)
 

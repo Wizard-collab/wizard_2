@@ -132,3 +132,15 @@ def get_file(version_id):
     signal_dic['version_id'] = version_id
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
+
+def get_hooks_folder():
+    signal_dic=dict()
+    signal_dic['function'] = 'get_hooks_folder'
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+
+def get_plugins_folder():
+    signal_dic=dict()
+    signal_dic['function'] = 'get_plugins_folder'
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned

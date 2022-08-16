@@ -1637,6 +1637,10 @@ def get_hooks_folder():
     hooks_folder = path_utils.join(environment.get_project_path(), project_vars._hooks_folder_)
     return hooks_folder
 
+def get_plugins_folder():
+    plugins_folder = path_utils.join(environment.get_project_path(), project_vars._plugins_folder_)
+    return plugins_folder
+
 def get_temp_scripts_folder():
     shared_files_folder = path_utils.join(environment.get_project_path(), project_vars._scripts_folder_, 'temp')
     if not os.path.isdir(shared_files_folder):

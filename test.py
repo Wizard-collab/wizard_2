@@ -1,39 +1,19 @@
-from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5 import QtCore
+import os
+import importlib.util
 import sys
 
-class Window(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(Window, self).__init__(parent)
-        self.resize(800,800)
-        self.pies_list = []
 
-    def add_pie(self, percent_factor=0, color='gray'):
-        self.pies_list.append([percent_factor, color])
+modules = os.listdir('modules_test')
+print(modules)
 
-    def paintEvent(self, event):
-        # Define area
-        rectangle = QtCore.QRectF(0,0,self.width(), self.height())
-        last_angle = 0
+for module in modules:
+	if module.endswith('.py'):
+		MODULE_NAME = 'modules.'+module.split('.py')[0]
+		MODULE_PATH = "modules_test/{0}".format(module)
+		spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
+		module = importlib.util.module_from_spec(spec)
+		sys.modules[spec.name] = module 
+		spec.loader.exec_module(module)
 
-        painter = QtGui.QPainter(self)
-
-        for pie in self.pies_list:
-            painter.setPen(QtGui.QPen(QtGui.QColor('transparent'), 0))
-            painter.setBrush(QtGui.QBrush(QtGui.QColor(pie[1]), QtCore.Qt.SolidPattern))
-            painter.setRenderHint(QtGui.QPainter.Antialiasing)
-            painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
-            angle = 360*pie[0]/100
-            spanAngle = int(angle*16)
-            painter.drawPie(rectangle, last_angle, spanAngle)
-            last_angle = spanAngle
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    main_win = Window()
-    main_win.add_pie(30, 'blue')
-    main_win.add_pie(70, 'red')
-    main_win.show()
-    sys.exit(app.exec())
+sys.modules['modules.b'].caca()
+print(sys.modules)

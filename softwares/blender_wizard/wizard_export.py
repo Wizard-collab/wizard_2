@@ -14,15 +14,8 @@ import bpy
 
 # Wizard modules
 import wizard_communicate
+import wizard_hooks
 from blender_wizard import wizard_tools
-
-# Hook modules
-try:
-    import blender_hook
-except:
-    blender_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import blender_hook")
 
 def export(stage_name, export_name, export_GRP_list):
     if trigger_sanity_hook(stage_name):
@@ -56,48 +49,17 @@ def save_or_save_increment():
     return scene
 
 def trigger_sanity_hook(stage_name):
-    # Trigger the before export hook
-    if blender_hook:
-        try:
-            logger.info("Trigger sanity hook")
-            sanity = blender_hook.sanity(stage_name)
-            if not sanity:
-                logger.info("Exporting cancelled due to sanity hook")
-            return sanity
-        except:
-            logger.info("Can't trigger sanity hook")
-            logger.error(str(traceback.format_exc()))
-            return True
-    else:
-        return True
+    return wizard_hooks.sanity_hooks('blender', stage_name)
 
 def trigger_before_export_hook(stage_name):
-    # Trigger the before export hook
-    if blender_hook:
-        try:
-            additionnal_objects = []
-            logger.info("Trigger before export hook")
-            objects = blender_hook.before_export(stage_name)
-            if type(objects) is list:
-                for object in objects:
-                    if wizard_tools.check_obj_list_existence([object]):
-                        additionnal_objects.append(bpy.context.scene.objects.get(object))
-                    else:
-                        logger.warning("{} doesn't exists".format(object))
-            else:
-                logger.warning("The before export hook should return an object list")
-            return additionnal_objects
-        except:
-            logger.info("Can't trigger before export hook")
-            logger.error(str(traceback.format_exc()))
-            return []
+    additionnal_objects = []
+    nodes = wizard_hooks.before_export_hooks('blender', stage_name)
+    for node in nodes:
+        if wizard_tools.check_obj_list_existence([node]):
+            additionnal_objects.append(bpy.data.objects[node])
+        else:
+            logger.warning("{} doesn't exists".format(node))
+    return additionnal_objects
 
 def trigger_after_export_hook(stage_name, export_dir):
-    # Trigger the after export hook
-    if blender_hook:
-        try:
-            logger.info("Trigger after export hook")
-            blender_hook.after_export(stage_name, export_dir)
-        except:
-            logger.info("Can't trigger after export hook")
-            logger.error(str(traceback.format_exc()))
+    wizard_hooks.after_export_hooks('blender', stage_name, export_dir)

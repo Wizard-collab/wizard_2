@@ -12,16 +12,9 @@ logger = logging.getLogger(__name__)
 import nuke
 
 # Wizard modules
+import wizard_hooks
 import wizard_communicate
 from nuke_wizard import wizard_tools
-
-# Hook modules
-try:
-    import nuke_hook
-except:
-    nuke_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import nuke_hook")
 
 def export(stage_name, export_name, frange=[0,0], custom_work_env_id = None):
     if trigger_sanity_hook(stage_name):
@@ -80,36 +73,11 @@ def export_nk(export_file, frange):
     nuke.scriptSaveAs(export_file)
 
 def trigger_sanity_hook(stage_name):
-    # Trigger the before export hook
-    if nuke_hook:
-        try:
-            logger.info("Trigger sanity hook")
-            sanity = nuke_hook.sanity(stage_name)
-            if not sanity:
-                logger.info("Exporting cancelled due to sanity hook")
-            return sanity
-        except:
-            logger.info("Can't trigger sanity hook")
-            logger.error(str(traceback.format_exc()))
-            return True
-    else:
-        return True
+    return wizard_hooks.sanity_hooks('nuke', stage_name)
 
 def trigger_before_export_hook(stage_name):
-    # Trigger the before export hook
-    if nuke_hook:
-        try:
-            logger.info("Trigger before export hook")
-        except:
-            logger.info("Can't trigger before export hook")
-            logger.error(str(traceback.format_exc()))
+    wizard_hooks.before_export_hooks('nuke', stage_name)
+    logger.warning("Ignoring additionnal objects from before export hooks. ( Wizard/Nuke exception )")
 
 def trigger_after_export_hook(stage_name, export_dir):
-    # Trigger the after export hook
-    if nuke_hook:
-        try:
-            logger.info("Trigger after export hook")
-            nuke_hook.after_export(stage_name, export_dir)
-        except:
-            logger.info("Can't trigger after export hook")
-            logger.error(str(traceback.format_exc()))
+    wizard_hooks.after_export_hooks('nuke', stage_name, export_dir)

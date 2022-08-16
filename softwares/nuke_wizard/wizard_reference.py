@@ -9,18 +9,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
+import wizard_hooks
 from nuke_wizard import wizard_tools
 
 # Nuke modules
 import nuke
-
-# Hook modules
-try:
-    import nuke_hook
-except:
-    nuke_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import nuke_hook")
 
 def reference_custom(namespace, files_list):
     import_from_extension(namespace, files_list, 'custom')
@@ -150,15 +143,9 @@ def trigger_after_reference_hook(referenced_stage_name,
                                     new_objects):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
-    # Trigger the after reference hook
-    if nuke_hook:
-        try:
-            logger.info("Trigger after reference hook")
-            nuke_hook.after_reference(stage_name,
-                                        referenced_stage_name,
-                                        referenced_files_dir,
-                                        namespace,
-                                        new_objects)
-        except:
-            logger.info("Can't trigger after reference hook")
-            logger.error(str(traceback.format_exc()))
+    wizard_hooks.after_reference_hooks('nuke',
+                                stage_name,
+                                referenced_stage_name,
+                                referenced_files_dir,
+                                namespace,
+                                new_objects)

@@ -9,18 +9,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
+import wizard_hooks
 from maya_wizard import wizard_tools
 
 # Maya modules
 import pymel.core as pm
-
-# Hook modules
-try:
-    import maya_hook
-except:
-    maya_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import maya_hook")
 
 def reference_modeling(namespace, files_list):
     old_objects = pm.ls()
@@ -208,17 +201,10 @@ def trigger_after_reference_hook(referenced_stage_name,
                                     new_objects):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
-    # Trigger the after export hook
-    if maya_hook:
-        try:
-            logger.info("Trigger after reference hook")
-            maya_hook.after_reference(stage_name,
-                                        referenced_stage_name,
-                                        referenced_files_dir,
-                                        namespace,
-                                        new_objects)
-        except:
-            logger.info("Can't trigger after reference hook")
-            logger.error(str(traceback.format_exc()))
-
+    wizard_hooks.after_reference_hooks('maya',
+                                stage_name,
+                                referenced_stage_name,
+                                referenced_files_dir,
+                                namespace,
+                                new_objects)
     

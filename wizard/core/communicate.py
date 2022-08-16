@@ -118,6 +118,10 @@ class communicate_server(Thread):
                                                     signal_dic['namespaces_list'])
         elif signal_dic['function'] == 'create_or_get_camera_work_env':
             returned = create_or_get_camera_work_env(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'get_hooks_folder':
+            returned = project.get_hooks_folder()
+        elif signal_dic['function'] == 'get_plugins_folder':
+            returned = project.get_plugins_folder()
 
         socket_utils.send_signal_with_conn(conn, returned)
 

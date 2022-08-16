@@ -9,18 +9,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
+import wizard_hooks
 from guerilla_render_wizard import wizard_tools
 
 # Guerilla modules
 from guerilla import Document, Modifier, pynode, Node, Plug
-
-# Hook modules
-try:
-    import guerilla_render_hook
-except:
-    guerilla_render_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import guerilla_render_hook")
 
 def reference_modeling(namespace, files_list):
     import_file(namespace, files_list, 'MODELING', 'modeling')
@@ -175,15 +168,10 @@ def trigger_after_reference_hook(referenced_stage_name,
                                     new_objects):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
-    # Trigger the after export hook
-    if guerilla_render_hook:
-        try:
-            logger.info("Trigger after reference hook")
-            guerilla_render_hook.after_reference(stage_name,
-                                        referenced_stage_name,
-                                        referenced_files_dir,
-                                        namespace,
-                                        new_objects)
-        except:
-            logger.info("Can't trigger after reference hook")
-            logger.error(str(traceback.format_exc()))
+    wizard_hooks.after_reference_hooks('guerilla_render',
+                                stage_name,
+                                referenced_stage_name,
+                                referenced_files_dir,
+                                namespace,
+                                new_objects)
+    

@@ -128,6 +128,7 @@ def init_project(project_name,
         tools.create_folder(project.get_shared_files_folder())
         tools.create_folder(project.get_scripts_folder())
         tools.create_folder(project.get_hooks_folder())
+        tools.create_folder(project.get_plugins_folder())
 
         init_hooks()
 

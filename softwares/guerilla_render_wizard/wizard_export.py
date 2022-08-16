@@ -14,15 +14,8 @@ from guerilla import Document, pynode
 
 # Wizard modules
 import wizard_communicate
+import wizard_hooks
 from guerilla_render_wizard import wizard_tools
-
-# Hook modules
-try:
-    import guerilla_render_hook
-except:
-    guerilla_render_hook = None
-    logger.error(str(traceback.format_exc()))
-    logger.warning("Can't import guerilla_render_hook")
 
 def __init__():
     pass
@@ -83,49 +76,17 @@ def save_or_save_increment():
     return scene
 
 def trigger_sanity_hook(stage_name):
-    # Trigger the before export hook
-    if guerilla_render_hook:
-        try:
-            logger.info("Trigger sanity hook")
-            sanity = guerilla_render_hook.sanity(stage_name)
-            if not sanity:
-                logger.info("Exporting cancelled due to sanity hook")
-            return sanity
-        except:
-            logger.info("Can't trigger sanity hook")
-            logger.error(str(traceback.format_exc()))
-            return True
-    else:
-        return True
+    return wizard_hooks.sanity_hooks('guerilla_render', stage_name)
 
 def trigger_before_export_hook(stage_name):
-    # Trigger the before export hook
-    if guerilla_render_hook:
-        try:
-            additionnal_objects = []
-            logger.info("Trigger before export hook")
-            objects = guerilla_render_hook.before_export(stage_name)
-            if type(objects) is list:
-                for object in objects:
-                    if wizard_tools.node_exists(object):
-                        additionnal_objects.append(object)
-                    else:
-                        logger.warning("{0} doesn't exists".format(object))
-            else:
-                logger.warning("The before export hook should return an object list")
-            return additionnal_objects
-        except:
-            logger.info("Can't trigger before export hook")
-            logger.error(str(traceback.format_exc()))
-            return []
+    additionnal_objects = []
+    nodes = wizard_hooks.before_export_hooks('guerilla_render', stage_name)
+    for node in nodes:
+        if wizard_tools.node_exists(node):
+            additionnal_objects.append(node)
+        else:
+            logger.warning("{0} doesn't exists".format(node))
+    return additionnal_objects
 
 def trigger_after_export_hook(stage_name, export_dir):
-    # Trigger the after export hook
-    if guerilla_render_hook:
-        try:
-            logger.info("Trigger after export hook")
-            guerilla_render_hook.after_export(stage_name, export_dir)
-        except:
-            logger.info("Can't trigger after export hook")
-            logger.error(str(traceback.format_exc()))
-
+    wizard_hooks.after_export_hooks('guerilla_render', stage_name, export_dir)
