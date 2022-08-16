@@ -1,1 +1,0 @@
-print('a.py module imported')
