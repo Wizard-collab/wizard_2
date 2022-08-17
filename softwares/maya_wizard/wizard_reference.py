@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_hooks
+import wizard_communicate
 from maya_wizard import wizard_tools
 
 # Maya modules
@@ -201,10 +202,12 @@ def trigger_after_reference_hook(referenced_stage_name,
                                     new_objects):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
     wizard_hooks.after_reference_hooks('maya',
                                 stage_name,
                                 referenced_stage_name,
                                 referenced_files_dir,
                                 namespace,
-                                new_objects)
+                                new_objects,
+                                string_asset)
     

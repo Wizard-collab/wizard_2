@@ -50,15 +50,16 @@ def export_animation(rigging_reference, frange, percent_factor):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
+    exported_string_asset = rigging_reference['string_variant']
     count = rigging_reference['count']
     if is_referenced(rig_nspace):
         export_GRP_list = get_objects_to_export(rig_nspace)
         if export_GRP_list:
             logger.info("Exporting {}".format(rig_nspace))
-            additionnal_objects = wizard_export.trigger_before_export_hook('animation')
+            additionnal_objects = wizard_export.trigger_before_export_hook('animation', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
-            wizard_export.export('animation', export_name, export_GRP_list, frange, percent_factor=percent_factor)
+            wizard_export.export('animation', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(rig_nspace))
 

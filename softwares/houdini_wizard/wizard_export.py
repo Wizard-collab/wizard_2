@@ -16,8 +16,8 @@ import wizard_hooks
 import wizard_communicate
 from houdini_wizard import wizard_tools
 
-def export(stage_name, export_name, out_node, frange=[0,0], custom_work_env_id = None, parent=None):
-    if trigger_sanity_hook(stage_name):
+def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0], custom_work_env_id = None, parent=None):
+    if trigger_sanity_hook(stage_name, exported_string_asset):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
         else:
@@ -34,7 +34,7 @@ def export(stage_name, export_name, out_node, frange=[0,0], custom_work_env_id =
                                                     [export_file],
                                                     work_env_id,
                                                     int(os.environ['wizard_version_id']))
-        trigger_after_export_hook(stage_name, export_dir)
+        trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def export_by_extension(export_file, frange, out_node, parent):
     if export_file.endswith('.hip'):
@@ -97,13 +97,16 @@ def export_vdb(export_dir, frange, out_node, parent):
     else:
         logger.warning(f'"{out_node}" node not found')
 
-def trigger_sanity_hook(stage_name):
-    return wizard_hooks.sanity_hooks('houdini', stage_name)
+def trigger_sanity_hook(stage_name, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    return wizard_hooks.sanity_hooks('houdini', stage_name, string_asset, exported_string_asset)
 
-def trigger_before_export_hook(stage_name):
-    wizard_hooks.before_export_hooks('houdini', stage_name)
+def trigger_before_export_hook(stage_name, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    wizard_hooks.before_export_hooks('houdini', stage_name, string_asset, exported_string_asset)
     logger.warning("Ignoring additionnal objects from before export hooks. ( Wizard/Houdini exception )")
 
-def trigger_after_export_hook(stage_name, export_dir):
-    wizard_hooks.after_export_hooks('houdini', stage_name, export_dir)
+def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    wizard_hooks.after_export_hooks('houdini', stage_name, export_dir, string_asset, exported_string_asset)
 

@@ -481,6 +481,7 @@ def get_references_files(work_env_id):
         variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
         variant_row = project.get_variant_data(variant_id)
         variant_name = variant_row['name']
+        string_variant = variant_row['string']
         asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
         asset_row = project.get_asset_data(asset_id)
         asset_name = asset_row['name']
@@ -492,6 +493,7 @@ def get_references_files(work_env_id):
         reference_dic['category_name'] = category_name
         reference_dic['asset_name'] = asset_name
         reference_dic['variant_name'] = variant_name
+        reference_dic['string_variant'] = string_variant
         if reference_row['stage'] not in references_dic.keys():
             references_dic[reference_row['stage']] = []
         references_dic[reference_row['stage']].append(reference_dic)
@@ -505,6 +507,7 @@ def get_references_files(work_env_id):
             variant_id = project.get_export_data(grouped_reference_row['export_id'], 'variant_id')
             variant_row = project.get_variant_data(variant_id)
             variant_name = variant_row['name']
+            string_variant = variant_row['string']
             asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
             asset_row = project.get_asset_data(asset_id)
             asset_name = asset_row['name']
@@ -516,6 +519,7 @@ def get_references_files(work_env_id):
             reference_dic['category_name'] = category_name
             reference_dic['asset_name'] = asset_name
             reference_dic['variant_name'] = variant_name
+            reference_dic['string_variant'] = string_variant
             if grouped_reference_row['stage'] not in references_dic.keys():
                 references_dic[grouped_reference_row['stage']] = []
             references_dic[grouped_reference_row['stage']].append(reference_dic)

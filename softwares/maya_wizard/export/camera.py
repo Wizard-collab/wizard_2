@@ -49,6 +49,7 @@ def export_camera(camrig_reference, frange):
     camrig_nspace = camrig_reference['namespace']
     asset_name = camrig_reference['asset_name']
     variant_name = camrig_reference['variant_name']
+    exported_string_asset = camrig_reference['string_variant']
     count = camrig_reference['count']
     if is_referenced(camrig_nspace):
         if os.environ['wizard_stage_name'] != 'camera':
@@ -58,10 +59,10 @@ def export_camera(camrig_reference, frange):
         export_GRP_list = get_objects_to_export(camrig_nspace)
         if export_GRP_list:
             logger.info("Exporting {}".format(camrig_nspace))
-            additionnal_objects = wizard_export.trigger_before_export_hook('camera')
+            additionnal_objects = wizard_export.trigger_before_export_hook('camera', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
-            wizard_export.export('camera', export_name, export_GRP_list, frange, custom_work_env_id = camera_work_env_id)
+            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list, frange, custom_work_env_id = camera_work_env_id)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(camrig_nspace))
 

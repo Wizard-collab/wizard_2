@@ -27,14 +27,14 @@ hooks['nuke'] = 'nuke_hook.py'
 hooks['substance_painter'] = 'substance_painter_hook.py'
 hooks['substance_designer'] = 'substance_designer_hook.py'
 
-def sanity_hooks(software, stage_name):
+def sanity_hooks(software, stage_name, string_asset, exported_string_asset):
 	sanity = True
 	hooks_modules = get_hooks_modules(software)
 	for module_name in hooks_modules.keys():
 		try:
 			logger.info("Executing {0} sanity hook from {1}".format(module_name,
 																hooks_modules[module_name]['path']))
-			module_sanity = hooks_modules[module_name]['module'].sanity(stage_name)
+			module_sanity = hooks_modules[module_name]['module'].sanity(stage_name, string_asset, exported_string_asset)
 			if not module_sanity:
 				logger.info("{0} sanity not passed. Skipping export".format(module_name))
 				sanity *= module_sanity
@@ -44,14 +44,14 @@ def sanity_hooks(software, stage_name):
 			logger.error(traceback.format_exc())
 	return sanity
 
-def before_export_hooks(software, stage_name):
+def before_export_hooks(software, stage_name, string_asset, exported_string_asset):
 	additionnal_objects = []
 	hooks_modules = get_hooks_modules(software)
 	for module_name in hooks_modules.keys():
 		try:
-			logger.info("Executing {0} sanity hook from {1}".format(module_name,
+			logger.info("Executing {0} before export hook from {1}".format(module_name,
 																hooks_modules[module_name]['path']))
-			nodes = hooks_modules[module_name]['module'].before_export(stage_name)
+			nodes = hooks_modules[module_name]['module'].before_export(stage_name, string_asset, exported_string_asset)
 			if type(nodes) != list:
 				logger.error("Before export hook {0} return {1} instead of list. Skipping.".format(module_name, type(nodes)))
 			else:
@@ -66,13 +66,13 @@ def before_export_hooks(software, stage_name):
 			logger.error(traceback.format_exc())
 	return list(set(additionnal_objects))
 
-def after_export_hooks(software, stage_name, export_dir):
+def after_export_hooks(software, stage_name, export_dir, string_asset, exported_string_asset):
 	hooks_modules = get_hooks_modules(software)
 	for module_name in hooks_modules.keys():
 		try:
 			logger.info("Executing {0} after export hook from {1}".format(module_name,
 																hooks_modules[module_name]['path']))
-			hooks_modules[module_name]['module'].after_export(stage_name, export_dir)
+			hooks_modules[module_name]['module'].after_export(stage_name, export_dir, string_asset, exported_string_asset)
 		except:
 			logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
 																hooks_modules[module_name]['path']))
@@ -83,7 +83,8 @@ def after_reference_hooks(software,
 	                        referenced_stage_name,
 	                        referenced_files_dir,
 	                        namespace,
-	                        new_objects):
+	                        new_objects,
+	                        string_asset):
 	hooks_modules = get_hooks_modules(software)
 	for module_name in hooks_modules.keys():
 		try:
@@ -93,7 +94,8 @@ def after_reference_hooks(software,
 										                        referenced_stage_name,
 										                        referenced_files_dir,
 										                        namespace,
-										                        new_objects)
+										                        new_objects,
+										                        string_asset)
 		except:
 			logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
 																hooks_modules[module_name]['path']))

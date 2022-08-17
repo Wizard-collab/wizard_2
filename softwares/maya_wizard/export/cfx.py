@@ -54,15 +54,16 @@ def export_fur(grooming_reference, frange, percent_factor):
     grooming_nspace = grooming_reference['namespace']
     asset_name = grooming_reference['asset_name']
     variant_name = grooming_reference['variant_name']
+    exported_string_asset = rigging_reference['string_variant']
     count = grooming_reference['count']
     if is_referenced(grooming_nspace):
         export_GRP_list = get_objects_to_export(grooming_nspace)
         if export_GRP_list:
             logger.info("Exporting {}".format(grooming_nspace))
-            additionnal_objects = wizard_export.trigger_before_export_hook('cfx')
+            additionnal_objects = wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
-            wizard_export.export('cfx', export_name, export_GRP_list, frange, percent_factor=percent_factor)
+            wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
         else:
             logger.warning("No objects to export in '{}:yeti_nodes_set'".format(grooming_nspace))
 

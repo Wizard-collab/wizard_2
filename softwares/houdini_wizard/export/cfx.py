@@ -45,12 +45,13 @@ def export_cfx(rigging_reference, frange):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
+    exported_string_asset = rigging_reference['string_variant']
     count = rigging_reference['count']
     if wizard_tools.look_for_node(rig_nspace):
         logger.info(f"Exporting {rig_nspace}")
-        wizard_export.trigger_before_export_hook('cfx')
+        wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
         export_name = buid_export_name(asset_name, variant_name, count)
-        wizard_export.export(stage_name='cfx', export_name=export_name, out_node='wizard_cfx_output', frange=frange, parent=rig_nspace)
+        wizard_export.export(stage_name='cfx', export_name=export_name, out_node='wizard_cfx_output', exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace)
     else:
         logger.warning("{} not found in current scene".format(rig_nspace))
 

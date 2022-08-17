@@ -121,9 +121,16 @@ class communicate_server(Thread):
         elif signal_dic['function'] == 'get_hooks_folder':
             returned = project.get_hooks_folder()
         elif signal_dic['function'] == 'get_plugins_folder':
-            returned = project.get_plugins_folder()
+            returned = project.get_plugins_folder() 
+        elif signal_dic['function'] == 'get_string_variant_from_work_env_id':
+            returned = get_string_variant_from_work_env_id(signal_dic['work_env_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
+
+def get_string_variant_from_work_env_id(work_env_id):
+    work_env_row = project.get_work_env_data(work_env_id)
+    string_variant = assets.instance_to_string(('variant', work_env_row['variant_id']))
+    return string_variant
 
 def get_file(version_id):
     version_path = project.get_version_data(version_id, 'file_path')

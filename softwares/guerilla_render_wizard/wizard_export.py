@@ -20,10 +20,8 @@ from guerilla_render_wizard import wizard_tools
 def __init__():
     pass
 
-def export(stage_name, export_name, export_GRP_list):
-    if trigger_sanity_hook(stage_name):
-        additionnal_objects = trigger_before_export_hook(stage_name)
-        export_GRP_list += additionnal_objects
+def export(stage_name, export_name, exported_string_asset, export_GRP_list):
+    if trigger_sanity_hook(stage_name, exported_string_asset):
         export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                                                     export_name)
         export_from_extension(export_file, export_GRP_list)
@@ -31,7 +29,7 @@ def export(stage_name, export_name, export_GRP_list):
                                                             [export_file],
                                                             int(os.environ['wizard_work_env_id']),
                                                             int(os.environ['wizard_version_id']))
-        trigger_after_export_hook(stage_name, export_dir)
+        trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def prepare_render(stage_name, export_name):
     if trigger_sanity_hook(stage_name):
@@ -75,12 +73,14 @@ def save_or_save_increment():
         logger.info("Saving file {0}".format(scene))
     return scene
 
-def trigger_sanity_hook(stage_name):
-    return wizard_hooks.sanity_hooks('guerilla_render', stage_name)
+def trigger_sanity_hook(stage_name, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    return wizard_hooks.sanity_hooks('guerilla_render', stage_name, string_asset, exported_string_asset)
 
-def trigger_before_export_hook(stage_name):
+def trigger_before_export_hook(stage_name, exported_string_asset):
     additionnal_objects = []
-    nodes = wizard_hooks.before_export_hooks('guerilla_render', stage_name)
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    nodes = wizard_hooks.before_export_hooks('guerilla_render', stage_name, string_asset, exported_string_asset)
     for node in nodes:
         if wizard_tools.node_exists(node):
             additionnal_objects.append(node)
@@ -88,5 +88,6 @@ def trigger_before_export_hook(stage_name):
             logger.warning("{0} doesn't exists".format(node))
     return additionnal_objects
 
-def trigger_after_export_hook(stage_name, export_dir):
-    wizard_hooks.after_export_hooks('guerilla_render', stage_name, export_dir)
+def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    wizard_hooks.after_export_hooks('guerilla_render', stage_name, export_dir, string_asset, exported_string_asset)

@@ -17,8 +17,8 @@ import wizard_hooks
 import wizard_communicate
 from maya_wizard import wizard_tools
 
-def export(stage_name, export_name, export_GRP_list, frange=[0,0], custom_work_env_id = None, percent_factor=(0,1)):
-    if trigger_sanity_hook(stage_name):
+def export(stage_name, export_name, exported_string_asset, export_GRP_list, frange=[0,0], custom_work_env_id = None, percent_factor=(0,1)):
+    if trigger_sanity_hook(stage_name, exported_string_asset):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
         else:
@@ -30,7 +30,7 @@ def export(stage_name, export_name, export_GRP_list, frange=[0,0], custom_work_e
                                                 export_files_list,
                                                 work_env_id,
                                                 int(os.environ['wizard_version_id']))
-        trigger_after_export_hook(stage_name, export_dir)
+        trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def export_by_extension(export_GRP_list, export_file, frange, percent_factor):
     if export_file.endswith('.abc'):
@@ -102,12 +102,14 @@ def save_or_save_increment():
         logger.info("Saving file {}".format(scene))
     return scene
 
-def trigger_sanity_hook(stage_name):
-    return wizard_hooks.sanity_hooks('maya', stage_name)
+def trigger_sanity_hook(stage_name, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    return wizard_hooks.sanity_hooks('maya', stage_name, string_asset, exported_string_asset)
 
-def trigger_before_export_hook(stage_name):
+def trigger_before_export_hook(stage_name, exported_string_asset):
     additionnal_objects = []
-    nodes = wizard_hooks.before_export_hooks('maya', stage_name)
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    nodes = wizard_hooks.before_export_hooks('maya', stage_name, string_asset, exported_string_asset)
     for node in nodes:
         if pm.objExists(node):
             additionnal_objects.append(node)
@@ -115,5 +117,6 @@ def trigger_before_export_hook(stage_name):
             logger.warning("{} doesn't exists".format(node))
     return additionnal_objects
 
-def trigger_after_export_hook(stage_name, export_dir):
-    wizard_hooks.after_export_hooks('maya', stage_name, export_dir)
+def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    wizard_hooks.after_export_hooks('maya', stage_name, export_dir, string_asset, exported_string_asset)
