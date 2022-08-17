@@ -41,6 +41,13 @@ from wizard.vars import env_vars
 
 logger = logging.getLogger(__name__)
 
+def set_gui(is_gui):
+	os.environ[env_vars._wizard_gui_] = str(is_gui)
+	return 1
+
+def is_gui():
+	return int(os.environ[env_vars._wizard_gui_])
+
 def build_user_env(user_row):
 	os.environ[env_vars._username_env_] = user_row['user_name']
 	os.environ[env_vars._useremail_env_] = user_row['email']

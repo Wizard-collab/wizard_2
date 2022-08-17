@@ -298,6 +298,7 @@ def create_variant(name, stage_id, comment=''):
         stage_path = get_stage_path(stage_id)
         if stage_path:
             dir_name = path_utils.clean_path(path_utils.join(stage_path, name))
+            
             variant_id = project.add_variant(name, stage_id, comment)
             if variant_id:
                 if not tools.create_folder(dir_name):
@@ -1090,70 +1091,23 @@ def instance_to_string(instance_tuple):
     instance_id = instance_tuple[-1]
     string = None
     if instance_type == 'export_version':
-        export_version_row = project.get_export_version_data(instance_id)
-        export_row = project.get_export_data(export_version_row['export_id'])
-        variant_row = project.get_variant_data(export_row['variant_id'])
-        stage_row = project.get_stage_data(variant_row['stage_id'])
-        asset_row = project.get_asset_data(stage_row['asset_id'])
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
-        string+=f"/{stage_row['name']}/{variant_row['name']}/{export_row['name']}/{export_version_row['name']}"
+        string = project.get_export_version_data(instance_id, 'string')
     elif instance_type == 'export':
-        export_row = project.get_export_data(instance_id)
-        variant_row = project.get_variant_data(export_row['variant_id'])
-        stage_row = project.get_stage_data(variant_row['stage_id'])
-        asset_row = project.get_asset_data(stage_row['asset_id'])
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
-        string+=f"/{stage_row['name']}/{variant_row['name']}/{export_row['name']}"
+        string = project.get_export_data(instance_id, 'string')
     elif instance_type == 'work_version':
-        version_row = project.get_version_data(instance_id)
-        work_env_row = project.get_work_env_data(version_row['work_env_id'])
-        variant_row = project.get_variant_data(work_env_row['variant_id'])
-        stage_row = project.get_stage_data(variant_row['stage_id'])
-        asset_row = project.get_asset_data(stage_row['asset_id'])
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
-        string+=f"/{stage_row['name']}/{variant_row['name']}/{work_env_row['name']}/{version_row['name']}"
+        string = project.get_version_data(instance_id, 'string')
     elif instance_type == 'work_env':
-        work_env_row = project.get_work_env_data(instance_id)
-        variant_row = project.get_variant_data(work_env_row['variant_id'])
-        stage_row = project.get_stage_data(variant_row['stage_id'])
-        asset_row = project.get_asset_data(stage_row['asset_id'])
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
-        string+=f"/{stage_row['name']}/{variant_row['name']}/{work_env_row['name']}"
+        string = project.get_work_env_data(instance_id, 'string')
     elif instance_type == 'variant':
-        variant_row = project.get_variant_data(instance_id)
-        stage_row = project.get_stage_data(variant_row['stage_id'])
-        asset_row = project.get_asset_data(stage_row['asset_id'])
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
-        string+=f"/{stage_row['name']}/{variant_row['name']}"
+        string = project.get_variant_data(instance_id, 'string')
     elif instance_type == 'stage':
-        stage_row = project.get_stage_data(instance_id)
-        asset_row = project.get_asset_data(stage_row['asset_id'])
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
-        string+=f"/{stage_row['name']}"
+        string = project.get_stage_data(instance_id, 'string')
     elif instance_type == 'asset':
-        asset_row = project.get_asset_data(instance_id)
-        category_row = project.get_category_data(asset_row['category_id'])
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}/{asset_row['name']}"
+        string = project.get_asset_data(instance_id, 'string')
     elif instance_type == 'category':
-        category_row = project.get_category_data(instance_id)
-        domain_row = project.get_domain_data(category_row['domain_id'])
-        string=f"{domain_row['name']}/{category_row['name']}"
+        string = project.get_category_data(instance_id, 'string')
     elif instance_type == 'domain':
-        domain_row = project.get_domain_data(instance_id)
-        string=f"{domain_row['name']}"
+        string = project.get_domain_data(instance_id, 'string')
     return string
 
 def string_to_instance(string):
@@ -1161,29 +1115,19 @@ def string_to_instance(string):
 
     if len(instances_list) == 1:
         instance_type = 'domain'
-        instance_id = project.get_domain_by_name(instances_list[0], 'id')
+        instance_id = project.get_domain_data_by_string(string, 'id')
     elif len(instances_list) ==2:
         instance_type = 'category'
-        domain_id = project.get_domain_by_name(instances_list[0], 'id')
-        instance_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
+        instance_id = project.get_category_data_by_string(string, 'id')
     elif len(instances_list) == 3:
         instance_type = 'asset'
-        domain_id = project.get_domain_by_name(instances_list[0], 'id')
-        category_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
-        instance_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
+        instance_id = project.get_asset_data_by_string(string, 'id')
     elif len(instances_list) == 4:
         instance_type = 'stage'
-        domain_id = project.get_domain_by_name(instances_list[0], 'id')
-        category_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
-        asset_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
-        instance_id = project.get_asset_child_by_name(asset_id, instances_list[3], 'id')
+        instance_id = project.get_stage_data_by_string(string, 'id')
     elif len(instances_list) == 5:
         instance_type = 'variant'
-        domain_id = project.get_domain_by_name(instances_list[0], 'id')
-        category_id = project.get_domain_child_by_name(domain_id, instances_list[1], 'id')
-        asset_id = project.get_category_child_by_name(category_id, instances_list[2], 'id')
-        stage_id = project.get_asset_child_by_name(asset_id, instances_list[3], 'id')
-        instance_id = project.get_stage_child_by_name(stage_id, instances_list[4], 'id')
+        instance_id = project.get_variant_data_by_string(string, 'id')
 
     return (instance_type, instance_id)
 
@@ -1193,16 +1137,10 @@ def string_to_work_instance(string):
     instances_list = string.split('/')
     if len(instances_list) == 6:
         instance_type = 'work_env'
-        work_env_name = instances_list.pop(-1)
-        _, variant_id = string_to_instance(('/').join(instances_list))
-        instance_id = project.get_variant_work_env_child_by_name(variant_id, work_env_name, 'id')
+        instance_id = project.get_work_env_data_by_string(string, 'id')
     elif len(instances_list) == 7:
         instance_type = 'work_version'
-        work_version_name = instances_list.pop(-1)
-        work_env_name = instances_list.pop(-1)
-        _, variant_id = string_to_instance(('/').join(instances_list))
-        work_env_id = project.get_variant_work_env_child_by_name(variant_id, work_env_name, 'id')
-        instance_id = project.get_work_version_by_name(work_env_id, work_version_name, 'id')
+        instance_id = project.get_work_version_data_by_string(string, 'id')
     else:
         logger.warning('The given string is not a work instance')
 

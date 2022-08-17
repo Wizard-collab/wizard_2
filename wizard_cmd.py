@@ -13,7 +13,7 @@ from wizard.core import custom_logger
 from wizard.core import db_core
 from wizard.core import communicate
 from wizard.core import launch
-from wizard.core import hook
+from wizard.core import hooks
 from wizard.core import launch_batch
 
 custom_logger.get_root_logger()
@@ -23,6 +23,7 @@ application.log_app_infos()
 print('Wizard CMD')
 
 app = gui_utils.get_app()
+environment.set_gui(0)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-psqlDns', dest='psql_dns', type=str, help='PostgreSQL connection DNS')
@@ -84,7 +85,7 @@ communicate_server.start()
 softwares_server = launch.softwares_server()
 softwares_server.start()
 
-hook.init_wizard_hook()
+hooks.init_wizard_hooks()
 
 if args.team_dns:
 	environment.set_team_dns(args.team_dns)

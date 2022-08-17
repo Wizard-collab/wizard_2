@@ -70,8 +70,8 @@ logger = logging.getLogger(__name__)
 def add_domain(name):
     domain_id = db_utils.create_row('project',
                         'domains_data', 
-                        ('name', 'creation_time', 'creation_user'), 
-                        (name, time.time(), environment.get_user()))
+                        ('name', 'creation_time', 'creation_user', 'string'), 
+                        (name, time.time(), environment.get_user(), name))
     if domain_id:
         logger.info(f"Domain {name} added to project")
     return domain_id
@@ -121,6 +121,17 @@ def get_domain_by_name(name, column='*'):
         logger.error("Domain not found")
         return None
 
+def get_domain_data_by_string(string, column='*'):
+    domain_rows = db_utils.get_row_by_column_data('project',
+                                                    'domains_data',
+                                                    ('string', string),
+                                                    column)
+    if domain_rows and len(domain_rows) >= 1:
+        return domain_rows[0]
+    else:
+        logger.error("Domain not found")
+        return None
+
 def remove_domain(domain_id):
     success = None
     if repository.is_admin():
@@ -143,10 +154,12 @@ def add_category(name, domain_id):
                                         'categories',
                                         ('name', 'domain_id'),
                                         (name, domain_id))):
+            domain_name = get_domain_data(domain_id, 'name')
+            string_asset = f"{domain_name}/{name}"
             category_id = db_utils.create_row('project',
                                 'categories',
-                                ('name', 'creation_time', 'creation_user', 'domain_id'), 
-                                (name, time.time(), environment.get_user(), domain_id))
+                                ('name', 'creation_time', 'creation_user', 'string', 'domain_id'), 
+                                (name, time.time(), environment.get_user(), string_asset, domain_id))
             if category_id:
                 logger.info(f"Category {name} added to project")
             return category_id
@@ -208,12 +221,27 @@ def get_category_data_by_name(name, column='*'):
         logger.error("Category not found")
         return None
 
+def get_category_data_by_string(string, column='*'):
+    category_rows = db_utils.get_row_by_column_data('project',
+                                                        'categories',
+                                                        ('string', string),
+                                                        column)
+    if category_rows and len(category_rows) >= 1:
+        return category_rows[0]
+    else:
+        logger.error("Category not found")
+        return None
+
 def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=0):
     if (name != '') and (name is not None):
         if not (db_utils.check_existence_by_multiple_data('project', 
                                         'assets',
                                         ('name', 'category_id'),
                                         (name, category_id))):
+            category_row = get_category_data(category_id)
+            domain_name = get_domain_data(category_row['domain_id'], 'name')
+            category_name = category_row['name']
+            string_asset = f"{domain_name}/{category_name}/{name}"
             asset_id = db_utils.create_row('project',
                                 'assets', 
                                 ('name',
@@ -223,6 +251,7 @@ def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=
                                     'outframe',
                                     'preroll',
                                     'postroll',
+                                    'string',
                                     'category_id'), 
                                 (name, 
                                     time.time(), 
@@ -231,6 +260,7 @@ def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=
                                     outframe,
                                     preroll,
                                     postroll,
+                                    string_asset,
                                     category_id))
             if asset_id:
                 add_asset_preview(asset_id)
@@ -241,6 +271,17 @@ def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=
             return None
     else:
         logger.warning(f"Please provide an asset name")
+        return None
+
+def get_asset_data_by_string(string, column='*'):
+    asset_rows = db_utils.get_row_by_column_data('project',
+                                                        'assets',
+                                                        ('string', string),
+                                                        column)
+    if asset_rows and len(asset_rows) >= 1:
+        return asset_rows[0]
+    else:
+        logger.error("Asset not found")
         return None
 
 def add_asset_preview(asset_id):
@@ -355,8 +396,13 @@ def add_stage(name, asset_id):
                                     ('name', 'asset_id'),
                                     (name, asset_id))):
 
-        category_id = get_asset_data(asset_id, 'category_id')
-        domain_id = get_category_data(category_id, 'domain_id')
+        asset_row = get_asset_data(asset_id)
+        category_row = get_category_data(asset_row['category_id'])
+        domain_name = get_domain_data(category_row['domain_id'], 'name')
+        string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{name}"
+
+        category_id = category_row['id']
+        domain_id = category_row['domain_id']
         stage_id = db_utils.create_row('project',
                             'stages', 
                             ('name',
@@ -367,6 +413,7 @@ def add_stage(name, asset_id):
                                 'work_time',
                                 'estimated_time',
                                 'progress',
+                                'string',
                                 'asset_id',
                                 'domain_id'), 
                             (name,
@@ -377,6 +424,7 @@ def add_stage(name, asset_id):
                                 0.0,
                                 None,
                                 0.0,
+                                string_asset,
                                 asset_id,
                                 domain_id))
         if stage_id:
@@ -384,6 +432,17 @@ def add_stage(name, asset_id):
         return stage_id
     else:
         logger.warning(f"{name} already exists")
+        return None
+
+def get_stage_data_by_string(string, column='*'):
+    stage_rows = db_utils.get_row_by_column_data('project',
+                                                        'stages',
+                                                        ('string', string),
+                                                        column)
+    if stage_rows and len(stage_rows) >= 1:
+        return stage_rows[0]
+    else:
+        logger.error("Stage not found")
         return None
 
 def get_all_stages(column='*'):
@@ -450,6 +509,13 @@ def add_variant(name, stage_id, comment):
                                         'variants',
                                         ('name', 'stage_id'),
                                         (name, stage_id))):
+
+            stage_row = get_stage_data(stage_id)
+            asset_row = get_asset_data(stage_row['asset_id'])
+            category_row = get_category_data(asset_row['category_id'])
+            domain_name = get_domain_data(category_row['domain_id'], 'name')
+            string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{name}"
+
             variant_id = db_utils.create_row('project',
                                 'variants', 
                                 ('name',
@@ -457,12 +523,14 @@ def add_variant(name, stage_id, comment):
                                     'creation_user',
                                     'comment',
                                     'default_work_env_id',
+                                    'string',
                                     'stage_id'), 
                                 (name,
                                     time.time(),
                                     environment.get_user(),
                                     comment,
                                     None,
+                                    string_asset,
                                     stage_id))
             if variant_id:
                 logger.info(f"Variant {name} added to project")
@@ -472,6 +540,17 @@ def add_variant(name, stage_id, comment):
             return None
     else:
         logger.warning(f"Please provide a variant name")
+        return None
+
+def get_variant_data_by_string(string, column='*'):
+    variant_rows = db_utils.get_row_by_column_data('project',
+                                                        'variants',
+                                                        ('string', string),
+                                                        column)
+    if variant_rows and len(variant_rows) >= 1:
+        return variant_rows[0]
+    else:
+        logger.error("Variant not found")
         return None
 
 def get_variant_by_name(stage_id, name, column='*'):
@@ -678,16 +757,26 @@ def add_export(name, variant_id):
                                     'exports',
                                     ('name', 'variant_id'),
                                     (name, variant_id))):
+
+        variant_row = get_variant_data(variant_id)
+        stage_row = get_stage_data(variant_row['stage_id'])
+        asset_row = get_asset_data(stage_row['asset_id'])
+        category_row = get_category_data(asset_row['category_id'])
+        domain_name = get_domain_data(category_row['domain_id'], 'name')
+        string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{name}"
+
         export_id = db_utils.create_row('project',
                             'exports', 
                             ('name',
                                 'creation_time',
                                 'creation_user',
+                                'string',
                                 'variant_id',
                                 'default_export_version'), 
                             (name,
                                 time.time(),
                                 environment.get_user(),
+                                string_asset,
                                 variant_id,
                                 None))
         if export_id:
@@ -695,6 +784,17 @@ def add_export(name, variant_id):
         return export_id
     else:
         logger.warning(f"{name} already exists")
+        return None
+
+def get_export_data_by_string(string, column='*'):
+    export_rows = db_utils.get_row_by_column_data('project',
+                                                        'exports',
+                                                        ('string', string),
+                                                        column)
+    if export_rows and len(export_rows) >= 1:
+        return export_rows[0]
+    else:
+        logger.error("Export not found")
         return None
 
 def remove_export(export_id):
@@ -788,6 +888,14 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
             software = None
             work_version_thumbnail = None
 
+        export_row = get_export_data(export_id)
+        variant_row = get_variant_data(export_row['variant_id'])
+        stage_row = get_stage_data(variant_row['stage_id'])
+        asset_row = get_asset_data(stage_row['asset_id'])
+        category_row = get_category_data(asset_row['category_id'])
+        domain_name = get_domain_data(category_row['domain_id'], 'name')
+        string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{export_row['name']}/{name}"
+
         export_version_id = db_utils.create_row('project',
                             'export_versions', 
                             ('name',
@@ -800,6 +908,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 'work_version_id',
                                 'work_version_thumbnail_path',
                                 'software',
+                                'string',
                                 'export_id'), 
                             (name,
                                 time.time(),
@@ -811,6 +920,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                 work_version_id,
                                 work_version_thumbnail,
                                 software,
+                                string_asset,
                                 export_id))
         if export_version_id:
             logger.info(f"Export version {name} added to project")
@@ -819,6 +929,17 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
         return export_version_id
     else:
         logger.warning(f"{name} already exists")
+        return None
+
+def get_export_version_data_by_string(string, column='*'):
+    export_version_rows = db_utils.get_row_by_column_data('project',
+                                                        'exports_versions',
+                                                        ('string', string),
+                                                        column)
+    if export_version_rows and len(export_version_rows) >= 1:
+        return export_version_rows[0]
+    else:
+        logger.error("Export version not found")
         return None
 
 def propagate_auto_update(export_id, export_version_id):
@@ -929,6 +1050,14 @@ def add_work_env(name, software_id, variant_id, export_extension=None):
                                     'work_envs',
                                     ('name', 'variant_id'),
                                     (name, variant_id))):
+
+        variant_row = get_variant_data(variant_id)
+        stage_row = get_stage_data(variant_row['stage_id'])
+        asset_row = get_asset_data(stage_row['asset_id'])
+        category_row = get_category_data(asset_row['category_id'])
+        domain_name = get_domain_data(category_row['domain_id'], 'name')
+        string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{name}"
+
         work_env_id = db_utils.create_row('project',
                             'work_envs', 
                             ('name',
@@ -938,6 +1067,7 @@ def add_work_env(name, software_id, variant_id, export_extension=None):
                                 'lock_id',
                                 'export_extension',
                                 'work_time',
+                                'string',
                                 'software_id'), 
                             (name,
                                 time.time(),
@@ -946,12 +1076,24 @@ def add_work_env(name, software_id, variant_id, export_extension=None):
                                 None,
                                 export_extension,
                                 0.0,
+                                string_asset,
                                 software_id))
         if work_env_id:
             logger.info(f"Work env {name} added to project")
         return work_env_id
     else:
         logger.warning(f"{name} already exists")
+        return None
+
+def get_work_env_data_by_string(string, column='*'):
+    work_env_rows = db_utils.get_row_by_column_data('project',
+                                                        'work_envs',
+                                                        ('string', string),
+                                                        column)
+    if work_env_rows and len(work_env_rows) >= 1:
+        return work_env_rows[0]
+    else:
+        logger.error("Work env not found")
         return None
 
 def create_reference(work_env_id, export_version_id, namespace, count=None):
@@ -1298,6 +1440,14 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
                                     ('name', 'work_env_id'),
                                     (name, work_env_id))):
 
+        work_env_row = get_work_env_data(work_env_id)
+        variant_row = get_variant_data(work_env_row['variant_id'])
+        stage_row = get_stage_data(variant_row['stage_id'])
+        asset_row = get_asset_data(stage_row['asset_id'])
+        category_row = get_category_data(asset_row['category_id'])
+        domain_name = get_domain_data(category_row['domain_id'], 'name')
+        string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{work_env_row['name']}/{name}"
+
         version_id = db_utils.create_row('project',
                             'versions', 
                             ('name',
@@ -1307,6 +1457,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
                                 'file_path',
                                 'screenshot_path',
                                 'thumbnail_path',
+                                'string',
                                 'work_env_id'),
                             (name,
                                 time.time(),
@@ -1315,6 +1466,7 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
                                 file_path,
                                 screenshot_path,
                                 thumbnail_path,
+                                string_asset,
                                 work_env_id))
         if version_id:
             tags.analyse_comment(comment, 'work_version', version_id)
@@ -1323,6 +1475,17 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
         logger.warning(f"Version {name} already exists")
 
     return version_id
+
+def get_work_version_data_by_string(string, column='*'):
+    work_version_rows = db_utils.get_row_by_column_data('project',
+                                                        'versions',
+                                                        ('string', string),
+                                                        column)
+    if work_version_rows and len(work_version_rows) >= 1:
+        return work_version_rows[0]
+    else:
+        logger.error("Work version not found")
+        return None
 
 def get_version_data(version_id, column='*'):
     work_envs_rows = db_utils.get_row_by_column_data('project',
@@ -2180,7 +2343,8 @@ def create_domains_table(database):
                                         id serial PRIMARY KEY,
                                         name text NOT NULL UNIQUE,
                                         creation_time real NOT NULL,
-                                        creation_user text NOT NULL
+                                        creation_user text NOT NULL,
+                                        string text NOT NULL
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Categories table created")
@@ -2191,6 +2355,7 @@ def create_categories_table(database):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
+                                        string text NOT NULL,
                                         domain_id integer NOT NULL,
                                         FOREIGN KEY (domain_id) REFERENCES domains_data (id)
                                     );"""
@@ -2207,6 +2372,7 @@ def create_assets_table(database):
                                         outframe integer NOT NULL,
                                         preroll integer NOT NULL,
                                         postroll integer NOT NULL,
+                                        string text NOT NULL,
                                         category_id integer NOT NULL,
                                         FOREIGN KEY (category_id) REFERENCES categories (id)
                                     );"""
@@ -2237,6 +2403,7 @@ def create_stages_table(database):
                                         progress real NOT NULL,
                                         tracking_comment text,
                                         default_variant_id integer,
+                                        string text NOT NULL,
                                         asset_id integer NOT NULL,
                                         domain_id integer NOT NULL,
                                         FOREIGN KEY (asset_id) REFERENCES assets (id),
@@ -2253,6 +2420,7 @@ def create_variants_table(database):
                                         creation_user text NOT NULL,
                                         comment text,
                                         default_work_env_id integer,
+                                        string text NOT NULL,
                                         stage_id integer NOT NULL,
                                         FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""
@@ -2284,6 +2452,7 @@ def create_work_envs_table(database):
                                         lock_id integer,
                                         export_extension text,
                                         work_time real NOT NULL,
+                                        string text NOT NULL,
                                         software_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (software_id) REFERENCES softwares (id)
@@ -2363,6 +2532,7 @@ def create_exports_table(database):
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
                                         variant_id integer NOT NULL,
+                                        string text NOT NULL,
                                         default_export_version integer,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id)
                                     );"""
@@ -2379,6 +2549,7 @@ def create_versions_table(database):
                                         file_path text NOT NULL,
                                         screenshot_path text,
                                         thumbnail_path text,
+                                        string text NOT NULL,
                                         work_env_id integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
@@ -2398,6 +2569,7 @@ def create_export_versions_table(database):
                                         work_version_id integer,
                                         work_version_thumbnail_path text,
                                         software text,
+                                        string text NOT NULL,
                                         export_id integer NOT NULL,
                                         FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (stage_id) REFERENCES stages (id),

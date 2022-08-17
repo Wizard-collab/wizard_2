@@ -57,7 +57,7 @@ from wizard.core import environment
 from wizard.core import launch
 from wizard.core import launch_batch
 from wizard.core import db_core
-from wizard.core import hook
+from wizard.core import hooks
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ application.log_app_infos()
 print('PyWizard')
 
 app = gui_utils.get_app()
+environment.set_gui(0)
 
 while not user.user().get_psql_dns():
     psql_host = tools.flushed_input("PostgreSQL host : ")
@@ -137,7 +138,7 @@ communicate_server.start()
 softwares_server = launch.softwares_server()
 softwares_server.start()
 
-hook.init_wizard_hook()
+hooks.init_wizard_hooks()
 
 console = code.InteractiveConsole()
 console.interact(banner=None, exitmsg=None)

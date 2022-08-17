@@ -193,8 +193,6 @@ class tree_widget(QtWidgets.QFrame):
         self.project_asset_ids = []
         self.project_stage_ids = []
 
-        self.all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
-
         for domain_row in project.get_domains():
             self.add_domain(domain_row)
         for category_row in project.get_all_categories():
@@ -206,6 +204,7 @@ class tree_widget(QtWidgets.QFrame):
         for stage_row in project.get_all_stages():
             self.add_stage(stage_row)
             self.project_stage_ids.append(stage_row['id'])
+
         stage_ids = list(self.stage_ids.keys())
         for id in stage_ids:
             if id not in self.project_stage_ids:
@@ -224,6 +223,7 @@ class tree_widget(QtWidgets.QFrame):
         if hard:
             self.get_context()
         self.update_creation_items_visibility()
+
         self.update_refresh_time(start_time)
 
     def update_creation_items_visibility(self):

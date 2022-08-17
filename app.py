@@ -58,7 +58,7 @@ from wizard.core import repository
 from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import stats
-from wizard.core import hook
+from wizard.core import hooks
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 
@@ -76,6 +76,8 @@ class app():
         self.custom_handler = logging_widget.custom_handler(long_formatter=False, parent=None)
         self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
         logging.getLogger().addHandler(self.custom_handler)
+        print('Wizard Gui')
+        environment.set_gui(1)
 
         '''
         if gui_server.try_connection():
@@ -115,7 +117,7 @@ class app():
                 self.quit()
 
         db_utils.modify_db_name('project', environment.get_project_name())
-        hook.init_wizard_hook()
+        hooks.init_wizard_hooks()
 
         stats.add_progress_event()
         self.stats_schedule = stats.schedule()
