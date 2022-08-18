@@ -28,7 +28,7 @@ def add_yeti_fur(namespace, referenced_stage_name, file):
         yeti_node.File.set(file)
 
 
-def sanity(stage_name):
+def sanity(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
         before the export and will stop the
         export process if the returned data is 
@@ -38,7 +38,7 @@ def sanity(stage_name):
         of the exported stage '''
     return True
 
-def before_export(stage_name):
+def before_export(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
         before the export 
 
@@ -49,7 +49,7 @@ def before_export(stage_name):
         that wizard will add to the export '''
     return []
 
-def after_export(stage_name, export_dir):
+def after_export(stage_name, export_dir, string_asset, exported_string_asset):
     ''' This function is triggered
         after the export
 
@@ -64,7 +64,8 @@ def after_reference(stage_name,
                         referenced_stage_name, 
                         referenced_files_dir,
                         namespace, 
-                        new_objects):
+                        new_objects,
+                        string_asset):
     ''' This function is triggered
         after referencing from wizard
 
