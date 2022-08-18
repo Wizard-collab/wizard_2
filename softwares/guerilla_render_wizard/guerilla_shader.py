@@ -12,23 +12,25 @@ from guerilla import Document, Modifier, pynode, Node, Plug
 from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard import wizard_reference
 
-def update_texturing(namespace, files_list, asset_name):
+def update_texturing(namespace, files_list, asset_name, referenced_string_asset):
     old_objects = wizard_tools.get_all_nodes()
     if namespace in wizard_tools.get_all_nodes():
         plug_texturing(namespace, files_list, asset_name, update=True)
         wizard_reference.trigger_after_reference_hook('texturing',
                                     files_list,
                                     namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    wizard_tools.get_new_objects(old_objects),
+                                    referenced_string_asset)
 
-def import_texturing(namespace, files_list, asset_name):
+def import_texturing(namespace, files_list, asset_name, referenced_string_asset):
     old_objects = wizard_tools.get_all_nodes()
     if namespace not in wizard_tools.get_all_nodes():
         plug_texturing(namespace, files_list, asset_name, update=False)
         wizard_reference.trigger_after_reference_hook('texturing',
                                         files_list,
                                         namespace,
-                                        wizard_tools.get_new_objects(old_objects))
+                                        wizard_tools.get_new_objects(old_objects),
+                                        referenced_string_asset)
 
 def plug_texturing(namespace, files_list, asset_name, update=False):
     render_graph, material_override_node, surface_node, displacement_node = get_shader(namespace, asset_name)

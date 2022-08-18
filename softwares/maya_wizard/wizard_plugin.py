@@ -87,109 +87,109 @@ def reference_modeling(*args, **kwargs):
     references = get_references(kwargs)
     if 'modeling' in references.keys():
         for reference in references['modeling']:
-            wizard_reference.reference_modeling(reference['namespace'], reference['files'])
+            wizard_reference.reference_modeling(reference)
 
 def update_modeling(*args, **kwargs):
     references = get_references(kwargs)
     if 'modeling' in references.keys():
         for reference in references['modeling']:
-            wizard_reference.update_modeling(reference['namespace'], reference['files'])
+            wizard_reference.update_modeling(reference)
 
 def reference_rigging(*args, **kwargs):
     references = get_references(kwargs)
     if 'rigging' in references.keys():
         for reference in references['rigging']:
-            wizard_reference.reference_rigging(reference['namespace'], reference['files'])
+            wizard_reference.reference_rigging(reference)
 
 def update_rigging(*args, **kwargs):
     references = get_references(kwargs)
     if 'rigging' in references.keys():
         for reference in references['rigging']:
-            wizard_reference.update_rigging(reference['namespace'], reference['files'])
+            wizard_reference.update_rigging(reference)
 
 def reference_grooming(*args, **kwargs):
     references = get_references(kwargs)
     if 'grooming' in references.keys():
         for reference in references['grooming']:
-            wizard_reference.reference_grooming(reference['namespace'], reference['files'])
+            wizard_reference.reference_grooming(reference)
 
 def update_grooming(*args, **kwargs):
     references = get_references(kwargs)
     if 'grooming' in references.keys():
         for reference in references['grooming']:
-            wizard_reference.update_grooming(reference['namespace'], reference['files'])
+            wizard_reference.update_grooming(reference)
 
 def reference_custom(*args, **kwargs):
     references = get_references(kwargs)
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.reference_custom(reference['namespace'], reference['files'])
+            wizard_reference.reference_custom(reference)
 
 def update_custom(*args, **kwargs):
     references = get_references(kwargs)
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.update_custom(reference['namespace'], reference['files'])
+            wizard_reference.update_custom(reference)
 
 def reference_camrig(*args, **kwargs):
     references = get_references(kwargs)
     if 'camrig' in references.keys():
         for reference in references['camrig']:
-            wizard_reference.reference_camrig(reference['namespace'], reference['files'])
+            wizard_reference.reference_camrig(reference)
 
 def update_camrig(*args, **kwargs):
     references = get_references(kwargs)
     if 'camrig' in references.keys():
         for reference in references['camrig']:
-            wizard_reference.update_camrig(reference['namespace'], reference['files'])
+            wizard_reference.update_camrig(reference)
 
 def reference_layout(*args, **kwargs):
     references = get_references(kwargs)
     if 'layout' in references.keys():
         for reference in references['layout']:
-            wizard_reference.reference_layout(reference['namespace'], reference['files'])
+            wizard_reference.reference_layout(reference)
 
 def update_layout(*args, **kwargs):
     references = get_references(kwargs)
     if 'layout' in references.keys():
         for reference in references['layout']:
-            wizard_reference.update_layout(reference['namespace'], reference['files'])
+            wizard_reference.update_layout(reference)
 
 def reference_animation(*args, **kwargs):
     references = get_references(kwargs)
     if 'animation' in references.keys():
         for reference in references['animation']:
-            wizard_reference.reference_animation(reference['namespace'], reference['files'])
+            wizard_reference.reference_animation(reference)
 
 def update_animation(*args, **kwargs):
     references = get_references(kwargs)
     if 'animation' in references.keys():
         for reference in references['animation']:
-            wizard_reference.update_animation(reference['namespace'], reference['files'])
+            wizard_reference.update_animation(reference)
 
 def reference_cfx(*args, **kwargs):
     references = get_references(kwargs)
     if 'cfx' in references.keys():
         for reference in references['cfx']:
-            wizard_reference.reference_cfx(reference['namespace'], reference['files'])
+            wizard_reference.reference_cfx(reference)
 
 def update_cfx(*args, **kwargs):
     references = get_references(kwargs)
     if 'cfx' in references.keys():
         for reference in references['cfx']:
-            wizard_reference.update_cfx(reference['namespace'], reference['files'])
+            wizard_reference.update_cfx(reference)
 
 def reference_camera(*args, **kwargs):
     references = get_references(kwargs)
     if 'camera' in references.keys():
         for reference in references['camera']:
-            wizard_reference.reference_camera(reference['namespace'], reference['files'])
+            wizard_reference.reference_camera(reference)
 
 def update_camera(*args, **kwargs):
     references = get_references(kwargs)
     if 'camera' in references.keys():
         for reference in references['camera']:
-            wizard_reference.update_camera(reference['namespace'], reference['files'])
+            wizard_reference.update_camera(reference)
 
 def get_references(kwargs):
     references = None

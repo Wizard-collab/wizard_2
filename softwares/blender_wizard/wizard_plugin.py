@@ -36,20 +36,17 @@ def set_image_size():
 def reference_texturing():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'texturing' in references.keys():
-        for texturing_reference in references['texturing']:
-            wizard_reference.reference_texturing(texturing_reference['namespace'],
-                                                    texturing_reference['files'])
+        for reference in references['texturing']:
+            wizard_reference.reference_texturing(reference)
 
 def update_texturing():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'texturing' in references.keys():
-        for texturing_reference in references['texturing']:
-            wizard_reference.update_texturing(texturing_reference['namespace'],
-                                                    texturing_reference['files'])
+        for reference in references['texturing']:
+            wizard_reference.update_texturing(reference)
 
 def reference_modeling():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'modeling' in references.keys():
-        for modeling_reference in references['modeling']:
-            wizard_reference.import_modeling_hard(modeling_reference['namespace'],
-                                                    modeling_reference['files'])
+        for reference in references['modeling']:
+            wizard_reference.import_modeling_hard(reference)

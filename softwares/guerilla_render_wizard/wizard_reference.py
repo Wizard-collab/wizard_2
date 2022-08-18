@@ -16,73 +16,75 @@ from guerilla_render_wizard import wizard_tools
 # Guerilla modules
 from guerilla import Document, Modifier, pynode, Node, Plug
 
-def reference_modeling(namespace, files_list):
-    import_file(namespace, files_list, 'MODELING', 'modeling')
-    append_wizardTags_to_guerillaTags(namespace)
+def reference_modeling(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def update_modeling(namespace, files_list):
-    update_file(namespace, files_list, 'MODELING', 'modeling')
-    append_wizardTags_to_guerillaTags(namespace)
+def update_modeling(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def reference_grooming(namespace, files_list):
+def reference_grooming(reference_dic):
     trigger_after_reference_hook('grooming',
-                                    files_list,
-                                    namespace,
-                                    [])
-    append_wizardTags_to_guerillaTags(namespace)
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    [],
+                                    reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def update_grooming(namespace, files_list):
+def update_grooming(reference_dic):
     trigger_after_reference_hook('grooming',
-                                    files_list,
-                                    namespace,
-                                    [])
-    append_wizardTags_to_guerillaTags(namespace)
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    [],
+                                    reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def reference_shading(namespace, files_list):
-    import_file(namespace, files_list, 'SHADING', 'shading')
+def reference_shading(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_variant'])
 
-def update_shading(namespace, files_list):
-    update_file(namespace, files_list, 'SHADING', 'shading')
+def update_shading(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_variant'])
 
-def reference_custom(namespace, files_list):
-    import_file(namespace, files_list, 'CUSTOM', 'custom')
+def reference_custom(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
 
-def update_custom(namespace, files_list):
-    update_file(namespace, files_list, 'CUSTOM', 'custom')
+def update_custom(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
 
-def reference_layout(namespace, files_list):
-    import_file(namespace, files_list, 'LAYOUT', 'layout')
-    append_wizardTags_to_guerillaTags(namespace)
+def reference_layout(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def update_layout(namespace, files_list):
-    update_file(namespace, files_list, 'LAYOUT', 'layout')
-    append_wizardTags_to_guerillaTags(namespace)
+def update_layout(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def reference_animation(namespace, files_list):
-    import_file(namespace, files_list, 'ANIMATION', 'animation')
-    append_wizardTags_to_guerillaTags(namespace)
+def reference_animation(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def update_animation(namespace, files_list):
-    update_file(namespace, files_list, 'ANIMATION', 'animation')
-    append_wizardTags_to_guerillaTags(namespace)
+def update_animation(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def reference_cfx(namespace, files_list):
-    import_file(namespace, files_list, 'CFX', 'cfx')
-    append_wizardTags_to_guerillaTags(namespace)
+def reference_cfx(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def update_cfx(namespace, files_list):
-    update_file(namespace, files_list, 'CFX', 'cfx')
-    append_wizardTags_to_guerillaTags(namespace)
+def update_cfx(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def reference_camera(namespace, files_list):
-    import_file(namespace, files_list, 'CAMERA', 'camera')
-    append_wizardTags_to_guerillaTags(namespace)
+def reference_camera(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def update_camera(namespace, files_list):
-    update_file(namespace, files_list, 'CAMERA', 'camera')
-    append_wizardTags_to_guerillaTags(namespace)
+def update_camera(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
-def import_file(namespace, files_list, parent_GRP_name, stage_name):
+def import_file(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_objects = wizard_tools.get_all_nodes()
     if namespace not in wizard_tools.get_all_nodes():
         GRP = wizard_tools.add_GRP(parent_GRP_name)
@@ -96,9 +98,10 @@ def import_file(namespace, files_list, parent_GRP_name, stage_name):
         trigger_after_reference_hook(stage_name,
                                         files_list,
                                         namespace,
-                                        wizard_tools.get_new_objects(old_objects))
+                                        wizard_tools.get_new_objects(old_objects),
+                                        referenced_string_asset)
 
-def update_file(namespace, files_list, parent_GRP_name, stage_name):
+def update_file(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_objects = wizard_tools.get_all_nodes()
     if namespace in wizard_tools.get_all_nodes():
         GRP = wizard_tools.add_GRP(parent_GRP_name)
@@ -112,7 +115,8 @@ def update_file(namespace, files_list, parent_GRP_name, stage_name):
         trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    wizard_tools.get_new_objects(old_objects),
+                                    referenced_string_asset)
 
 def create_ref(namespace, files_list, GRP):
     with Modifier() as mod:
@@ -166,7 +170,8 @@ def append_wizardTags_to_guerillaTags(namespace):
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
                                     namespace,
-                                    new_objects):
+                                    new_objects,
+                                    referenced_string_asset):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
@@ -176,5 +181,6 @@ def trigger_after_reference_hook(referenced_stage_name,
                                 referenced_files_dir,
                                 namespace,
                                 new_objects,
-                                string_asset)
+                                string_asset,
+                                referenced_string_asset)
     

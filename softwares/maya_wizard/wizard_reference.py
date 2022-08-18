@@ -16,167 +16,185 @@ from maya_wizard import wizard_tools
 # Maya modules
 import pymel.core as pm
 
-def reference_modeling(namespace, files_list):
+def reference_modeling(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'MODELING')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'MODELING')
         trigger_after_reference_hook('modeling',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_modeling(namespace, files_list):
+def update_modeling(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('modeling',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_rigging(namespace, files_list):
+def reference_rigging(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'RIGGING')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'RIGGING')
         trigger_after_reference_hook('rigging',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_rigging(namespace, files_list):
+def update_rigging(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('rigging',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_grooming(namespace, files_list):
+def reference_grooming(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'GROOMING')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'GROOMING')
         trigger_after_reference_hook('grooming',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_grooming(namespace, files_list):
+def update_grooming(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('grooming',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_custom(namespace, files_list):
+def reference_custom(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'CUSTOM')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CUSTOM')
         trigger_after_reference_hook('custom',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_custom(namespace, files_list):
+def update_custom(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('custom',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_camrig(namespace, files_list):
+def reference_camrig(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'CAMRIG')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CAMRIG')
         trigger_after_reference_hook('camrig',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_camrig(namespace, files_list):
+def update_camrig(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('camrig',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_layout(namespace, files_list):
+def reference_layout(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'LAYOUT')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'LAYOUT')
         trigger_after_reference_hook('layout',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_layout(namespace, files_list):
+def update_layout(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('layout',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_animation(namespace, files_list):
+def reference_animation(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'ANIMATION')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'ANIMATION')
         trigger_after_reference_hook('animation',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_animation(namespace, files_list):
+def update_animation(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('animation',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_cfx(namespace, files_list):
+def reference_cfx(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'CFX')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CFX')
         trigger_after_reference_hook('cfx',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_cfx(namespace, files_list):
+def update_cfx(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('cfx',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def reference_camera(namespace, files_list):
+def reference_camera(reference_dic):
     old_objects = pm.ls()
-    if not pm.namespace(exists=namespace):
-        create_reference(files_list[0], namespace, 'CAMERA')
+    if not pm.namespace(exists=reference_dic['namespace']):
+        create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CAMERA')
         trigger_after_reference_hook('camera',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
-def update_camera(namespace, files_list):
+def update_camera(reference_dic):
     old_objects = pm.ls()
-    if pm.namespace(exists=namespace):
-        update_reference(namespace, files_list)
+    if pm.namespace(exists=reference_dic['namespace']):
+        update_reference(reference_dic['files'], reference_dic['namespace'])
         trigger_after_reference_hook('camera',
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_objects))
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
 
 def create_reference(file, namespace, group):
     if not pm.objExists(group):
@@ -189,7 +207,7 @@ def create_reference(file, namespace, group):
         pm.parent(object, group)
     pm.delete('wizard_temp_reference_node')
 
-def update_reference(namespace, files_list):
+def update_reference(files_list, namespace):
     references = pm.listReferences(namespaces=True)
     for reference in references:
         if reference[0] == namespace:
@@ -199,7 +217,8 @@ def update_reference(namespace, files_list):
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
                                     namespace,
-                                    new_objects):
+                                    new_objects,
+                                    referenced_string_asset):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
@@ -209,5 +228,6 @@ def trigger_after_reference_hook(referenced_stage_name,
                                 referenced_files_dir,
                                 namespace,
                                 new_objects,
-                                string_asset)
+                                string_asset,
+                                referenced_string_asset)
     

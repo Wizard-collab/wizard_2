@@ -16,25 +16,25 @@ from nuke_wizard import wizard_tools
 # Nuke modules
 import nuke
 
-def reference_custom(namespace, files_list):
-    import_from_extension(namespace, files_list, 'custom')
+def reference_custom(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_variant'])
 
-def update_custom(namespace, files_list):
-    update_from_extension(namespace, files_list, 'custom')
+def update_custom(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_variant'])
 
-def reference_camera(namespace, files_list):
-    import_from_extension(namespace, files_list, 'camera')
+def reference_camera(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_variant'])
 
-def update_camera(namespace, files_list):
-    update_from_extension(namespace, files_list, 'camera')
+def update_camera(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_variant'])
 
-def reference_lighting(namespace, files_list):
-    import_from_extension(namespace, files_list, 'lighting')
+def reference_lighting(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_variant'])
 
-def update_lighting(namespace, files_list):
-    update_from_extension(namespace, files_list, 'lighting')
+def update_lighting(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_variant'])
 
-def import_from_extension(namespace, files_list, stage_name):
+def import_from_extension(namespace, files_list, stage_name, referenced_string_asset):
     old_nodes = wizard_tools.get_all_nodes()
     extension = files_list[0].split('.')[-1]
     if extension == 'exr':
@@ -47,9 +47,10 @@ def import_from_extension(namespace, files_list, stage_name):
     trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
-                                    wizard_tools.get_new_objects(old_nodes))
+                                    wizard_tools.get_new_objects(old_nodes),
+                                    referenced_string_asset)
 
-def update_from_extension(namespace, files_list, stage_name):
+def update_from_extension(namespace, files_list, stage_name, referenced_string_asset):
     old_nodes = wizard_tools.get_all_nodes()
     extension = files_list[0].split('.')[-1]
     if extension == 'exr':
@@ -62,9 +63,10 @@ def update_from_extension(namespace, files_list, stage_name):
     trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
-                                    wizard_tools.get_new_objects(old_nodes))
+                                    wizard_tools.get_new_objects(old_nodes),
+                                    referenced_string_asset)
 
-def import_nk(namespace, files_list):
+def import_nk( namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
         if len(files_list) == 1:
             old_nodes = wizard_tools.get_all_nodes()
@@ -74,11 +76,11 @@ def import_nk(namespace, files_list):
         else:
             logger.warning("Can't merge multiple files")
 
-def update_nk(namespace, files_list):
+def update_nk( namespace, files_list):
     if namespace in wizard_tools.get_all_namespaces().keys():
         logger.info(f"Can't update {namespace} since it is merged")
 
-def reference_abc_camera(namespace, files_list):
+def reference_abc_camera( namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
         if len(files_list) == 1:
             old_nodes = wizard_tools.get_all_nodes()
@@ -92,7 +94,7 @@ def reference_abc_camera(namespace, files_list):
         else:
             logger.warning("Can't merge multiple files")
 
-def update_abc_camera(namespace, files_list):
+def update_abc_camera( namespace, files_list):
     if namespace in wizard_tools.get_all_namespaces().keys():
         if len(files_list) == 1:
             camera_node = wizard_tools.get_all_namespaces()[namespace][0]
@@ -100,7 +102,7 @@ def update_abc_camera(namespace, files_list):
         else:
             logger.warning("Can't merge multiple files")
 
-def reference_exr(namespace, files_list):
+def reference_exr( namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
         reads_list = []
@@ -113,7 +115,7 @@ def reference_exr(namespace, files_list):
         wizard_tools.align_nodes(reads_list)
         wizard_tools.backdrop_nodes(reads_list, namespace)
 
-def update_exr(namespace, files_list):
+def update_exr( namespace, files_list):
     all_namespaces = wizard_tools.get_all_namespaces()
     if namespace in all_namespaces.keys():
         existing_reads_list = all_namespaces[namespace]
@@ -141,7 +143,8 @@ def update_exr(namespace, files_list):
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
                                     namespace,
-                                    new_objects):
+                                    new_objects,
+                                    referenced_string_asset):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
@@ -151,4 +154,5 @@ def trigger_after_reference_hook(referenced_stage_name,
                                 referenced_files_dir,
                                 namespace,
                                 new_objects,
-                                string_asset)
+                                string_asset,
+                                referenced_string_asset)

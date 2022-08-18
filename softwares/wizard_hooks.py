@@ -84,7 +84,8 @@ def after_reference_hooks(software,
 	                        referenced_files_dir,
 	                        namespace,
 	                        new_objects,
-	                        string_asset):
+	                        string_asset,
+	                        referenced_string_asset):
 	hooks_modules = get_hooks_modules(software)
 	for module_name in hooks_modules.keys():
 		try:
@@ -95,7 +96,8 @@ def after_reference_hooks(software,
 										                        referenced_files_dir,
 										                        namespace,
 										                        new_objects,
-										                        string_asset)
+										                        string_asset,
+										                        referenced_string_asset)
 		except:
 			logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
 																hooks_modules[module_name]['path']))

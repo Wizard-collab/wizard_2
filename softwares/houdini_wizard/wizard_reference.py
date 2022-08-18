@@ -16,49 +16,49 @@ from houdini_wizard import wizard_tools
 # Houdini modules
 import hou
 
-def reference_modeling(namespace, files_list):
-    import_from_extension(namespace, files_list, 'MODELING', 'modeling')
+def reference_modeling(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
 
-def update_modeling(namespace, files_list):
-    update_from_extension(namespace, files_list, 'MODELING', 'modeling')
+def update_modeling(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
 
-def reference_rigging(namespace, files_list):
-    import_from_extension(namespace, files_list, 'RIGGING', 'rigging')
+def reference_rigging(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_variant'])
 
-def update_rigging(namespace, files_list):
-    update_from_extension(namespace, files_list, 'RIGGING', 'rigging')
+def update_rigging(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_variant'])
 
-def reference_custom(namespace, files_list):
-    import_from_extension(namespace, files_list, 'CUSTOM', 'custom')
+def reference_custom(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
 
-def update_custom(namespace, files_list):
-    update_from_extension(namespace, files_list, 'CUSTOM', 'custom')
+def update_custom(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
 
-def reference_layout(namespace, files_list):
-    import_from_extension(namespace, files_list, 'LAYOUT', 'layout')
+def reference_layout(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
 
-def update_layout(namespace, files_list):
-    update_from_extension(namespace, files_list, 'LAYOUT', 'layout')
+def update_layout(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
 
-def reference_animation(namespace, files_list):
-    import_from_extension(namespace, files_list, 'ANIMATION', 'animation')
+def reference_animation(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
 
-def update_animation(namespace, files_list):
-    update_from_extension(namespace, files_list, 'ANIMATION', 'animation')
+def update_animation(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
 
-def reference_cfx(namespace, files_list):
-    import_from_extension(namespace, files_list, 'CFX', 'cfx')
+def reference_cfx(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
 
-def update_cfx(namespace, files_list):
-    update_from_extension(namespace, files_list, 'CFX', 'cfx')
+def update_cfx(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
 
-def reference_camera(namespace, files_list):
-    import_from_extension(namespace, files_list, 'CAMERA', 'camera')
+def reference_camera(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
 
-def update_camera(namespace, files_list):
-    update_from_extension(namespace, files_list, 'CAMERA', 'camera')
+def update_camera(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
 
-def import_from_extension(namespace, files_list, parent_GRP_name, stage_name):
+def import_from_extension(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_nodes = wizard_tools.get_all_nodes()
     extension = files_list[0].split('.')[-1]
     if extension == 'abc':
@@ -71,9 +71,10 @@ def import_from_extension(namespace, files_list, parent_GRP_name, stage_name):
     trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
-                                    wizard_tools.get_new_objects(old_nodes))
+                                    wizard_tools.get_new_objects(old_nodes),
+                                    referenced_string_asset)
 
-def update_from_extension(namespace, files_list, parent_GRP_name, stage_name):
+def update_from_extension(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_nodes = wizard_tools.get_all_nodes()
     extension = files_list[0].split('.')[-1]
     if extension == 'abc':
@@ -86,7 +87,8 @@ def update_from_extension(namespace, files_list, parent_GRP_name, stage_name):
     trigger_after_reference_hook(stage_name,
                                     files_list,
                                     namespace,
-                                    wizard_tools.get_new_objects(old_nodes))
+                                    wizard_tools.get_new_objects(old_nodes),
+                                    referenced_string_asset)
 
 def reference_abc(namespace, files_list):
     if len(files_list) == 1:
@@ -163,7 +165,8 @@ def update_abc_camera(namespace, files_list):
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
                                     namespace,
-                                    new_objects):
+                                    new_objects,
+                                    referenced_string_asset):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
@@ -173,5 +176,6 @@ def trigger_after_reference_hook(referenced_stage_name,
                                 referenced_files_dir,
                                 namespace,
                                 new_objects,
-                                string_asset)
+                                string_asset,
+                                referenced_string_asset)
     

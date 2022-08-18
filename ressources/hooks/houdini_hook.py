@@ -41,7 +41,8 @@ def after_reference(stage_name,
 						referenced_files_dir,
 						namespace, 
  						new_objects,
- 						string_asset):
+ 						string_asset,
+ 						referenced_string_asset):
 	''' This function is triggered
 		after referencing from wizard
 

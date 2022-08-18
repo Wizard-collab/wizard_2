@@ -75,28 +75,28 @@ def import_modeling(references=None):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'modeling' in references.keys():
         for reference in references['modeling']:
-            wizard_reference.reference_modeling(reference['namespace'], reference['files'])
+            wizard_reference.reference_modeling(reference)
 
 def update_modeling(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'modeling' in references.keys():
         for reference in references['modeling']:
-            wizard_reference.update_modeling(reference['namespace'], reference['files'])
+            wizard_reference.update_modeling(reference)
 
 def import_grooming(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'grooming' in references.keys():
         for reference in references['grooming']:
-            wizard_reference.reference_grooming(reference['namespace'], reference['files'])
+            wizard_reference.reference_grooming(reference)
 
 def update_grooming(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'grooming' in references.keys():
         for reference in references['grooming']:
-            wizard_reference.update_grooming(reference['namespace'], reference['files'])
+            wizard_reference.update_grooming(reference)
 
 def import_texturing(references=None):
     if not references:
@@ -105,7 +105,8 @@ def import_texturing(references=None):
         for reference in references['texturing']:
             guerilla_shader.import_texturing(reference['namespace'],
                                                 reference['files'],
-                                                reference['asset_name'])
+                                                reference['asset_name'],
+                                                reference['string_variant'])
 
 def update_texturing(references=None):
     if not references:
@@ -114,91 +115,92 @@ def update_texturing(references=None):
         for reference in references['texturing']:
             guerilla_shader.update_texturing(reference['namespace'],
                                                 reference['files'],
-                                                reference['asset_name'])
+                                                reference['asset_name'],
+                                                reference['string_variant'])
 
 def import_shading(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'shading' in references.keys():
         for reference in references['shading']:
-            wizard_reference.reference_shading(reference['namespace'], reference['files'])
+            wizard_reference.reference_shading(reference)
 
 def update_shading(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'shading' in references.keys():
         for reference in references['shading']:
-            wizard_reference.update_shading(reference['namespace'], reference['files'])
+            wizard_reference.update_shading(reference)
 
 def import_custom(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.reference_custom(reference['namespace'], reference['files'])
+            wizard_reference.reference_custom(reference)
 
 def update_custom(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.update_custom(reference['namespace'], reference['files'])
+            wizard_reference.update_custom(reference)
 
 def import_layout(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'layout' in references.keys():
         for reference in references['layout']:
-            wizard_reference.reference_layout(reference['namespace'], reference['files'])
+            wizard_reference.reference_layout(reference)
 
 def update_layout(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'layout' in references.keys():
         for reference in references['layout']:
-            wizard_reference.update_layout(reference['namespace'], reference['files'])
+            wizard_reference.update_layout(reference)
 
 def import_animation(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'animation' in references.keys():
         for reference in references['animation']:
-            wizard_reference.reference_animation(reference['namespace'], reference['files'])
+            wizard_reference.reference_animation(reference)
 
 def update_animation(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'animation' in references.keys():
         for reference in references['animation']:
-            wizard_reference.update_animation(reference['namespace'], reference['files'])
+            wizard_reference.update_animation(reference)
 
 def import_cfx(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'cfx' in references.keys():
         for reference in references['cfx']:
-            wizard_reference.reference_cfx(reference['namespace'], reference['files'])
+            wizard_reference.reference_cfx(reference)
 
 def update_cfx(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'cfx' in references.keys():
         for reference in references['cfx']:
-            wizard_reference.update_cfx(reference['namespace'], reference['files'])
+            wizard_reference.update_cfx(reference)
 
 def import_camera(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'camera' in references.keys():
         for reference in references['camera']:
-            wizard_reference.reference_camera(reference['namespace'], reference['files'])
+            wizard_reference.reference_camera(reference)
 
 def update_camera(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'camera' in references.keys():
         for reference in references['camera']:
-            wizard_reference.update_camera(reference['namespace'], reference['files'])
+            wizard_reference.update_camera(reference)
 
 def set_frame_range(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))

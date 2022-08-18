@@ -54,42 +54,42 @@ def reference_custom(references=None):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.reference_custom(reference['namespace'], reference['files'])
+            wizard_reference.reference_custom(reference)
 
 def update_custom(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.update_custom(reference['namespace'], reference['files'])
+            wizard_reference.update_custom(reference)
 
 def reference_camera(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'camera' in references.keys():
         for reference in references['camera']:
-            wizard_reference.reference_camera(reference['namespace'], reference['files'])
+            wizard_reference.reference_camera(reference)
 
 def update_camera(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'camera' in references.keys():
         for reference in references['camera']:
-            wizard_reference.update_camera(reference['namespace'], reference['files'])
+            wizard_reference.update_camera(reference)
 
 def reference_lighting(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'lighting' in references.keys():
         for reference in references['lighting']:
-            wizard_reference.reference_lighting(reference['namespace'], reference['files'])
+            wizard_reference.reference_lighting(reference)
 
 def update_lighting(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'lighting' in references.keys():
         for reference in references['lighting']:
-            wizard_reference.update_lighting(reference['namespace'], reference['files'])
+            wizard_reference.update_lighting(reference)
 
 def set_frame_range(rolls=0):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
