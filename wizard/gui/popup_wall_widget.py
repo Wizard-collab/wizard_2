@@ -140,10 +140,10 @@ class popup_save_widget(QtWidgets.QFrame):
         super(popup_save_widget, self).__init__(parent)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.setGraphicsEffect(self.shadow)
 
         self.setObjectName('popup_event_frame')
@@ -242,10 +242,10 @@ class popup_event_widget(QtWidgets.QFrame):
         super(popup_event_widget, self).__init__(parent)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.setGraphicsEffect(self.shadow)
 
         self.setObjectName('popup_event_frame')
@@ -475,10 +475,10 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.is_comment = False
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.setGraphicsEffect(self.shadow)
 
         self.setObjectName('popup_event_frame')

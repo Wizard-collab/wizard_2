@@ -220,10 +220,10 @@ class group_creation_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.main_frame)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(8)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.main_frame.setGraphicsEffect(self.shadow)
 
         self.close_frame = QtWidgets.QFrame()

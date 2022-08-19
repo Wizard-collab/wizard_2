@@ -200,10 +200,10 @@ class uninstaller(QtWidgets.QWidget):
         self.main_frame.setStyleSheet('QFrame{border-radius:10px;}')
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(18)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.main_frame.setGraphicsEffect(self.shadow)
 
         self.frame_layout = QtWidgets.QVBoxLayout()

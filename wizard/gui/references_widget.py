@@ -147,7 +147,7 @@ class references_widget(QtWidgets.QWidget):
                 stage_row = project.get_stage_data(variant_row['stage_id'])
                 asset_row = project.get_asset_data(stage_row['asset_id'])
                 category_row = project.get_category_data(asset_row['category_id'])
-                self.search_reference_widget.search_asset(f"{category_row['name']}:{asset_row['name']}")
+                self.search_reference_widget.search_asset(f"{category_row['name']}/{asset_row['name']}")
             else:
                 self.search_reference_widget.search_asset(f"")
 

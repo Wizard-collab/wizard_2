@@ -46,10 +46,10 @@ class team_widget(QtWidgets.QWidget):
         self.main_widget_layout.addWidget(self.main_widget)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(12)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 190))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.main_widget.setGraphicsEffect(self.shadow)
 
         self.header_widget = QtWidgets.QWidget()

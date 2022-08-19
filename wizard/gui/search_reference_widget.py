@@ -12,6 +12,7 @@ import time
 from wizard.core import assets
 from wizard.core import project
 from wizard.vars import ressources
+from wizard.vars import assets_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -26,8 +27,12 @@ class search_reference_widget(QtWidgets.QWidget):
     def __init__(self, context, parent = None):
         super(search_reference_widget, self).__init__(parent)
 
+        self.init_icons_dic()
+
         self.parent = parent
         self.context = context
+        self.old_thread_id = None
+        self.search_threads = dict()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Create references")
@@ -37,12 +42,16 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)       
 
-        self.search_thread = search_thread(self.context)
         self.variant_ids = dict()
         self.groups_ids = dict()
 
         self.build_ui()
         self.connect_functions()
+
+    def init_icons_dic(self):
+        self.icons_dic = dict()
+        for stage in assets_vars._all_stages_:
+            self.icons_dic[stage] = QtGui.QIcon(ressources._stage_icons_dic_[stage])
 
     def move_ui(self):
         cursor = self.mapFromGlobal(QtGui.QCursor.pos())
@@ -84,27 +93,48 @@ class search_reference_widget(QtWidgets.QWidget):
         self.close()
 
     def search_ended(self):
+        search_time = str(round((time.time()-self.search_start_time), 3))
+        self.found_label.setText(f"Found {self.list_view.invisibleRootItem().childCount()} occurences in {search_time}s")
         if self.list_view.invisibleRootItem().childCount() == 0:
             self.show_info_mode('No export found...', ressources._nothing_info_)
         else:
             self.hide_info_mode()
 
+    def clean_threads(self):
+        ids = list(self.search_threads.keys())
+        for thread_id in ids:
+            if not self.search_threads[thread_id].running:
+                self.search_threads[thread_id].terminate()
+                del self.search_threads[thread_id]
+
     def search_asset(self, search):
+        self.search_start_time = time.time()
         self.accept_item_from_thread = False
+        if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
+            self.search_threads[self.old_thread_id].item_signal.disconnect()
+            self.search_threads[self.old_thread_id].group_signal.disconnect()
+            self.search_threads[self.old_thread_id].search_ended.disconnect()
+        thread_id = time.time()
+        self.search_threads[thread_id] = search_thread(self.context)
+        self.search_threads[thread_id].item_signal.connect(self.add_item)
+        self.search_threads[thread_id].group_signal.connect(self.add_group)
+        self.search_threads[thread_id].search_ended.connect(self.search_ended)
+        self.old_thread_id = thread_id
         self.list_view.clear()
         self.variant_ids = dict()
         self.groups_ids = dict()
-        if len(search) > 1:
+        if len(search) > 0:
             self.accept_item_from_thread = True
-            self.search_thread.update_search(search)
+            self.search_threads[thread_id].update_search(search)
         else:
-            self.search_thread.running=False
+            self.search_threads[thread_id].running=False
             self.search_ended()
+        self.clean_threads()
 
     def add_item(self, item_list):
         if self.accept_item_from_thread:
             if item_list[3]['id'] not in self.variant_ids.keys():
-                variant_item = custom_item(item_list[0], item_list[1], item_list[2], item_list[3], self.list_view.invisibleRootItem())
+                variant_item = custom_item(item_list[0], item_list[1], item_list[2], item_list[3], self.icons_dic, self.list_view.invisibleRootItem())
                 self.variant_ids[item_list[3]['id']] = variant_item
 
     def add_group(self, group_row):
@@ -115,9 +145,7 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
-        self.search_thread.item_signal.connect(self.add_item)
-        self.search_thread.group_signal.connect(self.add_group)
-        self.search_thread.search_ended.connect(self.search_ended)
+        
         self.list_view.itemDoubleClicked.connect(self.return_references)
 
     def keyPressEvent(self, event):
@@ -166,6 +194,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.main_widget = QtWidgets.QWidget()
+        self.main_widget.setObjectName('dark_widget')
         self.main_widget.setStyleSheet('border-radius:5px;')
         self.main_widget_layout = QtWidgets.QVBoxLayout()
         self.main_widget_layout.setContentsMargins(0,0,0,0)
@@ -174,15 +203,24 @@ class search_reference_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.main_widget)
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(12)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 180))
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
         self.main_widget.setGraphicsEffect(self.shadow)
 
         self.search_bar = gui_utils.search_bar()
-        self.search_bar.setPlaceholderText('"asset", "category:asset"')
+        self.search_bar.setPlaceholderText('"Joe", "characters&Joe", "INTRO&animation"')
         self.main_widget_layout.addWidget(self.search_bar)
+
+        self.found_widget = QtWidgets.QWidget()
+        self.found_widget.setObjectName('dark_widget')
+        self.found_layout = QtWidgets.QHBoxLayout()
+        self.found_widget.setLayout(self.found_layout)
+        self.main_widget_layout.addWidget(self.found_widget)
+        self.found_label = QtWidgets.QLabel()
+        self.found_label.setObjectName('gray_label')
+        self.found_layout.addWidget(self.found_label)
 
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)
@@ -213,12 +251,10 @@ class search_thread(QtCore.QThread):
         self.running = True
 
     def update_search(self, string):
-        self.running = False
         self.string = string
         self.start()
 
     def run(self):
-        self.running = True
         keywords = self.string.split('&') 
         all_export_versions_variant_ids = project.get_all_export_versions('variant_id')
         all_variants = project.get_all_variants()
@@ -235,23 +271,25 @@ class search_thread(QtCore.QThread):
         for category_row in all_categories:
             categories[category_row['id']] = category_row
         for variant_row in all_variants:
-            if variant_row['id'] in all_export_versions_variant_ids:
-                if all(keyword.upper() in variant_row['string'].upper() for keyword in keywords):
-                    stage_row = stages[variant_row['stage_id']]
-                    asset_row = assets[stage_row['asset_id']]
-                    category_row = categories[asset_row['category_id']]
-                    self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+            #if variant_row['id'] in all_export_versions_variant_ids:
+            if all(keyword.upper() in variant_row['string'].upper() for keyword in keywords):
+                stage_row = stages[variant_row['stage_id']]
+                asset_row = assets[stage_row['asset_id']]
+                category_row = categories[asset_row['category_id']]
+                self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
         if (self.context == 'work_env'):
                 groups_rows = project.get_groups()
                 for group_row in groups_rows:
                     if all(keyword.upper() in group_row['name'].upper()+'GROUPS' for keyword in keywords):
                         self.group_signal.emit(group_row)
         self.search_ended.emit(1)
+        self.running = False
 
 class custom_item(QtWidgets.QTreeWidgetItem):
-    def __init__(self, category_row, asset_row, stage_row, variant_row, parent=None):
+    def __init__(self, category_row, asset_row, stage_row, variant_row, icons_dic, parent=None):
         super(custom_item, self).__init__(parent)
         self.type = 'variant'
+        self.icons_dic = icons_dic
         self.category_row = category_row
         self.asset_row = asset_row
         self.stage_row = stage_row
@@ -265,7 +303,7 @@ class custom_item(QtWidgets.QTreeWidgetItem):
         bold_font.setBold(True)
         self.setFont(1, bold_font)
         self.setText(2, self.stage_row['name'])
-        self.setIcon(2, QtGui.QIcon(ressources._stage_icons_dic_[self.stage_row['name']]))
+        self.setIcon(2, self.icons_dic[self.stage_row['name']])
         self.setText(3, self.variant_row['name'])
 
 class custom_group_item(QtWidgets.QTreeWidgetItem):
