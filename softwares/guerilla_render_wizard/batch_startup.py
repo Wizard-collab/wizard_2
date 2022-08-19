@@ -11,9 +11,12 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 from guerilla_render_wizard import wizard_plugin
+from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard.export import shading
 from guerilla_render_wizard.export import custom
 from guerilla_render_wizard.export import lighting
+
+wizard_tools.trigger_after_scene_openning_hook()
 
 # read_settings
 if 'WIZARD_JSON_SETTINGS' in os.environ.keys():

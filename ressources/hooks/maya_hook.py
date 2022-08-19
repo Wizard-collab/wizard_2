@@ -4,6 +4,20 @@
 import logging
 logger = logging.getLogger(__name__)
 
+def after_scene_openning(stage_name, string_asset):
+	''' This function is triggered
+		when you open the software.
+
+		The "stage_name" argument is the name
+		of the exported stage
+
+		The "string_asset" argument is the current
+		asset represented as string
+
+		The "scene_path" argument is the scene path, 
+		if there is no scene, it will be 'None' '''
+	pass		
+
 def after_save(stage_name, string_asset, scene_path):
 	''' This function is triggered
 		after an incremental save.

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # Wizard modules
 import wizard_communicate
 from nuke_wizard import wizard_plugin
+from nuke_wizard import wizard_tools
 from nuke_wizard.export import compositing
 
 # Nuke modules
@@ -19,6 +20,8 @@ import nuke
 
 # Open version file
 nuke.scriptOpen(wizard_communicate.get_file(os.environ['wizard_version_id']))
+
+wizard_tools.trigger_after_scene_openning_hook()
 
 # read_settings
 if 'wizard_json_settings' in os.environ.keys():

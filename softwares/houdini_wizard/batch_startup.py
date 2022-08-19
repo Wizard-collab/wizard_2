@@ -11,12 +11,15 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 from houdini_wizard import wizard_plugin
+from houdini_wizard import wizard_tools
 from houdini_wizard.export import modeling
 from houdini_wizard.export import rigging
 from houdini_wizard.export import custom
 from houdini_wizard.export import layout
 from houdini_wizard.export import cfx
 from houdini_wizard.export import fx
+
+wizard_tools.trigger_after_scene_openning_hook()
 
 # read_settings
 if 'wizard_json_settings' in os.environ.keys():

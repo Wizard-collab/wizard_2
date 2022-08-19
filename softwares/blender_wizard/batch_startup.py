@@ -10,7 +10,10 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 from blender_wizard import wizard_plugin
+from blender_wizard import wizard_tools
 from blender_wizard.export import modeling
+
+wizard_tools.trigger_after_scene_openning_hook()
 
 # read_settings
 if 'wizard_json_settings' in os.environ.keys():

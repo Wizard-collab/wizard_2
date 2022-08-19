@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Wizard modules
 from maya_wizard import wizard_plugin
+from maya_wizard import wizard_tools
 from maya_wizard.export import modeling
 from maya_wizard.export import rigging
 from maya_wizard.export import grooming
@@ -20,6 +21,8 @@ from maya_wizard.export import layout
 from maya_wizard.export import animation
 from maya_wizard.export import cfx
 from maya_wizard.export import camera
+
+wizard_tools.trigger_after_scene_openning_hook()
 
 # read_settings
 if 'wizard_json_settings'.upper() in os.environ.keys():

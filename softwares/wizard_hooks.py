@@ -27,8 +27,19 @@ hooks['nuke'] = 'nuke_hook.py'
 hooks['substance_painter'] = 'substance_painter_hook.py'
 hooks['substance_designer'] = 'substance_designer_hook.py'
 
+def after_scene_openning_hooks(software, stage_name, string_asset):
+	hooks_modules = get_hooks_modules(software)
+	for module_name in hooks_modules.keys():
+		try:
+			logger.info("Executing {0} after scene openning hook from {1}".format(module_name,
+																hooks_modules[module_name]['path']))
+			hooks_modules[module_name]['module'].after_scene_openning(stage_name, string_asset)
+		except:
+			logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+																hooks_modules[module_name]['path']))
+			logger.error(traceback.format_exc())
+
 def after_save_hooks(software, stage_name, string_asset, scene_path):
-	sanity = True
 	hooks_modules = get_hooks_modules(software)
 	for module_name in hooks_modules.keys():
 		try:
@@ -39,7 +50,6 @@ def after_save_hooks(software, stage_name, string_asset, scene_path):
 			logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
 																hooks_modules[module_name]['path']))
 			logger.error(traceback.format_exc())
-	return sanity
 
 def sanity_hooks(software, stage_name, string_asset, exported_string_asset):
 	sanity = True

@@ -7,6 +7,40 @@ logger = logging.getLogger(__name__)
 import pymel.core as pm
 import maya.cmds as cmds
 
+# coding: utf-8
+# Wizard hook
+
+import logging
+logger = logging.getLogger(__name__)
+
+def after_scene_openning(stage_name, string_asset):
+    ''' This function is triggered
+        when you open the software.
+
+        The "stage_name" argument is the name
+        of the exported stage
+
+        The "string_asset" argument is the current
+        asset represented as string
+
+        The "scene_path" argument is the scene path, 
+        if there is no scene, it will be 'None' '''
+    pass    
+
+def after_save(stage_name, string_asset, scene_path):
+    ''' This function is triggered
+        after an incremental save.
+
+        The "stage_name" argument is the name
+        of the exported stage
+
+        The "string_asset" argument is the current
+        asset represented as string
+
+        The "scene_path" argument is the saved 
+        incremental file'''
+    pass        
+
 def sanity(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
         before the export and will stop the
@@ -14,7 +48,13 @@ def sanity(stage_name, string_asset, exported_string_asset):
         "False"
         
         The "stage_name" argument is the name
-        of the exported stage '''
+        of the exported stage
+
+        The "string_asset" argument is the current
+        asset represented as string
+
+        The "exported_string_asset" argument is the
+        asset wizard will export represented as string'''
     if stage_name == 'grooming':
         # Grooming sanity
         sanity_status = True
@@ -35,8 +75,14 @@ def before_export(stage_name, string_asset, exported_string_asset):
         The "stage_name" argument is the name
         of the exported stage
 
+        The "string_asset" argument is the current
+        asset represented as string
+
         You can return a list of objects 
-        that wizard will add to the export '''
+        that wizard will add to the export
+
+        The "exported_string_asset" argument is the
+        asset wizard will export represented as string'''
     if stage_name == 'grooming':
         yeti_scalps_set = pm.PyNode('yeti_scalps_set')
         yeti_nodes_set = pm.PyNode('yeti_nodes_set')
@@ -52,7 +98,13 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
         of the exported stage
 
         The "export_dir" argument is the path wher wizard exported the
-        file as string '''
+        file as string
+
+        The "string_asset" argument is the current
+        asset represented as string
+
+        The "exported_string_asset" argument is the
+        asset wizard just exported represented as string'''
     if stage_name == 'grooming':
         yeti_nodes_list = cmds.sets( 'yeti_nodes_set', q=True )
         for yeti_node in yeti_nodes_list:
@@ -82,5 +134,11 @@ def after_reference(stage_name,
         The "namespace" argument is the namespace of the reference
 
         The "new_objects" argument is a list of the new objects added
-        to the current scene after the reference '''
+        to the current scene after the reference
+
+        The "string_asset" argument is the current
+        asset represented as string
+
+        The "referenced_string_asset" argument is the
+        asset wizard just imported represented as string'''
     pass

@@ -76,6 +76,11 @@ def trigger_after_save_hook(scene_path):
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
     return wizard_hooks.after_save_hooks('maya', stage_name, string_asset, scene_path)
 
+def trigger_after_scene_openning_hook():
+    stage_name = os.environ['wizard_stage_name']
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    return wizard_hooks.after_scene_openning_hooks('maya', stage_name, string_asset)
+
 def apply_tags(object_list):
     all_objects = []
     for object in object_list:
