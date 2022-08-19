@@ -3,7 +3,7 @@ import time
 import statistics
 times = []
 start_time = time.time()
-for a in range(500,1000):
+for a in range(1,10):
 	asset_start_time = time.time()
 	asset_path=wapi.assets.create_asset("sequences/INTRO", f"benchmark_{str(a)}")
 	for stage in ['layout', 'animation', 'cfx', 'fx', 'camera', 'lighting', 'compositing']:

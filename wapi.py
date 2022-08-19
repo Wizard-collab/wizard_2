@@ -465,46 +465,46 @@ class tracking:
     def __init__(self):
         pass
 
-    def get_task_assignment(self, variant):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            return core.project.get_variant_data(variant_id, 'assignment')
+    def get_task_assignment(self, stage):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            return core.project.get_stage_data(stage_id, 'assignment')
 
-    def get_task_state(self, variant):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            return core.project.get_variant_data(variant_id, 'state')
+    def get_task_state(self, stage):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            return core.project.get_stage_data(stage_id, 'state')
 
-    def get_task_work_time(self, variant):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            return core.project.get_variant_data(variant_id, 'work_time')
+    def get_task_work_time(self, stage):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            return core.project.get_stage_data(stage_id, 'work_time')
 
-    def get_task_estimated_time(self, variant):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            return core.project.get_variant_data(variant_id, 'estimated_time')
+    def get_task_estimated_time(self, stage):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            return core.project.get_stage_data(stage_id, 'estimated_time')
 
-    def assign_task(self, variant, user):
+    def assign_task(self, stage, user):
         user_id = core.repository.get_user_row_by_name(user, 'id')
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if user_id and variant_id:
-            core.assets.modify_variant_assignment(variant_id, user)
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if user_id and stage_id:
+            core.assets.modify_stage_assignment(stage_id, user)
 
-    def set_task_state(self, variant, state, comment=''):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            core.assets.modify_variant_state(variant_id, state, comment)
+    def set_task_state(self, stage, state, comment=''):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            core.assets.modify_stage_state(stage_id, state, comment)
 
-    def estimate_task_time(self, variant, time):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            core.assets.modify_variant_estimation(variant_id, time)    
+    def estimate_task_time(self, stage, time):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            core.assets.modify_stage_estimation(stage_id, time)    
 
-    def add_task_comment(self, variant, comment):
-        instance_type, variant_id = core.assets.string_to_instance(variant)
-        if variant_id:
-            core.assets.add_variant_comment(variant_id, comment)    
+    def add_task_comment(self, stage, comment):
+        instance_type, stage_id = core.assets.string_to_instance(stage)
+        if stage_id:
+            core.assets.add_stage_comment(stage_id, comment)    
 
 class launch:
     def __init__(self):
