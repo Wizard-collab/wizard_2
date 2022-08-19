@@ -114,7 +114,12 @@ class assets:
         # The parent argument should look like
         # "assets/characters"
         string_asset = None
-        instance_type, category_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, category_id = core.assets.string_to_instance(parent)
+        else:
+            category_id = parent
+
         if category_id:
             asset_id = core.assets.create_asset(name, category_id)
             if asset_id:
@@ -126,7 +131,12 @@ class assets:
         # The parent argument should look like
         # "assets/characters/Joe"
         string_stage = None
-        instance_type, asset_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, asset_id = core.assets.string_to_instance(parent)
+        else:
+            asset_id = parent
+
         if asset_id:
             stage_id = core.assets.create_stage(stage, asset_id)
             if stage_id:
@@ -138,7 +148,12 @@ class assets:
         # The parent argument should look like
         # "assets/characters/Joe/modeling"
         string_variant = None
-        instance_type, stage_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, stage_id = core.assets.string_to_instance(parent)
+        else:
+            stage_id = parent
+
         if stage_id:
             variant_id = core.assets.create_variant(name, stage_id)
             if variant_id:
@@ -150,7 +165,12 @@ class assets:
         # The parent argument should look like
         # "assets/characters/Joe/modeling/main"
         string_work_env = None
-        instance_type, variant_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, variant_id = core.assets.string_to_instance(parent)
+        else:
+            variant_id = parent
+
         if variant_id:
             software_id = core.assets.get_software_id_by_name(software)
             if software_id:
@@ -165,13 +185,23 @@ class assets:
     def create_export(self, variant, export_name, files_list, comment=''):
         # Create a new export in the given variant and export name and merge the given files list.
         success = None
-        instance_type, variant_id = core.assets.string_to_instance(variant)
+
+        if type(variant) == str:
+            instance_type, variant_id = core.assets.string_to_instance(variant)
+        else:
+            variant_id = variant
+
         if variant_id and instance_type == 'variant':
             success = core.assets.merge_file_as_export_version(export_name, files_list, variant_id, comment)
         return success
 
     def batch_export(self, work_env, namespaces_list=[], rolls=False, custom_frame_range=None, refresh_assets_in_scene=False):
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id and instance_type == 'work_env':
             version_id = core.project.get_last_work_version(work_env_id, 'id')
             if version_id:
@@ -194,7 +224,12 @@ class assets:
                 core.subtasks_library.batch_export(version_id, settings_dic)
 
     def batch_export_camera(self, work_env, namespaces_list=[], rolls=False, custom_frame_range=None, refresh_assets_in_scene=False):
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id and instance_type == 'work_env':
             version_id = core.project.get_last_work_version(work_env_id, 'id')
             if version_id:
@@ -222,18 +257,28 @@ class assets:
         # Create a new group with the given name
         return core.assets.create_group(name)
 
-    def modify_group_color(self, group_name, color):
+    def modify_group_color(self, group, color):
         # Modify the given group color with the given color
         success = None
-        group_id = core.project.get_group_by_name(group_name, 'id')
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if group_id:
             success = core.project.modify_group_color(group_id, color)
         return success
 
-    def delete_group(self, group_name):
+    def delete_group(self, group):
         # Delete the given group
         success = None
-        group_id = core.project.get_group_by_name(group_name, 'id')
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if group_id:
             success = core.assets.remove_group(group_id)
         return success
@@ -243,8 +288,17 @@ class assets:
     def create_reference(self, destination_work_env, variant_to_reference):
         # Reference the given variant in the given work env
         new_references = None
-        dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
-        orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+
+        if type(destination_work_env) == str:
+            dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
+        else:
+            work_env_id = destination_work_env
+
+        if type(variant_to_reference) == str:
+            orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+        else:
+            variant_id = variant_to_reference
+
         if work_env_id and variant_id:
             old_references = core.project.get_references(work_env_id, 'namespace')
             core.assets.create_references_from_variant_id(work_env_id, variant_id)
@@ -254,8 +308,17 @@ class assets:
     def create_grouped_reference(self, destination_group, variant_to_reference):
         # Reference the given variant in the given group
         new_references = None
-        group_id = core.project.get_group_by_name(destination_group, 'id')
-        orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+
+        if type(destination_group) == str:
+            group_id = core.project.get_group_by_name(destination_group, 'id')
+        else:
+            group_id = destination_group
+
+        if type(variant_to_reference) == str:
+            orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+        else:
+            variant_id = variant_to_reference
+
         if group_id and variant_id:
             old_references = core.project.get_grouped_references(group_id, 'namespace')
             core.assets.create_grouped_references_from_variant_id(group_id, variant_id)
@@ -264,14 +327,28 @@ class assets:
 
     def create_referenced_group(self, destination_work_env, group):
         # Reference the given group in the given destination work environment
-        dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
-        group_id = core.project.get_group_by_name(group, 'id')
+
+        if type(destination_work_env) == str:
+            dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
+        else:
+            work_env_id = destination_work_env
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if work_env_id and group_id:
             core.assets.create_referenced_group(work_env_id, group_id)
 
     def get_references(self, work_env):
         # Return the work environment references as a list of namespaces
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             return core.project.get_references(work_env_id, 'namespace')
         else:
@@ -279,7 +356,12 @@ class assets:
 
     def get_references_from_group(self, group):
         # Return the group references as a list of namespaces
-        group_id = core.project.get_group_by_name(group, 'id')
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if group_id:
             return core.project.get_grouped_references(group_id, 'namespace')
         else:
@@ -287,7 +369,12 @@ class assets:
 
     def get_referenced_groups(self, work_env):
         # Return the work environment referenced groups as a list of namespaces
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             return core.project.get_referenced_groups(work_env_id, 'namespace')
         else:
@@ -295,7 +382,12 @@ class assets:
 
     def remove_reference(self, work_env, reference):
         # Remove the given reference from the work environment
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
             if reference_id:
@@ -303,7 +395,12 @@ class assets:
 
     def remove_reference_from_group(self, group, reference):
         # Remove the given reference from the group
-        group_id = core.project.get_group_by_name(group, 'id')
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if group_id:
             grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
             if grouped_reference_id:
@@ -311,7 +408,12 @@ class assets:
 
     def remove_referenced_group(self, work_env, referenced_group):
         # Remove the given referenced group from the work environment
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             referenced_group_id = core.project.get_referenced_group_by_namespace(work_env_id, referenced_group, 'id')
             if referenced_group_id:
@@ -319,7 +421,12 @@ class assets:
 
     def set_reference_as_default(self, work_env, reference):
         # Modify the given reference to match the default export version
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
             if reference_id:
@@ -327,7 +434,12 @@ class assets:
 
     def set_grouped_reference_as_default(self, group, reference):
         # Modify the given reference to match the default export version
-        group_id = core.project.get_group_by_name(group, 'id')
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if group_id:
             grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
             if grouped_reference_id:
@@ -339,7 +451,12 @@ class assets:
             auto_update = 1
         else:
             auto_update = 0
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
             if reference_id:
@@ -351,7 +468,12 @@ class assets:
             auto_update = 1
         else:
             auto_update = 0
-        group_id = core.project.get_group_by_name(group, 'id')
+
+        if type(group) == str:
+            group_id = core.project.get_group_by_name(group, 'id')
+        else:
+            group_id = group
+
         if group_id:
             grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
             if grouped_reference_id:
@@ -361,148 +483,279 @@ class assets:
 
     def archive_asset(self, asset):
         success = None
-        instance_type, asset_id = core.assets.string_to_instance(asset)
+
+        if type(asset) == str:
+            instance_type, asset_id = core.assets.string_to_instance(asset)
+        else:
+            asset_id = asset
+
         if asset_id:
             success = core.assets.archive_asset(asset_id)
         return success
 
     def archive_sequence(self, sequence):
         success = None
-        instance_type, sequence_id = core.assets.string_to_instance(sequence)
+
+        if type(sequence) == str:
+            instance_type, sequence_id = core.assets.string_to_instance(sequence)
+        else:
+            sequence_id = sequence
+
         if sequence_id:
             success = core.assets.archive_category(sequence_id)
         return success
 
     def archive_stage(self, stage):
         success = None
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             success = core.assets.archive_stage(stage_id)
         return success
 
     def archive_variant(self, variant):
         success = None
-        instance_type, variant_id = core.assets.string_to_instance(variant)
+
+        if type(variant) == str:
+            instance_type, variant_id = core.assets.string_to_instance(variant)
+        else:
+            variant_id = variant
+
         if variant_id:
             success = core.assets.archive_variant(variant_id)
         return success
 
     def archive_work_env(self, work_env):
         success = None
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            instance_type = 'work_env'
+            work_env_id = work_env
+
         if instance_type == 'work_env' and work_env_id:
             success = core.assets.archive_work_env(work_env_id)
         return success
 
     def archive_work_version(self, work_version):
         success = None
-        instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+
+        if type(work_version) == str:
+            instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+        else:
+            instance_type = 'work_version'
+            work_version_id = work_version
+
         if instance_type == 'work_version' and work_version_id:
             success = core.assets.archive_work_version(work_version_id)
         return success
 
     # List commands
 
-    def list_domains(self):
-        domains = core.project.get_domains('name')
+    def list_domains(self, column='*'):
+        domains = core.project.get_domains(column)
         return domains
 
-    def list_categories(self, parent):
+    def list_categories(self, parent, column='*'):
         # The parent argument should look like
         # "assets"
         categories = None
-        instance_type, domain_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, domain_id = core.assets.string_to_instance(parent)
+        else:
+            domain_id = parent
+
         if domain_id:
-            categories = core.project.get_domain_childs(domain_id, 'name')
+            categories = core.project.get_domain_childs(domain_id, column)
         return categories
 
-    def list_assets(self, parent):
+    def list_assets(self, parent, column='*'):
         # The parent argument should look like
         # "assets/characters"
         assets = None
-        instance_type, category_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, category_id = core.assets.string_to_instance(parent)
+        else:
+            category_id = parent
+
         if category_id:
-            assets = core.project.get_category_childs(category_id, 'name')
+            assets = core.project.get_category_childs(category_id, column)
         return assets
 
-    def list_stages(self, parent):
+    def list_stages(self, parent, column='*'):
         # The parent argument should look like
         # "assets/characters/Joe"
         stages = None
-        instance_type, asset_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, asset_id = core.assets.string_to_instance(parent)
+        else:
+            asset_id = parent
+
         if asset_id:
-            stages = core.project.get_asset_childs(asset_id, 'name')
+            stages = core.project.get_asset_childs(asset_id, column)
         return stages
 
-    def list_variants(self, parent):
+    def list_variants(self, parent, column='*'):
         # The parent argument should look like
         # "assets/characters/Joe/modeling"
         variants = None
-        instance_type, stage_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, stage_id = core.assets.string_to_instance(parent)
+        else:
+            stage_id = parent
+
         if stage_id:
-            variants = core.project.get_stage_childs(stage_id, 'name')
+            variants = core.project.get_stage_childs(stage_id, column)
         return variants
 
-    def list_work_envs(self, parent):
+    def list_work_envs(self, parent, column='*'):
         # The parent argument should look like
         # "assets/characters/Joe/modeling/main"
         work_envs = None
-        instance_type, variant_id = core.assets.string_to_instance(parent)
+
+        if type(parent) == str:
+            instance_type, variant_id = core.assets.string_to_instance(parent)
+        else:
+            variant_id = parent
+
         if variant_id:
-            work_envs = core.project.get_variant_work_envs_childs(variant_id, 'name')
+            work_envs = core.project.get_variant_work_envs_childs(variant_id, column)
         return work_envs
 
-    def list_work_versions(self, parent):
+    def list_work_versions(self, parent, column='*'):
         # The parent argument should look like
         # "assets/characters/Joe/modeling/main/blender"
         work_versions = None
-        instance_type, work_env_id = core.assets.string_to_work_instance(parent)
+
+        if type(parent) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(parent)
+        else:
+            work_env_id = parent
+
         if work_env_id:
-            work_versions = core.project.get_work_versions(work_env_id, 'name')
+            work_versions = core.project.get_work_versions(work_env_id, column)
         return work_versions
+
+    def list_exports(self, parent, column='*'):
+        # The parent argument should look like
+        # "assets/characters/Joe/modeling/main/"
+        exports = None
+
+        if type(parent) == str:
+            instance_type, variant_id = core.assets.string_to_instance(parent)
+        else:
+            variant_id = parent
+
+        if variant_id:
+            exports = core.project.get_variant_export_childs(variant_id, column)
+        return exports
+
+    def list_export_versions(self, parent, column='*'):
+        # The parent argument should look like
+        # "assets/characters/Joe/modeling/main/LOD1"
+
+        export_versions = None
+
+        if type(parent) == str:
+            instance_type, export_id = core.assets.string_to_export_instance(parent)
+        else:
+            export_id = parent
+
+        if export_id:
+            export_versions = core.project.get_export_childs(export_id, column)
+        return export_versions
 
 class tracking:
     def __init__(self):
         pass
 
     def get_task_assignment(self, stage):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             return core.project.get_stage_data(stage_id, 'assignment')
 
     def get_task_state(self, stage):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             return core.project.get_stage_data(stage_id, 'state')
 
     def get_task_work_time(self, stage):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+        
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             return core.project.get_stage_data(stage_id, 'work_time')
 
     def get_task_estimated_time(self, stage):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+        
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             return core.project.get_stage_data(stage_id, 'estimated_time')
 
     def assign_task(self, stage, user):
         user_id = core.repository.get_user_row_by_name(user, 'id')
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if user_id and stage_id:
             core.assets.modify_stage_assignment(stage_id, user)
 
     def set_task_state(self, stage, state, comment=''):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+        
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             core.assets.modify_stage_state(stage_id, state, comment)
 
     def estimate_task_time(self, stage, time):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+        
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             core.assets.modify_stage_estimation(stage_id, time)    
 
     def add_task_comment(self, stage, comment):
-        instance_type, stage_id = core.assets.string_to_instance(stage)
+        
+        if type(stage) == str:
+            instance_type, stage_id = core.assets.string_to_instance(stage)
+        else:
+            stage_id = stage
+
         if stage_id:
             core.assets.add_stage_comment(stage_id, comment)    
 
@@ -512,7 +765,12 @@ class launch:
 
     def work_env(self, work_env):
         # Run the last version of the given work environment related software
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             last_work_version_id = core.project.get_last_work_version(work_env_id, 'id')
             if last_work_version_id:
@@ -520,13 +778,23 @@ class launch:
 
     def work_version(self, work_version):
         # Run the given work version related software
-        instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+
+        if type(work_version) == str:
+            instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+        else:
+            work_version_id = work_version
+
         if work_version_id:
             core.launch.launch_work_version(work_version_id)
 
     def kill_work_env(self, work_env):
         # Terminate the given work environment related software instance
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             core.launch.kill(work_env_id)
 
@@ -546,13 +814,23 @@ class launch:
 
     def lock_work_env(self, work_env):
         # Lock the given work environment for the current user
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             core.project.set_work_env_lock(work_env_id, 1)
 
     def unlock_work_env(self, work_env):
         # Unlock the given work environment if it is locked by the current user
-        instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        
+        if type(work_env) == str:
+            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+        else:
+            work_env_id = work_env
+
         if work_env_id:
             core.project.set_work_env_lock(work_env_id, 0)
 
@@ -598,25 +876,49 @@ class ui:
 
     def focus_asset(self, asset):
         # Focus on the given asset in the project tree
-        instance_type, instance_id = core.assets.string_to_instance(asset)
+
+        if type(asset) == str:
+            instance_type, instance_id = core.assets.string_to_instance(asset)
+        else:
+            instance_type = 'asset'
+            instance_id = asset
+
         if instance_type == 'asset':
             gui.gui_server.focus_instance((instance_type, instance_id))
 
     def focus_stage(self, stage):
         # Focus on the given stage in the project tree
-        instance_type, instance_id = core.assets.string_to_instance(stage)
+
+        if type(stage) == str:
+            instance_type, instance_id = core.assets.string_to_instance(stage)
+        else:
+            instance_type = 'stage'
+            instance_id = stage
+
         if instance_type == 'stage':
             gui.gui_server.focus_instance((instance_type, instance_id))
 
     def focus_variant(self, variant):
         # Focus on the given variant in wizard
-        instance_type, instance_id = core.assets.string_to_instance(variant)
+
+        if type(variant) == str:
+            instance_type, instance_id = core.assets.string_to_instance(variant)
+        else:
+            instance_type = 'variant'
+            instance_id = variant
+
         if instance_type == 'variant':
             gui.gui_server.focus_instance((instance_type, instance_id))
 
     def focus_work_version(self, work_version):
         # Focus on the given work version in the work versions tab
-        instance_type, instance_id = core.assets.string_to_work_instance(work_version)
+
+        if type(work_version) == str:
+            instance_type, instance_id = core.assets.string_to_work_instance(work_version)
+        else:
+            instance_type = 'work_version'
+            instance_id = work_version
+
         if instance_type == 'work_version':
             gui.gui_server.focus_work_version(instance_id)
 

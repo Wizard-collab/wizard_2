@@ -1139,3 +1139,18 @@ def string_to_work_instance(string):
         logger.warning('The given string is not a work instance')
 
     return (instance_type, instance_id)
+
+def string_to_export_instance(string):
+    instance_type = None
+    instance_id = None
+    instances_list = string.split('/')
+    if len(instances_list) == 6:
+        instance_type = 'export'
+        instance_id = project.get_export_data_by_string(string, 'id')
+    elif len(instances_list) == 7:
+        instance_type = 'export_version'
+        instance_id = project.get_export_version_data_by_string(string, 'id')
+    else:
+        logger.warning('The given string is not an export instance')
+
+    return (instance_type, instance_id)
