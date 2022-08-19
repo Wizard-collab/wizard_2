@@ -149,6 +149,7 @@ def get_hooks_modules(software):
 			plugin_path = os.path.join(plugins_path, folder)
 			module_name, module_path = load_module(software, plugin_path, hook_type="plugin_{0}".format(folder))
 			if module_name and module_path:
+				sys.path.append(os.path.dirname(module_path))
 				hooks_modules[module_name] = dict()
 				hooks_modules[module_name]['module'] = sys.modules[module_name]
 				hooks_modules[module_name]['path'] = module_path

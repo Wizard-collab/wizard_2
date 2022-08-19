@@ -95,18 +95,28 @@ def decrypt_string(stored_string, provided_string):
     pwdhash = binascii.hexlify(pwdhash).decode('ascii')
     return pwdhash == stored_string
 
-def is_safe(input):
+def is_safe(input_string):
     # Check if the given string doesn't 
     # contains illegal characters
     charRe = re.compile(r'[^a-zA-Z0-9._]')
-    string = charRe.search(input)
-    return not bool(string)
+    string = charRe.search(input_string)
+    success = not bool(string)
+    if not success:
+        logger.warning(f"'{input_string}' contains illegal characters")
+    try:
+        int(input_string)
+        logger.warning(f"'{input_string}' can't only be digits")
+        success = False
+        print(int(input_string))
+    except:
+        pass
+    return success
 
-def is_dbname_safe(input):
+def is_dbname_safe(input_string):
     # Check if the given string doesn't 
     # contains illegal characters
     charRe = re.compile(r'[^a-z0-9_]')
-    string = charRe.search(input)
+    string = charRe.search(input_string)
     return not bool(string)
 
 def zip_files(files_list, destination):

@@ -38,7 +38,6 @@ from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
-
 def send_log(log, type, additionnal_message=''):
     URL = "http://93.19.210.30/support/"
     contact_dic = dict()

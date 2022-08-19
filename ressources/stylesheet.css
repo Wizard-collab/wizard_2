@@ -602,6 +602,7 @@ QTableCornerButton::section {
 }
 
 #loading_widget_frame{
+	background-color:#24242b;
 	border-radius: 0px;
 }
 

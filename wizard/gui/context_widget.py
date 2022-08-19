@@ -204,8 +204,9 @@ class context_widget(QtWidgets.QFrame):
             if self.variant_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
                 variant_name = self.variant_creation_widget.name_field.text()
                 new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
-                project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
-                gui_server.refresh_team_ui()
+                if new_variant_id:
+                    project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
+                    gui_server.refresh_team_ui()
 
     def init_work_env(self):
         if self.work_env_row is None:

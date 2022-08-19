@@ -87,6 +87,7 @@ class loading_widget(QtWidgets.QWidget):
         self.datas_layout.addWidget(self.user_label)
 
         self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('transparent_widget')
         self.infos_layout = QtWidgets.QHBoxLayout()
         self.infos_layout.setContentsMargins(0,0,0,0)
         self.infos_widget.setLayout(self.infos_layout)

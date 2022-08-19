@@ -86,8 +86,6 @@ def create_domain(name):
             if not tools.create_folder(dir_name):
                 project.remove_domain(domain_id)
                 domain_id = None
-    else:
-        logger.warning(f"{name} contains illegal characters")
     return domain_id
 
 def archive_domain(domain_id):
@@ -123,8 +121,6 @@ def create_category(name, domain_id):
                     game.add_xps(game_vars._creation_xp_)
         else:
             logger.error("Can't create category")
-    else:
-        logger.warning(f"{name} contains illegal characters")
     return category_id
 
 def archive_category(category_id):
@@ -166,8 +162,6 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
                     game.add_xps(game_vars._creation_xp_)
         else:
             logger.error("Can't create asset")
-    else:
-        logger.warning(f"{name} contains illegal characters")
     return asset_id
 
 def archive_asset(asset_id):
@@ -312,8 +306,6 @@ def create_variant(name, stage_id, comment=''):
                     game.add_xps(game_vars._creation_xp_)
         else:
             logger.error("Can't create variant")
-    else:
-        logger.warning(f"{name} contains illegal characters")
     return variant_id
 
 def archive_variant(variant_id):
@@ -681,8 +673,6 @@ def get_or_add_export(name, variant_id):
                 export_id = project.get_export_by_name(name, variant_id)['id']
         else:
             logger.error("Can't create export")
-    else:
-        logger.warning(f"{name} contains illegal characters")
     return export_id
 
 def archive_export_version(export_version_id):

@@ -155,6 +155,9 @@ class project_quickstats_widget(QtWidgets.QFrame):
                 if stage_row['state'] == 'done':
                     tasks_done+=1
 
+        if all_work_times == []:
+            all_work_times = [0]
+
         work_time_mean = statistics.mean(all_work_times)
         self.assignments_widget.stat_label.setText(f"{len(all_work_times)}")
         self.total_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
@@ -214,7 +217,7 @@ class main_progress_widget(QtWidgets.QFrame):
             if stage_row['domain_id'] != 2:
                 all_progresses.append(stage_row['progress'])
         if all_progresses == []:
-            all_progresses == [0]
+            all_progresses = [0]
         mean = statistics.mean(all_progresses)
         self.progress_bar.setValue(mean)
         self.progress_label.setText(f"{round(mean, 1)} %")
@@ -878,17 +881,18 @@ class progress_overview_widget(QtWidgets.QFrame):
         domains_progresses_dic = dict()
 
         for stage_row in stages_rows:
-            if stage_row['name'] not in stages_progresses_dic.keys():
-                stages_progresses_dic[stage_row['name']] = []
-            stages_progresses_dic[stage_row['name']].append(stage_row['progress'])
-            if stage_row['name'] in assets_vars._assets_stages_list_:
-                if 'assets' not in domains_progresses_dic.keys():
-                    domains_progresses_dic['assets'] = []
-                domains_progresses_dic['assets'].append(stage_row['progress'])
-            elif stage_row['name'] in assets_vars._sequences_stages_list_:
-                if 'sequences' not in domains_progresses_dic.keys():
-                    domains_progresses_dic['sequences'] = []
-                domains_progresses_dic['sequences'].append(stage_row['progress'])
+            if stage_row['name'] in assets_vars._assets_stages_list_ or stage_row['name'] in assets_vars._sequences_stages_list_:
+                if stage_row['name'] not in stages_progresses_dic.keys():
+                    stages_progresses_dic[stage_row['name']] = []
+                stages_progresses_dic[stage_row['name']].append(stage_row['progress'])
+                if stage_row['name'] in assets_vars._assets_stages_list_:
+                    if 'assets' not in domains_progresses_dic.keys():
+                        domains_progresses_dic['assets'] = []
+                    domains_progresses_dic['assets'].append(stage_row['progress'])
+                elif stage_row['name'] in assets_vars._sequences_stages_list_:
+                    if 'sequences' not in domains_progresses_dic.keys():
+                        domains_progresses_dic['sequences'] = []
+                    domains_progresses_dic['sequences'].append(stage_row['progress'])
 
         for stage in stages_progresses_dic.keys():
             mean = statistics.mean(stages_progresses_dic[stage])
