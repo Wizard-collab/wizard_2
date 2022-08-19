@@ -6,6 +6,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import logging
+import time
 
 # Wizard modules
 from wizard.core import assets
@@ -94,19 +95,8 @@ class search_reference_widget(QtWidgets.QWidget):
         self.variant_ids = dict()
         self.groups_ids = dict()
         if len(search) > 1:
-            stage_filter = None
-            if '*' in search:
-                stage_filter = search.split('*')[-1]
-                search = search.split('*')[0]
-
-            if ':' in search:
-                category_string=search.split(':')[0]
-                asset_string=search.split(':')[-1]
-            else:
-                category_string = None
-                asset_string = search
             self.accept_item_from_thread = True
-            self.search_thread.update_search(category_string, asset_string, stage_filter)
+            self.search_thread.update_search(search)
         else:
             self.search_thread.running=False
             self.search_ended()
@@ -220,55 +210,41 @@ class search_thread(QtCore.QThread):
     def __init__(self, context):
         super().__init__()
         self.context = context
-        self.category = None
-        self.asset = None
         self.running = True
-        self.all_export_versions_stage_ids = []
 
-    def update_search(self, category=None, asset=None, stage_filter=None):
+    def update_search(self, string):
         self.running = False
-        self.all_export_versions_variant_ids = project.get_all_export_versions('variant_id')
-        self.category = category
-        self.asset = asset
-        self.group = asset
-        self.stage_filter = stage_filter
-        self.running = True
+        self.string = string
         self.start()
 
     def run(self):
-        process=1
-        parent_id = None
-        if self.category and len(self.category)>2:
-            category_id=project.get_category_data_by_name(self.category, 'id')
-            if category_id:
-                parent_id = category_id
-        if self.category and not parent_id:
-            process=None
-        if process:
-            assets_list = project.search_asset(self.asset, parent_id)
-            for asset_row in assets_list:
-                if not self.running:
-                    break
-                category_row = project.get_category_data(project.get_asset_data(asset_row['id'], 'category_id'))
-                stage_rows = project.get_asset_childs(asset_row['id'])
-                for stage_row in stage_rows:
-                    if not self.running:
-                        break
-                    variant_rows = project.get_stage_childs(stage_row['id'])
-                    for variant_row in variant_rows:
-                        if not self.running:
-                            break
-                        if variant_row['id'] in self.all_export_versions_variant_ids:
-                            if (self.stage_filter is None) or (self.stage_filter in stage_row['name']):
-                                if self.running:
-                                    self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
-            if (self.context == 'work_env') and (len(self.group)>1):
-                if self.group in 'group':
-                    groups_list = project.get_groups()
-                else:
-                    groups_list = project.search_group(self.group)
-                for group_row in groups_list:
-                    if self.running:
+        self.running = True
+        keywords = self.string.split('&') 
+        all_export_versions_variant_ids = project.get_all_export_versions('variant_id')
+        all_variants = project.get_all_variants()
+        all_stages = project.get_all_stages()
+        all_assets = project.get_all_assets()
+        all_categories = project.get_all_categories()
+        stages = dict()
+        for stage_row in all_stages:
+            stages[stage_row['id']] = stage_row
+        assets = dict()
+        for asset_row in all_assets:
+            assets[asset_row['id']] = asset_row    
+        categories = dict()
+        for category_row in all_categories:
+            categories[category_row['id']] = category_row
+        for variant_row in all_variants:
+            if variant_row['id'] in all_export_versions_variant_ids:
+                if all(keyword.upper() in variant_row['string'].upper() for keyword in keywords):
+                    stage_row = stages[variant_row['stage_id']]
+                    asset_row = assets[stage_row['asset_id']]
+                    category_row = categories[asset_row['category_id']]
+                    self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+        if (self.context == 'work_env'):
+                groups_rows = project.get_groups()
+                for group_row in groups_rows:
+                    if all(keyword.upper() in group_row['name'].upper()+'GROUPS' for keyword in keywords):
                         self.group_signal.emit(group_row)
         self.search_ended.emit(1)
 
