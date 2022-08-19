@@ -4,6 +4,7 @@
 
 # Wizard modules
 import wizard_communicate
+import wizard_hooks
 
 # Blender modules
 import bpy
@@ -24,8 +25,14 @@ def save_increment():
         logger.info("Saving file {}".format(file_path))
         bpy.ops.wm.save_as_mainfile(filepath=file_path)
         os.environ['wizard_version_id'] = str(version_id)
+        trigger_after_save_hook(file_path)
     else:
         logger.warning("Can't save increment")
+
+def trigger_after_save_hook(scene_path):
+    stage_name = os.environ['wizard_stage_name']
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    return wizard_hooks.after_save_hooks('blender', stage_name, string_asset, scene_path)
 
 def check_obj_list_existence(object_list):
     success = True

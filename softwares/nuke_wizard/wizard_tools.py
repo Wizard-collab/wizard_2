@@ -14,6 +14,7 @@ import nukescripts
 
 # Wizard modules
 import wizard_communicate
+import wizard_hooks
 
 def save_increment():
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
@@ -21,8 +22,14 @@ def save_increment():
         logger.debug("Saving file {}".format(file_path))
         nuke.scriptSaveAs(file_path)
         os.environ['wizard_version_id'] = str(version_id)
+        trigger_after_save_hook(file_path)
     else:
         logger.warning("Can't save increment")
+
+def trigger_after_save_hook(scene_path):
+    stage_name = os.environ['wizard_stage_name']
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    return wizard_hooks.after_save_hooks('nuke', stage_name, string_asset, scene_path)
 
 def get_all_nodes():
     return nuke.allNodes()
