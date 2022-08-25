@@ -612,6 +612,23 @@ def add_ip_user():
                             (ip, None, None)):
             logger.debug("Machine ip added to ips wrap table")
 
+def flush_ips():
+    if is_admin():
+        success = db_utils.delete_rows('repository', 'ips_wrap')
+        if success:
+            logger.info("All users ip removed")
+
+def flush_user_ip():
+    ip = socket.gethostbyname(socket.gethostname())
+    ip_rows = get_ips('ip')
+    if not ip_rows:
+        ip_rows=[]
+    if ip in ip_rows:
+        if db_utils.delete_row('repository',
+                            'ips_wrap', 
+                            ip, 'ip'):
+            logger.debug("Machine ip removed from ips wrap table")
+
 def update_current_ip_data(column, data):
     ip = socket.gethostbyname(socket.gethostname())
     

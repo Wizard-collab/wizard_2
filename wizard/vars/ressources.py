@@ -32,7 +32,7 @@ import os
 # Wizard modules
 from wizard.core import path_utils
 
-_documentation_url_ = 'http://93.19.210.30/Documentation/build/html/index.html'
+_documentation_url_ = 'http://93.19.210.30/documentation/'
 
 # Softwares
 _maya_ = 'maya'

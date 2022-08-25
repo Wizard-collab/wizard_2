@@ -163,6 +163,10 @@ def delete_row(level, table, id, column='id'):
     sql_cmd = f'DELETE FROM {table} WHERE {column}=%s'
     return execute_sql(sql_cmd, level, 0, (id,), 0)
 
+def delete_rows(level, table):
+    sql_cmd = f'DELETE FROM {table}'
+    return execute_sql(sql_cmd, level, 0, None, 0)
+
 def check_database_existence(database):
     conn = db_core.create_connection()
     if conn is not None:

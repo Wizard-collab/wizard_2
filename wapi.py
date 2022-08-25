@@ -45,9 +45,29 @@ class repository:
         # Return a list of the existing projects in the repository database
         return core.repository.get_projects_names_list()
 
+    def create_project(self, project_name,
+                            project_path,
+                            project_password,
+                            frame_rate=24,
+                            image_format=[1920,1080]
+                            ):
+        return core.create_project.create_project(project_name,
+                            project_path,
+                            project_password,
+                            frame_rate,
+                            image_format
+                            )
+
     def users(self):
         # Return a list of the existing users in the repository database
         return core.repository.get_user_names_list()
+
+    def create_user(self, user_name, user_password, email, administrator_pass=''):
+        return core.repository.create_user(user_name,
+                                            user_password,
+                                            email,
+                                            administrator_pass)
+
 
     def upgrade_user_privilege(self, user_name, administrator_pass):
         return core.repository.upgrade_user_privilege(user_name,
@@ -95,6 +115,12 @@ class project:
     def path(self):
         # Return the current project path
         return core.environment.get_project_path()
+
+    def change_password(self, old_password, new_password, administrator_pass):
+        return core.repository.modify_project_password(core.environment.get_project_name(),
+                                                    old_password,
+                                                    new_password,
+                                                    administrator_pass)
 
 class assets:
     def __init__(self):
