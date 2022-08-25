@@ -62,12 +62,14 @@ class repository:
         # Return a list of the existing users in the repository database
         return core.repository.get_user_names_list()
 
+    def flush_ips(self):
+        return core.repository.flush_ips()
+
     def create_user(self, user_name, user_password, email, administrator_pass=''):
         return core.repository.create_user(user_name,
                                             user_password,
                                             email,
                                             administrator_pass)
-
 
     def upgrade_user_privilege(self, user_name, administrator_pass):
         return core.repository.upgrade_user_privilege(user_name,
