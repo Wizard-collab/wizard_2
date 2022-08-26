@@ -42,6 +42,7 @@ def send_log(log, type, additionnal_message=''):
     URL = "http://93.19.210.30/support/"
     contact_dic = dict()
     contact_dic['username'] = environment.get_user()
+    contact_dic['project'] = environment.get_project_name()
     contact_dic['log'] = log
     contact_dic['additionnal_message'] = additionnal_message
     version_dic = application.get_version()
@@ -51,12 +52,11 @@ def send_log(log, type, additionnal_message=''):
 
     try:
         response = requests.post(URL, data=contact_dic)
-        response_dic = response.json()
-        if response_dic['success']:
-            logger.info(response_dic['messages_list'][0])
+        success = response.json()
+        if success:
+            logger.info("Log successfully submitted")
         else:
-            for message in response_dic['messages_list']:
-                logger.error(message)
+            logger.info("Can't submit log, server error")
     except requests.Timeout:
         logger.error('Connection timed out')
     except requests.ConnectionError:

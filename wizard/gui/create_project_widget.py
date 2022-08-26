@@ -244,11 +244,16 @@ class create_project_widget(QtWidgets.QDialog):
         project_path = self.project_path_lineEdit.text()
         password = self.password_lineEdit.text()
         password_confirm = self.password_confirm_lineEdit.text()
+        frame_rate = self.frame_rate_spinBox.value()
+        width = self.format_width.value()
+        height = self.format_height.value()
         if password == password_confirm:
             if create_project.create_project(project_name=project_name,
                                                 project_path=project_path,
                                                 project_password=password,
-                                                project_image=self.image):
+                                                project_image=self.image,
+                                                frame_rate=frame_rate,
+                                                image_format=[width, height]):
                 self.accept()
         else:
             logger.warning("Project passwords doesn't matches")

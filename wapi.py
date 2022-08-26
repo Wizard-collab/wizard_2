@@ -34,6 +34,7 @@ import logging
 
 # Wizard modules
 from wizard import core
+from wizard import vars
 from wizard import gui
 logger = logging.getLogger(__name__)
 
@@ -101,6 +102,18 @@ class user:
         # Return the current user privilege
         return core.repository.is_admin()
 
+    def set_team_dns(self, host, port):
+        # Set the team server DNS as user preference
+        return core.user.user().set_team_dns(host, port)
+
+    def get_team_dns(self):
+        # Return the current team server DNS
+        return core.environment.get_team_dns()
+
+    def set_popups_settings(self, enabled=1, duration=3, keep_until_comment=True):
+        # Set the given popups settings for the current user
+        return core.user.user().set_popups_settings(enabled, duration, keep_until_comment)
+
 class project:
     def __init__(self):
         pass
@@ -123,6 +136,28 @@ class project:
                                                     old_password,
                                                     new_password,
                                                     administrator_pass)
+
+    def set_software_executable(self, software_name, executable_path):
+        software_id = core.project.get_software_data_by_name(software_name, 'id')
+        if software_id:
+            core.project.set_software_path(software_id, executable_path)
+
+    def set_software_batch_executable(self, software_name, batch_executable_path):
+        software_id = core.project.get_software_data_by_name(software_name, 'id')
+        if software_id:
+            core.project.set_software_batch_path(software_id, batch_executable_path)
+
+class shelf:
+    def __init__(self):
+        pass
+
+    def create_shelf_tool(self, name, script, help, only_subprocess=0, icon=vars.ressources._default_script_shelf_icon_):
+        # Create a shelf tool with the given arguments
+        return core.shelf.create_project_script(name, script, help, only_subprocess, icon)
+
+    def create_separator(self):
+        # Create a shelf separator
+        return core.shelf.create_separator()
 
 class assets:
     def __init__(self):
@@ -953,6 +988,7 @@ class ui:
 repository = repository()
 user = user()
 project = project()
+shelf = shelf()
 assets = assets()
 tracking = tracking()
 launch = launch()
