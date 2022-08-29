@@ -12,8 +12,9 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 
 class comment_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None, title='Add comment'):
+    def __init__(self, parent=None, title='Add comment', old_comment=''):
         super(comment_widget, self).__init__(parent)
+        self.old_comment = old_comment
         self.build_ui(title)
         self.connect_functions()
 
@@ -60,6 +61,7 @@ class comment_widget(QtWidgets.QDialog):
         self.frame_layout.addWidget(self.close_frame)
 
         self.comment_field = QtWidgets.QTextEdit()
+        self.comment_field.setText(self.old_comment)
         self.frame_layout.addWidget(self.comment_field)
 
         self.accept_button = QtWidgets.QPushButton('Comment')

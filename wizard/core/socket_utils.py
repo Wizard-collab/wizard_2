@@ -120,8 +120,11 @@ def send_signal(DNS, msg_raw, timeout=5.0):
         msg = json.dumps(msg_raw).encode('utf8')
         msg = struct.pack('>I', len(msg)) + msg
         server.sendall(msg)
-        returned = recvall(server).decode('utf8')
-        return json.loads(returned)
+        returned_b = recvall(server)
+        if returned_b:
+            return json.loads(returned_b.decode('utf8'))
+        else:
+            return None
     except ConnectionRefusedError:
         logger.error(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return None

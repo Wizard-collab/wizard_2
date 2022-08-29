@@ -501,7 +501,10 @@ class exports_widget(QtWidgets.QWidget):
         selection = self.list_view.selectedItems()
         if selection is not None:
             if len(selection) > 0:
-                self.comment_widget = comment_widget.comment_widget()
+                old_comment = ''
+                if len(selection) == 1:
+                    old_comment = selection[0].export_version_row['comment']
+                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment)
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     for item in selection:

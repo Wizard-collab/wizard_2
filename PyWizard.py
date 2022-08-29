@@ -132,6 +132,8 @@ while not user.get_project():
         user.log_project(project_name, project_password)
 
 db_server.project_name = environment.get_project_name()
+project.add_user(repository.get_user_row_by_name(environment.get_user(),
+                                                            'id'))
 
 communicate_server = communicate.communicate_server()
 communicate_server.start()

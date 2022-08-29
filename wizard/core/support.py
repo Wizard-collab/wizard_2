@@ -45,6 +45,8 @@ def send_log(log, type, additionnal_message=''):
     contact_dic['project'] = environment.get_project_name()
     contact_dic['repository'] = environment.get_repository()
     contact_dic['log'] = log
+    if additionnal_message == '':
+        additionnal_message = 'No message from user'
     contact_dic['additionnal_message'] = additionnal_message
     version_dic = application.get_version()
     contact_dic['wizard_version'] = f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}.{version_dic['builds']}"

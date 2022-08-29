@@ -540,7 +540,10 @@ class versions_widget(QtWidgets.QWidget):
         items = self.get_selection()
         if items is not None:
             if len(items) > 0:
-                self.comment_widget = comment_widget.comment_widget()
+                old_comment = ''
+                if len(items) == 1:
+                    old_comment = items[0].version_row['comment']
+                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment)
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     for item in items:

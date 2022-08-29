@@ -55,6 +55,7 @@ from wizard.core import application
 from wizard.core import user
 from wizard.core import environment
 from wizard.core import repository
+from wizard.core import project
 from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import stats
@@ -117,6 +118,8 @@ class app():
                 self.quit()
 
         db_utils.modify_db_name('project', environment.get_project_name())
+        project.add_user(repository.get_user_row_by_name(environment.get_user(),
+                                                            'id'))
         hooks.init_wizard_hooks()
 
         stats.add_progress_event()
