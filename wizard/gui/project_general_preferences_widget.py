@@ -23,7 +23,6 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         super(project_general_preferences_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
-        self.refresh()
 
     def refresh(self):
         frame_rate = project.get_frame_rate()

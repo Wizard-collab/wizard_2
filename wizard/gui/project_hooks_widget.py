@@ -26,7 +26,6 @@ class project_hooks_widget(QtWidgets.QWidget):
         self.build_ui()
         self.fill_softwares()
         self.connect_functions()
-        self.refresh()
 
     def connect_functions(self):
         self.softwares_comboBox.currentTextChanged.connect(self.refresh)

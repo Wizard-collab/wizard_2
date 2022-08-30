@@ -27,7 +27,6 @@ class project_manager_widget(QtWidgets.QDialog):
         self.setWindowTitle(f"Wizard - Project manager")
 
         self.build_ui()
-        self.refresh()
         self.connect_functions()
 
     def build_ui(self):
