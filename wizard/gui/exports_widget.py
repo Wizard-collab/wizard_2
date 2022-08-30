@@ -218,7 +218,7 @@ class exports_widget(QtWidgets.QWidget):
                     message = 'The following export versions are referenced in some scenes,\ndo you REALLY want to continue ?\n\n-'
                     message += ('\n-').join(referenced_items)
                     self.confirm_widget.set_important_message(message)
-                    self.confirm_widget.set_security_sentence('I understand the risks')
+                    self.confirm_widget.set_security_sentence('archive anyway')
 
                 if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
 

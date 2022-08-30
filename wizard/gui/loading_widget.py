@@ -29,11 +29,11 @@ class loading_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def showEvent(self, event):
-        desktop = QtWidgets.QApplication.desktop()
-        screenRect = desktop.screenGeometry()
+        screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+        screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
-        self.move((screen_maxX-self.width())/2, (screen_maxY-self.height())/2)
+        self.move((screenRect.x()+screen_maxX-self.width())/2, (screenRect.y()+screen_maxY-self.height())/2)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

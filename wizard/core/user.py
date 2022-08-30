@@ -157,6 +157,16 @@ class user:
             logger.info("No team DNS set")
             return None
 
+    def set_widget_pos(self, widget_name, pos_dic):
+        self.prefs_dic[user_vars._widgets_pos_][widget_name] = pos_dic
+        self.write_prefs_dic()
+
+    def get_widget_pos(self, widget_name):
+        if widget_name in self.prefs_dic[user_vars._widgets_pos_].keys():
+            return self.prefs_dic[user_vars._widgets_pos_][widget_name]
+        else:
+            return None
+
     def add_context(self, type, context_dic):
         self.prefs_dic[type][environment.get_project_name()] = context_dic
         self.write_prefs_dic()
@@ -248,6 +258,7 @@ class user:
             self.prefs_dic[user_vars._wall_context_] = dict()
             self.prefs_dic[user_vars._asset_tracking_context_] = dict()
             self.prefs_dic[user_vars._console_context_] = dict()
+            self.prefs_dic[user_vars._production_manager_context_] = dict()
             self.prefs_dic[user_vars._local_path_] = None
             self.prefs_dic[user_vars._popups_settings_] = dict()
             self.prefs_dic[user_vars._popups_settings_]['enabled'] = 1
@@ -256,6 +267,7 @@ class user:
             self.prefs_dic[user_vars._show_whatsnew_] = True
             self.prefs_dic[user_vars._user_build_] = None
             self.prefs_dic[user_vars._creation_items_visibility_] = True
+            self.prefs_dic[user_vars._widgets_pos_] = dict()
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:

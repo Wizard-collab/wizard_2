@@ -87,14 +87,17 @@ class tree_widget(QtWidgets.QFrame):
 
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific item")
-        self.search_bar.setPlaceholderText('characters:Lola*grooming')
+        self.search_bar.setPlaceholderText('characters&Lola&grooming')
         self.search_layout.addWidget(self.search_bar)
 
         self.main_layout.addWidget(self.search_frame)
 
         self.tree = QtWidgets.QTreeWidget()
-        self.tree.setObjectName('transparent_widget')
-        self.tree.setAnimated(1)
+        self.tree.setObjectName('tree_widget')
+        self.tree.setAnimated(0)
+        self.tree.setColumnCount(2)
+        self.tree.header().resizeSection(0, 240)
+        self.tree.header().resizeSection(1, 8)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setHeaderHidden(True)
@@ -265,11 +268,15 @@ class tree_widget(QtWidgets.QFrame):
                                                         instance_name = row['name'],
                                                         instance_type = 'category',
                                                         instance_id = row['id'])
+                category_item.add_indicator('error')
+                category_item.set_indicator_visibility(0)
                 category_item.setIcon(0, self.icons_dic['folder'])
                 category_item.setText(0, row['name'])
                 self.category_ids[row['id']] = category_item
                 parent_widget.addChild(category_item)
                 self.add_creation_item(category_item, 'new', 'asset_creation')
+            else:
+                self.category_ids[row['id']].set_indicator_visibility(0)
 
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -279,6 +286,8 @@ class tree_widget(QtWidgets.QFrame):
                                                         instance_name = row['name'],
                                                         instance_type = 'asset',
                                                         instance_id = row['id'])
+                asset_item.add_indicator('error')
+                asset_item.set_indicator_visibility(0)
                 asset_item.setIcon(0, self.icons_dic['folder'])
                 asset_item.setText(0, row['name'])
                 self.asset_ids[row['id']] = asset_item
@@ -286,12 +295,14 @@ class tree_widget(QtWidgets.QFrame):
                 domain_id = project.get_category_data(row['category_id'], 'domain_id')
                 domain_name = project.get_domain_data(domain_id, 'name')
                 self.add_creation_item(asset_item, 'new', 'stage_creation')
+            else:
+                self.asset_ids[row['id']].set_indicator_visibility(0)
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
             if row['id'] not in self.stage_ids.keys():
                 parent_widget = self.asset_ids[row['asset_id']]
-                stage_item = stage_treeWidgetItem( None,
+                stage_item = custom_treeWidgetItem( None,
                                                     instance_name = row['name'],
                                                     instance_id = row['id'],
                                                     instance_type = 'stage')
@@ -301,9 +312,12 @@ class tree_widget(QtWidgets.QFrame):
 
                 parent_widget.addChild(stage_item)
 
-                stage_item.set_item_widget()
+                stage_item.add_indicator()
                 self.remove_stage_creation_item(parent_widget)
             self.stage_ids[row['id']].set_state_indicator(row['state'])
+            if row['state'] == 'error':
+                self.stage_ids[row['id']].parent().set_indicator_visibility(1)
+                self.stage_ids[row['id']].parent().parent().set_indicator_visibility(1)
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
@@ -554,16 +568,10 @@ class tree_widget(QtWidgets.QFrame):
 
     def archive_instance(self, item):
         self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
-
+        
+        security_sentence = f"{item.instance_name}"
         if item.instance_type == 'category':
             security_sentence = f"{environment.get_project_name()}/{item.instance_name}"
-        elif item.instance_type == 'asset':
-            category_name = project.get_category_data(project.get_asset_data(item.instance_id, 'category_id'), 'name')
-            security_sentence = f"{environment.get_project_name()}/{category_name}/{item.instance_name}"
-        elif item.instance_type== 'stage':
-            asset_row = project.get_asset_data(project.get_stage_data(item.instance_id, 'asset_id'))
-            category_name = project.get_category_data(asset_row['category_id'], 'name')
-            security_sentence = f"{environment.get_project_name()}/{category_name}/{asset_row['name']}/{item.instance_name}"
 
         self.confirm_widget.set_security_sentence(security_sentence)
         if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
@@ -629,50 +637,33 @@ class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
         self.instance_type = instance_type
         self.instance_id = instance_id
         self.instance_parent_id = parent_id
+        self.state = None
 
-class stage_treeWidgetItem(custom_treeWidgetItem):
-    def __init__(self, parent, instance_name, instance_type, instance_id=None, parent_id=None):
-        super(stage_treeWidgetItem, self).__init__(parent, 
-                                                instance_name, 
-                                                instance_type,
-                                                instance_id,
-                                                parent_id)
+    def add_indicator(self, state='todo'):
+        self.state_indicator = indicator(assets_vars._state_colors_dic_[state])
+        self.treeWidget().setItemWidget(self, 1, self.state_indicator)
 
-        self.state = 'todo'
-        
-        self.widget = QtWidgets.QWidget()
-        self.widget.setStyleSheet('background:transparent;')
-        self.widget_layout = QtWidgets.QHBoxLayout()
-        self.widget_layout.setContentsMargins(2,2,2,2)
-        self.widget.setLayout(self.widget_layout)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Fixed)
-        self.widget_layout.addSpacerItem(self.spaceItem)
-        self.spaceItem = QtWidgets.QSpacerItem(150,10,QtWidgets.QSizePolicy.Expanding)
-        self.widget_layout.addSpacerItem(self.spaceItem)
-        self.state_indicator = indicator(assets_vars._state_colors_dic_['todo'])
-        self.widget_layout.addWidget(self.state_indicator)
-
-    def set_item_widget(self):
-        self.treeWidget().setItemWidget(self, 0, self.widget)
+    def set_indicator_visibility(self, visibility):
+        self.state_indicator.indicator_frame.setVisible(visibility)
 
     def set_state_indicator(self, state):
         if state != self.state:
             self.state_indicator.update(assets_vars._state_colors_dic_[state])
             self.state = state
-        '''
-        if state != 'error':
-            self.state_ids[variant_row['id']].setVisible(0)
-        else:
-            self.state_ids[variant_row['id']].setVisible(1)
-        '''
-class indicator(QtWidgets.QFrame):
+
+class indicator(QtWidgets.QWidget):
     def __init__(self, color):
         super(indicator, self).__init__()
-        self.setFixedSize(8,8)
-        self.setStyleSheet(f'background-color:{color};border-radius:4px;')
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+        self.indicator_frame = QtWidgets.QFrame()
+        self.indicator_frame.setFixedSize(8,8)
+        self.indicator_frame.setStyleSheet(f'background-color:{color};border-radius:4px;')
+        self.main_layout.addWidget(self.indicator_frame)
 
     def update(self, color):
-        self.setStyleSheet(f'background-color:{color};border-radius:4px;')
+        self.indicator_frame.setStyleSheet(f'background-color:{color};border-radius:4px;')
 
 class instance_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, request_frames=1, title=''):

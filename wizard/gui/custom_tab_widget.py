@@ -15,6 +15,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 		super(custom_tab_widget, self).__init__(parent)
 		self.build_ui()
 		self.tabs_dic = dict()
+		self.index = None
 
 	def build_ui(self):
 		self.main_layout = QtWidgets.QHBoxLayout()
@@ -70,6 +71,10 @@ class custom_tab_widget(QtWidgets.QWidget):
 				self.tabs_dic[tab_index]['widget'].setVisible(0)
 		self.tabs_dic[index]['button'].setChecked(True)
 		self.tabs_dic[index]['widget'].setVisible(1)
+		self.index = index
+
+	def current_index(self):
+		return self.index
 
 class tab_button(QtWidgets.QPushButton):
 

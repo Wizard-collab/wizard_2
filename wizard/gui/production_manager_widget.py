@@ -17,7 +17,9 @@ from wizard.gui import production_table_widget
 from wizard.gui import custom_tab_widget
 
 # Wizard core modules
+from wizard.core import user
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +46,18 @@ class production_manager_widget(QtWidgets.QWidget):
 
         self.production_table_index = self.tabs_widget.addTab(self.production_table_widget, '', QtGui.QIcon(ressources._table_viewer_icon_))
         self.overview_index = self.tabs_widget.addTab(self.overview_widget, '', QtGui.QIcon(ressources._chart_icon_))
+
+    def set_context(self):
+        current_tab = self.tabs_widget.current_index()
+        context_dic = dict()
+        context_dic['current_tab'] = current_tab
+        user.user().add_context(user_vars._production_manager_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._production_manager_context_)
+        if context_dic is not None and context_dic != dict():
+            current_tab = context_dic['current_tab']
+            self.tabs_widget.tab_selected(current_tab)
 
     def refresh(self):
         self.overview_widget.refresh()

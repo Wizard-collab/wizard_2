@@ -56,6 +56,7 @@ from wizard.gui import whatsnew_widget
 from wizard.gui import groups_manager_widget
 from wizard.gui import quotes_manager
 from wizard.gui import table_viewer_widget
+from wizard.gui import floating_widgets_layout
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,7 @@ class main_widget(QtWidgets.QWidget):
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.quotes_manager = quotes_manager.quotes_manager()
         self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
+
         self.build_ui()
         self.connect_functions()
         self.init_gui_server()
@@ -134,12 +136,37 @@ class main_widget(QtWidgets.QWidget):
     def init_softwares_server(self):
         self.softwares_server.start()
 
+    def init_widgets_pos(self):
+        floating_widgets_layout.init_widget_pos(self, 'main_widget', force_show=1, maximized=1)
+        floating_widgets_layout.init_widget_pos(self.console_widget, 'console_widget')
+        floating_widgets_layout.init_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
+        floating_widgets_layout.init_widget_pos(self.project_preferences_widget, 'project_preferences_widget')
+        floating_widgets_layout.init_widget_pos(self.subtask_manager, 'subtask_manager')
+        floating_widgets_layout.init_widget_pos(self.championship_widget, 'championship_widget')
+        floating_widgets_layout.init_widget_pos(self.production_manager_widget, 'production_manager_widget')
+        floating_widgets_layout.init_widget_pos(self.groups_manager_widget, 'groups_manager_widget')
+        floating_widgets_layout.init_widget_pos(self.quotes_manager, 'quotes_manager')
+        floating_widgets_layout.init_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
+
     def init_contexts(self):
         self.tree_widget.get_context()
         self.tabs_widget.get_context()
         self.versions_widget.get_context()
         self.asset_tracking_widget.get_context()
         self.console_widget.get_context()
+        self.production_manager_widget.get_context()
+
+    def save_widgets_pos(self):
+        floating_widgets_layout.save_widget_pos(self, 'main_widget')
+        floating_widgets_layout.save_widget_pos(self.console_widget, 'console_widget')
+        floating_widgets_layout.save_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
+        floating_widgets_layout.save_widget_pos(self.project_preferences_widget, 'project_preferences_widget')
+        floating_widgets_layout.save_widget_pos(self.subtask_manager, 'subtask_manager')
+        floating_widgets_layout.save_widget_pos(self.championship_widget, 'championship_widget')
+        floating_widgets_layout.save_widget_pos(self.production_manager_widget, 'production_manager_widget')
+        floating_widgets_layout.save_widget_pos(self.groups_manager_widget, 'groups_manager_widget')
+        floating_widgets_layout.save_widget_pos(self.quotes_manager, 'quotes_manager')
+        floating_widgets_layout.save_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
 
     def save_contexts(self):
         self.tree_widget.set_context()
@@ -148,6 +175,7 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget.set_context()
         self.asset_tracking_widget.set_context()
         self.console_widget.set_context()
+        self.production_manager_widget.set_context()
 
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
@@ -226,6 +254,9 @@ class main_widget(QtWidgets.QWidget):
         self.raise_()
         self.show()
         self.activateWindow()
+
+    def init_floating_windows(self):
+        self.init_widgets_pos()
 
     def focus_export_version(self, export_version_id):
         export_version_row = project.get_export_version_data(export_version_id)
@@ -324,6 +355,7 @@ class main_widget(QtWidgets.QWidget):
         if close:
             self.quit_threads()
             self.save_contexts()
+            self.save_widgets_pos()
         return close
 
     def closeEvent(self, event):

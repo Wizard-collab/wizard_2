@@ -136,7 +136,7 @@ class app():
         self.main_widget.stop_threads.connect(self.db_server.stop)
         self.main_widget.stop_threads.connect(self.stats_schedule.stop)
         self.main_widget.refresh()
-        self.main_widget.showMaximized()
+        self.main_widget.init_floating_windows()
         QtWidgets.QApplication.processEvents()
         self.main_widget.init_contexts()
         self.loading_widget.close()

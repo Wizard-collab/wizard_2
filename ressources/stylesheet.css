@@ -143,7 +143,7 @@ QTreeView::item {
 	padding:5px;
 	border-radius:5px;
 	margin: 1px;
-	margin-right: 10px;
+	margin-right: 1px;
 }
  
 QTreeView::item:hover {
@@ -470,6 +470,10 @@ QTableWidget::item:selected{
 QTableCornerButton::section {
 	background-color: rgba(0,0,0,30);
 	border: 1px solid rgba(0,0,0,80);
+}
+
+#tree_widget{
+	background-color: transparent;
 }
 
 #table_widget_horizontal_header_view::section{

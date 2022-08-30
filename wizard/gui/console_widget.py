@@ -78,6 +78,10 @@ class console_widget(QtWidgets.QWidget):
             self.show()
             self.raise_()
 
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
+
     def redirect_stdout(self):
         sys.stdout = custom_stdout()
         sys.stderr = custom_stderr()
