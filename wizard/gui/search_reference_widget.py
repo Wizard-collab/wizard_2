@@ -271,12 +271,12 @@ class search_thread(QtCore.QThread):
         for category_row in all_categories:
             categories[category_row['id']] = category_row
         for variant_row in all_variants:
-            #if variant_row['id'] in all_export_versions_variant_ids:
-            if all(keyword.upper() in variant_row['string'].upper() for keyword in keywords):
-                stage_row = stages[variant_row['stage_id']]
-                asset_row = assets[stage_row['asset_id']]
-                category_row = categories[asset_row['category_id']]
-                self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+            if variant_row['id'] in all_export_versions_variant_ids:
+                if all(keyword.upper() in variant_row['string'].upper() for keyword in keywords):
+                    stage_row = stages[variant_row['stage_id']]
+                    asset_row = assets[stage_row['asset_id']]
+                    category_row = categories[asset_row['category_id']]
+                    self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
         if (self.context == 'work_env'):
                 groups_rows = project.get_groups()
                 for group_row in groups_rows:

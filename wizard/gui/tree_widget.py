@@ -5,10 +5,12 @@
 # Python modules
 import time
 import os
+import copy
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import logging
+import traceback
 
 # Wizard modules
 from wizard.core import project
@@ -353,6 +355,8 @@ class tree_widget(QtWidgets.QFrame):
             self.category_ids[id].setHidden(visibility)
         for id in self.asset_ids.keys():
             self.asset_ids[id].setHidden(visibility)
+        for id in self.stage_ids.keys():
+            self.stage_ids[id].setHidden(visibility)
 
     def filter_stage(self, string):
         if not string or len(string)<2:
@@ -395,14 +399,14 @@ class tree_widget(QtWidgets.QFrame):
     def isolate_item(self, item):
         search_text = ''
         if item.instance_type == 'category':
-            search_text = f"{item.instance_name}:"
+            search_text = f"{item.instance_name}/"
         elif item.instance_type == 'asset':
             category_item = self.category_ids[item.parent().instance_id]
-            search_text = f"{category_item.instance_name}:{item.instance_name}"
+            search_text = f"{category_item.instance_name}/{item.instance_name}"
         elif item.instance_type == 'stage':
             asset_item = self.asset_ids[item.parent().instance_id]
             category_item = self.category_ids[asset_item.parent().instance_id]
-            search_text = f"{category_item.instance_name}:{asset_item.instance_name}*{item.instance_name}"
+            search_text = f"{category_item.instance_name}/{asset_item.instance_name}/{item.instance_name}"
         if search_text != '':
             self.search_bar.setText(search_text)
 
@@ -411,24 +415,12 @@ class tree_widget(QtWidgets.QFrame):
         self.search_asset(search)
 
     def search_asset(self, search):
-        stage_filter = None
-        if '*' in search:
-            stage_filter = search.split('*')[-1]
-            search = search.split('*')[0]
-        self.filter_stage(stage_filter)
-        if len(search) > 2:
+        if len(search) > 0:
             self.toggle_all_visibility(1)
-            if ':' in search:
-                category_string=search.split(':')[0]
-                asset_string=search.split(':')[-1]
-            else:
-                category_string = None
-                asset_string = search
-            self.search_thread.update_search(category_string, asset_string)
+            self.search_thread.update_search(search)
         else:
             self.search_thread.running=False
             self.toggle_all_visibility(0)
-
 
     def double_click(self, item):
         new_stage_id = None
@@ -436,19 +428,30 @@ class tree_widget(QtWidgets.QFrame):
         new_category_id = None
 
         if item.instance_type == 'stage_creation':
+            existing_stages = project.get_asset_childs(item.instance_parent_id, 'name')
             menu = gui_utils.QMenu()
             domain_name = item.parent().parent().parent().instance_name 
             for stage in assets_vars._stages_list_[domain_name]:
-                action = menu.addAction(QtGui.QIcon(self.icons_dic['stage'][stage]), stage)
-                action.name = stage
+                if stage not in existing_stages:
+                    action = menu.addAction(QtGui.QIcon(self.icons_dic['stage'][stage]), stage)
+                    action.name = stage
+            action = menu.addAction(QtGui.QIcon(ressources._guess_icon_), 'Create all stages')
+            action.name = 'create_all'
             action = menu.exec_(QtGui.QCursor().pos())
             if action is not None:
-                stage_name = action.name
                 parent_id = item.instance_parent_id
-                new_stage_id = assets.create_stage(stage_name, parent_id)
-                if new_stage_id:
-                    self.refresh()
-                    gui_server.refresh_team_ui()
+                if action.name in assets_vars._stages_list_[domain_name]:
+                    new_stage_id = assets.create_stage(action.name, parent_id)
+                    if new_stage_id:
+                        self.refresh()
+                        gui_server.refresh_team_ui()
+                else:
+                    if action.name == 'create_all':
+                        for stage_name in assets_vars._stages_list_[domain_name]:
+                            if stage_name not in existing_stages:
+                                assets.create_stage(stage_name, parent_id)
+                        self.refresh()
+                        gui_server.refresh_team_ui()
 
         elif item.instance_type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self, title='Create asset')
@@ -609,13 +612,15 @@ class tree_widget(QtWidgets.QFrame):
         if is_selected:
             self.tree.clearSelection()
 
-    def add_search_item(self, ids_list):
-        if ids_list[0] in self.domain_ids.keys():
-            self.domain_ids[ids_list[0]].setHidden(0)
-        if ids_list[1] in self.category_ids.keys():
-            self.category_ids[ids_list[1]].setHidden(0)
-        if ids_list[2] in self.asset_ids.keys():
-            self.asset_ids[ids_list[2]].setHidden(0)
+    def add_search_item(self, stage_id):
+        if stage_id in self.stage_ids.keys():
+            self.stage_ids[stage_id].setHidden(0)
+            self.stage_ids[stage_id].parent().setHidden(0)
+            self.stage_ids[stage_id].parent().setExpanded(1)
+            self.stage_ids[stage_id].parent().parent().setHidden(0)
+            self.stage_ids[stage_id].parent().parent().setExpanded(1)
+            self.stage_ids[stage_id].parent().parent().parent().setExpanded(1)
+            self.stage_ids[stage_id].parent().parent().parent().setHidden(0)
 
 class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent, instance_name, instance_type, instance_id=None, parent_id=None):
@@ -794,7 +799,7 @@ class instance_creation_widget(QtWidgets.QDialog):
 
 class search_thread(QtCore.QThread):
 
-    item_signal = pyqtSignal(list)
+    item_signal = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -802,29 +807,36 @@ class search_thread(QtCore.QThread):
         self.asset = None
         self.running = True
 
-    def update_search(self, category=None, asset=None):
+    def update_search(self, string):
         self.running = False
-        self.category = category
-        self.asset = asset
+        self.string = string
         self.running = True
         self.start()
 
     def run(self):
-        process=1
-        parent_id = None
-        if self.category and len(self.category)>2:
-            category_id=project.get_category_data_by_name(self.category, 'id')
-            if category_id:
-                parent_id = category_id
-        if self.category and not parent_id:
-            process=None
-        if process:
-            assets_list = project.search_asset(self.asset, parent_id)
-            for asset_row in assets_list:
-                if not self.running:
-                    break
-                domain_id = project.get_category_data(project.get_asset_data(asset_row['id'], 'category_id'), 'domain_id')
-                self.item_signal.emit([domain_id, asset_row['category_id'], asset_row['id']])
+        keywords = self.string.split('&') 
+        all_stages = project.get_all_stages()
+        for stage_row in all_stages:
+
+            stage_row_cp = copy.deepcopy(stage_row)
+
+            del stage_row_cp['id']
+            del stage_row_cp['creation_time']
+            del stage_row_cp['work_time']
+            del stage_row_cp['progress']
+            del stage_row_cp['estimated_time']
+            del stage_row_cp['default_variant_id']
+            del stage_row_cp['asset_id']
+            del stage_row_cp['domain_id']
+
+            values = list(stage_row_cp.values())
+            data_list = []
+            for data_block in values:
+                data_list.append(str(data_block))
+            data = (' ').join(data_list)
+
+            if all(keyword.upper() in data.upper() for keyword in keywords):
+                self.item_signal.emit(stage_row['id'])
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
