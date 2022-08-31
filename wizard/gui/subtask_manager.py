@@ -12,7 +12,7 @@ import traceback
 import logging
 
 # Wizard gui modules
-from wizard.gui import log_viewer
+from wizard.gui import subtask_viewer
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import submit_log_widget
@@ -150,6 +150,8 @@ class subtask_widget(QtWidgets.QFrame):
         self.task_thread = task_thread(self.conn)
         self.task_thread.start()
 
+        self.subtask_viewer = subtask_viewer.subtask_viewer()
+
         self.start_clock()
         self.connect_functions()
 
@@ -182,11 +184,11 @@ class subtask_widget(QtWidgets.QFrame):
         self.send_log_button.setIcon(QtGui.QIcon(ressources._send_icon_))
         self.header_layout.addWidget(self.send_log_button)
 
-        self.show_log_viewer_button = QtWidgets.QPushButton()
-        self.show_log_viewer_button.setFixedSize(16, 16)
-        self.show_log_viewer_button.setIconSize(QtCore.QSize(10,10))
-        self.show_log_viewer_button.setIcon(QtGui.QIcon(ressources._console_icon_))
-        self.header_layout.addWidget(self.show_log_viewer_button)
+        self.show_subtask_viewer_button = QtWidgets.QPushButton()
+        self.show_subtask_viewer_button.setFixedSize(16, 16)
+        self.show_subtask_viewer_button.setIconSize(QtCore.QSize(10,10))
+        self.show_subtask_viewer_button.setIcon(QtGui.QIcon(ressources._console_icon_))
+        self.header_layout.addWidget(self.show_subtask_viewer_button)
 
         self.delete_task_button = QtWidgets.QPushButton()
         self.delete_task_button.setFixedSize(16, 16)
@@ -230,9 +232,8 @@ class subtask_widget(QtWidgets.QFrame):
         self.clock_thread.time_signal.connect(self.update_time)
         self.clock_thread.start()
 
-    def show_log_viewer(self):
-        self.log_viewer = log_viewer.log_viewer(self.log_file)
-        self.log_viewer.show()
+    def show_subtask_viewer(self):
+        self.subtask_viewer.show()
 
     def send_to_support(self):
         if self.log_file:
@@ -280,7 +281,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.task_thread.connection_dead.connect(self.create_popup)
         self.kill_button.clicked.connect(self.task_thread.kill)
         self.delete_task_button.clicked.connect(self.delete_task)
-        self.show_log_viewer_button.clicked.connect(self.show_log_viewer)
+        self.show_subtask_viewer_button.clicked.connect(self.show_subtask_viewer)
         self.send_log_button.clicked.connect(self.send_to_support)
 
     def delete_task(self):
@@ -301,14 +302,19 @@ class subtask_widget(QtWidgets.QFrame):
 
         if data_type == 'percent':
             self.update_progress(data)
+            self.subtask_viewer.update_progress(data)
         elif data_type == 'current_task':
             self.update_current_task(data)
+            self.subtask_viewer.update_current_task(data)
         elif data_type == 'status':
             self.update_status(data)
+            self.subtask_viewer.update_status(data)
         elif data_type == 'log_file':
             self.log_file = data
         elif data_type == 'end':
             self.task_thread.stop()
+        elif data_type == 'stdout':
+            self.subtask_viewer.update_log(data)
 
 class clock_thread(QThread):
 
@@ -382,6 +388,14 @@ class task_thread(QThread):
     def kill(self):
         if self.conn is not None:
             if not socket_utils.send_signal_with_conn(self.conn, 'kill'):
+                if self.conn is not None:
+                    self.conn.close()
+                    self.conn = None
+                    self.connection_dead.emit(1)
+
+    def get_stdout(self):
+        if self.conn is not None:
+            if not socket_utils.send_signal_with_conn(self.conn, 'get_stdout'):
                 if self.conn is not None:
                     self.conn.close()
                     self.conn = None

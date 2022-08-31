@@ -145,6 +145,8 @@ class app():
         logger.info(f"Wizard start time : {str(round((time.time()-start_time), 1))}s")
 
     def quit(self):
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         if self.db_server:
             self.db_server.stop()
         self.stats_schedule.stop()

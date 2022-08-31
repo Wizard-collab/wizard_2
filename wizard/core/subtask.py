@@ -64,6 +64,8 @@ class subtask(Thread):
             self.env = env
         self.cwd = cwd
         self.print_stdout = print_stdout
+        self.stream_stdout_buffer = ''
+        self.stream_stdout_last_send = 0
         self.running = False
         self.out = ''
 
@@ -124,6 +126,7 @@ class subtask(Thread):
                 last_stdout_line = line
 
         self.out += buffered_stdout
+        self.communicate_thread.send_signal([self.process_id, 'stdout', self.stream_stdout_buffer+buffered_stdout])
 
         if last_percent is not None:
             self.communicate_thread.send_percent([self.process_id, 'percent', last_percent])
@@ -156,8 +159,13 @@ class subtask(Thread):
                 self.set_done()
         else:
             self.out+='\n'+out
+            self.stream_stdout_buffer += '\n'+out
             if self.print_stdout:
                 print(out)
+            if time.time() - self.stream_stdout_last_send > 0.2:
+                self.communicate_thread.send_signal([self.process_id, 'stdout', self.stream_stdout_buffer])
+                self.stream_stdout_buffer = ''
+                self.stream_stdout_last_send = time.time()
 
     def write(self, stdin):
         try:

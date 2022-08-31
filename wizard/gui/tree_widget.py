@@ -431,6 +431,7 @@ class tree_widget(QtWidgets.QFrame):
     def search_asset(self, search):
         if len(search) > 0:
             self.toggle_all_visibility(1)
+            self.reduce_all()
             self.search_thread.update_search(search)
         else:
             self.search_thread.running=False
