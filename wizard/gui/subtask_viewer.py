@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 import os
 import logging
 
@@ -14,6 +15,8 @@ from wizard.core import path_utils
 logger = logging.getLogger(__name__)
 
 class subtask_viewer(QtWidgets.QWidget):
+
+    kill_task_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(subtask_viewer, self).__init__(parent)
@@ -26,6 +29,7 @@ class subtask_viewer(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.log_textEdit_scrollBar.rangeChanged.connect(lambda: self.log_textEdit_scrollBar.setValue(self.log_textEdit_scrollBar.maximum()))
+        self.kill_button.clicked.connect(self.kill_task_signal.emit)
 
     def update_log(self, log):
         self.analyse_log(log)
@@ -40,7 +44,8 @@ class subtask_viewer(QtWidgets.QWidget):
             color = '#f0605b'
         elif status == 'Done':
             color = '#9cf277'
-        self.status_frame.setStyleSheet(f"background-color:{color};border-radius:4px;")
+        self.status_frame.setStyleSheet(f"background-color:{color};border-radius:5px;")
+        self.progress.setStyleSheet('#task_progressBar{color:transparent;}\n#task_progressBar::chunk{background-color:%s;}'%color)
         self.status_label.setText(status)
 
     def update_progress(self, percent):
@@ -64,14 +69,20 @@ class subtask_viewer(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_widget)
 
         self.status_frame = QtWidgets.QFrame()
-        self.status_frame.setFixedSize(8,8)
-        self.status_frame.setStyleSheet(f"background-color:#f79360;border-radius:4px;")
+        self.status_frame.setFixedSize(10,10)
+        self.status_frame.setStyleSheet(f"background-color:#f79360;border-radius:5px;")
         self.header_layout.addWidget(self.status_frame)
 
-        self.status_label = QtWidgets.QLabel('Running')
+        self.status_label = QtWidgets.QLabel('')
         self.header_layout.addWidget(self.status_label)
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.kill_button = QtWidgets.QPushButton()
+        self.kill_button.setFixedSize(20,20)
+        self.kill_button.setIconSize(QtCore.QSize(18,18))
+        self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
+        self.header_layout.addWidget(self.kill_button)
 
         self.progress = QtWidgets.QProgressBar()
         self.progress.setMaximumHeight(6)

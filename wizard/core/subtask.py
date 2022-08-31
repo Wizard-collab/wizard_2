@@ -225,7 +225,6 @@ class subtask(Thread):
             self.communicate_thread = communicate_thread(self)
             self.communicate_thread.start()
 
-            self.communicate_thread.send_signal([self.process_id, 'status', 'Running'])
             self.add_python_buffer_env()
 
             self.build_pycmd()
@@ -233,6 +232,8 @@ class subtask(Thread):
             self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=self.cwd,
                                             stdout = subprocess.PIPE, stderr = subprocess.STDOUT, stdin = subprocess.PIPE)
 
+            self.communicate_thread.send_signal([self.process_id, 'status', 'Running'])
+            
             self.check_realtime_output()
             self.analyse_missed_stdout()
             self.running = False

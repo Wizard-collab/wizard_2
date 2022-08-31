@@ -283,12 +283,15 @@ class subtask_widget(QtWidgets.QFrame):
         self.delete_task_button.clicked.connect(self.delete_task)
         self.show_subtask_viewer_button.clicked.connect(self.show_subtask_viewer)
         self.send_log_button.clicked.connect(self.send_to_support)
+        self.subtask_viewer.kill_task_signal.connect(self.task_thread.kill)
 
     def delete_task(self):
         if self.task_thread.conn is not None:
             logger.warning('You need to kill the task before removing it')
         else:
             self.remove_task_signal.emit(self.process_id)
+            self.subtask_viewer.close()
+            self.subtask_viewer.deleteLater()
             self.setParent(None)
             self.deleteLater()
 
