@@ -422,7 +422,7 @@ def add_stage(name, asset_id):
                                 'todo',
                                 environment.get_user(),
                                 0.0,
-                                None,
+                                18000,
                                 0.0,
                                 string_asset,
                                 asset_id,

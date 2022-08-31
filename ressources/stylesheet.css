@@ -140,8 +140,8 @@ QTreeView {
 }
  
 QTreeView::item {
-	padding:5px;
-	border-radius:5px;
+	padding:4px;
+	border-radius:4px;
 	margin: 1px;
 	margin-right: 1px;
 }
@@ -474,6 +474,12 @@ QTableCornerButton::section {
 
 #tree_widget{
 	background-color: transparent;
+	alternate-background-color: rgba(0,0,0,20);
+}
+
+#tree_widget::item{
+	margin-left: 0px;
+	margin-right: 0px;
 }
 
 #table_widget_horizontal_header_view::section{

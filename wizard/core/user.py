@@ -229,17 +229,6 @@ class user:
         self.prefs_dic[user_vars._user_build_] = build
         self.write_prefs_dic()
 
-    def set_creation_items_visibility(self, visibility):
-        self.prefs_dic[user_vars._creation_items_visibility_] = visibility
-        self.write_prefs_dic()
-
-    def get_creation_items_visibility(self):
-        if user_vars._creation_items_visibility_ in self.prefs_dic.keys():
-            return self.prefs_dic[user_vars._creation_items_visibility_]
-        else:
-            self.set_creation_items_visibility(True)
-            return None
-
     def get_user_prefs_dic(self):
         # Read ~/Documents/wizard/prefences.yaml
         # or init it if not found
@@ -266,7 +255,6 @@ class user:
             self.prefs_dic[user_vars._popups_settings_]['duration'] = 3
             self.prefs_dic[user_vars._show_whatsnew_] = True
             self.prefs_dic[user_vars._user_build_] = None
-            self.prefs_dic[user_vars._creation_items_visibility_] = True
             self.prefs_dic[user_vars._widgets_pos_] = dict()
             self.write_prefs_dic()
         else:

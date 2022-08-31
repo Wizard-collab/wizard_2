@@ -38,7 +38,9 @@ class tree_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(tree_widget, self).__init__(parent)
 
-        self.creation_items_visibility = user.user().get_creation_items_visibility()
+        self.creation_items_visibility = 1
+        self.progress_visibility = 1
+        self.state_visibility = 1
 
         self.domain_ids=dict()
         self.category_ids=dict()
@@ -92,25 +94,28 @@ class tree_widget(QtWidgets.QFrame):
 
         self.main_layout.addWidget(self.search_frame)
 
+        self.data_label = QtWidgets.QLabel()
+        self.data_label.setObjectName('tree_datas_label')
+        self.main_layout.addWidget(self.data_label)
+
         self.tree = QtWidgets.QTreeWidget()
+
         self.tree.setObjectName('tree_widget')
         self.tree.setAnimated(0)
-        self.tree.setColumnCount(2)
-        self.tree.header().resizeSection(0, 240)
+        self.tree.setColumnCount(3)
+        self.tree.header().resizeSection(0, 190)
         self.tree.header().resizeSection(1, 8)
+        self.tree.header().resizeSection(2, 20)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tree.setAlternatingRowColors(True)
         self.tree.setHeaderHidden(True)
-        self.tree.setIndentation(20)
+        self.tree.setIndentation(16)
         self.main_layout.addWidget(self.tree)
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('tree_datas_label')
         self.main_layout.addWidget(self.refresh_label)
-
-        self.data_label = QtWidgets.QLabel()
-        self.data_label.setObjectName('tree_datas_label')
-        self.main_layout.addWidget(self.data_label)
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
@@ -139,6 +144,9 @@ class tree_widget(QtWidgets.QFrame):
 
     def set_context(self):
         context_dic = dict()
+        context_dic['creation_items_visibility'] = self.creation_items_visibility
+        context_dic['progress_visibility'] = self.progress_visibility
+        context_dic['state_visibility'] = self.state_visibility
         context_dic['expanded_domains'] = []
         context_dic['expanded_categories'] = []
         context_dic['expanded_assets'] = []
@@ -159,7 +167,6 @@ class tree_widget(QtWidgets.QFrame):
                 context_dic['selected_instance'] = (selected_item.instance_type,
                                                             selected_item.instance_id)
         user.user().add_context(user_vars._tree_context_, context_dic)
-        user.user().set_creation_items_visibility(self.creation_items_visibility)
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._tree_context_)
@@ -188,6 +195,11 @@ class tree_widget(QtWidgets.QFrame):
                         self.focus_on_item(self.stage_ids[context_dic['selected_instance'][1]])
             self.search_bar.setText(context_dic['search_string'])
             self.apply_search()
+            self.creation_items_visibility = context_dic['creation_items_visibility']
+            self.progress_visibility = context_dic['progress_visibility']
+            self.state_visibility = context_dic['state_visibility']
+            self.update_creation_items_visibility()
+            self.update_columns_visibility()
 
     def refresh(self, hard=None):
         start_time = time.time()
@@ -230,6 +242,18 @@ class tree_widget(QtWidgets.QFrame):
         self.update_creation_items_visibility()
 
         self.update_refresh_time(start_time)
+
+    def update_columns_visibility(self):
+        self.tree.setColumnHidden(2, not self.progress_visibility)
+        self.tree.setColumnHidden(1, not self.state_visibility)
+
+    def toggle_progress_visibility(self):
+        self.progress_visibility = not self.progress_visibility
+        self.update_columns_visibility()
+
+    def toggle_state_visibility(self):
+        self.state_visibility = not self.state_visibility
+        self.update_columns_visibility()
 
     def update_creation_items_visibility(self):
         for creation_item in self.creation_items:
@@ -315,6 +339,7 @@ class tree_widget(QtWidgets.QFrame):
                 stage_item.add_indicator()
                 self.remove_stage_creation_item(parent_widget)
             self.stage_ids[row['id']].set_state_indicator(row['state'])
+            self.stage_ids[row['id']].setText(2, f"{int(row['progress'])}%")
             if row['state'] == 'error':
                 self.stage_ids[row['id']].parent().set_indicator_visibility(1)
                 self.stage_ids[row['id']].parent().parent().set_indicator_visibility(1)
@@ -526,10 +551,20 @@ class tree_widget(QtWidgets.QFrame):
         menu.addSeparator()
 
         creation_items_visibility_icon = ressources._uncheck_icon_
-        if not self.creation_items_visibility:
+        if self.creation_items_visibility:
             creation_items_visibility_icon = ressources._check_icon_
 
-        hide_creation_items = menu.addAction(QtGui.QIcon(creation_items_visibility_icon), f'Hide creation items')
+        progress_visibility_icon = ressources._uncheck_icon_
+        if self.progress_visibility:
+            progress_visibility_icon = ressources._check_icon_
+
+        state_visibility_icon = ressources._uncheck_icon_
+        if self.state_visibility:
+            state_visibility_icon = ressources._check_icon_
+
+        hide_creation_items = menu.addAction(QtGui.QIcon(creation_items_visibility_icon), f'Creation items')
+        hide_progress = menu.addAction(QtGui.QIcon(progress_visibility_icon), f'Progress')
+        hide_state = menu.addAction(QtGui.QIcon(state_visibility_icon), f'State')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -547,6 +582,10 @@ class tree_widget(QtWidgets.QFrame):
                 self.open_sandbox_folder(item)
             elif action == hide_creation_items:
                 self.toggle_creation_items_visibility()
+            elif action == hide_progress:
+                self.toggle_progress_visibility()
+            elif action == hide_state:
+                self.toggle_state_visibility()
 
     def open_folder(self, item):
         if item.instance_type == 'domain':
@@ -634,6 +673,9 @@ class tree_widget(QtWidgets.QFrame):
 class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent, instance_name, instance_type, instance_id=None, parent_id=None):
         super(custom_treeWidgetItem, self ).__init__(parent)
+
+        self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
+
         self.instance_name = instance_name
         self.instance_type = instance_type
         self.instance_id = instance_id
