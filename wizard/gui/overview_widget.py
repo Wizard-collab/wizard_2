@@ -8,6 +8,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtChart import QChart, QChartView, QPieSeries
 import statistics
 import time
+import datetime
 import json
 import copy
 import logging
@@ -34,6 +35,7 @@ class overview_widget(QtWidgets.QWidget):
         self.user_progress_widget = user_progress_widget()
         self.progress_overview_widget = progress_overview_widget()
         self.progress_curves_widget = progress_curves_widget()
+        self.time_left_overview_widget = time_left_overview_widget()
         self.build_ui()
         self.refresh()
 
@@ -56,6 +58,7 @@ class overview_widget(QtWidgets.QWidget):
 
         self.vertical_layout_1.addWidget(self.main_progress_widget)
         self.vertical_layout_1.addWidget(self.progress_overview_widget)
+        self.vertical_layout_1.addWidget(self.time_left_overview_widget)
 
         self.project_quickstats_widget = project_quickstats_widget()
         self.vertical_layout_1.addWidget(self.project_quickstats_widget)
@@ -94,6 +97,7 @@ class overview_widget(QtWidgets.QWidget):
             self.user_progress_widget.refresh()
             self.progress_curves_widget.refresh()
             self.project_quickstats_widget.refresh()
+            self.time_left_overview_widget.refresh()
             self.update_refresh_time(start_time)
 
 class project_quickstats_widget(QtWidgets.QFrame):
@@ -105,7 +109,7 @@ class project_quickstats_widget(QtWidgets.QFrame):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(20,20,20,20)
-        self.main_layout.setSpacing(12)
+        self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.title_label = QtWidgets.QLabel('Project stats')
@@ -180,7 +184,7 @@ class main_progress_widget(QtWidgets.QFrame):
         self.setObjectName('round_frame')
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setSpacing(12)
+        self.main_layout.setSpacing(6)
         self.main_layout.setContentsMargins(20,20,20,20)
         self.setLayout(self.main_layout)
 
@@ -230,7 +234,7 @@ class user_progress_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(12)
+        self.main_layout.setSpacing(6)
         self.main_layout.setContentsMargins(20,20,20,20)
         self.setLayout(self.main_layout)
 
@@ -238,7 +242,7 @@ class user_progress_widget(QtWidgets.QFrame):
         self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.header_widget_layout = QtWidgets.QHBoxLayout()
         self.header_widget_layout.setContentsMargins(0,0,0,0)
-        self.header_widget_layout.setSpacing(12)
+        self.header_widget_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_widget_layout)
         self.main_layout.addWidget(self.header_widget)
 
@@ -456,6 +460,7 @@ class stages_piechart(QtWidgets.QFrame):
         self.setFixedSize(140,140)
         self.setObjectName("quickstats_widget")
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(6)
         self.main_layout.setContentsMargins(20,20,20,20)
         self.setLayout(self.main_layout)
 
@@ -476,7 +481,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.setMinimumHeight(400)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(20,20,20,20)
-        self.main_layout.setSpacing(12)
+        self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
@@ -558,8 +563,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         total_progress = []
 
         start_time = all_progress_events_rows[0]['creation_time']
-        end_time = all_progress_events_rows[-1]['creation_time']
-        #end_time = time.time()+3600*12
+        end_time = project.get_deadline()
         time_range = end_time - start_time
 
         if time_range > 0:
@@ -654,6 +658,7 @@ class data_item(QtWidgets.QFrame):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setSpacing(6)
         self.main_layout.setContentsMargins(4,4,4,4)
         self.setLayout(self.main_layout)
         self.color_frame = QtWidgets.QFrame()
@@ -694,6 +699,7 @@ class stage_stats_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setFixedWidth(250)
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(6)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 
@@ -782,6 +788,49 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.stage_name_label.setText(self.stage.capitalize())
         self.color_frame.setStyleSheet(f"border-top-left-radius:4px;border-bottom-left-radius:4px;background-color:{ressources._stages_colors_[self.stage]}")
 
+class time_left_overview_widget(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(time_left_overview_widget, self).__init__(parent)
+        self.build_ui()
+
+    def build_ui(self):
+        self.setObjectName('round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(30,30,30,30)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.title_label = QtWidgets.QLabel('Time left')
+        self.title_label.setObjectName('title_label')
+        self.main_layout.addWidget(self.title_label)
+
+        self.time_left_chart_frame = QtWidgets.QFrame()
+        self.time_left_chart_frame.setObjectName('quickstats_widget')
+        self.time_left_chart_frame_layout = QtWidgets.QVBoxLayout()
+        self.time_left_chart_frame.setLayout(self.time_left_chart_frame_layout)
+        self.main_layout.addWidget(self.time_left_chart_frame)
+
+        self.time_left_chart = chart_utils.time_left_chart()
+        self.time_left_chart.setObjectName('transparent_widget')
+        self.time_left_chart_frame_layout.addWidget(self.time_left_chart)
+
+        self.data_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.data_label)
+
+    def refresh(self):
+        creation_time = repository.get_project_row_by_name(environment.get_project_name())['creation_time']
+        deadline = project.get_deadline()
+        self.time_left_chart.refresh(creation_time, deadline)
+
+        time_delta = deadline - time.time()
+        days = int(time_delta/86400)
+        months = int(days/30.5)
+        if months == 0:
+            time_left_string = f"{days} days left"
+        else:
+            time_left_string = f"{months} months left"
+        self.data_label.setText(time_left_string)
+
 class progress_overview_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(progress_overview_widget, self).__init__(parent)
@@ -791,7 +840,7 @@ class progress_overview_widget(QtWidgets.QFrame):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(30,30,30,30)
-        self.main_layout.setSpacing(18)
+        self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.domains_dic = dict()

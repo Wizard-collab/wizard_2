@@ -185,6 +185,13 @@ class production_table_widget(QtWidgets.QWidget):
                 labels_names = ["Name", "Frame range", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Compositing"]
                 stages_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
 
+            project_asset_ids = [asset_row['id'] for asset_row in asset_rows]
+
+            asset_ids = list(self.asset_ids.keys())
+            for asset_id in asset_ids:
+                if asset_id not in project_asset_ids:
+                    self.remove_asset(asset_id)
+
             self.table_widget.setColumnCount(len(labels_names))
             self.table_widget.setHorizontalHeaderLabels(labels_names)
             self.table_widget.setRowCount(len(asset_rows))
@@ -245,11 +252,6 @@ class production_table_widget(QtWidgets.QWidget):
                 if stage_id not in project_stage_ids:
                     self.remove_stage(stage_id)
 
-            asset_ids = list(self.asset_ids.keys())
-            for asset_id in asset_ids:
-                if asset_id not in project_asset_ids:
-                    self.remove_asset(asset_id)
-
             QtWidgets.QApplication.processEvents()
             self.table_widget.resizeColumnsToContents()
             self.table_widget.resizeRowsToContents()
@@ -283,6 +285,7 @@ class production_table_widget(QtWidgets.QWidget):
     def remove_asset(self, asset_id):
         if asset_id in self.asset_ids.keys():
             row_index = self.get_asset_coord(asset_id).row()
+            print(row_index)
             self.table_widget.removeRow(row_index)
             del self.asset_ids[asset_id]
 

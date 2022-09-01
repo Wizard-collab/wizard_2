@@ -48,6 +48,7 @@
 import re
 import os
 import time
+import datetime
 import json
 import shutil
 import logging
@@ -1691,15 +1692,17 @@ def set_default_extension(extension_id, extension):
     else:
         return None
 
-def create_settings_row(frame_rate, image_format):
+def create_settings_row(frame_rate, image_format, deadline):
     if len(db_utils.get_rows('project', 'settings', 'id'))==0:
         if db_utils.create_row('project',
                                             'settings',
                                             ('frame_rate',
                                                 'image_format',
+                                                'deadline',
                                                 'users_ids'),
                                             (frame_rate,
                                                 json.dumps(image_format),
+                                                deadline,
                                                 json.dumps(list()))):
             logger.info("Project settings initiated")
             return 1
@@ -1747,6 +1750,27 @@ def get_image_format():
                                                         'image_format')
     if image_format_list and len(image_format_list) >= 1:
         return json.loads(image_format_list[0])
+    else:
+        logger.error("Project settings not found")
+        return None
+
+def set_deadline(time_float):
+    if db_utils.update_data('project',
+                            'settings',
+                            ('deadline', time_float),
+                            ('id', 1)):
+        logger.info('Project deadline modified')
+        return 1
+    else:
+        return None
+
+def get_deadline():
+    deadline_list = db_utils.get_row_by_column_data('project',
+                                                        'settings',
+                                                        ('id', 1),
+                                                        'deadline')
+    if deadline_list and len(deadline_list) >= 1:
+        return deadline_list[0]
     else:
         logger.error("Project settings not found")
         return None
@@ -2601,6 +2625,7 @@ def create_settings_table(database):
                                         id serial PRIMARY KEY,
                                         frame_rate text NOT NULL,
                                         image_format text NOT NULL,
+                                        deadline real NOT NULL,
                                         users_ids text
                                     );"""
     if db_utils.create_table(database, sql_cmd):

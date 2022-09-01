@@ -128,6 +128,13 @@ class create_project_widget(QtWidgets.QDialog):
         self.format_height.setValue(1080)
         self.format_layout.addWidget(self.format_height)
 
+        self.deadline_label = QtWidgets.QLabel('Deadline')
+        self.deadline_label.setMinimumWidth(100)
+        self.deadline_label.setObjectName('gray_label')
+        self.deadline_lineedit = QtWidgets.QLineEdit()
+        self.deadline_lineedit.setPlaceholderText('day/month/year')
+        self.settings_layout.addRow(self.deadline_label, self.deadline_lineedit)
+
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
@@ -240,6 +247,7 @@ class create_project_widget(QtWidgets.QDialog):
 
         old_project_name = environment.get_project_name()
 
+        deadline_string = self.deadline_lineedit.text()
         project_name = self.project_name_lineEdit.text()
         project_path = self.project_path_lineEdit.text()
         password = self.password_lineEdit.text()
@@ -253,7 +261,8 @@ class create_project_widget(QtWidgets.QDialog):
                                                 project_password=password,
                                                 project_image=self.image,
                                                 frame_rate=frame_rate,
-                                                image_format=[width, height]):
+                                                image_format=[width, height],
+                                                deadline=deadline_string):
                 self.accept()
         else:
             logger.warning("Project passwords doesn't matches")

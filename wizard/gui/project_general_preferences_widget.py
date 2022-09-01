@@ -5,9 +5,12 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
+import datetime
+import time
 
 # Wizard modules
 from wizard.core import image
+from wizard.core import tools
 from wizard.core import repository
 from wizard.core import project
 from wizard.core import environment
@@ -25,6 +28,8 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.connect_functions()
 
     def refresh(self):
+        deadline_float = project.get_deadline()
+        deadline_string = datetime.datetime.fromtimestamp(deadline_float).strftime('%d/%m/%Y')
         frame_rate = project.get_frame_rate()
         image_format = project.get_image_format()
         project_name = environment.get_project_name()
@@ -34,6 +39,8 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.format_height.setValue(image_format[1])
         self.project_name_data.setText(project_name)
         self.project_path_data.setText(project_path)
+        self.deadline_lineedit.setText(deadline_string)
+        self.update_deadline_timeleft(deadline_float)
 
         project_row = repository.get_project_row_by_name(environment.get_project_name())
         project_image = image.convert_str_data_to_image_bytes(project_row['project_image'])
@@ -48,10 +55,18 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.random_image_button.clicked.connect(self.get_random_image)
         self.frame_rate_accept_button.clicked.connect(self.apply_frame_rate)
         self.format_accept_button.clicked.connect(self.apply_format)
+        self.deadline_accept_button.clicked.connect(self.apply_deadline)
 
     def apply_frame_rate(self):
         frame_rate = self.frame_rate_spinBox.value()
         project.set_frame_rate(frame_rate)
+
+    def apply_deadline(self):
+        date_string = self.deadline_lineedit.text()
+        time_float = tools.get_time_float_from_string_date(date_string)
+        if time_float:
+            project.set_deadline(time_float)
+            self.update_deadline_timeleft(time_float)
 
     def apply_format(self):
         width = self.format_width.value()
@@ -76,6 +91,16 @@ class project_general_preferences_widget(QtWidgets.QWidget):
                 self.refresh()
             else:
                 logger.warning('{} is not a valid image file...'.format(image_file))
+
+    def update_deadline_timeleft(self, time_float):
+        time_delta = time_float - time.time()
+        days = int(time_delta/86400)
+        months = int(days/30.5)
+        if months == 0:
+            time_left_string = f"{days} days left"
+        else:
+            time_left_string = f"{months} months left"
+        self.deadline_timeleft_label.setText(time_left_string)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -253,5 +278,39 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.format_accept_button = QtWidgets.QPushButton('Apply')
         self.format_accept_button.setObjectName('blue_button')
         self.format_buttons_layout.addWidget(self.format_accept_button)
+
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
+        self.deadline_frame = QtWidgets.QFrame()
+        self.deadline_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.deadline_layout = QtWidgets.QVBoxLayout()
+        self.deadline_layout.setContentsMargins(0,0,0,0)
+        self.deadline_layout.setSpacing(6)
+        self.deadline_frame.setLayout(self.deadline_layout)
+        self.scrollArea_layout.addWidget(self.deadline_frame)
+
+        self.deadline_title = QtWidgets.QLabel('Deadline')
+        self.deadline_title.setObjectName('bold_label')
+        self.deadline_layout.addWidget(self.deadline_title)
+
+        self.deadline_lineedit = QtWidgets.QLineEdit()
+        self.deadline_layout.addWidget(self.deadline_lineedit)
+
+        self.deadline_timeleft_label = QtWidgets.QLabel()
+        self.deadline_timeleft_label.setObjectName('gray_label')
+        self.deadline_layout.addWidget(self.deadline_timeleft_label)
+
+        self.deadline_buttons_widget = QtWidgets.QWidget()
+        self.deadline_buttons_layout = QtWidgets.QHBoxLayout()
+        self.deadline_buttons_layout.setContentsMargins(0,0,0,0)
+        self.deadline_buttons_layout.setSpacing(6)
+        self.deadline_buttons_widget.setLayout(self.deadline_buttons_layout)
+        self.deadline_layout.addWidget(self.deadline_buttons_widget)
+
+        self.deadline_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.deadline_accept_button = QtWidgets.QPushButton('Apply')
+        self.deadline_accept_button.setObjectName('blue_button')
+        self.deadline_buttons_layout.addWidget(self.deadline_accept_button)
 
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))

@@ -46,13 +46,14 @@ class project_preferences_widget(QtWidgets.QWidget):
             if not self.isActiveWindow():
                 self.show()
                 self.raise_()
-                self.refresh()
             else:
                 self.close()
         else:
             self.show()
             self.raise_()
-            self.refresh()
+
+    def showEvent(self, event):
+        self.refresh()
 
     def refresh(self):
         if self.isVisible():

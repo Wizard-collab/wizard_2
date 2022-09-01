@@ -28,6 +28,7 @@ class project_manager_widget(QtWidgets.QDialog):
 
         self.build_ui()
         self.connect_functions()
+        self.refresh()
 
     def build_ui(self):
         self.resize(900,700)

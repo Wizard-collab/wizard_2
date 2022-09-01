@@ -41,6 +41,8 @@
 # project database and initialize the project settings
 
 # Python modules
+import time
+import datetime
 import logging
 
 # Wizard modules
@@ -59,12 +61,17 @@ logger = logging.getLogger(__name__)
 # Python modules
 import os
 
+def get_default_deadline():
+    deadline_string = datetime.datetime.fromtimestamp(time.time()+23328000).strftime('%d/%m/%Y')
+    return deadline_string
+
 def create_project(project_name,
                     project_path,
                     project_password,
                     frame_rate=24,
                     image_format=[1920,1080],
-                    project_image=None):
+                    project_image=None,
+                    deadline=get_default_deadline()):
     do_creation = 1
 
     if project_name == '':
@@ -76,12 +83,15 @@ def create_project(project_name,
     if project_password == '':
         logger.warning("Please provide a password")
         do_creation = 0
+    deadline_float = tools.get_time_float_from_string_date(deadline)
+    if not deadline_float:
+        do_creation = 0
 
     if do_creation: 
         old_project_name = environment.get_project_name()
         if project.create_project(project_name, project_path, project_password, project_image):
             db_utils.modify_db_name('project', project_name)
-            init_project(project_name, project_path, project_password, frame_rate, image_format)
+            init_project(project_name, project_path, project_password, frame_rate, image_format, deadline_float)
             if old_project_name is not None:
                 user.log_project_without_cred(old_project_name)
             return 1
@@ -93,7 +103,8 @@ def init_project(project_name,
                     project_path,
                     project_password,
                     frame_rate=24,
-                    image_format=[1920,1080]):
+                    image_format=[1920,1080],
+                    deadline=time.time()+23328000):
     do_creation = 1
 
     if project_name == '':
@@ -107,7 +118,7 @@ def init_project(project_name,
         do_creation = 0
 
     if do_creation: 
-        project.create_settings_row(frame_rate, image_format)
+        project.create_settings_row(frame_rate, image_format, deadline)
         for domain in assets_vars._domains_list_:
             assets.create_domain(domain)
         assets_domain_id = 1

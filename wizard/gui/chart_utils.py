@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 import sys
+import time
 import logging
 import traceback
 
@@ -39,6 +40,58 @@ class pie_chart(QtWidgets.QWidget):
             span_angle = int(angle*16)
             painter.drawPie(rectangle, last_angle, span_angle)
             last_angle += span_angle
+
+class time_left_chart(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(time_left_chart, self).__init__(parent)
+        self.setMinimumHeight(35)
+        self.refresh(time.time(), time.time()+200)
+
+    def refresh(self, project_creation_time, deadline):
+        self.project_creation_time = project_creation_time
+        self.deadline = deadline
+        self.update()
+
+    def paintEvent(self, event):
+        rectangle = QtCore.QRectF(0,0,self.width(), self.height())
+        time_range = self.deadline - self.project_creation_time
+        current_time = time.time() - self.project_creation_time
+        percent = current_time/time_range*100
+        painter = QtGui.QPainter(self)
+        painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 0))
+        painter.setBrush(QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.SolidPattern))
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+        # Draw gradient
+        gradient_line_rect = QtCore.QRectF(0, (self.height()/2)-3, self.width(), 6)
+        path = QtGui.QPainterPath()
+        path.addRoundedRect(gradient_line_rect, 3, 3);
+        gradient = QtGui.QLinearGradient(gradient_line_rect.topLeft(), gradient_line_rect.topRight())
+        gradient.setColorAt(0, QtGui.QColor('transparent'))
+        gradient.setColorAt(percent/100, QtGui.QColor('#d7d7d7'))
+        gradient.setColorAt(1, QtGui.QColor('#d7d7d7'))
+        painter.fillPath(path, gradient)
+        # Draw pointer
+        position_x = (self.width()*percent/100) - 2
+        position_y = (self.height()/2) - 20
+        position_rect = QtCore.QRectF(position_x, position_y, 4, 12)
+        path = QtGui.QPainterPath()
+        path.addRoundedRect(position_rect, 2, 2);
+        painter.fillPath(path, QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.SolidPattern))
+        # Draw percent text
+        text = f"{int(percent)} %"
+        font = QtGui.QFont()
+        font_metric = QtGui.QFontMetrics(font)
+        width = font_metric.width(text)
+        height = font_metric.height()
+        text_point_x = (self.width()*percent/100) - width/2
+        text_point_y = self.height()/2 + height + 2
+        if text_point_x <= 0:
+            text_point_x = 0
+        if text_point_x+width >= self.width():
+            text_point_x = self.width() - width
+        painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
+        painter.drawText(text_point_x, text_point_y, text)
 
 class curves_chart(QtWidgets.QFrame):
     def __init__(self, parent=None):
