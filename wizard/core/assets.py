@@ -164,6 +164,12 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
             logger.error("Can't create asset")
     return asset_id
 
+def modify_asset_frame_range(asset_id, inframe, outframe, preroll, postroll):
+    success = project.modify_asset_frame_range(asset_id, inframe, outframe, preroll, postroll)
+    if success:
+        logger.info("Frame range modified")
+    return success
+
 def archive_asset(asset_id):
     if repository.is_admin():
         asset_row = project.get_asset_data(asset_id)

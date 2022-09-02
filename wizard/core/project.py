@@ -274,6 +274,30 @@ def add_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=
         logger.warning(f"Please provide an asset name")
         return None
 
+def modify_asset_frame_range(asset_id, inframe, outframe, preroll, postroll):
+    success = 1
+    if not db_utils.update_data('project',
+                        'assets',
+                        ('inframe', inframe),
+                        ('id', asset_id)):
+        success = 0
+    if not db_utils.update_data('project',
+                        'assets',
+                        ('outframe', outframe),
+                        ('id', asset_id)):
+        success = 0
+    if not db_utils.update_data('project',
+                        'assets',
+                        ('preroll', preroll),
+                        ('id', asset_id)):
+        success = 0
+    if not db_utils.update_data('project',
+                        'assets',
+                        ('postroll', postroll),
+                        ('id', asset_id)):
+        success = 0
+    return success
+
 def get_asset_data_by_string(string, column='*'):
     asset_rows = db_utils.get_row_by_column_data('project',
                                                         'assets',
