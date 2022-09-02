@@ -30,6 +30,8 @@ class loading_widget(QtWidgets.QWidget):
 
     def showEvent(self, event):
         screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+        if not screen:
+            screen = QtWidgets.QApplication.desktop()
         screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()

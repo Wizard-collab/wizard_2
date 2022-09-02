@@ -822,14 +822,24 @@ class time_left_overview_widget(QtWidgets.QFrame):
         deadline = project.get_deadline()
         self.time_left_chart.refresh(creation_time, deadline)
 
+        spent_time = time.time() - creation_time
+        days_spent = int(spent_time/86400)
+        months_spent = int(days_spent/30.5)
+
         time_delta = deadline - time.time()
-        days = int(time_delta/86400)
-        months = int(days/30.5)
-        if months == 0:
-            time_left_string = f"{days} days left"
+        days_left = int(time_delta/86400)
+        months_left = int(days_left/30.5)
+        
+        if months_spent == 0:
+            string = f"{days_spent} days spent"
         else:
-            time_left_string = f"{months} months left"
-        self.data_label.setText(time_left_string)
+            string = f"{months_spent} months spent"
+
+        if months_left == 0:
+            string += f" - {days_left} days left"
+        else:
+            string += f" - {months_left} months left ( {days_left} days )"
+        self.data_label.setText(string)
 
 class progress_overview_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
