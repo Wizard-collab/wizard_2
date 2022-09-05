@@ -33,7 +33,7 @@ import os
 from wizard.core import path_utils
 
 # User constants
-_user_path_ = os.path.expanduser('~/Documents/wizard_2/')
+_user_path_ = os.path.expanduser('~/Documents/wizard/')
 _user_prefs_file_ = path_utils.join(_user_path_, 'preferences.yaml')
 _user_logger_file_ = path_utils.join(_user_path_, 'main.log')
 _subtasks_logs_ = path_utils.join(_user_path_, 'subtasks_logs')
