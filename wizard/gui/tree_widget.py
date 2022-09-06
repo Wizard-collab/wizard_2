@@ -980,6 +980,7 @@ class search_thread(QtCore.QThread):
 
             del stage_row_cp['id']
             del stage_row_cp['creation_time']
+            del stage_row_cp['creation_user']
             del stage_row_cp['work_time']
             del stage_row_cp['progress']
             del stage_row_cp['estimated_time']
