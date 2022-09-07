@@ -5,7 +5,6 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtChart import QChart, QChartView, QPieSeries
 import statistics
 import time
 import datetime
