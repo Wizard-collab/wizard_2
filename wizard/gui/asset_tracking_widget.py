@@ -229,7 +229,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
             if self.stage_row['state'] == 'done':
                 self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
-            self.time_progress_bar.setValue(percent)
+            self.time_progress_bar.setValue(int(percent))
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')

@@ -49,7 +49,7 @@ class subtask_viewer(QtWidgets.QWidget):
         self.status_label.setText(status)
 
     def update_progress(self, percent):
-        self.progress.setValue(percent)
+        self.progress.setValue(int(percent))
 
     def build_ui(self):
         self.resize(QtCore.QSize(1400,1000))

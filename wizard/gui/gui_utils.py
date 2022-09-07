@@ -174,8 +174,8 @@ def mask_image(imgdata, imgtype='png', size=64):
     image.convertToFormat(QtGui.QImage.Format_ARGB32)
     imgsize = min(image.width(), image.height())
     rect = QtCore.QRect(
-        (image.width() - imgsize) / 2,
-        (image.height() - imgsize) / 2,
+        int((image.width() - imgsize) / 2),
+        int((image.height() - imgsize) / 2),
         imgsize,
         imgsize,
     )
@@ -193,15 +193,15 @@ def mask_image(imgdata, imgtype='png', size=64):
     pm = QtGui.QPixmap.fromImage(out_img)
     pm.setDevicePixelRatio(pr)
     size *= pr
-    pm = pm.scaled(size, size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    pm = pm.scaled(int(size), int(size), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
     return pm
     
 def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     pr = QtGui.QWindow().devicePixelRatio()
     image = QtGui.QImage.fromData(imgdata, imgtype)
     image.convertToFormat(QtGui.QImage.Format_ARGB32)
-    image = image.scaled(size_tuple[0]*pr, size_tuple[1]*pr, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-    out_img = QtGui.QImage(size_tuple[0]*pr, size_tuple[1]*pr, QtGui.QImage.Format_ARGB32)
+    image = image.scaled(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    out_img = QtGui.QImage(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtGui.QImage.Format_ARGB32)
     out_img.fill(QtCore.Qt.transparent)
     brush = QtGui.QBrush(image)        # Create texture brush
     painter = QtGui.QPainter(out_img)  # Paint the output image
@@ -210,7 +210,7 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
     path = QtGui.QPainterPath()
     path.addRoundedRect(
-        0, 0, size_tuple[0]*pr, size_tuple[1]*pr, radius*pr, radius*pr)
+        0, 0, int(size_tuple[0]*pr), int(size_tuple[1]*pr), int(radius*pr), int(radius*pr))
     painter.setClipPath(path)
     painter.drawPath(path)
     painter.end()                # We are done (segfault if you forget this)
@@ -292,7 +292,7 @@ class QProgressBar(QtWidgets.QProgressBar):
         newValue = (minSize + 1 + offset) / rect.width() * valueRange
         if int(newValue) != newValue:
             newValue = min(self.maximum(), newValue + 1)
-        opt.progress = newValue
+        opt.progress = int(newValue)
         qp.drawControl(QtWidgets.QStyle.CE_ProgressBar, opt)
 
 class password_lineEdit(QtWidgets.QFrame):

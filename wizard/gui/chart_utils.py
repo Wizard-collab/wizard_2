@@ -91,7 +91,7 @@ class time_left_chart(QtWidgets.QFrame):
         if text_point_x+width >= self.width():
             text_point_x = self.width() - width
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
-        painter.drawText(text_point_x, text_point_y, text)
+        painter.drawText(int(text_point_x), int(text_point_y), text)
 
 class curves_chart(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -183,7 +183,7 @@ class curves_chart(QtWidgets.QFrame):
                         if self.point_thickness > 0:
                             pen.setWidth(self.point_thickness)
                             painter.setPen(pen)
-                            painter.drawPoint(point_x, point_y)
+                            painter.drawPoint(int(point_x), int(point_y))
                         old_point = point
                 last_point = point
 
@@ -208,8 +208,8 @@ class curves_chart(QtWidgets.QFrame):
                         pen.setBrush(color)
                         painter.setPen(pen)
                         path = QtGui.QPainterPath()
-                        path.moveTo(last_point_x, last_point_y)
-                        path.lineTo(point_x, point_y)
+                        path.moveTo(int(last_point_x), int(last_point_y))
+                        path.lineTo(int(point_x), int(point_y))
                         painter.drawPath(path)
                         line_dic['prevision_path'] = path
 
@@ -280,10 +280,10 @@ class curves_chart(QtWidgets.QFrame):
         painter.drawRect(rect)
 
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
-        painter.drawText(text_point_x, text_point_y, text)
+        painter.drawText(int(text_point_x), int(text_point_y), text)
 
         painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1, QtCore.Qt.DashLine))
-        painter.drawLine(point.x(), point.y(), point.x(), self.height()-self.margin)
+        painter.drawLine(int(point.x()), int(point.y()), int(point.x()), int(self.height()-self.margin))
 
         pen = QtGui.QPen()
         pen.setCapStyle(QtCore.Qt.RoundCap)
@@ -303,12 +303,12 @@ class curves_chart(QtWidgets.QFrame):
         header_index = 0
         for header in self.ordonea_headers:
             painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1))
-            painter.drawText(self.margin-font_metric.width(header), h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin, header)
+            painter.drawText(int(self.margin-font_metric.width(header)), int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin), header)
             painter.setPen(QtGui.QPen(QtGui.QColor(255,255,255,10), 1))
-            painter.drawLine(self.margin,
-                            h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin,
-                            w-self.margin,
-                            h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin)
+            painter.drawLine(int(self.margin),
+                            int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin),
+                            int(w-self.margin),
+                            int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin))
             header_index += 1
 
     def draw_abscissa_headers(self, painter, w, h):
@@ -317,14 +317,14 @@ class curves_chart(QtWidgets.QFrame):
         header_index = 0
         for header in self.abscissa_headers:
             painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1))
-            painter.drawText((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin-font_metric.width(header)/2,
-                                h-self.margin+font_metric.height(),
+            painter.drawText(int((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin-font_metric.width(header)/2),
+                                int(h-self.margin+font_metric.height()),
                                 header)
             painter.setPen(QtGui.QPen(QtGui.QColor(255,255,255,10), 1))
-            painter.drawLine((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin,
-                                self.margin,
-                                (w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin,
-                                h-self.margin)
+            painter.drawLine(int((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin),
+                                int(self.margin),
+                                int((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin),
+                                int(h-self.margin))
             header_index += 1
 
 
