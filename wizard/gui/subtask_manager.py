@@ -268,7 +268,7 @@ class subtask_widget(QtWidgets.QFrame):
         self.progress.setStyleSheet('#task_progressBar{color:transparent;}\n#task_progressBar::chunk{background-color:%s;}'%color)
 
     def update_progress(self, percent):
-        self.progress.setValue(percent)
+        self.progress.setValue(int(percent))
 
     def update_thread_status(self, status):
         self.thread_status_label.setText(f"{status} - ")

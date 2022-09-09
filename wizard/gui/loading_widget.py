@@ -35,7 +35,7 @@ class loading_widget(QtWidgets.QWidget):
         screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
-        self.move((screenRect.x()+screen_maxX-self.width())/2, (screenRect.y()+screen_maxY-self.height())/2)
+        self.move(int((screenRect.x()+screen_maxX-self.width())/2), int((screenRect.y()+screen_maxY-self.height())/2))
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

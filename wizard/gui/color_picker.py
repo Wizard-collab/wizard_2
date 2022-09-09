@@ -35,9 +35,9 @@ class color_picker(QtWidgets.QWidget):
         self.set_HSV(h, s, v)
 
     def set_HSV(self, h, s, v):
-        self.hue_selector.move(0, (100 - h) * 1.85)
+        self.hue_selector.move(0, int((100 - h) * 1.85))
         self.color_view.setStyleSheet(f"border-radius: 5px;background-color: qlineargradient(x1:1, x2:0, stop:0 hsl({h}%,100%,50%), stop:1 #fff);")
-        self.selector.move(s * 2 - 6, (200 - v * 2) - 6)
+        self.selector.move(int(s * 2 - 6), int((200 - v * 2) - 6))
 
     def hex_to_hsv(self, hex):
         hex = hex.replace('#', '')

@@ -222,7 +222,7 @@ class main_progress_widget(QtWidgets.QFrame):
         if all_progresses == []:
             all_progresses = [0]
         mean = statistics.mean(all_progresses)
-        self.progress_bar.setValue(mean)
+        self.progress_bar.setValue(int(mean))
         self.progress_label.setText(f"{round(mean, 1)} %")
 
 class user_progress_widget(QtWidgets.QFrame):
@@ -391,7 +391,7 @@ class user_progress_widget(QtWidgets.QFrame):
             all_work_times = [0]
 
         mean = statistics.mean(all_progresses)
-        self.main_progress_bar.setValue(mean)
+        self.main_progress_bar.setValue(int(mean))
         self.main_progress_label.setText(f"{round(mean, 1)} %")
 
         work_time_mean = statistics.mean(all_work_times)
@@ -411,7 +411,7 @@ class user_progress_widget(QtWidgets.QFrame):
             mean = statistics.mean(stages_dic[stage]['all_progresses'])
             work_time_mean = statistics.mean(stages_dic[stage]['all_work_times'])
             total_work_time = stages_dic[stage]['total_work_time']
-            self.stages_widgets_dic[stage].progress_bar.setValue(mean)
+            self.stages_widgets_dic[stage].progress_bar.setValue(int(mean))
             self.stages_widgets_dic[stage].progress_label.setText(f"{int(mean)}%")
             self.stages_widgets_dic[stage].total_work_time.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
             self.stages_widgets_dic[stage].tasks_count.setText(f"{len(stages_dic[stage]['all_progresses'])}")
@@ -954,11 +954,11 @@ class progress_overview_widget(QtWidgets.QFrame):
 
         for stage in stages_progresses_dic.keys():
             mean = statistics.mean(stages_progresses_dic[stage])
-            self.stages_dic[stage]['progress_bar'].setValue(mean)
+            self.stages_dic[stage]['progress_bar'].setValue(int(mean))
             self.stages_dic[stage]['progress_label'].setText(f"{round(mean, 1)} %")
             self.stages_dic[stage]['widget'].setVisible(True)
 
         for domain in domains_progresses_dic.keys():
             mean = statistics.mean(domains_progresses_dic[domain])
-            self.domains_dic[domain]['progress_bar'].setValue(mean)
+            self.domains_dic[domain]['progress_bar'].setValue(int(mean))
             self.domains_dic[domain]['progress_label'].setText(f"{round(mean, 1)} %")

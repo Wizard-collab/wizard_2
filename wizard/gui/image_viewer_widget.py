@@ -31,7 +31,7 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
 
         self.setPhoto(QtGui.QPixmap(image))
         rect = QtCore.QRectF(self.photo.pixmap().rect())
-        self.resize(rect.width(), rect.height())
+        self.resize(int(rect.width()), int(rect.height()))
 
     def hasPhoto(self):
         return not self.empty
@@ -48,7 +48,6 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
                     scenerect = self.transform().mapRect(rect)
                     factor = min(viewrect.width() / scenerect.width(),
                                  viewrect.height() / scenerect.height())
-                    #self.scale(factor, factor)
             self.zoom = 0
 
     def setPhoto(self, pixmap=None):
@@ -75,7 +74,3 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
                 self.scale(factor, factor)
             elif self.zoom == 0:
                 self.fitInView()
-            '''
-            else:
-                self.zoom = 0
-            '''

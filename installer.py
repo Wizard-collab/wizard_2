@@ -220,7 +220,7 @@ class installer(QtWidgets.QWidget):
         screenRect = desktop.screenGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
-        self.move((screen_maxX-self.width())/2, (screen_maxY-self.height())/2)
+        self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))
 
     def process(self):
         version_dic = get_version()

@@ -67,7 +67,6 @@ logger = logging.getLogger('wizard')
 
 class app():
     def __init__(self, project_manager):
-
         self.db_server = None
 
         self.app = gui_utils.get_app()
@@ -79,15 +78,6 @@ class app():
         logging.getLogger().addHandler(self.custom_handler)
         print('Wizard Gui')
         environment.set_gui(1)
-
-        '''
-        if gui_server.try_connection():
-            gui_server.raise_ui()
-            self.instance_running_info_widget = message_widget.message_widget("Multiple application instance",
-                                                                "You're already running an instance of Wizard.")
-            self.instance_running_info_widget.exec_()
-            sys.exit()
-        '''
         
         if not user.user().get_psql_dns():
             self.psql_widget = psql_widget.psql_widget()
