@@ -31,7 +31,7 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
 
         self.setPhoto(QtGui.QPixmap(image))
         rect = QtCore.QRectF(self.photo.pixmap().rect())
-        self.resize(rect.width(), rect.height())
+        self.resize(int(rect.width()), int(rect.height()))
 
     def hasPhoto(self):
         return not self.empty
