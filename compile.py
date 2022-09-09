@@ -127,20 +127,20 @@ class compile():
 							'LICENSE',
 							'wapi.py',
 							'dist/PyWizard/PyWizard.exe',
-							'dist/PyWizard/PyWizard.exe.manifest',
+							#'dist/PyWizard/PyWizard.exe.manifest',
 							'dist/Create Repository/Create Repository.exe',
-							'dist/Create Repository/Create Repository.exe.manifest',
+							#'dist/Create Repository/Create Repository.exe.manifest',
 							'dist/wizard_cmd/wizard_cmd.exe',
-							'dist/wizard_cmd/wizard_cmd.exe.manifest',
+							#'dist/wizard_cmd/wizard_cmd.exe.manifest',
 							'dist/server/server.exe',
-							'dist/server/server.exe.manifest',
+							#'dist/server/server.exe.manifest',
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
-							'dist/Project Manager/Project Manager.exe.manifest',
+							#'dist/Project Manager/Project Manager.exe.manifest',
 							'dist/error_handler/error_handler.exe',
-							'dist/error_handler/error_handler.exe.manifest',
-							'dist/Table Viewer/Table Viewer.exe',
-							'dist/Table Viewer/Table Viewer.exe.manifest']
+							#'dist/error_handler/error_handler.exe.manifest',
+							'dist/Table Viewer/Table Viewer.exe']
+							#'dist/Table Viewer/Table Viewer.exe.manifest']
 							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))
