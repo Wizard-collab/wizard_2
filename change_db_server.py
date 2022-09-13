@@ -28,4 +28,4 @@
 
 # Wizard modules
 import app
-app.main(project_manager=True)
+app.main(change_psql=True)

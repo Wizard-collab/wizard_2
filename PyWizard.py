@@ -42,7 +42,7 @@ import logging
 sys.path.append(os.path.abspath(''))
 
 # Wizard gui modules
-from wizard.gui import gui_utils
+from wizard.gui import app_utils
 from wizard.gui import gui_server
 
 # Wizard modules
@@ -63,89 +63,43 @@ from wizard.core import custom_logger
 custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
 
-application.log_app_infos()
-print('PyWizard')
+class app():
+    def __init__(self):
+        self.db_server = None
+        self.stats_schedule = None
+        self.softwares_server = None
+        self.communicate_server = None
 
-app = gui_utils.get_app()
-environment.set_gui(0)
+        application.log_app_infos()
 
-while not user.user().get_psql_dns():
-    psql_host = tools.flushed_input("PostgreSQL host : ")
-    psql_port = tools.flushed_input("PostgreSQL port : ")
-    psql_user = tools.flushed_input("PostgreSQL user : ")
-    psql_password = tools.flushed_input("PostgreSQL password : ")
-    user.user().set_psql_dns(
-                            psql_host,
-                            psql_port,
-                            psql_user,
-                            psql_password
-                            )
+        self.app = app_utils.get_app()
 
-db_server = db_core.db_server()
-db_server.start()
+        app_utils.set_pywizard()
+        app_utils.init_psql_dns(self)
+        self.db_server = app_utils.init_repository(self)
+        app_utils.init_user(self)
+        app_utils.init_project(self)
+        self.stats_schedule = app_utils.init_stats()
+        self.communicate_server = communicate.communicate_server()
+        self.communicate_server.start()
+        self.softwares_server = launch.softwares_server()
+        self.softwares_server.start()
 
-if not user.user().get_repository():
-    input_repository = tools.flushed_input("repository : ")
-    user.user().set_repository(input_repository)
+        console = code.InteractiveConsole()
+        console.interact(banner=None, exitmsg=None)
+        self.quit()
+            
+    def quit(self):
+        if self.db_server:
+            self.db_server.stop()
+        if self.stats_schedule:
+            self.stats_schedule.stop()
+        if self.softwares_server:
+            self.softwares_server.stop()
+        if self.communicate_server:
+            self.communicate_server.stop()
+        QtWidgets.QApplication.quit()
+        sys.exit()
 
-if not repository.is_repository_database():
-    while not repository.is_repository_database():
-        init_repository = tools.flushed_input("Warning, repository database doesn't exists, init database (y/n) ? : ")
-        if init_repository == 'y':
-            admin_password = tools.flushed_input('Administator password : ')
-            admin_email = tools.flushed_input('Administator email : ')
-            repository.create_repository_database()
-            db_server.repository='repository'
-            repository.init_repository(admin_password, admin_email)
-
-db_server.repository=environment.get_repository()
-repository.add_ip_user()
-
-while not user.get_user():
-    do_create_user = tools.flushed_input('Create user (y/n) ? : ')
-    if do_create_user == 'y':
-        user_name = tools.flushed_input('User name : ')
-        password = tools.flushed_input('Password : ')
-        email = tools.flushed_input('Email : ')
-        profile_picture = tools.flushed_input('Profile picture ( without any "\\" ) ( Optional ) : ')
-        administrator_pass = tools.flushed_input('Administrator pass ( Optional ) : ')
-        repository.create_user(user_name,
-                                password,
-                                email,
-                                administrator_pass,
-                                profile_picture)
-    else:
-        user_name = tools.flushed_input('User name : ')
-        password = tools.flushed_input('Password : ')
-        user.log_user(user_name, password)
-
-while not user.get_project():
-    do_create_project = tools.flushed_input('Create project (y/n) ? : ')
-    if do_create_project == 'y':
-        project_name = tools.flushed_input('Project name : ')
-        project_path = tools.flushed_input('Project path : ')
-        project_password = tools.flushed_input('Project password : ')
-        create_project.create_project(project_name, project_path, project_password)
-    else:
-        project_name = tools.flushed_input('Project name : ')
-        project_password = tools.flushed_input('Project password : ')
-        user.log_project(project_name, project_password)
-
-db_server.project_name = environment.get_project_name()
-project.add_user(repository.get_user_row_by_name(environment.get_user(),
-                                                            'id'))
-
-communicate_server = communicate.communicate_server()
-communicate_server.start()
-
-softwares_server = launch.softwares_server()
-softwares_server.start()
-
-hooks.init_wizard_hooks()
-
-console = code.InteractiveConsole()
-console.interact(banner=None, exitmsg=None)
-    
-db_server.stop()
-softwares_server.stop()
-communicate_server.stop()
+if __name__ == '__main__':
+    _app = app()

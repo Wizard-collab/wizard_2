@@ -32,7 +32,7 @@ import os
 import sys
 
 # Wizard gui modules
-from wizard.gui import gui_utils
+from wizard.gui import app_utils
 
 # Wizard modules
 from wizard.vars import ressources
@@ -146,7 +146,7 @@ class error_handler(QtWidgets.QWidget):
         self.move(frameGm.topLeft())
 
 def main():
-    app = gui_utils.get_app()
+    app = app_utils.get_app()
     error = sys.argv[1]
     error_handler_widget = error_handler(error)
     error_handler_widget.show()

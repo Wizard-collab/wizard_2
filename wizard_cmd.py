@@ -3,6 +3,7 @@ import traceback
 import json
 import logging
 from wizard.gui import gui_utils
+from wizard.gui import app_utils
 from wizard.core import application
 from wizard.core import environment
 from wizard.core import repository
@@ -20,10 +21,8 @@ custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
 
 application.log_app_infos()
-print('Wizard CMD')
-
-app = gui_utils.get_app()
-environment.set_gui(0)
+app = app_utils.get_app()
+app_utils.set_wizard_cmd()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-psqlDns', dest='psql_dns', type=str, help='PostgreSQL connection DNS')

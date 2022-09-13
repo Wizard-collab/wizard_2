@@ -15,27 +15,6 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_server
 
-def get_app():
-    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
-    app = QtWidgets.QApplication(sys.argv)
-
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BlackItalic.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Bold.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-BoldItalic.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Light.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-LightItalic.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Medium.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-MediumItalic.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Regular.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Thin.ttf")
-    QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-ThinItalic.ttf")
-    with open('ressources/stylesheet.css', 'r') as f:
-        app.setStyleSheet(f.read())
-    return app
-
 class QFlowLayout(QtWidgets.QLayout):
     def __init__(self, parent=None):
         super(QFlowLayout, self).__init__(parent)
