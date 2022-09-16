@@ -24,7 +24,6 @@ class project_hooks_widget(QtWidgets.QWidget):
         super(project_hooks_widget, self).__init__(parent)
 
         self.build_ui()
-        self.fill_softwares()
         self.connect_functions()
 
     def connect_functions(self):
@@ -32,17 +31,23 @@ class project_hooks_widget(QtWidgets.QWidget):
         self.apply_button.clicked.connect(self.apply)
 
     def fill_softwares(self):
+        self.softwares_comboBox.clear()
         for software in softwares_vars._softwares_list_:
             icon = ressources._sofwares_icons_dic_[software]
             self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
+        self.softwares_comboBox.addItem(QtGui.QIcon(ressources._wizard_icon_), 'wizard')
+
+    def showEvent(self, event):
+        self.fill_softwares()
 
     def refresh(self):
         software = self.softwares_comboBox.currentText()
-        hook_file = path_utils.join(project.get_hooks_folder(), softwares_vars._hooks_files_[software])
-        if not path_utils.isfile(hook_file):
-            hook_file = path_utils.join('ressources/hooks', softwares_vars._hooks_files_[software])
-        with open(hook_file, 'r') as f:
-            self.script_editor_widget.setText(f.read())
+        if software != '':
+            hook_file = path_utils.join(project.get_hooks_folder(), softwares_vars._hooks_files_[software])
+            if not path_utils.isfile(hook_file):
+                hook_file = path_utils.join('ressources/hooks', softwares_vars._hooks_files_[software])
+            with open(hook_file, 'r') as f:
+                self.script_editor_widget.setText(f.read())
 
     def build_ui(self):
         self.container_layout = QtWidgets.QVBoxLayout()

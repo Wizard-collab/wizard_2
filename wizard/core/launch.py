@@ -114,6 +114,9 @@ def core_launch_version(version_id):
 
 def build_command(file_path, software_row, version_id):
     software_path = software_row['path']
+    if not os.path.isfile(software_path):
+        logger.warning(f"{software_row['name']} not found ( {software_path} does not exists )")
+        return None
     if software_path != '':
         if path_utils.isfile(file_path):
             raw_command = software_row['file_command']

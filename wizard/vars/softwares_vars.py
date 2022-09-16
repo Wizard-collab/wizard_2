@@ -40,6 +40,7 @@ _substance_designer_ = 'substance_designer'
 _nuke_ = 'nuke'
 _houdini_ = 'houdini'
 _blender_ = 'blender'
+_wizard_ = 'wizard'
 
 _softwares_list_ = [_maya_,
 					_guerilla_render_,
@@ -144,3 +145,4 @@ _hooks_files_[_substance_designer_] = 'substance_designer_hook.py'
 _hooks_files_[_guerilla_render_] = 'guerilla_render_hook.py'
 _hooks_files_[_houdini_] = 'houdini_hook.py'
 _hooks_files_[_nuke_] = 'nuke_hook.py'
+_hooks_files_[_wizard_] = 'wizard_hook.py'
