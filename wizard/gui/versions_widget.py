@@ -131,6 +131,7 @@ class versions_widget(QtWidgets.QWidget):
         self.setAcceptDrops(True)
 
     def refresh(self):
+        QtWidgets.QApplication.processEvents()
         start_time = time.time()
         if self.isVisible():
             self.refresh_list_view()

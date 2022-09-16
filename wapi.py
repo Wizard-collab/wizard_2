@@ -925,6 +925,11 @@ class ui:
     def __init__(self):
         pass
 
+    def is_gui(self):
+        # Return true if the wizard gui is openned
+        # False if it is PyWizard or Wizard_CMD
+        return core.environment.is_gui()
+
     def raise_ui(self):
         # Raise the wizard window
         gui.gui_server.raise_ui()

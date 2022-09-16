@@ -43,6 +43,7 @@ class context_widget(QtWidgets.QFrame):
         self.change_stage(None)
 
     def refresh(self):
+        QtWidgets.QApplication.processEvents()
         self.refresh_variants()
 
     def change_stage(self, stage_id):

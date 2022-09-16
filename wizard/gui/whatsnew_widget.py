@@ -29,6 +29,7 @@ class whatsnew_widget(QtWidgets.QWidget):
         self.resize(600,600)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
@@ -53,29 +54,13 @@ class whatsnew_widget(QtWidgets.QWidget):
         self.version_label.setObjectName('bold_label')
         self.header_layout.addWidget(self.version_label)
 
-        self.scrollArea = QtWidgets.QScrollArea()
-        self.scrollBar = self.scrollArea.verticalScrollBar()
-
-        self.scrollArea_widget = QtWidgets.QWidget()
-        self.scrollArea_widget.setObjectName('transparent_widget')
-        self.scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.scrollArea_layout.setContentsMargins(20,20,20,20)
-        self.scrollArea_layout.setSpacing(0)
-        self.scrollArea_widget.setLayout(self.scrollArea_layout)
-
-        self.content_widget = QtWidgets.QWidget()
-        self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_layout.setContentsMargins(0,0,0,0)
-        self.content_layout.setSpacing(4)
-        self.content_widget.setLayout(self.content_layout)
-        self.scrollArea_layout.addWidget(self.content_widget)
-
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
-
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setWidget(self.scrollArea_widget)
-        self.main_layout.addWidget(self.scrollArea)
+        self.textedit_layout = QtWidgets.QHBoxLayout()
+        self.textedit_layout.setContentsMargins(10,10,10,10)
+        self.textedit = QtWidgets.QTextEdit()
+        self.textedit.setObjectName('transparent_widget')
+        self.textedit.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.textedit_layout.addWidget(self.textedit)
+        self.main_layout.addLayout(self.textedit_layout)
 
         self.footer_widget = QtWidgets.QWidget()
         self.footer_layout = QtWidgets.QHBoxLayout()
@@ -94,14 +79,10 @@ class whatsnew_widget(QtWidgets.QWidget):
         version_dic = application.get_version()
         self.version_label.setText(f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']} - build {version_dic['builds']}")
 
-        with open('ressources/whatsnew.yaml', 'r') as f:
-            whatsnew_dic = yaml.load(f, Loader=yaml.Loader)
+        with open(ressources._whatsnew_html_, 'r') as f:
+            html_data = f.read()
 
-        for title in whatsnew_dic.keys():
-            type = whatsnew_dic[title]['type']
-            comment = whatsnew_dic[title]['comment']
-            widget = row_widget(title, type, comment)
-            self.content_layout.addWidget(widget)
+        self.textedit.insertHtml(html_data)
 
     def connect_functions(self):
         self.show_at_startup_checkbox.stateChanged.connect(self.toggle_show_at_startup)

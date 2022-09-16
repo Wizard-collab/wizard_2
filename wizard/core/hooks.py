@@ -31,6 +31,7 @@ import os
 import sys
 import logging
 import importlib
+import traceback
 
 # Wizard modules
 from wizard.core import project
@@ -44,7 +45,7 @@ def init_wizard_hooks():
     hook_path = path_utils.join(environment.get_project_path(), project_vars._hooks_folder_)
     sys.path.append(hook_path)
 
-def load_hooks():
+def get_hooks_modules():
     hooks_modules = dict()
     # Load user hooks
     plugins_path = project.get_plugins_folder()
@@ -90,3 +91,19 @@ def load_module(plugin_path, hook_type):
         logger.info("Can't load module {0}, skipping".format(module_name))
         logger.error(traceback.format_exc())
         return None, None
+
+def after_export_hooks(export_version_string, export_dir, stage_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after export hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_export(export_version_string,
+                                                                export_dir,
+                                                                stage_name,
+                                                                gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())

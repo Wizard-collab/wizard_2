@@ -46,6 +46,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.refresh_versions_hard()
 
     def refresh(self):
+        QtWidgets.QApplication.processEvents()
         self.refresh_versions()
         if self.version_row is not None:
             self.version_row = project.get_version_data(self.version_row['id'])

@@ -122,10 +122,11 @@ class tree_widget(QtWidgets.QFrame):
         self.search_thread = search_thread()
         self.search_thread.item_signal.connect(self.add_search_item)
         self.tree.itemDoubleClicked.connect(self.double_click)
-        self.tree.currentItemChanged.connect(self.item_changed)
+        self.tree.itemSelectionChanged.connect(self.item_changed)
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
 
-    def item_changed(self, item):
+    def item_changed(self):#, item):
+        item = self.tree.currentItem()
         if item:
             if item.instance_type == 'stage':
                 self.stage_changed_signal.emit(item.instance_id)
@@ -416,7 +417,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setCurrentItem(item)
         if expand is not None:
             item.setExpanded(expand)
-        self.item_changed(item)
+        self.item_changed()#item)
 
     def focus_instance(self, instance_tuple):
         instance_type = instance_tuple[0]

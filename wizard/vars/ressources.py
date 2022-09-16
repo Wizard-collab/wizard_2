@@ -367,3 +367,5 @@ _stages_colors_['fx'] = '#4b8673'
 _stages_colors_['camera'] = '#94b49f'
 _stages_colors_['lighting'] = '#63f191'
 _stages_colors_['compositing'] = '#676fa3'
+
+_whatsnew_html_ = path_utils.join(_ressources_path_, 'whatsnew.html')

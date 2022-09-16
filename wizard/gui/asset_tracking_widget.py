@@ -199,6 +199,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh()
 
     def refresh(self):
+        QtWidgets.QApplication.processEvents()
         start_time = time.time()
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)

@@ -330,6 +330,7 @@ class exports_widget(QtWidgets.QWidget):
         self.selection_count_label.setText(f"{number} selected")
 
     def refresh(self):
+        QtWidgets.QApplication.processEvents()
         start_time = time.time()
         if self.isVisible():
             if self.variant_id is not None:

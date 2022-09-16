@@ -27,38 +27,23 @@
 # SOFTWARE.
 
 # Python modules
+from threading import Thread
+import json
 import os
+import time
 
 # Wizard modules
-from wizard.core import path_utils
+from wizard.vars import user_vars
 
-# User constants
-_user_path_ = os.path.expanduser('~/Documents/wizard/')
-_user_prefs_file_ = path_utils.join(_user_path_, 'preferences.yaml')
-_user_logger_file_ = path_utils.join(_user_path_, 'main.log')
-_data_collect_file_ = path_utils.join(_user_path_, 'data_collect.json')
-_subtasks_logs_ = path_utils.join(_user_path_, 'subtasks_logs')
-_script_path_ = path_utils.join(_user_path_, 'script')
-_icons_path_ = path_utils.join(_user_path_, 'icons')
-_session_file_ = path_utils.join(_script_path_, 'session.py')
+_FILE_ = user_vars._data_collect_file_
 
-# Dictionary keys
-_user_ = 'user'
-_repository_ = 'repository'
-_project_ = 'project'
-_scripts_ = 'scripts'
-_psql_dns_ = 'psql_dns'
-_team_dns_ = 'team_dns'
-_tree_context_ = 'tree_context'
-_tabs_context_ = 'tabs_context'
-_versions_context_ = 'versions_context'
-_wall_context_ = 'wall_context'
-_asset_tracking_context_ = 'asset_tracking_context'
-_console_context_ = 'console_context'
-_production_manager_context_ = 'production_manager_context'
-_local_path_ = 'local_path'
-_popups_settings_ = 'popups_settings'
-_show_whatsnew_ = 'show_whatsnew'
-_user_build_ = 'user_build'
-_creation_items_visibility_ = 'creation_items_visibility'
-_widgets_pos_ = 'widgets_pos'
+class collect_object():
+	def __init__(self):
+		self.data_dic = dict()
+
+	def add_data(self, name, data):
+		key_id = time.time()
+		if name not in self.data_dic.keys():
+			self.data_dic[name] = dict()
+		self.data_dic[name][key_id] = data
+		print(self.data_dic)

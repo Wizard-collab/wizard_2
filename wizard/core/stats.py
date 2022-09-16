@@ -26,12 +26,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# This module manages the wizard "game" part
-# it uses the "repository" module to access 
-# and write user data
-# Uses this module to add xps, levels,
-# remove levels and remove life
-
 # Python modules
 import time
 import threading

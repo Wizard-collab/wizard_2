@@ -177,6 +177,7 @@ class references_widget(QtWidgets.QWidget):
         self.refresh()
 
     def refresh(self):
+        QtWidgets.QApplication.processEvents()
         start_time = time.time()
         if self.isVisible():
             if self.parent_instance_id is not None and self.parent_instance_id != 0:
