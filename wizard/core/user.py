@@ -188,6 +188,17 @@ class user:
         self.prefs_dic[user_vars._show_whatsnew_] = show_whatsnew
         self.write_prefs_dic()
 
+    def get_show_latest_build(self):
+        if user_vars._show_latest_build_ in self.prefs_dic.keys():
+            return self.prefs_dic[user_vars._show_latest_build_]
+        else:
+            self.set_show_latest_build(True)
+            return True
+
+    def set_show_latest_build(self, show_latest_build):
+        self.prefs_dic[user_vars._show_latest_build_] = show_latest_build
+        self.write_prefs_dic()
+
     def set_local_path(self, path):
         if path != '' and path_utils.isdir(path):
             self.prefs_dic[user_vars._local_path_] = path

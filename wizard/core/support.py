@@ -38,6 +38,18 @@ from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
+def get_latest_build():
+    URL = "http://93.19.210.30/latest_build/"
+    try:
+        response = requests.post(URL)
+        return response.json()
+    except requests.Timeout:
+        logger.error('Connection timed out')
+    except requests.ConnectionError:
+        logger.error('No network connection')
+    except:
+        logger.error(str(traceback.format_exc()))
+
 def send_log(log, type, additionnal_message=''):
     URL = "http://93.19.210.30/support/"
     contact_dic = dict()

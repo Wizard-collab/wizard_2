@@ -77,6 +77,7 @@ class app():
         self.main_widget.init_contexts()
         self.loading_widget.close()
         self.main_widget.whatsnew()
+        self.main_widget.is_latest_build(force=0)
         logger.info(f"Wizard start time : {str(round((time.time()-start_time), 1))}s")
 
     def quit(self):

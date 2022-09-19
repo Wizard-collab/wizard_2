@@ -22,6 +22,7 @@ from wizard.core import communicate
 from wizard.core import launch
 from wizard.core import team_client
 from wizard.core import path_utils
+from wizard.core import support
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -53,6 +54,7 @@ from wizard.gui import license_widget
 from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
 from wizard.gui import whatsnew_widget
+from wizard.gui import new_build_widget
 from wizard.gui import groups_manager_widget
 from wizard.gui import quotes_manager
 from wizard.gui import table_viewer_widget
@@ -120,6 +122,18 @@ class main_widget(QtWidgets.QWidget):
         else:
             if show_whatsnew:
                 self.whatsnew_widget.toggle()
+
+    def is_latest_build(self, force=1):
+        latest_build = support.get_latest_build()
+        if latest_build and len(latest_build) == 2:
+            build = latest_build[0]
+            link = latest_build[1]
+            current_build = application.get_version()['builds']
+            if (build['BUILDS'] > current_build) and (user.user().get_show_latest_build() or force):
+                self.new_build_widget = new_build_widget.new_build_widget(build, link)
+                self.new_build_widget.show()
+            elif build['BUILDS'] <= current_build:
+                logger.info("Wizard is up to date !")
 
     def init_popup_wall_widget(self):
         self.popup_wall_widget.show()
@@ -191,6 +205,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_pywizard.connect(self.show_pywizard)
         self.header_widget.show_license.connect(self.license_widget.toggle)
         self.header_widget.show_whatsnew.connect(self.whatsnew_widget.toggle)
+        self.header_widget.show_latest_build.connect(lambda:self.is_latest_build(force=1))
         self.header_widget.show_documentation.connect(self.show_documentation)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)

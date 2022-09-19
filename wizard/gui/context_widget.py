@@ -118,10 +118,10 @@ class context_widget(QtWidgets.QFrame):
             self.refresh_work_envs_hard()
 
             if self.variant_row is not None:
+                self.archive_variant_button.setVisible(self.variant_row['name'] != 'main')
                 if by_user:
                     project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
                 self.variant_changed_signal.emit(self.variant_row['id'])
-                self.archive_variant_button.setVisible(self.variant_row['name'] != 'main')
 
             else:
                 self.variant_changed_signal.emit(None)
