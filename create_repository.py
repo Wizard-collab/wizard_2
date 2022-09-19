@@ -36,7 +36,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard gui modules
-from wizard.gui import gui_utils
+from wizard.gui import app_utils
 from wizard.gui import gui_server
 from wizard.gui import message_widget
 from wizard.gui import create_repository_widget
@@ -57,11 +57,11 @@ custom_logger.get_root_logger()
 logger = logging.getLogger('wizard')
 
 class app():
-    def __init__(self, project_manager):
+    def __init__(self):
 
         self.db_server = None
 
-        self.app = gui_utils.get_app()
+        self.app = app_utils.get_app()
         QtCore.qInstallMessageHandler(customQtMsgHandler)
 
         self.warning_tooltip = warning_tooltip.warning_tooltip()
@@ -69,10 +69,8 @@ class app():
         self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
         logging.getLogger().addHandler(self.custom_handler)
 
-        if not user.user().get_psql_dns():
-            self.psql_widget = psql_widget.psql_widget()
-            if self.psql_widget.exec_() != QtWidgets.QDialog.Accepted:
-                self.quit()
+        app_utils.set_wizard_gui()
+        app_utils.init_psql_dns(self)
 
         self.db_server = db_core.db_server()
         self.db_server.start()
@@ -103,10 +101,10 @@ def excepthook(exc_type, exc_value, exc_tb):
         command = f'python error_handler.py "{tb}"'
     subprocess.Popen(command, start_new_session=True)
 
-def main(project_manager=False):
+def main():
     sys.excepthook = excepthook
     application.log_app_infos()
-    wizard_app = app(project_manager)
+    wizard_app = app()
     ret = wizard_app.app.exec_()
 
     sys.exit(ret)

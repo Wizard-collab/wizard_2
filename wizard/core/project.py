@@ -621,6 +621,14 @@ def remove_variant(variant_id):
             remove_export(export_id)
         for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
             remove_work_env(work_env_id)
+        for stage_id in db_utils.get_row_by_column_data('project', 
+                                                        'stages', 
+                                                        ('default_variant_id', variant_id), 
+                                                        'id'):
+            db_utils.update_data('project',
+                            'stages',
+                            ('default_variant_id', None),
+                            ('id', stage_id))
         success = db_utils.delete_row('project', 'variants', variant_id)
         if success:
             logger.info(f"Variant removed from project")

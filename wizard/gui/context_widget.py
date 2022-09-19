@@ -18,10 +18,12 @@ from wizard.core import image
 from wizard.core import tools
 from wizard.core import launch
 from wizard.core import path_utils
+from wizard.core import subtasks_library
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import confirm_widget
 
 class context_widget(QtWidgets.QFrame):
 
@@ -75,15 +77,31 @@ class context_widget(QtWidgets.QFrame):
             self.stage_row = None
         if self.stage_row is not None:
             variant_rows = project.get_stage_childs(self.stage_row['id'])
+            project_variants = [row['name'] for row in variant_rows]
             if variant_rows is not None:
                 for variant_row in variant_rows:
                     if variant_row['name'] not in self.variants.keys():
                         self.variant_comboBox.addItem(variant_row['name'])
                         self.variants[variant_row['name']] = variant_row['id']
-            if apply_default:
+
+            if apply_default and self.stage_row['default_variant_id']:
                 default_variant_name = project.get_variant_data(self.stage_row['default_variant_id'], 'name')
                 self.variant_comboBox.setCurrentText(default_variant_name)
+
         self.refresh_variant_changed = 1
+
+        variants = list(self.variants.keys())
+        current_variant = self.variant_comboBox.currentText()
+        for variant in variants:
+            if variant not in project_variants:
+                self.remove_variant(variant)
+
+    def remove_variant(self, variant_name):
+        index = self.variant_comboBox.findText(variant_name)
+        if index:
+            self.variant_comboBox.removeItem(index)
+        if variant_name in self.variants.keys():
+            del self.variants[variant_name]
 
     def refresh_variants_hard(self):
         self.refresh_variant_changed = None
@@ -103,8 +121,11 @@ class context_widget(QtWidgets.QFrame):
                 if by_user:
                     project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
                 self.variant_changed_signal.emit(self.variant_row['id'])
+                self.archive_variant_button.setVisible(self.variant_row['name'] != 'main')
+
             else:
                 self.variant_changed_signal.emit(None)
+                self.archive_variant_button.setVisible(0)
 
     def refresh_work_envs_hard(self):
         self.refresh_work_env_changed = None
@@ -179,6 +200,17 @@ class context_widget(QtWidgets.QFrame):
         self.folder_button.clicked.connect(self.open_work_env_folder)
         self.sandbox_button.clicked.connect(self.open_sandbox_folder)
         self.init_work_env_button.clicked.connect(self.init_work_env)
+        self.archive_variant_button.clicked.connect(self.archive_variant)
+
+    def archive_variant(self):
+        if self.variant_row is not None:
+            self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+            security_sentence = f"{self.variant_row['name']}"
+            self.confirm_widget.set_security_sentence(security_sentence)
+            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                subtasks_library.archive_variant(self.variant_row['id'])        
+        else:
+            logger.warning("No variant found")
 
     def refresh_string_asset_label(self):
         if self.work_env_row is not None and self.variant_row is not None:
@@ -257,6 +289,13 @@ class context_widget(QtWidgets.QFrame):
         self.variant_comboBox.setFixedWidth(150)
         gui_utils.application_tooltip(self.variant_comboBox, "Change variant")
         self.main_layout.addWidget(self.variant_comboBox)
+
+        self.archive_variant_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.archive_variant_button, "Archive variant")
+        self.archive_variant_button.setFixedSize(29,29)
+        self.archive_variant_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
+        self.archive_variant_button.setIconSize(QtCore.QSize(14,14))
+        self.main_layout.addWidget(self.archive_variant_button)
 
         self.work_env_comboBox = gui_utils.QComboBox()
         self.work_env_comboBox.setFixedWidth(190)

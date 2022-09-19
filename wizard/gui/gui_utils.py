@@ -113,8 +113,10 @@ def QIcon_from_svg(svg_filepath, color='black'):
     return QtGui.QIcon(img)
 
 def move_ui(widget, margin=0, pos=None):
-    desktop = QtWidgets.QApplication.desktop()
-    screenRect = desktop.screenGeometry()
+    screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+    if not screen:
+        screen = QtWidgets.QApplication.desktop()
+    screenRect = screen.availableGeometry()
 
     screen_minX = screenRect.topLeft().x()
     screen_minY = screenRect.topLeft().y()
