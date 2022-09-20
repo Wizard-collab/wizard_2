@@ -532,7 +532,7 @@ def get_export_files_list(export_version_id):
     return files_list
 
 def merge_file_as_export_version(export_name, files, variant_id, comment='', execute_xp=True):
-    return add_export_version(export_name, files, variant_id, None, comment)
+    return add_export_version(export_name, files, variant_id, None, comment, skip_temp_purge=True)
 
 def add_export_version_from_version_id(export_name, files, version_id, comment='', execute_xp=True):
     work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))
@@ -540,7 +540,7 @@ def add_export_version_from_version_id(export_name, files, version_id, comment='
         variant_id = work_env_row['variant_id']
         return add_export_version(export_name, files, variant_id, version_id, comment, execute_xp)
 
-def add_export_version(export_name, files, variant_id, version_id, comment='', execute_xp=True):
+def add_export_version(export_name, files, variant_id, version_id, comment='', execute_xp=True, skip_temp_purge=False):
     # For adding an export version, wizard need an existing files list
     # it will just create the new version in the database
     # and copy the files in the corresponding directory
@@ -585,7 +585,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                                                                             export_id,
                                                                             version_id,
                                                                             comment)
-                            if len(copied_files) == len(files) and len(files) > 0:
+                            if (len(copied_files) == len(files) and len(files) > 0) and not skip_temp_purge:
                                 tools.remove_tree(os.path.dirname(files[0]))
                             elif len(copied_files) != len(files):
                                 logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
