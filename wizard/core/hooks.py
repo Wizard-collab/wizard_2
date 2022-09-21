@@ -42,8 +42,12 @@ from wizard.vars import project_vars
 logger = logging.getLogger(__name__)
 
 def init_wizard_hooks():
-    hook_path = path_utils.join(environment.get_project_path(), project_vars._hooks_folder_)
+    hook_path = project.get_hooks_folder()
+    plugin_path = project.get_plugins_folder()
+    scripts_path = project.get_scripts_folder()
     sys.path.append(hook_path)
+    sys.path.append(plugin_path)
+    sys.path.append(scripts_path)
 
 def get_hooks_modules():
     hooks_modules = dict()
