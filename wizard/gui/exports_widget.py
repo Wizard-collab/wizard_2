@@ -384,8 +384,9 @@ class exports_widget(QtWidgets.QWidget):
 
                     for export_id in self.export_ids.keys():
                         default_export_version = project.get_default_export_version(export_id)
-                        self.export_ids[export_id].set_default_name(default_export_version['name'])
-                        self.export_versions_ids[default_export_version['id']].set_default(True)
+                        if default_export_version:
+                            self.export_ids[export_id].set_default_name(default_export_version['name'])
+                            self.export_versions_ids[default_export_version['id']].set_default(True)
 
                 else:
                     self.show_info_mode("No exports, create exports\nwithin softwares !",
