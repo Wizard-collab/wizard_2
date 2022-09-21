@@ -15,6 +15,8 @@ import substance_painter.logging as logging
 import wizard_communicate
 from substance_painter_wizard import export_ui
 from substance_painter_wizard import substance_painter_export
+from substance_painter_wizard import wizard_project
+from substance_painter_wizard import wizard_references
 
 def save():
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
@@ -34,6 +36,16 @@ def save():
 def export(material, size, file_type):
     substance_painter_export.export_textures(material, size, file_type)
 
+def init_project():
+    mesh_file_path = wizard_references.get_mesh_file()
+    if mesh_file_path:
+        wizard_project.init_project(mesh_file_path)
+
+def update_mesh():
+    mesh_file_path = wizard_references.get_mesh_file()
+    if mesh_file_path:
+        wizard_project.update_mesh(mesh_file_path)
+
 class tool_bar(QtWidgets.QMenu):
     def __init__(self):
         super(tool_bar, self).__init__()
@@ -42,10 +54,18 @@ class tool_bar(QtWidgets.QMenu):
         substance_painter.ui.add_menu(self)
         save_icon = os.path.abspath("icons/save_increment.png")
         export_icon = os.path.abspath("icons/export.png")
+        magic_icon = os.path.abspath("icons/all.png")
+        modeling_icon = os.path.abspath("icons/modeling.png")
+        update_icon = os.path.abspath("icons/update.png")
         self.save_action = self.addAction(QtGui.QIcon(save_icon), 'Save')
         self.export_action = self.addAction(QtGui.QIcon(export_icon), 'Export')
+        self.init_project_action = self.addAction(QtGui.QIcon(magic_icon), 'Init project')
+        self.update_menu = self.addMenu(QtGui.QIcon(update_icon), 'Update')
+        self.update_modeling_action = self.update_menu.addAction(QtGui.QIcon(modeling_icon), 'Update modeling')
         self.save_action.triggered.connect(save)
         self.export_action.triggered.connect(self.show_export_ui)
+        self.init_project_action.triggered.connect(init_project)
+        self.update_modeling_action.triggered.connect(update_mesh)
 
     def show_export_ui(self):
         if self.export_dialog.exec_() == QtWidgets.QDialog.Accepted:

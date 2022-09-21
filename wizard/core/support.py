@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 def get_latest_build():
     URL = "http://93.19.210.30/latest_build/"
     try:
-        response = requests.post(URL)
+        response = requests.post(URL, timeout=3)
         return response.json()
     except requests.Timeout:
         logger.error('Connection timed out')
