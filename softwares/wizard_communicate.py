@@ -151,3 +151,20 @@ def get_plugins_folder():
     signal_dic['function'] = 'get_plugins_folder'
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
+
+def get_local_path():
+    # Send a new version request to wizard
+    # Wizard return a file path 
+    signal_dic=dict()
+    signal_dic['function'] = 'get_local_path'
+    local_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return local_path
+
+def get_project_path():
+    # Send a new version request to wizard
+    # Wizard return a file path 
+    signal_dic=dict()
+    signal_dic['function'] = 'get_project_path'
+    local_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return local_path
+

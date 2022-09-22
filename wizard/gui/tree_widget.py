@@ -19,6 +19,7 @@ from wizard.core import environment
 from wizard.core import user
 from wizard.core import path_utils
 from wizard.core import subtasks_library
+from wizard.core import repository
 from wizard.vars import user_vars
 from wizard.vars import assets_vars
 from wizard.vars import ressources
@@ -612,6 +613,8 @@ class tree_widget(QtWidgets.QFrame):
         path_utils.startfile(sandbox_path)
 
     def archive_instance(self, item):
+        if not repository.is_admin():
+            return
         self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
         
         security_sentence = f"{item.instance_name}"
@@ -868,6 +871,9 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         outframe = self.outframe_spinBox.value()
         preroll = self.preroll_spinBox.value()
         postroll = self.postroll_spinBox.value()
+        if outframe <= inframe:
+            logger.warning("Can't set an outframe inferior to an inframe")
+            return
         if assets.modify_asset_frame_range(self.asset_id, inframe, outframe, preroll, postroll):
             self.accept()
 
@@ -930,13 +936,13 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.frange_layout.addWidget(self.preroll_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
-        self.inframe_spinBox.setRange(-100000, 219)
+        self.inframe_spinBox.setRange(-100000, 100000)
         self.inframe_spinBox.setValue(100)
         self.inframe_spinBox.setButtonSymbols(2)
         self.frange_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
-        self.outframe_spinBox.setRange(101, 100000)
+        self.outframe_spinBox.setRange(-1000000, 100000)
         self.outframe_spinBox.setValue(220)
         self.outframe_spinBox.setButtonSymbols(2)
         self.frange_layout.addWidget(self.outframe_spinBox)

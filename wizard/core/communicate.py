@@ -49,6 +49,7 @@ from wizard.gui import gui_server
 from wizard.core import environment
 from wizard.core import socket_utils
 from wizard.core import assets
+from wizard.core import user
 from wizard.core import project
 from wizard.core import path_utils
 from wizard.vars import user_vars
@@ -124,6 +125,10 @@ class communicate_server(Thread):
             returned = project.get_plugins_folder() 
         elif signal_dic['function'] == 'get_string_variant_from_work_env_id':
             returned = get_string_variant_from_work_env_id(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'get_local_path':
+            returned = get_local_path()
+        elif signal_dic['function'] == 'get_project_path':
+            returned = get_project_path()
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -200,3 +205,9 @@ def get_user_folder():
 
 def create_or_get_camera_work_env(work_env_id):
     return assets.create_or_get_camera_work_env(work_env_id)
+
+def get_local_path():
+    return user.user().get_local_path()
+
+def get_project_path():
+    return environment.get_project_path()

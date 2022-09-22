@@ -104,6 +104,8 @@ def update_abc_camera( namespace, files_list):
 
 def reference_exr( namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
+        # Mirror exrs in localdir
+        local_files_list = wizard_tools.mirror_files_to_local(files_list)
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
         reads_list = []
         for path in paths_dic.keys():

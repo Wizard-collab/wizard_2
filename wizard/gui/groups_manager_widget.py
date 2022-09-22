@@ -14,6 +14,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import references_widget
+from wizard.gui import confirm_widget
 from wizard.gui import color_picker
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
@@ -151,9 +152,12 @@ class groups_manager_widget(QtWidgets.QWidget):
     def delete_group(self):
         current_group = self.groups_comboBox.currentText()
         if current_group != '':
-            group_id = self.groups[current_group]['id']
-            assets.remove_group(group_id)
-            gui_server.refresh_team_ui()
+            self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+            security_sentence = f"{current_group}"
+            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                group_id = self.groups[current_group]['id']
+                assets.remove_group(group_id)
+                gui_server.refresh_team_ui()
 
     def remove_group(self, group):
         if group in self.groups.keys():

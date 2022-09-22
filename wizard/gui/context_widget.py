@@ -19,6 +19,7 @@ from wizard.core import tools
 from wizard.core import launch
 from wizard.core import path_utils
 from wizard.core import subtasks_library
+from wizard.core import repository
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -203,6 +204,8 @@ class context_widget(QtWidgets.QFrame):
         self.archive_variant_button.clicked.connect(self.archive_variant)
 
     def archive_variant(self):
+        if not repository.is_admin():
+            return
         if self.variant_row is not None:
             self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
             security_sentence = f"{self.variant_row['name']}"

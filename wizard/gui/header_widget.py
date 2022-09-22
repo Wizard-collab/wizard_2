@@ -60,7 +60,7 @@ class header_widget(QtWidgets.QFrame):
         self.wizard_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='', icon=QtGui.QIcon(ressources._wizard_icon_))
         self.license_action = self.wizard_action.addAction(QtGui.QIcon(ressources._license_icon_), "License")
         self.whatsnew_action = self.wizard_action.addAction(QtGui.QIcon(ressources._whatsnew_icon_), "What's new ?")
-        self.latest_build_action = self.wizard_action.addAction(QtGui.QIcon(ressources._whatsnew_icon_), "Update")
+        self.latest_build_action = self.wizard_action.addAction(QtGui.QIcon(ressources._update_icon_), "Update")
         self.wizard_action.addSeparator()
         self.quit_action = self.wizard_action.addAction("Quit")
 

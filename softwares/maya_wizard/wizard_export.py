@@ -37,6 +37,10 @@ def export_by_extension(export_GRP_list, export_file, frange, percent_factor):
         export_files_list = export_abc(export_GRP_list, export_file, frange, percent_factor)
     elif export_file.endswith('.ma'):
         export_files_list = export_ma(export_GRP_list, export_file)
+    elif export_file.endswith('.obj'):
+        export_files_list = export_obj(export_GRP_list, export_file)
+    elif export_file.endswith('.fbx'):
+        export_files_list = export_obj(export_GRP_list, export_file)
     elif export_file.endswith('.fur'):
         export_files_list = export_fur(export_GRP_list, export_file, frange, percent_factor)
     else:
@@ -69,6 +73,15 @@ def export_fur(export_GRP_list, export_file, frange, percent_factor):
 
     return files_list
 
+def export_obj(export_GRP_list, export_file):
+    pm.select(export_GRP_list, replace=True, noExpand=True)
+    pm.exportSelected(export_file, preserveReferences=0, shader=1)
+    return [export_file]
+
+def export_fbx(export_GRP_list, export_file):
+    pm.select(export_GRP_list, replace=True, noExpand=True)
+    pm.exportSelected(export_file, preserveReferences=0, shader=1)
+    return [export_file]
 
 def export_abc(export_GRP_list, export_file, frange, percent_factor):
     logger.info("Exporting .abc")

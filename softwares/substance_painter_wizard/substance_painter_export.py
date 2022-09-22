@@ -35,12 +35,17 @@ def export_textures(material, size, file_type) :
         export_result = None
 
     if export_result:
-    
         exported_files = []
+        files = os.listdir(temp_export_path)
+        for file in files:
+            exported_files.append(os.path.join(temp_export_path, file))
+
+        '''
         for udim in export_result.keys():
             for template in export_result[udim].keys():
                 if export_result[udim][template] != '':
                     exported_files.append(export_result[udim][template])
+        '''
 
         export_dir = wizard_communicate.add_export_version(export_name,
                                                                 exported_files,

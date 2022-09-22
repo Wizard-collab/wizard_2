@@ -344,6 +344,22 @@ def modify_user_password(user_name, password, new_password):
             logger.warning(f'Wrong password for {user_name}')
             return None
 
+def reset_user_password(user_name, administrator_pass, new_password):
+    user_row = get_user_row_by_name(user_name)
+    if not user_row:
+        return
+    if not tools.decrypt_string(get_administrator_pass(),
+                                administrator_pass):
+        logger.warning("Wrong administrator_pass")
+        return
+    if db_utils.update_data('repository',
+                            'users',
+                            ('pass',
+                                tools.encrypt_string(new_password)),
+                            ('user_name', user_name)):
+            logger.info(f'{user_name} password modified')
+            return 1
+
 def get_users_list():
     users_rows = db_utils.get_rows('repository', 'users', order='level DESC, total_xp DESC;')
     return users_rows
@@ -499,7 +515,7 @@ def modify_user_email(user_name, email):
 def is_admin():
     is_admin = get_user_row_by_name(environment.get_user(), 'administrator')
     if not is_admin:
-        logger.info("You are not administrator")
+        logger.warning("You are not administrator")
     return is_admin
 
 def add_quote(content):

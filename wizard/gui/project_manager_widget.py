@@ -209,10 +209,11 @@ class project_log_widget(QtWidgets.QDialog):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Log in")
 
-        self.build_ui()
-        self.connect_functions()
         self.project_name = project_name
         self.wait_for_restart = wait_for_restart
+
+        self.build_ui()
+        self.connect_functions()
 
     def build_ui(self):
         self.setMinimumWidth(300)
@@ -220,9 +221,18 @@ class project_log_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
+        self.title_label = QtWidgets.QLabel(f"Log in {self.project_name}")
+        self.title_label.setObjectName("title_label_2")
+        self.main_layout.addWidget(self.title_label)
+        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.main_layout.addSpacerItem(self.spaceItem)
+
         self.password_lineEdit = gui_utils.password_lineEdit()
         self.password_lineEdit.setPlaceholderText('Password')
         self.main_layout.addWidget(self.password_lineEdit)
+
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()

@@ -7,3 +7,4 @@ pip install psycopg2
 pip install psutil
 pip install QScintilla
 pip install requests
+pip install clipboard

@@ -1129,7 +1129,7 @@ def get_work_env_data_by_string(string, column='*'):
         logger.error("Work env not found")
         return None
 
-def create_reference(work_env_id, export_version_id, namespace, count=None):
+def create_reference(work_env_id, export_version_id, namespace, count=None, auto_update=0):
     reference_id = None
 
     export_id = get_export_version_data(export_version_id, 'export_id')
@@ -1158,7 +1158,7 @@ def create_reference(work_env_id, export_version_id, namespace, count=None):
                                     work_env_id,
                                     export_id,
                                     export_version_id,
-                                    0))
+                                    auto_update))
         if reference_id:
             logger.info(f"Reference created")
     else:

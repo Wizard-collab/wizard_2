@@ -33,10 +33,13 @@ class create_repository_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel('New repository')
-        self.main_layout.addWidget(self.infos_label)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.main_layout.addSpacerItem(self.spaceItem)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.title_label = QtWidgets.QLabel("Create repository")
+        self.title_label.setObjectName("title_label_2")
+        self.main_layout.addWidget(self.title_label)
+        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.repository_name_lineEdit = QtWidgets.QLineEdit()
@@ -55,7 +58,7 @@ class create_repository_widget(QtWidgets.QDialog):
         self.email_lineEdit.setPlaceholderText('Administrator email')
         self.main_layout.addWidget(self.email_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.button_widget = QtWidgets.QWidget()

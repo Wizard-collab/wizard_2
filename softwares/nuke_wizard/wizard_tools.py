@@ -26,6 +26,15 @@ def save_increment():
     else:
         logger.warning("Can't save increment")
 
+def mirror_files_to_local(files_list):
+    local_path = wizard_communicate.get_local_path()
+    project_path = wizard_communicate.get_project_path()
+    for file in files_list:
+        local_file = replace_project_path_with_local_path(file, project_path, local_path)
+
+def replace_project_path_with_local_path(file, project_path, local_path):
+    return local_path+file[len(project_path):]
+
 def trigger_after_save_hook(scene_path):
     stage_name = os.environ['wizard_stage_name']
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))

@@ -56,6 +56,8 @@ import time
 import shutil
 import json
 import logging
+import clipboard
+import traceback
 
 # Wizard modules
 from wizard.core import environment
@@ -430,18 +432,23 @@ def create_references_from_variant_id(work_env_id, variant_id):
     else:
         return None
 
-def create_reference(work_env_id, export_version_id):
-    namespaces_list = project.get_references(work_env_id, 'namespace')
-    count = 0
-    namespace_raw = build_namespace(export_version_id)
-    namespace = f"{namespace_raw}"
-    while namespace in namespaces_list:
-        count+=1
-        namespace = f"{namespace_raw}_{str(count)}"
+def create_reference(work_env_id, export_version_id, namespace_and_count=None, auto_update=0):
+    if not namespace_and_count:
+        namespaces_list = project.get_references(work_env_id, 'namespace')
+        count = 0
+        namespace_raw = build_namespace(export_version_id)
+        namespace = f"{namespace_raw}"
+        while namespace in namespaces_list:
+            count+=1
+            namespace = f"{namespace_raw}_{str(count)}"
+    else:
+        namespace = namespace_and_count[0]
+        count = namespace_and_count[1]
     return project.create_reference(work_env_id,
                                             export_version_id,
                                             namespace,
-                                            count)
+                                            count,
+                                            auto_update)
 
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)
@@ -558,56 +565,57 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
     for file in files:
         if os.path.splitext(file)[-1].replace('.', '') not in extensions_rules:
             extension_errors.append(file)
-    if extension_errors == []:
-        if variant_row:
-            export_id = get_or_add_export(export_name, variant_id)
-            if export_id:
-                last_version_name = project.get_last_export_version(export_id, 'name')
-                if last_version_name:
-                    new_version =  str(int(last_version_name)+1).zfill(4)
-                else:
-                    new_version = '0001'
-                export_path = get_export_path(export_id)
-                if export_path:
-                    dir_name = path_utils.clean_path(path_utils.join(export_path, new_version))
-                    if not tools.create_folder(dir_name):
-                        project.remove_export_version(export_version_id)
-                        export_version_id = None
-                    else:
-                        copied_files = tools.copy_files(files, dir_name)
-                        if copied_files is None:
-                            if not tools.remove_folder(dir_name):
-                                logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
-                            export_version_id = None
-                        else:
-                            export_version_id = project.add_export_version(new_version,
-                                                                            copied_files,
-                                                                            export_id,
-                                                                            version_id,
-                                                                            comment)
-                            if (len(copied_files) == len(files) and len(files) > 0) and not skip_temp_purge:
-                                tools.remove_tree(os.path.dirname(files[0]))
-                            elif len(copied_files) != len(files):
-                                logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
-                            else:
-                                pass
-                            game.add_xps(game_vars._export_xp_)
-                            if execute_xp:
-                                game.analyse_comment(comment, game_vars._export_penalty_)
-                            events.add_export_event(export_version_id)
-                # Trigger after export hook
-                export_version_string = instance_to_string(('export_version', export_version_id))
-                hooks.after_export_hooks(export_version_string=export_version_string,
-                                            export_dir=dir_name,
-                                            stage_name=stage_name)
-                return export_version_id
-            else:
-                return None
-        else:
-            return None
-    else:
+    if extension_errors != []:
         for file in extension_errors:
             logger.warning(f"{file} format doesn't math the stage export rules ( {(', ').join(extensions_rules)} )")
+        return
+    if not variant_row:
+        return
+    export_id = get_or_add_export(export_name, variant_id)
+    if not export_id:
+        return
+    last_version_name = project.get_last_export_version(export_id, 'name')
+    if last_version_name:
+        new_version =  str(int(last_version_name)+1).zfill(4)
+    else:
+        new_version = '0001'
+
+    export_path = get_export_path(export_id)
+    if not export_path:
+        return
+    dir_name = path_utils.clean_path(path_utils.join(export_path, new_version))
+    while path_utils.isdir(dir_name):
+        new_version = str(int(new_version)+1).zfill(4)
+        dir_name = path_utils.clean_path(path_utils.join(export_path, new_version))
+    if not tools.create_folder(dir_name):
+        return
+    copied_files = tools.copy_files(files, dir_name)
+    if copied_files is None:
+        if not tools.remove_folder(dir_name):
+            logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+        return
+    export_version_id = project.add_export_version(new_version,
+                                                    copied_files,
+                                                    export_id,
+                                                    version_id,
+                                                    comment)
+    if (len(copied_files) == len(files) and len(files) > 0) and not skip_temp_purge:
+        tools.remove_tree(os.path.dirname(files[0]))
+    elif len(copied_files) != len(files):
+        logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
+    else:
+        pass
+    game.add_xps(game_vars._export_xp_)
+    if execute_xp:
+        game.analyse_comment(comment, game_vars._export_penalty_)
+    events.add_export_event(export_version_id)
+    # Trigger after export hook
+    export_version_string = instance_to_string(('export_version', export_version_id))
+    hooks.after_export_hooks(export_version_string=export_version_string,
+                                export_dir=dir_name,
+                                stage_name=stage_name)
+    return export_version_id
+        
 
 def modify_export_version_comment(export_version_id, comment):
     success = project.modify_export_version_comment(export_version_id, comment)
@@ -760,6 +768,39 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
 
     return version_id
 
+def copy_work_version(work_version_id):
+    clipboard_dic = dict()
+    clipboard_dic['work_version_id'] = work_version_id
+    clipboard.copy(json.dumps(clipboard_dic))
+    logger.info("Version ID copied to clipboard")
+
+def paste_work_version(destination_work_env_id, mirror_work_env_references=False):
+    clipboard_json = clipboard.paste()
+    try:
+        clipboard_dic = json.loads(clipboard_json)
+    except json.decoder.JSONDecodeError:
+        logger.warning("No valid work version found in clipboard")
+        return
+    if 'work_version_id' not in clipboard_dic.keys():
+        logger.warning("No valid work version found in clipboard")
+        return
+    work_version_id = clipboard_dic['work_version_id']
+    if not duplicate_version(work_version_id, work_env_id=destination_work_env_id):
+        return
+    if mirror_work_env_references:
+        work_version_row = project.get_version_data(work_version_id)
+        work_env_id = work_version_row['work_env_id']
+        mirror_references(work_env_id, destination_work_env_id)
+
+def mirror_references(work_env_id, destination_work_env_id):
+    for reference_id in project.get_references(destination_work_env_id, 'id'):
+        remove_reference(reference_id)
+    for reference_row in project.get_references(work_env_id):
+        create_reference(destination_work_env_id,
+                                reference_row['export_version_id'],
+                                namespace_and_count=[reference_row['namespace'], reference_row['count']],
+                                auto_update=reference_row['auto_update'])
+
 def modify_version_comment(version_id, comment=''):
     success = project.modify_version_comment(version_id, comment)
     if success:
@@ -794,15 +835,19 @@ def merge_file(file, work_env_id, comment="", do_screenshot=1):
         logger.warning(f"{file} doesn't exists")
         return None
 
-def duplicate_version(version_id, comment=None):
+def duplicate_version(version_id, work_env_id=None, comment=None):
     new_version_id = None
     version_row = project.get_version_data(version_id)
     if version_row is not None:
         if comment is None:
             comment = version_row['comment']
+        if work_env_id is None:
+            work_env_id = version_row['work_env_id']
         new_version_id = merge_file(version_row['file_path'],
-                                    version_row['work_env_id'],
+                                    work_env_id,
                                     comment, 0)
+        if new_version_id is None:
+            return
         new_version_row = project.get_version_data(new_version_id)
         if path_utils.isfile(version_row['screenshot_path']):
             path_utils.copyfile(version_row['screenshot_path'], new_version_row['screenshot_path'])
@@ -834,7 +879,8 @@ def archive_version(version_id):
         return None
 
 def create_group(name, color='#798fe8'):
-    return project.create_group(name, color)
+    if tools.is_safe(name):
+        return project.create_group(name, color)
 
 def remove_group(group_id):
     return project.remove_group(group_id)

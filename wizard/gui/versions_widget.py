@@ -509,6 +509,7 @@ class versions_widget(QtWidgets.QWidget):
         archive_action = None
         comment_action = None
         batch_action = None
+        copy_action = None
         if len(selection)>=1:
             duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate version(s)')
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
@@ -517,6 +518,9 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch version')
             batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export version')
+            copy_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Copy version to clipboard')
+        paste_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard')
+        paste_and_mirror_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard and mirror references')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -536,6 +540,12 @@ class versions_widget(QtWidgets.QWidget):
                 self.open_files()
             elif action == batch_action:
                 self.batch_export()
+            elif action == copy_action:
+                self.copy_version()
+            elif action == paste_action:
+                self.paste_work_version()
+            elif action == paste_and_mirror_action:
+                self.paste_work_version_and_mirror_references()
 
     def modify_comment(self):
         items = self.get_selection()
@@ -550,6 +560,20 @@ class versions_widget(QtWidgets.QWidget):
                     for item in items:
                         assets.modify_version_comment(item.version_row['id'], comment)
                     gui_server.refresh_team_ui()
+
+    def copy_version(self):
+        selection = self.get_selection()
+        if len(selection) == 1:
+            item = selection[0]
+            assets.copy_work_version(item.version_row['id'])
+
+    def paste_work_version(self):
+        assets.paste_work_version(self.work_env_id)
+        gui_server.refresh_team_ui()
+
+    def paste_work_version_and_mirror_references(self):
+        assets.paste_work_version(self.work_env_id, mirror_work_env_references=True)
+        gui_server.refresh_team_ui()
 
     def version_changed(self):
         selection = self.get_selection()
@@ -642,7 +666,7 @@ class versions_widget(QtWidgets.QWidget):
         selection = self.get_selection()
         if selection is not None:
             for item in selection:
-                assets.duplicate_version(item.version_row['id'], f"Duplicate from version {item.version_row['name']}")
+                assets.duplicate_version(item.version_row['id'], comment=f"Duplicate from version {item.version_row['name']}")
             gui_server.refresh_team_ui()
 
     def launch(self):

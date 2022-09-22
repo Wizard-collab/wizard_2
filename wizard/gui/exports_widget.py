@@ -20,6 +20,7 @@ from wizard.core import project
 from wizard.core import tools
 from wizard.core import subtasks_library
 from wizard.core import path_utils
+from wizard.core import repository
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -194,6 +195,8 @@ class exports_widget(QtWidgets.QWidget):
         return string
 
     def archive(self):
+        if not repository.is_admin():
+            return
         selection = self.list_view.selectedItems()
         if selection is not None:
             if selection != []:

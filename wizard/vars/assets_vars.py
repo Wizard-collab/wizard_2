@@ -127,7 +127,7 @@ strings depending on the software and the stage
 '''
 _ext_dic_ = dict()
 _ext_dic_[_modeling_] = dict()
-_ext_dic_[_modeling_][_maya_] = ['abc', 'ma']
+_ext_dic_[_modeling_][_maya_] = ['abc', 'ma', 'obj', 'fbx']
 _ext_dic_[_modeling_][_blender_] = ['abc', 'blend']
 _ext_dic_[_modeling_][_houdini_] = ['abc', 'hip']
 _ext_dic_[_rigging_] = dict()
