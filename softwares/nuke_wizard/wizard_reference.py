@@ -118,8 +118,9 @@ def reference_exr(namespace, files_list, local=True ):
             read = wizard_tools.create_read(read_name, namespace)
             wizard_tools.set_read_data(read, path, frange)
             reads_list.append(read)
-        wizard_tools.align_nodes(reads_list)
-        wizard_tools.backdrop_nodes(reads_list, namespace)
+        if len(reads_list) > 0:
+            wizard_tools.align_nodes(reads_list)
+            wizard_tools.backdrop_nodes(reads_list, namespace)
 
 def update_exr(namespace, files_list, local=True):
     all_namespaces = wizard_tools.get_all_namespaces()
@@ -136,6 +137,7 @@ def update_exr(namespace, files_list, local=True):
             existing_read_names_dic[read_name] = read
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
         reads_list = []
+        new_reads_list = []
         for path in paths_dic.keys():
             read_name = os.path.basename(path).split('.')[0]
             frange = paths_dic[path]
@@ -143,13 +145,16 @@ def update_exr(namespace, files_list, local=True):
                 read = existing_read_names_dic[read_name]
             else:
                 read = wizard_tools.create_read(read_name, namespace)
+                new_reads_list.append(read)
             wizard_tools.set_read_data(read, path, frange)
             reads_list.append(read)
         for read in existing_reads_list:
             if read not in reads_list:
                 nuke.delete(read)
-        wizard_tools.align_nodes(reads_list)
-        wizard_tools.backdrop_nodes(reads_list, namespace)
+        if len(new_reads_list) > 0:
+            wizard_tools.align_nodes(new_reads_list)
+        if len(reads_list) > 1:
+            wizard_tools.backdrop_nodes(reads_list, namespace)
 
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,

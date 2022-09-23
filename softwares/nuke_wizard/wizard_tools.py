@@ -142,7 +142,8 @@ def get_bouding_box(nodes_list):
     return x0, x1, y0, y1
 
 def align_nodes(nodes_list):
-    pos = [int(nodes_list[0]['xpos'].value()), int(nodes_list[0]['ypos'].value())]
+    x0, x1, y0, y1 = get_bouding_box(nuke.allNodes())
+    pos = [int(x1)+250, int(y0)+250]
     for node in nodes_list:
         node.setXYpos( pos[0], pos[1] )
         pos[0] += 100
