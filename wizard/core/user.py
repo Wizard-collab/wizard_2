@@ -201,7 +201,7 @@ class user:
 
     def set_local_path(self, path):
         if path != '' and path_utils.isdir(path):
-            self.prefs_dic[user_vars._local_path_] = path
+            self.prefs_dic[user_vars._local_path_] = path_utils.clean_path(path)
             self.write_prefs_dic()
             logger.info("Local path modified")
             return 1

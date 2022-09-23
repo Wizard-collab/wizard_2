@@ -32,12 +32,11 @@ def setup_render_directory(stage_name, export_name):
 
 def setup_frame_range(render_type, frame_range=None):
     if not frame_range:
-        shot_range = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
-        frame_range = [shot_range[1], shot_range[2]]
+        frame_range = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
     if render_type == 'FML':
-        frames = "{0},{1},{2}".format(frame_range[0], int((frame_range[0]+frame_range[1])/2), frame_range[1])
+        frames = "{0},{1},{2}".format(frame_range[1], int((frame_range[1]+frame_range[2])/2), frame_range[2])
     elif render_type == 'HD' or render_type == 'LD':
-        frames = "{0}-{1}".format(frame_range[0], frame_range[1])
+        frames = "{0}-{1}".format(frame_range[1], frame_range[2])
     else:
         logger.info("Unkown render type : {0}".format(render_type))
         frames = None
