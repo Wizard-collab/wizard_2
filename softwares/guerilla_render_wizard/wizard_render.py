@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 # Guerilla modules
 import guerilla
-from guerilla import Document, pynode
+from guerilla import Document, pynode, Modifier
 
 # Wizard modules
 import wizard_communicate
@@ -41,9 +41,10 @@ def setup_frame_range(render_type, frame_range=None):
     else:
         logger.info("Unkown render type : {0}".format(render_type))
         frames = None
-    if frames:
-        preferences_node = wizard_tools.get_node_from_name('Preferences')
-        preferences_node.RenderRange.set(frames)
+    if frames is not None:
+        with Modifier() as mod: 
+            preferences_node = wizard_tools.get_node_from_name('Preferences')
+            preferences_node.RenderRange.set(frames)
 
 def setup_image_format(render_type):
     image_format = wizard_communicate.get_image_format()

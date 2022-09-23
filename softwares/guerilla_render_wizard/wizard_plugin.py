@@ -35,7 +35,8 @@ def export():
 def setup_render(render_type):
     stage_name = os.environ['wizard_stage_name']
     if stage_name == 'lighting':
-        lighting.setup_render_directory(render_type)
+        frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
+        lighting.setup_render_directory(render_type, frame_range)
     else:
         logger.warning("Unplugged stage : {0}".format(stage_name))
 

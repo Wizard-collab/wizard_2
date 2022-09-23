@@ -43,10 +43,12 @@ def main(render_type, frange, farm=0):
     except:
         logger.error(str(traceback.format_exc()))
 
-def setup_render_directory(render_type):
+def setup_render_directory(render_type, frange):
     if render_type in ['FML', 'LD', 'HD']:
         export_name = "render_{0}".format(render_type)
         render_directory = wizard_render.setup_render_directory('lighting', export_name)
+        wizard_render.setup_frame_range(render_type, frange)
+        wizard_render.setup_image_format(render_type)
         return render_directory
 
 def batch():

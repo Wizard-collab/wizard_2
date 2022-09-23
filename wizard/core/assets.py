@@ -72,6 +72,7 @@ from wizard.core import tags
 from wizard.core import stats
 from wizard.core import asset_tracking
 from wizard.core import hooks
+from wizard.core import user
 from wizard.vars import assets_vars
 from wizard.vars import env_vars
 from wizard.vars import softwares_vars
@@ -1060,13 +1061,23 @@ def get_export_path(export_id):
 
 def get_temp_export_path(export_id):
     dir_name = None
+
+    local_path = user.user().get_local_path()
+    project_path = environment.get_project_path()
+
+    if local_path is None or local_path == '':
+        dir_name = tools.temp_dir()
+        logger.warning("Your local path is not setted, exporting in default temp dir.")
+        return dir_name
+
     export_row = project.get_export_data(export_id)
     if export_row:
         export_name = export_row['name']
         variant_path = get_variant_path(export_row['variant_id'])
         if export_name and variant_path:
             dir_name = path_utils.join(variant_path, '_EXPORTS', export_name, 'temp')
-    return dir_name
+            dir_name = local_path+dir_name[len(project_path):]
+            return dir_name
 
 def get_export_version_path(export_version_id):
     dir_name = None

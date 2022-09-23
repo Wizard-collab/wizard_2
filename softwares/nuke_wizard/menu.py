@@ -20,6 +20,13 @@ menu.addSeparator()
 
 nuke.menu('Nuke').addCommand("Wizard/Import and update all", "wizard_plugin.reference_and_update_all()")
 
+menu.addSeparator()
+
+nuke.menu('Nuke').addCommand("Wizard/Mirror renders to local", "wizard_plugin.update_lighting()")
+nuke.menu('Nuke').addCommand("Wizard/Use project renders ( Not recommended )", "wizard_plugin.update_lighting(local=False)")
+
+menu.addSeparator()
+
 menu.addMenu("Import")
 nuke.menu('Nuke').addCommand("Wizard/Import/Import all", "wizard_plugin.reference_all()")
 nuke.menu('Nuke').addCommand("Wizard/Import/Import custom", "wizard_plugin.reference_custom()")
