@@ -433,7 +433,12 @@ def create_references_from_variant_id(work_env_id, variant_id):
     else:
         return None
 
-def create_reference(work_env_id, export_version_id, namespace_and_count=None, auto_update=0):
+def create_reference(work_env_id,
+                        export_version_id,
+                        namespace_and_count=None,
+                        auto_update=None):
+    if auto_update is None:
+        auto_update = user.user().get_reference_auto_update_default()
     if not namespace_and_count:
         namespaces_list = project.get_references(work_env_id, 'namespace')
         count = 0
@@ -449,7 +454,7 @@ def create_reference(work_env_id, export_version_id, namespace_and_count=None, a
                                             export_version_id,
                                             namespace,
                                             count,
-                                            auto_update)
+                                            int(auto_update==True))
 
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)

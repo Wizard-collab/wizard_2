@@ -23,7 +23,6 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         super(softwares_preferences_widget, self).__init__(parent)
 
         self.build_ui()
-        self.fill_softwares()
         self.connect_functions()
 
     def connect_functions(self):
@@ -31,6 +30,9 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.apply_button.clicked.connect(self.apply)
         self.guess_button.clicked.connect(self.guess_path)
         self.open_folder_button.clicked.connect(self.open_folder)
+
+    def showEvent(self, event):
+        self.fill_softwares()
 
     def build_ui(self):
         self.container_layout = QtWidgets.QVBoxLayout()
@@ -123,17 +125,20 @@ class softwares_preferences_widget(QtWidgets.QWidget):
                 self.path_lineEdit.setText(versions_dic[action.name])
 
     def fill_softwares(self):
+        self.softwares_comboBox.clear()
         for software in softwares_vars._softwares_list_:
             icon = ressources._sofwares_icons_dic_[software]
             self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
 
     def refresh(self):
-        software = self.softwares_comboBox.currentText()
-        software_row = project.get_software_data_by_name(software)
-        self.path_lineEdit.setText(software_row['path'])
-        self.batch_path_lineEdit.setText(software_row['batch_path'])
-        self.custom_script_paths_textEdit.setText(software_row['additionnal_scripts'])
-        self.custom_env_textEdit.setText(self.load_additionnal_env(software_row['additionnal_env']))
+        if self.isVisible():
+            software = self.softwares_comboBox.currentText()
+            if software and software != '':
+                software_row = project.get_software_data_by_name(software)
+                self.path_lineEdit.setText(software_row['path'])
+                self.batch_path_lineEdit.setText(software_row['batch_path'])
+                self.custom_script_paths_textEdit.setText(software_row['additionnal_scripts'])
+                self.custom_env_textEdit.setText(self.load_additionnal_env(software_row['additionnal_env']))
 
     def apply(self):
         software = self.softwares_comboBox.currentText()

@@ -10,6 +10,7 @@ import time
 
 # Wizard modules
 from wizard.core import assets
+from wizard.core import user
 from wizard.core import project
 from wizard.vars import ressources
 from wizard.vars import assets_vars
@@ -46,7 +47,16 @@ class search_reference_widget(QtWidgets.QWidget):
         self.groups_ids = dict()
 
         self.build_ui()
+        self.load_context()
         self.connect_functions()
+
+    def load_context(self):
+        reference_auto_update_default = user.user().get_reference_auto_update_default()
+        self.reference_with_auto_update_checkBox.setChecked(reference_auto_update_default)
+
+    def set_context(self):
+        reference_auto_update_default = self.reference_with_auto_update_checkBox.isChecked()
+        user.user().set_reference_auto_update_default(reference_auto_update_default)
 
     def init_icons_dic(self):
         self.icons_dic = dict()
@@ -145,8 +155,8 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
-        
         self.list_view.itemDoubleClicked.connect(self.return_references)
+        self.reference_with_auto_update_checkBox.stateChanged.connect(self.set_context)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Down:
@@ -238,6 +248,16 @@ class search_reference_widget(QtWidgets.QWidget):
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.main_widget_layout.addWidget(self.list_view)
         self.show_info_mode('No export found...', ressources._nothing_info_)
+
+        self.settings_widget = QtWidgets.QWidget()
+        self.settings_layout = QtWidgets.QHBoxLayout()
+        self.settings_widget.setLayout(self.settings_layout)
+        self.main_widget_layout.addWidget(self.settings_widget)
+
+        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.reference_with_auto_update_checkBox = QtWidgets.QCheckBox("Reference with auto update")
+        self.settings_layout.addWidget(self.reference_with_auto_update_checkBox)
 
 class search_thread(QtCore.QThread):
 

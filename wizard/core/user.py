@@ -209,6 +209,19 @@ class user:
             logger.warning('Please enter a valid local path')
             return None
 
+    def set_reference_auto_update_default(self, auto_update_default=False):
+        if user_vars._reference_settings_ not in self.prefs_dic.keys():
+            self.prefs_dic[user_vars._reference_settings_] = dict()
+        self.prefs_dic[user_vars._reference_settings_]['auto_update_default'] = auto_update_default
+        self.write_prefs_dic()
+
+    def get_reference_auto_update_default(self):
+        if user_vars._reference_settings_ in self.prefs_dic.keys():
+            return self.prefs_dic[user_vars._reference_settings_]['auto_update_default']
+        else:
+            self.set_reference_auto_update_default()
+            return False
+
     def set_popups_settings(self, enabled=1, duration=3, keep_until_comment=True):
         popups_settings_dic = dict()
         popups_settings_dic['enabled'] = enabled
@@ -264,6 +277,9 @@ class user:
             self.prefs_dic[user_vars._popups_settings_]['enabled'] = 1
             self.prefs_dic[user_vars._popups_settings_]['keep_until_comment'] = True
             self.prefs_dic[user_vars._popups_settings_]['duration'] = 3
+            self.prefs_dic[user_vars._reference_settings_] = dict()
+            self.prefs_dic[user_vars._reference_settings_]['auto_update_default'] = False
+
             self.prefs_dic[user_vars._show_whatsnew_] = True
             self.prefs_dic[user_vars._user_build_] = None
             self.prefs_dic[user_vars._widgets_pos_] = dict()

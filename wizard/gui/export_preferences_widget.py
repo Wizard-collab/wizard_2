@@ -25,11 +25,13 @@ class export_preferences_widget(QtWidgets.QWidget):
         self.combobox_list = []
 
         self.build_ui()
-        self.fill_stages()
         self.connect_functions()
-        self.refresh()
+
+    def showEvent(self, event):
+        self.fill_stages()
 
     def fill_stages(self):
+        self.stages_comboBox.clear()
         stages_list = assets_vars._all_stages_
         for stage in stages_list:
             icon = ressources._stage_icons_dic_[stage]
@@ -50,10 +52,11 @@ class export_preferences_widget(QtWidgets.QWidget):
 
         comboBox = extension_comboBox(extension_row)
         comboBox.setFixedWidth(150)
-        comboBox.addItems(extensions_list)
         comboBox.setCurrentText(extension_row['extension'])
         self.software_rows_layout.addRow(info_widget, comboBox)
         self.combobox_list.append(comboBox)
+        #QtWidgets.QApplication.processEvents()
+        comboBox.addItems(extensions_list)
 
     def connect_functions(self):
         self.stages_comboBox.currentTextChanged.connect(self.stage_changed)
@@ -63,18 +66,20 @@ class export_preferences_widget(QtWidgets.QWidget):
         self.combobox_list = []
         self.clear_softwares_rows_layout()
         stage = self.stages_comboBox.currentText()
-        available_softwares = list(assets_vars._ext_dic_[stage].keys())
-        for software in available_softwares:
-            extensions_list = assets_vars._ext_dic_[stage][software]
-            software_id = project.get_software_data_by_name(software, 'id')
-            self.add_software_row(software, extensions_list, project.get_default_extension_row(stage, software_id))
+        if stage is not None and stage != '':
+            available_softwares = list(assets_vars._ext_dic_[stage].keys())
+            for software in available_softwares:
+                extensions_list = assets_vars._ext_dic_[stage][software]
+                software_id = project.get_software_data_by_name(software, 'id')
+                self.add_software_row(software, extensions_list, project.get_default_extension_row(stage, software_id))
 
     def clear_softwares_rows_layout(self):
         while self.software_rows_layout.rowCount():
             self.software_rows_layout.removeRow(0)
 
     def refresh(self):
-        self.stage_changed()
+        if self.isVisible():
+            self.stage_changed()
 
     def build_ui(self):
         self.container_layout = QtWidgets.QVBoxLayout()
