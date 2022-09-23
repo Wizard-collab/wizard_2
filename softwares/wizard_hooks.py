@@ -144,17 +144,18 @@ def get_hooks_modules(software):
 	module_path = None
 
 	# Load plugins hooks
-	if os.path.isdir(plugins_path):
-		for folder in os.listdir(plugins_path):
-			plugin_path = os.path.join(plugins_path, folder)
-			module_name, module_path = load_module(software, plugin_path, hook_type="plugin_{0}".format(folder))
-			if module_name and module_path:
-				sys.path.append(os.path.dirname(module_path))
-				hooks_modules[module_name] = dict()
-				hooks_modules[module_name]['module'] = sys.modules[module_name]
-				hooks_modules[module_name]['path'] = module_path
-				module_name = None
-				module_path = None
+	if plugins_path:
+		if os.path.isdir(plugins_path):
+			for folder in os.listdir(plugins_path):
+				plugin_path = os.path.join(plugins_path, folder)
+				module_name, module_path = load_module(software, plugin_path, hook_type="plugin_{0}".format(folder))
+				if module_name and module_path:
+					sys.path.append(os.path.dirname(module_path))
+					hooks_modules[module_name] = dict()
+					hooks_modules[module_name]['module'] = sys.modules[module_name]
+					hooks_modules[module_name]['path'] = module_path
+					module_name = None
+					module_path = None
 
 	return hooks_modules
 
