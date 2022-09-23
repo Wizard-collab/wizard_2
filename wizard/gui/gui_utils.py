@@ -276,6 +276,21 @@ class QProgressBar(QtWidgets.QProgressBar):
         opt.progress = int(newValue)
         qp.drawControl(QtWidgets.QStyle.CE_ProgressBar, opt)
 
+class QRightClickButton(QtWidgets.QPushButton):
+
+    rightClicked = pyqtSignal(object)
+    leftClicked = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(QRightClickButton, self).__init__(parent)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.rightClicked.emit(1)
+        else:
+            self.leftClicked.emit(1)
+        super().mouseReleaseEvent(event)
+
 class password_lineEdit(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(password_lineEdit, self).__init__(parent)

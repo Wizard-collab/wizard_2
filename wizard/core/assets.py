@@ -411,6 +411,9 @@ def create_work_env(software_id, variant_id):
         logger.warning(f"{name} is not a valid work environment ( software not handled )")
     return work_env_id
 
+def force_unlock(work_env_id):
+    project.set_work_env_lock(work_env_id, 0)
+
 def create_references_from_variant_id(work_env_id, variant_id):
     export_rows = project.get_variant_export_childs(variant_id)
     stage_id = project.get_variant_data(variant_id, 'stage_id')
@@ -454,7 +457,7 @@ def create_reference(work_env_id,
                                             export_version_id,
                                             namespace,
                                             count,
-                                            int(auto_update==True))
+                                            int(auto_update))
 
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)

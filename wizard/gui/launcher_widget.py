@@ -23,6 +23,7 @@ from wizard.core import launch
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import image_viewer_widget
+from wizard.gui import confirm_widget
 
 class launcher_widget(QtWidgets.QFrame):
 
@@ -171,9 +172,24 @@ class launcher_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.version_comboBox.currentTextChanged.connect(self.version_changed)
         self.launch_button.clicked.connect(self.launch)
-        self.lock_button.clicked.connect(self.toggle_lock)
+        self.lock_button.leftClicked.connect(self.toggle_lock)
+        self.lock_button.rightClicked.connect(self.unlock_context_menu)
         self.screenshot_button.clicked.connect(self.show_screen_shot)
         self.kill_button.clicked.connect(self.kill)
+
+    def unlock_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        force_unlock_action = menu.addAction(QtGui.QIcon(ressources._lock_icons_[0]), 'Force unlock')
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == force_unlock_action:
+                self.force_unlock()
+
+    def force_unlock(self):
+        self.confirm_widget = confirm_widget.confirm_widget("Do you want to continue ?\nPlease make sure this work environment is not used by someone.", parent=self)
+        if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            assets.force_unlock(self.work_env_id)
+            gui_server.refresh_team_ui()
 
     def kill(self):
         if self.work_env_id:
@@ -257,7 +273,7 @@ class launcher_widget(QtWidgets.QFrame):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.lock_button = QtWidgets.QPushButton()
+        self.lock_button = gui_utils.QRightClickButton()
         gui_utils.application_tooltip(self.lock_button, "Lock work environment")
         self.lock_button.setFixedSize(60,60)
         self.lock_button.setIconSize(QtCore.QSize(25,25))
