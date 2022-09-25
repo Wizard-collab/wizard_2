@@ -65,7 +65,9 @@ class compile():
 				compil_data_dic['MINOR'] = MINOR
 				compil_data_dic['PATCH'] = PATCH
 				compil_data_dic['builds'] = build_no
+				compil_data_dic['BUILDS'] = build_no
 				compil_data_dic['date'] = time.time()
+				compil_data_dic['setup_name'] = self.setup_name
 				with open(compil_data_file, 'w') as f:
 					yaml.dump(compil_data_dic, f)
 				logger.info(f"Release name : {release_name}")

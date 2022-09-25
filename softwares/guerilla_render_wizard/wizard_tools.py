@@ -117,7 +117,7 @@ def get_fur_nodes_files(files_list):
                 nodes_list.append(file)
     return nodes_list
 
-def get_tags_for_yeti_node(namespace, node_name):
+def get_tags_for_yeti_or_vdb_node(namespace, node_name):
     tags = [node_name]
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     for stage in references.keys():
@@ -129,3 +129,13 @@ def get_tags_for_yeti_node(namespace, node_name):
                 tags.append(category_name)
                 break
     return tags
+
+def convert_files_list_to_sequence(files_list):
+    files = []
+    for file in files_list:
+        extension = file.split('.')[-1]
+        file_name = file.split('.')[-3]
+        new_name = "{0}.$04f.{1}".format(file_name, extension)
+        if new_name not in files:
+            files.append(new_name)
+    return files

@@ -76,6 +76,14 @@ def update_cfx(reference_dic):
     update_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
+def reference_fx(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'FX', 'fx', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
+
+def update_fx(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'FX', 'fx', reference_dic['string_variant'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
+
 def reference_camera(reference_dic):
     import_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
@@ -91,6 +99,8 @@ def import_file(namespace, files_list, parent_GRP_name, stage_name, referenced_s
         extension = files_list[0].split('.')[-1]
         if extension == 'abc' or  extension == 'gproject':
             create_ref(namespace, files_list, GRP)
+        elif extension == 'vdb':
+            create_vdb_ref(namespace, files_list, GRP)
         elif extension == 'gnode':
             merge(namespace, files_list, GRP)
         elif extension == 'fur':
@@ -108,6 +118,8 @@ def update_file(namespace, files_list, parent_GRP_name, stage_name, referenced_s
         extension = files_list[0].split('.')[-1]
         if extension == 'abc' or  extension == 'gproject':
             update_ref(namespace, files_list, GRP)
+        elif extension == 'vdb':
+            update_vdb_ref(namespace, files_list, GRP)
         elif extension == 'gnode':
             update_merge(namespace, files_list, GRP)
         elif extension == 'fur':
@@ -117,6 +129,27 @@ def update_file(namespace, files_list, parent_GRP_name, stage_name, referenced_s
                                     namespace,
                                     wizard_tools.get_new_objects(old_objects),
                                     referenced_string_asset)
+
+def create_vdb_ref(namespace, files_list, GRP):
+    sequence_files_list = wizard_tools.convert_files_list_to_sequence(files_list)
+    with Modifier() as mod:
+        refNode, topNodes = mod.createref(namespace, files_list[0], GRP)
+    with Modifier() as mod:
+        for primitive in topNodes:
+            primitive.GeometryPath.set(sequence_files_list[0]+'@')
+            tags = wizard_tools.get_tags_for_yeti_or_vdb_node(namespace, primitive.getname())
+            primitive.Membership.set((',').join(tags))
+
+
+def update_vdb_ref(namespace, files_list, GRP):
+    sequence_files_list = wizard_tools.convert_files_list_to_sequence(files_list)
+    refNode = wizard_tools.get_node_from_name(namespace)
+    with Modifier() as mod:
+        refNode.ReferenceFileName.set(files_list[0])
+        refNode.reload(files_list[0])
+        for node in wizard_tools.get_all_nodes(False):
+            if node.belongstoreference(refNode):
+                node.GeometryPath.set(sequence_files_list[0]+'@')
 
 def create_ref(namespace, files_list, GRP):
     with Modifier() as mod:
@@ -148,7 +181,7 @@ def create_or_update_yeti_nodes(namespace, files_list, GRP):
             if node_name not in wizard_tools.get_all_nodes():
                 yeti_node = mod.createnode(node_name, "Yeti", namespace_GRP)
                 yeti_node.HierarchyMode.set(2)
-                tags = wizard_tools.get_tags_for_yeti_node(namespace, fur_name)
+                tags = wizard_tools.get_tags_for_yeti_or_vdb_node(namespace, fur_name)
                 yeti_node.Membership.set((',').join(tags))
             else:
                 yeti_node = wizard_tools.get_node_from_name(node_name)

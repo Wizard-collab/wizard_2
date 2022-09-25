@@ -73,7 +73,7 @@ class new_build_widget(QtWidgets.QWidget):
 
     def fill_ui(self):
         self.link_label.setText(self.link)
-        self.build_label.setText(f"Build {self.build['MAJOR']}.{self.build['MINOR']}.{self.build['PATCH']}.{str(self.build['BUILDS']).zfill(4)}")
+        self.build_label.setText(f"Build {self.build['MAJOR']}.{self.build['MINOR']}.{self.build['PATCH']}.{str(self.build['builds']).zfill(4)}")
         self.ignore_checkbox.setChecked(not user.user().get_show_latest_build())
 
     def download(self):

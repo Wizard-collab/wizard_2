@@ -83,7 +83,7 @@ def export_abc(export_file, frange, out_node, parent):
 def export_vdb(export_dir, frange, out_node, parent):
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_vdb_output:
-        file = f"{export_dir}/$F4.vdb"
+        file = f"{export_dir}/fx_export.$F4.vdb"
         wizard_vdb_output.parm('sopoutput').set(file)
         wizard_vdb_output.parm("trange").set('normal')
         hou.playbar.setFrameRange(frange[0], frange[1])
