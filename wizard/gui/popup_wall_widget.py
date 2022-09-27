@@ -26,6 +26,7 @@ from wizard.vars import game_vars
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import tags_widget
 
 logger = logging.getLogger(__name__)
 
@@ -178,6 +179,17 @@ class popup_save_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.update_comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.version_id))
+        self.comment_textEdit.textChanged.connect(self.propose_tags)
+
+    def propose_tags(self):
+        text = self.comment_textEdit.toPlainText()
+        if text.endswith('@'):
+            position_rect = self.comment_textEdit.cursorRect()
+            pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+            self.tags_widget = tags_widget.tags_widget(pos)
+            action = self.tags_widget.exec_()
+            if action is not None:
+                self.comment_textEdit.insertHtml(f"<strong>{action.text()}</strong> ")
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -313,11 +325,22 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
         self.action_button.clicked.connect(self.action)
+        self.comment_textEdit.textChanged.connect(self.propose_tags)
+
+    def propose_tags(self):
+        text = self.comment_textEdit.toPlainText()
+        if text.endswith('@'):
+            position_rect = self.comment_textEdit.cursorRect()
+            pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+            self.tags_widget = tags_widget.tags_widget(pos)
+            action = self.tags_widget.exec_()
+            if action is not None:
+                self.comment_textEdit.insertHtml(f"<strong>{action.text()}</strong> ")
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
         export_version_id = self.event_row['data']
-        project.update_export_version_data(export_version_id, ('comment', comment))
+        assets.modify_export_version_comment(export_version_id, comment)
         gui_server.refresh_team_ui()
         self.time_out.emit(self.event_row['id'])
 

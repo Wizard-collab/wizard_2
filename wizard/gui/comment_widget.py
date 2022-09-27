@@ -10,9 +10,10 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import tags_widget
 
 class comment_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None, title='Add comment', old_comment=''):
+    def __init__(self, parent=None, title='Add comment', old_comment='', propose_tags=True):
         super(comment_widget, self).__init__(parent)
         self.old_comment = old_comment
         self.build_ui(title)
@@ -74,6 +75,17 @@ class comment_widget(QtWidgets.QDialog):
     	self.comment = self.comment_field.toPlainText()
     	self.accept()
 
+    def propose_tags(self):
+        text = self.comment_field.toPlainText()
+        if text.endswith('@'):
+            position_rect = self.comment_field.cursorRect()
+            pos = self.comment_field.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+            self.tags_widget = tags_widget.tags_widget(pos)
+            action = self.tags_widget.exec_()
+            if action is not None:
+                self.comment_field.insertHtml(f"<strong>{action.text()}</strong> ")
+
     def connect_functions(self):
         self.accept_button.clicked.connect(self.confirm)
         self.close_pushButton.clicked.connect(self.reject)
+        self.comment_field.textChanged.connect(self.propose_tags)

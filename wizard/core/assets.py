@@ -618,6 +618,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
     if execute_xp:
         game.analyse_comment(comment, game_vars._export_penalty_)
     events.add_export_event(export_version_id)
+    tags.analyse_comment(comment, 'export_version', export_version_id)
     # Trigger after export hook
     export_version_string = instance_to_string(('export_version', export_version_id))
     hooks.after_export_hooks(export_version_string=export_version_string,
