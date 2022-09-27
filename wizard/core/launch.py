@@ -187,7 +187,7 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
 
     # Merging the project software additionnal environment
     # to the main env variable
-    for script_path in additionnal_script_paths:
+    for script_path in additionnal_script_paths.split('\n'):
         env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+script_path
     for key in additionnal_env.keys():
         if key in env.keys():
