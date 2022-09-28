@@ -180,6 +180,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.update_comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.version_id))
         self.comment_textEdit.textChanged.connect(self.propose_tags)
+        self.comment_textEdit.apply_signal.connect(self.update_comment)
 
     def propose_tags(self):
         text = self.comment_textEdit.toPlainText()
@@ -238,7 +239,7 @@ class popup_save_widget(QtWidgets.QFrame):
         
         self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
-        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit = gui_utils.no_return_textEdit()
         self.comment_textEdit.setPlaceholderText('Your comment')
         self.comment_textEdit.setMaximumHeight(50)
         self.main_layout.addWidget(self.comment_textEdit)
@@ -323,6 +324,7 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.comment_button.clicked.connect(self.update_comment)
+        self.comment_textEdit.apply_signal.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
         self.action_button.clicked.connect(self.action)
         self.comment_textEdit.textChanged.connect(self.propose_tags)
@@ -474,7 +476,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.comment_widget)
         self.comment_widget.setVisible(False)
 
-        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit = gui_utils.no_return_textEdit()
         self.comment_textEdit.setMaximumHeight(50)
         self.comment_textEdit.setPlaceholderText('Your comment')
         self.comment_widget_layout.addWidget(self.comment_textEdit)

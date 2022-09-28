@@ -199,6 +199,27 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     pm.setDevicePixelRatio(pr)
     return pm
 
+class no_return_textEdit(QtWidgets.QTextEdit):
+
+    apply_signal = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(no_return_textEdit, self).__init__(parent)
+
+    def keyPressEvent(self, event):
+        if event.modifiers() & QtCore.Qt.ControlModifier:
+            if event.key() == QtCore.Qt.Key_Return:
+                self.insertPlainText('\n')
+                self.moveCursor(QtGui.QTextCursor.End)
+            else:
+                super().keyPressEvent(event)
+        else:
+            if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+                self.apply_signal.emit(1)
+            else:
+                super().keyPressEvent(event)
+
+
 class QComboBox(QtWidgets.QComboBox):
     def __init__(self, parent = None):
         super(QComboBox, self).__init__(parent)

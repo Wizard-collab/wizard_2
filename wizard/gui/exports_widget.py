@@ -450,18 +450,20 @@ class exports_widget(QtWidgets.QWidget):
         launch_action = None
         set_default_action = None
         focus_version_action = None
+        comment_action = None
         if len(selection)>=1:
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
-            comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
             destination_action = menu.addAction(QtGui.QIcon(ressources._destination_icon_), 'Open destination manager')
             focus_version_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on work version')
             if selection[0].type != 'export':
                 set_default_action = menu.addAction(QtGui.QIcon(ressources._default_export_version_icon_), 'Set as default')
+                comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
             else:
                 set_default_action = menu.addAction(QtGui.QIcon(ressources._default_export_version_icon_), 'Set default as always last')
-        action = menu.exec_(QtGui.QCursor().pos())
+        pos = QtGui.QCursor().pos()
+        action = menu.exec_(pos)
         if action is not None:
             if action == folder_action:
                 self.open_folder()
@@ -472,7 +474,7 @@ class exports_widget(QtWidgets.QWidget):
             elif action == manual_action:
                 self.merge_files()
             elif action == comment_action:
-                self.modify_comment()
+                self.modify_comment(pos)
             elif action == destination_action:
                 self.open_destination_manager()
             elif action == set_default_action:
@@ -502,14 +504,14 @@ class exports_widget(QtWidgets.QWidget):
             self.destination_manager = destination_manager.destination_manager(export_id)  
             self.destination_manager.show()  
 
-    def modify_comment(self):
+    def modify_comment(self, pos=None):
         selection = self.list_view.selectedItems()
         if selection is not None:
             if len(selection) > 0:
                 old_comment = ''
                 if len(selection) == 1:
                     old_comment = selection[0].export_version_row['comment']
-                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment)
+                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment, pos=pos)
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     for item in selection:

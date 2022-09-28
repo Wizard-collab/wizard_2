@@ -13,9 +13,10 @@ from wizard.gui import gui_utils
 from wizard.gui import tags_widget
 
 class comment_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None, title='Add comment', old_comment='', propose_tags=True):
+    def __init__(self, parent=None, title='Add comment', old_comment='', pos=None, propose_tags=True):
         super(comment_widget, self).__init__(parent)
         self.old_comment = old_comment
+        self.pos = pos
         self.build_ui(title)
         self.connect_functions()
 
@@ -26,7 +27,7 @@ class comment_widget(QtWidgets.QDialog):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
     def showEvent(self, event):
-        gui_utils.move_ui(self)
+        gui_utils.move_ui(self, pos=self.pos)
         self.comment_field.setFocus()
 
     def build_ui(self, title):
@@ -61,8 +62,9 @@ class comment_widget(QtWidgets.QDialog):
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 
-        self.comment_field = QtWidgets.QTextEdit()
+        self.comment_field = gui_utils.no_return_textEdit()
         self.comment_field.setText(self.old_comment)
+        self.comment_field.moveCursor(QtGui.QTextCursor.End)
         self.frame_layout.addWidget(self.comment_field)
 
         self.accept_button = QtWidgets.QPushButton('Comment')
@@ -89,3 +91,4 @@ class comment_widget(QtWidgets.QDialog):
         self.accept_button.clicked.connect(self.confirm)
         self.close_pushButton.clicked.connect(self.reject)
         self.comment_field.textChanged.connect(self.propose_tags)
+        self.comment_field.apply_signal.connect(self.confirm)

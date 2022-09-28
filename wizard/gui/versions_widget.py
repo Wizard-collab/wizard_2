@@ -275,7 +275,7 @@ class versions_widget(QtWidgets.QWidget):
         self.folder_button.clicked.connect(self.open_folder)
         self.toggle_view_button.clicked.connect(self.toggle_view)
         self.launch_button.clicked.connect(self.launch)
-        self.comment_button.clicked.connect(self.modify_comment)
+        self.comment_button.clicked.connect(lambda:self.modify_comment(pos=None))
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
@@ -522,7 +522,8 @@ class versions_widget(QtWidgets.QWidget):
         paste_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard')
         paste_and_mirror_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard and mirror references')
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        pos = QtGui.QCursor().pos()
+        action = menu.exec_(pos)
         if action is not None:
             if action == folder_action:
                 self.open_folder()
@@ -535,7 +536,7 @@ class versions_widget(QtWidgets.QWidget):
             elif action == launch_action:
                 self.launch()
             elif action == comment_action:
-                self.modify_comment()
+                self.modify_comment(pos)
             elif action == merge_action:
                 self.open_files()
             elif action == batch_action:
@@ -547,14 +548,14 @@ class versions_widget(QtWidgets.QWidget):
             elif action == paste_and_mirror_action:
                 self.paste_work_version_and_mirror_references()
 
-    def modify_comment(self):
+    def modify_comment(self, pos=None):
         items = self.get_selection()
         if items is not None:
             if len(items) > 0:
                 old_comment = ''
                 if len(items) == 1:
                     old_comment = items[0].version_row['comment']
-                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment)
+                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment, pos=pos)
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
                     comment = self.comment_widget.comment
                     for item in items:
