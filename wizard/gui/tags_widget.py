@@ -19,12 +19,20 @@ logger = logging.getLogger(__name__)
 
 class tags_widget(gui_utils.QMenu):
 
-    returned_user = pyqtSignal(str)
+    other_key_pressed = pyqtSignal(object)
 
     def __init__(self, pos, parent=None):
         super(tags_widget, self).__init__(parent)
         self.pos = pos
         self.add_users()
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Up or key == QtCore.Qt.Key_Down or key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter:
+            super().keyPressEvent(event)
+        else:
+            self.other_key_pressed.emit(event)
+            self.close() 
 
     def showEvent(self, event):
         self.move_ui()

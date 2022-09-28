@@ -81,6 +81,7 @@ class comment_widget(QtWidgets.QDialog):
             position_rect = self.comment_field.cursorRect()
             pos = self.comment_field.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
             self.tags_widget = tags_widget.tags_widget(pos)
+            self.tags_widget.other_key_pressed.connect(self.comment_field.keyPressEvent)
             action = self.tags_widget.exec_()
             if action is not None:
                 self.comment_field.insertHtml(f"<strong>{action.text()}</strong> ")
