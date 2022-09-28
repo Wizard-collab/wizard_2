@@ -183,14 +183,13 @@ class popup_save_widget(QtWidgets.QFrame):
 
     def propose_tags(self):
         text = self.comment_textEdit.toPlainText()
-        if text.endswith('@'):
-            position_rect = self.comment_textEdit.cursorRect()
-            pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
-            self.tags_widget = tags_widget.tags_widget(pos)
-            self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
-            action = self.tags_widget.exec_()
-            if action is not None:
-                self.comment_textEdit.insertHtml(f"<strong>{action.text()}</strong> ")
+        position_rect = self.comment_textEdit.cursorRect()
+        pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+        self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
+        self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
+        self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
+        self.tags_widget.exec()
+        self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -330,14 +329,13 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def propose_tags(self):
         text = self.comment_textEdit.toPlainText()
-        if text.endswith('@'):
-            position_rect = self.comment_textEdit.cursorRect()
-            pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
-            self.tags_widget = tags_widget.tags_widget(pos)
-            self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
-            action = self.tags_widget.exec_()
-            if action is not None:
-                self.comment_textEdit.insertHtml(f"<strong>{action.text()}</strong> ")
+        position_rect = self.comment_textEdit.cursorRect()
+        pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+        self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
+        self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
+        self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
+        self.tags_widget.exec()
+        self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()

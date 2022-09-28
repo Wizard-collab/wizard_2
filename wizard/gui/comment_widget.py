@@ -77,14 +77,13 @@ class comment_widget(QtWidgets.QDialog):
 
     def propose_tags(self):
         text = self.comment_field.toPlainText()
-        if text.endswith('@'):
-            position_rect = self.comment_field.cursorRect()
-            pos = self.comment_field.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
-            self.tags_widget = tags_widget.tags_widget(pos)
-            self.tags_widget.other_key_pressed.connect(self.comment_field.keyPressEvent)
-            action = self.tags_widget.exec_()
-            if action is not None:
-                self.comment_field.insertHtml(f"<strong>{action.text()}</strong> ")
+        position_rect = self.comment_field.cursorRect()
+        pos = self.comment_field.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+        self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
+        self.tags_widget.other_key_pressed.connect(self.comment_field.keyPressEvent)
+        self.tags_widget.returned_text.connect(self.comment_field.setText)
+        self.tags_widget.exec()
+        self.comment_field.moveCursor(QtGui.QTextCursor.End)
 
     def connect_functions(self):
         self.accept_button.clicked.connect(self.confirm)

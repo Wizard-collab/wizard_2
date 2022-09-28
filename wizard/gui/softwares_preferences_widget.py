@@ -81,9 +81,13 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.batch_path_lineEdit.setPlaceholderText('Software batch executable path')
         self.main_layout.addWidget(self.batch_path_lineEdit)
 
+        self.main_layout.addWidget(QtWidgets.QLabel("Additionnal scripts path"))
+
         self.custom_script_paths_textEdit = QtWidgets.QTextEdit()
         self.custom_script_paths_textEdit.setPlaceholderText('path/to/my/scripts')
         self.main_layout.addWidget(self.custom_script_paths_textEdit)
+
+        self.main_layout.addWidget(QtWidgets.QLabel("Additionnal environment"))
 
         self.custom_env_textEdit = QtWidgets.QTextEdit()
         self.custom_env_textEdit.setPlaceholderText('PYTHONPATH=path/to/my/scripts')
@@ -137,7 +141,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
                 software_row = project.get_software_data_by_name(software)
                 self.path_lineEdit.setText(software_row['path'])
                 self.batch_path_lineEdit.setText(software_row['batch_path'])
-                self.custom_script_paths_textEdit.setText(software_row['additionnal_scripts'])
+                self.custom_script_paths_textEdit.setText(self.load_additionnal_scripts(software_row['additionnal_scripts']))
                 self.custom_env_textEdit.setText(self.load_additionnal_env(software_row['additionnal_env']))
 
     def apply(self):
@@ -149,7 +153,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
             project.set_software_path(software_row['id'], path)
         if batch_path != software_row['batch_path']:
             project.set_software_batch_path(software_row['id'], batch_path)
-        additionnal_scripts = self.custom_script_paths_textEdit.toPlainText()
+        additionnal_scripts = self.custom_script_paths_textEdit.toPlainText().split('\n')
         if additionnal_scripts != software_row['additionnal_scripts']:
             project.set_software_additionnal_scripts(software_row['id'], additionnal_scripts)
         additionnal_env = self.custom_env_textEdit.toPlainText()
@@ -173,3 +177,12 @@ class softwares_preferences_widget(QtWidgets.QWidget):
 	        for key in dic.keys():
 	            text += f"{key}={dic[key]}\n"
         return text
+
+    def load_additionnal_scripts(self, additionnal_scripts):
+        text = ""
+        if additionnal_scripts is not None and additionnal_scripts != '':
+            scripts_list = json.loads(additionnal_scripts)
+            for script in scripts_list:
+                text += script + '\n'
+        return text
+
