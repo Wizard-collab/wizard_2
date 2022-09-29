@@ -52,6 +52,7 @@ from wizard.core import assets
 from wizard.core import user
 from wizard.core import project
 from wizard.core import path_utils
+from wizard.core import video
 from wizard.vars import user_vars
 logger = logging.getLogger(__name__)
 
@@ -129,8 +130,10 @@ class communicate_server(Thread):
             returned = get_local_path()
         elif signal_dic['function'] == 'get_project_path':
             returned = get_project_path()
-        elif signal_dic['function'] == 'get_video_folder':
-            returned = get_video_folder(signal_dic['version_id'])
+        elif signal_dic['function'] == 'request_video':
+            returned = request_video(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'add_video':
+            returned = add_video(signal_dic['work_env_id'], signal_dic['temp_dir'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -142,10 +145,6 @@ def get_string_variant_from_work_env_id(work_env_id):
 def get_file(version_id):
     version_path = project.get_version_data(version_id, 'file_path')
     return version_path
-
-def get_video_folder(version_id):
-    playblast_folder = assets.get_video_folder(version_id)
-    return playblast_folder
 
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 
@@ -168,6 +167,14 @@ def request_export(work_env_id, export_name):
 def get_export_format(work_env_id):
     extension = assets.get_default_extension(work_env_id)
     return extension
+
+def request_video(work_env_id):
+    return video.request_video(work_env_id)
+
+def add_video(work_env_id, temp_dir):
+    video_path = video.add_video(work_env_id, temp_dir)
+    gui_server.refresh_team_ui()
+    return video_path
 
 def request_render(version_id, export_name):
     # Just return a temporary file name using the 'assets' module

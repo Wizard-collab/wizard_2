@@ -1078,6 +1078,19 @@ def modify_export_version_comment(export_version_id, comment):
         logger.warning("You did not created this file, modification forbidden")
     return success
 
+def modify_video_comment(video_id, comment):
+    success = None
+    if environment.get_user() == get_video_data(video_id, 'creation_user'):
+        success = db_utils.update_data('project',
+            'videos',
+            ('comment', comment),
+            ('id', video_id))
+        if success:
+            logger.info('Video comment modified')
+    else:
+        logger.warning("You did not created this file, modification forbidden")
+    return success
+
 def add_work_env(name, software_id, variant_id, export_extension=None):
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'work_envs',
@@ -1269,6 +1282,8 @@ def remove_work_env(work_env_id):
             remove_reference(reference_id)
         for referenced_group_id in get_referenced_groups(work_env_id, 'id'):
             remove_referenced_group(referenced_group_id)
+        for video_id in get_videos(work_env_id, 'id'):
+            remove_video(video_id)
         success = db_utils.delete_row('project', 'work_envs', work_env_id)
         if success:
             logger.info("Work env removed from project")
@@ -1312,6 +1327,13 @@ def get_last_work_version(work_env_id, column='*'):
                                                         ('work_env_id', work_env_id),
                                                         column)
     return versions_rows
+
+def get_last_video_version(work_env_id, column='*'):
+    videos_rows = db_utils.get_last_row_by_column_data('project',
+                                                        'videos',
+                                                        ('work_env_id', work_env_id),
+                                                        column)
+    return videos_rows
 
 def get_work_env_data(work_env_id, column='*'):
     work_env_rows = db_utils.get_row_by_column_data('project',
@@ -1509,6 +1531,61 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
 
     return version_id
 
+def add_video(name, file_path, work_env_id, comment='', thumbnail_path=None):
+
+    video_id = None
+    
+    if not (db_utils.check_existence_by_multiple_data('project', 
+                                    'videos',
+                                    ('name', 'work_env_id'),
+                                    (name, work_env_id))):
+
+        work_env_row = get_work_env_data(work_env_id)
+        variant_row = get_variant_data(work_env_row['variant_id'])
+        stage_row = get_stage_data(variant_row['stage_id'])
+        asset_row = get_asset_data(stage_row['asset_id'])
+        category_row = get_category_data(asset_row['category_id'])
+        domain_name = get_domain_data(category_row['domain_id'], 'name')
+
+        video_id = db_utils.create_row('project',
+                            'videos', 
+                            ('name',
+                                'creation_time',
+                                'creation_user',
+                                'comment',
+                                'file_path',
+                                'thumbnail_path',
+                                'work_env_id'),
+                            (name,
+                                time.time(),
+                                environment.get_user(),
+                                comment,
+                                file_path,
+                                thumbnail_path,
+                                work_env_id))
+        if video_id:
+            '''
+            tags.analyse_comment(comment, 'video', video_id)
+            '''
+            logger.info(f"Video {name} added to project")
+    else:
+        logger.warning(f"Video {name} already exists")
+
+    return video_id
+
+
+def get_video_data(video_id, column='*'):
+    videos_rows = db_utils.get_row_by_column_data('project',
+                                                        'videos',
+                                                        ('id', video_id),
+                                                        column)
+    if videos_rows and len(videos_rows) >= 1:
+        return videos_rows[0]
+    else:
+        logger.error("Video not found")
+        return None
+
+
 def get_work_version_data_by_string(string, column='*'):
     work_version_rows = db_utils.get_row_by_column_data('project',
                                                         'versions',
@@ -1521,12 +1598,12 @@ def get_work_version_data_by_string(string, column='*'):
         return None
 
 def get_version_data(version_id, column='*'):
-    work_envs_rows = db_utils.get_row_by_column_data('project',
+    work_version_rows = db_utils.get_row_by_column_data('project',
                                                         'versions',
                                                         ('id', version_id),
                                                         column)
-    if work_envs_rows and len(work_envs_rows) >= 1:
-        return work_envs_rows[0]
+    if work_version_rows and len(work_version_rows) >= 1:
+        return work_version_rows[0]
     else:
         logger.error("Version not found")
         return None
@@ -2174,12 +2251,25 @@ def remove_referenced_group(referenced_group_id):
         logger.info(f"Referenced group removed from project")
     return success
 
+def remove_video(video_id):
+    success = db_utils.delete_row('project', 'videos', video_id)
+    if success:
+        logger.info(f"Video removed from project")
+    return success
+
 def get_referenced_groups(work_env_id, column='*'):
     referenced_groups_rows = db_utils.get_row_by_column_data('project',
                                                         'referenced_groups_data',
                                                         ('work_env_id', work_env_id),
                                                         column)
     return referenced_groups_rows
+
+def get_videos(work_env_id, column='*'):
+    videos_rows = db_utils.get_row_by_column_data('project',
+                                                        'videos',
+                                                        ('work_env_id', work_env_id),
+                                                        column)
+    return videos_rows
 
 def get_referenced_groups_by_group_id(group_id, column='*'):
     referenced_groups_rows = db_utils.get_row_by_column_data('project',
@@ -2389,6 +2479,7 @@ def init_project(project_path, project_name):
             create_referenced_groups_table(project_name)
             create_grouped_references_table(project_name)
             create_progress_events_table(project_name)
+            create_videos_table(project_name)
             return project_name
     else:
         logger.warning(f"Database {project_name} already exists")
@@ -2611,6 +2702,21 @@ def create_versions_table(database):
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Versions table created")
+
+def create_videos_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS videos (
+                                        id serial PRIMARY KEY,
+                                        name text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        creation_user text NOT NULL,
+                                        comment text,
+                                        file_path text NOT NULL,
+                                        thumbnail_path text,
+                                        work_env_id integer NOT NULL,
+                                        FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Videos table created")
 
 def create_export_versions_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS export_versions (

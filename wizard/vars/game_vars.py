@@ -29,7 +29,9 @@
 _creation_xp_ = 2
 
 _save_xp_ = 1
+_video_xp_ = 3
 _export_xp_ = 3
 
 _save_penalty_ = 2
+_video_penalty_ = 4
 _export_penalty_ = 10

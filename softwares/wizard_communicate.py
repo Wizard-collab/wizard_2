@@ -47,6 +47,21 @@ def request_export(work_env_id, export_name):
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return file_path
 
+def request_video(work_env_id):
+    signal_dic=dict()
+    signal_dic['function'] = 'request_video'
+    signal_dic['work_env_id'] = work_env_id
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+
+def add_video(work_env_id, temp_dir):
+    signal_dic=dict()
+    signal_dic['function'] = 'add_video'
+    signal_dic['work_env_id'] = work_env_id
+    signal_dic['temp_dir'] = temp_dir
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+
 def get_export_format(work_env_id):
     # Get a temporary export dir and file from wizard
     signal_dic=dict()
@@ -129,13 +144,6 @@ def create_or_get_camera_work_env(work_env_id):
 def get_file(version_id):
     signal_dic=dict()
     signal_dic['function'] = 'get_file'
-    signal_dic['version_id'] = version_id
-    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
-    return returned
-
-def get_video_folder(version_id):
-    signal_dic=dict()
-    signal_dic['function'] = 'get_video_folder'
     signal_dic['version_id'] = version_id
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
