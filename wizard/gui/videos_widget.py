@@ -137,6 +137,8 @@ class videos_widget(QtWidgets.QWidget):
                 for video_id in video_list_ids:
                     if video_id not in project_videos_id:
                         self.remove_tree_video(video_id)
+                if len(self.video_list_ids.keys()) == 0:
+                    self.show_info_mode("No video found\nCreate videos within softwares !", ressources._no_video_info_image_)
                 self.check_existence_thread.update_videos_rows(self.videos_rows)
             elif self.variant_id is None:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
@@ -159,6 +161,8 @@ class videos_widget(QtWidgets.QWidget):
                 for video_id in video_icon_ids:
                     if video_id not in project_videos_id:
                         self.remove_icon_video(video_id)
+                if len(self.video_icon_ids.keys()) == 0:
+                    self.show_info_mode("No video found\nCreate videos within softwares !", ressources._no_video_info_image_)
                 self.check_existence_thread.update_videos_rows(self.videos_rows)
             elif self.variant_id is None:
                 self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)

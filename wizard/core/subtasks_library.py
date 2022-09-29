@@ -53,6 +53,20 @@ def batch_export(version_id, settings_dic=None):
 	task.start()
 	logger.info('Export started as subtask, open the subtask manager to get more informations')
 
+def batch_video(version_id, settings_dic=None):
+	asset_string = assets.instance_to_string(('work_version', version_id))
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import launch_batch\n"
+	command += "from wizard.core import team_client\n"
+	command += "from wizard.core import environment\n"
+	command += f"print('wizard_task_name:Creating video for {asset_string}')\n"
+	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+	command += "team_client.refresh_team(environment.get_team_dns())\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=False)
+	task.start()
+	logger.info('Video creation started as subtask, open the subtask manager to get more informations')
+
 def deadline_batch_export(version_id, settings_dic=None):
 	asset_string = assets.instance_to_string(('work_version', version_id))
 	command =  "# coding: utf-8\n"

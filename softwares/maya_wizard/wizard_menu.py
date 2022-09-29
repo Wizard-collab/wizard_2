@@ -97,5 +97,5 @@ class menu():
 
         pm.menuItem(divider=True, parent=mainMenu)
 
-        pm.menuItem(l='Create video', c=wizard_video.create_video, i='icons/video.png', parent=mainMenu)
+        pm.menuItem(l='Create video', c=wizard_video.invoke_settings_widget, i='icons/video.png', parent=mainMenu)
 

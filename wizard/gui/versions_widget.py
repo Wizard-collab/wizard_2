@@ -30,6 +30,7 @@ from wizard.gui import confirm_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
+from wizard.gui import video_settings_widget
 
 logger = logging.getLogger(__name__)
 
@@ -270,6 +271,7 @@ class versions_widget(QtWidgets.QWidget):
         self.manual_merge_button.clicked.connect(self.open_files)
         self.batch_button.clicked.connect(self.batch_export)
         self.batch_camera_button.clicked.connect(self.batch_export_camera)
+        self.batch_video_button.clicked.connect(self.batch_video)
         self.duplicate_button.clicked.connect(self.duplicate_version)
         self.new_version_button.clicked.connect(self.add_empty_version)
         self.folder_button.clicked.connect(self.open_folder)
@@ -300,6 +302,7 @@ class versions_widget(QtWidgets.QWidget):
             if self.batch_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
                 
                 settings_dic = dict()
+                settings_dic['batch_type'] = 'export'
                 settings_dic['frange'] = self.batch_settings_widget.frange
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
@@ -332,6 +335,7 @@ class versions_widget(QtWidgets.QWidget):
             self.batch_settings_widget = batch_settings_widget.batch_settings_widget(self.work_env_id, 'camera')
             if self.batch_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
                 settings_dic = dict()
+                settings_dic['batch_type'] = 'export'
                 settings_dic['frange'] = self.batch_settings_widget.frange
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
@@ -341,6 +345,29 @@ class versions_widget(QtWidgets.QWidget):
                     subtasks_library.deadline_batch_export(version_id, settings_dic)
                 else:
                     subtasks_library.batch_export(version_id, settings_dic)
+
+    def batch_video(self):
+        selection = self.get_selection()
+        version_id = None
+        if len(selection) == 1:
+            version_id = selection[0].version_row['id']
+        elif len(selection) == 0:
+            last_version_id = project.get_last_work_version(self.work_env_id, 'id')
+            if last_version_id:
+                version_id = last_version_id[0]
+        if version_id:
+            domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
+            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
+            self.video_settings_widget = video_settings_widget.video_settings_widget(self.work_env_id)
+            if self.video_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
+                
+                settings_dic = dict()
+                settings_dic['batch_type'] = 'video'
+                settings_dic['frange'] = self.video_settings_widget.frange
+                settings_dic['nspace_list'] = []
+                settings_dic['refresh_assets'] = self.video_settings_widget.refresh_assets
+
+                subtasks_library.batch_video(version_id, settings_dic)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -453,6 +480,13 @@ class versions_widget(QtWidgets.QWidget):
         self.batch_camera_button.setIcon(QtGui.QIcon(ressources._tool_batch_camera_))
         self.buttons_layout.addWidget(self.batch_camera_button)
 
+        self.batch_video_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.batch_camera_button, "Batch video")
+        self.batch_video_button.setFixedSize(35,35)
+        self.batch_video_button.setIconSize(QtCore.QSize(25,25))
+        self.batch_video_button.setIcon(QtGui.QIcon(ressources._tool_video_))
+        self.buttons_layout.addWidget(self.batch_video_button)
+
         self.comment_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.comment_button, "Modify comment")
         self.comment_button.setFixedSize(35,35)
@@ -509,6 +543,7 @@ class versions_widget(QtWidgets.QWidget):
         archive_action = None
         comment_action = None
         batch_action = None
+        batch_video_action = None
         copy_action = None
         if len(selection)>=1:
             duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate version(s)')
@@ -518,6 +553,7 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch version')
             batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export version')
+            batch_video_action = menu.addAction(QtGui.QIcon(ressources._tool_video_), 'Batch video version')
             copy_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Copy version to clipboard')
         paste_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard')
         paste_and_mirror_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard and mirror references')
@@ -541,6 +577,8 @@ class versions_widget(QtWidgets.QWidget):
                 self.open_files()
             elif action == batch_action:
                 self.batch_export()
+            elif action == batch_video_action:
+                self.batch_video()
             elif action == copy_action:
                 self.copy_version()
             elif action == paste_action:

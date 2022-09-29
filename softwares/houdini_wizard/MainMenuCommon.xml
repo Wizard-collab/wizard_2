@@ -147,7 +147,14 @@ wizard_plugin.set_frame_range(rolls=1)]]>
         </scriptCode>
       </scriptItem>
 
+      <separatorItem/>
 
+      <scriptItem>
+        <label>Create video</label>
+         <scriptCode><![CDATA[from houdini_wizard import wizard_video
+wizard_video.invoke_settings_widget()]]>
+        </scriptCode>
+      </scriptItem>
       
     </subMenu>
   </menuBar>
