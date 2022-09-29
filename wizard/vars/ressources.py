@@ -275,6 +275,7 @@ _available_icons_list_.append(_update_icon_)
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')
 _exports_icon_ = path_utils.join(_icons_path_, 'export_icon.svg')
+_videos_icon_ = path_utils.join(_icons_path_, 'video_icon.svg')
 
 # Lock icons
 _lock_icons_ = dict()

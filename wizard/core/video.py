@@ -41,11 +41,11 @@ from wizard.core import image
 
 logger = logging.getLogger(__name__)
 
-def add_video(work_env_id, images_directory, comment=''):
+def add_video(variant_id, images_directory, comment=''):
     temp_video_file, to_thumbnail = merge_video(images_directory)
     if not temp_video_file:
         return
-    video_id = assets.add_video(work_env_id)
+    video_id = assets.add_video(variant_id)
     video_row = project.get_video_data(video_id)
     video_path = video_row['file_path']
     thumbnail_path = video_row['thumbnail_path']
@@ -54,12 +54,12 @@ def add_video(work_env_id, images_directory, comment=''):
     image.resize_preview(to_thumbnail, thumbnail_path)
     if path_utils.isfile(video_path):
         path_utils.rmtree(images_directory)
-    print('lol')
     return video_path
 
-def request_video(work_env_id):
-    temp_video_dir = assets.get_temp_video_path(work_env_id)
+def request_video(variant_id):
+    temp_video_dir = assets.get_temp_video_path(variant_id)
     path_utils.makedirs(temp_video_dir)
+    logger.info(f"Temporary directory created : {temp_video_dir}, if something goes wrong in the video process please go there to find your temporary video file")
     return temp_video_dir
 
 def merge_video(images_directory):

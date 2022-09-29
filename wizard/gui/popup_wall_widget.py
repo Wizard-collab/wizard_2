@@ -314,7 +314,7 @@ class popup_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
         elif self.event_row['type'] == 'video':
-            profile_color = '#cb5cf0'
+            profile_color = '#B988F3'
             if self.event_row['creation_user'] == environment.get_user():
                 self.comment_widget.setVisible(True)
                 self.is_comment = True
@@ -364,9 +364,9 @@ class popup_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'export':
             export_version_id = json.loads(self.event_row['data'])
             gui_server.focus_export_version(export_version_id)
-        #elif self.event_row['type'] == 'video':
-        #    video_id = json.loads(self.event_row['data'])
-        #    gui_server.focus_video(video_id)
+        elif self.event_row['type'] == 'video':
+            video_id = json.loads(self.event_row['data'])
+            gui_server.focus_video(video_id)
         elif self.event_row['type'] == 'tag':
             data = json.loads(self.event_row['data'])
             instance_type = data['instance'][0]
@@ -376,9 +376,9 @@ class popup_event_widget(QtWidgets.QFrame):
             if instance_type == 'work_version':
                 work_version_id = data['instance'][1]
                 gui_server.focus_work_version(work_version_id)
-            #if instance_type == 'video':
-            #    video_id = data['instance'][1]
-            #    gui_server.focus_video(video_id)
+            if instance_type == 'video':
+                video_id = data['instance'][1]
+                gui_server.focus_video(video_id)
             else:
                 gui_server.focus_instance(data['instance'])
 

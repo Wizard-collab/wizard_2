@@ -621,6 +621,8 @@ def remove_variant(variant_id):
             remove_export(export_id)
         for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
             remove_work_env(work_env_id)
+        for video_id in get_videos(variant_id, 'id'):
+            remove_video(video_id)
         for stage_id in db_utils.get_row_by_column_data('project', 
                                                         'stages', 
                                                         ('default_variant_id', variant_id), 
@@ -1282,8 +1284,6 @@ def remove_work_env(work_env_id):
             remove_reference(reference_id)
         for referenced_group_id in get_referenced_groups(work_env_id, 'id'):
             remove_referenced_group(referenced_group_id)
-        for video_id in get_videos(work_env_id, 'id'):
-            remove_video(video_id)
         success = db_utils.delete_row('project', 'work_envs', work_env_id)
         if success:
             logger.info("Work env removed from project")
@@ -1328,10 +1328,10 @@ def get_last_work_version(work_env_id, column='*'):
                                                         column)
     return versions_rows
 
-def get_last_video_version(work_env_id, column='*'):
+def get_last_video_version(variant_id, column='*'):
     videos_rows = db_utils.get_last_row_by_column_data('project',
                                                         'videos',
-                                                        ('work_env_id', work_env_id),
+                                                        ('variant_id', variant_id),
                                                         column)
     return videos_rows
 
@@ -1531,17 +1531,16 @@ def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, 
 
     return version_id
 
-def add_video(name, file_path, work_env_id, comment='', thumbnail_path=None):
+def add_video(name, file_path, variant_id, comment='', thumbnail_path=None):
 
     video_id = None
     
     if not (db_utils.check_existence_by_multiple_data('project', 
                                     'videos',
-                                    ('name', 'work_env_id'),
-                                    (name, work_env_id))):
+                                    ('name', 'variant_id'),
+                                    (name, variant_id))):
 
-        work_env_row = get_work_env_data(work_env_id)
-        variant_row = get_variant_data(work_env_row['variant_id'])
+        variant_row = get_variant_data(variant_id)
         stage_row = get_stage_data(variant_row['stage_id'])
         asset_row = get_asset_data(stage_row['asset_id'])
         category_row = get_category_data(asset_row['category_id'])
@@ -1555,14 +1554,14 @@ def add_video(name, file_path, work_env_id, comment='', thumbnail_path=None):
                                 'comment',
                                 'file_path',
                                 'thumbnail_path',
-                                'work_env_id'),
+                                'variant_id'),
                             (name,
                                 time.time(),
                                 environment.get_user(),
                                 comment,
                                 file_path,
                                 thumbnail_path,
-                                work_env_id))
+                                variant_id))
         if video_id:
             '''
             tags.analyse_comment(comment, 'video', video_id)
@@ -2264,10 +2263,10 @@ def get_referenced_groups(work_env_id, column='*'):
                                                         column)
     return referenced_groups_rows
 
-def get_videos(work_env_id, column='*'):
+def get_videos(variant_id, column='*'):
     videos_rows = db_utils.get_row_by_column_data('project',
                                                         'videos',
-                                                        ('work_env_id', work_env_id),
+                                                        ('variant_id', variant_id),
                                                         column)
     return videos_rows
 
@@ -2712,8 +2711,8 @@ def create_videos_table(database):
                                         comment text,
                                         file_path text NOT NULL,
                                         thumbnail_path text,
-                                        work_env_id integer NOT NULL,
-                                        FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
+                                        variant_id integer NOT NULL,
+                                        FOREIGN KEY (variant_id) REFERENCES variants (id)
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Videos table created")

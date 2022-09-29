@@ -168,10 +168,14 @@ class user:
             return None
 
     def add_context(self, type, context_dic):
+        if type not in self.prefs_dic.keys():
+            self.prefs_dic[type] = dict()
         self.prefs_dic[type][environment.get_project_name()] = context_dic
         self.write_prefs_dic()
 
     def get_context(self, type):
+        if type not in self.prefs_dic.keys():
+            return None
         if environment.get_project_name() in self.prefs_dic[type].keys():
             return self.prefs_dic[type][environment.get_project_name()]
         else:
@@ -268,6 +272,7 @@ class user:
             self.prefs_dic[user_vars._tree_context_] = dict()
             self.prefs_dic[user_vars._tabs_context_] = dict()
             self.prefs_dic[user_vars._versions_context_] = dict()
+            self.prefs_dic[user_vars._videos_context_] = dict()
             self.prefs_dic[user_vars._wall_context_] = dict()
             self.prefs_dic[user_vars._asset_tracking_context_] = dict()
             self.prefs_dic[user_vars._console_context_] = dict()

@@ -83,6 +83,24 @@ def archive_versions(version_ids):
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
 
+def archive_videos(videos_ids):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import assets\n"
+	command += "from wizard.gui import gui_server\n"
+	command += "print('wizard_task_name:Video archiving')\n"
+	command += f"percent_step=100.0/len({videos_ids})\n"
+	command += "percent=0.0\n"
+	command += "print(f'wizard_task_percent:{percent}')\n"
+	command += f"for video_id in {videos_ids}:\n"
+	command += "	assets.archive_video(video_id)\n"
+	command += "	percent+=percent_step\n"
+	command += "	print(f'wizard_task_percent:{percent}')\n"
+	command += "gui_server.refresh_team_ui()\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=False)
+	task.start()
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+
 def archive_export_versions(export_version_ids):
 	command =  "# coding: utf-8\n"
 	command += "from wizard.core import assets\n"

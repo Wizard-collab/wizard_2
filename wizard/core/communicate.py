@@ -169,10 +169,12 @@ def get_export_format(work_env_id):
     return extension
 
 def request_video(work_env_id):
-    return video.request_video(work_env_id)
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    return video.request_video(variant_id)
 
 def add_video(work_env_id, temp_dir):
-    video_path = video.add_video(work_env_id, temp_dir)
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    video_path = video.add_video(variant_id, temp_dir)
     gui_server.refresh_team_ui()
     return video_path
 
