@@ -129,6 +129,8 @@ class communicate_server(Thread):
             returned = get_local_path()
         elif signal_dic['function'] == 'get_project_path':
             returned = get_project_path()
+        elif signal_dic['function'] == 'get_video_folder':
+            returned = get_video_folder(signal_dic['version_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -140,6 +142,10 @@ def get_string_variant_from_work_env_id(work_env_id):
 def get_file(version_id):
     version_path = project.get_version_data(version_id, 'file_path')
     return version_path
+
+def get_video_folder(version_id):
+    playblast_folder = assets.get_video_folder(version_id)
+    return playblast_folder
 
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 

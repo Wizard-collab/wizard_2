@@ -888,6 +888,14 @@ def archive_version(version_id):
     else:
         return None
 
+def get_video_folder(version_id):
+    version_row = project.get_version_data(version_id)
+    work_env_path = get_work_env_path(version_row['work_env_id'])
+    playblast_folder = path_utils.join(work_env_path, 'video')
+    if not path_utils.isdir(playblast_folder):
+        path_utils.mkdir(playblast_folder)
+    return playblast_folder
+
 def create_group(name, color='#798fe8'):
     if tools.is_safe(name):
         return project.create_group(name, color)

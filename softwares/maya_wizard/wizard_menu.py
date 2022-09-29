@@ -10,6 +10,7 @@ import pymel.core as pm
 
 # Wizard modules
 from maya_wizard import wizard_plugin
+from maya_wizard import quick_playblast
 
 class menu():
     def __init__(self):
@@ -28,7 +29,7 @@ class menu():
         if stage_name in camera_export_stage_names:
             pm.menuItem(l='Export camera', c=wizard_plugin.export_camera, i='icons/export.png')
         
-        pm.menuItem( divider=True )
+        pm.menuItem(divider=True)
         
         pm.menuItem(l='Import and update all', c=wizard_plugin.reference_and_update_all, i='icons/all.png', parent=mainMenu)
 
@@ -93,3 +94,8 @@ class menu():
         pm.menuItem(l='Set image size', c=wizard_plugin.set_image_format, i='icons/set_image_size.png', parent=mainMenu)
         pm.menuItem(l='Set frame range', c=wizard_plugin.set_frame_range, i='icons/set_frame_range.png', parent=mainMenu)
         pm.menuItem(l='Set frame range with rolls', c=wizard_plugin.set_frame_range_with_rolls, i='icons/set_frame_range.png', parent=mainMenu)
+
+        pm.menuItem(divider=True, parent=mainMenu)
+
+        pm.menuItem(l='Quick playblast', c=quick_playblast.quick_playblast, i='icons/video.png', parent=mainMenu)
+
