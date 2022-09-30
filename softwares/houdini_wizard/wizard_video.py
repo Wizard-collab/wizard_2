@@ -47,21 +47,32 @@ def publish_video_script(directory):
     command += f"""wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), "{directory}")"""
     return command
 
+def progress_script(frange):
+    command = "import hou\n"
+    command+= "frame=hou.frame()\n"
+    command+= f"inframe={frange[0]}\n"
+    command+= f"outframe={frange[0]}\n"
+    command+= "percent=(frame-inframe)/(outframe-inframe)\n"
+    command+= 'print("wizard_task_percent:{}".format(percent))\n'
+    return command
+
 def flipbook(directory, frange, camera):
     image_format = wizard_communicate.get_image_format()
     file = os.path.join(directory, "tmp_flipbook.$F4.png")
     opengl_node = create_rop_network()
     logger.info(f"Creating video trough {camera}")
+
+    hou.playbar.setFrameRange(frange[0], frange[1])
     opengl_node.parm('camera').set(camera)
     opengl_node.parm('trange').set("normal")
     opengl_node.parm('f1').set(frange[0])
     opengl_node.parm('f2').set(frange[1])
     opengl_node.parm('scenepath').set('/obj')
     opengl_node.parm('picture').set(file)
-
+    opengl_node.parm('lpostframe').set("python")
+    opengl_node.parm('postframe').set(wizard_tools.by_frame_progress_script())
     opengl_node.parm('lpostrender').set("python")
     opengl_node.parm('postrender').set(publish_video_script(directory))
-
     opengl_node.parm('execute').pressButton()
 
 def get_default_camera():
