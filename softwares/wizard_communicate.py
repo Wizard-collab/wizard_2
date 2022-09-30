@@ -54,11 +54,13 @@ def request_video(work_env_id):
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
 
-def add_video(work_env_id, temp_dir):
+def add_video(work_env_id, temp_dir, frange, version_id):
     signal_dic=dict()
     signal_dic['function'] = 'add_video'
     signal_dic['work_env_id'] = work_env_id
     signal_dic['temp_dir'] = temp_dir
+    signal_dic['frange'] = frange
+    signal_dic['version_id'] = version_id
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
 

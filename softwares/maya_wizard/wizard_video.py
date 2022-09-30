@@ -38,7 +38,7 @@ def create_video(frange):
     directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
     logger.info("Playblasting at {}...".format(directory))
     playblast(directory, frange)
-    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory)
+    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']))
 
 def playblast(directory, frange):
     image_format = wizard_communicate.get_image_format()

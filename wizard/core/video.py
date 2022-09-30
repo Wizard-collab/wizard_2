@@ -32,17 +32,19 @@ import logging
 import cv2
 import numpy as np
 import shutil
+from PIL import Image, ImageCms, ImageFont, ImageDraw
 
 # Wizard modules
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import path_utils
+from wizard.core import environment
 from wizard.core import image
 
 logger = logging.getLogger(__name__)
 
-def add_video(variant_id, images_directory, comment=''):
-    temp_video_file, to_thumbnail = merge_video(images_directory)
+def add_video(variant_id, images_directory, frange, version_id, comment=''):
+    temp_video_file, to_thumbnail = merge_video(images_directory, frange, version_id)
     if not temp_video_file:
         return
     video_id = assets.add_video(variant_id)
@@ -62,7 +64,7 @@ def request_video(variant_id):
     logger.info(f"Temporary directory created : {temp_video_dir}, if something goes wrong in the video process please go there to find your temporary video file")
     return temp_video_dir
 
-def merge_video(images_directory):
+def merge_video(images_directory, frange, version_id):
     temp_video_file = path_utils.join(images_directory, "temp.mp4")
 
     files_list = []
@@ -75,14 +77,9 @@ def merge_video(images_directory):
     if files_list == []:
         logger.warning(f"{images_directory} is empty, can't create video.")
         return
-    img_array = []
-    for file in files_list:
-        img = cv2.imread(file)
-        height, width, layers = img.shape
-        size = (width,height)
-        img_array.append(img)
-
+    
     frame_rate = project.get_frame_rate()
+    img_array, size = merge_with_overlay(files_list, frange, frame_rate, version_id)
 
     out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*'MP4V'), frame_rate, size)
     for i in range(len(img_array)):
@@ -93,3 +90,59 @@ def merge_video(images_directory):
 
     if path_utils.isfile(temp_video_file):
         return temp_video_file, to_thumbnail
+
+def merge_with_overlay(files_list, frange, frame_rate, version_id):
+    img_array = []
+    string_asset = project.get_version_data(version_id, 'string')
+    for file in files_list:
+        frame_number = frange[0] + files_list.index(file)
+        pil_img = add_overlay(file, string_asset, frame_number, frange, frame_rate)
+        img = np.asarray(pil_img)
+        height, width, layers = img.shape
+        size = (width,height)
+        img_array.append(img)
+    return img_array, size
+
+def merge_only(files_list):
+    img_array = []
+    for file in files_list:
+        img = cv2.imread(file)
+        height, width, layers = img.shape
+        size = (width,height)
+        img_array.append(img)
+    return img_array, size
+
+def add_overlay(file, string_asset, frame_number, frange, frame_rate):
+    pil_image = Image.open(file)
+    pil_image = pil_image.convert('RGBA')
+
+    bg_image = Image.new('RGBA', pil_image.size, (70,70,70,255))
+
+    over_image = Image.new('RGBA', pil_image.size, (255,255,255,0))
+    draw = ImageDraw.Draw(over_image)
+    # Draw overlay
+    im_width, im_height = pil_image.size
+    margin_percent = int((im_height*1)/100)
+    font_size = int((im_width*1)/100)
+    font = ImageFont.truetype('cour.ttf', font_size)
+    font_width, font_height = font.getsize(string_asset)
+    rectangle_xy = [im_width, im_height, 0, im_height-(margin_percent*2+font_height)]
+    draw.rectangle(rectangle_xy, fill=(0,0,0,120), outline=None)
+    # Draw string asset
+    string_asset_position = ( margin_percent, im_height - (font_height + margin_percent) )
+    draw.text(string_asset_position, string_asset, font = font, fill = "white")
+    # Draw frame text
+    frame_text = f"[{frange[0]}-{frange[1]}] - f{frame_number} - {frame_rate}fps"
+    font_width, font_height = font.getsize(frame_text)
+    frame_text_position = ( im_width/2 - font_width/2, im_height - (font_height + margin_percent) )
+    draw.text(frame_text_position, frame_text, font = font, fill = "white")
+    # Draw user text
+    user_text = environment.get_user()
+    font_width, font_height = font.getsize(user_text)
+    user_text_position = ( im_width - font_width - margin_percent, im_height - (font_height + margin_percent) )
+    draw.text(user_text_position, user_text, font = font, fill = "white")
+
+    out = Image.alpha_composite(bg_image, pil_image)
+    out = Image.alpha_composite(out, over_image)
+    out = out.convert('RGB')
+    return out

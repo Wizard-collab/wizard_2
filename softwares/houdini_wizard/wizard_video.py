@@ -39,12 +39,11 @@ def create_video(frange, camera):
     directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
     logger.info("Flipbooking at {}...".format(directory))
     flipbook(directory, frange, camera)
-    #wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory)
 
-def publish_video_script(directory):
+def publish_video_script(directory, frange):
     command = """import wizard_communicate\n"""
     command += """import os\n"""
-    command += f"""wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), "{directory}")"""
+    command += f"""wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), "{directory}", {frange}, int(os.environ['wizard_version_id']))"""
     return command
 
 def progress_script(frange):
@@ -72,7 +71,7 @@ def flipbook(directory, frange, camera):
     opengl_node.parm('lpostframe').set("python")
     opengl_node.parm('postframe').set(wizard_tools.by_frame_progress_script())
     opengl_node.parm('lpostrender').set("python")
-    opengl_node.parm('postrender').set(publish_video_script(directory))
+    opengl_node.parm('postrender').set(publish_video_script(directory, frange))
     opengl_node.parm('execute').pressButton()
 
 def get_default_camera():

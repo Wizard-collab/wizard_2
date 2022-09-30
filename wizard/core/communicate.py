@@ -133,7 +133,10 @@ class communicate_server(Thread):
         elif signal_dic['function'] == 'request_video':
             returned = request_video(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'add_video':
-            returned = add_video(signal_dic['work_env_id'], signal_dic['temp_dir'])
+            returned = add_video(signal_dic['work_env_id'],
+                                    signal_dic['temp_dir'],
+                                    signal_dic['frange'],
+                                    signal_dic['version_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -172,9 +175,9 @@ def request_video(work_env_id):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     return video.request_video(variant_id)
 
-def add_video(work_env_id, temp_dir):
+def add_video(work_env_id, temp_dir, frange, version_id):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
-    video_path = video.add_video(variant_id, temp_dir)
+    video_path = video.add_video(variant_id, temp_dir, frange, version_id)
     gui_server.refresh_team_ui()
     return video_path
 
