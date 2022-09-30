@@ -481,7 +481,7 @@ class versions_widget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.batch_camera_button)
 
         self.batch_video_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.batch_camera_button, "Batch video")
+        gui_utils.application_tooltip(self.batch_video_button, "Batch video")
         self.batch_video_button.setFixedSize(35,35)
         self.batch_video_button.setIconSize(QtCore.QSize(25,25))
         self.batch_video_button.setIcon(QtGui.QIcon(ressources._tool_video_))
