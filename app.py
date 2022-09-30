@@ -41,6 +41,7 @@ import error_handler
 # Wizard modules
 from wizard.core import application
 from wizard.core import custom_logger
+import version_database_modification
 custom_logger.get_root_logger()
 
 logger = logging.getLogger('wizard')
@@ -68,6 +69,9 @@ class app():
         self.loading_widget = loading_widget.loading_widget()
         self.loading_widget.show()
         QtWidgets.QApplication.processEvents()
+
+        version_database_modification.main()
+
         self.main_widget = main_widget.main_widget()
         self.main_widget.stop_threads.connect(self.db_server.stop)
         self.main_widget.stop_threads.connect(self.stats_schedule.stop)
