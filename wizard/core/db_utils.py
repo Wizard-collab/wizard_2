@@ -198,7 +198,7 @@ def execute_sql(sql, level, as_dict, data=None, fetch=2):
     signal_dic['as_dict'] = as_dict
     signal_dic['data'] = data
     signal_dic['fetch'] = fetch
-    return socket_utils.send_signal(('localhost', environment.get_local_db_server_port()), signal_dic)
+    return socket_utils.send_signal(('localhost', environment.get_local_db_server_port()), signal_dic, timeout=10000)
 
 def modify_db_name(level, db_name):
     signal_dic = dict()

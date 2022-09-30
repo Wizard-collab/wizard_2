@@ -82,8 +82,11 @@ class db_server(threading.Thread):
         self.running = False
 
     def execute_signal(self, signal_as_str):
-            signal_dic = json.loads(signal_as_str)
-            if signal_dic['request'] == 'sql_cmd':
+        signal_dic = json.loads(signal_as_str)
+        rows = None
+        retry_count = 0
+        if signal_dic['request'] == 'sql_cmd':
+            while rows is None:
                 try:
                     if signal_dic['level'] == 'repository':
                         if not self.repository_conn:
@@ -116,26 +119,34 @@ class db_server(threading.Thread):
                                 rows = [r[0] for r in rows]
                         return rows
                     else:
-                       logger.error("No connection")
-                       return None
+                        logger.error("No connection")
+                        self.repository_conn = None
+                        self.project_conn = None
                 except (Exception, psycopg2.DatabaseError) as error:
                     logger.error(error)
+                    self.repository_conn = None
+                    self.project_conn = None
+                if retry_count == 5:
+                    logger.error("Database max retry reached ( 5 ). Can't access database")
+                    time.sleep(0.02)
                     return None
-            elif signal_dic['request'] == 'modify_database_name':
-                if signal_dic['level'] == 'repository':
-                    self.repository = signal_dic['db_name']
-                    if self.repository_conn:
-                        self.repository_conn.close()
-                    self.repository_conn = create_connection(self.repository)
-                else:
-                    self.project_name = signal_dic['db_name']
-                    if self.project_conn:
-                        self.project_conn.close()
-                    self.project_conn = create_connection(self.project_name)
-                return 1
-            elif signal_dic['request'] == 'port':
-                return 1
+                retry_count += 1
+                logger.error(f"Can't reach database, retrying ( {retry_count} )")
 
+        elif signal_dic['request'] == 'modify_database_name':
+            if signal_dic['level'] == 'repository':
+                self.repository = signal_dic['db_name']
+                if self.repository_conn:
+                    self.repository_conn.close()
+                self.repository_conn = create_connection(self.repository)
+            else:
+                self.project_name = signal_dic['db_name']
+                if self.project_conn:
+                    self.project_conn.close()
+                self.project_conn = create_connection(self.project_name)
+            return 1
+        elif signal_dic['request'] == 'port':
+            return 1
 
 def create_connection(database=None):
     try:
