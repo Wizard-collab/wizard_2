@@ -14,6 +14,7 @@ if sys.version_info[0] < 3:
 	import imp
 else:
 	import importlib
+	import importlib.util
 
 # Wizard modules
 import wizard_communicate
