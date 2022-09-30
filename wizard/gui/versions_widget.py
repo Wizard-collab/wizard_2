@@ -364,7 +364,7 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'video'
                 settings_dic['frange'] = self.video_settings_widget.frange
-                settings_dic['nspace_list'] = []
+                settings_dic['nspace_list'] = self.video_settings_widget.nspace_list
                 settings_dic['refresh_assets'] = self.video_settings_widget.refresh_assets
 
                 subtasks_library.batch_video(version_id, settings_dic)

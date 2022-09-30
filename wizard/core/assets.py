@@ -943,6 +943,7 @@ def archive_video(video_id):
                             'archives.zip')
                 if tools.zip_files([video_row['file_path']], zip_file):
                     path_utils.remove(video_row['file_path'])
+                    path_utils.remove(video_row['thumbnail_path'])
                     logger.info(f"{video_row['file_path']} deleted")
             else:
                 logger.warning(f"{video_row['file_path']} not found")

@@ -37,7 +37,7 @@ if 'wizard_json_settings'.upper() in os.environ.keys():
 
     if 'batch_type' in settings_dic.keys():
         if settings_dic['batch_type'] == 'video':
-            wizard_video.create_video(frange)
+            wizard_video.create_videos(frange, nspace_list)
         elif settings_dic['batch_type'] == 'export':
             if stage_name in settings_dic.keys():
                 stage_name = settings_dic['stage_to_export']
@@ -64,6 +64,5 @@ if 'wizard_json_settings'.upper() in os.environ.keys():
                                         frange=frange)
                 else:
                     logger.warning("Unplugged stage : {}".format(stage_name))
-
 else:
     logger.error("Batch settings not found")

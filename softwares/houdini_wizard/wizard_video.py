@@ -33,13 +33,18 @@ def flipbook(directory, frange):
 
     opengl_node = create_rop_network()
     #cam_path = get_cam_path(namespace)
-    #opengl_node.parm('camera').set(cam_path)
+    opengl_node.parm('camera').set(create_default_camera())
     opengl_node.parm('trange').set("normal")
     opengl_node.parm('f1').set(frange[0])
     opengl_node.parm('f2').set(frange[1])
     opengl_node.parm('scenepath').set('/obj')
     opengl_node.parm('picture').set(file)
     opengl_node.parm('execute').pressButton()
+
+def create_default_camera():
+    obj_node = hou.node("/obj")
+    cam_node = obj_node.createNode("cam", "wizard_flipbook_default_cam")
+    return cam_node.path()
 
 def create_rop_network():
     obj_node = hou.node("/obj")
