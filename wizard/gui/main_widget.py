@@ -30,6 +30,7 @@ from wizard.gui import gui_server
 from wizard.gui import tree_widget
 from wizard.gui import references_widget
 from wizard.gui import versions_widget
+from wizard.gui import videos_widget
 from wizard.gui import exports_widget
 from wizard.gui import context_widget
 from wizard.gui import tabs_widget
@@ -80,6 +81,7 @@ class main_widget(QtWidgets.QWidget):
         self.launcher_widget = launcher_widget.launcher_widget(self)
         self.references_widget = references_widget.references_widget('work_env', self)
         self.versions_widget = versions_widget.versions_widget(self)
+        self.videos_widget = videos_widget.videos_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
         self.context_widget = context_widget.context_widget(self)
         self.tabs_widget = tabs_widget.tabs_widget(self)
@@ -166,6 +168,7 @@ class main_widget(QtWidgets.QWidget):
         self.tree_widget.get_context()
         self.tabs_widget.get_context()
         self.versions_widget.get_context()
+        self.videos_widget.get_context()
         self.asset_tracking_widget.get_context()
         self.console_widget.get_context()
         self.production_manager_widget.get_context()
@@ -186,6 +189,7 @@ class main_widget(QtWidgets.QWidget):
         self.tree_widget.set_context()
         self.tabs_widget.set_context()
         self.versions_widget.set_context()
+        self.videos_widget.set_context()
         self.wall_widget.set_context()
         self.asset_tracking_widget.set_context()
         self.console_widget.set_context()
@@ -244,6 +248,7 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.stdout_signal.connect(self.update_stdout)
         self.gui_server.focus_instance_signal.connect(self.focus_instance)
         self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
+        self.gui_server.video_focus_signal.connect(self.focus_video)
         self.gui_server.work_version_focus_signal.connect(self.focus_work_version)
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
@@ -279,6 +284,13 @@ class main_widget(QtWidgets.QWidget):
             self.tree_widget.focus_instance(('stage', export_version_row['stage_id']))
             self.tabs_widget.setCurrentIndex(self.exports_tab_index)
             self.exports_widget.focus_export_version(export_version_id)
+
+    def focus_video(self, video_id):
+        video_row = project.get_video_data(video_id)
+        if video_row is not None:
+            self.focus_variant(video_row['variant_id'])
+            self.tabs_widget.setCurrentIndex(self.videos_tab_index)
+            self.videos_widget.focus_video(video_id)
 
     def focus_work_version(self, work_version_id):
         work_version_row = project.get_version_data(work_version_id)
@@ -336,6 +348,7 @@ class main_widget(QtWidgets.QWidget):
 
     def variant_changed(self, variant_id):
         self.exports_widget.change_variant(variant_id)
+        self.videos_widget.change_variant(variant_id)
 
     def work_env_changed(self, work_env_id):
         self.versions_widget.change_work_env(work_env_id)
@@ -346,6 +359,7 @@ class main_widget(QtWidgets.QWidget):
         self.references_widget.refresh()
         self.versions_widget.refresh()
         self.exports_widget.refresh()
+        self.videos_widget.refresh()
 
     def quit_threads(self):
         self.stop_threads.emit(1)
@@ -387,6 +401,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.refresh()
         self.references_widget.refresh()
         self.versions_widget.refresh()
+        self.videos_widget.refresh()
         self.exports_widget.refresh()
         self.wall_widget.refresh()
         self.softwares_widget.refresh()
@@ -448,6 +463,7 @@ class main_widget(QtWidgets.QWidget):
         self.references_tab_index = self.tabs_widget.addTab(self.references_widget, QtGui.QIcon(ressources._references_icon_), 'References')
         self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, QtGui.QIcon(ressources._work_icon_), 'Work versions')
         self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
+        self.videos_tab_index = self.tabs_widget.addTab(self.videos_widget, QtGui.QIcon(ressources._videos_icon_), 'Videos')
         
         self.contents_3_widget = QtWidgets.QWidget()
         self.contents_3_widget.setObjectName('main_widget')

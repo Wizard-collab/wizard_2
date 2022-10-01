@@ -312,6 +312,7 @@ def create_variant(name, stage_id, comment=''):
                     # Add other folders
                     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
                     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_SANDBOX')))
+                    tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_VIDEOS')))
                     events.add_creation_event('variant', variant_id)
                     game.add_xps(game_vars._creation_xp_)
         else:
@@ -633,6 +634,13 @@ def modify_export_version_comment(export_version_id, comment):
         tags.analyse_comment(comment, 'export_version', export_version_id)
     return success
 
+def modify_video_comment(video_id, comment):
+    success = project.modify_video_comment(video_id, comment)
+    if success:
+        tags.analyse_comment(comment, 'video', video_id)
+    return success
+
+
 def request_export(work_env_id, export_name, multiple=None, only_dir=None):
     # Gives a temporary ( and local ) export file name
     # for the softwares
@@ -778,6 +786,44 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
 
     return version_id
 
+def add_video(variant_id, comment="", analyse_comment=None):
+    last_version_list = project.get_last_video_version(variant_id, 'name')
+    if len(last_version_list) == 1:
+        last_version = last_version_list[0]
+        new_version =  str(int(last_version)+1).zfill(4)
+    else:
+        new_version = '0001'
+
+    dirname = get_video_path(variant_id)
+    if not path_utils.isdir(dirname):
+        path_utils.mkdir(dirname)
+    screenshot_dir_name = path_utils.join(dirname, 'thumbnails')
+    if not path_utils.isdir(screenshot_dir_name):
+        path_utils.mkdir(screenshot_dir_name)
+
+    file_name = path_utils.clean_path(path_utils.join(dirname, 
+                            build_video_file_name(variant_id, new_version)))
+    file_name_ext = os.path.splitext(file_name)[-1]
+
+    basename = os.path.basename(file_name)
+    thumbnail_file = path_utils.join(screenshot_dir_name, 
+                    basename.replace(file_name_ext, '.thumbnail.jpg'))
+
+
+    video_id = project.add_video(new_version,
+                                file_name,
+                                variant_id,
+                                comment,
+                                thumbnail_file)
+    if video_id:
+        events.add_video_event(video_id, variant_id)
+        game.add_xps(game_vars._video_xp_)
+        tags.analyse_comment(comment, 'video', video_id)
+    if analyse_comment and video_id:
+        game.analyse_comment(comment, game_vars._video_penalty_)
+
+    return video_id
+
 def copy_work_version(work_version_id):
     clipboard_dic = dict()
     clipboard_dic['work_version_id'] = work_version_id
@@ -884,6 +930,26 @@ def archive_version(version_id):
                 return None    
         else:
             logger.warning("You can't archive the default version (0001)")
+            return None    
+    else:
+        return None
+
+def archive_video(video_id):
+    if repository.is_admin():
+        video_row = project.get_video_data(video_id)
+        if video_row:
+            if path_utils.isfile(video_row['file_path']):
+                zip_file = path_utils.join(os.path.split(video_row['file_path'])[0], 
+                            'archives.zip')
+                if tools.zip_files([video_row['file_path']], zip_file):
+                    path_utils.remove(video_row['file_path'])
+                    path_utils.remove(video_row['thumbnail_path'])
+                    logger.info(f"{video_row['file_path']} deleted")
+            else:
+                logger.warning(f"{video_row['file_path']} not found")
+            success = project.remove_video(video_row['id'])
+            return success
+        else:
             return None    
     else:
         return None
@@ -1066,6 +1132,15 @@ def get_work_env_path(work_env_id):
             dir_name = path_utils.join(variant_path, work_env_name)
     return dir_name
 
+def get_video_path(variant_id):
+    dir_name = None
+    variant_path = get_variant_path(variant_id)
+    if variant_path:
+        dir_name = path_utils.join(variant_path, '_VIDEOS')
+        if not path_utils.isdir(dir_name):
+            path_utils.mkdir(dir_name)
+    return dir_name
+
 def get_export_path(export_id):
     dir_name = None
     export_row = project.get_export_data(export_id)
@@ -1096,6 +1171,25 @@ def get_temp_export_path(export_id):
             dir_name = local_path+dir_name[len(project_path):]
             return dir_name
 
+def get_temp_video_path(variant_id):
+    dir_name = None
+
+    local_path = user.user().get_local_path()
+    project_path = environment.get_project_path()
+
+    if local_path is None or local_path == '':
+        dir_name = tools.temp_dir()
+        logger.warning("Your local path is not setted, exporting in default temp dir.")
+        return dir_name
+
+    video_path = get_video_path(variant_id)
+    dir_name = path_utils.join(video_path, 'temp')
+    dir_name = local_path+dir_name[len(project_path):]
+    if not path_utils.isdir(dir_name):
+        path_utils.makedirs(dir_name)
+    dir_name = tools.temp_dir_in_dir(dir_name)
+    return dir_name
+
 def get_export_version_path(export_version_id):
     dir_name = None
     export_version_row = project.get_export_version_data(export_version_id)
@@ -1121,6 +1215,22 @@ def build_version_file_name(work_env_id, name):
     file_name += f".{name}"
     file_name += f".{extension}"
     return file_name
+
+def build_video_file_name(variant_id, name):
+    variant_row = project.get_variant_data(variant_id)
+    stage_row = project.get_stage_data(variant_row['stage_id'])
+    asset_row = project.get_asset_data(stage_row['asset_id'])
+    category_row = project.get_category_data(asset_row['category_id'])
+    extension = 'mp4' 
+
+    file_name = f"{category_row['name']}"
+    file_name += f"_{asset_row['name']}"
+    file_name += f"_{stage_row['name']}"
+    file_name += f"_{variant_row['name']}"
+    file_name += f".{name}"
+    file_name += f".{extension}"
+    return file_name
+
 
 def build_export_file_name(work_env_id, export_name, multiple=None):
     work_env_row = project.get_work_env_data(work_env_id)

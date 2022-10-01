@@ -53,6 +53,20 @@ def batch_export(version_id, settings_dic=None):
 	task.start()
 	logger.info('Export started as subtask, open the subtask manager to get more informations')
 
+def batch_video(version_id, settings_dic=None):
+	asset_string = assets.instance_to_string(('work_version', version_id))
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import launch_batch\n"
+	command += "from wizard.core import team_client\n"
+	command += "from wizard.core import environment\n"
+	command += f"print('wizard_task_name:Creating video for {asset_string}')\n"
+	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+	command += "team_client.refresh_team(environment.get_team_dns())\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=False)
+	task.start()
+	logger.info('Video creation started as subtask, open the subtask manager to get more informations')
+
 def deadline_batch_export(version_id, settings_dic=None):
 	asset_string = assets.instance_to_string(('work_version', version_id))
 	command =  "# coding: utf-8\n"
@@ -75,6 +89,24 @@ def archive_versions(version_ids):
 	command += "print(f'wizard_task_percent:{percent}')\n"
 	command += f"for version_id in {version_ids}:\n"
 	command += "	assets.archive_version(version_id)\n"
+	command += "	percent+=percent_step\n"
+	command += "	print(f'wizard_task_percent:{percent}')\n"
+	command += "gui_server.refresh_team_ui()\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=False)
+	task.start()
+	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+
+def archive_videos(videos_ids):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import assets\n"
+	command += "from wizard.gui import gui_server\n"
+	command += "print('wizard_task_name:Video archiving')\n"
+	command += f"percent_step=100.0/len({videos_ids})\n"
+	command += "percent=0.0\n"
+	command += "print(f'wizard_task_percent:{percent}')\n"
+	command += f"for video_id in {videos_ids}:\n"
+	command += "	assets.archive_video(video_id)\n"
 	command += "	percent+=percent_step\n"
 	command += "	print(f'wizard_task_percent:{percent}')\n"
 	command += "gui_server.refresh_team_ui()\n"

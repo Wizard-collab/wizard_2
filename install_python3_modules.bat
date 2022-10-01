@@ -8,3 +8,4 @@ pip install psutil
 pip install QScintilla
 pip install requests
 pip install clipboard
+pip install opencv-python

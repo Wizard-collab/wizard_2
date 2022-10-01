@@ -4,6 +4,7 @@
 
 # Python modules
 import os
+import sys
 import shutil
 import traceback
 import logging
@@ -161,3 +162,9 @@ def backdrop_nodes(nodes_list, namespace, namespace_knob=False):
     backdrop['tile_color'].setValue(2325008641)
     if namespace_knob:
         add_namespace_knob(backdrop, namespace)
+
+def by_frame_progress(frange):
+    current_frame = nuke.frame()
+    progress = ((current_frame-frange[0])/(frange[1]-frange[0]))*100
+    print(f"wizard_task_percent:{progress}")
+    sys.stdout.flush()

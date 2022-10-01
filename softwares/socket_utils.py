@@ -84,7 +84,7 @@ def send_bottle(DNS, msg_raw, timeout=0.01):
         if server is not None:
             server.close()
 
-def send_signal(DNS, msg_raw, timeout=5.0):
+def send_signal(DNS, msg_raw, timeout=200.0):
     server = None
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

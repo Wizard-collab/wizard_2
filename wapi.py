@@ -280,6 +280,7 @@ class assets:
                     frange[1] = frange[1]+asset_row['postroll']
 
                 settings_dic = dict()
+                settings_dic['batch_type'] = 'export'
                 settings_dic['frange'] = frange
                 settings_dic['refresh_assets'] = refresh_assets_in_scene
                 settings_dic['nspace_list'] = namespaces_list
@@ -308,6 +309,7 @@ class assets:
                     frange[1] = frange[1]+asset_row['postroll']
 
                 settings_dic = dict()
+                settings_dic['batch_type'] = 'export'
                 settings_dic['frange'] = frange
                 settings_dic['refresh_assets'] = refresh_assets_in_scene
                 settings_dic['nspace_list'] = namespaces_list

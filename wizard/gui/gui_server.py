@@ -45,6 +45,7 @@ class gui_server(QThread):
     restart_signal = pyqtSignal(int)
     tooltip_signal = pyqtSignal(str)
     stdout_signal = pyqtSignal(tuple)
+    video_focus_signal = pyqtSignal(object)
     export_version_focus_signal = pyqtSignal(object)
     work_version_focus_signal = pyqtSignal(object)
     focus_instance_signal = pyqtSignal(object)
@@ -101,6 +102,9 @@ class gui_server(QThread):
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'export_version_focus':
             self.export_version_focus_signal.emit(signal_dic['export_version_id'])
+            self.raise_ui_signal.emit(1)
+        elif signal_dic['function'] == 'video_focus':
+            self.video_focus_signal.emit(signal_dic['video_id'])
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'work_version_focus':
             self.work_version_focus_signal.emit(signal_dic['work_version_id'])
@@ -169,6 +173,12 @@ def focus_export_version(export_version_id):
     signal_dic = dict()
     signal_dic['function'] = 'export_version_focus'
     signal_dic['export_version_id'] = export_version_id
+    send_signal(signal_dic)
+
+def focus_video(video_id):
+    signal_dic = dict()
+    signal_dic['function'] = 'video_focus'
+    signal_dic['video_id'] = video_id
     send_signal(signal_dic)
 
 def focus_work_version(work_version_id):

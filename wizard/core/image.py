@@ -70,12 +70,12 @@ def pixmap_to_PIL(pixmap):
     PIL_image = Image.open(io.BytesIO(buffer.data()))
     return PIL_image
 
-def resize_preview(file, destination, size=200):
+def resize_preview(file, destination, size=200, image_format='PNG'):
     if path_utils.isfile(file):
         image = Image.open(file)
         preview, null, null = resize_image_with_fixed_width(image, size)
         preview_file = tools.get_filename_without_override(destination)
-        preview.save(preview_file, format="PNG")
+        preview.save(preview_file, format=image_format)
         return preview_file
     else:
         return None

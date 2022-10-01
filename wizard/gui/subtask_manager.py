@@ -261,6 +261,8 @@ class subtask_widget(QtWidgets.QFrame):
         elif status == 'Killed':
             color = '#f0605b'
         elif status == 'Done':
+            self.update_progress(100)
+            self.subtask_viewer.update_progress(100)
             color = '#9cf277'
         self.status = status
         self.status_data_label.setText(status)

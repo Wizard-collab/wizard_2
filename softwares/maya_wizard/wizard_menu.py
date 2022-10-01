@@ -10,7 +10,7 @@ import pymel.core as pm
 
 # Wizard modules
 from maya_wizard import wizard_plugin
-from maya_wizard import quick_playblast
+from maya_wizard import wizard_video
 
 class menu():
     def __init__(self):
@@ -97,5 +97,5 @@ class menu():
 
         pm.menuItem(divider=True, parent=mainMenu)
 
-        pm.menuItem(l='Quick playblast', c=quick_playblast.quick_playblast, i='icons/video.png', parent=mainMenu)
+        pm.menuItem(l='Create video', c=wizard_video.invoke_settings_widget, i='icons/video.png', parent=mainMenu)
 

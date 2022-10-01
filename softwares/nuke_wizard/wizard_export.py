@@ -42,13 +42,19 @@ def export_by_extension(export_file, frange):
     else:
         logger.info("{} extension is unkown".format(export_file))
 
+def after_exr_render(frange):
+    nuke.removeAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
+    nuke.removeAfterRender(after_exr_render, args=(frange))
+
 def export_exr(export_dir, frange):
     render_node_name = 'wizard_render_node'
     if render_node_name in wizard_tools.get_all_nodes_names():
         render_node = nuke.toNode(render_node_name)
         file = f"{export_dir}/%05d.exr"
         render_node['file'].setValue(file)
-        #render_node['compression'].setValue('PIZ Wavelet')
+        render_node.knob('afterFrameRender')
+        nuke.addAfterRender(after_exr_render, args=(frange))
+        nuke.addAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
         nuke.execute(render_node_name,frange[0],frange[1],1)
     else:
         logger.warning(f"{render_node_name} not found")
