@@ -31,6 +31,7 @@ def create_video(frange):
 def after_render(directory, frange, video_node):
     wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']))
     nuke.removeAfterRender(after_render, args=(directory, frange, video_node))
+    nuke.removeAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
     nuke.delete(video_node)
 
 def export_pngs(directory, frange):
@@ -45,6 +46,7 @@ def export_pngs(directory, frange):
     video_node['file'].setValue(file)
     video_node.knob('afterRender')
     nuke.addAfterRender(after_render, args=(directory, frange, video_node))
+    nuke.addAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
     nuke.execute(video_node, frange[0], frange[1], 1)
 
 def get_viewer():

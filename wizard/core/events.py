@@ -53,8 +53,8 @@ def add_export_event(export_version_id):
 	export_version_row = project.get_export_version_data(export_version_id)
 	project.add_event('export', title, export_version_row['comment'], data, '', export_version_row['work_version_thumbnail_path'])
 
-def add_video_event(video_id, work_env_id):
-	title = f"Created a video from {assets.instance_to_string(('work_env', work_env_id))}"
+def add_video_event(video_id, variant_id):
+	title = f"Created a video from {assets.instance_to_string(('variant', variant_id))}"
 	data = video_id
 	video_row = project.get_video_data(video_id)
 	project.add_event('video', title, video_row['comment'], data, '', video_row['thumbnail_path'])
