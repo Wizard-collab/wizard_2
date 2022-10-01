@@ -99,6 +99,7 @@ def merge_with_overlay(files_list, frange, frame_rate, version_id):
         frame_number = frange[0] + files_list.index(file)
         pil_img = add_overlay(file, string_asset, frame_number, frange, frame_rate)
         img = np.asarray(pil_img)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         height, width, layers = img.shape
         size = (width,height)
         img_array.append(img)

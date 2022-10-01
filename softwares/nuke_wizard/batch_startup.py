@@ -13,6 +13,7 @@ logger = logging.getLogger('batch_startup')
 import wizard_communicate
 from nuke_wizard import wizard_plugin
 from nuke_wizard import wizard_tools
+from nuke_wizard import wizard_video
 from nuke_wizard.export import compositing
 from nuke_wizard.export import custom
 
@@ -44,7 +45,7 @@ def main():
         if 'nspace_list' not in settings_dic.keys():
             logger.error("nspace_list parameter not found")
             return
-        logger.warning("Video not plugged for nuke. Quitting")
+        wizard_video.create_video(settings_dic['frange'])
     if settings_dic['batch_type'] == 'export':
         if 'frange' not in settings_dic.keys():
             logger.error("frange parameter not found")
