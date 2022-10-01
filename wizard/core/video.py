@@ -84,9 +84,10 @@ def merge_video(images_directory, frange, version_id):
     out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*'MP4V'), frame_rate, size)
     for i in range(len(img_array)):
         out.write(img_array[i])
+        if int(len(img_array)/2) == i:
+            to_thumbnail = path_utils.join(images_directory, 'thumbnail.png')
+            cv2.imwrite(to_thumbnail, img_array[i])
     out.release()
-
-    to_thumbnail = files_list[int(len(files_list)/2)]
 
     if path_utils.isfile(temp_video_file):
         return temp_video_file, to_thumbnail
