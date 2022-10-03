@@ -295,6 +295,7 @@ class wall_event_widget(QtWidgets.QFrame):
     def fill_ui(self):
         if self.event_row['creation_user'] in self.users_images_dic.keys():
             self.profile_picture.setPixmap(self.users_images_dic[self.event_row['creation_user']])
+            
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         if self.event_row['message'] is not None and self.event_row['message'] != '':

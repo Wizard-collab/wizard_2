@@ -1,7 +1,7 @@
-BUILDS: 200
+BUILDS: 202
 MAJOR: 2
-MINOR: 49
+MINOR: 50
 PATCH: 0
-builds: 200
-date: 1664660603.485013
-setup_name: 2.49.0.0200-setup.exe
+builds: 202
+date: 1664809411.7315292
+setup_name: 2.50.0.0202-setup.exe
