@@ -15,6 +15,7 @@ from wizard.gui import project_general_preferences_widget
 from wizard.gui import export_preferences_widget
 from wizard.gui import project_security_widget
 from wizard.gui import project_hooks_widget
+from wizard.gui import project_users_widget
 
 # Wizard modules
 from wizard.vars import ressources
@@ -38,6 +39,7 @@ class project_preferences_widget(QtWidgets.QWidget):
         self.export_preferences_widget = export_preferences_widget.export_preferences_widget()
         self.project_hooks_widget = project_hooks_widget.project_hooks_widget()
         self.project_security_widget = project_security_widget.project_security_widget()
+        self.project_users_widget = project_users_widget.project_users_widget()
 
         self.build_ui()
 
@@ -61,6 +63,7 @@ class project_preferences_widget(QtWidgets.QWidget):
             self.softwares_preferences_widget.refresh()
             self.export_preferences_widget.refresh()
             self.project_hooks_widget.refresh()
+            self.project_users_widget.refresh()
 
     def build_ui(self):
         self.resize(600,800)
@@ -87,4 +90,7 @@ class project_preferences_widget(QtWidgets.QWidget):
         self.security_tab_index = self.tabs_widget.addTab(self.project_security_widget,
                                                             'Security',
                                                             QtGui.QIcon(ressources._lock_icons_[1]))
+        self.users_tab_index = self.tabs_widget.addTab(self.project_users_widget,
+                                                            'Users',
+                                                            QtGui.QIcon(ressources._user_icon_))
 

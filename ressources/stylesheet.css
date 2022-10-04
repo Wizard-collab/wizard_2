@@ -942,6 +942,11 @@ QTableCornerButton::section {
 	background-color: #19191f;
 }
 
+#dark_round_frame{
+	border-radius: 8px;
+	background-color: #24242b;
+}
+
 #reference_edit_widget{
 	border-radius: 4px;
 	background-color: rgba(0,0,0,22);
