@@ -2424,6 +2424,27 @@ def search_group(name, column='*'):
                                                         column)
     return groups_rows
 
+def add_tag(name, icon_path=ressources._tag_icon_):
+    if (name != '') and (name is not None):
+        if not (db_utils.check_existence('project', 
+                                        'tags',
+                                        'name',
+                                        name)):
+            
+            tag_id = db_utils.create_row('project',
+                                'tags',
+                                ('name', 'creation_time', 'creation_user', 'icon', 'user_ids'), 
+                                (name, time.time(), environment.get_user(), icon_path, json.dumps([])))
+            if tag_id:
+                logger.info(f"Tag {name} added to project")
+            return tag_id
+        else:
+            logger.warning(f"{name} already exists")
+            return None
+    else:
+        logger.warning(f"Please provide a tag name")
+        return None
+
 def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1
 
@@ -2479,6 +2500,7 @@ def init_project(project_path, project_name):
             create_grouped_references_table(project_name)
             create_progress_events_table(project_name)
             create_videos_table(project_name)
+            #create_tags_table(project_name)
             return project_name
     else:
         logger.warning(f"Database {project_name} already exists")
@@ -2804,6 +2826,18 @@ def create_progress_events_table(database):
                                     );"""
     if db_utils.create_table(database, sql_cmd):
         logger.info("Progress table created")
+
+def create_tags_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS tags (
+                                        id serial PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        name text NOT NULL,
+                                        icon text NOT NULL,
+                                        user_ids text NOT NULL
+                                    );"""
+    if db_utils.create_table(database, sql_cmd):
+        logger.info("Tags table created")
 
 def create_shelf_scripts_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS shelf_scripts (

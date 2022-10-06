@@ -21,7 +21,7 @@ def add_yeti_fur(namespace, referenced_stage_name, file):
         if node_name not in wizard_tools.get_all_nodes():
             yeti_node = mod.createnode(node_name, "Yeti", namespace_GRP)
             yeti_node.HierarchyMode.set(2)
-            tags = wizard_tools.get_tags_for_yeti_node(namespace, fur_name)
+            tags = wizard_tools.get_tags_for_yeti_or_vdb_node(namespace, fur_name)
             yeti_node.Membership.set((',').join(tags))
         else:
             yeti_node = wizard_tools.get_node_from_name(node_name)

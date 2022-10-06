@@ -274,6 +274,8 @@ _missing_image_ = path_utils.join(_icons_path_, 'missing_image.svg')
 _available_icons_list_.append(_missing_image_)
 _update_icon_ = path_utils.join(_icons_path_, 'update_icon.svg')
 _available_icons_list_.append(_update_icon_)
+_tag_icon_ = path_utils.join(_icons_path_, 'tag.svg')
+_available_icons_list_.append(_tag_icon_)
 
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')
