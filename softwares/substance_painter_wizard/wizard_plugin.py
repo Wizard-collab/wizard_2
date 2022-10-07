@@ -4,6 +4,7 @@
     
 # Python modules
 import os
+import shutil
 from PySide2 import QtWidgets, QtCore, QtGui
 
 # Substance Painter modules
@@ -19,19 +20,42 @@ from substance_painter_wizard import wizard_project
 from substance_painter_wizard import wizard_references
 
 def save():
+    if not substance_painter.project.is_open():
+        logging.info("No painter project openned!")
+        return
+    if not substance_painter.project.needs_saving():
+        logging.info("There is nothing to save!")
+        return
+    # Save as local
+    local_path = wizard_communicate.get_local_path()
+    if local_path is None:
+        logging.warning("Please set a local path, skipping save.")
+        return
     file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
-    if file_path:
-        if substance_painter.project.is_open():
-            if substance_painter.project.needs_saving():
-                substance_painter.project.save_as(file_path,
-                                                  substance_painter.project.ProjectSaveMode.Full)
-            else:
-                logging.info("There is nothing to save!")
-        else:
-            logging.info("No painter project openned!")
+    if not file_path:
+        logging.error("No file path found")
+        return
+    project_path = wizard_communicate.get_project_path()
+    local_file_path = local_path+file_path[len(project_path):]
+    substance_painter.project.save_as(local_file_path,
+                                      substance_painter.project.ProjectSaveMode.Full)
             
     if version_id is not None:
         os.environ['wizard_version_id'] = str(version_id)
+
+def copy_save(evt):
+    saved_file = substance_painter.project.file_path()
+    # Copy to network
+    local_path = wizard_communicate.get_local_path()
+    project_path = wizard_communicate.get_project_path()
+    if not saved_file.startswith(local_path):
+        return
+    network_file_path = project_path+saved_file[len(local_path):]
+    if not os.path.isdir(os.path.dirname(network_file_path)):
+        logging.error(f"{os.path.dirname(network_file_path)} not found. Skipping copy to project")
+        return
+    logging.info(f"Copying {saved_file} to {network_file_path}")
+    shutil.copyfile(saved_file, network_file_path)
 
 def export(material, size, file_type):
     substance_painter_export.export_textures(material, size, file_type)
