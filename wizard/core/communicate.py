@@ -137,6 +137,8 @@ class communicate_server(Thread):
                                     signal_dic['temp_dir'],
                                     signal_dic['frange'],
                                     signal_dic['version_id'])
+        elif signal_dic['function'] == 'screen_over_version':
+            returned = screen_over_version(signal_dic['version_id'])
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -148,6 +150,10 @@ def get_string_variant_from_work_env_id(work_env_id):
 def get_file(version_id):
     version_path = project.get_version_data(version_id, 'file_path')
     return version_path
+
+def screen_over_version(version_id):
+    success = assets.screen_over_version(version_id)
+    return success
 
 def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 

@@ -185,3 +185,10 @@ def get_project_path():
     local_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return local_path
 
+def screen_over_version(version_id):
+    signal_dic=dict()
+    signal_dic['function'] = 'screen_over_version'
+    signal_dic['version_id'] = version_id
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+

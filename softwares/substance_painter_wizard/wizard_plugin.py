@@ -48,6 +48,7 @@ def copy_save(evt):
     # Copy to network
     local_path = wizard_communicate.get_local_path()
     project_path = wizard_communicate.get_project_path()
+    wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
     if not saved_file.startswith(local_path):
         return
     network_file_path = project_path+saved_file[len(local_path):]
@@ -58,7 +59,16 @@ def copy_save(evt):
     shutil.copyfile(saved_file, network_file_path)
 
 def export(material, size, file_type):
+    save_or_save_increment()
     substance_painter_export.export_textures(material, size, file_type)
+
+def save_or_save_increment():
+    if substance_painter.project.name() is None:
+        save()
+    else:
+        logging.info("Saving file")
+        substance_painter.project.save()
+        copy_save(None)
 
 def init_project():
     mesh_file_path = wizard_references.get_mesh_file()

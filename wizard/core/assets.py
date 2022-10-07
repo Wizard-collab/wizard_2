@@ -739,6 +739,13 @@ def archive_export_version(export_version_id):
     else:
         return None
 
+def screen_over_version(version_id):
+    version_row = project.get_version_data(version_id)
+    if not version_row:
+        return
+    screenshot_file, thumbnail_file = image.screenshot(version_row['screenshot_path'], version_row['thumbnail_path'])
+    return project.modify_version_screen(version_id, screenshot_file, thumbnail_file)
+
 def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_comment=None):
     if fresh:
         new_version = '0001'

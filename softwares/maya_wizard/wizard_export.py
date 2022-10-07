@@ -112,6 +112,7 @@ def save_or_save_increment():
         scene = pm.sceneName()
     else:
         pm.saveFile(force=True)
+        wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
         logger.info("Saving file {}".format(scene))
     return scene
 

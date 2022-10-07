@@ -1620,6 +1620,19 @@ def modify_version_comment(version_id, comment=''):
         logger.warning("You did not created this file, modification forbidden")
     return success
 
+def modify_version_screen(version_id, screenshot_path, thumbnail_path):
+    screenshot_path_success = db_utils.update_data('project',
+                        'versions',
+                        ('screenshot_path', screenshot_path),
+                        ('id', version_id))
+    thumbnail_path_success = db_utils.update_data('project',
+                        'versions',
+                        ('thumbnail_path', thumbnail_path),
+                        ('id', version_id))
+    if screenshot_path_success*thumbnail_path_success:
+        logger.info('Version screen modified')
+    return screenshot_path_success*thumbnail_path_success
+
 def remove_version(version_id):
     success = None
     if repository.is_admin():

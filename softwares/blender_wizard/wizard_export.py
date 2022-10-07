@@ -45,6 +45,7 @@ def save_or_save_increment():
         scene = bpy.data.filepath
     else:
         bpy.ops.wm.save_as_mainfile(filepath=scene)
+        wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
         logger.info("Saving file {}".format(scene))
     return scene
 

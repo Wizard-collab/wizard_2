@@ -186,6 +186,8 @@ class versions_widget(QtWidgets.QWidget):
                             version_item = custom_version_icon_item(version_row)
                             self.icon_view.addItem(version_item)
                             self.version_icon_ids[version_row['id']] = version_item
+                        else:
+                            self.version_icon_ids[version_row['id']].refresh(version_row)
                 version_icon_ids = list(self.version_icon_ids.keys())
                 for version_id in version_icon_ids:
                     if version_id not in project_versions_id:
@@ -814,6 +816,10 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
 
     def set_not_missing(self):
         self.setForeground(QtGui.QColor('#9ce87b'))
+
+    def refresh(self, version_row):
+        self.version_row = version_row
+        self.fill_ui()
 
 class check_existence_thread(QtCore.QThread):
 
