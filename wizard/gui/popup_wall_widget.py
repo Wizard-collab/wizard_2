@@ -30,6 +30,8 @@ from wizard.gui import tags_widget
 
 logger = logging.getLogger(__name__)
 
+import test
+
 class popup_wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(popup_wall_widget, self).__init__(parent)
@@ -469,9 +471,12 @@ class popup_event_widget(QtWidgets.QFrame):
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
 
+        '''
         self.event_content_label = QtWidgets.QLabel()
-        self.event_content_label.setVisible(0)
         self.event_content_label.setWordWrap(True)
+        '''
+        self.event_content_label = test.customLabel()
+        self.event_content_label.setVisible(0)
         self.content_layout.addWidget(self.event_content_label)
 
         self.event_additional_content_label = QtWidgets.QLabel()

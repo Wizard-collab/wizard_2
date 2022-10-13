@@ -32,6 +32,8 @@ from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import destination_manager
 
+import test
+
 logger = logging.getLogger(__name__)
 
 class exports_widget(QtWidgets.QWidget):
@@ -609,6 +611,8 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         super(custom_export_version_tree_item, self).__init__(parent)
         self.export_version_row = export_version_row
         self.type = 'export_version'
+        self.comment_label = test.customLabel()
+        self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
 
     def fill_ui(self):
@@ -620,7 +624,7 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         day, hour = tools.convert_time(self.export_version_row['creation_time'])
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
-        self.setText(4, self.export_version_row['comment'])
+        self.comment_label.setText(self.export_version_row['comment'])
         if self.export_version_row['software'] is not None:
             self.setIcon(5, QtGui.QIcon(ressources._sofwares_icons_dic_[self.export_version_row['software']]))
         else:

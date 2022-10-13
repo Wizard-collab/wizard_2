@@ -21,6 +21,8 @@ from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import comment_widget
 
+import test
+
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(asset_tracking_widget, self).__init__(parent)
@@ -429,8 +431,10 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.comment_layout.setSpacing(6)
         self.comment_widget.setLayout(self.comment_layout)
         self.widget_layout.addWidget(self.comment_widget)
-        self.comment_label = QtWidgets.QLabel(self.tracking_event_row['comment'])
-        self.comment_label.setWordWrap(True)
+        self.comment_label = test.customLabel()
+        self.comment_label.setText(self.tracking_event_row['comment'])
+        #self.comment_label = QtWidgets.QLabel(self.tracking_event_row['comment'])
+        #self.comment_label.setWordWrap(True)
         self.comment_layout.addWidget(self.comment_label)
 
     def build_comment_event_ui(self):

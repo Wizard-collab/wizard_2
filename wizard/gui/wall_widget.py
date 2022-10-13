@@ -26,6 +26,8 @@ from wizard.vars import user_vars
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
+import test
+
 class wall_widget(QtWidgets.QWidget):
 
     notification = pyqtSignal(int)
@@ -335,7 +337,7 @@ class wall_event_widget(QtWidgets.QFrame):
             self.content_layout.setContentsMargins(0,0,41,0)
             self.event_title_label.setAlignment(QtCore.Qt.AlignRight)
             self.user_name_label.setAlignment(QtCore.Qt.AlignRight)
-            self.event_content_label.setAlignment(QtCore.Qt.AlignRight)
+            #self.event_content_label.setAlignment(QtCore.Qt.AlignRight)
             self.event_additional_content_label.setAlignment(QtCore.Qt.AlignRight)
             self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-left-radius:6px;}'%profile_color)
         else:
@@ -444,8 +446,8 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
 
-        self.event_content_label = QtWidgets.QLabel()
-        self.event_content_label.setWordWrap(True)
+        self.event_content_label = test.customLabel()
+        #self.event_content_label.setWordWrap(True)
         self.content_layout.addWidget(self.event_content_label)
 
         self.event_additional_content_label = QtWidgets.QLabel()
