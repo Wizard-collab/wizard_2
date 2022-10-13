@@ -27,6 +27,8 @@ from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
+import test
+
 class production_table_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(production_table_widget, self).__init__(parent)
@@ -303,6 +305,7 @@ class view_comment_widget(QtWidgets.QWidget):
         super(view_comment_widget, self).__init__(parent)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setMinimumWidth(200)
         self.build_ui()
 
     def build_ui(self):
@@ -327,7 +330,7 @@ class view_comment_widget(QtWidgets.QWidget):
         self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
         self.main_layout.addWidget(self.line_frame)
 
-        self.stage_comment = QtWidgets.QLabel()
+        self.stage_comment = test.customLabel()
         self.main_layout.addWidget(self.stage_comment)
 
     def show_comment(self, stage_row):
