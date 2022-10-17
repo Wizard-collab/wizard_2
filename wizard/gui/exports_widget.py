@@ -1,4 +1,3 @@
-
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
@@ -31,8 +30,7 @@ from wizard.gui import manual_export_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import destination_manager
-
-import test
+from wizard.gui import tag_label
 
 logger = logging.getLogger(__name__)
 
@@ -611,7 +609,8 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         super(custom_export_version_tree_item, self).__init__(parent)
         self.export_version_row = export_version_row
         self.type = 'export_version'
-        self.comment_label = test.customLabel()
+        self.comment_label = tag_label.tag_label()
+        self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
 

@@ -30,6 +30,7 @@ from wizard.gui import confirm_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
+from wizard.gui import tag_label
 
 logger = logging.getLogger(__name__)
 
@@ -524,6 +525,9 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, video_row, parent=None):
         super(custom_video_tree_item, self).__init__(parent)
         self.video_row = video_row
+        self.comment_label = tag_label.tag_label()
+        self.comment_label.setNoMultipleLines()
+        self.treeWidget().setItemWidget(self, 3, self.comment_label)
         self.fill_ui()
 
     def fill_ui(self):
@@ -535,7 +539,7 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         day, hour = tools.convert_time(self.video_row['creation_time'])
         self.setText(2, f"{day} - {hour}")
         self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
-        self.setText(3, self.video_row['comment'])
+        self.comment_label.setText( self.video_row['comment'])
         self.setText(4, os.path.basename(self.video_row['file_path']))
         self.setText(5, str(self.video_row['id']))
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))

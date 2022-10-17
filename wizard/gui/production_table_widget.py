@@ -12,6 +12,7 @@ import logging
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import logging_widget
+from wizard.gui import tag_label
 
 # Wizard modules
 from wizard.core import repository
@@ -26,8 +27,6 @@ from wizard.vars import ressources
 from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
-
-import test
 
 class production_table_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -330,7 +329,7 @@ class view_comment_widget(QtWidgets.QWidget):
         self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
         self.main_layout.addWidget(self.line_frame)
 
-        self.stage_comment = test.customLabel()
+        self.stage_comment = tag_label.tag_label()
         self.main_layout.addWidget(self.stage_comment)
 
     def show_comment(self, stage_row):

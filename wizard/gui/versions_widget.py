@@ -31,6 +31,7 @@ from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
 from wizard.gui import video_settings_widget
+from wizard.gui import tag_label
 
 logger = logging.getLogger(__name__)
 
@@ -763,6 +764,9 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         super(custom_version_tree_item, self).__init__(parent)
         self.software_icon = software_icon
         self.version_row = version_row
+        self.comment_label = tag_label.tag_label()
+        self.comment_label.setNoMultipleLines()
+        self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
 
     def fill_ui(self):
@@ -775,7 +779,7 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         day, hour = tools.convert_time(self.version_row['creation_time'])
         self.setText(3, f"{day} - {hour}")
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
-        self.setText(4, self.version_row['comment'])
+        self.comment_label.setText(self.version_row['comment'])
         self.setText(5, os.path.basename(self.version_row['file_path']))
         self.setText(6, str(self.version_row['id']))
         self.setForeground(6, QtGui.QBrush(QtGui.QColor('gray')))

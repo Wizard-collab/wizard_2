@@ -27,10 +27,9 @@ from wizard.vars import game_vars
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import tags_widget
+from wizard.gui import tag_label
 
 logger = logging.getLogger(__name__)
-
-import test
 
 class popup_wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -475,7 +474,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.event_content_label = QtWidgets.QLabel()
         self.event_content_label.setWordWrap(True)
         '''
-        self.event_content_label = test.customLabel()
+        self.event_content_label = tag_label.tag_label()
         self.event_content_label.setVisible(0)
         self.content_layout.addWidget(self.event_content_label)
 
