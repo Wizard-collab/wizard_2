@@ -4,10 +4,17 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 
 class tag_label(QtWidgets.QWidget):
+
+    enter = pyqtSignal(str)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+
     def __init__(self, text='', parent=None):
         super(tag_label, self).__init__(parent)
+        self.setMouseTracking(True)
         self.text = text
         self.tag_block_margin = 3
         self.font = QtGui.QFont("Roboto", 8)
@@ -16,18 +23,32 @@ class tag_label(QtWidgets.QWidget):
         self.space_width = self.font_metric.width(' ')
         self.no_multiple_lines = False
         self.align_right = False
+        self.stop_drawing = False
         self.tokens = []
 
     def setText(self, text):
         self.text = text
         self.parse_tokens()
-        self.calculate_size()
+        self.calculate_height()
 
     def resizeEvent(self, event):
         self.parse_tokens()
-        self.calculate_size()
+        self.calculate_height()
 
-    def calculate_size(self):
+    def set_width(self):
+        max_width = self.parent().maximumWidth()
+        lines = self.text.split('\n')
+        tokens = []
+        larger = 0
+        for line in lines:
+            width = self.get_items_width(line.split())
+            if width > larger:
+                larger = width
+        if larger > max_width:
+            larger = max_width
+        self.setMinimumWidth(larger)
+
+    def calculate_height(self):
         heigth = (len(self.tokens)*self.font_height)+(len(self.tokens)*self.tag_block_margin)+self.tag_block_margin
         self.setMinimumHeight(heigth)
 
@@ -37,10 +58,23 @@ class tag_label(QtWidgets.QWidget):
     def setAlignRight(self, align_right=True):
         self.align_right = align_right
 
+    def enterEvent(self, event):
+        self.enter.emit(self.text)
+
+    def leaveEvent(self, event):
+        self.leave.emit(1)
+
+    def mouseMoveEvent(self, event):
+        self.move_event.emit(1)
+        super().mouseMoveEvent(event)
+
     def parse_tokens(self):
         # Parsing tokens
         index = 0
         self.tokens = []
+        if self.no_multiple_lines:
+            self.tokens = [self.text.split()]
+            return
         lines = self.text.split('\n')
         for line in lines:
             self.tokens.append(line.split())
@@ -81,10 +115,11 @@ class tag_label(QtWidgets.QWidget):
             for item in line:
                 item_width = self.get_item_width(item)
                 pos = self.draw_item(item, pos, item_width, painter)
+                if self.stop_drawing and self.no_multiple_lines:
+                    self.stop_drawing = False
+                    break
                 pos = self.draw_item(' ', pos, self.space_width, painter)
             self.new_line(pos)
-            if (pos[0] > self.width()) and self.no_multiple_lines:
-                break
 
     def new_line(self, pos):
         if self.no_multiple_lines:
@@ -107,6 +142,15 @@ class tag_label(QtWidgets.QWidget):
         return width
                     
     def draw_item(self, item, pos, item_width, painter):
+        if self.no_multiple_lines:
+            if pos[0] + item_width > self.width():
+                while (pos[0] + item_width + self.get_item_width('...') > self.width()) and len(item) >= 1:
+                    item = item[:-1]
+                    item_width = self.get_item_width(item)
+                item += '...'
+                item_width = self.get_item_width(item)
+                self.stop_drawing = True
+
         if item.startswith('@'):
             pos_to_draw = [pos[0], pos[1]]
             painter.setBrush(QtGui.QBrush(QtGui.QColor(119, 133, 222, 255)))

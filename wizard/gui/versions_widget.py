@@ -49,6 +49,8 @@ class versions_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.search_thread = search_thread()
 
+        self.view_comment_widget = gui_utils.view_comment_widget(self)
+
         self.icon_mode = 0
         self.list_mode = 1
 
@@ -159,6 +161,9 @@ class versions_widget(QtWidgets.QWidget):
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_list_ids.keys():
                             version_item = custom_version_tree_item(version_row, software_icon, self.list_view.invisibleRootItem())
+                            version_item.comment_label.enter.connect(self.view_comment_widget.show_comment)
+                            version_item.comment_label.leave.connect(self.view_comment_widget.close)
+                            version_item.comment_label.move_event.connect(self.view_comment_widget.move_ui)
                             self.version_list_ids[version_row['id']] = version_item
                         else:
                             self.version_list_ids[version_row['id']].refresh(version_row)

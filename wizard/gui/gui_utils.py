@@ -14,6 +14,7 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_server
+from wizard.gui import tag_label
 
 class QFlowLayout(QtWidgets.QLayout):
     def __init__(self, parent=None):
@@ -586,3 +587,47 @@ class transparent_button(QtWidgets.QPushButton):
 
     def reset_stylesheet(self):
         self.setStyleSheet('background-color: transparent;border: none;')
+
+class view_comment_widget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(view_comment_widget, self).__init__(parent)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setMaximumWidth(300)
+        self.build_ui()
+
+    def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_widget_layout = QtWidgets.QHBoxLayout()
+        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
+        self.setLayout(self.main_widget_layout)
+
+        self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setObjectName('black_round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(6)
+        self.main_widget.setLayout(self.main_layout)
+        self.main_widget_layout.addWidget(self.main_widget)
+
+        self.comment_label = QtWidgets.QLabel('Comment')
+        self.comment_label.setObjectName('bold_label')
+        self.main_layout.addWidget(self.comment_label)
+
+        self.line_frame = QtWidgets.QFrame()
+        self.line_frame.setFixedHeight(1)
+        self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
+        self.main_layout.addWidget(self.line_frame)
+
+        self.content_label = tag_label.tag_label()
+        self.main_layout.addWidget(self.content_label)
+
+    def show_comment(self, comment):
+        if comment is not None and comment != '':
+            self.content_label.setText(comment)
+            self.content_label.set_width()
+            move_ui(self, 20)
+            self.show()
+            self.adjustSize()
+
+    def move_ui(self):
+        move_ui(self, 20)

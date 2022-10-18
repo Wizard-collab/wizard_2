@@ -46,6 +46,8 @@ class videos_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.search_thread = search_thread()
 
+        self.view_comment_widget = gui_utils.view_comment_widget(self)
+
         self.icon_mode = 0
         self.list_mode = 1
 
@@ -130,6 +132,9 @@ class videos_widget(QtWidgets.QWidget):
                         project_videos_id.append(video_row['id'])
                         if video_row['id'] not in self.video_list_ids.keys():
                             video_item = custom_video_tree_item(video_row, self.list_view.invisibleRootItem())
+                            video_item.comment_label.enter.connect(self.view_comment_widget.show_comment)
+                            video_item.comment_label.leave.connect(self.view_comment_widget.close)
+                            video_item.comment_label.move_event.connect(self.view_comment_widget.move_ui)
                             self.video_list_ids[video_row['id']] = video_item
                         else:
                             self.video_list_ids[video_row['id']].refresh(video_row)

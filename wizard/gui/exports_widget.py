@@ -56,6 +56,8 @@ class exports_widget(QtWidgets.QWidget):
         self.icons_dic['custom'] = QtGui.QIcon(ressources._custom_icon_)
         self.icons_dic['camrig'] = QtGui.QIcon(ressources._camera_rig_icon_)
 
+        self.view_comment_widget = gui_utils.view_comment_widget(self)
+
         self.variant_id = None
         self.export_versions_rows = None
         self.export_ids = dict()
@@ -370,6 +372,9 @@ class exports_widget(QtWidgets.QWidget):
                                     if export_version_row['export_id'] in self.export_ids.keys():
                                         export_version_item = custom_export_version_tree_item(export_version_row,
                                                                     self.export_ids[export_version_row['export_id']])
+                                        export_version_item.comment_label.enter.connect(self.view_comment_widget.show_comment)
+                                        export_version_item.comment_label.leave.connect(self.view_comment_widget.close)
+                                        export_version_item.comment_label.move_event.connect(self.view_comment_widget.move_ui)
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
                                 else:
                                     self.export_versions_ids[export_version_row['id']].refresh(export_version_row)
@@ -605,6 +610,7 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         self.fill_ui()
 
 class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
+
     def __init__(self, export_version_row, parent=None):
         super(custom_export_version_tree_item, self).__init__(parent)
         self.export_version_row = export_version_row
