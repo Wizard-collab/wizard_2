@@ -336,6 +336,7 @@ class wall_event_widget(QtWidgets.QFrame):
             self.content_layout.setContentsMargins(0,0,41,0)
             self.event_title_label.setAlignment(QtCore.Qt.AlignRight)
             self.user_name_label.setAlignment(QtCore.Qt.AlignRight)
+            self.event_content_label.setAlignRight()
             self.event_additional_content_label.setAlignment(QtCore.Qt.AlignRight)
             self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-left-radius:6px;}'%profile_color)
         else:
