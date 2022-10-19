@@ -35,18 +35,14 @@ class tag_label(QtWidgets.QWidget):
         self.parse_tokens()
         self.calculate_height()
 
-    def set_width(self):
-        max_width = self.parent().maximumWidth()
+    def get_width(self):
         lines = self.text.split('\n')
-        tokens = []
         larger = 0
         for line in lines:
             width = self.get_items_width(line.split())
             if width > larger:
                 larger = width
-        if larger > max_width:
-            larger = max_width
-        self.setMinimumWidth(larger)
+        return larger
 
     def calculate_height(self):
         heigth = (len(self.tokens)*self.font_height)+(len(self.tokens)*self.tag_block_margin)+self.tag_block_margin
@@ -153,14 +149,13 @@ class tag_label(QtWidgets.QWidget):
 
         if item.startswith('@'):
             pos_to_draw = [pos[0], pos[1]]
-            painter.setBrush(QtGui.QBrush(QtGui.QColor(119, 133, 222, 255)))
+            painter.setBrush(QtGui.QBrush(QtGui.QColor(119, 133, 222, 100)))
             pen = QtGui.QPen()
             pen.setBrush(QtGui.QColor('transparent'))
             pen.setCapStyle(QtCore.Qt.RoundCap)
             pen.setJoinStyle(QtCore.Qt.RoundJoin)
             pen.setWidth(0)
             painter.setPen(pen)
-
             bouding_rect = self.font_metric.boundingRect(item)
             rect = QtCore.QRect((pos_to_draw[0]+bouding_rect.x()),
                                     (pos_to_draw[1]+bouding_rect.y())-self.tag_block_margin,

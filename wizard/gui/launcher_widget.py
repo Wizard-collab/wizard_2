@@ -24,6 +24,7 @@ from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import image_viewer_widget
 from wizard.gui import confirm_widget
+from wizard.gui import tag_label
 
 class launcher_widget(QtWidgets.QFrame):
 
@@ -242,9 +243,9 @@ class launcher_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.version_comboBox, "Change version")
         self.main_layout.addWidget(self.version_comboBox)
 
-        self.comment_label = QtWidgets.QLabel('comment')
+        self.comment_label = tag_label.tag_label()
+        self.comment_label.setText('Comment')
         gui_utils.application_tooltip(self.comment_label, "Version comment")
-        self.comment_label.setWordWrap(True)
         self.main_layout.addWidget(self.comment_label)
 
         self.version_infos_widget = QtWidgets.QWidget()

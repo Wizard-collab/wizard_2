@@ -148,30 +148,10 @@ class wall_widget(QtWidgets.QWidget):
 
     def toggle(self):
         if self.isVisible():
-            self.animate_hide()
+            self.setVisible(0)
         else:
             self.setVisible(1)
             self.notification.emit(0)
-            self.animate_show()
-
-    def animate_show(self):
-        self.setMaximumWidth(300)
-        self.setMinimumWidth(0)
-        self.anim = QtCore.QPropertyAnimation(self, b"maximumWidth")
-        self.anim.setDuration(100)
-        self.anim.setStartValue(0)
-        self.anim.setEndValue(300)
-        self.anim.start()
-
-    def animate_hide(self):
-        self.setMaximumWidth(300)
-        self.setMinimumWidth(0)
-        self.anim = QtCore.QPropertyAnimation(self, b"maximumWidth")
-        self.anim.setDuration(100)
-        self.anim.setStartValue(300)
-        self.anim.setEndValue(0)
-        self.anim.finished.connect(lambda:self.setVisible(0))
-        self.anim.start()
 
     def hide_all(self):
         for event_id in self.event_ids.keys():

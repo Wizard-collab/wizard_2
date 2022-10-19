@@ -624,7 +624,10 @@ class view_comment_widget(QtWidgets.QWidget):
     def show_comment(self, comment):
         if comment is not None and comment != '':
             self.content_label.setText(comment)
-            self.content_label.set_width()
+            width = self.content_label.get_width() + 24 + 22
+            if width > self.maximumWidth():
+                width = self.maximumWidth()
+            self.setMinimumWidth(width)
             move_ui(self, 20)
             self.show()
             self.adjustSize()
