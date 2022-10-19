@@ -199,6 +199,9 @@ class wall_widget(QtWidgets.QWidget):
                                 self.popup.emit(event_row)
                         else:
                             self.popup.emit(event_row)
+                else:
+                    if event_row != self.event_ids[event_row['id']].event_row:
+                        self.event_ids[event_row['id']].refresh(event_row)
                             
             self.remove_useless_events(event_number)
 
@@ -272,8 +275,12 @@ class wall_event_widget(QtWidgets.QFrame):
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
+
+    def refresh(self, event_row):
+        self.event_row = event_row
+        self.fill_ui(init=None)
     
-    def fill_ui(self):
+    def fill_ui(self, init=True):
         if self.event_row['creation_user'] in self.users_images_dic.keys():
             self.profile_picture.setPixmap(self.users_images_dic[self.event_row['creation_user']])
             
@@ -281,30 +288,37 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_title_label.setText(self.event_row['title'])
         if self.event_row['message'] is not None and self.event_row['message'] != '':
             self.event_content_label.setText(self.event_row['message'])
+            self.event_content_label.setVisible(1)
         else:
             self.event_content_label.setVisible(0)
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
             self.event_additional_content_label.setText(self.event_row['additional_message'])
+            self.event_additional_content_label.setVisible(1)
         else:
             self.event_additional_content_label.setVisible(0)
         if self.event_row['image_path'] is not None:
             self.image_label.setPixmap(QtGui.QIcon(self.event_row['image_path']).pixmap(300))
+            self.image_label.setVisible(1)
         else:
             self.image_label.setVisible(0)
         self.action_button_button.setText('View')
         
         if self.event_row['type'] == 'creation':
             profile_color = '#77c5f2'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
-            gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
         elif self.event_row['type'] == 'video':
             profile_color = '#B988F3'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on video")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Focus on video")
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 

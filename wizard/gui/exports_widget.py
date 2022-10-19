@@ -550,7 +550,7 @@ class exports_widget(QtWidgets.QWidget):
                 export_name = self.manual_export_widget.export_name
                 comment = self.manual_export_widget.comment
                 if assets.merge_file_as_export_version(export_name, files, self.variant_id, comment):
-                    gui_server.refresh_team_ui()
+                    gui_server.refresh_ui()
 
     def focus_export_version(self, export_version_id):
         if export_version_id in self.export_versions_ids.keys():

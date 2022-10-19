@@ -17,6 +17,7 @@ from wizard.core import repository
 from wizard.core import image
 from wizard.core import game
 from wizard.core import project
+from wizard.core import events
 from wizard.core import assets
 from wizard.core import environment
 from wizard.core import path_utils
@@ -93,6 +94,8 @@ class popup_wall_widget(QtWidgets.QWidget):
             self.popup_ids[event_row['id']] = widget
             self.popups_scrollArea_layout.addWidget(widget)
             self.popup_ids[event_row['id']].time_out.connect(self.remove_popup)
+        else:
+            gui_server.refresh_only_team_ui()
 
     def add_custom_popup(self, data):
         if user.user().get_popups_enabled():
@@ -108,7 +111,9 @@ class popup_wall_widget(QtWidgets.QWidget):
             self.popup_save_ids[version_id] = widget
             self.popups_scrollArea_layout.addWidget(widget)
             self.popup_save_ids[version_id].time_out.connect(self.remove_save_popup)
-
+        else:
+            gui_server.refresh_only_team_ui()
+            
     def remove_popup(self, popup_id):
         if popup_id in self.popup_ids.keys():
             widget = self.popup_ids[popup_id]
@@ -121,6 +126,7 @@ class popup_wall_widget(QtWidgets.QWidget):
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
+            gui_server.refresh_team_ui()
 
     def remove_save_popup(self, popup_id):
         if popup_id in self.popup_save_ids.keys():
@@ -133,6 +139,7 @@ class popup_wall_widget(QtWidgets.QWidget):
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
+            gui_server.refresh_team_ui()
 
 class popup_save_widget(QtWidgets.QFrame):
 
@@ -196,7 +203,6 @@ class popup_save_widget(QtWidgets.QFrame):
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
         assets.modify_version_comment(self.version_id, comment)
-        gui_server.refresh_team_ui()
         self.time_out.emit(self.version_id)
 
     def build_ui(self):
@@ -346,13 +352,12 @@ class popup_event_widget(QtWidgets.QFrame):
         if self.event_row['type'] == 'export':
             export_version_id = self.event_row['data']
             assets.modify_export_version_comment(export_version_id, comment)
-            gui_server.refresh_team_ui()
             self.time_out.emit(self.event_row['id'])
         elif self.event_row['type'] == 'video':
             video_id = self.event_row['data']
             assets.modify_video_comment(video_id, comment)
-            gui_server.refresh_team_ui()
             self.time_out.emit(self.event_row['id'])
+        events.modify_comment(self.event_row['id'], comment)
 
     def action(self):
         if self.event_row['type'] == 'archive':

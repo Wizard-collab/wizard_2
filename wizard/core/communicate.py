@@ -162,7 +162,7 @@ def add_version(work_env_id):
     if version_id:
         version_path = project.get_version_data(version_id,
                                                         'file_path')
-        gui_server.refresh_team_ui()
+        gui_server.refresh_ui()
         gui_server.save_popup(version_id)
         return (version_path, version_id)
     else:
@@ -184,13 +184,13 @@ def request_video(work_env_id):
 def add_video(work_env_id, temp_dir, frange, version_id):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     video_path = video.add_video(variant_id, temp_dir, frange, version_id)
-    gui_server.refresh_team_ui()
+    gui_server.refresh_ui()
     return video_path
 
 def request_render(version_id, export_name):
     # Just return a temporary file name using the 'assets' module
     render_directory = assets.request_render(version_id, export_name)
-    gui_server.refresh_team_ui()
+    gui_server.refresh_ui()
     return render_directory
 
 def add_export_version(export_name, files, work_env_id, version_id, comment):
@@ -199,7 +199,7 @@ def add_export_version(export_name, files, work_env_id, version_id, comment):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     export_version_id = assets.add_export_version(export_name, files, variant_id, version_id, comment, execute_xp=False)
     export_dir = assets.get_export_version_path(export_version_id)
-    gui_server.refresh_team_ui()
+    gui_server.refresh_ui()
     return export_dir
 
 def get_references(work_env_id):
