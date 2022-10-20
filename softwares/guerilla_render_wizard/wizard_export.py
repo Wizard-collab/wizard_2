@@ -69,7 +69,8 @@ def save_or_save_increment():
         wizard_tools.save_increment()
         scene = Document().getfilename()
     else:
-        wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
+        if os.environ["wizard_launch_mode"] == 'gui':
+            wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
         Document().save(scene)
         logger.info("Saving file {0}".format(scene))
     return scene

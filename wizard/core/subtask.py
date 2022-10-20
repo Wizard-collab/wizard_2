@@ -94,7 +94,10 @@ class subtask(Thread):
         while self.running:
             output = self.process.stdout.readline()
             if output:
-                out = output.strip().decode('utf-8')
+                try:
+                    out = output.strip().decode('utf-8')
+                except UnicodeDecodeError:
+                    out = str(output.strip())
                 self.analyse_signal(out)
             if self.process.poll() is not None:
                 self.running = False
