@@ -333,7 +333,7 @@ class view_comment_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.stage_comment)
 
     def show_comment(self, stage_row):
-        self.stage_state.setText(stage_row['state'])
+        self.stage_state.setText(stage_row['state'].capitalize())
         self.stage_state.setStyleSheet(f"color:{ressources._states_colors_[stage_row['state']]};")
         self.stage_comment.setText(stage_row['tracking_comment'])
         gui_utils.move_ui(self, 20)

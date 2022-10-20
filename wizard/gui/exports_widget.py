@@ -56,7 +56,7 @@ class exports_widget(QtWidgets.QWidget):
         self.icons_dic['custom'] = QtGui.QIcon(ressources._custom_icon_)
         self.icons_dic['camrig'] = QtGui.QIcon(ressources._camera_rig_icon_)
 
-        self.view_comment_widget = gui_utils.view_comment_widget(self)
+        self.view_comment_widget = tag_label.view_comment_widget(self)
 
         self.variant_id = None
         self.export_versions_rows = None
@@ -372,9 +372,9 @@ class exports_widget(QtWidgets.QWidget):
                                     if export_version_row['export_id'] in self.export_ids.keys():
                                         export_version_item = custom_export_version_tree_item(export_version_row,
                                                                     self.export_ids[export_version_row['export_id']])
-                                        export_version_item.comment_label.enter.connect(self.view_comment_widget.show_comment)
-                                        export_version_item.comment_label.leave.connect(self.view_comment_widget.close)
-                                        export_version_item.comment_label.move_event.connect(self.view_comment_widget.move_ui)
+                                        export_version_item.signal_handler.enter.connect(self.view_comment_widget.show_comment)
+                                        export_version_item.signal_handler.leave.connect(self.view_comment_widget.close)
+                                        export_version_item.signal_handler.move_event.connect(self.view_comment_widget.move_ui)
                                     self.export_versions_ids[export_version_row['id']] = export_version_item
                                 else:
                                     self.export_versions_ids[export_version_row['id']].refresh(export_version_row)
@@ -619,6 +619,17 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
+        self.signal_handler = signal_handler()
+        self.connect_functions()
+
+    def show_comment(self):
+        if self.comment_label.isActiveWindow():
+            self.signal_handler.enter.emit(self.export_version_row['comment'], self.export_version_row['creation_user'])
+
+    def connect_functions(self):
+        self.comment_label.enter.connect(self.show_comment)
+        self.comment_label.leave.connect(self.signal_handler.leave.emit)
+        self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
     def fill_ui(self):
         self.setText(1, self.export_version_row['name'])
@@ -667,6 +678,15 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         else:
             self.setText(7, '')
         self.setForeground(7, QtGui.QBrush(QtGui.QColor('#9ce87b')))
+
+class signal_handler(QtCore.QObject):
+
+    enter = pyqtSignal(str, str)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(signal_handler, self).__init__(parent)
 
 class check_existence_thread(QtCore.QThread):
 

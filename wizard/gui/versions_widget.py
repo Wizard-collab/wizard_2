@@ -49,7 +49,7 @@ class versions_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.search_thread = search_thread()
 
-        self.view_comment_widget = gui_utils.view_comment_widget(self)
+        self.view_comment_widget = tag_label.view_comment_widget(self)
 
         self.icon_mode = 0
         self.list_mode = 1
@@ -161,9 +161,9 @@ class versions_widget(QtWidgets.QWidget):
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_list_ids.keys():
                             version_item = custom_version_tree_item(version_row, software_icon, self.list_view.invisibleRootItem())
-                            version_item.comment_label.enter.connect(self.view_comment_widget.show_comment)
-                            version_item.comment_label.leave.connect(self.view_comment_widget.close)
-                            version_item.comment_label.move_event.connect(self.view_comment_widget.move_ui)
+                            version_item.signal_handler.enter.connect(self.view_comment_widget.show_comment)
+                            version_item.signal_handler.leave.connect(self.view_comment_widget.close)
+                            version_item.signal_handler.move_event.connect(self.view_comment_widget.move_ui)
                             self.version_list_ids[version_row['id']] = version_item
                         else:
                             self.version_list_ids[version_row['id']].refresh(version_row)
@@ -773,6 +773,17 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
+        self.signal_handler = signal_handler()
+        self.connect_functions()
+
+    def show_comment(self):
+        if self.comment_label.isActiveWindow():
+            self.signal_handler.enter.emit(self.version_row['comment'], self.version_row['creation_user'])
+
+    def connect_functions(self):
+        self.comment_label.enter.connect(self.show_comment)
+        self.comment_label.leave.connect(self.signal_handler.leave.emit)
+        self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
     def fill_ui(self):
         self.setText(0, self.version_row['name'])
@@ -798,6 +809,15 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
     def refresh(self, version_row):
         self.version_row = version_row
         self.fill_ui()
+
+class signal_handler(QtCore.QObject):
+
+    enter = pyqtSignal(str, str)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(signal_handler, self).__init__(parent)
 
 class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, version_row, parent=None):

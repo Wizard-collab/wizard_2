@@ -6,9 +6,16 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 
+# Wizard core modules
+from wizard.core import repository
+from wizard.core import image
+
+# Wizard gui modules
+from wizard.gui import gui_utils
+
 class tag_label(QtWidgets.QWidget):
 
-    enter = pyqtSignal(str)
+    enter = pyqtSignal(int)
     leave = pyqtSignal(int)
     move_event = pyqtSignal(int)
 
@@ -55,7 +62,7 @@ class tag_label(QtWidgets.QWidget):
         self.align_right = align_right
 
     def enterEvent(self, event):
-        self.enter.emit(self.text)
+        self.enter.emit(1)
 
     def leaveEvent(self, event):
         self.leave.emit(1)
@@ -169,3 +176,69 @@ class tag_label(QtWidgets.QWidget):
             painter.drawText(pos[0], pos[1], item)
         pos[0] += item_width 
         return pos
+
+class view_comment_widget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(view_comment_widget, self).__init__(parent)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setMaximumWidth(300)
+        self.build_ui()
+        self.init_users_images()
+
+    def init_users_images(self):
+        self.users_images_dic = dict()
+        for user_row in repository.get_users_list():
+            user_image =  user_row['profile_picture']
+            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 18)
+            self.users_images_dic[user_row['user_name']] = pixmap
+
+    def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_widget_layout = QtWidgets.QHBoxLayout()
+        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
+        self.setLayout(self.main_widget_layout)
+
+        self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setObjectName('black_round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(6)
+        self.main_widget.setLayout(self.main_layout)
+        self.main_widget_layout.addWidget(self.main_widget)
+
+        self.header_layout = QtWidgets.QHBoxLayout()
+        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setSpacing(6)
+        self.main_layout.addLayout(self.header_layout)
+
+        self.user_image_label = QtWidgets.QLabel()
+        self.user_image_label.setFixedSize(18,18)
+        self.header_layout.addWidget(self.user_image_label)
+
+        self.user_name_label = QtWidgets.QLabel()
+        self.user_name_label.setObjectName('gray_label')
+        self.header_layout.addWidget(self.user_name_label)
+
+        self.line_frame = QtWidgets.QFrame()
+        self.line_frame.setFixedHeight(1)
+        self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
+        self.main_layout.addWidget(self.line_frame)
+
+        self.content_label = tag_label()
+        self.main_layout.addWidget(self.content_label)
+
+    def show_comment(self, comment, user):
+        if comment is not None and comment != '':
+            self.content_label.setText(comment)
+            self.user_name_label.setText(user)
+            self.user_image_label.setPixmap(self.users_images_dic[user])
+            width = self.content_label.get_width() + 24 + 22
+            if width > self.maximumWidth():
+                width = self.maximumWidth()
+            self.setMinimumWidth(width)
+            gui_utils.move_ui(self, 20)
+            self.show()
+            self.adjustSize()
+
+    def move_ui(self):
+        gui_utils.move_ui(self, 20)

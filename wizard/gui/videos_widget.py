@@ -46,7 +46,7 @@ class videos_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.search_thread = search_thread()
 
-        self.view_comment_widget = gui_utils.view_comment_widget(self)
+        self.view_comment_widget = tag_label.view_comment_widget(self)
 
         self.icon_mode = 0
         self.list_mode = 1
@@ -132,9 +132,9 @@ class videos_widget(QtWidgets.QWidget):
                         project_videos_id.append(video_row['id'])
                         if video_row['id'] not in self.video_list_ids.keys():
                             video_item = custom_video_tree_item(video_row, self.list_view.invisibleRootItem())
-                            video_item.comment_label.enter.connect(self.view_comment_widget.show_comment)
-                            video_item.comment_label.leave.connect(self.view_comment_widget.close)
-                            video_item.comment_label.move_event.connect(self.view_comment_widget.move_ui)
+                            video_item.signal_handler.enter.connect(self.view_comment_widget.show_comment)
+                            video_item.signal_handler.leave.connect(self.view_comment_widget.close)
+                            video_item.signal_handler.move_event.connect(self.view_comment_widget.move_ui)
                             self.video_list_ids[video_row['id']] = video_item
                         else:
                             self.video_list_ids[video_row['id']].refresh(video_row)
@@ -534,6 +534,17 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 3, self.comment_label)
         self.fill_ui()
+        self.signal_handler = signal_handler()
+        self.connect_functions()
+
+    def show_comment(self):
+        if self.comment_label.isActiveWindow():
+            self.signal_handler.enter.emit(self.video_row['comment'], self.video_row['creation_user'])
+
+    def connect_functions(self):
+        self.comment_label.enter.connect(self.show_comment)
+        self.comment_label.leave.connect(self.signal_handler.leave.emit)
+        self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
     def fill_ui(self):
         self.setText(0, self.video_row['name'])
@@ -558,6 +569,15 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
     def refresh(self, video_row):
         self.video_row = video_row
         self.fill_ui()
+
+class signal_handler(QtCore.QObject):
+
+    enter = pyqtSignal(str, str)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(signal_handler, self).__init__(parent)
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, video_row, parent=None):
