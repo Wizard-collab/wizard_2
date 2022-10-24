@@ -218,7 +218,7 @@ class software_thread(Thread):
         self.software = software
         self.work_env_id = work_env_id
         self.killed = False
-        self.start_time = time.time()
+        self.start_time = time.perf_counter()
  
     def run(self):
         self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=path_utils.abspath('softwares'))
@@ -229,7 +229,7 @@ class software_thread(Thread):
             gui_server.refresh_ui()
 
     def set_infos(self):
-        work_time = time.time()-self.start_time
+        work_time = time.perf_counter()-self.start_time
         project.set_work_env_lock(self.work_env_id, 0)
         assets.add_work_time(self.work_env_id, work_time)
         logger.info(f"{self.software} closed")

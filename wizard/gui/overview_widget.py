@@ -85,12 +85,12 @@ class overview_widget(QtWidgets.QWidget):
         self.refresh()
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def refresh(self):
         if self.isVisible():
-            start_time = time.time()
+            start_time = time.perf_counter()
             self.progress_overview_widget.refresh()
             self.main_progress_widget.refresh()
             self.user_progress_widget.refresh()

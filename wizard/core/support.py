@@ -35,11 +35,12 @@ import logging
 # Wizard modules
 from wizard.core import application
 from wizard.core import environment
+from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
 def get_latest_build():
-    URL = "http://93.19.210.30/latest_build/"
+    URL = f"{ressources._web_server_url_}latest_build/"
     try:
         response = requests.post(URL, timeout=3)
         return response.json()
@@ -51,7 +52,7 @@ def get_latest_build():
         logger.error(str(traceback.format_exc()))
 
 def send_log(log, type, additionnal_message=''):
-    URL = "http://93.19.210.30/support/"
+    URL = f"{ressources._web_server_url_}support/"
     contact_dic = dict()
     contact_dic['username'] = environment.get_user()
     contact_dic['project'] = environment.get_project_name()
@@ -80,7 +81,7 @@ def send_log(log, type, additionnal_message=''):
         logger.error(str(traceback.format_exc()))
 
 def send_quote(quote):
-    URL = "http://93.19.210.30/quotes/"
+    URL = f"{ressources._web_server_url_}quotes/"
     contact_dic = dict()
     contact_dic['username'] = environment.get_user()
     contact_dic['quote_content'] = quote

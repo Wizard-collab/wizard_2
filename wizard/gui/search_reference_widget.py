@@ -103,7 +103,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.close()
 
     def search_ended(self):
-        search_time = str(round((time.time()-self.search_start_time), 3))
+        search_time = str(round((time.perf_counter()-self.search_start_time), 3))
         self.found_label.setText(f"Found {self.list_view.invisibleRootItem().childCount()} occurences in {search_time}s")
         if self.list_view.invisibleRootItem().childCount() == 0:
             self.show_info_mode('No export found...', ressources._nothing_info_)
@@ -118,7 +118,7 @@ class search_reference_widget(QtWidgets.QWidget):
                 del self.search_threads[thread_id]
 
     def search_asset(self, search):
-        self.search_start_time = time.time()
+        self.search_start_time = time.perf_counter()
         self.accept_item_from_thread = False
         if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
             self.search_threads[self.old_thread_id].item_signal.disconnect()

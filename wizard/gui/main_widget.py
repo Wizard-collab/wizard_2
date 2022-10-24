@@ -394,7 +394,7 @@ class main_widget(QtWidgets.QWidget):
             event.ignore()
 
     def refresh(self):
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.tree_widget.refresh()
         self.context_widget.refresh()
         self.launcher_widget.refresh()

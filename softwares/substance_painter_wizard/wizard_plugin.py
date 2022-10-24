@@ -48,7 +48,8 @@ def copy_save(evt):
     # Copy to network
     local_path = wizard_communicate.get_local_path()
     project_path = wizard_communicate.get_project_path()
-    wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
+    if os.environ["wizard_launch_mode"] == 'gui':
+        wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
     if not saved_file.startswith(local_path):
         return
     network_file_path = project_path+saved_file[len(local_path):]

@@ -25,6 +25,7 @@ from wizard.vars import user_vars
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import tag_label
 
 class wall_widget(QtWidgets.QWidget):
 
@@ -147,30 +148,10 @@ class wall_widget(QtWidgets.QWidget):
 
     def toggle(self):
         if self.isVisible():
-            self.animate_hide()
+            self.setVisible(0)
         else:
             self.setVisible(1)
             self.notification.emit(0)
-            self.animate_show()
-
-    def animate_show(self):
-        self.setMaximumWidth(300)
-        self.setMinimumWidth(0)
-        self.anim = QtCore.QPropertyAnimation(self, b"maximumWidth")
-        self.anim.setDuration(100)
-        self.anim.setStartValue(0)
-        self.anim.setEndValue(300)
-        self.anim.start()
-
-    def animate_hide(self):
-        self.setMaximumWidth(300)
-        self.setMinimumWidth(0)
-        self.anim = QtCore.QPropertyAnimation(self, b"maximumWidth")
-        self.anim.setDuration(100)
-        self.anim.setStartValue(300)
-        self.anim.setEndValue(0)
-        self.anim.finished.connect(lambda:self.setVisible(0))
-        self.anim.start()
 
     def hide_all(self):
         for event_id in self.event_ids.keys():
@@ -196,7 +177,7 @@ class wall_widget(QtWidgets.QWidget):
             self.event_ids[event_id].setVisible(False)
 
     def refresh(self):
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.event_rows = project.get_all_events()
         if self.event_rows is not None:
 
@@ -218,6 +199,9 @@ class wall_widget(QtWidgets.QWidget):
                                 self.popup.emit(event_row)
                         else:
                             self.popup.emit(event_row)
+                else:
+                    if event_row != self.event_ids[event_row['id']].event_row:
+                        self.event_ids[event_row['id']].refresh(event_row)
                             
             self.remove_useless_events(event_number)
 
@@ -246,7 +230,7 @@ class wall_widget(QtWidgets.QWidget):
             del self.event_ids[event_id]
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
 class wall_time_widget(QtWidgets.QWidget):
@@ -291,8 +275,12 @@ class wall_event_widget(QtWidgets.QFrame):
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
+
+    def refresh(self, event_row):
+        self.event_row = event_row
+        self.fill_ui(init=None)
     
-    def fill_ui(self):
+    def fill_ui(self, init=True):
         if self.event_row['creation_user'] in self.users_images_dic.keys():
             self.profile_picture.setPixmap(self.users_images_dic[self.event_row['creation_user']])
             
@@ -300,30 +288,37 @@ class wall_event_widget(QtWidgets.QFrame):
         self.event_title_label.setText(self.event_row['title'])
         if self.event_row['message'] is not None and self.event_row['message'] != '':
             self.event_content_label.setText(self.event_row['message'])
+            self.event_content_label.setVisible(1)
         else:
             self.event_content_label.setVisible(0)
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
             self.event_additional_content_label.setText(self.event_row['additional_message'])
+            self.event_additional_content_label.setVisible(1)
         else:
             self.event_additional_content_label.setVisible(0)
         if self.event_row['image_path'] is not None:
             self.image_label.setPixmap(QtGui.QIcon(self.event_row['image_path']).pixmap(300))
+            self.image_label.setVisible(1)
         else:
             self.image_label.setVisible(0)
         self.action_button_button.setText('View')
         
         if self.event_row['type'] == 'creation':
             profile_color = '#77c5f2'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
-            gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
         elif self.event_row['type'] == 'video':
             profile_color = '#B988F3'
-            gui_utils.application_tooltip(self.action_button_button, "Focus on video")
+            if init:
+                gui_utils.application_tooltip(self.action_button_button, "Focus on video")
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 
@@ -335,7 +330,7 @@ class wall_event_widget(QtWidgets.QFrame):
             self.content_layout.setContentsMargins(0,0,41,0)
             self.event_title_label.setAlignment(QtCore.Qt.AlignRight)
             self.user_name_label.setAlignment(QtCore.Qt.AlignRight)
-            self.event_content_label.setAlignment(QtCore.Qt.AlignRight)
+            self.event_content_label.setAlignRight()
             self.event_additional_content_label.setAlignment(QtCore.Qt.AlignRight)
             self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-left-radius:6px;}'%profile_color)
         else:
@@ -444,8 +439,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
 
-        self.event_content_label = QtWidgets.QLabel()
-        self.event_content_label.setWordWrap(True)
+        self.event_content_label = tag_label.tag_label()
         self.content_layout.addWidget(self.event_content_label)
 
         self.event_additional_content_label = QtWidgets.QLabel()

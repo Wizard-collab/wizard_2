@@ -1985,6 +1985,14 @@ def search_event(data_to_search, column_to_search='title', column='*'):
                                                     column)
     return events_rows
 
+def modify_event_message(event_id, message):
+    if db_utils.update_data('project',
+                                'events',
+                                ('message', message),
+                                ('id', event_id)):
+        logger.info('Event message modified')
+        return 1
+
 def get_event_data(event_id, column='*'):
     events_rows = db_utils.get_row_by_column_data('project',
                                                         'events',

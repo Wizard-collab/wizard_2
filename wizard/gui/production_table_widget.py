@@ -12,6 +12,7 @@ import logging
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import logging_widget
+from wizard.gui import tag_label
 
 # Wizard modules
 from wizard.core import repository
@@ -161,7 +162,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.stage_ids = dict()
 
     def refresh_assets(self):
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         category = self.category_comboBox.currentText()
         if category != self.category:
@@ -261,7 +262,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.update_refresh_time(start_time)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def get_asset_coord(self, asset_id):
@@ -303,6 +304,7 @@ class view_comment_widget(QtWidgets.QWidget):
         super(view_comment_widget, self).__init__(parent)
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setMinimumWidth(200)
         self.build_ui()
 
     def build_ui(self):
@@ -327,11 +329,11 @@ class view_comment_widget(QtWidgets.QWidget):
         self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
         self.main_layout.addWidget(self.line_frame)
 
-        self.stage_comment = QtWidgets.QLabel()
+        self.stage_comment = tag_label.tag_label()
         self.main_layout.addWidget(self.stage_comment)
 
     def show_comment(self, stage_row):
-        self.stage_state.setText(stage_row['state'])
+        self.stage_state.setText(stage_row['state'].capitalize())
         self.stage_state.setStyleSheet(f"color:{ressources._states_colors_[stage_row['state']]};")
         self.stage_comment.setText(stage_row['tracking_comment'])
         gui_utils.move_ui(self, 20)

@@ -69,3 +69,6 @@ def add_tag_event(instance_type, instance_id, comment, user):
 	data_dic['tagged_user'] = user
 	title = f"Tagged {user} in a comment"
 	project.add_event('tag', title, comment, data_dic)
+
+def modify_comment(event_id, comment):
+	project.modify_event_message(event_id, comment)

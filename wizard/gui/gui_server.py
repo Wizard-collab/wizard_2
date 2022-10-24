@@ -140,6 +140,11 @@ def refresh_team_ui():
     signal_dic['function'] = 'refresh_team'
     send_signal(signal_dic)
 
+def refresh_only_team_ui():
+    signal_dic = dict()
+    signal_dic['function'] = 'refresh_team'
+    send_signal(signal_dic)
+
 def restart_ui():
     signal_dic = dict()
     signal_dic['function'] = 'restart'

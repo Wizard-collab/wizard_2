@@ -77,7 +77,7 @@ def remove_life(amount):
 	new_life = user_row['life'] - amount
 	if new_life <= 0:
 		new_life = 100
-		remove_levels(2)
+		remove_levels(1)
 	repository.modify_user_life(user_row['user_name'], new_life)
 
 def analyse_comment(comment, life_amount):

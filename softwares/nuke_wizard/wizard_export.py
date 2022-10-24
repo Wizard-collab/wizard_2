@@ -71,7 +71,8 @@ def save_or_save_increment():
         scene = nuke.root()['name'].value()
     else:
         nuke.scriptSave()
-        wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
+        if os.environ["wizard_launch_mode"] == 'gui':
+            wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
         logger.info("Saving file {}".format(scene))
     return scene
 

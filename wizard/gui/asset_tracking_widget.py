@@ -20,6 +20,7 @@ from wizard.vars import user_vars
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import comment_widget
+from wizard.gui import tag_label
 
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -200,7 +201,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
     def refresh(self):
         QtWidgets.QApplication.processEvents()
-        start_time = time.time()
+        start_time = time.perf_counter()
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
         else:
@@ -213,7 +214,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.update_refresh_time(start_time)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_time(self):
@@ -429,8 +430,10 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.comment_layout.setSpacing(6)
         self.comment_widget.setLayout(self.comment_layout)
         self.widget_layout.addWidget(self.comment_widget)
-        self.comment_label = QtWidgets.QLabel(self.tracking_event_row['comment'])
-        self.comment_label.setWordWrap(True)
+        self.comment_label = tag_label.tag_label()
+        self.comment_label.setText(self.tracking_event_row['comment'])
+        #self.comment_label = QtWidgets.QLabel(self.tracking_event_row['comment'])
+        #self.comment_label.setWordWrap(True)
         self.comment_layout.addWidget(self.comment_label)
 
     def build_comment_event_ui(self):

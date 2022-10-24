@@ -30,6 +30,7 @@ from wizard.gui import confirm_widget
 from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
+from wizard.gui import tag_label
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,8 @@ class videos_widget(QtWidgets.QWidget):
         self.video_icon_ids = dict()
         self.check_existence_thread = check_existence_thread()
         self.search_thread = search_thread()
+
+        self.view_comment_widget = tag_label.view_comment_widget(self)
 
         self.icon_mode = 0
         self.list_mode = 1
@@ -107,7 +110,7 @@ class videos_widget(QtWidgets.QWidget):
 
     def refresh(self):
         QtWidgets.QApplication.processEvents()
-        start_time = time.time()
+        start_time = time.perf_counter()
         if self.isVisible():
             self.refresh_list_view()
             self.refresh_icons_view()
@@ -115,7 +118,7 @@ class videos_widget(QtWidgets.QWidget):
         self.update_refresh_time(start_time)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def refresh_list_view(self):
@@ -129,6 +132,9 @@ class videos_widget(QtWidgets.QWidget):
                         project_videos_id.append(video_row['id'])
                         if video_row['id'] not in self.video_list_ids.keys():
                             video_item = custom_video_tree_item(video_row, self.list_view.invisibleRootItem())
+                            video_item.signal_handler.enter.connect(self.view_comment_widget.show_comment)
+                            video_item.signal_handler.leave.connect(self.view_comment_widget.close)
+                            video_item.signal_handler.move_event.connect(self.view_comment_widget.move_ui)
                             self.video_list_ids[video_row['id']] = video_item
                         else:
                             self.video_list_ids[video_row['id']].refresh(video_row)
@@ -524,7 +530,21 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, video_row, parent=None):
         super(custom_video_tree_item, self).__init__(parent)
         self.video_row = video_row
+        self.comment_label = tag_label.tag_label()
+        self.comment_label.setNoMultipleLines()
+        self.treeWidget().setItemWidget(self, 3, self.comment_label)
         self.fill_ui()
+        self.signal_handler = signal_handler()
+        self.connect_functions()
+
+    def show_comment(self):
+        if self.comment_label.isActiveWindow():
+            self.signal_handler.enter.emit(self.video_row['comment'], self.video_row['creation_user'])
+
+    def connect_functions(self):
+        self.comment_label.enter.connect(self.show_comment)
+        self.comment_label.leave.connect(self.signal_handler.leave.emit)
+        self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
     def fill_ui(self):
         self.setText(0, self.video_row['name'])
@@ -535,7 +555,7 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         day, hour = tools.convert_time(self.video_row['creation_time'])
         self.setText(2, f"{day} - {hour}")
         self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
-        self.setText(3, self.video_row['comment'])
+        self.comment_label.setText( self.video_row['comment'])
         self.setText(4, os.path.basename(self.video_row['file_path']))
         self.setText(5, str(self.video_row['id']))
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))
@@ -549,6 +569,15 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
     def refresh(self, video_row):
         self.video_row = video_row
         self.fill_ui()
+
+class signal_handler(QtCore.QObject):
+
+    enter = pyqtSignal(str, str)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(signal_handler, self).__init__(parent)
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, video_row, parent=None):
