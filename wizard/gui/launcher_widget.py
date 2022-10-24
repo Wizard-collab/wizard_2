@@ -43,7 +43,6 @@ class launcher_widget(QtWidgets.QFrame):
         self.change_work_env(None)
 
     def change_work_env(self, work_env_id):
-        start_time = time.time()
         self.work_env_id = work_env_id
         self.refresh_versions_hard()
 

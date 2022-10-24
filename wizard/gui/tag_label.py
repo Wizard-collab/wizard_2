@@ -145,15 +145,6 @@ class tag_label(QtWidgets.QWidget):
         return width
                     
     def draw_item(self, item, pos, item_width, painter):
-        if self.no_multiple_lines:
-            if pos[0] + item_width > self.width():
-                while (pos[0] + item_width + self.get_item_width('...') > self.width()) and len(item) >= 1:
-                    item = item[:-1]
-                    item_width = self.get_item_width(item)
-                item += '...'
-                item_width = self.get_item_width(item)
-                self.stop_drawing = True
-
         if item.startswith('@'):
             pos_to_draw = [pos[0], pos[1]]
             painter.setBrush(QtGui.QBrush(QtGui.QColor(119, 133, 222, 100)))

@@ -5,8 +5,8 @@ import yaml
 import logging
 logger = logging.getLogger(__name__)
 
-SERVER_DOWNLOAD_PATH = "W:/html/download/"
-SERVER_CGI_BIN_PATH = "W:/html/cgi-bin/"
+SERVER_DOWNLOAD_PATH = "O:/html/download/"
+SERVER_CGI_BIN_PATH = "O:/html/cgi-bin/"
 COMPIL_PATH = 'compile/'
 
 def deploy_to_server():

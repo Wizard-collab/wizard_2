@@ -162,7 +162,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.stage_ids = dict()
 
     def refresh_assets(self):
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         category = self.category_comboBox.currentText()
         if category != self.category:
@@ -262,7 +262,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.update_refresh_time(start_time)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def get_asset_coord(self, asset_id):

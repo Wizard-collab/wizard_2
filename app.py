@@ -65,7 +65,7 @@ class app():
         self.stats_schedule = app_utils.init_stats()
         
         # Main gui app
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.loading_widget = loading_widget.loading_widget()
         self.loading_widget.show()
         QtWidgets.QApplication.processEvents()
@@ -82,7 +82,7 @@ class app():
         self.loading_widget.close()
         self.main_widget.whatsnew()
         self.main_widget.is_latest_build(force=0)
-        logger.info(f"Wizard start time : {str(round((time.time()-start_time), 1))}s")
+        logger.info(f"Wizard start time : {str(round((time.perf_counter()-start_time), 1))}s")
 
     def quit(self):
         sys.stdout = sys.__stdout__

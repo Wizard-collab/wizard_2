@@ -59,7 +59,7 @@ class championship_widget(QtWidgets.QWidget):
         self.footer_layout.addWidget(self.refresh_label)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def toggle(self):
@@ -81,7 +81,7 @@ class championship_widget(QtWidgets.QWidget):
 
     def refresh(self):
         if self.isVisible():
-            start_time = time.time()
+            start_time = time.perf_counter()
             all_user_rows = repository.get_users_list()
             indexes_dic = dict()
             xp_dic = dict()

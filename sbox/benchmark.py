@@ -2,14 +2,14 @@ import wapi
 import time
 import statistics
 times = []
-start_time = time.time()
+start_time = time.perf_counter()
 for a in range(1,100):
-	asset_start_time = time.time()
+	asset_start_time = time.perf_counter()
 	asset_path=wapi.assets.create_asset("sequences/INTRO", f"benchmark_{str(a)}")
 	for stage in ['layout', 'animation', 'cfx', 'fx', 'camera', 'lighting', 'compositing']:
 		wapi.assets.create_stage(asset_path, stage)
-	times.append(time.time()-asset_start_time)
-print(time.time()-start_time)
+	times.append(time.perf_counter()-asset_start_time)
+print(time.perf_counter()-start_time)
 print(statistics.mean(times))
 
 wapi.team.refresh_ui()

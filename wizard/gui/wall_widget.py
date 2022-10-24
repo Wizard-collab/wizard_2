@@ -177,7 +177,7 @@ class wall_widget(QtWidgets.QWidget):
             self.event_ids[event_id].setVisible(False)
 
     def refresh(self):
-        start_time = time.time()
+        start_time = time.perf_counter()
         self.event_rows = project.get_all_events()
         if self.event_rows is not None:
 
@@ -230,7 +230,7 @@ class wall_widget(QtWidgets.QWidget):
             del self.event_ids[event_id]
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
 class wall_time_widget(QtWidgets.QWidget):

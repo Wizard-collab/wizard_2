@@ -178,7 +178,7 @@ class references_widget(QtWidgets.QWidget):
 
     def refresh(self):
         QtWidgets.QApplication.processEvents()
-        start_time = time.time()
+        start_time = time.perf_counter()
         if self.isVisible():
             if self.parent_instance_id is not None and self.parent_instance_id != 0:
                 if self.context == 'work_env':
@@ -250,7 +250,7 @@ class references_widget(QtWidgets.QWidget):
         self.update_group_item()
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def remove_selection(self):

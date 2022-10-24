@@ -201,7 +201,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
     def refresh(self):
         QtWidgets.QApplication.processEvents()
-        start_time = time.time()
+        start_time = time.perf_counter()
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
         else:
@@ -214,7 +214,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.update_refresh_time(start_time)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_time(self):

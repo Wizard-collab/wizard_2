@@ -106,8 +106,6 @@ class app():
 
         db_utils.modify_db_name('project', environment.get_project_name())
 
-        start_time = time.time()
-        
         self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
         self.table_viewer_widget.exec_()
         self.quit()

@@ -204,7 +204,7 @@ class tree_widget(QtWidgets.QFrame):
             self.update_columns_visibility()
 
     def refresh(self, hard=None):
-        start_time = time.time()
+        start_time = time.perf_counter()
         if hard:
             self.init_tree()
 
@@ -266,7 +266,7 @@ class tree_widget(QtWidgets.QFrame):
         self.update_creation_items_visibility()
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
     def refresh_datas(self):

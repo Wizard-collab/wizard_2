@@ -136,7 +136,7 @@ class footer_widget(QtWidgets.QFrame):
         self.buttons_layout.addWidget(self.wall_button)
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"global refresh : {refresh_time}s")
 
     def set_team_connection(self, team_connection):

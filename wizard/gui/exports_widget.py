@@ -336,7 +336,7 @@ class exports_widget(QtWidgets.QWidget):
 
     def refresh(self):
         QtWidgets.QApplication.processEvents()
-        start_time = time.time()
+        start_time = time.perf_counter()
         if self.isVisible():
             if self.variant_id is not None:
                 self.setAcceptDrops(True)
@@ -410,7 +410,7 @@ class exports_widget(QtWidgets.QWidget):
             self.destination_manager.refresh()
 
     def update_refresh_time(self, start_time):
-        refresh_time = str(round((time.time()-start_time), 3))
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"- refresh : {refresh_time}s")
 
     def extension_signal(self, tuple_signal):
