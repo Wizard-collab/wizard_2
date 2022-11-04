@@ -14,7 +14,7 @@ import substance_painter.logging as logging
 def get_mesh_file():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'modeling' not in references.keys():
-        logging.error("Not modeling references found")
+        logging.error("No modeling references found")
         return
     if len(references['modeling']) != 1:
         logging.error("Please reference only ONE modeling export")

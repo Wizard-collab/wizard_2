@@ -88,6 +88,17 @@ def get_substance_painter():
 	else:
 		return None
 
+def get_substance_designer():
+	executable = path_utils.join(program_files,
+								'Adobe',
+								'Adobe Substance 3D Designer',
+								'Adobe Substance 3D Designer.exe')
+	if path_utils.isfile(executable):
+		return {'Adobe Substance 3D Designer':executable.replace('\\', '/')}
+	else:
+		return None
+
+
 def get_houdini():
 	to_list = path_utils.join(program_files, 'Side Effects Software')
 	executables_dic = dict()
@@ -129,6 +140,7 @@ def get_software_executables(software_name):
 	functions_dic['blender'] = get_blender
 	functions_dic['maya'] = get_maya
 	functions_dic['substance_painter'] = get_substance_painter
+	functions_dic['substance_designer'] = get_substance_designer
 	functions_dic['houdini'] = get_houdini
 	functions_dic['nuke'] = get_nuke
 	if software_name in functions_dic.keys():
