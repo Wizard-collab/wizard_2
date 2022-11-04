@@ -72,6 +72,11 @@ def get_output(node, socket_identifier):
             break
     return output
 
+def find_image(full_name):
+    for image_name in bpy.data.images.keys():
+        if full_name.split('.')[0] in image_name:
+            return bpy.data.images[image_name]
+
 def get_textures_dic(files_list):
     textures_dic = dict()
 
@@ -98,9 +103,12 @@ def get_textures_dic(files_list):
         if 'diffuse_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images['diffuse_maps'])
         bpy.ops.image.open(filepath=diffuse_maps[0], directory=os.path.dirname(diffuse_maps[0]), use_udim_detecting=True)
-        image = bpy.data.images[os.path.basename(diffuse_maps[0])]
-        image.name = 'diffuse_maps'
-        textures_dic['diffuse'] = image
+        image = find_image(os.path.basename(diffuse_maps[0]))
+        if image:
+            image.name = 'diffuse_maps'
+            textures_dic['diffuse'] = image
+        else:
+            textures_dic['diffuse'] = None
     else:
         textures_dic['diffuse'] = None
 
@@ -108,9 +116,12 @@ def get_textures_dic(files_list):
         if 'roughness_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images['roughness_maps'])
         bpy.ops.image.open(filepath=roughness_maps[0], directory=os.path.dirname(roughness_maps[0]), use_udim_detecting=True)
-        image = bpy.data.images[os.path.basename(roughness_maps[0])]
-        image.name = 'roughness_maps'
-        textures_dic['roughness'] = image
+        image = find_image(os.path.basename(roughness_maps[0]))
+        if image:
+            image.name = 'roughness_maps'
+            textures_dic['roughness'] = image
+        else:
+            textures_dic['roughness'] = None
     else:
         textures_dic['roughness'] = None
 
@@ -118,9 +129,12 @@ def get_textures_dic(files_list):
         if 'metalness_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images['metalness_maps'])
         bpy.ops.image.open(filepath=metalness_maps[0], directory=os.path.dirname(metalness_maps[0]), use_udim_detecting=True)
-        image = bpy.data.images[os.path.basename(metalness_maps[0])]
-        image.name = 'metalness_maps'
-        textures_dic['metalness'] = image
+        image = find_image(os.path.basename(metalness_maps[0]))
+        if image:
+            image.name = 'metalness_maps'
+            textures_dic['metalness'] = image
+        else:
+            textures_dic['metalness'] = None
     else:
         textures_dic['metalness'] = None
 
@@ -128,9 +142,12 @@ def get_textures_dic(files_list):
         if 'normal_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images['normal_maps'])
         bpy.ops.image.open(filepath=normal_maps[0], directory=os.path.dirname(normal_maps[0]), use_udim_detecting=True)
-        image = bpy.data.images[os.path.basename(normal_maps[0])]
-        image.name = 'normal_maps'
-        textures_dic['normal_map'] = image
+        image = find_image(os.path.basename(normal_maps[0]))
+        if image:
+            image.name = 'normal_maps'
+            textures_dic['normal_map'] = image
+        else:
+            textures_dic['normal_map'] = None
     else:
         textures_dic['normal_map'] = None
 
@@ -138,9 +155,12 @@ def get_textures_dic(files_list):
         if 'height_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images['height_maps'])
         bpy.ops.image.open(filepath=height_maps[0], directory=os.path.dirname(height_maps[0]), use_udim_detecting=True)
-        image = bpy.data.images[os.path.basename(height_maps[0])]
-        image.name = 'height_maps'
-        textures_dic['height_map'] = image
+        image = find_image(os.path.basename(height_maps[0]))
+        if image:
+            image.name = 'height_maps'
+            textures_dic['height_map'] = image
+        else:
+            textures_dic['height_map'] = None
     else:
         textures_dic['height_map'] = None
 
