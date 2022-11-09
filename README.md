@@ -1,9 +1,9 @@
-![alt text](http://93.19.210.30/documentation/_images/wizard_icon_256.png)
+![alt text](http://54.39.96.76/documentation/_images/wizard_icon_256.png)
 
 # Wizard
 
 Wizard is an autonomous software for managing CGI productions.
-http://93.19.210.30/
+http://54.39.96.76/
 
 * Installation:
 	* Install PostgreSQL on your computer or any server
