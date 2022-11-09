@@ -551,6 +551,7 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(0, bold_font)
+        self.setIcon(0, QtGui.QIcon(ressources._file_icon_))
         self.setText(1, self.video_row['creation_user'])
         day, hour = tools.convert_time(self.video_row['creation_time'])
         self.setText(2, f"{day} - {hour}")

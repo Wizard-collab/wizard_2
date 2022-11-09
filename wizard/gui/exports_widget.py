@@ -635,6 +635,8 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.export_version_row['name'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
+        self.setIcon(0, QtGui.QIcon(ressources._exports_icon_))
+
         self.setFont(1, bold_font)
         self.setText(2, self.export_version_row['creation_user'])
         day, hour = tools.convert_time(self.export_version_row['creation_time'])

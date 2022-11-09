@@ -158,6 +158,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.setObjectName('popup_event_frame')
         self.version_id = version_id
         self.build_ui()
+        self.update_comment_validity()
         self.fill_ui()
         self.connect_functions()
         self.init_clock()
@@ -188,6 +189,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.update_comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.version_id))
         self.comment_textEdit.textChanged.connect(self.propose_tags)
+        self.comment_textEdit.textChanged.connect(self.update_comment_validity)
         self.comment_textEdit.apply_signal.connect(self.update_comment)
 
     def propose_tags(self):
@@ -199,6 +201,17 @@ class popup_save_widget(QtWidgets.QFrame):
         self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
         self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.exec()
+
+    def update_comment_validity(self):
+        text = self.comment_textEdit.toPlainText()
+        if len(text) < 5:
+            color = '#ff5d5d'
+            self.warning_text.setText('Warning, your comment is too short')
+        else:
+            color = '#95d859'
+            self.warning_text.setText("That's better !")
+        self.comment_textEdit.setStyleSheet('#comment_textEdit{border:1px solid %s}' %color)
+        self.warning_text.setStyleSheet('color: %s' %color)
 
     def move_cursor_to_end(self):
         self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
@@ -250,9 +263,13 @@ class popup_save_widget(QtWidgets.QFrame):
         self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.comment_textEdit = gui_utils.no_return_textEdit()
+        self.comment_textEdit.setObjectName('comment_textEdit')
         self.comment_textEdit.setPlaceholderText('Your comment')
         self.comment_textEdit.setMaximumHeight(50)
         self.main_layout.addWidget(self.comment_textEdit)
+
+        self.warning_text = QtWidgets.QLabel("")
+        self.main_layout.addWidget(self.warning_text)
 
         self.update_comment_button = QtWidgets.QPushButton('Comment')
         self.main_layout.addWidget(self.update_comment_button)
@@ -275,6 +292,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.is_comment = False
         self.event_row = event_row
         self.build_ui()
+        self.update_comment_validity()
         self.fill_ui()
         self.connect_functions()
         self.init_clock()
@@ -339,6 +357,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
         self.action_button.clicked.connect(self.action)
         self.comment_textEdit.textChanged.connect(self.propose_tags)
+        self.comment_textEdit.textChanged.connect(self.update_comment_validity)
 
     def propose_tags(self):
         text = self.comment_textEdit.toPlainText()
@@ -352,6 +371,17 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def move_cursor_to_end(self):
         self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
+
+    def update_comment_validity(self):
+        text = self.comment_textEdit.toPlainText()
+        if len(text) < 5:
+            color = '#ff5d5d'
+            self.warning_text.setText('Warning, your comment is too short')
+        else:
+            color = '#95d859'
+            self.warning_text.setText("That's better !")
+        self.comment_textEdit.setStyleSheet('#comment_textEdit{border:1px solid %s}' %color)
+        self.warning_text.setStyleSheet('color: %s' %color)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -505,9 +535,13 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_widget.setVisible(False)
 
         self.comment_textEdit = gui_utils.no_return_textEdit()
+        self.comment_textEdit.setObjectName('comment_textEdit')
         self.comment_textEdit.setMaximumHeight(50)
         self.comment_textEdit.setPlaceholderText('Your comment')
         self.comment_widget_layout.addWidget(self.comment_textEdit)
+
+        self.warning_text = QtWidgets.QLabel()
+        self.comment_widget_layout.addWidget(self.warning_text)
 
         self.comment_button = QtWidgets.QPushButton('Comment')
         self.comment_widget_layout.addWidget(self.comment_button)

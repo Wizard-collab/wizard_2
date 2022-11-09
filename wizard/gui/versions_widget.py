@@ -790,6 +790,7 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(0, bold_font)
+        self.setIcon(0, QtGui.QIcon(ressources._file_icon_))
         self.setIcon(1, self.software_icon)
         self.setText(2, self.version_row['creation_user'])
         day, hour = tools.convert_time(self.version_row['creation_time'])
