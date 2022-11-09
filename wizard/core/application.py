@@ -39,13 +39,12 @@ logger = logging.getLogger(__name__)
 
 def get_version():
     version_file = 'version.yaml'
-    if path_utils.isfile(version_file):
-        with open(version_file, 'r') as f:
-            version_dic = yaml.load(f, Loader=yaml.Loader)
-        return version_dic
-    else:
+    if not path_utils.isfile(version_file):
         logger.error(f'{version_file} not found')
         return None
+    with open(version_file, 'r') as f:
+        version_dic = yaml.load(f, Loader=yaml.Loader)
+    return version_dic
 
 def log_app_infos():
 	print('')
