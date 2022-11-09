@@ -18,6 +18,7 @@ from houdini_wizard import wizard_reference
 from houdini_wizard.export import custom
 from houdini_wizard.export import modeling
 from houdini_wizard.export import rigging
+from houdini_wizard.export import grooming
 from houdini_wizard.export import layout
 from houdini_wizard.export import cfx
 from houdini_wizard.export import fx
@@ -33,6 +34,8 @@ def export():
         modeling.main()
     elif stage_name == 'rigging':
         rigging.main()
+    elif stage_name == 'grooming':
+        grooming.main()
     elif stage_name == 'layout':
         layout.main()
     elif stage_name == 'cfx':
@@ -52,6 +55,7 @@ def reference_all(references=None):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     import_modeling(references)
     import_rigging(references)
+    import_grooming(references)
     import_custom(references)
     import_layout(references)
     import_animation(references)
@@ -63,6 +67,7 @@ def update_all(references=None):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     update_modeling(references)
     update_rigging(references)
+    update_grooming(references)
     update_custom(references)
     update_layout(references)
     update_animation(references)
@@ -96,6 +101,20 @@ def update_rigging(references=None):
     if 'rigging' in references.keys():
         for reference in references['rigging']:
             wizard_reference.update_rigging(reference)
+
+def import_grooming(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.reference_grooming(reference)
+
+def update_grooming(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.update_grooming(reference)
 
 def import_custom(references=None):
     if not references:

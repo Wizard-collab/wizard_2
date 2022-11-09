@@ -28,6 +28,12 @@ def reference_rigging(reference_dic):
 def update_rigging(reference_dic):
     update_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_variant'])
 
+def reference_grooming(reference_dic):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
+
+def update_grooming(reference_dic):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
+
 def reference_custom(reference_dic):
     import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
 

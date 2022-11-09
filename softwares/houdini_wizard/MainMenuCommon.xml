@@ -48,6 +48,12 @@ wizard_plugin.import_rigging()]]>
                   </scriptCode>
                 </scriptItem>
                 <scriptItem>
+                  <label>Import grooming</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.import_grooming()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
                   <label>Import custom</label>
                   <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
 wizard_plugin.import_custom()]]>
@@ -97,6 +103,12 @@ wizard_plugin.update_modeling()]]>
                   <label>Update rigging</label>
                   <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
 wizard_plugin.update_rigging()]]>
+                  </scriptCode>
+                </scriptItem>
+                <scriptItem>
+                  <label>Update grooming</label>
+                  <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.update_grooming()]]>
                   </scriptCode>
                 </scriptItem>
                 <scriptItem>

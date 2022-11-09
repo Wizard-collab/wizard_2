@@ -12,7 +12,7 @@ def init_project(mesh_file):
     workflow = substance_painter.project.ProjectWorkflow.UVTile
 
     project_settings = substance_painter.project.Settings(
-        import_cameras=False,
+        import_cameras=True,
         normal_map_format=ogl_normal_map_format,
         tangent_space_mode=per_vertex_tangent,
         project_workflow=workflow)
@@ -30,7 +30,7 @@ def on_mesh_reload(status: substance_painter.project.ReloadMeshStatus):
 
 def update_mesh(mesh_file):
     mesh_reloading_settings = substance_painter.project.MeshReloadingSettings(
-        import_cameras=False,
+        import_cameras=True,
         preserve_strokes=True)
 
     substance_painter.project.reload_mesh(

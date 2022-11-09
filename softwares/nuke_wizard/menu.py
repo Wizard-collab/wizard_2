@@ -42,6 +42,12 @@ nuke.menu('Nuke').addCommand("Wizard/Update/Update lighting", "wizard_plugin.upd
 
 menu.addSeparator()
 
+menu.addMenu("Exr options")
+nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to DeepRead", "wizard_tools.switch_selection_to_deepRead()")
+nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to Read", "wizard_tools.switch_selection_to_read()")
+
+menu.addSeparator()
+
 nuke.menu('Nuke').addCommand("Wizard/Set frame range", "wizard_plugin.set_frame_range()")
 nuke.menu('Nuke').addCommand("Wizard/Set frame range with rolls", "wizard_plugin.set_frame_range(rolls=1)")
 nuke.menu('Nuke').addCommand("Wizard/Set image format", "wizard_plugin.set_image_format()")

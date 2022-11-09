@@ -99,6 +99,39 @@ def create_read(name, namespace):
     add_namespace_knob(read, namespace)
     return read
 
+def switch_selection_to_deepRead():
+    selection = nuke.selectedNodes()
+    all_nodes = nuke.allNodes()
+    for node in selection:
+        if node.Class() == 'Read':
+            new_node = nuke.nodes.DeepRead(file='', name='temp', xpos=0, ypos=-500)
+            replace_node(node, new_node, all_nodes)
+            new_node.setSelected(True)
+
+def switch_selection_to_read():
+    selection = nuke.selectedNodes()
+    all_nodes = nuke.allNodes()
+    for node in selection:
+        if node.Class() == 'DeepRead':
+            new_node = nuke.nodes.Read(file='', name='temp', xpos=0, ypos=-500)
+            replace_node(node, new_node, all_nodes)
+            new_node.setSelected(True)
+
+def replace_node(node, new_node, all_nodes):
+    for other_node in all_nodes:
+        try:
+            for i in range(other_node.inputs()):
+                if other_node.input(i) == node:
+                    other_node.setInput(i, new_node)
+        except ValueError:
+            pass
+    add_namespace_knob(new_node, node['wizard_namespace'].value())
+    set_read_data(new_node, node['file'].value(), [node['first'].value(), node['last'].value()])
+    new_node.setXYpos(int(node['xpos'].value()), int(node['ypos'].value()))
+    name = node['name'].value()
+    nuke.delete(node)  
+    new_node['name'].setValue(name)
+
 def add_namespace_knob(node, namespace):
     namespace_knob = nuke.String_Knob('wizard_namespace', 'wizard_namespace')
     node.addKnob(namespace_knob)
