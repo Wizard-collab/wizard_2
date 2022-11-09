@@ -197,7 +197,10 @@ class popup_save_widget(QtWidgets.QFrame):
         self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
         self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
+        self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.exec()
+
+    def move_cursor_to_end(self):
         self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
 
     def update_comment(self):
@@ -344,7 +347,10 @@ class popup_event_widget(QtWidgets.QFrame):
         self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
         self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
+        self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.exec()
+
+    def move_cursor_to_end(self):
         self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
 
     def update_comment(self):

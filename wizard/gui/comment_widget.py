@@ -84,7 +84,10 @@ class comment_widget(QtWidgets.QDialog):
         self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
         self.tags_widget.other_key_pressed.connect(self.comment_field.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_field.setText)
+        self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.exec()
+
+    def move_cursor_to_end(self):
         self.comment_field.moveCursor(QtGui.QTextCursor.End)
 
     def connect_functions(self):
