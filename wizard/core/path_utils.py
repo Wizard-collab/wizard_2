@@ -42,6 +42,8 @@ def mkdir(path):
 		logger.info("No path given")
 		return
 	path = clean_path(path)
+	if os.path.isdir(path):
+		return True
 	return os.mkdir(path)
 
 def makedirs(path):

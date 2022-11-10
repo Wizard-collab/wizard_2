@@ -150,7 +150,7 @@ def move_ui(widget, margin=0, pos=None):
     widget.move(posx, posy)
     return f"{angley}-{anglex}"
 
-def mask_image(imgdata, imgtype='png', size=64):
+def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
     image = QtGui.QImage.fromData(imgdata, imgtype)
     image.convertToFormat(QtGui.QImage.Format_ARGB32)
     imgsize = min(image.width(), image.height())
@@ -168,7 +168,11 @@ def mask_image(imgdata, imgtype='png', size=64):
     painter.setBrush(brush)      # Use the image texture brush
     painter.setPen(QtCore.Qt.NoPen)     # Don't draw an outline
     painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
-    painter.drawEllipse(0, 0, imgsize, imgsize)  # Actually draw the circle
+    if custom_radius:
+        rect = QtCore.QRect(0,0,imgsize,imgsize)
+        painter.drawRoundedRect(rect, custom_radius, custom_radius)
+    else:
+        painter.drawEllipse(0, 0, imgsize, imgsize)  # Actually draw the circle
     painter.end()                # We are done (segfault if you forget this)
     pr = QtGui.QWindow().devicePixelRatio()
     pm = QtGui.QPixmap.fromImage(out_img)
