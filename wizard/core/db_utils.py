@@ -169,18 +169,18 @@ def delete_rows(level, table):
 
 def check_database_existence(database):
     conn = db_core.create_connection()
-    if conn is not None:
-        conn.autocommit = True
-        cur = conn.cursor()
-        cur.execute("SELECT datname FROM pg_database;")
-        list_database = cur.fetchall()
-        conn.close()
-        if (database,) in list_database:
-            logger.debug("'{}' Database already exist".format(database))
-            return 1
-        else:
-            logger.debug("'{}' Database doesn't exist.".format(database))
-            return None
+    if conn is None:
+        return
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute("SELECT datname FROM pg_database;")
+    list_database = cur.fetchall()
+    conn.close()
+    if (database,) not in list_database:
+        logger.debug("'{}' Database doesn't exist.".format(database))
+        return
+    logger.debug("'{}' Database already exist".format(database))
+    return 1
 
 def get_table_description(level, table):
     sql_cmd = f"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = '{table}' order by ORDINAL_POSITION;"

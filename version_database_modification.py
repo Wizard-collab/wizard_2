@@ -31,5 +31,4 @@ from wizard.core import environment
 from wizard.core import project
 
 def main():
-	project.create_videos_table(environment.get_project_name())
-	#project.create_tags_table(environment.get_project_name())
+	pass

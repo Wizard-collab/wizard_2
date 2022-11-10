@@ -60,17 +60,18 @@ class db_server(threading.Thread):
         while self.running:
             try:
                 conn, addr = self.server.accept()
-                if addr[0] == self.server_address:
-                    signal_as_str = socket_utils.recvall(conn)
-                    if signal_as_str:
-                        returned = self.execute_signal(signal_as_str.decode('utf8'))
-                        socket_utils.send_signal_with_conn(conn, returned)
-                        conn.close()
+                if addr[0] != self.server_address:
+                    continue
+                signal_as_str = socket_utils.recvall(conn)
+                if not signal_as_str:
+                    continue
+                returned = self.execute_signal(signal_as_str.decode('utf8'))
+                socket_utils.send_signal_with_conn(conn, returned)
+                conn.close()
             except OSError:
                 pass
             except:
                 logger.error(str(traceback.format_exc()))
-                continue
                 
         if self.repository_conn is not None:
             self.repository_conn.close()
@@ -150,7 +151,6 @@ class db_server(threading.Thread):
 
 def create_connection(database=None):
     try:
-        conn=None
         conn = psycopg2.connect(environment.get_psql_dns(), database=database)
         if conn and database:
             conn.autocommit=True
@@ -158,11 +158,10 @@ def create_connection(database=None):
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         logger.error(error)
-        return None
+        return
 
 def try_connection(DNS):
     try:
-        conn=None
         conn = psycopg2.connect(DNS)
         if conn is not None:
             conn.close()
@@ -170,7 +169,7 @@ def try_connection(DNS):
     except psycopg2.OperationalError as e:
         logger.error(e)
         logger.error(f"Wizard could not connect to PostgreSQL server with this DNS : {DNS}")
-        return None
+        return
 
 def create_database(database):
     conn=None
@@ -183,7 +182,7 @@ def create_database(database):
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
         logger.error(error)
-        return None
+        return
     finally:
         if conn is not None:
             conn.close()
@@ -197,7 +196,7 @@ def create_table(database, cmd):
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
         logger.error(error)
-        return None
+        return
     finally:
         if conn:
             conn.close()

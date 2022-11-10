@@ -73,7 +73,6 @@ def create_project(project_name,
                     project_image=None,
                     deadline=get_default_deadline()):
     do_creation = 1
-
     if project_name == '':
         logger.warning("Please provide a project name")
         do_creation = 0
@@ -86,17 +85,16 @@ def create_project(project_name,
     deadline_float = tools.get_time_float_from_string_date(deadline)
     if not deadline_float:
         do_creation = 0
-
-    if do_creation: 
-        old_project_name = environment.get_project_name()
-        if project.create_project(project_name, project_path, project_password, project_image):
-            db_utils.modify_db_name('project', project_name)
-            init_project(project_name, project_path, project_password, frame_rate, image_format, deadline_float)
-            if old_project_name is not None:
-                user.log_project_without_cred(old_project_name)
-            return 1
-    else:
-        return None
+    if not do_creation: 
+        return
+    old_project_name = environment.get_project_name()
+    if not project.create_project(project_name, project_path, project_password, project_image):
+        return
+    db_utils.modify_db_name('project', project_name)
+    init_project(project_name, project_path, project_password, frame_rate, image_format, deadline_float)
+    if old_project_name is not None:
+        user.log_project_without_cred(old_project_name)
+    return 1
 
 
 def init_project(project_name,
@@ -106,7 +104,6 @@ def init_project(project_name,
                     image_format=[1920,1080],
                     deadline=time.time()+23328000):
     do_creation = 1
-
     if project_name == '':
         logger.warning("Please provide a project name")
         do_creation = 0
@@ -116,36 +113,32 @@ def init_project(project_name,
     if project_password == '':
         logger.warning("Please provide a password")
         do_creation = 0
+    if not do_creation: 
+        return
+    project.create_settings_row(frame_rate, image_format, deadline)
+    for domain in assets_vars._domains_list_:
+        assets.create_domain(domain)
+    assets_domain_id = 1
+    for category in assets_vars._assets_categories_list_:
+        assets.create_category(category, assets_domain_id)
+    for software in softwares_vars._softwares_list_:
+        software_id = project.add_software(software,
+                        softwares_vars._extensions_dic_[software],
+                        softwares_vars._file_command_[software],
+                        softwares_vars._no_file_command_[software],
+                        softwares_vars._batch_file_command_[software],
+                        softwares_vars._batch_no_file_command_[software])
+        for stage in assets_vars._ext_dic_.keys():
+            if software in assets_vars._ext_dic_[stage].keys():
+                extension = assets_vars._ext_dic_[stage][software][0]
+                project.create_extension_row(stage, software_id, extension)
 
-    if do_creation: 
-        project.create_settings_row(frame_rate, image_format, deadline)
-        for domain in assets_vars._domains_list_:
-            assets.create_domain(domain)
-        assets_domain_id = 1
-        for category in assets_vars._assets_categories_list_:
-            assets.create_category(category, assets_domain_id)
-        for software in softwares_vars._softwares_list_:
-            software_id = project.add_software(software,
-                            softwares_vars._extensions_dic_[software],
-                            softwares_vars._file_command_[software],
-                            softwares_vars._no_file_command_[software],
-                            softwares_vars._batch_file_command_[software],
-                            softwares_vars._batch_no_file_command_[software])
-            for stage in assets_vars._ext_dic_.keys():
-                if software in assets_vars._ext_dic_[stage].keys():
-                    extension = assets_vars._ext_dic_[stage][software][0]
-                    project.create_extension_row(stage, software_id, extension)
-
-        tools.create_folder(project.get_shared_files_folder())
-        tools.create_folder(project.get_scripts_folder())
-        tools.create_folder(project.get_hooks_folder())
-        tools.create_folder(project.get_plugins_folder())
-
-        init_hooks()
-
-        return 1
-    else:
-        return None
+    tools.create_folder(project.get_shared_files_folder())
+    tools.create_folder(project.get_scripts_folder())
+    tools.create_folder(project.get_hooks_folder())
+    tools.create_folder(project.get_plugins_folder())
+    init_hooks()
+    return 1
 
 def init_hooks():
     hooks_dir = 'ressources/hooks'

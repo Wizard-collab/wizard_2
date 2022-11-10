@@ -60,30 +60,25 @@ def create_project_script(name,
 	if name is None or name =='':
 		logger.warning('Please provide a tool name')
 		execute = False
-
 	if script is None or script =='':
 		logger.warning('Please provide a script')
 		execute = False
-
 	if help is None or help =='':
 		logger.warning('Please provide a short help for your tool')
 		execute = False
-
-	if execute:
-		scripts_folder = project.get_scripts_folder()
-		file_name = f"{name}.py"
-		file = tools.get_filename_without_override(path_utils.join(scripts_folder, file_name))
-		if project.add_shelf_script(name, file, help, only_subprocess, icon):
-			with open(file, 'w') as f:
-				f.write(script)
-			return 1
-		else:
-			return None
-	else:
-		return None
+	if not execute:
+		return
+	scripts_folder = project.get_scripts_folder()
+	file_name = f"{name}.py"
+	file = tools.get_filename_without_override(path_utils.join(scripts_folder, file_name))
+	if not project.add_shelf_script(name, file, help, only_subprocess, icon):
+		return
+	with open(file, 'w') as f:
+		f.write(script)
+	return 1
 
 def create_separator():
-	project.add_shelf_separator()
+	return project.add_shelf_separator()
 
 def edit_project_script(id,
 						help,
@@ -93,11 +88,15 @@ def edit_project_script(id,
 
 def execute_script(script_id):
 	py_file = project.get_shelf_script_data(script_id, 'py_file')
-	if py_file:
-		user.user().execute_py(py_file)
+	if not py_file:
+		return
+	user.user().execute_py(py_file)
+	return 1
 
 def execute_script_as_subtask(script_id):
 	py_file = project.get_shelf_script_data(script_id, 'py_file')
-	if py_file:
-		task = subtask.subtask(pycmd=py_file)
-		task.start()
+	if not py_file:
+		return
+	task = subtask.subtask(pycmd=py_file)
+	task.start()
+	return 1

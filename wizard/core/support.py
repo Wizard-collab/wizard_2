@@ -46,10 +46,13 @@ def get_latest_build():
         return response.json()
     except requests.Timeout:
         logger.error('Connection timed out')
+        return
     except requests.ConnectionError:
         logger.error('No network connection')
+        return
     except:
         logger.error(str(traceback.format_exc()))
+        return
 
 def send_log(log, type, additionnal_message=''):
     URL = f"{ressources._web_server_url_}support/"
@@ -65,7 +68,6 @@ def send_log(log, type, additionnal_message=''):
     contact_dic['wizard_version'] = f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}.{version_dic['builds']}"
     contact_dic['user_email'] = environment.get_user_email()
     contact_dic['type'] = type
-
     try:
         response = requests.post(URL, data=contact_dic)
         success = response.json()
@@ -75,10 +77,13 @@ def send_log(log, type, additionnal_message=''):
             logger.info("Can't submit log, server error\nPlease contact the administrator")
     except requests.Timeout:
         logger.error('Connection timed out')
+        return
     except requests.ConnectionError:
         logger.error('No network connection')
+        return
     except:
         logger.error(str(traceback.format_exc()))
+        return
 
 def send_quote(quote):
     URL = f"{ressources._web_server_url_}quotes/"
@@ -87,7 +92,6 @@ def send_quote(quote):
     contact_dic['quote_content'] = quote
     contact_dic['user_email'] = environment.get_user_email()
     contact_dic['repository'] = environment.get_repository()
-
     try:
         response = requests.post(URL, data=contact_dic)
         success = response.json()
@@ -97,8 +101,10 @@ def send_quote(quote):
             logger.info("Can't submit quote, server error\nPlease contact the administrator")
     except requests.Timeout:
         logger.error('Connection timed out')
+        return
     except requests.ConnectionError:
         logger.error('No network connection')
+        return
     except:
         logger.error(str(traceback.format_exc()))
-
+        return

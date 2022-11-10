@@ -79,16 +79,19 @@ class subtask(Thread):
         self.pycmd = pycmd
 
     def set_env(self, env):
-        if env is not None:
-            if type(env)==dict:
-                self.env = env
+        if env is None:
+            return
+        if type(env)!=dict:
+            return
+        self.env = env
 
     def set_cwd(self, cwd):
         self.cwd = cwd
 
     def add_python_buffer_env(self):
-        if "PYTHONUNBUFFERED" not in self.env:
-            self.env["PYTHONUNBUFFERED"] = "1"
+        if "PYTHONUNBUFFERED" in self.env:
+            return
+        self.env["PYTHONUNBUFFERED"] = "1"
 
     def check_realtime_output(self):
         while self.running:
@@ -140,10 +143,12 @@ class subtask(Thread):
             print(buffered_stdout)
 
     def set_done(self):
-        if self.running == True:
-            if self.process is not None:
-                self.process.kill()
-            self.running = False
+        if self.running != True:
+            return
+        if self.process is None:
+            return
+        self.process.kill()
+        self.running = False
 
     def analyse_signal(self, out):
         if 'wizard_task_percent:' in out:
@@ -179,13 +184,15 @@ class subtask(Thread):
             logger.error(str(traceback.format_exc()))
 
     def kill(self):
-        if self.running == True:
-            if self.process is not None:
-                for child in psutil.Process(self.process.pid).children(recursive=True):
-                    child.kill()
-                self.process.kill()
-                self.communicate_thread.send_signal([self.process_id, 'status', 'Killed'])
-            self.running = False
+        if self.running != True:
+            return
+        if self.process is None:
+            return
+        for child in psutil.Process(self.process.pid).children(recursive=True):
+            child.kill()
+        self.process.kill()
+        self.communicate_thread.send_signal([self.process_id, 'status', 'Killed'])
+        self.running = False
 
     def write_log(self):
         log_name = f"subtask_{self.process_id}.log"
@@ -196,30 +203,31 @@ class subtask(Thread):
         self.communicate_thread.send_signal([self.process_id, 'log_file', log_file])
 
     def build_pycmd(self):
-        if self.pycmd is not None:
-            if self.pycmd.endswith('.py') and path_utils.isfile(self.pycmd):
-                py_file = self.pycmd
-            else:
-                py_file = tools.temp_file_from_pycmd(self.pycmd)
-            
-            if sys.argv[0].endswith('.py'):
-                executable = 'python wizard_cmd.py'
-            else:
-                executable = 'wizard_cmd'
+        if self.pycmd is None:
+            return
+        if self.pycmd.endswith('.py') and path_utils.isfile(self.pycmd):
+            py_file = self.pycmd
+        else:
+            py_file = tools.temp_file_from_pycmd(self.pycmd)
+        
+        if sys.argv[0].endswith('.py'):
+            executable = 'python wizard_cmd.py'
+        else:
+            executable = 'wizard_cmd'
 
-            psql_dns = environment.get_psql_dns()
-            repository_name = environment.get_repository()[11:]
-            user_name = environment.get_user()
-            project_name = environment.get_project_name()
-            team_dns = json.dumps(environment.get_team_dns())
+        psql_dns = environment.get_psql_dns()
+        repository_name = environment.get_repository()[11:]
+        user_name = environment.get_user()
+        project_name = environment.get_project_name()
+        team_dns = json.dumps(environment.get_team_dns())
 
-            self.command = f'{executable} '
-            self.command += f'-psqlDns "{psql_dns}" '
-            self.command += f'-repository "{repository_name}" '
-            self.command += f'-user "{user_name}" '
-            self.command += f'-project "{project_name}" '
-            self.command += f'-teamDns "{team_dns}" '
-            self.command += f'-pyfile "{py_file}"'
+        self.command = f'{executable} '
+        self.command += f'-psqlDns "{psql_dns}" '
+        self.command += f'-repository "{repository_name}" '
+        self.command += f'-user "{user_name}" '
+        self.command += f'-project "{project_name}" '
+        self.command += f'-teamDns "{team_dns}" '
+        self.command += f'-pyfile "{py_file}"'
 
     def run(self):
         try:
@@ -280,14 +288,16 @@ class communicate_thread(Thread):
 
     def send_percent(self, signal_list):
         percent = signal_list[-1]
-        if percent != self.percent:
-            if percent >= self.percent+5 or int(percent) == 100:
-                self.send_signal(signal_list)
-                self.percent = percent
+        if percent == self.percent:
+            return
+        if percent >= self.percent+5 or int(percent) == 100:
+            self.send_signal(signal_list)
+            self.percent = percent
 
     def send_signal(self, signal_list):
-        if self.conn is not None:
-            if not socket_utils.send_signal_with_conn(self.conn, signal_list, only_debug=False):
-                self.conn.close()
-                self.conn = None
-                self.stop()
+        if self.conn is None:
+            return
+        if not socket_utils.send_signal_with_conn(self.conn, signal_list, only_debug=False):
+            self.conn.close()
+            self.conn = None
+            self.stop()

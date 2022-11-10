@@ -71,14 +71,13 @@ def pixmap_to_PIL(pixmap):
     return PIL_image
 
 def resize_preview(file, destination, size=200, image_format='PNG'):
-    if path_utils.isfile(file):
-        image = Image.open(file)
-        preview, null, null = resize_image_with_fixed_width(image, size)
-        preview_file = tools.get_filename_without_override(destination)
-        preview.save(preview_file, format=image_format)
-        return preview_file
-    else:
-        return None
+    if not path_utils.isfile(file):
+        return
+    image = Image.open(file)
+    preview, null, null = resize_image_with_fixed_width(image, size)
+    preview_file = tools.get_filename_without_override(destination)
+    preview.save(preview_file, format=image_format)
+    return preview_file
 
 def convert_image_to_bytes(image_file, resize=None):
     # Resize the given file to 100*100
@@ -132,10 +131,11 @@ def resize_image(image, fixed_height):
     return image
 
 def resize_image_file(image_file, fixed_height):
-    if not image_file.endswith('.svg'):
-        image = Image.open(image_file)
-        image = resize_image(image, fixed_height)
-        image.save(image_file, format="PNG")
+    if image_file.endswith('.svg'):
+        return
+    image = Image.open(image_file)
+    image = resize_image(image, fixed_height)
+    image.save(image_file, format="PNG")
 
 def crop_image_height(pillow_image, height):
     area = (0, 0, pillow_image.size[0], height)

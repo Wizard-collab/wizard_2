@@ -120,11 +120,6 @@ _stages_rules_dic_[_assets_] = _assets_stages_list_
 _stages_rules_dic_[_sequences_] = _sequences_stages_list_
 _stages_rules_dic_[_library_] = _library_stages_list_
 
-# Default export dic
-''' The _ext_dic_ dictionnary 
-stores the default software export extensions as
-strings depending on the software and the stage
-'''
 _ext_dic_ = dict()
 _ext_dic_[_modeling_] = dict()
 _ext_dic_[_modeling_][_maya_] = ['abc', 'ma', 'obj', 'fbx']
@@ -189,7 +184,6 @@ _ext_dic_[_camera_rig_] = dict()
 _ext_dic_[_camera_rig_][_maya_] = ['ma']
 _ext_dic_[_camera_rig_][_blender_] = ['blend']
 _ext_dic_[_camera_rig_][_houdini_] = ['hip']
-
 
 # Stages softwares rules
 _stage_softwares_rules_dic_ = dict()

@@ -159,14 +159,13 @@ def add_version(work_env_id):
     # Add a version using the 'assets' module and return the file path 
     # of the new version
     version_id = assets.add_version(work_env_id, analyse_comment=False)
-    if version_id:
-        version_path = project.get_version_data(version_id,
-                                                        'file_path')
-        gui_server.refresh_ui()
-        gui_server.save_popup(version_id)
-        return (version_path, version_id)
-    else:
+    if not version_id:
         return (None, None)
+    version_path = project.get_version_data(version_id,
+                                                    'file_path')
+    gui_server.refresh_ui()
+    gui_server.save_popup(version_id)
+    return (version_path, version_id)
 
 def request_export(work_env_id, export_name):
     # Just return a temporary file name using the 'assets' module
@@ -208,18 +207,17 @@ def get_references(work_env_id):
 
 def get_frame_range(work_env_id):
     asset_row = assets.get_asset_data_from_work_env_id(work_env_id)
-    if asset_row:
-        return [asset_row['preroll'],
-                asset_row['inframe'],
-                asset_row['outframe'],
-                asset_row['postroll']]
-    else:
-        return None
+    if not asset_row:
+        return
+    return [asset_row['preroll'],
+            asset_row['inframe'],
+            asset_row['outframe'],
+            asset_row['postroll']]
 
 def modify_reference_LOD(work_env_id, LOD, namespaces_list):
     assets.modify_reference_LOD(work_env_id, LOD, namespaces_list)
     gui_server.refresh_team_ui()
-    return None
+    return
 
 def get_image_format():
     return project.get_image_format()
