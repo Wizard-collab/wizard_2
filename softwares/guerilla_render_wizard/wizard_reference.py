@@ -31,6 +31,8 @@ def reference_grooming(reference_dic):
                                     [],
                                     reference_dic['string_variant'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming',
+                reference_dic['string_variant'])
 
 def update_grooming(reference_dic):
     trigger_after_reference_hook('grooming',
@@ -39,7 +41,8 @@ def update_grooming(reference_dic):
                                     [],
                                     reference_dic['string_variant'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
-
+    update_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming',
+                reference_dic['string_variant'])
 def reference_shading(reference_dic):
     import_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_variant'])
 
