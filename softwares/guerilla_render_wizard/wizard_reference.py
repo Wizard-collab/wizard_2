@@ -25,14 +25,11 @@ def update_modeling(reference_dic):
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def reference_grooming(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming',
-                reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
-    
 
 def update_grooming(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming',
-                reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
     
 def reference_shading(reference_dic):
