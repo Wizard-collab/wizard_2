@@ -309,7 +309,6 @@ _available_icons_list_.append(_grooming_icon_)
 _available_icons_list_.append(_texturing_icon_)
 _available_icons_list_.append(_shading_icon_)
 
-
 _layout_icon_ = path_utils.join(_icons_path_, 'layout.svg')
 _animation_icon_ = path_utils.join(_icons_path_, 'animation.svg')
 _cfx_icon_ = path_utils.join(_icons_path_, 'cfx.svg')

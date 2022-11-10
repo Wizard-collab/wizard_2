@@ -63,11 +63,10 @@ def set_psql_dns(DNS):
 	return 1
 
 def get_psql_dns():
-	if env_vars._psql_dns_ in os.environ.keys():
-		return os.environ[env_vars._psql_dns_]
-	else:
+	if env_vars._psql_dns_ not in os.environ.keys():
 		logger.error('No PostgreSQL DNS defined')
-		return None
+		return
+	return os.environ[env_vars._psql_dns_]
 
 def set_communicate_server_port(port):
 	os.environ[env_vars._communicate_server_port_] = str(port)
@@ -78,79 +77,71 @@ def set_softwares_server_port(port):
 	return 1
 
 def get_softwares_server_port():
-	if env_vars._softwares_server_port_ in os.environ.keys():
-		return int(os.environ[env_vars._softwares_server_port_])
-	else:
+	if env_vars._softwares_server_port_ not in os.environ.keys():
 		logger.error('No softwares server port defined')
-		return None
+		return
+	return int(os.environ[env_vars._softwares_server_port_])
 
 def set_gui_server_port(port):
 	os.environ[env_vars._gui_server_port_] = str(port)
 	return 1
 
 def get_gui_server_port():
-	if env_vars._gui_server_port_ in os.environ.keys():
-		return int(os.environ[env_vars._gui_server_port_])
-	else:
+	if env_vars._gui_server_port_ not in os.environ.keys():
 		logger.debug('No gui server port defined')
-		return None
+		return
+	return int(os.environ[env_vars._gui_server_port_])
 
 def set_local_db_server_port(port):
 	os.environ[env_vars._local_db_server_port_] = str(port)
 	return 1
 
 def get_local_db_server_port():
-	if env_vars._local_db_server_port_ in os.environ.keys():
-		return int(os.environ[env_vars._local_db_server_port_])
-	else:
+	if env_vars._local_db_server_port_ not in os.environ.keys():
 		logger.error('No local db server port defined')
-		return None
+		return
+	return int(os.environ[env_vars._local_db_server_port_])
 
 def set_team_dns(DNS):
 	os.environ[env_vars._team_dns_] = json.dumps(DNS)
 	return 1
 
 def get_team_dns():
-	if env_vars._team_dns_ in os.environ.keys():
-		return json.loads(os.environ[env_vars._team_dns_])
-	else:
+	if env_vars._team_dns_ not in os.environ.keys():
 		logger.debug('No team DNS defined')
-		return None
+		return
+	return json.loads(os.environ[env_vars._team_dns_])
 
 def get_user():
-	if env_vars._username_env_ in os.environ.keys():
-		return os.environ[env_vars._username_env_]
-	else:
+	if env_vars._username_env_ not in os.environ.keys():
 		logger.error('No user defined')
-		return None
+		return
+	return os.environ[env_vars._username_env_]
 
 def get_user_email():
-	if env_vars._useremail_env_ in os.environ.keys():
-		return os.environ[env_vars._useremail_env_]
-	else:
+	if env_vars._useremail_env_ not in os.environ.keys():
 		logger.error('No user email defined')
-		return None
+		return
+	return os.environ[env_vars._useremail_env_]
 
 def get_project_name():
-	if env_vars._project_name_env_ in os.environ.keys():
-		return os.environ[env_vars._project_name_env_]
-	else:
+	if env_vars._project_name_env_ not in os.environ.keys():
 		logger.info('No project defined')
-		return None
+		return
+	return os.environ[env_vars._project_name_env_]
 
 def get_project_path():
-	if env_vars._project_path_env_ in os.environ.keys():
-		return os.environ[env_vars._project_path_env_]
-	else:
+	if env_vars._project_path_env_ not in os.environ.keys():
 		logger.info('No project defined')
-		return None
+		return
+	return os.environ[env_vars._project_path_env_]
 
 def get_repository():
-	if env_vars._repository_env_ in os.environ.keys():
-		return os.environ[env_vars._repository_env_]
-	else:
+	if env_vars._repository_env_ not in os.environ.keys():
 		logger.error('No repository defined')
-		return None
+		return
+	return os.environ[env_vars._repository_env_]
 
 def set_repository(repository):
 	os.environ[env_vars._repository_env_] = f"repository_{repository}"
+	return 1

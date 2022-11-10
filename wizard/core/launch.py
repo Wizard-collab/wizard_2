@@ -63,87 +63,103 @@ def launch_work_version(version_id):
     signal_dic = dict()
     signal_dic['function'] = 'launch'
     signal_dic['version_id'] = version_id
-    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=0.5)
+    return socket_utils.send_signal(('localhost',
+                                    environment.get_softwares_server_port()),
+                                    signal_dic,
+                                    timeout=0.5)
 
 def kill(work_env_id):
     signal_dic = dict()
     signal_dic['function'] = 'kill'
     signal_dic['work_env_id'] = work_env_id
-    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=100)
+    return socket_utils.send_signal(('localhost',
+                                    environment.get_softwares_server_port()),
+                                    signal_dic,
+                                    timeout=100)
 
 def kill_all():
     signal_dic = dict()
     signal_dic['function'] = 'kill_all'
-    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=100)
+    return socket_utils.send_signal(('localhost',
+                                    environment.get_softwares_server_port()),
+                                    signal_dic,
+                                    timeout=100)
 
 def died(work_env_id):
     signal_dic = dict()
     signal_dic['function'] = 'died'
     signal_dic['work_env_id'] = work_env_id
-    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=0.5)
+    return socket_utils.send_signal(('localhost',
+                                    environment.get_softwares_server_port()),
+                                    signal_dic,
+                                    timeout=0.5)
 
 def get():
     signal_dic = dict()
     signal_dic['function'] = 'get'
-    return socket_utils.send_signal(('localhost', environment.get_softwares_server_port()), signal_dic, timeout=0.5)
+    return socket_utils.send_signal(('localhost',
+                                    environment.get_softwares_server_port()),
+                                    signal_dic,
+                                    timeout=0.5)
 
 def core_kill_software_thread(software_thread):
     return software_thread.kill()
 
 def core_launch_version(version_id):
-    thread = None
-    work_env_id = None
     work_version_row = project.get_version_data(version_id)
-    if work_version_row:
-        file_path = work_version_row['file_path']
-        work_env_id = work_version_row['work_env_id']
-        if not project.get_lock(work_env_id):
-            project.set_work_env_lock(work_env_id)
-            software_id = project.get_work_env_data(work_env_id, 'software_id')
-            software_row = project.get_software_data(software_id)
-            command = build_command(file_path, software_row, version_id)
-            env = build_env(work_env_id, software_row, version_id)
-            if command :
-                thread = software_thread(command,
-                                            env,
-                                            software_row['name'],
-                                            work_env_id)
-                thread.start()
-                logger.info(f"{software_row['name']} launched")
+    if not work_version_row:
+        return None, None
+    file_path = work_version_row['file_path']
+    work_env_id = work_version_row['work_env_id']
+    if project.get_lock(work_env_id):
+        return None, None
+    project.set_work_env_lock(work_env_id)
+    software_id = project.get_work_env_data(work_env_id, 'software_id')
+    software_row = project.get_software_data(software_id)
+    command = build_command(file_path, software_row, version_id)
+    env = build_env(work_env_id, software_row, version_id)
+    if not command :
+        return None, None
+    thread = software_thread(command,
+                                env,
+                                software_row['name'],
+                                work_env_id)
+    thread.start()
+    logger.info(f"{software_row['name']} launched")
     return thread, work_env_id
 
 def build_command(file_path, software_row, version_id):
     software_path = software_row['path']
     if not os.path.isfile(software_path):
         logger.warning(f"{software_row['name']} not found ( {software_path} does not exists )")
-        return None
-    if software_path != '':
-        if path_utils.isfile(file_path):
-            raw_command = software_row['file_command']
-        else:
-            raw_command = software_row['no_file_command']
-            logger.info("File not existing, launching software with empty scene")
-
-        raw_command = raw_command.replace(softwares_vars._executable_key_, software_path)
-        raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
-
-        # Substance Painter specific launch
-        if software_row['name'] == softwares_vars._substance_painter_:
-            work_env_id = project.get_version_data(version_id, 'work_env_id')
-            references_dic = assets.get_references_files(work_env_id) 
-            if 'modeling' in references_dic.keys():
-                reference_file = references_dic['modeling'][0]['files'][0]
-                raw_command = raw_command.replace(softwares_vars._reference_key_, reference_file.replace('\\', '/'))
-            else:
-                logger.warning('Please create ONE modeling reference to launch Substance Painter')
-
-        if software_row['name'] in softwares_vars._scripts_dic_.keys():
-            raw_command = raw_command.replace(softwares_vars._script_key_,
-                                softwares_vars._scripts_dic_[software_row['name']])
-        return raw_command
-    else:
+        return
+    if software_path == '':
         logger.warning(f"{software_row['name']} path not defined")
-        return None
+        return
+    if path_utils.isfile(file_path):
+        raw_command = software_row['file_command']
+    else:
+        raw_command = software_row['no_file_command']
+        logger.info("File not existing, launching software with empty scene")
+
+    raw_command = raw_command.replace(softwares_vars._executable_key_, software_path)
+    raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
+
+    # Substance Painter specific launch
+    if software_row['name'] == softwares_vars._substance_painter_:
+        work_env_id = project.get_version_data(version_id, 'work_env_id')
+        references_dic = assets.get_references_files(work_env_id) 
+        if 'modeling' in references_dic.keys():
+            reference_file = references_dic['modeling'][0]['files'][0]
+            raw_command = raw_command.replace(softwares_vars._reference_key_,
+                                                reference_file.replace('\\', '/'))
+        else:
+            logger.warning('Please create ONE modeling reference to launch Substance Painter')
+
+    if software_row['name'] in softwares_vars._scripts_dic_.keys():
+        raw_command = raw_command.replace(softwares_vars._script_key_,
+                            softwares_vars._scripts_dic_[software_row['name']])
+    return raw_command
 
 def build_env(work_env_id, software_row, version_id, mode='gui'):
     # Building the default software environment for wizard workflow
@@ -250,24 +266,25 @@ class softwares_server(Thread):
         super(softwares_server, self).__init__()
         self.port = socket_utils.get_port('localhost')
         environment.set_softwares_server_port(self.port)
-        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
+        self.server, self.server_address = socket_utils.get_server(('localhost',
+                                                                    self.port))
         self.running = True
-
         self.software_threads_dic = dict()
 
     def run(self):
         while self.running:
             try:
                 conn, addr = self.server.accept()
-                if addr[0] == self.server_address:
-                    signal_as_str = socket_utils.recvall(conn)
-                    if signal_as_str:
-                        self.analyse_signal(signal_as_str.decode('utf8'), conn)
+                if addr[0] != self.server_address:
+                    continue
+                signal_as_str = socket_utils.recvall(conn)
+                if not signal_as_str:
+                    continue
+                self.analyse_signal(signal_as_str.decode('utf8'), conn)
             except OSError:
                 pass
             except:
                 logger.error(str(traceback.format_exc()))
-                continue
 
     def stop(self):
         self.server.close()
@@ -294,30 +311,31 @@ class softwares_server(Thread):
 
     def launch(self, version_id):
         work_env_id = project.get_version_data(version_id, 'work_env_id')
-        if work_env_id not in self.software_threads_dic.keys():
-            software_thread, work_env_id = core_launch_version(version_id)
-            if software_thread is not None:
-                self.software_threads_dic[work_env_id] = software_thread
-            return work_env_id
-        else:
+        if not work_env_id:
+            return
+        if work_env_id in self.software_threads_dic.keys():
             logger.warning(f"You are already running a work instance of this asset")
-            return 0
+            return
+        software_thread, work_env_id = core_launch_version(version_id)
+        if software_thread is not None:
+            self.software_threads_dic[work_env_id] = software_thread
+        return work_env_id
 
     def kill_all(self):
         software_threads_ids = list(self.software_threads_dic.keys())
-        if software_threads_ids is not None:
-            for work_env_id in software_threads_ids:
-                self.kill(work_env_id)
+        if software_threads_ids is None:
+            return
+        for work_env_id in software_threads_ids:
+            self.kill(work_env_id)
         return 1
 
     def kill(self, work_env_id):
-        if work_env_id in self.software_threads_dic.keys():
-            software_thread = self.software_threads_dic[work_env_id]
-            self.remove(work_env_id)
-            return core_kill_software_thread(software_thread)
-        else:
+        if work_env_id not in self.software_threads_dic.keys():
             logger.warning("Work environment not running or not found")
-            return 0
+            return
+        software_thread = self.software_threads_dic[work_env_id]
+        self.remove(work_env_id)
+        return core_kill_software_thread(software_thread)
 
     def remove(self, work_env_id):
         if work_env_id in self.software_threads_dic.keys():

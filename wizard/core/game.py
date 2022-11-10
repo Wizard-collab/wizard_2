@@ -53,11 +53,12 @@ def add_xps(amount):
 		add_levels(1)
 	repository.modify_user_xp(user_row['user_name'], new_xp)
 	repository.modify_user_total_xp(user_row['user_name'], new_total_xp)
+	return 1
 
 def add_levels(amount):
 	user_row = repository.get_user_row_by_name(environment.get_user())
 	new_level = user_row['level'] + amount
-	repository.modify_user_level(user_row['user_name'], new_level)
+	return repository.modify_user_level(user_row['user_name'], new_level)
 
 def remove_levels(amount):
 	user_row = repository.get_user_row_by_name(environment.get_user())
@@ -66,6 +67,7 @@ def remove_levels(amount):
 		new_level = 0
 	repository.modify_user_level(user_row['user_name'], new_level)
 	repository.add_death(user_row['user_name'])
+	return 1
 
 def remove_life(amount):
 	# Remove the given amount of life of
@@ -78,7 +80,7 @@ def remove_life(amount):
 	if new_life <= 0:
 		new_life = 100
 		remove_levels(1)
-	repository.modify_user_life(user_row['user_name'], new_life)
+	return repository.modify_user_life(user_row['user_name'], new_life)
 
 def analyse_comment(comment, life_amount):
 	# Analyse if a comment length is 10 characters 
@@ -89,3 +91,5 @@ def analyse_comment(comment, life_amount):
 		logger.info(f"Comment with more than 5 characters to avoid loosing life.")
 	else:
 		repository.increase_user_comments_count(environment.get_user())
+	return 1
+	

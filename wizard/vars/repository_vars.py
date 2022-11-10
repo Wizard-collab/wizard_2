@@ -36,3 +36,4 @@ _crown_quote_ = "Work hard and you may get the crown !"
 _default_quotes_list_ = [_life_quote_,
 							_xp_quote_,
 							_crown_quote_]
+							

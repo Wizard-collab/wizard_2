@@ -50,19 +50,22 @@ logger = logging.getLogger(__name__)
 
 def batch_export(version_id, settings_dic=None):
     work_version_row = project.get_version_data(version_id)
-    if work_version_row:
-        file_path = work_version_row['file_path']
-        work_env_id = work_version_row['work_env_id']
-        software_id = project.get_work_env_data(work_env_id, 'software_id')
-        software_row = project.get_software_data(software_id)
-        command = build_command(file_path, software_row, version_id)
-        env = launch.build_env(work_env_id, software_row, version_id, mode='batch')
-        env = add_settings_dic_to_env(env, settings_dic)
-        if command :
-            process = subprocess.Popen(args = shlex.split(command), env=env, cwd=path_utils.abspath('softwares'))
-            logger.info(f"{software_row['name']} launched")
-            process.wait()
-            logger.info(f"{software_row['name']} closed")
+    if not work_version_row:
+        return
+    file_path = work_version_row['file_path']
+    work_env_id = work_version_row['work_env_id']
+    software_id = project.get_work_env_data(work_env_id, 'software_id')
+    software_row = project.get_software_data(software_id)
+    command = build_command(file_path, software_row, version_id)
+    env = launch.build_env(work_env_id, software_row, version_id, mode='batch')
+    env = add_settings_dic_to_env(env, settings_dic)
+    if not command :
+        return
+    process = subprocess.Popen(args = shlex.split(command), env=env, cwd=path_utils.abspath('softwares'))
+    logger.info(f"{software_row['name']} launched")
+    process.wait()
+    logger.info(f"{software_row['name']} closed")
+    return 1
 
 def add_settings_dic_to_env(env, settings_dic):
     env['wizard_json_settings'] = json.dumps(settings_dic)
@@ -70,20 +73,17 @@ def add_settings_dic_to_env(env, settings_dic):
 
 def build_command(file_path, software_row, version_id):
     software_batch_path = software_row['batch_path']
-    if software_batch_path != '':
-        if path_utils.isfile(file_path):
-            raw_command = software_row['batch_file_command']
-        else:
-            raw_command = software_row['batch_no_file_command']
-            logger.info("File not existing, launching software with empty scene")
-
-        raw_command = raw_command.replace(softwares_vars._executable_key_, software_batch_path)
-        raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
-
-        if software_row['name'] in softwares_vars._batch_scripts_dic_.keys():
-            raw_command = raw_command.replace(softwares_vars._script_key_,
-                                softwares_vars._batch_scripts_dic_[software_row['name']])
-        return raw_command
-    else:
+    if software_batch_path == '':
         logger.warning(f"{software_row['name']} batch path not defined")
-        return None
+        return
+    if path_utils.isfile(file_path):
+        raw_command = software_row['batch_file_command']
+    else:
+        raw_command = software_row['batch_no_file_command']
+        logger.info("File not existing, launching software with empty scene")
+    raw_command = raw_command.replace(softwares_vars._executable_key_, software_batch_path)
+    raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
+    if software_row['name'] in softwares_vars._batch_scripts_dic_.keys():
+        raw_command = raw_command.replace(softwares_vars._script_key_,
+                            softwares_vars._batch_scripts_dic_[software_row['name']])
+    return raw_command
