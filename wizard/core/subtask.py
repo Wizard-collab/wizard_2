@@ -39,6 +39,7 @@ import os
 import traceback
 import sys
 import logging
+import uuid
 
 # Wizard modules
 from wizard.vars import user_vars
@@ -49,12 +50,10 @@ from wizard.core import socket_utils
 
 logger = logging.getLogger(__name__)
 
-_DNS_ = ('localhost', 10231)
-
 class subtask(Thread):
     def __init__(self, cmd=None, pycmd=None, env=None, cwd=None, print_stdout=False):
         super(subtask, self).__init__()
-        self.process_id = str(time.time())
+        self.process_id = str(uuid.uuid4())
         self.process = None
         self.command = cmd
         self.pycmd = pycmd
@@ -255,7 +254,7 @@ class subtask(Thread):
             logger.error(str(traceback.format_exc()))
 
 def send_signal(signal_list):
-    socket_utils.send_bottle(_DNS_, signal_list, 0.001)
+    socket_utils.send_bottle(('localhost', environment.get_subtasks_server_port()), signal_list, 0.001)
 
 class communicate_thread(Thread):
     def __init__(self, parent = None):
@@ -263,7 +262,7 @@ class communicate_thread(Thread):
         self.parent = parent
         self.percent = 0
         self.running = True
-        self.conn = socket_utils.get_connection(_DNS_)
+        self.conn = socket_utils.get_connection(('localhost', environment.get_subtasks_server_port()))
         if self.conn is not None:
             socket_utils.send_signal_with_conn(self.conn, self.parent.process_id)
 
@@ -301,3 +300,103 @@ class communicate_thread(Thread):
             self.conn.close()
             self.conn = None
             self.stop()
+
+class tasks_server(Thread):
+    def __init__(self):
+        super(tasks_server, self).__init__()
+        self.port = socket_utils.get_port('localhost')
+        environment.set_subtasks_server_port(self.port)
+        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
+        self.running = True
+        self.threads = dict()
+
+    def run(self):
+        while self.running:
+            try:
+                conn, addr = self.server.accept()
+                if addr[0] == self.server_address:
+                    signal_as_str = socket_utils.recvall(conn)
+                    if signal_as_str:
+                        process_id = json.loads(signal_as_str)
+                        self.new_thread(process_id, conn)
+            except OSError:
+                pass
+            except:
+                logger.error(str(traceback.format_exc()))
+                continue
+
+    def new_thread(self, process_id, conn):
+        self.task_thread = task_thread(conn, process_id)
+        self.task_thread.start()
+        self.threads[process_id] = conn
+
+    def stop(self):
+        self.server.close()
+        self.running = False
+
+class task_thread(Thread):
+    def __init__(self, conn, process_id):
+        super(task_thread, self).__init__()
+        self.conn = conn
+        self.process_id = process_id
+        self.running = True
+
+    def run(self):
+        while self.running and self.conn is not None:
+            try:
+                raw_data = socket_utils.recvall(self.conn)
+                if raw_data is not None:
+                    self.analyse_signal(raw_data)
+                else:
+                    if self.conn is not None:
+                        self.conn.close()
+                        self.conn = None
+                        #self.connection_dead.emit(1)
+            except:
+                logger.error(str(traceback.format_exc()))
+                continue
+
+    def kill(self):
+        if self.conn is not None:
+            if not socket_utils.send_signal_with_conn(self.conn, 'kill'):
+                if self.conn is not None:
+                    self.conn.close()
+                    self.conn = None
+                    #self.connection_dead.emit(1)
+
+    def get_stdout(self):
+        if self.conn is not None:
+            if not socket_utils.send_signal_with_conn(self.conn, 'get_stdout'):
+                if self.conn is not None:
+                    self.conn.close()
+                    self.conn = None
+                    #self.connection_dead.emit(1)
+
+    def stop(self):
+        self.running = False
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None
+            #self.connection_dead.emit(1)
+
+    def analyse_signal(self, raw_data):
+        try:
+            signal_list = json.loads(raw_data)
+            data_type = signal_list[1]
+            data = signal_list[2]
+
+            if data_type == 'percent':
+                print(f"Task id : {self.process_id} | Progress : {data}% ")
+            elif data_type == 'current_task':
+                print(f"Task id : {self.process_id} | Current task : {data} ")
+            elif data_type == 'status':
+                print(f"Task id : {self.process_id} | Status : {data} ")
+            elif data_type == 'log_file':
+                print(f"Task id : {self.process_id} | Log file : {data} ")
+            elif data_type == 'end':
+                print(f"Task id : {self.process_id} | Stopped ")
+                self.stop()
+            elif data_type == 'stdout':
+                pass
+        except json.decoder.JSONDecodeError:
+            logger.debug("cannot read json data")

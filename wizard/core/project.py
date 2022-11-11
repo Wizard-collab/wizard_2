@@ -858,10 +858,9 @@ def get_last_export_version(export_id, column='*'):
                                                         'export_versions',
                                                         ('export_id', export_id),
                                                         column)
-    if datas is None and datas == []:
+    if datas is None or datas == []:
         return
-    data = datas[0]
-    return data
+    return datas[0]
 
 def set_default_export_version(export_id, export_version_id):
     if not db_utils.update_data('project',

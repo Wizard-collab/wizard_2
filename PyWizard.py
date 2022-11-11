@@ -58,6 +58,7 @@ from wizard.core import launch
 from wizard.core import launch_batch
 from wizard.core import db_core
 from wizard.core import subtasks_library
+from wizard.core import subtask
 from wizard.core import hooks
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
@@ -69,6 +70,7 @@ class app():
         self.stats_schedule = None
         self.softwares_server = None
         self.communicate_server = None
+        self.tasks_server = None
 
         application.log_app_infos()
 
@@ -84,6 +86,8 @@ class app():
         self.communicate_server.start()
         self.softwares_server = launch.softwares_server()
         self.softwares_server.start()
+        self.tasks_server = subtask.tasks_server()
+        self.tasks_server.start()
 
         console = code.InteractiveConsole()
         console.interact(banner=None, exitmsg=None)
@@ -98,6 +102,8 @@ class app():
             self.softwares_server.stop()
         if self.communicate_server:
             self.communicate_server.stop()
+        if self.tasks_server:
+            self.tasks_server.stop()
         QtWidgets.QApplication.quit()
         sys.exit()
 

@@ -92,6 +92,16 @@ def get_gui_server_port():
 		return
 	return int(os.environ[env_vars._gui_server_port_])
 
+def set_subtasks_server_port(port):
+	os.environ[env_vars._subtasks_server_port_] = str(port)
+	return 1
+
+def get_subtasks_server_port():
+	if env_vars._subtasks_server_port_ not in os.environ.keys():
+		logger.debug('No subtasks server port defined')
+		return
+	return int(os.environ[env_vars._subtasks_server_port_])
+
 def set_local_db_server_port(port):
 	os.environ[env_vars._local_db_server_port_] = str(port)
 	return 1
