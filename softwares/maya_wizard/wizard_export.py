@@ -40,7 +40,7 @@ def export_by_extension(export_GRP_list, export_file, frange, percent_factor):
     elif export_file.endswith('.obj'):
         export_files_list = export_obj(export_GRP_list, export_file)
     elif export_file.endswith('.fbx'):
-        export_files_list = export_obj(export_GRP_list, export_file)
+        export_files_list = export_fbx(export_GRP_list, export_file)
     elif export_file.endswith('.fur'):
         export_files_list = export_fur(export_GRP_list, export_file, frange, percent_factor)
     else:
@@ -79,8 +79,14 @@ def export_obj(export_GRP_list, export_file):
     return [export_file]
 
 def export_fbx(export_GRP_list, export_file):
+    try:
+        pm.loadPlugin("fbxmaya")
+    except:
+        logger.debug("fbxmaya plug-in already loaded") 
     pm.select(export_GRP_list, replace=True, noExpand=True)
-    pm.exportSelected(export_file, preserveReferences=0, shader=1)
+    pm.mel.FBXResetExport()
+    pm.mel.FBXExportSmoothMesh(v = False)
+    pm.mel.FBXExport(f=export_file, s=True)
     return [export_file]
 
 def export_abc(export_GRP_list, export_file, frange, percent_factor):
