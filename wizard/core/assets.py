@@ -449,13 +449,7 @@ def create_reference(work_env_id,
     if auto_update is None:
         auto_update = user.user().get_reference_auto_update_default()
     if not namespace_and_count:
-        namespaces_list = project.get_references(work_env_id, 'namespace')
-        count = 0
-        namespace_raw = build_namespace(export_version_id)
-        namespace = f"{namespace_raw}"
-        while namespace in namespaces_list:
-            count+=1
-            namespace = f"{namespace_raw}_{str(count)}"
+        namespace, count = numbered_namespace(work_env_id, export_version_id)
     else:
         namespace = namespace_and_count[0]
         count = namespace_and_count[1]
@@ -464,6 +458,39 @@ def create_reference(work_env_id,
                                             namespace,
                                             count,
                                             int(auto_update))
+
+def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None):
+    namespaces_list = project.get_references(work_env_id, 'namespace')
+    if (namespace_to_update is not None) and namespace_to_update in namespaces_list:
+        namespaces_list.remove(namespace_to_update)
+    count = 0
+    namespace_raw = build_namespace(export_version_id)
+    namespace = f"{namespace_raw}"
+    while namespace in namespaces_list:
+        count+=1
+        namespace = f"{namespace_raw}_{str(count)}"
+    return namespace, count
+
+def modify_reference_variant(reference_id, variant_id):
+    reference_row = project.get_reference_data(reference_id)
+    old_variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
+    if old_variant_id == variant_id:
+        return
+    exports_list = project.get_variant_export_childs(variant_id, 'id')
+    if exports_list is None or exports_list == []:
+        logger.warning("No export found")
+        return
+    export_id = exports_list[0]
+    export_version_id = project.get_default_export_version(export_id, 'id')
+    new_namespace, new_count = numbered_namespace(reference_row['work_env_id'], export_version_id, namespace_to_update=reference_row['namespace'])
+    if export_version_id:
+        project.update_reference_data(reference_id, ('export_id', export_id))
+        project.update_reference_data(reference_id, ('export_version_id', export_version_id))
+        if new_namespace != reference_row['namespace']:
+            project.update_reference_data(reference_id, ('namespace', new_namespace))
+        if new_count != reference_row['count']:
+            project.update_reference_data(reference_id, ('count', new_count))
+    return 1
 
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)
@@ -1262,11 +1289,15 @@ def build_namespace(export_version_id):
     asset_row = project.get_asset_data(stage_row['asset_id'])
     category_row = project.get_category_data(asset_row['category_id'])
     domain_row = project.get_domain_data(category_row['domain_id'])
-    namespace = f"{category_row['name']}" 
+    if domain_row['name'] == 'assets':
+        namespace = f"{category_row['name'][:5]}" 
+    else:
+        namespace = f"{category_row['name']}" 
     namespace += f"_{asset_row['name']}" 
     if stage_row['name'] == 'animation' or stage_row['name'] == 'cfx':
         namespace += f"_{export_row['name']}"
     namespace += f"_{stage_row['name'][:3]}"
+    namespace += f"_{variant_row['name']}"
     return namespace
 
 def instance_to_string(instance_tuple):
