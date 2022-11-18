@@ -534,7 +534,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.connect_functions()
 
     def fill_ui(self):
-        self.setText(1, self.reference_row['namespace'])
+        #self.setText(1, self.reference_row['namespace'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
@@ -561,6 +561,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.set_auto_update(infos_list[5])
         self.setText(0, infos_list[6])
         self.setText(5, infos_list[7])
+        self.setText(1, infos_list[8])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
@@ -645,7 +646,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
 
     def modify_variant(self, variant_id):
         if self.context == 'work_env':
-            project.modify_reference_variant(self.reference_row['id'], variant_id)
+            assets.modify_reference_variant(self.reference_row['id'], variant_id)
         else:
             project.modify_grouped_reference_variant(self.reference_row['id'], variant_id)
         gui_server.refresh_team_ui()
@@ -736,7 +737,8 @@ class reference_infos_thread(QtCore.QThread):
                                                         up_to_date, 
                                                         reference_row['auto_update'],
                                                         asset_name,
-                                                        extension])
+                                                        extension,
+                                                        reference_row['namespace']])
         except:
             logger.error(str(traceback.format_exc()))
 
