@@ -471,6 +471,7 @@ def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None)
         namespace = f"{namespace_raw}_{str(count)}"
     return namespace, count
 
+'''
 def modify_reference_variant(reference_id, variant_id):
     reference_row = project.get_reference_data(reference_id)
     old_variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
@@ -491,6 +492,7 @@ def modify_reference_variant(reference_id, variant_id):
         if new_count != reference_row['count']:
             project.update_reference_data(reference_id, ('count', new_count))
     return 1
+'''
 
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)

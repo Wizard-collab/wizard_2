@@ -534,12 +534,12 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.connect_functions()
 
     def fill_ui(self):
-        #self.setText(1, self.reference_row['namespace'])
+        self.setText(1, self.reference_row['namespace'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
-        self.variant_widget = editable_data_widget()
-        self.treeWidget().setItemWidget(self, 2, self.variant_widget)
+        #self.variant_widget = editable_data_widget()
+        #self.treeWidget().setItemWidget(self, 2, self.variant_widget)
         self.export_widget = editable_data_widget()
         self.treeWidget().setItemWidget(self, 3, self.export_widget)
         self.version_widget = editable_data_widget(bold=True)
@@ -555,13 +555,12 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
-        self.variant_widget.setText(infos_list[1])
+        self.setText(2, infos_list[1])
         self.export_widget.setText(infos_list[2])
         self.version_widget.setText(infos_list[3])
         self.set_auto_update(infos_list[5])
         self.setText(0, infos_list[6])
         self.setText(5, infos_list[7])
-        self.setText(1, infos_list[8])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
@@ -570,9 +569,10 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def connect_functions(self):
         self.version_widget.button_clicked.connect(self.version_modification_requested)
         self.export_widget.button_clicked.connect(self.export_modification_requested)
-        self.variant_widget.button_clicked.connect(self.variant_modification_requested)
+        #self.variant_widget.button_clicked.connect(self.variant_modification_requested)
         self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
 
+    '''
     def variant_modification_requested(self, point):
         variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
         stage_id = project.get_variant_data(variant_id, 'stage_id')
@@ -585,6 +585,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             action = menu.exec_(QtGui.QCursor().pos())
             if action is not None:
                 self.modify_variant(action.id)
+    '''
 
     def export_modification_requested(self, point):
         variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
@@ -644,12 +645,14 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             project.modify_grouped_reference_export(self.reference_row['id'], export_id)
         gui_server.refresh_team_ui()
 
+    '''
     def modify_variant(self, variant_id):
         if self.context == 'work_env':
-            assets.modify_reference_variant(self.reference_row['id'], variant_id)
+            project.modify_reference_variant(self.reference_row['id'], variant_id)
         else:
             project.modify_grouped_reference_variant(self.reference_row['id'], variant_id)
         gui_server.refresh_team_ui()
+    '''
 
 class editable_data_widget(QtWidgets.QFrame):
 
@@ -737,8 +740,7 @@ class reference_infos_thread(QtCore.QThread):
                                                         up_to_date, 
                                                         reference_row['auto_update'],
                                                         asset_name,
-                                                        extension,
-                                                        reference_row['namespace']])
+                                                        extension])
         except:
             logger.error(str(traceback.format_exc()))
 

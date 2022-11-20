@@ -1189,6 +1189,7 @@ def get_reference_by_namespace(work_env_id, namespace, column='*'):
         return
     return reference_rows[0]
 
+'''
 def modify_reference_variant(reference_id, variant_id):
     exports_list = get_variant_export_childs(variant_id, 'id')
     if exports_list is None or exports_list == []:
@@ -1200,6 +1201,7 @@ def modify_reference_variant(reference_id, variant_id):
         update_reference_data(reference_id, ('export_id', export_id))
         update_reference_data(reference_id, ('export_version_id', export_version_id))
     return 1
+'''
 
 def modify_reference_export(reference_id, export_id):
     export_version_id = get_default_export_version(export_id, 'id')
