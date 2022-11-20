@@ -123,6 +123,8 @@ def create_category(name, domain_id):
     if not tools.create_folder(dir_name):
         project.remove_category(category_id)
         return
+    category_row = project.get_category_data(category_id)
+    hooks.after_category_creation_hook(category_row['string'], name)
     events.add_creation_event('category', category_id)
     game.add_xps(game_vars._creation_xp_)
     return category_id
@@ -167,6 +169,8 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     if not tools.create_folder(dir_name):
         project.remove_asset(asset_id)
         return
+    asset_row = project.get_asset_data(asset_id)
+    hooks.after_asset_creation_hook(asset_row['string'], name)
     events.add_creation_event('asset', asset_id)
     game.add_xps(game_vars._creation_xp_)
     return asset_id
@@ -275,6 +279,9 @@ def create_stage(name, asset_id):
     if not tools.create_folder(dir_name):
         project.remove_stage(stage_id)
         return
+    stage_row = project.get_stage_data(stage_id)
+    hooks.after_stage_creation_hook(string_stage = stage_row['string'],
+                                    stage_name = name)
     variant_id = create_variant('main', stage_id, 'default variant')
     if variant_id:
         project.set_stage_default_variant(stage_id, variant_id)
@@ -318,6 +325,8 @@ def create_variant(name, stage_id, comment=''):
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_SANDBOX')))
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_VIDEOS')))
+    variant_row = project.get_variant_data(variant_id)
+    hooks.after_variant_creation_hook(variant_row['string'], name)
     events.add_creation_event('variant', variant_id)
     game.add_xps(game_vars._creation_xp_)
     return variant_id
@@ -416,6 +425,8 @@ def create_work_env(software_id, variant_id):
     if (not tools.create_folder(dir_name)) or (not tools.create_folder(screenshots_dir_name)) :
         project.remove_work_env(work_env_id)
         return
+    work_env_row = project.get_work_env_data(work_env_id)
+    hooks.after_work_environment_creation_hook(work_env_row['string'], name)
     add_version(work_env_id, do_screenshot=0, fresh=1)
     return work_env_id
 
@@ -453,11 +464,21 @@ def create_reference(work_env_id,
     else:
         namespace = namespace_and_count[0]
         count = namespace_and_count[1]
-    return project.create_reference(work_env_id,
-                                            export_version_id,
-                                            namespace,
-                                            count,
-                                            int(auto_update))
+    reference_id = project.create_reference(work_env_id,
+                                export_version_id,
+                                namespace,
+                                count,
+                                int(auto_update))
+    work_env_row = project.get_work_env_data(work_env_id)
+    variant_row = project.get_variant_data(work_env_row['variant_id'])
+    stage_name = project.get_stage_data(variant_row['id'], 'name')
+    reference_row = project.get_reference_data(reference_id)
+    export_version_row = project.get_export_version_data(reference_row['export_version_id'])
+    hooks.after_reference_hook(work_env_row['string'],
+                                export_version_row['string'],
+                                stage_name,
+                                reference_row['stage'])
+    return reference_id
 
 def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None):
     namespaces_list = project.get_references(work_env_id, 'namespace')
@@ -662,7 +683,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
     events.add_export_event(export_version_id)
     tags.analyse_comment(comment, 'export_version', export_version_id)
     export_version_string = instance_to_string(('export_version', export_version_id))
-    hooks.after_export_hooks(export_version_string=export_version_string,
+    hooks.after_export_hook(export_version_string=export_version_string,
                                 export_dir=dir_name,
                                 stage_name=stage_name)
     return export_version_id
@@ -817,6 +838,8 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
                                                 thumbnail_file)
     if not version_id:
         return
+    version_row = project.get_version_data(version_id)
+    hooks.after_work_version_creation_hook(version_row['string'], new_version, file_name)
     game.add_xps(game_vars._save_xp_)
     if analyse_comment and not fresh:
         game.analyse_comment(comment, game_vars._save_penalty_)

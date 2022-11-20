@@ -96,7 +96,7 @@ def load_module(plugin_path, hook_type):
         logger.error(traceback.format_exc())
         return None, None
 
-def after_export_hooks(export_version_string, export_dir, stage_name):
+def after_export_hook(export_version_string, export_dir, stage_name):
     hooks_modules = get_hooks_modules()
     gui = environment.is_gui()
     for module_name in hooks_modules.keys():
@@ -107,6 +107,114 @@ def after_export_hooks(export_version_string, export_dir, stage_name):
                                                                 export_dir,
                                                                 stage_name,
                                                                 gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_category_creation_hook(string_category, category_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after category creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_category_creation(string_category,
+                                                                    category_name,
+                                                                    gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_asset_creation_hook(string_asset, asset_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after asset creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_asset_creation(string_asset,
+                                                                    asset_name,
+                                                                    gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_stage_creation_hook(string_stage, stage_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after stage creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_stage_creation(string_stage,
+                                                                    stage_name,
+                                                                    gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_variant_creation_hook(string_variant, variant_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after variant creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_variant_creation(string_variant,
+                                                                        variant_name,
+                                                                        gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_work_environment_creation_hook(string_work_env, software_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after work environment creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_work_environment_creation(string_work_env,
+                                                                                    software_name,
+                                                                                    gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_work_version_creation_hook(string_work_version, version_name, file_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after work version creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_work_version_creation(string_work_version,
+                                                                                version_name,
+                                                                                file_name,
+                                                                                gui)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+def after_reference_hook(string_work_environment, string_referenced_export_version, stage_name, referenced_stage_name):
+    hooks_modules = get_hooks_modules()
+    gui = environment.is_gui()
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} after reference creation hook from {1}".format(module_name,
+                                                                hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].after_reference_creation(string_work_environment,
+                                                                                string_referenced_export_version,
+                                                                                stage_name,
+                                                                                referenced_stage_name,
+                                                                                gui)
         except:
             logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
                                                                 hooks_modules[module_name]['path']))
