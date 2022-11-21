@@ -52,11 +52,10 @@ class export_preferences_widget(QtWidgets.QWidget):
 
         comboBox = extension_comboBox(extension_row)
         comboBox.setFixedWidth(150)
-        comboBox.setCurrentText(extension_row['extension'])
         self.software_rows_layout.addRow(info_widget, comboBox)
         self.combobox_list.append(comboBox)
-        #QtWidgets.QApplication.processEvents()
         comboBox.addItems(extensions_list)
+        comboBox.setCurrentText(extension_row['extension'])
 
     def connect_functions(self):
         self.stages_comboBox.currentTextChanged.connect(self.stage_changed)
