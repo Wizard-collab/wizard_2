@@ -66,6 +66,10 @@ def plug_texturing(namespace, files_list, asset_name, update=False):
 
     # Plug roughness
     if textures_dic['roughness']:
+
+        plug = get_plug(material_override_node, 'roughness', dataType='string')
+        plug.set(textures_dic['roughness'])
+
         if not update:
             surface_node.overrideinheritedattr('Spec1',1)
         attribute = get_attribute(surface_node, 'Spec1Roughness', 'MaskTexture', [('Gamma', 'data')])

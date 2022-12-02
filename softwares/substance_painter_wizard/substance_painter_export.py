@@ -16,6 +16,7 @@ import substance_painter.logging as logging
 
 # Wizard modules
 import wizard_communicate
+import wizard_hooks
 
 def export_textures(material, size, file_type) :
     if file_type == 'exr':
@@ -52,3 +53,8 @@ def export_textures(material, size, file_type) :
                                                                 int(os.environ['wizard_work_env_id']),
                                                                 int(os.environ['wizard_version_id']))
 
+        trigger_after_export_hook('texturing', export_dir)
+
+def trigger_after_export_hook(stage_name, export_dir):
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    wizard_hooks.after_export_hooks('substance_painter', stage_name, export_dir, string_asset, string_asset)
