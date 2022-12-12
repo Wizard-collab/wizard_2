@@ -87,6 +87,9 @@ def get_default_camera():
 
 def create_rop_network():
     obj_node = hou.node("/obj")
+    opengl_node = wizard_tools.look_for_node('wizard_opengl_flipbook', parent=obj_node)
+    if opengl_node is not None:
+        return opengl_node
     rop_network = obj_node.createNode("ropnet", "wizard_rop_flipbook")
     opengl_node = rop_network.createNode("opengl", "wizard_opengl_flipbook")
     return opengl_node
