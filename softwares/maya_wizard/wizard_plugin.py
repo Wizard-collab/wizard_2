@@ -23,6 +23,7 @@ from maya_wizard.export import camrig
 from maya_wizard.export import layout
 from maya_wizard.export import animation
 from maya_wizard.export import cfx
+from maya_wizard.export import fx
 from maya_wizard.export import camera
 
 def save_increment(*args):
@@ -46,6 +47,8 @@ def export(*args):
         animation.invoke_settings_widget()
     elif stage_name == 'cfx':
         cfx.invoke_settings_widget()
+    elif stage_name == 'fx':
+        fx.invoke_settings_widget()
     elif stage_name == 'camera':
         camera.invoke_settings_widget()
     else:

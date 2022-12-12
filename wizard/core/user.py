@@ -216,7 +216,7 @@ class user:
         return self.prefs_dic[user_vars._popups_settings_]['duration']
 
     def get_local_path(self):
-        return self.prefs_dic[user_vars._local_path_]
+        return path_utils.clean_path(self.prefs_dic[user_vars._local_path_])
 
     def get_user_build(self):
         if user_vars._user_build_ not in self.prefs_dic.keys():

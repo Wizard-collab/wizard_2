@@ -20,6 +20,7 @@ from maya_wizard.export import custom
 from maya_wizard.export import camrig
 from maya_wizard.export import layout
 from maya_wizard.export import animation
+from maya_wizard.export import fx
 from maya_wizard.export import cfx
 from maya_wizard.export import camera
 
@@ -76,6 +77,8 @@ def main():
         elif stage_name == 'cfx':
             cfx.main(nspace_list=settings_dic['nspace_list'],
                                 frange=settings_dic['frange'])
+        elif stage_name == 'fx':
+            fx.main(frange=settings_dic['frange'])
         elif stage_name == 'camera':
             camera.main(nspace_list=settings_dic['nspace_list'],
                                 frange=settings_dic['frange'])

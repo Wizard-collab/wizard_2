@@ -471,7 +471,7 @@ def create_reference(work_env_id,
                                 int(auto_update))
     work_env_row = project.get_work_env_data(work_env_id)
     variant_row = project.get_variant_data(work_env_row['variant_id'])
-    stage_name = project.get_stage_data(variant_row['id'], 'name')
+    stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
     reference_row = project.get_reference_data(reference_id)
     export_version_row = project.get_export_version_data(reference_row['export_version_id'])
     hooks.after_reference_hook(work_env_row['string'],
