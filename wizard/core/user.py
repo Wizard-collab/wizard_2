@@ -83,6 +83,7 @@ class user:
         if not db_core.try_connection(DNS):
             return
         self.prefs_dic[user_vars._psql_dns_] = DNS
+        self.prefs_dic[user_vars._repository_] = None
         self.write_prefs_dic()
         environment.set_psql_dns(DNS)
         return 1

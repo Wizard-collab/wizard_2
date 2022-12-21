@@ -20,6 +20,7 @@ def main():
     scene = wizard_export.save_or_save_increment()
     try:
         export_name = 'main'
+
         if wizard_tools.check_obj_list_existence(['camrig_GRP', 'render_set']):
             rigging_GRP_node = pm.PyNode('camrig_GRP')
             asset_name = os.environ['wizard_asset_name']
