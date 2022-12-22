@@ -61,8 +61,8 @@ def get_new_nodes_in_parent(parent, old_nodes_in_parent):
 def get_children(parent):
     return parent.children() 
 
-def get_all_nodes():
-    return hou.node('/').allSubChildren() 
+def get_all_nodes(parent=hou.node('/')):
+    return parent.allSubChildren() 
 
 def node_exists(name, parent = None):
     if not parent:
@@ -141,3 +141,21 @@ def by_frame_progress_script(percent_factor=100):
     command+= "percent={}*((frame-inframe)/(outframe-inframe))\n".format(percent_factor)
     command+= 'print("wizard_task_percent:{}".format(percent))\n'
     return command
+
+def get_export_nodes(base_name, parent=hou.node('/')):
+    out_nodes_dic = dict()
+    tokens_len = len(base_name.split('_'))
+    for node in get_all_nodes(parent=parent):
+        node_name = node.name()
+        short_node_name = node_name.split('|')[-1]
+        if base_name in short_node_name:
+            node_name_tokens = node_name.split('_')
+            if len(node_name_tokens) == tokens_len:
+                export_name = 'main'
+            elif len(node_name_tokens) > tokens_len:
+                export_name = node_name_tokens[-1]
+            if export_name in out_nodes_dic.values():
+                logger.warning(f'{node_name} already found.')
+                continue
+            out_nodes_dic[node_name] = export_name
+    return out_nodes_dic
