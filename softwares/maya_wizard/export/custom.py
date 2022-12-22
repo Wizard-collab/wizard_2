@@ -38,6 +38,7 @@ def main():
             export_GRP_list += additionnal_objects
 
             wizard_export.export('custom', export_name, exported_string_asset, export_GRP_list)
+            custom_GRP_node.rename(grp_name)
     except:
         logger.error(str(traceback.format_exc()))
     finally:

@@ -139,3 +139,21 @@ def convert_files_list_to_sequence(files_list):
         if new_name not in files:
             files.append(new_name)
     return files
+
+def get_export_grps(base_name):
+    grp_dic = dict()
+    tokens_len = len(base_name.split('_'))
+    for obj in Document().children(recursive=True, type="SceneGraphNode"):
+        object_name = obj.getname()
+        short_object_name = object_name.split('|')[-1]
+        if base_name in short_object_name:
+            object_name_tokens = object_name.split('_')
+            if len(object_name_tokens) == tokens_len:
+                export_name = 'main'
+            elif len(object_name_tokens) > tokens_len:
+                export_name = object_name_tokens[-1]
+            if export_name in grp_dic.values():
+                logger.warning('{0} already found.'.format(object_name))
+                continue
+            grp_dic[object_name] = export_name
+    return grp_dic

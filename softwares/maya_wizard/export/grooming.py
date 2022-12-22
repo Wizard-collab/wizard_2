@@ -34,6 +34,7 @@ def main():
             additionnal_objects = wizard_export.trigger_before_export_hook('grooming', exported_string_asset)
             export_GRP_list += additionnal_objects
             wizard_export.export('grooming', export_name, exported_string_asset, export_GRP_list)
+            grooming_GRP_node.rename(grp_name)
     except:
         logger.error(str(traceback.format_exc()))
     finally:
