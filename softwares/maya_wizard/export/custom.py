@@ -19,13 +19,19 @@ import pymel.core as pm
 def main():
     scene = wizard_export.save_or_save_increment()
     try:
-        export_name = 'main'
-        if wizard_tools.check_obj_list_existence(['custom_GRP']):
-            custom_GRP_node = pm.PyNode('custom_GRP')
+        groups_dic = wizard_tools.get_export_grps('custom_GRP')
+        if groups_dic == dict():
+            logger.warning("No group to export...")
+            return
+        for grp_name in groups_dic.keys():
+            logger.info(f"Exporting {grp_name}...")
+            custom_GRP_node = pm.PyNode(grp_name)
             asset_name = os.environ['wizard_asset_name']
             custom_GRP_node.rename(asset_name)
             export_GRP_list = [asset_name]
 
+            export_name = groups_dic[grp_name]
+            
             exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
 
             additionnal_objects = wizard_export.trigger_before_export_hook('custom', exported_string_asset)

@@ -19,14 +19,18 @@ import pymel.core as pm
 def main(frange):
     scene = wizard_export.save_or_save_increment()
     try:
-        grp_name = 'fx_GRP'
-        if wizard_tools.check_obj_list_existence([grp_name]):
+        groups_dic = wizard_tools.get_export_grps('fx_GRP')
+        if groups_dic == dict():
+            logger.warning("No group to export...")
+            return
+        for grp_name in groups_dic.keys():
+            logger.info(f"Exporting {grp_name}...")
             grp_obj = pm.PyNode(grp_name)
             asset_name = os.environ['wizard_asset_name']
             grp_obj.rename(asset_name)
             object_list = [grp_obj] + pm.listRelatives(grp_obj,
                                                         allDescendents=True)
-            export_name = 'main'
+            export_name = groups_dic[grp_name]
 
             exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
 

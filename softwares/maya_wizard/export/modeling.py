@@ -30,7 +30,6 @@ def main():
             grp_obj.rename(asset_name)
             object_list = [grp_obj] + pm.listRelatives(grp_obj,
                                                         allDescendents=True)
-            objects_dic = wizard_tools.remove_LOD_from_names(object_list)
             export_name = groups_dic[grp_name]
 
             exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
@@ -42,7 +41,6 @@ def main():
 
             wizard_export.export('modeling', export_name, exported_string_asset, export_GRP_list)
             grp_obj.rename(grp_name)
-            wizard_tools.reassign_old_name_to_objects(objects_dic)
     except:
         logger.error(str(traceback.format_exc()))
     finally:

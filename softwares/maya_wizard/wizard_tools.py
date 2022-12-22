@@ -27,19 +27,19 @@ def get_new_objects(old_objects):
             new_objects.append(object)
     return new_objects
 
-def remove_LOD_from_names(object_list):
-    objects_dic = dict()
-    for object in object_list:
-        old_name = object.name()
-        for NUM in range(1,4):
-            LOD = '_LOD{}'.format(str(NUM))
-            if object.name().endswith(LOD):
-                try:
-                    object = pm.rename(object.name(), old_name.replace(LOD, ''))
-                    objects_dic[object] = old_name
-                except:
-                    logger.warning("Can't rename {}".format(object.name()))
-    return objects_dic
+def rename_render_set(obj):
+    if obj.name() == 'render_set':
+        obj.rename('render_set')
+        return
+    else:
+        if not pm.objExists('render_set'):
+            obj.rename('render_set')
+            return
+        else:
+            main_set = pm.PyNode('render_set')
+            main_set.rename('render_set_main')
+            obj.rename('render_set')
+            return main_set
 
 def reassign_old_name_to_objects(objects_dic):
     for object in objects_dic.keys():
