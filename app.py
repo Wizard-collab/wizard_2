@@ -51,7 +51,6 @@ class app():
                         log_user,
                         change_repo, 
                         change_psql):
-        self.db_server = None
         self.stats_schedule = None
 
         # Init
@@ -59,7 +58,7 @@ class app():
         self.warning_tooltip = app_utils.init_warning_tooltip()
         app_utils.set_wizard_gui()
         app_utils.init_psql_dns(self, change_psql)
-        self.db_server = app_utils.init_repository(self, change_repo)
+        app_utils.init_repository(self, change_repo)
         app_utils.init_user(self, log_user)
         app_utils.init_project(self, project_manager)
         self.stats_schedule = app_utils.init_stats()
@@ -73,7 +72,6 @@ class app():
         version_database_modification.main()
 
         self.main_widget = main_widget.main_widget()
-        self.main_widget.stop_threads.connect(self.db_server.stop)
         self.main_widget.stop_threads.connect(self.stats_schedule.stop)
         self.main_widget.refresh()
         self.main_widget.init_floating_windows()
@@ -87,8 +85,6 @@ class app():
     def quit(self):
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
-        if self.db_server:
-            self.db_server.stop()
         if self.stats_schedule:
             self.stats_schedule.stop()
         QtWidgets.QApplication.closeAllWindows()

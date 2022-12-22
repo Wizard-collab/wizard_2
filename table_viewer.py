@@ -65,9 +65,6 @@ logger = logging.getLogger('wizard')
 
 class app():
     def __init__(self):
-
-        self.db_server = None
-
         self.app = gui_utils.get_app()
         QtCore.qInstallMessageHandler(customQtMsgHandler)
 
@@ -85,9 +82,6 @@ class app():
             self.repository_widget = repository_widget.repository_widget()
             if self.repository_widget.exec_() != QtWidgets.QDialog.Accepted:
                 self.quit()
-
-        self.db_server = db_core.db_server()
-        self.db_server.start()
 
         user.user().get_team_dns()
 
@@ -111,8 +105,6 @@ class app():
         self.quit()
 
     def quit(self):
-        if self.db_server:
-            self.db_server.stop()
         QtWidgets.QApplication.closeAllWindows()
         QtWidgets.QApplication.quit()
         sys.exit()

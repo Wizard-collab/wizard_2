@@ -58,9 +58,6 @@ logger = logging.getLogger('wizard')
 
 class app():
     def __init__(self):
-
-        self.db_server = None
-
         self.app = app_utils.get_app()
         QtCore.qInstallMessageHandler(customQtMsgHandler)
 
@@ -72,16 +69,11 @@ class app():
         app_utils.set_wizard_gui()
         app_utils.init_psql_dns(self)
 
-        self.db_server = db_core.db_server()
-        self.db_server.start()
-
         self.create_repository_widget = create_repository_widget.create_repository_widget()
         if self.create_repository_widget.exec_() == QtWidgets.QDialog.Accepted:
             self.quit()
 
     def quit(self):
-        if self.db_server:
-            self.db_server.stop()
         QtWidgets.QApplication.closeAllWindows()
         QtWidgets.QApplication.quit()
         sys.exit()

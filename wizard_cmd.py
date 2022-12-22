@@ -64,11 +64,9 @@ else:
 	logger.info(f"Pyfile : {args.pyfile}")
 
 environment.set_psql_dns(args.psql_dns)
-db_server = db_core.db_server()
-db_server.start()
 
 environment.set_repository(args.repository)
-db_server.repository=environment.get_repository()
+db_core.db_access_singleton().set_repository(environment.get_repository())
 
 user_row = repository.get_user_row_by_name(args.user)
 environment.build_user_env(user_row)
@@ -76,7 +74,7 @@ environment.build_user_env(user_row)
 project_row = repository.get_project_row_by_name(args.project)
 environment.build_project_env(project_row['project_name'], project_row['project_path'])
 
-db_server.project_name = environment.get_project_name()
+db_core.db_access_singleton().set_project(environment.get_project_name())
 
 communicate_server = communicate.communicate_server()
 communicate_server.start()
@@ -93,6 +91,6 @@ try:
 except:
     logger.error(str(traceback.format_exc()))
 finally:
-    db_server.stop()
+    #db_server.stop()
     softwares_server.stop()
     communicate_server.stop()
