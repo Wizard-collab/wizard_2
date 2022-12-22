@@ -43,111 +43,80 @@ from wizard.core import environment
 from wizard.core import socket_utils
 logger = logging.getLogger(__name__)
 
-class db_server(threading.Thread):
-    def __init__(self, project_name=None):
-        super(db_server, self).__init__()
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
-        self.port = socket_utils.get_port('localhost')
-        environment.set_local_db_server_port(self.port)
-        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
-        self.running = True
+class db_access_singleton(metaclass=Singleton):
+    def __init__(self):
+        super(db_access_singleton, self).__init__()
         self.project_name = None
+        self.project_conn = None
         self.repository = None
         self.repository_conn = None
-        self.project_conn = None
 
-    def run(self):
-        while self.running:
-            try:
-                conn, addr = self.server.accept()
-                if addr[0] != self.server_address:
-                    continue
-                signal_as_str = socket_utils.recvall(conn)
-                if not signal_as_str:
-                    continue
-                returned = self.execute_signal(signal_as_str.decode('utf8'))
-                socket_utils.send_signal_with_conn(conn, returned)
-                conn.close()
-            except OSError:
-                pass
-            except:
-                logger.error(str(traceback.format_exc()))
-                
-        if self.repository_conn is not None:
-            self.repository_conn.close()
-        if self.project_conn is not None:
-            self.project_conn.close()
+    def set_repository(self, repository):
+        self.repository = repository
 
-    def stop(self):
-        self.server.close()
-        self.running = False
+    def set_project(self, project_name):
+        self.project_name = project_name
 
-    def execute_signal(self, signal_as_str):
-        signal_dic = json.loads(signal_as_str)
+    def execute_signal(self, level,
+                            sql_cmd,
+                            as_dict=1,
+                            data=None,
+                            fetch=2):
         rows = None
         retry_count = 0
-        if signal_dic['request'] == 'sql_cmd':
-            while rows is None:
-                try:
-                    if signal_dic['level'] == 'repository':
-                        if not self.repository_conn:
-                            if self.repository:
-                                self.repository_conn = create_connection(self.repository)
-                        conn = self.repository_conn
+        while rows is None:
+            try:
+                if level == 'repository':
+                    if not self.repository_conn:
+                        if self.repository:
+                            self.repository_conn = create_connection(self.repository)
+                    conn = self.repository_conn
+                else:
+                    if not self.project_conn:
+                        if self.project_name:
+                            self.project_conn = create_connection(self.project_name)
+                    conn = self.project_conn
+                if conn:
+                    rows = None
+                    if as_dict:
+                        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                     else:
-                        if not self.project_conn:
-                            if self.project_name:
-                                self.project_conn = create_connection(self.project_name)
-                        conn = self.project_conn
-                    if conn:
-                        rows = None
-                        if signal_dic['as_dict']:
-                            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-                        else:
-                            cursor = conn.cursor()
-                        if signal_dic['data']:
-                            cursor.execute(signal_dic['sql'], signal_dic['data'])
-                        else:
-                            cursor.execute(signal_dic['sql'])
-                        if signal_dic['fetch'] == 2:
-                            rows = cursor.fetchall()
-                        elif signal_dic['fetch'] == 1:
-                            rows = cursor.fetchone()[0]
-                        else:
-                            rows = 1
-                        if not signal_dic['as_dict'] and signal_dic['fetch'] != 1:
-                            if rows != 1:
-                                rows = [r[0] for r in rows]
-                        return rows
+                        cursor = conn.cursor()
+                    if data:
+                        cursor.execute(sql_cmd, data)
                     else:
-                        logger.error("No connection")
-                        self.repository_conn = None
-                        self.project_conn = None
-                except (Exception, psycopg2.DatabaseError) as error:
-                    logger.error(error)
+                        cursor.execute(sql_cmd)
+                    if fetch == 2:
+                        rows = cursor.fetchall()
+                    elif fetch == 1:
+                        rows = cursor.fetchone()[0]
+                    else:
+                        rows = 1
+                    if not as_dict and fetch != 1:
+                        if rows != 1:
+                            rows = [r[0] for r in rows]
+                    return rows
+                else:
+                    logger.error("No connection")
                     self.repository_conn = None
                     self.project_conn = None
-                if retry_count == 5:
-                    logger.error("Database max retry reached ( 5 ). Can't access database")
-                    time.sleep(0.02)
-                    return None
-                retry_count += 1
-                logger.error(f"Can't reach database, retrying ( {retry_count} )")
-
-        elif signal_dic['request'] == 'modify_database_name':
-            if signal_dic['level'] == 'repository':
-                self.repository = signal_dic['db_name']
-                if self.repository_conn:
-                    self.repository_conn.close()
-                self.repository_conn = create_connection(self.repository)
-            else:
-                self.project_name = signal_dic['db_name']
-                if self.project_conn:
-                    self.project_conn.close()
-                self.project_conn = create_connection(self.project_name)
-            return 1
-        elif signal_dic['request'] == 'port':
-            return 1
+            except (Exception, psycopg2.DatabaseError) as error:
+                logger.error(error)
+                self.repository_conn = None
+                self.project_conn = None
+            if retry_count == 5:
+                logger.error("Database max retry reached ( 5 ). Can't access database")
+                time.sleep(0.02)
+                return None
+            retry_count += 1
+            logger.error(f"Can't reach database, retrying ( {retry_count} )")
 
 def create_connection(database=None):
     try:

@@ -66,7 +66,6 @@ logger = logging.getLogger(__name__)
 
 class app():
     def __init__(self):
-        self.db_server = None
         self.stats_schedule = None
         self.softwares_server = None
         self.communicate_server = None
@@ -78,7 +77,7 @@ class app():
 
         app_utils.set_pywizard()
         app_utils.init_psql_dns(self)
-        self.db_server = app_utils.init_repository(self)
+        app_utils.init_repository(self)
         app_utils.init_user(self)
         app_utils.init_project(self)
         self.stats_schedule = app_utils.init_stats()

@@ -191,18 +191,14 @@ def get_tables(level):
     return execute_sql(sql_cmd, level, 1)
 
 def execute_sql(sql, level, as_dict, data=None, fetch=2):
-    signal_dic = dict()
-    signal_dic['request'] = 'sql_cmd'
-    signal_dic['sql'] = sql
-    signal_dic['level'] = level
-    signal_dic['as_dict'] = as_dict
-    signal_dic['data'] = data
-    signal_dic['fetch'] = fetch
-    return socket_utils.send_signal(('localhost', environment.get_local_db_server_port()), signal_dic, timeout=10000)
+    return db_core.db_access_singleton().execute_signal(level=level,
+                                                        sql_cmd=sql,
+                                                        as_dict=as_dict,
+                                                        data=data,
+                                                        fetch=fetch)
 
 def modify_db_name(level, db_name):
-    signal_dic = dict()
-    signal_dic['request'] = 'modify_database_name'
-    signal_dic['level'] = level
-    signal_dic['db_name'] = db_name
-    return socket_utils.send_signal(('localhost', environment.get_local_db_server_port()), signal_dic)
+    if level == 'repository':
+        return db_core.db_access_singleton().set_repository(db_name)
+    elif level == 'project':
+        return db_core.db_access_singleton().set_project(db_name)

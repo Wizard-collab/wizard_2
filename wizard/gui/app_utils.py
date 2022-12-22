@@ -110,11 +110,9 @@ def init_repository(app, change_repo=False):
                 if repository.is_repository_database(repository_name):
                     user.user().set_repository(repository_name)
 
-    db_server = db_core.db_server()
-    db_server.start()
-    db_utils.modify_db_name('repository', environment.get_repository())
+    db_core.db_access_singleton().set_repository(environment.get_repository())
     repository.add_ip_user()
-    return db_server
+    return 1
 
 def init_user(app, log_user=False):
     if (not user.get_user()) or log_user:
@@ -161,7 +159,7 @@ def init_project(app, project_manager=False):
                     project_password = tools.flushed_input('Project password : ')
                     user.log_project(project_name, project_password)
 
-    db_utils.modify_db_name('project', environment.get_project_name())
+    db_core.db_access_singleton().set_project(environment.get_project_name())
     project.add_user(repository.get_user_row_by_name(environment.get_user(), 'id'))
     hooks.init_wizard_hooks()
 
