@@ -52,12 +52,16 @@ def export_from_extension(file, export_GRP_list):
         return export_project(file, export_GRP_list)
 
 def export_node(file, export_GRP_list):
-    grp_node = wizard_tools.get_node_from_name(export_GRP_list[0])
-    grp_node.savefile(file)
+    gnode_command = wizard_hooks.get_gnode_command("guerilla_render")
+    if gnode_command is None:
+        gnode_command = default_gnode_command
+    gnode_command(export_GRP_list, file)
 
 def export_project(file, export_GRP_list):
-    wizard_tools.delete_all_but_list(export_GRP_list)
-    Document().save(file)
+    gproject_command = wizard_hooks.get_gproject_command("guerilla_render")
+    if gproject_command is None:
+        gproject_command = default_gproject_command
+    gproject_command(export_GRP_list, file)
 
 def reopen(scene):
     Document().load(scene)
@@ -93,3 +97,17 @@ def trigger_before_export_hook(stage_name, exported_string_asset):
 def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
     wizard_hooks.after_export_hooks('guerilla_render', stage_name, export_dir, string_asset, exported_string_asset)
+
+def default_gnode_command(export_GRP_list, export_file):
+    grp_node = wizard_tools.get_node_from_name(export_GRP_list[0])
+    grp_node.savefile(export_file)
+
+def default_gproject_command(export_GRP_list, export_file):
+    for object in wizard_tools.get_all_nodes():
+        if object not in export_GRP_list:
+            continue
+        try:
+            pynode(object).delete()
+        except:
+            pass
+    Document().save(export_file)

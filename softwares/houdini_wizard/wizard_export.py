@@ -64,38 +64,28 @@ def save_or_save_increment():
 
 def export_hip(export_file, frange):
     logger.info("Exporting .ma")
-    hou.hipFile.save(file_name=export_file)
+    hip_command = wizard_hooks.get_hip_command("houdini")
+    if hip_command is None:
+        hip_command = default_hip_command
+    hip_command(export_file)
 
 def export_abc(export_file, frange, out_node, parent):
     wizard_abc_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_abc_output:
-        wizard_tools.apply_tags(wizard_abc_output)
-        wizard_abc_output.parm("trange").set('normal')
-        hou.playbar.setFrameRange(frange[0], frange[1])
-        wizard_abc_output.parm("f1").setExpression('$FSTART')
-        wizard_abc_output.parm("f2").setExpression('$FEND')
-        wizard_abc_output.parm("motionBlur").set(1)
-        wizard_abc_output.parm("shutter1").set(-0.2)
-        wizard_abc_output.parm("shutter2").set(0.2)
-        wizard_abc_output.parm("filename").set(export_file)
-        wizard_abc_output.parm("execute").pressButton()
+        abc_command = wizard_hooks.get_abc_command("houdini")
+        if abc_command is None:
+            abc_command = default_abc_command
+        abc_command(wizard_abc_output, frange, export_file)
     else:
         logger.warning(f'"{out_node}" node not found')
 
 def export_vdb(export_dir, frange, out_node, parent):
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_vdb_output:
-        file = f"{export_dir}/fx_export.$F4.vdb"
-        wizard_vdb_output.parm('sopoutput').set(file)
-        wizard_vdb_output.parm("trange").set('normal')
-        hou.playbar.setFrameRange(frange[0], frange[1])
-        wizard_vdb_output.parm("f1").setExpression('$FSTART')
-        wizard_vdb_output.parm("f2").setExpression('$FEND')
-
-        wizard_vdb_output.parm('lpostframe').set("python")
-        wizard_vdb_output.parm('postframe').set(wizard_tools.by_frame_progress_script())
-
-        wizard_vdb_output.parm("execute").pressButton()
+        vdb_command = wizard_hooks.get_vdb_command("houdini")
+        if vdb_command is None:
+            vdb_command = default_vdb_command
+        vdb_command(wizard_vdb_output, frange, export_dir)
     else:
         logger.warning(f'"{out_node}" node not found')
 
@@ -112,3 +102,28 @@ def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
     wizard_hooks.after_export_hooks('houdini', stage_name, export_dir, string_asset, exported_string_asset)
 
+def default_hip_command(export_file):
+    hou.hipFile.save(file_name=export_file)
+
+def default_abc_command(wizard_abc_output, frange, export_file):
+    wizard_tools.apply_tags(wizard_abc_output)
+    wizard_abc_output.parm("trange").set('normal')
+    hou.playbar.setFrameRange(frange[0], frange[1])
+    wizard_abc_output.parm("f1").setExpression('$FSTART')
+    wizard_abc_output.parm("f2").setExpression('$FEND')
+    wizard_abc_output.parm("motionBlur").set(1)
+    wizard_abc_output.parm("shutter1").set(-0.2)
+    wizard_abc_output.parm("shutter2").set(0.2)
+    wizard_abc_output.parm("filename").set(export_file)
+    wizard_abc_output.parm("execute").pressButton()
+
+def default_vdb_command(wizard_vdb_output, frange, export_dir):
+    file = f"{export_dir}/fx_export.$F4.vdb"
+    wizard_vdb_output.parm('sopoutput').set(file)
+    wizard_vdb_output.parm("trange").set('normal')
+    hou.playbar.setFrameRange(frange[0], frange[1])
+    wizard_vdb_output.parm("f1").setExpression('$FSTART')
+    wizard_vdb_output.parm("f2").setExpression('$FEND')
+    wizard_vdb_output.parm('lpostframe').set("python")
+    wizard_vdb_output.parm('postframe').set(wizard_tools.by_frame_progress_script())
+    wizard_vdb_output.parm("execute").pressButton()

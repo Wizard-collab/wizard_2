@@ -50,61 +50,51 @@ def export_by_extension(export_GRP_list, export_file, frange, percent_factor):
 
 def export_ma(export_GRP_list, export_file):
     logger.info("Exporting .ma")
-    pm.select(export_GRP_list, replace=True, noExpand=True)
-    pm.exportSelected(export_file, type='mayaAscii', pr=0)
-
+    ma_command = wizard_hooks.get_ma_command('maya')
+    if ma_command is None:
+        ma_command = default_ma_command
+    ma_command(export_GRP_list, export_file)
     return [export_file]
 
 def export_fur(export_GRP_list, export_file, frange, percent_factor):
     logger.info("Exporting .fur")
-    files_list = []
-    for yeti_node in export_GRP_list:
-        export_directory = os.path.dirname(export_file)
-        node_name = yeti_node.split(':')[-1]
-        file = os.path.join(export_directory, '{}.%04d.fur'.format(node_name))
-        pm.select(yeti_node, r=True)
-        cmds.pgYetiCommand(writeCache=file, range=(frange[0], frange[-1]), samples=3, sampleTimes= "-0.2 0.0 0.2")
-        
-        #current_percent = float(percent) + (100.0/int(len_nspacelist))/2
-        #print('percent:{}'.format(current_percent))
-
+    fur_command = wizard_hooks.get_fur_command('maya')
+    if fur_command is None:
+        fur_command = default_fur_command
+    fur_command(export_GRP_list,
+                export_file,
+                frange[0],
+                frange[1])
     for file in os.listdir(export_directory):
         files_list.append(os.path.join(export_directory, file))
-
     return files_list
 
 def export_obj(export_GRP_list, export_file):
-    pm.select(export_GRP_list, replace=True, noExpand=True)
-    pm.exportSelected(export_file, preserveReferences=0, shader=1)
+    logger.info("Exporting .obj")
+    obj_command = wizard_hooks.get_obj_command('maya')
+    if obj_command is None:
+        obj_command = default_obj_command
+    obj_command(export_GRP_list, export_file)
     return [export_file]
 
 def export_fbx(export_GRP_list, export_file):
-    try:
-        pm.loadPlugin("fbxmaya")
-    except:
-        logger.debug("fbxmaya plug-in already loaded") 
-    pm.select(export_GRP_list, replace=True, noExpand=True)
-    pm.mel.FBXResetExport()
-    pm.mel.FBXExportSmoothMesh(v = False)
-    pm.mel.FBXExport(f=export_file, s=True)
+    logger.info("Exporting .fbx")
+    fbx_command = wizard_hooks.get_fbx_command('maya')
+    if fbx_command is None:
+        fbx_command = default_fbx_command
+    fbx_command(export_GRP_list, export_file)
     return [export_file]
 
 def export_abc(export_GRP_list, export_file, frange, percent_factor):
     logger.info("Exporting .abc")
-    start = str(frange[0])
-    end = str(frange[1])
-    command = "-frameRange "
-    command += start
-    command += " "
-    command += end
-    command += " -step 1"
-    command += " -frameRelativeSample -0.2 -frameRelativeSample 0 -frameRelativeSample 0.2 -attr wizardTags -writeVisibility -writeUVSets -uvWrite -worldSpace "
-    for object in export_GRP_list:
-        command += " -root {}".format(object)
-    command += " -dataFormat ogawa -file "
-    command += export_file
-    command += " -pythonPerFrameCallback '{}'".format(wizard_tools.by_frame_progress_script(frange, percent_factor))
-    cmds.AbcExport(j=command)
+    abc_command = wizard_hooks.get_abc_command('maya')
+    if abc_command is None:
+        abc_command = default_abc_command
+    abc_command(frange[0],
+                frange[1],
+                export_GRP_list,
+                export_file,
+                wizard_tools.by_frame_progress_script(frange, percent_factor))
     return [export_file]
 
 def reopen(scene):
@@ -141,3 +131,62 @@ def trigger_before_export_hook(stage_name, exported_string_asset):
 def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
     wizard_hooks.after_export_hooks('maya', stage_name, export_dir, string_asset, exported_string_asset)
+
+def default_abc_command(start,
+                end,
+                export_GRP_list,
+                export_file,
+                perFrameCallback):
+    abc_command = "-frameRange {start} {end} "
+    abc_command += "-step 1 -frameRelativeSample -0.2 -frameRelativeSample 0 -frameRelativeSample 0.2 "
+    abc_command += "-attr wizardTags "
+    abc_command += "-writeVisibility "
+    abc_command += "-writeUVSets -uvWrite "
+    abc_command += "-worldSpace "
+    abc_command += "{object_list} "
+    abc_command += "-dataFormat ogawa "
+    abc_command += "-file {export_file} "
+    abc_command += "-pythonPerFrameCallback '{perFrameCallback}' "
+    objects_list = ''
+    for node in export_GRP_list:
+        objects_list += " -root {}".format(node)
+    abc_command = abc_command.format(start=start,
+                        end=end,
+                        object_list=objects_list,
+                        export_file=export_file,
+                        perFrameCallback=perFrameCallback)
+    cmds.AbcExport(j=abc_command)
+
+def default_fbx_command(export_GRP_list,
+                export_file):
+    try:
+        pm.loadPlugin("fbxmaya")
+    except:
+        logger.debug("fbxmaya plug-in already loaded") 
+    pm.select(export_GRP_list, replace=True, noExpand=True)
+    pm.mel.FBXResetExport()
+    pm.mel.FBXExportSmoothMesh(v = False)
+    pm.mel.FBXExport(f=export_file, s=True)
+
+def default_obj_command(export_GRP_list,
+                export_file):
+    pm.select(export_GRP_list, replace=True, noExpand=True)
+    pm.exportSelected(export_file, preserveReferences=0, shader=1)
+
+def default_fur_command(export_GRP_list,
+                export_file,
+                start,
+                end):
+    files_list = []
+    for yeti_node in export_GRP_list:
+        export_directory = os.path.dirname(export_file)
+        node_name = yeti_node.split(':')[-1]
+        file = os.path.join(export_directory, '{}.%04d.fur'.format(node_name))
+        pm.select(yeti_node, r=True)
+        cmds.pgYetiCommand(writeCache=file, range=(start, end), samples=3, sampleTimes= "-0.2 0.0 0.2")
+
+def default_ma_command(export_GRP_list,
+                export_file):
+    pm.select(export_GRP_list, replace=True, noExpand=True)
+    pm.exportSelected(export_file, type='mayaAscii', pr=0)
+    

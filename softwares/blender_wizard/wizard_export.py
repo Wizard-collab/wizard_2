@@ -30,9 +30,10 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list):
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def export_abc(export_GRP_list, export_file):
-    wizard_tools.select_GRP_list_and_all_children(export_GRP_list)
-    bpy.ops.wm.alembic_export(filepath=export_file, 
-                      selected=True, export_custom_properties=True)
+    abc_command = wizard_hooks.get_abc_command("blender")
+    if abc_command is None:
+        abc_command = default_abc_command
+    abc_command(export_GRP_list, export_file)
 
 def reopen(scene):
     bpy.ops.wm.open_mainfile(filepath=scene)
@@ -68,3 +69,8 @@ def trigger_before_export_hook(stage_name, exported_string_asset):
 def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
     wizard_hooks.after_export_hooks('blender', stage_name, export_dir, string_asset, exported_string_asset)
+
+def default_abc_command(export_GRP_list, export_file):
+    wizard_tools.select_GRP_list_and_all_children(export_GRP_list)
+    bpy.ops.wm.alembic_export(filepath=export_file, 
+                      selected=True, export_custom_properties=True)
