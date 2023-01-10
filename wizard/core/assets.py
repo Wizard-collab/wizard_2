@@ -73,6 +73,7 @@ from wizard.core import stats
 from wizard.core import asset_tracking
 from wizard.core import hooks
 from wizard.core import user
+from wizard.core import subtasks_library
 from wizard.vars import assets_vars
 from wizard.vars import env_vars
 from wizard.vars import softwares_vars
@@ -661,22 +662,29 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
         dir_name = path_utils.clean_path(path_utils.join(export_path, new_version))
     if not tools.create_folder(dir_name):
         return
-    copied_files = tools.copy_files(files, dir_name)
-    if copied_files is None:
-        if not tools.remove_folder(dir_name):
-            logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
-        return
+
+    if tools.get_files_list_size(files) > 10000000000:
+        logger.info(f"Files list size over 10Gb, starting files copying as subtask.")
+        subtasks_library.threaded_copy(files, dir_name, max_threads=16)
+        copied_files = []
+    else:
+        copied_files = tools.copy_files(files, dir_name)
+        if copied_files is None:
+            if not tools.remove_folder(dir_name):
+                logger.warning(f"{dir_name} can't be removed, keep export version {new_version} in database")
+            return
+        if (len(copied_files) == len(files) and len(files) > 0) and not skip_temp_purge:
+            tools.remove_tree(os.path.dirname(files[0]))
+        elif len(copied_files) != len(files):
+            logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
+        else:
+            pass
+
     export_version_id = project.add_export_version(new_version,
                                                     copied_files,
                                                     export_id,
                                                     version_id,
                                                     comment)
-    if (len(copied_files) == len(files) and len(files) > 0) and not skip_temp_purge:
-        tools.remove_tree(os.path.dirname(files[0]))
-    elif len(copied_files) != len(files):
-        logger.warning(f"Missing files, keeping temp dir: {os.path.dirname(files[0])}")
-    else:
-        pass
     game.add_xps(game_vars._export_xp_)
     if execute_xp:
         game.analyse_comment(comment, game_vars._export_penalty_)

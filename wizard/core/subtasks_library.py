@@ -206,3 +206,12 @@ def archive_variant(variant_id, print_stdout=False):
 	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
 	task.start()
 	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+
+def threaded_copy(files_list, destination, max_threads=16, print_stdout=False):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.core import threaded_copy\n"
+	command += f"threaded_copy.threaded_copy({files_list}, '{destination}', {max_threads}).copy()\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+	task.start()
+	logger.info('Threaded copy started as subtask, open the subtask manager to get more informations')

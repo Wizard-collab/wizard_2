@@ -129,6 +129,14 @@ def dirname(path):
 	path = clean_path(path)
 	return path
 
+def basename(path):
+	if path is None:
+		logger.info("No path given")
+		return
+	path = os.path.basename(path)
+	path = clean_path(path)
+	return path
+
 def clean_path(path):
 	if path is None:
 		logger.info("No path given")

@@ -166,6 +166,12 @@ def get_filename_without_override(file):
         index+=1
     return file
 
+def get_files_list_size(files_list):
+    total_size = 0
+    for file in files_list:
+        total_size += os.path.getsize(file)
+    return total_size
+
 def copy_files(files_list, destination):
     sanity = 1
     for file in files_list:
