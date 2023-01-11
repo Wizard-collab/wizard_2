@@ -43,10 +43,12 @@ def batch_export(version_id, settings_dic=None, print_stdout=False):
 	asset_string = assets.instance_to_string(('work_version', version_id))
 	command =  "# coding: utf-8\n"
 	command += "from wizard.core import launch_batch\n"
+	command += "from wizard.core import tools\n"
 	command += "from wizard.core import team_client\n"
 	command += "from wizard.core import environment\n"
 	command += f"print('wizard_task_name:Exporting {asset_string}')\n"
 	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+	command += "tools.wait_for_child_processes()\n"
 	command += "team_client.refresh_team(environment.get_team_dns())\n"
 	command += "print('wizard_task_status:done')\n"
 	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)

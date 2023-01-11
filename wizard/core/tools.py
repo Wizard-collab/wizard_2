@@ -37,6 +37,7 @@ import tempfile
 import time
 import datetime
 import logging
+import psutil
 
 # Wizard modules
 from wizard.core import path_utils
@@ -290,3 +291,21 @@ def shared_temp_file_from_pycmd(pycmd, directory):
     with open(temporary_python_file, 'w') as f:
         f.write(pycmd)
     return path_utils.clean_path(temporary_python_file)
+
+def wait_for_child_processes():
+    current_process = psutil.Process()
+    children = current_process.children(recursive=True)
+    while 1:
+        is_running = 0
+        for child in children:
+            try:
+                if child.status() == psutil.STATUS_RUNNING:
+                    is_running = 1
+                    logger.info(f"Waiting for child process to end ( PID : {child.pid})")
+            except psutil.NoSuchProcess:
+                pass
+        if is_running:
+            time.sleep(1)
+            continue
+        else:
+            break

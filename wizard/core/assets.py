@@ -663,8 +663,8 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
     if not tools.create_folder(dir_name):
         return
 
-    if tools.get_files_list_size(files) > 10000000000:
-        logger.info(f"Files list size over 10Gb, starting files copying as subtask.")
+    if (tools.get_files_list_size(files) > 5000000000) and (len(files)>3):
+        logger.info(f"Files list size over 5Gb, starting files copying as subtask.")
         subtasks_library.threaded_copy(files, dir_name, max_threads=16)
         copied_files = []
     else:
