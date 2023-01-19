@@ -44,6 +44,11 @@ from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
 
+def natural_sort(l): 
+    convert = lambda text: int(text) if text.isdigit() else text.lower() 
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
+    return sorted(l, key=alphanum_key)
+
 def flushed_input(placeholder):
     user_input = input(placeholder)
     return user_input

@@ -338,6 +338,9 @@ class popup_event_widget(QtWidgets.QFrame):
             profile_color = '#9cf277'
             if self.event_row['creation_user'] == environment.get_user():
                 self.comment_widget.setVisible(True)
+                if self.event_row['message'] is not None and self.event_row['message'] != '':
+                    self.comment_textEdit.setText(self.event_row['message'])
+                    self.update_comment_validity()
                 self.is_comment = True
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'

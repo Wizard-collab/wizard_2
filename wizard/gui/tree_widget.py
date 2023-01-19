@@ -20,6 +20,7 @@ from wizard.core import user
 from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.core import repository
+from wizard.core import tools
 from wizard.vars import user_vars
 from wizard.vars import assets_vars
 from wizard.vars import ressources
@@ -236,14 +237,71 @@ class tree_widget(QtWidgets.QFrame):
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
+        
+        for domain_id in self.domain_ids.keys():
+            self.sort_domain_children(domain_id)
+        for category_id in self.category_ids.keys():
+            self.sort_category_children(category_id)
+        for asset_id in self.asset_ids.keys():
+            self.sort_asset_children(asset_id)
 
         self.apply_search()
         self.refresh_datas()
         if hard:
             self.get_context()
         self.update_creation_items_visibility()
-
         self.update_refresh_time(start_time)
+
+    def sort_domain_children(self, domain_id):
+        if self.domain_ids[domain_id].instance_name == 'assets':
+            return
+        names_dic = dict()
+        names = []
+        creation_item = None
+        for child_index in range(self.domain_ids[domain_id].childCount()):
+            item = self.domain_ids[domain_id].child(child_index)
+            if item.instance_type == 'category_creation':
+                item.setText(50, str(0))
+                continue
+            names_dic[item.instance_name] = item
+            names.append(item.instance_name)
+        names = tools.natural_sort(names)
+        for name in names:
+            names_dic[name].setText(50, str(names.index(name)).zfill(10))
+        self.domain_ids[domain_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+
+    def sort_category_children(self, category_id):
+        names_dic = dict()
+        names = []
+        creation_item = None
+        for child_index in range(self.category_ids[category_id].childCount()):
+            item = self.category_ids[category_id].child(child_index)
+            if item.instance_type == 'asset_creation':
+                item.setText(50, str(0))
+                continue
+            names_dic[item.instance_name] = item
+            names.append(item.instance_name)
+        names = tools.natural_sort(names)
+        for name in names:
+            names_dic[name].setText(50, str(names.index(name)).zfill(10))
+        self.category_ids[category_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+
+    def sort_asset_children(self, asset_id):
+        names_dic = dict()
+        names = []
+        creation_item = None
+        for child_index in range(self.asset_ids[asset_id].childCount()):
+            item = self.asset_ids[asset_id].child(child_index)
+            if item.instance_type == 'stage_creation':
+                item.setText(50, str(0))
+                continue
+            names_dic[item.instance_name] = item
+            names.append(item.instance_name)
+        order_list = [x for x in assets_vars._all_stages_ if x in names]
+        names = sorted(names, key=lambda x: order_list.index(x))
+        for name in names:
+            names_dic[name].setText(50, str(names.index(name)).zfill(10))
+        self.asset_ids[asset_id].sortChildren(50, QtCore.Qt.AscendingOrder)
 
     def update_columns_visibility(self):
         self.tree.setColumnHidden(2, not self.progress_visibility)

@@ -31,10 +31,14 @@ import requests
 import traceback
 import json
 import logging
+import os
+import sys
 
 # Wizard modules
 from wizard.core import application
 from wizard.core import environment
+from wizard.core import tools
+from wizard.core import path_utils
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -53,6 +57,20 @@ def get_latest_build():
     except:
         logger.error(str(traceback.format_exc()))
         return
+
+'''
+def download_install_latest_build():
+    latest_build = get_latest_build()
+    file_name = latest_build[0]['setup_name']
+    url = latest_build[1]
+    destination = path_utils.join(tools.temp_dir(), file_name)
+    r = requests.get(url)
+    r = requests.get(url)
+    with open(destination,'wb') as f:
+        f.write(r.content)
+    os.startfile(destination)
+    sys.exit()
+'''
 
 def send_log(log, type, additionnal_message=''):
     URL = f"{ressources._web_server_url_}support/"

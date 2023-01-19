@@ -74,6 +74,7 @@ from wizard.core import asset_tracking
 from wizard.core import hooks
 from wizard.core import user
 from wizard.core import subtasks_library
+from wizard.core import threaded_copy
 from wizard.vars import assets_vars
 from wizard.vars import env_vars
 from wizard.vars import softwares_vars

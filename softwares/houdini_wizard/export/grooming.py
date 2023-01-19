@@ -19,11 +19,23 @@ from houdini_wizard import wizard_export
 def main():
     scene = wizard_export.save_or_save_increment()
     try:
-        export_name = 'main'
-        asset_name = os.environ['wizard_asset_name']
-        exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
-        wizard_export.trigger_before_export_hook('grooming', exported_string_asset)
-        wizard_export.export(stage_name='grooming', export_name=export_name, exported_string_asset=exported_string_asset, out_node='wizard_grooming_output')
+        if wizard_communicate.get_export_format(int(os.environ['wizard_work_env_id'])) == 'abc':
+            out_nodes_dic = wizard_tools.get_export_nodes('wizard_grooming_output')
+            if out_nodes_dic == dict():
+                logger.warning("No export nodes found...")
+                return
+            for out_node_name in out_nodes_dic.keys():
+                export_name = out_nodes_dic[out_node_name]
+                asset_name = os.environ['wizard_asset_name']
+                exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+                wizard_export.trigger_before_export_hook('grooming', exported_string_asset)
+                wizard_export.export(stage_name='grooming', export_name=export_name, exported_string_asset=exported_string_asset, out_node=out_node_name)
+        else:
+            export_name = 'main'
+            asset_name = os.environ['wizard_asset_name']
+            exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+            wizard_export.trigger_before_export_hook('grooming', exported_string_asset)
+            wizard_export.export(stage_name='grooming', export_name=export_name, exported_string_asset=exported_string_asset, out_node='')
     except:
         logger.error(str(traceback.format_exc()))
     finally:
