@@ -187,6 +187,10 @@ class groups_manager_widget(QtWidgets.QWidget):
                     self.remove_group(group)
             self.update_grouped_references = True
             self.get_current_group_id()
+
+            #comboBox->model()->sort(0, Qt::DescendingOrder)
+            self.groups_comboBox.model().sort(0, QtCore.Qt.AscendingOrder)
+
             if self.group_id != self.old_group_id:
                 self.current_group_changed()
             else:

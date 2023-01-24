@@ -15,6 +15,7 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import create_quote_widget
+from wizard.gui import stars_widget
 
 class quotes_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -50,9 +51,7 @@ class quotes_widget(QtWidgets.QFrame):
         self.quote_label.setMinimumHeight(0)
         self.animation_handler_layout.addWidget(self.quote_label)
 
-        self.score_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.score_slider.setRange(0,5)
-        self.score_slider.setFixedWidth(60)
+        self.score_slider = stars_widget.rate_widget()
         self.animation_handler_layout.addWidget(self.score_slider)
         
         self.random_button = QtWidgets.QPushButton()
@@ -75,16 +74,18 @@ class quotes_widget(QtWidgets.QFrame):
         self.timer.timeout.connect(self.clear_anim)
         self.random_button.clicked.connect(self.clear_anim)
         self.random_button.clicked.connect(self.timer.stop)
-        self.score_slider.sliderReleased.connect(self.vote)
+        self.score_slider.rate_signal.connect(self.vote)
         self.add_button.clicked.connect(self.add_quote)
 
     def add_quote(self):
         self.create_quote_widget = create_quote_widget.create_quote_widget(self)
         self.create_quote_widget.exec_()
 
-    def vote(self):
-        score = self.score_slider.value()
+    def vote(self, score):
         repository.add_quote_score(self.quote_row['id'], score)
+        score_list = json.loads(repository.get_quote_data(self.quote_row['id'], 'score'))
+        if score_list != []:
+            self.score_slider.set_rate(int(statistics.mean(score_list)))
 
     def get_new_random_quote(self, without_anim=0):
         self.animation_handler_widget.setVisible(0)
@@ -113,9 +114,9 @@ class quotes_widget(QtWidgets.QFrame):
     def update_score_slider(self):
         score_list = json.loads(self.quote_row['score'])
         if score_list != []:
-            self.score_slider.setValue(int(statistics.mean(score_list)))
+            self.score_slider.set_rate(int(statistics.mean(score_list)))
         else:
-            self.score_slider.setValue(0)
+            self.score_slider.set_rate(0)
 
     def clear_anim(self):
         self.animation = QtCore.QPropertyAnimation(self.animation_handler_widget, b"geometry")

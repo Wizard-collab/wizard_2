@@ -28,6 +28,7 @@
 
 # Python modules
 import numpy as np
+import multiprocessing
 import threading
 import time
 import random
@@ -41,10 +42,13 @@ from wizard.core import path_utils
 logger = logging.getLogger(__name__)
 
 class threaded_copy:
-    def __init__(self, files_list, destination, max_threads=16):
+    def __init__(self, files_list, destination, max_threads=None):
+        if max_threads is None:
+            self.max_threads = multiprocessing.cpu_count()
+        else:
+            self.max_threads = max_threads
         self.files_list = files_list
         self.destination = destination
-        self.max_threads = max_threads
         self.threads = []
         self.copied_files = []
 
