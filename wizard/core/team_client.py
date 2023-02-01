@@ -102,16 +102,17 @@ class team_client(QThread):
         self.team_connection_status_signal.emit(False)
 
     def analyse_signal(self, data):
-        if data['project'] != environment.get_project_name():
-            return
-        if data['type'] == 'refresh_team':
-            self.refresh_signal.emit(1)
-        elif data['type'] == 'prank':
+        if 'project' in data.keys():
+            if data['project'] != environment.get_project_name():
+                return
+            if data['type'] == 'refresh_team':
+                self.refresh_signal.emit(1)
+            elif data['type'] == 'new_user':
+                self.new_user_signal.emit(data['user_name'])
+            elif data['type'] == 'remove_user':
+                self.remove_user_signal.emit(data['user_name'])
+        if data['type'] == 'prank' and (data['prank_data']['destination_user'] == environment.get_user()):
             self.prank_signal.emit(data['prank_data'])
-        elif data['type'] == 'new_user':
-            self.new_user_signal.emit(data['user_name'])
-        elif data['type'] == 'remove_user':
-            self.remove_user_signal.emit(data['user_name'])
 
 def try_connection(DNS):
     signal_dic = dict()

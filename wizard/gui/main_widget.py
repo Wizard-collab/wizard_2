@@ -239,8 +239,7 @@ class main_widget(QtWidgets.QWidget):
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
         self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
         self.team_client.refresh_signal.connect(self.refresh)
-        #self.team_client.prank_signal.connect(print)
-        #self.team_client.prank_signal.connect(prank.execute_prank)
+        self.team_client.prank_signal.connect(prank.execute_prank)
         self.team_client.new_user_signal.connect(self.team_widget.add_user)
         self.team_client.remove_user_signal.connect(self.team_widget.remove_user)
 

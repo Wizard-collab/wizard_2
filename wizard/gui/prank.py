@@ -26,8 +26,8 @@ def execute_prank(signal_dic):
 		gui_server.custom_popup(f"Mouahahah", f"You are pranked by {signal_dic['from_user']}, jiggly mouuuse !")
 		prank.start()
 	elif signal_dic['prank_type'] == 'attack':
-		gui_server.custom_popup(f"Mouahahah", f"You are pranked by {signal_dic['from_user']}, you loose {signal_dic['amount']}% of life !")
-		attack(signal_dic['amount'])
+		gui_server.custom_popup(f"Mouahahah", f"You are pranked by {signal_dic['from_user']}, you loose {signal_dic['force']}% of life !")
+		attack(signal_dic['force'])
 
 class mouse_prank(threading.Thread):
 	def __init__(self):
@@ -49,9 +49,18 @@ def attack(force=10):
 	game.remove_life(force)
 	gui_server.refresh_ui()
 
-def send_mouse_prank(duration=10):
+def send_mouse_prank(destination_user, duration=10):
 	signal_dic = dict()
 	signal_dic['prank_type'] = 'mouse_prank'
 	signal_dic['duration'] = duration
 	signal_dic['from_user'] = environment.get_user()
+	signal_dic['destination_user'] = destination_user
+	team_client.send_prank(environment.get_team_dns(), signal_dic)
+
+def send_attack_prank(destination_user, force=10):
+	signal_dic = dict()
+	signal_dic['prank_type'] = 'attack'
+	signal_dic['force'] = force
+	signal_dic['from_user'] = environment.get_user()
+	signal_dic['destination_user'] = destination_user
 	team_client.send_prank(environment.get_team_dns(), signal_dic)
