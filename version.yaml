@@ -1,7 +1,7 @@
-BUILDS: 240
+BUILDS: 243
 MAJOR: 2
-MINOR: 58
-PATCH: 2
-builds: 240
-date: 1673862824.2297473
-setup_name: 2.58.2.0240-setup.exe
+MINOR: 60
+PATCH: 0
+builds: 243
+date: 1675268656.8715186
+setup_name: 2.60.0.0243-setup.exe

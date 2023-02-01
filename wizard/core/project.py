@@ -1352,13 +1352,14 @@ def get_lock(work_env_id):
     logger.warning(f"Work env locked by {lock_user_name}")
     return lock_user_name
 
-def set_work_env_lock(work_env_id, lock=1):
+def set_work_env_lock(work_env_id, lock=1, force=0):
     if lock:
         user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
     else:
         user_id = None
-    if get_lock(work_env_id):
-        return
+    if not force:
+        if get_lock(work_env_id) and not force:
+            return
     if not db_utils.update_data('project',
                             'work_envs',
                             ('lock_id', user_id),

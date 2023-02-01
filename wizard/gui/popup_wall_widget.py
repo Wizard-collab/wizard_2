@@ -353,6 +353,9 @@ class popup_event_widget(QtWidgets.QFrame):
             profile_color = '#f0d969'
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
+        if self.is_comment:
+            if user.user().get_popups_blink_enabled():
+                self.start_blink()
 
     def connect_functions(self):
         self.comment_button.clicked.connect(self.update_comment)
@@ -397,6 +400,20 @@ class popup_event_widget(QtWidgets.QFrame):
             assets.modify_video_comment(video_id, comment)
             self.time_out.emit(self.event_row['id'])
         events.modify_comment(self.event_row['id'], comment)
+
+    def start_blink(self):
+        self.blink_state = 1
+        self.blink_timer = QtCore.QTimer(self)
+        self.blink_timer.start(400)
+        self.blink_timer.timeout.connect(self.update_blink)
+
+    def update_blink(self):
+        if self.blink_state:
+            color = '#19191f'
+        else:
+            color = '#23232b'
+        self.blink_state = 1-self.blink_state
+        self.setStyleSheet("#popup_event_frame{background-color:%s}" %color)
 
     def action(self):
         if self.event_row['type'] == 'archive':
