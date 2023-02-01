@@ -90,9 +90,11 @@ class general_widget(QtWidgets.QWidget):
             self.local_path_lineEdit.clear()
 
         popups_enabled = user.user().get_popups_enabled()
+        popups_blink_enabled = user.user().get_popups_blink_enabled()
         keep_until_comment = user.user().get_keep_until_comment()
         popups_duration = user.user().get_popups_duration()
         self.enable_popups_checkbox.setChecked(popups_enabled)
+        self.enable_popups_blink_checkbox.setChecked(popups_blink_enabled)
         self.keep_until_comment_checkbox.setChecked(keep_until_comment)
         self.popups_duration_spinBox.setValue(popups_duration)
 
@@ -114,9 +116,11 @@ class general_widget(QtWidgets.QWidget):
 
     def apply_popups_settings(self):
         popups_enabled = self.enable_popups_checkbox.isChecked()
+        blink = self.enable_popups_blink_checkbox.isChecked()
         keep_until_comment = self.keep_until_comment_checkbox.isChecked()
         popups_duration = self.popups_duration_spinBox.value()
         user.user().set_popups_settings(popups_enabled,
+                                            blink,
                                             popups_duration,
                                             keep_until_comment)
 
@@ -149,6 +153,7 @@ class general_widget(QtWidgets.QWidget):
         self.local_path_accept_button.clicked.connect(self.apply_local_path)
         self.folder_button.clicked.connect(self.open_explorer)
         self.enable_popups_checkbox.stateChanged.connect(self.apply_popups_settings)
+        self.enable_popups_blink_checkbox.stateChanged.connect(self.apply_popups_settings)
         self.keep_until_comment_checkbox.stateChanged.connect(self.apply_popups_settings)
         self.popups_duration_spinBox.valueChanged.connect(self.apply_popups_settings)
 
@@ -210,6 +215,10 @@ class general_widget(QtWidgets.QWidget):
         self.enable_popups_checkbox = QtWidgets.QCheckBox()
         self.enable_popups_checkbox.setObjectName('android_checkbox')
         self.popups_sublayout.addRow(QtWidgets.QLabel('Popups enabled'), self.enable_popups_checkbox)
+
+        self.enable_popups_blink_checkbox = QtWidgets.QCheckBox()
+        self.enable_popups_blink_checkbox.setObjectName('android_checkbox')
+        self.popups_sublayout.addRow(QtWidgets.QLabel('Popups blink enabled'), self.enable_popups_blink_checkbox)
 
         self.keep_until_comment_checkbox = QtWidgets.QCheckBox()
         self.keep_until_comment_checkbox.setObjectName('android_checkbox')

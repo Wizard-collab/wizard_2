@@ -199,9 +199,10 @@ class user:
             self.set_reference_auto_update_default()
         return self.prefs_dic[user_vars._reference_settings_]['auto_update_default']
 
-    def set_popups_settings(self, enabled=1, duration=3, keep_until_comment=True):
+    def set_popups_settings(self, enabled=1, blink=1, duration=3, keep_until_comment=True):
         popups_settings_dic = dict()
         popups_settings_dic['enabled'] = enabled
+        popups_settings_dic['blink'] = blink
         popups_settings_dic['duration'] = duration
         popups_settings_dic['keep_until_comment'] = keep_until_comment
         self.prefs_dic[user_vars._popups_settings_] = popups_settings_dic
@@ -209,6 +210,12 @@ class user:
 
     def get_popups_enabled(self):
         return self.prefs_dic[user_vars._popups_settings_]['enabled']
+
+    def get_popups_blink_enabled(self):
+        if 'blink' in self.prefs_dic[user_vars._popups_settings_].keys():
+            return self.prefs_dic[user_vars._popups_settings_]['blink']
+        else:
+            return 1
 
     def get_keep_until_comment(self):
         return self.prefs_dic[user_vars._popups_settings_]['keep_until_comment']

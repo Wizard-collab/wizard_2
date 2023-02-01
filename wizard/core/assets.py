@@ -433,7 +433,7 @@ def create_work_env(software_id, variant_id):
     return work_env_id
 
 def force_unlock(work_env_id):
-    project.set_work_env_lock(work_env_id, 0)
+    project.set_work_env_lock(work_env_id, 0, 1)
     return 1
 
 def create_references_from_variant_id(work_env_id, variant_id):
