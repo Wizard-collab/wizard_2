@@ -20,6 +20,8 @@ def reference_modeling(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'MODELING')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('modeling',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -30,6 +32,8 @@ def update_modeling(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('modeling',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -40,6 +44,8 @@ def reference_rigging(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'RIGGING')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('rigging',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -50,6 +56,8 @@ def update_rigging(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('rigging',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -61,6 +69,8 @@ def reference_grooming(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'GROOMING')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('grooming',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -71,6 +81,8 @@ def update_grooming(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('grooming',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -81,6 +93,8 @@ def reference_custom(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CUSTOM')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('custom',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -91,6 +105,8 @@ def update_custom(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('custom',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -101,6 +117,8 @@ def reference_camrig(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CAMRIG')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('camrig',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -111,6 +129,8 @@ def update_camrig(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('camrig',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -121,6 +141,8 @@ def reference_layout(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'LAYOUT')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('layout',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -131,6 +153,8 @@ def update_layout(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('layout',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -141,6 +165,8 @@ def reference_animation(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'ANIMATION')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('animation',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -151,6 +177,8 @@ def update_animation(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('animation',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -161,6 +189,8 @@ def reference_cfx(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CFX')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('cfx',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -171,6 +201,8 @@ def update_cfx(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('cfx',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -181,6 +213,8 @@ def reference_camera(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
         new_nodes = create_reference(reference_dic['files'][0], reference_dic['namespace'], 'CAMERA')
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('camera',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -191,6 +225,8 @@ def update_camera(reference_dic):
     old_objects = pm.ls()
     if pm.namespace(exists=reference_dic['namespace']):
         new_nodes = update_reference(reference_dic['files'], reference_dic['namespace'])
+        if new_nodes is None:
+            return
         trigger_after_reference_hook('camera',
                                     reference_dic['files'],
                                     reference_dic['namespace'],
@@ -212,8 +248,10 @@ def create_reference(file, namespace, group):
 
 def update_reference(files_list, namespace):
     fileReference = pm.FileReference(namespace=namespace, refnode=True)
-    if os.path.normpath(files_list[0]) != os.path.normpath(fileReference.path):
-        return fileReference.load(files_list[0], returnNewNodes=True)
+    if os.path.normpath(files_list[0]) == os.path.normpath(fileReference.path):
+        logger.info(f"{namespace} already up to date, skipping")
+        return
+    return fileReference.load(files_list[0], returnNewNodes=True)
 
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
