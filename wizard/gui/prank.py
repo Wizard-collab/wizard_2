@@ -1,0 +1,57 @@
+# coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
+
+# Python modules
+import threading
+import pyautogui
+import random
+import time
+import logging
+logger = logging.getLogger(__name__)
+
+# Wizard core modules
+from wizard.core import game
+from wizard.core import team_client
+from wizard.core import environment
+
+# Wizard gui modules
+from wizard.gui import gui_server
+
+
+def execute_prank(signal_dic):
+	if signal_dic['prank_type'] == 'mouse_prank':
+		prank = mouse_prank()
+		prank.set_duration(signal_dic['duration'])
+		gui_server.custom_popup(f"Mouahahah", f"You are pranked by {signal_dic['from_user']}, jiggly mouuuse !")
+		prank.start()
+	elif signal_dic['prank_type'] == 'attack':
+		gui_server.custom_popup(f"Mouahahah", f"You are pranked by {signal_dic['from_user']}, you loose {signal_dic['amount']}% of life !")
+		attack(signal_dic['amount'])
+
+class mouse_prank(threading.Thread):
+	def __init__(self):
+		super(mouse_prank, self).__init__()
+		self.duration = 10
+
+	def set_duration(self, duration):
+		self.duration = duration
+
+	def run(self):
+		start_time = time.time()
+		while time.time() - self.duration < start_time:
+			rel_pos_x = random.randint(-50, 50)
+			rel_pos_y = random.randint(-50, 50)
+			pyautogui.moveRel(rel_pos_x, rel_pos_y)#), duration = 0.01)
+			time.sleep(0.02)
+
+def attack(force=10):
+	game.remove_life(force)
+	gui_server.refresh_ui()
+
+def send_mouse_prank(duration=10):
+	signal_dic = dict()
+	signal_dic['prank_type'] = 'mouse_prank'
+	signal_dic['duration'] = duration
+	signal_dic['from_user'] = environment.get_user()
+	team_client.send_prank(environment.get_team_dns(), signal_dic)

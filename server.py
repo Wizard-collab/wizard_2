@@ -169,12 +169,12 @@ class server(threading.Thread):
         data = json.loads(msg_raw)
         if data['type'] == 'test_conn':
             logger.info('test_conn')
-        elif data['type'] == 'refresh_team':
+        elif data['type'] == 'new_client':
+            self.add_client(data['user_name'], conn, addr, data['project'])
+        else:
             client_dic = dict()
             client_dic['id'] = None
             self.broadcast(data, client_dic)
-        elif data['type'] == 'new_client':
-            self.add_client(data['user_name'], conn, addr, data['project'])
 
     def add_client(self, user_name, conn, addr, project):
         client_dic = dict()
@@ -229,9 +229,9 @@ class server(threading.Thread):
     def broadcast(self, data, client_dic):
         logger.debug("Broadcasting : " + str(data))
         for client in self.client_ids.keys(): 
-            if client != client_dic['id']:
-                if not send_signal_with_conn(self.client_ids[client]['conn'], data):
-                    self.remove_client(self.client_ids[client])
+            #if client != client_dic['id']:
+            if not send_signal_with_conn(self.client_ids[client]['conn'], data):
+                self.remove_client(self.client_ids[client])
 
     def remove_client(self, client_dic): 
         if client_dic['id'] in self.client_ids.keys(): 

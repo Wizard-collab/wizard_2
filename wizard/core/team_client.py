@@ -41,6 +41,7 @@ class team_client(QThread):
 
     team_connection_status_signal = pyqtSignal(bool)
     refresh_signal = pyqtSignal(int)
+    prank_signal = pyqtSignal(object)
     new_user_signal = pyqtSignal(str)
     remove_user_signal = pyqtSignal(str)
 
@@ -105,6 +106,8 @@ class team_client(QThread):
             return
         if data['type'] == 'refresh_team':
             self.refresh_signal.emit(1)
+        elif data['type'] == 'prank':
+            self.prank_signal.emit(data['prank_data'])
         elif data['type'] == 'new_user':
             self.new_user_signal.emit(data['user_name'])
         elif data['type'] == 'remove_user':
@@ -119,4 +122,10 @@ def refresh_team(DNS):
     signal_dic = dict()
     signal_dic['type'] = 'refresh_team'
     signal_dic['project'] = environment.get_project_name()
+    return socket_utils.send_bottle(DNS, signal_dic)
+
+def send_prank(DNS, prank_data):
+    signal_dic = dict()
+    signal_dic['type'] = 'prank'
+    signal_dic['prank_data'] = prank_data
     return socket_utils.send_bottle(DNS, signal_dic)
