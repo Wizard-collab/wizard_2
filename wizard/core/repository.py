@@ -233,7 +233,8 @@ def create_user(user_name,
                     'deaths',
                     'level',
                     'life',
-                    'administrator'), 
+                    'administrator',
+                    'coins'), 
                 (user_name,
                     tools.encrypt_string(password),
                     email,
@@ -245,7 +246,8 @@ def create_user(user_name,
                     0,
                     0,
                     100,
-                    administrator)):
+                    administrator,
+                    0)):
         return
     info = f"User {user_name} created"
     if administrator:
@@ -451,6 +453,15 @@ def modify_user_life(user_name, life):
                                     ('user_name', user_name)):
         return
     logger.debug(f'{user_name} life is {life}%')
+    return 1
+
+def modify_user_coins(user_name, coins):
+    if not db_utils.update_data('repository',
+                                    'users',
+                                    ('coins', coins),
+                                    ('user_name', user_name)):
+        return
+    logger.info(f'{user_name} have now {coins} coins')
     return 1
 
 def modify_user_email(user_name, email):
@@ -682,7 +693,8 @@ def create_admin_user(admin_password, admin_email):
                                 'deaths',
                                 'level',
                                 'life', 
-                                'administrator'), 
+                                'administrator',
+                                'coins'), 
                             ('admin',
                                 tools.encrypt_string(admin_password),
                                 admin_email,
@@ -694,7 +706,8 @@ def create_admin_user(admin_password, admin_email):
                                 0,
                                 0,
                                 100,
-                                1)):
+                                1,
+                                0)):
         return
     logger.info('Admin user created')
     return 1
@@ -713,7 +726,8 @@ def create_users_table():
                                         deaths integer NOT NULL,
                                         level integer NOT NULL,
                                         life integer NOT NULL,
-                                        administrator integer NOT NULL
+                                        administrator integer NOT NULL,
+                                        coins integer NOT NULL
                                     );"""
     if not db_utils.create_table(environment.get_repository(), sql_cmd):
         return

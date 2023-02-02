@@ -289,6 +289,8 @@ _coin_icon_ = path_utils.join(_icons_path_, 'coin.png')
 _available_icons_list_.append(_coin_icon_)
 _sword_icon_ = path_utils.join(_icons_path_, 'sword.png')
 _available_icons_list_.append(_sword_icon_)
+_purse_icon_ = path_utils.join(_icons_path_, 'purse.png')
+_available_icons_list_.append(_purse_icon_)
 
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')

@@ -29,6 +29,11 @@
 # Wizard modules
 from wizard.core import environment
 from wizard.core import project
+from wizard.core import db_utils
 
 def main():
 	pass
+
+def alter_repository_users_table():
+	sql_cmd = """ALTER TABLE users ADD COLUMN coins int DEFAULT 0;"""
+	db_utils.create_table(environment.get_repository(), sql_cmd)

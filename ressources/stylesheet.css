@@ -1078,3 +1078,20 @@ QTableCornerButton::section {
 	background-color: transparent;
 	border-radius: 2px;
 }
+
+#market_frame{
+	border-top:2px solid #32323b;
+	border-bottom:2px solid #1e1e24;
+	border-left:2px solid #27272e;
+	border-right:2px solid #2a2a36;
+	border-radius:2px;
+}
+
+#market_icon_view{
+	padding: 6px;
+}
+
+#market_icon_view::item{
+	padding: 0px;
+	background-color: transparent;
+}
