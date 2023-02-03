@@ -37,3 +37,7 @@ def main():
 def alter_repository_users_table():
 	sql_cmd = """ALTER TABLE users ADD COLUMN coins int DEFAULT 0;"""
 	db_utils.create_table(environment.get_repository(), sql_cmd)
+	sql_cmd = """ALTER TABLE users ADD COLUMN artefacts text DEFAULT '[]';"""
+	db_utils.create_table(environment.get_repository(), sql_cmd)
+	sql_cmd = """ALTER TABLE users ADD COLUMN keeped_artefacts text DEFAULT '{}';"""
+	db_utils.create_table(environment.get_repository(), sql_cmd)

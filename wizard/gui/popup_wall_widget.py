@@ -122,11 +122,11 @@ class popup_wall_widget(QtWidgets.QWidget):
             if widget.is_comment:
                 comment = widget.comment_textEdit.toPlainText()
                 game.analyse_comment(comment, game_vars._export_penalty_)
+                gui_server.refresh_team_ui()
 
             widget.setVisible(0)
             widget.setParent(None)
             widget.deleteLater()
-            gui_server.refresh_team_ui()
 
     def remove_save_popup(self, popup_id):
         if popup_id in self.popup_save_ids.keys():
@@ -656,6 +656,7 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.title_layout.addWidget(self.event_title_label)
 
         self.msg_label = QtWidgets.QLabel()
+        self.msg_label.setWordWrap(True)
         self.msg_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.msg_label)
 

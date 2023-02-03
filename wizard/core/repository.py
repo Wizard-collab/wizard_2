@@ -464,6 +464,24 @@ def modify_user_coins(user_name, coins):
     logger.info(f'{user_name} have now {coins} coins')
     return 1
 
+def modify_user_artefacts(user_name, artefacts_list):
+    if not db_utils.update_data('repository',
+                                    'users',
+                                    ('artefacts', json.dumps(artefacts_list)),
+                                    ('user_name', user_name)):
+        return
+    logger.debug(f'Artefacts list modified')
+    return 1
+
+def modify_keeped_artefacts(user_name, artefacts_dic):
+    if not db_utils.update_data('repository',
+                                    'users',
+                                    ('keeped_artefacts', json.dumps(artefacts_dic)),
+                                    ('user_name', user_name)):
+        return
+    logger.debug(f'Keeped artefacts dic modified')
+    return 1
+
 def modify_user_email(user_name, email):
     if email == '':
         logger.warning('Please enter a valid email')
