@@ -66,14 +66,14 @@ class artefact_item(QtWidgets.QFrame):
         self.connect_functions()
 
     def build_ui(self):
-        self.setFixedSize(250, 90)
+        self.setFixedSize(250, 120)
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.setLayout(self.main_layout)
 
         self.artefact_icon = QtWidgets.QLabel()
-        self.artefact_icon.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        self.artefact_icon.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         self.artefact_icon.setPixmap(QtGui.QIcon(self.artefact_dic['icon']).pixmap(70))
         self.main_layout.addWidget(self.artefact_icon)
 
@@ -95,6 +95,11 @@ class artefact_item(QtWidgets.QFrame):
         self.info_label.setObjectName('gray_label')
         self.content_layout.addWidget(self.info_label)
 
+        self.type_label = QtWidgets.QLabel(self.artefact_dic['type'].capitalize())
+        self.type_label.setStyleSheet('color:#f2c96b')
+        self.type_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.content_layout.addWidget(self.type_label)
+
         self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.button_layout = QtWidgets.QHBoxLayout()
@@ -102,12 +107,16 @@ class artefact_item(QtWidgets.QFrame):
         self.button_layout.setSpacing(0)
         self.content_layout.addLayout(self.button_layout)
 
+        self.level_label = QtWidgets.QLabel(f"Level {self.artefact_dic['level']}")
+        self.level_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.button_layout.addWidget(self.level_label)
+
         self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.buy_button = QtWidgets.QPushButton(f"{self.artefact_dic['price']} | Buy")
         self.buy_button.setStyleSheet('padding:2px')
         self.buy_button.setIcon(QtGui.QIcon(ressources._coin_icon_))
-        self.buy_button.setIconSize(QtCore.QSize(12,12))
+        self.buy_button.setIconSize(QtCore.QSize(18,18))
         self.button_layout.addWidget(self.buy_button)
 
     def connect_functions(self):

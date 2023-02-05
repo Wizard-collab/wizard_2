@@ -447,6 +447,8 @@ def modify_user_level(user_name, new_level):
     return 1
 
 def modify_user_life(user_name, life):
+    if life > 100:
+        life = 100
     if not db_utils.update_data('repository',
                                     'users',
                                     ('life', life),

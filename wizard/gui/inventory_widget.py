@@ -91,14 +91,14 @@ class artefact_item(QtWidgets.QFrame):
 
     def build_ui(self):
         icon = QtGui.QIcon(self.artefact_dic['icon'])
-        self.setFixedSize(250, 90)
+        self.setFixedSize(250, 110)
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.setLayout(self.main_layout)
 
         self.artefact_icon = QtWidgets.QLabel()
-        self.artefact_icon.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        self.artefact_icon.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         self.artefact_icon.setPixmap(icon.pixmap(70))
         self.main_layout.addWidget(self.artefact_icon)
 
@@ -120,6 +120,11 @@ class artefact_item(QtWidgets.QFrame):
         self.info_label.setObjectName('gray_label')
         self.content_layout.addWidget(self.info_label)
 
+        self.type_label = QtWidgets.QLabel(self.artefact_dic['type'].capitalize())
+        self.type_label.setStyleSheet('color:#f2c96b')
+        self.type_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.content_layout.addWidget(self.type_label)
+
         self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.button_layout = QtWidgets.QHBoxLayout()
@@ -137,7 +142,7 @@ class artefact_item(QtWidgets.QFrame):
         self.use_button = QtWidgets.QPushButton(f"Use")
         self.use_button.setStyleSheet('padding:2px')
         self.use_button.setIcon(icon)
-        self.use_button.setIconSize(QtCore.QSize(12,12))
+        self.use_button.setIconSize(QtCore.QSize(18,18))
         self.button_layout.addWidget(self.use_button)
 
     def connect_functions(self):

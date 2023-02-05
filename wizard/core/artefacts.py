@@ -52,8 +52,8 @@ def use_artefact(artefact_name, destination_user=None):
 		if check_immunity(destination_user):
 			return
 		send_attack(destination_user, artefact_name)
-	if artefact_name == 'heal':
-		drink_heal_potion()
+	if 'heal' in artefact_name:
+		heal(game_vars.artefacts_dic[artefact_name]['amount'])
 
 def check_immunity(destination_user):
 	destination_user_row = repository.get_user_row_by_name(destination_user)
@@ -77,9 +77,15 @@ def check_artefacts_expiration():
 			del user_keeped_artefacts[time_id]
 	repository.modify_keeped_artefacts(environment.get_user(), user_keeped_artefacts)
 
-def drink_heal_potion():
-	repository.modify_user_life(environment.get_user(), 100)
-	logger.info(f"You just drank a heal potion, your life is now full !")
+def heal(amount):
+	if amount == 100:
+		life = 100
+	else:
+		life = repository.get_user_row_by_name(environment.get_user(), 'life') + amount
+		if life > 100:
+			life = 100
+	repository.modify_user_life(environment.get_user(), life)
+	logger.info(f"You just drank a heal potion, your life is now at {life}% !")
 
 def send_attack(destination_user, attack_name):
 	signal_dic = dict()
