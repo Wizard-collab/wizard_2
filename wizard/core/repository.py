@@ -466,6 +466,29 @@ def modify_user_coins(user_name, coins):
     logger.info(f'{user_name} have now {coins} coins')
     return 1
 
+def add_user_coins(user_name, coins):
+    user_coins = get_user_row_by_name(user_name, 'coins')
+    if not db_utils.update_data('repository',
+                                    'users',
+                                    ('coins', user_coins+coins),
+                                    ('user_name', user_name)):
+        return
+    logger.info(f'{user_name} just won {coins} coins !')
+    return 1
+
+def remove_user_coins(user_name, coins):
+    user_coins = get_user_row_by_name(user_name, 'coins')
+    new_coins = user_coins-coins
+    if new_coins < 0:
+        new_coins = 0
+    if not db_utils.update_data('repository',
+                                    'users',
+                                    ('coins', new_coins),
+                                    ('user_name', user_name)):
+        return
+    logger.info(f'{user_name} just lost {coins} coins !')
+    return 1
+
 def modify_user_artefacts(user_name, artefacts_list):
     if not db_utils.update_data('repository',
                                     'users',

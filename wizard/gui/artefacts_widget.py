@@ -26,6 +26,7 @@ class artefacts_widget(QtWidgets.QWidget):
         self.setWindowTitle(f"Wizard artefacts")
 
         self.keeped_artefacts_dic = dict()
+        self.coins = None
 
         self.build_ui()
         self.connect_functions()
@@ -91,11 +92,20 @@ class artefacts_widget(QtWidgets.QWidget):
         self.tabs_widget.addTab(self.market_widget, QtGui.QIcon(ressources._market_icon_), 'Market')
         
     def refresh(self):
-        user_row = repository.get_user_row_by_name(environment.get_user())
-        self.coins_amount.setText(str(user_row['coins']))
+        self.refresh_coins()
         self.market_widget.refresh()
         self.inventory_widget.refresh()
         self.refresh_keeped_artefacts()
+
+    def refresh_coins(self):
+        user_coins = repository.get_user_row_by_name(environment.get_user(), 'coins')
+        if self.coins is not None:
+            if user_coins > self.coins:
+                gui_server.custom_popup(f"Inventory", f"You just earned {user_coins-self.coins} coins", ressources._coin_icon_)
+            if user_coins < self.coins:
+                gui_server.custom_popup(f"Inventory", f"You just lost {self.coins-user_coins} coins", ressources._coin_icon_)
+        self.coins_amount.setText(str(user_coins))
+        self.coins = user_coins
 
     def refresh_keeped_artefacts(self):
         artefacts.check_artefacts_expiration()

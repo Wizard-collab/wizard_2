@@ -56,6 +56,14 @@ def execute_attack(signal_dic):
         logger.info(f"Your screen was flipped by {signal_dic['from_user']}")
         gui_server.custom_popup(f"Mouahahah", f"Your screen was flipped by {signal_dic['from_user']}, try to turn your head !", game_vars.artefacts_dic[signal_dic['attack_type']]['icon'])
         rotate_screen_once()
+    elif 'steal_attack_1' in signal_dic['attack_type']:
+        logger.info(f"{signal_dic['from_user']} just stole you 1 level !")
+        gui_server.custom_popup(f"Mouahahah", f"{signal_dic['from_user']} just stole you 1 level !", game_vars.artefacts_dic[signal_dic['attack_type']]['icon'])
+        gui_server.refresh_ui()
+    elif 'steal_attack_2' in signal_dic['attack_type']:
+        logger.info(f"{signal_dic['from_user']} just stole you some coins !")
+        gui_server.custom_popup(f"Mouahahah", f"{signal_dic['from_user']} just stole you some coins !", game_vars.artefacts_dic[signal_dic['attack_type']]['icon'])
+        gui_server.refresh_ui()
 
 
 class mouse_attack(threading.Thread):

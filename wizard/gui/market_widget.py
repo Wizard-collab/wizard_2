@@ -55,6 +55,7 @@ class market_widget(QtWidgets.QWidget):
             return
         user_row = repository.get_user_row_by_name(environment.get_user())
         for artefact, widget in self.artefacts.items():
+            widget.update_level(user_row['level'])
             widget.update_buy_button(user_row['coins'])
 
 class artefact_item(QtWidgets.QFrame):
@@ -121,6 +122,14 @@ class artefact_item(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.buy_button.clicked.connect(self.buy_artefact)
+
+    def update_level(self, level):
+        if level >= self.artefact_dic['level']:
+            self.setEnabled(True)
+            self.setStyleSheet('')
+        else:
+            self.setEnabled(False)
+            self.setStyleSheet('color:gray')
 
     def update_buy_button(self, coins):
         if coins >= self.artefact_dic['price']:

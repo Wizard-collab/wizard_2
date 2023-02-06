@@ -5,6 +5,7 @@
 # Python modules
 import json
 import time
+import random
 import logging
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 from wizard.core import team_client
 from wizard.core import environment
 from wizard.core import repository
+from wizard.core import game
 from wizard.vars import ressources
 from wizard.vars import game_vars
 
@@ -51,6 +53,11 @@ def use_artefact(artefact_name, destination_user=None):
 	if game_vars.artefacts_dic[artefact_name]['type'] == 'attack':
 		if check_immunity(destination_user):
 			return
+		if 'steal_attack_1' in artefact_name:
+			steal_attack_1(destination_user)
+		if 'steal_attack_2' in artefact_name:
+			if not steal_attack_2(destination_user):
+				return
 		send_attack(destination_user, artefact_name)
 	if 'heal' in artefact_name:
 		heal(game_vars.artefacts_dic[artefact_name]['amount'])
@@ -86,6 +93,28 @@ def heal(amount):
 			life = 100
 	repository.modify_user_life(environment.get_user(), life)
 	logger.info(f"You just drank a heal potion, your life is now at {life}% !")
+
+def steal_attack_1(destination_user):
+	game.remove_levels_to_user(1, destination_user)
+	game.add_levels(1)
+
+def steal_attack_2(destination_user):
+	destination_user_coins = repository.get_user_row_by_name(destination_user, 'coins')
+	if destination_user_coins == 0:
+		logger.warning(f"{destination_user} doesn't have coins, attack failed.")
+		return
+	range_step = int(destination_user_coins/10)
+	l = list(range(0, destination_user_coins, range_step))
+	percent_step = 100/len(l)
+	weights_list = []
+	for a in l:
+		index = l.index(a)+1
+		weight = 100-(percent_step*index)+percent_step/2
+		weights_list.append(weight)
+	coins_amount = random.choices(l, weights=weights_list)[0]
+	repository.remove_user_coins(destination_user, coins_amount)
+	repository.add_user_coins(environment.get_user(), coins_amount)
+	return coins_amount
 
 def send_attack(destination_user, attack_name):
 	signal_dic = dict()

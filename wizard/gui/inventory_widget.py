@@ -29,6 +29,11 @@ class inventory_widget(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
+
+        self.info_widget = gui_utils.info_widget()
+        self.info_widget.setVisible(0)
+        self.main_layout.addWidget(self.info_widget)
+
         self.artefacts_view = QtWidgets.QListView()
         self.artefacts_view = QtWidgets.QListWidget()
         self.artefacts_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -40,6 +45,18 @@ class inventory_widget(QtWidgets.QWidget):
         self.artefacts_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.artefacts_view_scrollBar = self.artefacts_view.verticalScrollBar()
         self.main_layout.addWidget(self.artefacts_view)
+
+    def show_info_mode(self, text, image):
+        self.artefacts_view.setVisible(0)
+        self.info_widget.setVisible(1)
+        self.info_widget.setText(text)
+        self.info_widget.setImage(image)
+        self.setAcceptDrops(False)
+
+    def hide_info_mode(self):
+        self.info_widget.setVisible(0)
+        self.artefacts_view.setVisible(1)
+        self.setAcceptDrops(True)
 
     def refresh(self):
         if not self.isVisible():
@@ -62,6 +79,10 @@ class inventory_widget(QtWidgets.QWidget):
         for artefact in existing_artefact_list:
             if artefact not in artefacts_list:
                 self.remove_item(artefact)
+        if len(self.artefacts.keys()) == 0:
+            self.show_info_mode("You doesn't have artefacts...", ressources._nothing_info_)
+        else:
+            self.hide_info_mode()
 
     def remove_item(self, artefact):
         if artefact not in self.artefacts.keys():
@@ -149,6 +170,6 @@ class artefact_item(QtWidgets.QFrame):
         self.use_button.clicked.connect(self.use_artefact)
 
     def use_artefact(self):
-        artefacts.use_artefact(self.artefact, 'l.brunel')
+        artefacts.use_artefact(self.artefact, 'admin')
         gui_server.refresh_ui()
         gui_server.custom_popup(f"Inventory", f"You just used {self.artefact_dic['name']} on {'l.brunel'}", ressources._purse_icon_)
