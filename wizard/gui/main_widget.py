@@ -61,7 +61,6 @@ from wizard.gui import quotes_manager
 from wizard.gui import table_viewer_widget
 from wizard.gui import floating_widgets_layout
 from wizard.gui import pranks
-from wizard.gui import artefacts_widget
 
 logger = logging.getLogger(__name__)
 
@@ -100,13 +99,13 @@ class main_widget(QtWidgets.QWidget):
         self.softwares_widget = softwares_widget.softwares_widget()
         self.locks_widget = locks_widget.locks_widget()
         self.championship_widget = championship_widget.championship_widget()
-        self.artefacts_widget = artefacts_widget.artefacts_widget()
         self.license_widget = license_widget.license_widget()
         self.whatsnew_widget = whatsnew_widget.whatsnew_widget()
         self.production_manager_widget = production_manager_widget.production_manager_widget()
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.quotes_manager = quotes_manager.quotes_manager()
         self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
+        self.pranks = pranks.pranks()
 
         self.build_ui()
         self.connect_functions()
@@ -209,7 +208,6 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_tables_viewer.connect(self.table_viewer_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
         self.header_widget.show_championship.connect(self.championship_widget.toggle)
-        self.header_widget.show_artefacts.connect(self.artefacts_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
         self.header_widget.show_license.connect(self.license_widget.toggle)
         self.header_widget.show_whatsnew.connect(self.whatsnew_widget.toggle)
@@ -242,7 +240,7 @@ class main_widget(QtWidgets.QWidget):
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
         self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
         self.team_client.refresh_signal.connect(self.refresh)
-        self.team_client.prank_signal.connect(pranks.execute_attack)
+        self.team_client.prank_signal.connect(self.pranks.execute_attack)
         self.team_client.new_user_signal.connect(self.team_widget.add_user)
         self.team_client.remove_user_signal.connect(self.team_widget.remove_user)
 
@@ -419,7 +417,6 @@ class main_widget(QtWidgets.QWidget):
         self.project_preferences_widget.refresh()
         self.quotes_manager.refresh()
         self.championship_widget.refresh()
-        self.artefacts_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

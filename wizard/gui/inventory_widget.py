@@ -5,10 +5,12 @@
 # Python modules
 import json
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import attack_user_widget
 
 # Wizard modules
 from wizard.core import repository
@@ -21,6 +23,7 @@ class inventory_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(inventory_widget, self).__init__(parent)
         self.artefacts = dict()
+        self.attack_user_widget = attack_user_widget.attack_user_widget()
         self.build_ui()
 
     def build_ui(self):
@@ -61,6 +64,7 @@ class inventory_widget(QtWidgets.QWidget):
     def refresh(self):
         if not self.isVisible():
             return
+        self.attack_user_widget.refresh()
         user_row = repository.get_user_row_by_name(environment.get_user())
         artefacts_list = json.loads(user_row['artefacts'])
         artefacts_set = list(set(artefacts_list))
@@ -68,6 +72,7 @@ class inventory_widget(QtWidgets.QWidget):
             if artefact not in self.artefacts.keys():
                 artefact_list_item = QtWidgets.QListWidgetItem('')
                 artefact_widget = artefact_item(artefact)
+                artefact_widget.use_artefact_signal.connect(self.use_artefact)
                 self.artefacts_view.addItem(artefact_list_item)
                 artefact_list_item.setSizeHint(artefact_widget.size())
                 self.artefacts_view.setItemWidget(artefact_list_item, artefact_widget)
@@ -84,6 +89,18 @@ class inventory_widget(QtWidgets.QWidget):
         else:
             self.hide_info_mode()
 
+    def use_artefact(self, artefact):
+        if game_vars.artefacts_dic[artefact]['type'] == 'attack':
+            if self.attack_user_widget.exec_() == QtWidgets.QDialog.Accepted:
+                user = self.attack_user_widget.user
+            else:
+                return
+        else:
+            user = environment.get_user()
+        artefacts.use_artefact(artefact, user)
+        gui_server.refresh_ui()
+        gui_server.custom_popup(f"Inventory", f"You just used {game_vars.artefacts_dic[artefact]['name']} on {user}", ressources._purse_icon_)
+
     def remove_item(self, artefact):
         if artefact not in self.artefacts.keys():
             return
@@ -95,6 +112,9 @@ class inventory_widget(QtWidgets.QWidget):
         del self.artefacts[artefact]
 
 class artefact_item(QtWidgets.QFrame):
+
+    use_artefact_signal = pyqtSignal(str)
+
     def __init__(self, artefact, parent=None):
         super(artefact_item, self).__init__(parent)
         self.artefact = artefact
@@ -170,6 +190,4 @@ class artefact_item(QtWidgets.QFrame):
         self.use_button.clicked.connect(self.use_artefact)
 
     def use_artefact(self):
-        artefacts.use_artefact(self.artefact, 'admin')
-        gui_server.refresh_ui()
-        gui_server.custom_popup(f"Inventory", f"You just used {self.artefact_dic['name']} on {'l.brunel'}", ressources._purse_icon_)
+        self.use_artefact_signal.emit(self.artefact)
