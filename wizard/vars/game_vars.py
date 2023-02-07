@@ -230,12 +230,14 @@ artefacts_dic['coins_booster_2']['description'] = 'Double each coin earned for t
 artefacts_dic['coins_booster_2']['level'] = 20
 artefacts_dic['coins_booster_2']['icon'] = ressources._coins_2_icon_
 
-
-
 _creation_xp_ = 2
+_creation_coins_ = 2
 _save_xp_ = 1
 _video_xp_ = 3
 _export_xp_ = 3
+_export_coins_ = 3
 _save_penalty_ = 2
 _video_penalty_ = 4
 _export_penalty_ = 10
+_task_done_coins_ = 1
+_work_coins_ = 1

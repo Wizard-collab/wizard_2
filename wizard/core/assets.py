@@ -175,6 +175,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     hooks.after_asset_creation_hook(asset_row['string'], name)
     events.add_creation_event('asset', asset_id)
     game.add_xps(game_vars._creation_xp_)
+    game.add_coins(game._creation_coins_)
     return asset_id
 
 def modify_asset_frame_range(asset_id, inframe, outframe, preroll, postroll):
@@ -363,6 +364,10 @@ def modify_stage_state(stage_id, state, comment=''):
         project.set_stage_data(stage_id, 'tracking_comment', comment)
     project.update_stage_progress(stage_id)
     asset_tracking.add_state_switch_event(stage_id, state, comment)
+    if state == assets_vars._asset_state_done_:
+        stage_row = project.get_stage_data(stage_id)
+        amount = int((stage_row['work_time']/400)*game_vars._task_done_coins_)
+        repository.add_user_coins(stage_row['assignment'], amount)
     return 1
 
 def add_stage_comment(stage_id, comment):
@@ -395,6 +400,8 @@ def add_work_time(work_env_id, work_time):
     project.add_stage_work_time(stage_id, work_time)
     project.update_stage_progress(stage_id)
     asset_tracking.add_work_session_event(stage_id, work_time)
+    amount = int((work_time/200)*game_vars._work_coins_)
+    repository.add_user_coins(environment.get_user(), amount)
     return 1
 
 def get_software_id_by_name(software):
@@ -687,6 +694,7 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
                                                     version_id,
                                                     comment)
     game.add_xps(game_vars._export_xp_)
+    game.add_coins(game_vars._export_coins_)
     if execute_xp:
         game.analyse_comment(comment, game_vars._export_penalty_)
     events.add_export_event(export_version_id)

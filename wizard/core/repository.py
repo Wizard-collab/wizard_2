@@ -473,7 +473,7 @@ def add_user_coins(user_name, coins):
                                     ('coins', user_coins+coins),
                                     ('user_name', user_name)):
         return
-    logger.info(f'{user_name} just won {coins} coins !')
+    logger.debug(f'{user_name} just won {coins} coins !')
     return 1
 
 def remove_user_coins(user_name, coins):
@@ -486,7 +486,7 @@ def remove_user_coins(user_name, coins):
                                     ('coins', new_coins),
                                     ('user_name', user_name)):
         return
-    logger.info(f'{user_name} just lost {coins} coins !')
+    logger.debug(f'{user_name} just lost {coins} coins !')
     return 1
 
 def modify_user_artefacts(user_name, artefacts_list):
@@ -737,7 +737,9 @@ def create_admin_user(admin_password, admin_email):
                                 'level',
                                 'life', 
                                 'administrator',
-                                'coins'), 
+                                'coins',
+                                'artefacts',
+                                'keeped_artefacts'), 
                             ('admin',
                                 tools.encrypt_string(admin_password),
                                 admin_email,
@@ -750,7 +752,9 @@ def create_admin_user(admin_password, admin_email):
                                 0,
                                 100,
                                 1,
-                                0)):
+                                0,
+                                '[]',
+                                '{}')):
         return
     logger.info('Admin user created')
     return 1
@@ -770,7 +774,9 @@ def create_users_table():
                                         level integer NOT NULL,
                                         life integer NOT NULL,
                                         administrator integer NOT NULL,
-                                        coins integer NOT NULL
+                                        coins integer NOT NULL,
+                                        artefacts text NOT NULL,
+                                        keeped_artefacts text NOT NULL
                                     );"""
     if not db_utils.create_table(environment.get_repository(), sql_cmd):
         return

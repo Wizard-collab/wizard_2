@@ -27,8 +27,17 @@ class championship_widget(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard championship")
 
+        user_row = repository.get_user_row_by_name(environment.get_user())
+        self.old_level = user_row['level']
+        self.old_icon = None
+
         self.keeped_artefacts_dic = dict()
         self.coins = None
+        self.is_first_comments_count = None
+        self.is_first_work_time = None
+        self.is_first_xp = None
+        self.is_first_deaths = None
+        self.first_refresh = 1
 
         self.build_ui()
         self.connect_functions()
@@ -66,24 +75,38 @@ class championship_widget(QtWidgets.QWidget):
 
         self.user_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
+        self.keeped_artefacts_frame = QtWidgets.QFrame()
+        self.keeped_artefacts_frame.setObjectName('dark_round_frame')
         self.keeped_artefacts_layout = QtWidgets.QHBoxLayout()
-        self.keeped_artefacts_layout.setContentsMargins(0,0,0,0)
-        self.keeped_artefacts_layout.setSpacing(2)
-        self.user_header_layout.addLayout(self.keeped_artefacts_layout)
+        self.keeped_artefacts_layout.setContentsMargins(8,8,8,8)
+        self.keeped_artefacts_frame.setLayout(self.keeped_artefacts_layout)
+        self.user_header_layout.addWidget(self.keeped_artefacts_frame)
 
-        self.life_frame = QtWidgets.QFrame()
-        self.life_frame.setObjectName('dark_round_frame')
-        self.life_layout = QtWidgets.QHBoxLayout()
-        self.life_layout.setContentsMargins(8,8,8,8)
-        self.life_frame.setLayout(self.life_layout)
-        self.user_header_layout.addWidget(self.life_frame)
-        self.life_icon = QtWidgets.QLabel()
-        self.life_icon.setFixedSize(25,25)
-        self.life_icon.setPixmap(QtGui.QIcon(ressources._heart_icon_).pixmap(25))
-        self.life_layout.addWidget(self.life_icon)
-        self.life_amount = QtWidgets.QLabel()
-        self.life_amount.setObjectName('title_label_2')
-        self.life_layout.addWidget(self.life_amount)
+        self.items_frame = QtWidgets.QFrame()
+        self.items_frame.setObjectName('dark_round_frame')
+        self.items_layout = QtWidgets.QHBoxLayout()
+        self.items_layout.setContentsMargins(8,8,8,8)
+        self.items_frame.setLayout(self.items_layout)
+        self.user_header_layout.addWidget(self.items_frame)
+
+        self.deaths_item_label = QtWidgets.QLabel()
+        self.deaths_item_label.setPixmap(QtGui.QIcon(ressources._skull_item_icon_).pixmap(25))
+        self.items_layout.addWidget(self.deaths_item_label)
+
+        self.comment_item_label = QtWidgets.QLabel()
+        self.comment_item_label.setPixmap(QtGui.QIcon(ressources._green_item_icon_).pixmap(25))
+        self.items_layout.addWidget(self.comment_item_label)
+
+        self.worker_item_label = QtWidgets.QLabel()
+        self.worker_item_label.setPixmap(QtGui.QIcon(ressources._red_item_icon_).pixmap(25))
+        self.items_layout.addWidget(self.worker_item_label)
+
+        self.xp_item_label = QtWidgets.QLabel()
+        self.xp_item_label.setPixmap(QtGui.QIcon(ressources._yellow_item_icon_).pixmap(25))
+        self.items_layout.addWidget(self.xp_item_label)
+
+        self.crown_label = QtWidgets.QLabel()
+        self.items_layout.addWidget(self.crown_label)
 
         self.level_frame = QtWidgets.QFrame()
         self.level_frame.setObjectName('dark_round_frame')
@@ -113,6 +136,20 @@ class championship_widget(QtWidgets.QWidget):
         self.coins_amount.setObjectName('title_label_2')
         self.purse_layout.addWidget(self.coins_amount)
 
+        self.life_frame = QtWidgets.QFrame()
+        self.life_frame.setObjectName('dark_round_frame')
+        self.life_layout = QtWidgets.QHBoxLayout()
+        self.life_layout.setContentsMargins(8,8,8,8)
+        self.life_frame.setLayout(self.life_layout)
+        self.user_header_layout.addWidget(self.life_frame)
+        self.life_icon = QtWidgets.QLabel()
+        self.life_icon.setFixedSize(25,25)
+        self.life_icon.setPixmap(QtGui.QIcon(ressources._heart_icon_).pixmap(25))
+        self.life_layout.addWidget(self.life_icon)
+        self.life_amount = QtWidgets.QLabel()
+        self.life_amount.setObjectName('title_label_2')
+        self.life_layout.addWidget(self.life_amount)
+
         self.tabs_widget = QtWidgets.QTabWidget()
         self.tabs_widget.setIconSize(QtCore.QSize(22,22))
         self.main_layout.addWidget(self.tabs_widget)
@@ -141,40 +178,45 @@ class championship_widget(QtWidgets.QWidget):
 
     def refresh(self):
         start_time = time.perf_counter()
-        self.refresh_infos()
+        user_row = repository.get_user_row_by_name(environment.get_user())
+        self.refresh_infos(user_row)
         self.market_widget.refresh()
         self.inventory_widget.refresh()
         self.users_championship_widget.refresh()
-        self.refresh_keeped_artefacts()
+        self.refresh_items(user_row)
+        self.refresh_keeped_artefacts(user_row)
         self.update_refresh_time(start_time)
 
-    def refresh_infos(self):
-        user_row = repository.get_user_row_by_name(environment.get_user())
+    def refresh_infos(self, user_row):
         user_coins = user_row['coins']
-        if self.coins is not None:
-            if user_coins > self.coins:
-                gui_server.custom_popup(f"Inventory", f"You just earned {user_coins-self.coins} coins", ressources._coin_icon_)
-            if user_coins < self.coins:
-                gui_server.custom_popup(f"Inventory", f"You just lost {self.coins-user_coins} coins", ressources._coin_icon_)
         self.coins_amount.setText(str(user_coins))
         self.coins = user_coins
         self.level_amount.setText(str(user_row['level']))
         self.life_amount.setText(f"{user_row['life']}%")
+        if user_row['level'] != self.old_level:
+            if user_row['level'] > self.old_level:
+                gui_server.custom_popup(f"You are now level {user_row['level']}", 'Congratulation', ressources._level_icon_)
+            else:
+                gui_server.custom_popup(f"You are now level {user_row['level']}", 'You just lost a level, take care of your comments', ressources._level_icon_)
+            self.old_level = user_row['level']
 
-    def refresh_keeped_artefacts(self):
+    def refresh_keeped_artefacts(self, user_row):
         artefacts.check_artefacts_expiration()
-        user_row = repository.get_user_row_by_name(environment.get_user())
         keeped_artefacts_dic = json.loads(user_row['keeped_artefacts'])
         for artefact in list(set(keeped_artefacts_dic.values())):
             if artefact not in self.keeped_artefacts_dic.keys():
                 keeped_artefact_label = QtWidgets.QLabel()
-                keeped_artefact_label.setPixmap(QtGui.QIcon(game_vars.artefacts_dic[artefact]['icon']).pixmap(30))
+                keeped_artefact_label.setPixmap(QtGui.QIcon(game_vars.artefacts_dic[artefact]['icon']).pixmap(25))
                 self.keeped_artefacts_layout.addWidget(keeped_artefact_label)
                 self.keeped_artefacts_dic[artefact] = keeped_artefact_label
         existing_artefacts_list = list(self.keeped_artefacts_dic.keys())
         for artefact in existing_artefacts_list:
             if artefact not in list(set(keeped_artefacts_dic.values())):
                 self.remove_keeped_artefact(artefact)
+        if len(self.keeped_artefacts_dic.keys()) == 0:
+            self.keeped_artefacts_frame.setVisible(0)
+        else:
+            self.keeped_artefacts_frame.setVisible(1)
 
     def remove_keeped_artefact(self, artefact):
         if artefact not in self.keeped_artefacts_dic.keys():
@@ -191,3 +233,89 @@ class championship_widget(QtWidgets.QWidget):
         self.market_widget.refresh()
         self.inventory_widget.refresh()
         self.users_championship_widget.refresh()
+
+    def refresh_items(self, user_row):
+        user_rows = repository.get_users_list()
+        self.items_check(user_row, user_rows)
+
+    def items_check(self, user_row, user_rows):
+
+        self.items_frame.setVisible(0)
+
+        xp_dic = dict()
+        comments_dic = dict()
+        work_time_dic = dict()
+        deaths_dic = dict()
+
+        for row in user_rows:
+            if row['total_xp'] not in xp_dic.keys():
+                xp_dic[row['total_xp']] = row['id']
+            if row['comments_count'] not in comments_dic.keys():
+                comments_dic[row['comments_count']] = row['id']
+            if row['work_time'] not in work_time_dic.keys():
+                work_time_dic[row['work_time']] = row['id']
+            if row['deaths'] not in deaths_dic.keys():
+                deaths_dic[row['deaths']] = row['id']
+
+        if user_row['id'] != xp_dic[sorted(list(xp_dic.keys()))[-1]]:
+            self.xp_item_label.setVisible(0)
+            self.is_first_xp = 0
+        else:
+            self.items_frame.setVisible(1)
+            self.xp_item_label.setVisible(1)
+            if not self.is_first_xp and not (self.first_refresh):
+                gui_server.custom_popup("You have earned so much experience !", 'Congratulation', ressources._yellow_item_icon_)
+            self.is_first_xp = 1
+
+        if user_row['id'] != deaths_dic[sorted(list(deaths_dic.keys()))[-1]]:
+            self.deaths_item_label.setVisible(0)
+            self.is_first_deaths = 0
+        else:
+            self.items_frame.setVisible(1)
+            self.deaths_item_label.setVisible(1)
+            if not self.is_first_deaths and not (self.first_refresh):
+                gui_server.custom_popup("You are the one who die the most !", 'Try to comment your work more often', ressources._skull_item_icon_)
+            self.is_first_deaths = 1
+
+        if user_row['id'] != comments_dic[sorted(list(comments_dic.keys()))[-1]]:
+            self.comment_item_label.setVisible(0)
+            self.is_first_comments_count = 0
+        else:
+            self.items_frame.setVisible(1)
+            self.comment_item_label.setVisible(1)
+            if not self.is_first_comments_count and not (self.first_refresh):
+                gui_server.custom_popup("You are really good at commenting !", 'Congratulation', ressources._green_item_icon_)
+            self.is_first_comments_count = 1
+
+        if user_row['id'] != work_time_dic[sorted(list(work_time_dic.keys()))[-1]]:
+            self.worker_item_label.setVisible(0)
+            self.is_first_work_time = 0
+        else:
+            self.items_frame.setVisible(1)
+            self.worker_item_label.setVisible(1)
+            if not self.is_first_work_time and not (self.first_refresh):
+                gui_server.custom_popup("You worked so much time !", 'Congratulation', ressources._red_item_icon_)
+            self.is_first_work_time = 1
+
+        icon = None
+        message = None
+        if user_row['id'] == user_rows[0]['id']:
+            icon = ressources._gold_icon_
+            message = "You just won the golden crown !"
+        if len(user_rows)>=2:
+            if (user_row['id'] ==  user_rows[1]['id']):
+                icon = ressources._silver_icon_
+                message = "You just won the silver crown !"
+        if len(user_rows)>=3:
+            if (user_row['id'] == user_rows[2]['id']):
+                icon = ressources._bronze_icon_
+                message = "You just won the bronze crown !"
+        if icon is not None:
+            self.items_frame.setVisible(1)
+            self.crown_label.setVisible(1)
+            self.crown_label.setPixmap(QtGui.QIcon(icon).pixmap(22))
+            if icon != self.old_icon and not (self.first_refresh):
+                gui_server.custom_popup(message, 'Congratulation', icon)
+            self.old_icon = icon
+        else:
+            self.crown_label.setVisible(0)

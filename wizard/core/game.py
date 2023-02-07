@@ -102,3 +102,5 @@ def analyse_comment(comment, life_amount):
 		repository.increase_user_comments_count(environment.get_user())
 	return 1
 	
+def add_coins(amount):
+	return repository.add_user_coins(environment.get_user(), amount)
