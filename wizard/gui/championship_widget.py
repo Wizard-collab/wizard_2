@@ -6,6 +6,7 @@
 import json
 import time
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_server
@@ -38,6 +39,9 @@ class championship_widget(QtWidgets.QWidget):
         self.is_first_xp = None
         self.is_first_deaths = None
         self.first_refresh = 1
+
+        self.refresh_thread = refresh_thread(self)
+        self.refresh_thread.start()
 
         self.build_ui()
         self.connect_functions()
@@ -201,7 +205,6 @@ class championship_widget(QtWidgets.QWidget):
             self.old_level = user_row['level']
 
     def refresh_keeped_artefacts(self, user_row):
-        artefacts.check_artefacts_expiration()
         keeped_artefacts_dic = json.loads(user_row['keeped_artefacts'])
         for artefact in list(set(keeped_artefacts_dic.values())):
             if artefact not in self.keeped_artefacts_dic.keys():
@@ -228,6 +231,7 @@ class championship_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.tabs_widget.currentChanged.connect(self.tab_changed)
+        self.refresh_thread.refresh_signal.connect(self.refresh)
 
     def tab_changed(self):
         self.market_widget.refresh()
@@ -319,3 +323,20 @@ class championship_widget(QtWidgets.QWidget):
             self.old_icon = icon
         else:
             self.crown_label.setVisible(0)
+
+class refresh_thread(QtCore.QThread):
+
+    refresh_signal = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(refresh_thread, self).__init__(parent)
+        self.running = True
+
+    def run(self):
+        while self.running:
+            refresh_ui = 0
+            if artefacts.check_artefacts_expiration():
+                refresh_ui = 1
+            if refresh_ui:
+                self.refresh_signal.emit(1)
+            time.sleep(5)

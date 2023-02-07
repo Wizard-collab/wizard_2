@@ -77,12 +77,17 @@ def check_artefacts_expiration():
 	user_row = repository.get_user_row_by_name(environment.get_user())
 	user_keeped_artefacts = json.loads(user_row['keeped_artefacts'])
 	time_ids = list(user_keeped_artefacts.keys())
+	update = 0
 	for time_id in time_ids:
 		keeped_artefact = user_keeped_artefacts[time_id]
 		if time.time() > float(time_id) + game_vars.artefacts_dic[keeped_artefact]['duration']:
 			logger.info(f"{game_vars.artefacts_dic[keeped_artefact]['name']} is expired")
 			del user_keeped_artefacts[time_id]
+			update = 1
+	if not update:
+		return
 	repository.modify_keeped_artefacts(environment.get_user(), user_keeped_artefacts)
+	return 1
 
 def heal(amount):
 	if amount == 100:
