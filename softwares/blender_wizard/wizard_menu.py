@@ -55,6 +55,28 @@ class import_modeling(bpy.types.Operator):
         wizard_plugin.reference_modeling()
         return {'FINISHED'}
 
+class import_layout(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_layout"
+    bl_label = "Import layout"
+    bl_description = "Import layout ( hard )"
+    
+    def execute(self, context):
+        wizard_plugin.reference_layout()
+        return {'FINISHED'}
+
+class import_animation(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_animation"
+    bl_label = "Import animation"
+    bl_description = "Import animation ( hard )"
+    
+    def execute(self, context):
+        wizard_plugin.reference_animation()
+        return {'FINISHED'}
+
 class import_texturing(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
@@ -106,6 +128,8 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
         layout = self.layout
         layout.operator("wizard.import_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.import_texturing", icon_value=wizard_icons["texturing"].icon_id)
+        layout.operator("wizard.import_layout", icon_value=wizard_icons["layout"].icon_id)
+        layout.operator("wizard.import_animation", icon_value=wizard_icons["animation"].icon_id)
 
 class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
     bl_label = "Update"
@@ -138,6 +162,8 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 classes = (save_increment,
                 export,
                 import_modeling,
+                import_layout,
+                import_animation,
                 import_texturing,
                 update_texturing,
                 set_image_size,
@@ -160,6 +186,8 @@ def register():
     wizard_icons.load("import", 'icons/import.png', 'IMAGE')
     wizard_icons.load("update", 'icons/update.png', 'IMAGE')
     wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
+    wizard_icons.load("layout", 'icons/wlayout.png', 'IMAGE')
+    wizard_icons.load("animation", 'icons/animation.png', 'IMAGE')
     wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("clear_all_materials", 'icons/remove_all_materials.png', 'IMAGE')

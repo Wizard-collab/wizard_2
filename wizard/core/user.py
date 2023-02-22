@@ -39,6 +39,7 @@
 # Python modules
 import yaml
 import json
+import ast
 import os
 import importlib
 import sys
@@ -275,6 +276,13 @@ class user:
         with open(user_vars._session_file_, 'w') as f:
             f.write(script)
         try:
+            if not analyze_module(script,
+                                    forbidden_modules=['wizard.core.game'],
+                                    ignore_nest=['wizard.core.assets',
+                                                'wapi',
+                                                'wizard.core.project']):
+                logger.info("Skipping script execution")
+                return
             importlib.reload(session)
         except KeyboardInterrupt:
             logger.warning("Execution manually stopped")
@@ -288,6 +296,47 @@ class user:
         with open(file, 'r') as f:
             data = f.read()
         self.execute_session(data)
+
+def analyze_module(script, forbidden_modules, ignore_nest=[]):
+    # Use a set to store all dependencies, including nested ones
+    all_dependencies = set()
+    dependencies_to_check = set()
+    tree = ast.parse(script)
+    for node in ast.iter_child_nodes(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                all_dependencies.add(alias.name)
+                dependencies_to_check.add(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module is not None:
+                module_path = node.module
+                for name in node.names:
+                    all_dependencies.add(f"{module_path}.{name.name}")
+                    dependencies_to_check.add(f"{module_path}.{name.name}")
+    # Traverse the dependencies iteratively
+    while dependencies_to_check:
+        dependency = dependencies_to_check.pop()
+        all_dependencies.add(dependency)
+        # Get the module's dependencies
+        try:
+            module = importlib.import_module(dependency)
+            if dependency in ignore_nest:
+                continue
+            for _, value in vars(module).items():
+                if isinstance(value, type(module)):
+                    dependency_name = value.__name__
+                    if dependency_name not in all_dependencies:
+                        dependencies_to_check.add(dependency_name)
+        except ModuleNotFoundError:
+            continue
+    # Do something with the module and its dependencies
+    logger.debug(f"Analyzing session and dependencies {all_dependencies}")
+    authorized = 1
+    for module_name in forbidden_modules:
+        if module_name in all_dependencies:
+            logger.error(f"You are trying to use a forbidden module : {module_name}")
+            authorized = 0
+    return authorized
 
 def log_user(user_name, password):
     if user_name not in repository.get_user_names_list():

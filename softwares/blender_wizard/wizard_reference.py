@@ -56,6 +56,32 @@ def import_modeling_hard(reference_dic):
                                 wizard_tools.get_new_objects(old_objects),
                                 reference_dic['string_variant'])
 
+def import_layout_hard(reference_dic):
+    old_objects = wizard_tools.get_all_nodes()
+    for file in reference_dic['files']:
+        if file.endswith('.abc'):
+            wizard_tools.import_abc(file)
+        else:
+            logger.info('{} extension is unknown'.format(file))
+    trigger_after_reference_hook('layout',
+                                reference_dic['files'],
+                                reference_dic['namespace'],
+                                wizard_tools.get_new_objects(old_objects),
+                                reference_dic['string_variant'])
+
+def import_animation_hard(reference_dic):
+    old_objects = wizard_tools.get_all_nodes()
+    for file in reference_dic['files']:
+        if file.endswith('.abc'):
+            wizard_tools.import_abc(file)
+        else:
+            logger.info('{} extension is unknown'.format(file))
+    trigger_after_reference_hook('animation',
+                                reference_dic['files'],
+                                reference_dic['namespace'],
+                                wizard_tools.get_new_objects(old_objects),
+                                reference_dic['string_variant'])
+
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,
                                     namespace,
