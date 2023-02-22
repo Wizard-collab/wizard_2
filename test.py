@@ -1,0 +1,1 @@
+from wizard.core import game

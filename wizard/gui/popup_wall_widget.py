@@ -184,6 +184,8 @@ class popup_save_widget(QtWidgets.QFrame):
         version_row = project.get_version_data(self.version_id)
         self.comment_textEdit.setText(version_row['comment'])
         self.version_name_label.setText(f"Version {version_row['name']}")
+        if user.user().get_popups_blink_enabled():
+            self.start_blink()
 
     def connect_functions(self):
         self.update_comment_button.clicked.connect(self.update_comment)
@@ -220,6 +222,20 @@ class popup_save_widget(QtWidgets.QFrame):
         comment = self.comment_textEdit.toPlainText()
         assets.modify_version_comment(self.version_id, comment)
         self.time_out.emit(self.version_id)
+
+    def start_blink(self):
+        self.blink_state = 1
+        self.blink_timer = QtCore.QTimer(self)
+        self.blink_timer.start(400)
+        self.blink_timer.timeout.connect(self.update_blink)
+
+    def update_blink(self):
+        if self.blink_state:
+            color = '#19191f'
+        else:
+            color = '#23232b'
+        self.blink_state = 1-self.blink_state
+        self.setStyleSheet("#popup_event_frame{background-color:%s}" %color)
 
     def build_ui(self):
         self.setMinimumWidth(320)

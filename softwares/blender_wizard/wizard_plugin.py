@@ -50,3 +50,15 @@ def reference_modeling():
     if 'modeling' in references.keys():
         for reference in references['modeling']:
             wizard_reference.import_modeling_hard(reference)
+
+def reference_layout():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'layout' in references.keys():
+        for reference in references['layout']:
+            wizard_reference.import_modeling_hard(reference)
+
+def reference_animation():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'animation' in references.keys():
+        for reference in references['animation']:
+            wizard_reference.import_modeling_hard(reference)
