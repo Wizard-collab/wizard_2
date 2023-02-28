@@ -23,6 +23,7 @@ from wizard.core import launch
 from wizard.core import path_utils
 from wizard.core import project
 from wizard.vars import ressources
+from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
@@ -175,6 +176,7 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.clear()
         self.parent_instance_id = work_env_id
         self.refresh()
+        self.update_quick_import_buttons()
 
     def refresh(self):
         QtWidgets.QApplication.processEvents()
@@ -393,6 +395,30 @@ class references_widget(QtWidgets.QWidget):
         if item.type == 'group':
             self.focus_on_group_signal.emit(item.referenced_group_row['group_id'])
 
+    def update_quick_import_buttons(self):
+        if not self.isVisible():
+            return
+        self.clear_quick_imports_buttons()
+        if self.parent_instance_id is None or self.parent_instance_id == 0:
+            return
+        if self.context != 'work_env':
+            return
+        variant_id = project.get_work_env_data(self.parent_instance_id, 'variant_id')
+        variant_row = project.get_variant_data(variant_id)
+        stage_row = project.get_stage_data(variant_row['stage_id'])
+        domain_name = project.get_domain_data(stage_row['domain_id'], 'name')
+        if domain_name == assets_vars._library_:
+            return
+        for stage in assets_vars._stages_list_[domain_name]:
+            if stage == stage_row['name']:
+                continue
+            button = quick_import_button(stage)
+            self.quick_import_layout.addWidget(button)
+
+    def clear_quick_imports_buttons(self):
+        for i in reversed(range(self.quick_import_layout.count())): 
+            self.quick_import_layout.itemAt(i).widget().setParent(None)
+
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -452,8 +478,16 @@ class references_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
+        self.quick_import_widget = QtWidgets.QWidget()
+        self.quick_import_widget.setObjectName('transparent_widget')
+        self.quick_import_layout = QtWidgets.QHBoxLayout()
+        self.quick_import_widget.setLayout(self.quick_import_layout)
+        self.quick_import_layout.setContentsMargins(0,0,0,0)
+        self.quick_import_layout.setSpacing(4)
+        self.buttons_layout.addWidget(self.quick_import_widget)
+
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-        
+
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
         self.search_bar.setPlaceholderText('"modeling", "props", "Joe"')
@@ -817,3 +851,24 @@ class search_thread(QtCore.QThread):
                     self.hide_group_signal.emit(referenced_group_id)
         except:
             logger.info(str(traceback.format_exc()))
+
+class quick_import_button(QtWidgets.QPushButton):
+
+    quick_import_signal = pyqtSignal(str)
+
+    def __init__(self, stage, parent=None):
+        super(quick_import_button, self).__init__(parent)
+        self.stage = stage
+        self.setFixedSize(35,35)
+        self.setIconSize(QtCore.QSize(21,21))
+        self.fill_ui()
+        gui_utils.application_tooltip(self, f"Import the {self.stage} of this asset")
+
+    def fill_ui(self):
+        self.setIcon(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]))
+
+    def connect_functions(self):
+        self.clicked.connect(self.emit_signal)
+
+    def emit_signal(self):
+        self.quick_import_signal.emit(self.stage)
