@@ -346,6 +346,7 @@ class view_comment_widget(QtWidgets.QWidget):
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, preview_row, parent=None):
         super(asset_widget, self).__init__(parent)
+        self.thumbnail_width = 110
         self.type = 'asset'
         self.asset_row = asset_row
         self.preview_row = preview_row
@@ -359,7 +360,7 @@ class asset_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.image_label = QtWidgets.QLabel()
-        self.image_label.setFixedWidth(72)
+        self.image_label.setFixedWidth(self.thumbnail_width)
         self.image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.image_label.setObjectName('production_manager_variant_frame')
         self.main_layout.addWidget(self.image_label)
@@ -376,7 +377,7 @@ class asset_widget(QtWidgets.QWidget):
                 image = self.preview_row['preview_path']
         else:
             image = self.preview_row['manual_override']
-        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(72, 40))
+        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(self.thumbnail_width, int(self.thumbnail_width/1.8)))
 
     def show_context_menu(self):
         menu = gui_utils.QMenu(self)
