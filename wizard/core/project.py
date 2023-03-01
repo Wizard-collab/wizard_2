@@ -1161,6 +1161,13 @@ def get_references_by_export_version(export_version_id, column='*'):
                                                         column)
     return references_rows
 
+def get_grouped_references_by_export_version(export_version_id, column='*'):
+    references_rows = db_utils.get_row_by_column_data('project',
+                                                        'grouped_references_data',
+                                                        ('export_version_id', export_version_id),
+                                                        column)
+    return references_rows
+
 def get_references_by_export(export_id, column='*'):
     references_rows = db_utils.get_row_by_column_data('project',
                                                         'references_data',

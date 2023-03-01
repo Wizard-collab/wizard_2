@@ -33,7 +33,7 @@ class destination_manager(QtWidgets.QWidget):
         self.refresh()
 
     def build_ui(self):
-        self.setMinimumSize(QtCore.QSize(800,500))
+        self.setMinimumSize(QtCore.QSize(900,500))
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
@@ -59,9 +59,10 @@ class destination_manager(QtWidgets.QWidget):
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(2)
-        self.list_view.setHeaderLabels(['Destination', 'Referenced version'])
+        self.list_view.setColumnCount(4)
+        self.list_view.setHeaderLabels(['Destination', 'Reference namespace', 'Referenced version', 'Auto update'])
         self.list_view.header().resizeSection(0, 450)
+        self.list_view.header().resizeSection(1, 200)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -132,24 +133,73 @@ class destination_manager(QtWidgets.QWidget):
         gui_server.refresh_team_ui()
 
     def update_reference(self, data_tuple):
-        if data_tuple[0] in self.references_ids.keys():
-            self.references_ids[data_tuple[0]].update(data_tuple)
+        if data_tuple[0]['id'] in self.references_ids.keys():
+            self.references_ids[data_tuple[0]['id']].update(data_tuple)
 
 class custom_target_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, parent=None):
         super(custom_target_item, self).__init__(parent)
         self.reference_row = reference_row
+        self.fill_ui()
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.version_widget.button_clicked.connect(self.version_modification_requested)
+        self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
+
+    def fill_ui(self):
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(0, bold_font)
+        self.version_widget = editable_data_widget(bold=True)
+        self.treeWidget().setItemWidget(self, 2, self.version_widget)
+        self.auto_update_checkbox = QtWidgets.QCheckBox()
+        self.auto_update_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 3, self.auto_update_checkbox)
 
     def update(self, data_tuple):
+        self.reference_row = data_tuple[0]
         self.setText(0, data_tuple[1])
-        self.setText(1, data_tuple[2])
+        self.setText(1, self.reference_row['namespace'])
+        self.version_widget.setText(data_tuple[2])
         if data_tuple[3]:
-            self.setForeground(1, QtGui.QBrush(QtGui.QColor('#9ce87b')))
+            self.version_widget.setColor('#9ce87b')
         else:
-            self.setForeground(1, QtGui.QBrush(QtGui.QColor('#f79360')))
+            self.version_widget.setColor('#f79360')
+        self.set_auto_update(self.reference_row['auto_update'])
+
+    def set_auto_update(self, auto_update):
+        self.apply_auto_update_change = False
+        self.auto_update_checkbox.setChecked(auto_update)
+        if auto_update:
+            self.version_widget.hide_button()
+        else:
+            self.version_widget.unhide_button()
+        self.apply_auto_update_change = True
+
+    def modify_auto_update(self, auto_update):
+        if self.apply_auto_update_change:
+            project.modify_reference_auto_update(self.reference_row['id'], auto_update)
+            gui_server.refresh_team_ui()
+
+    def version_modification_requested(self, point):
+        versions_list = project.get_export_versions(self.reference_row['export_id'])
+        if versions_list is not None and versions_list != []:
+            menu = gui_utils.QMenu()
+            for version in versions_list:
+                if len(version['comment']) > 20:
+                    comment = version['comment'][-20:] + '...'
+                else:
+                    comment = version['comment']
+                action = menu.addAction(f"{version['name']} - {comment}")
+                action.id = version['id']
+            action = menu.exec_(QtGui.QCursor().pos())
+            if action is not None:
+                self.modify_version(action.id)
+
+    def modify_version(self, export_version_id):
+        project.update_reference(self.reference_row['id'], export_version_id)
+        gui_server.refresh_team_ui()
 
 class fill_thread(QtCore.QThread):
 
@@ -178,4 +228,48 @@ class fill_thread(QtCore.QThread):
                 else:
                     up_to_date = 1
 
-                self.data_signal.emit((reference_row['id'], work_env_string, export_version_row['name'], up_to_date))
+                self.data_signal.emit((reference_row, work_env_string, export_version_row['name'], up_to_date))
+
+class editable_data_widget(QtWidgets.QFrame):
+
+    button_clicked = pyqtSignal(int)
+
+    def __init__(self, parent=None, bold=False):
+        super(editable_data_widget, self).__init__(parent)
+        self.bold=bold
+        self.build_ui()
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.main_button.clicked.connect(self.button_clicked.emit)
+
+    def build_ui(self):
+        self.setObjectName('reference_edit_widget')
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(8,4,4,4)
+        self.main_layout.setSpacing(6)
+        self.setLayout(self.main_layout)
+
+        self.label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.label)
+        if self.bold:
+            bold_font=QtGui.QFont()
+            bold_font.setBold(True)
+            self.label.setFont(bold_font)
+
+        self.main_button = QtWidgets.QPushButton()
+        self.main_button.setObjectName('dropdown_button')
+        self.main_button.setFixedSize(QtCore.QSize(14,14))
+        self.main_layout.addWidget(self.main_button)
+
+    def hide_button(self):
+        self.main_button.setVisible(0)
+
+    def unhide_button(self):
+        self.main_button.setVisible(1)
+
+    def setText(self, text):
+        self.label.setText(text)
+
+    def setColor(self, color):
+        self.setStyleSheet(f'color:{color}')
