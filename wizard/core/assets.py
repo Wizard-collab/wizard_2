@@ -453,7 +453,7 @@ def create_references_from_variant_id(work_env_id, variant_id):
     if not at_least_one:
         logger.warning('No export found')
         return
-    return 1
+    return
 
 def create_reference(work_env_id,
                         export_version_id,
@@ -481,6 +481,31 @@ def create_reference(work_env_id,
                                 stage_name,
                                 reference_row['stage'])
     return reference_id
+
+def quick_reference(work_env_id, stage):
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+    if not variant_id:
+        return
+    variant_row = project.get_variant_data(variant_id)
+    if not variant_row:
+        return
+    stage_row = project.get_stage_data(variant_row['stage_id'])
+    if not stage_row:
+        return
+    asset_row = project.get_asset_data(stage_row['asset_id'])
+    if not asset_row:
+        return
+    stages_rows = project.get_asset_childs(asset_row['id'])
+    for stage_row in stages_rows:
+        if stage_row['name'] != stage:
+            continue
+        default_variant_id = stage_row['default_variant_id']
+        default_variant_row = project.get_variant_data(default_variant_id)
+        if len(project.get_export_versions_by_variant(default_variant_id, 'id')) == 0:
+            logger.warning(f"No export found for {asset_row['name']}/{stage}/{default_variant_row['name']}")
+            return
+        return create_references_from_variant_id(work_env_id, default_variant_id)
+    logger.warning(f"Stage {stage} not found for {asset_row['name']}")
 
 def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None):
     namespaces_list = project.get_references(work_env_id, 'namespace')
