@@ -162,6 +162,10 @@ class references_widget(QtWidgets.QWidget):
                     if assets.create_grouped_references_from_variant_id(self.parent_instance_id, variant_id):
                         gui_server.refresh_team_ui()
 
+    def quick_import(self, stage):
+        assets.quick_reference(self.parent_instance_id, stage)
+        gui_server.refresh_team_ui()
+
     def create_referenced_groups(self, groups_ids):
         if self.context == 'work_env':
             for group_id in groups_ids:
@@ -169,18 +173,20 @@ class references_widget(QtWidgets.QWidget):
             gui_server.refresh_team_ui()
 
     def change_work_env(self, work_env_id):
+        start_time = time.perf_counter()
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
         self.group_item = None
         self.list_view.clear()
         self.parent_instance_id = work_env_id
-        self.refresh()
         self.update_quick_import_buttons()
+        self.refresh(start_time)
 
-    def refresh(self):
+    def refresh(self, start_time=None):
         QtWidgets.QApplication.processEvents()
-        start_time = time.perf_counter()
+        if start_time is None:
+            start_time = time.perf_counter()
         if self.isVisible():
             if self.parent_instance_id is not None and self.parent_instance_id != 0:
                 if self.context == 'work_env':
@@ -406,13 +412,14 @@ class references_widget(QtWidgets.QWidget):
         variant_id = project.get_work_env_data(self.parent_instance_id, 'variant_id')
         variant_row = project.get_variant_data(variant_id)
         stage_row = project.get_stage_data(variant_row['stage_id'])
+        asset_row = project.get_asset_data(stage_row['asset_id'])
         domain_name = project.get_domain_data(stage_row['domain_id'], 'name')
-        if domain_name == assets_vars._library_:
-            return
-        for stage in assets_vars._stages_list_[domain_name]:
-            if stage == stage_row['name']:
+        stages_rows = project.get_asset_childs(asset_row['id'])
+        for row in stages_rows:
+            if row['name'] == stage_row['name']:
                 continue
-            button = quick_import_button(stage)
+            button = quick_import_button(row['name'])
+            button.quick_import_signal.connect(self.quick_import)
             self.quick_import_layout.addWidget(button)
 
     def clear_quick_imports_buttons(self):
@@ -861,6 +868,7 @@ class quick_import_button(QtWidgets.QPushButton):
         self.stage = stage
         self.setFixedSize(35,35)
         self.setIconSize(QtCore.QSize(21,21))
+        self.connect_functions()
         self.fill_ui()
         gui_utils.application_tooltip(self, f"Import the {self.stage} of this asset")
 
