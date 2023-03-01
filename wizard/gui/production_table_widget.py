@@ -539,10 +539,8 @@ class state_widget(QtWidgets.QLabel):
 
     def states_menu_requested(self):
         menu = gui_utils.QMenu(self)
-        menu.addAction(QtGui.QIcon(ressources._state_todo_), 'todo')
-        menu.addAction(QtGui.QIcon(ressources._state_wip_), 'wip')
-        menu.addAction(QtGui.QIcon(ressources._state_done_), 'done')
-        menu.addAction(QtGui.QIcon(ressources._state_error_), 'error')
+        for state in assets_vars._asset_states_list_:
+            menu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             self.state_signal.emit(action.text())

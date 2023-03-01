@@ -73,10 +73,8 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.state_comboBox.setIconSize(QtCore.QSize(14,14))
         self.state_comboBox.setFixedWidth(100)
         self.setup_layout.addWidget(self.state_comboBox)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_todo_), assets_vars._asset_state_todo_)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_wip_), assets_vars._asset_state_wip_)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_done_), assets_vars._asset_state_done_ )
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_error_), assets_vars._asset_state_error_)
+        for state in assets_vars._asset_states_list_:
+            self.state_comboBox.addItem(QtGui.QIcon(ressources._states_icons_[state]), state)
 
         self.progress_widget = QtWidgets.QFrame()
         self.progress_widget.setObjectName('asset_tracking_event_frame')
@@ -518,14 +516,7 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.state_frame.setLayout(self.state_frame_layout)
         self.main_layout.addWidget(self.state_frame)
 
-        if self.tracking_event_row['data'] == 'todo':
-            color = '#8a8a8a'
-        elif self.tracking_event_row['data'] == 'wip':
-            color = '#ffad4d'
-        elif self.tracking_event_row['data'] == 'done':
-            color = '#95d859'
-        elif self.tracking_event_row['data'] == 'error':
-            color = '#ff5d5d'
+        color = ressources._states_colors_[self.tracking_event_row['data']]
         self.state_frame.setStyleSheet(f'background-color:{color};')
         
         self.state_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())

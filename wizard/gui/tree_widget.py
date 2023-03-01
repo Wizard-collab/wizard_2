@@ -106,7 +106,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setAnimated(0)
         self.tree.setColumnCount(3)
         self.tree.header().resizeSection(0, 190)
-        self.tree.header().resizeSection(1, 8)
+        self.tree.header().resizeSection(1, 16)
         self.tree.header().resizeSection(2, 20)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -341,6 +341,7 @@ class tree_widget(QtWidgets.QFrame):
             domain_item.setText(0, row['name'])
             self.domain_ids[row['id']] = domain_item
             self.tree.addTopLevelItem(domain_item)
+            domain_item.add_indicator()
             if row['id'] != 1:
                 self.add_creation_item(domain_item, 'new', 'category_creation')
 
@@ -352,15 +353,14 @@ class tree_widget(QtWidgets.QFrame):
                                                         instance_name = row['name'],
                                                         instance_type = 'category',
                                                         instance_id = row['id'])
-                category_item.add_indicator('error')
-                category_item.set_indicator_visibility(0)
                 category_item.setIcon(0, self.icons_dic['folder'])
                 category_item.setText(0, row['name'])
                 self.category_ids[row['id']] = category_item
                 parent_widget.addChild(category_item)
+                category_item.add_indicator()
                 self.add_creation_item(category_item, 'new', 'asset_creation')
             else:
-                self.category_ids[row['id']].set_indicator_visibility(0)
+                self.category_ids[row['id']].state_indicator.clear_states()
 
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -370,17 +370,16 @@ class tree_widget(QtWidgets.QFrame):
                                                         instance_name = row['name'],
                                                         instance_type = 'asset',
                                                         instance_id = row['id'])
-                asset_item.add_indicator('error')
-                asset_item.set_indicator_visibility(0)
                 asset_item.setIcon(0, self.icons_dic['folder'])
                 asset_item.setText(0, row['name'])
                 self.asset_ids[row['id']] = asset_item
                 parent_widget.addChild(asset_item)
+                asset_item.add_indicator()
                 domain_id = project.get_category_data(row['category_id'], 'domain_id')
                 domain_name = project.get_domain_data(domain_id, 'name')
                 self.add_creation_item(asset_item, 'new', 'stage_creation')
             else:
-                self.asset_ids[row['id']].set_indicator_visibility(0)
+                self.asset_ids[row['id']].state_indicator.clear_states()
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
@@ -395,14 +394,14 @@ class tree_widget(QtWidgets.QFrame):
                 self.stage_ids[row['id']] = stage_item
 
                 parent_widget.addChild(stage_item)
-
                 stage_item.add_indicator()
+
                 self.remove_stage_creation_item(parent_widget)
-            self.stage_ids[row['id']].set_state_indicator(row['state'])
+            self.stage_ids[row['id']].state_indicator.set_state(row['state'])
             self.stage_ids[row['id']].setText(2, f"{int(row['progress'])}%")
-            if row['state'] == 'error':
-                self.stage_ids[row['id']].parent().set_indicator_visibility(1)
-                self.stage_ids[row['id']].parent().parent().set_indicator_visibility(1)
+            if row['state'] in ['error', 'rtk']:
+                self.stage_ids[row['id']].parent().state_indicator.add_state(row['state'])
+                self.stage_ids[row['id']].parent().parent().state_indicator.add_state(row['state'])
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
@@ -751,33 +750,49 @@ class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
         self.instance_type = instance_type
         self.instance_id = instance_id
         self.instance_parent_id = parent_id
-        self.state = None
 
-    def add_indicator(self, state='todo'):
-        self.state_indicator = indicator(assets_vars._state_colors_dic_[state])
+    def add_indicator(self):
+        self.state_indicator = indicator()
         self.treeWidget().setItemWidget(self, 1, self.state_indicator)
 
-    def set_indicator_visibility(self, visibility):
-        self.state_indicator.indicator_frame.setVisible(visibility)
-
-    def set_state_indicator(self, state):
-        if state != self.state:
-            self.state_indicator.update(assets_vars._state_colors_dic_[state])
-            self.state = state
-
 class indicator(QtWidgets.QWidget):
-    def __init__(self, color):
+    def __init__(self):
         super(indicator, self).__init__()
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
-        self.indicator_frame = QtWidgets.QFrame()
-        self.indicator_frame.setFixedSize(8,8)
-        self.indicator_frame.setStyleSheet(f'background-color:{color};border-radius:4px;')
-        self.main_layout.addWidget(self.indicator_frame)
+        self.states = []
+        self.indicators = dict()
 
-    def update(self, color):
-        self.indicator_frame.setStyleSheet(f'background-color:{color};border-radius:4px;')
+    def update_indicators(self):
+        for state in self.states:
+            if state in self.indicators.keys():
+                continue
+            indicator_frame = QtWidgets.QFrame()
+            indicator_frame.setFixedSize(8,8)
+            indicator_frame.setStyleSheet(f'background-color:{ressources._states_colors_[state]};border-radius:4px;')
+            self.main_layout.addWidget(indicator_frame)
+            self.indicators[state] = indicator_frame
+        current_states = list(self.indicators.keys())
+        for current_state in current_states:
+            if current_state not in self.states:
+                self.indicators[current_state].setParent(None)
+                self.indicators[current_state].deleteLater()
+                del self.indicators[current_state]
+
+    def set_state(self, state):
+        self.states = [state]
+        self.update_indicators()
+
+    def add_state(self, state):
+        if state in self.states:
+            return
+        self.states.append(state)
+        self.update_indicators()
+
+    def clear_states(self):
+        self.states = []
+        self.update_indicators()
 
 class instance_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, request_frames=1, title=''):
