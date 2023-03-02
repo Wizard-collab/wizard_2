@@ -758,7 +758,9 @@ class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
 class indicator(QtWidgets.QWidget):
     def __init__(self):
         super(indicator, self).__init__()
+        self.setFixedWidth(18)
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
         self.states = []

@@ -40,7 +40,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.category = None
         self.domain_ids = []
         self.category_ids = []
-        self.view_comment_widget = view_comment_widget(self)
+        self.view_comment_widget = tag_label.view_comment_widget(self)
         self.init_users_images()
         self.build_ui()
         self.connect_functions()
@@ -234,9 +234,9 @@ class production_table_widget(QtWidgets.QWidget):
                     if stage_row['id'] not in self.stage_ids.keys():
                         row_index = self.get_asset_coord(stage_row['asset_id']).row()
                         widget = stage_widget(stage_row, self.users_images_dic)
-                        widget.show_comment_signal.connect(self.show_comment)
-                        widget.hide_comment_signal.connect(self.hide_comment)
-                        widget.move_comment.connect(self.move_comment)
+                        widget.show_comment_signal.connect(self.view_comment_widget.show_comment)
+                        widget.hide_comment_signal.connect(self.view_comment_widget.close)
+                        widget.move_comment.connect(self.view_comment_widget.move_ui)
                         widget.state_signal.connect(self.update_state)
                         widget.assignment_signal.connect(self.update_assignment)
                         self.table_widget.setCellWidget(row_index, stages_list.index(stage_row['name']), widget)
@@ -289,59 +289,6 @@ class production_table_widget(QtWidgets.QWidget):
             print(row_index)
             self.table_widget.removeRow(row_index)
             del self.asset_ids[asset_id]
-
-    def show_comment(self, stage_row):
-        self.view_comment_widget.show_comment(stage_row)
-
-    def hide_comment(self):
-        self.view_comment_widget.close()
-
-    def move_comment(self):
-        self.view_comment_widget.move_ui()
-
-class view_comment_widget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(view_comment_widget, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setMinimumWidth(200)
-        self.build_ui()
-
-    def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.main_widget_layout = QtWidgets.QHBoxLayout()
-        self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
-        self.setLayout(self.main_widget_layout)
-
-        self.main_widget = QtWidgets.QFrame()
-        self.main_widget.setObjectName('black_round_frame')
-        self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(6)
-        self.main_widget.setLayout(self.main_layout)
-        self.main_widget_layout.addWidget(self.main_widget)
-
-        self.stage_state = QtWidgets.QLabel()
-        self.stage_state.setObjectName('bold_label')
-        self.main_layout.addWidget(self.stage_state)
-
-        self.line_frame = QtWidgets.QFrame()
-        self.line_frame.setFixedHeight(1)
-        self.line_frame.setStyleSheet('background-color:rgba(255,255,255,20)')
-        self.main_layout.addWidget(self.line_frame)
-
-        self.stage_comment = tag_label.tag_label()
-        self.main_layout.addWidget(self.stage_comment)
-
-    def show_comment(self, stage_row):
-        self.stage_state.setText(stage_row['state'].capitalize())
-        self.stage_state.setStyleSheet(f"color:{ressources._states_colors_[stage_row['state']]};")
-        self.stage_comment.setText(stage_row['tracking_comment'])
-        gui_utils.move_ui(self, 20)
-        self.show()
-        self.adjustSize()
-
-    def move_ui(self):
-        gui_utils.move_ui(self, 20)
 
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, preview_row, parent=None):
@@ -452,7 +399,7 @@ class stage_widget(QtWidgets.QWidget):
 
     state_signal = pyqtSignal(str)
     assignment_signal = pyqtSignal(str)
-    show_comment_signal = pyqtSignal(dict)
+    show_comment_signal = pyqtSignal(str, str)
     hide_comment_signal = pyqtSignal(int)
     move_comment = pyqtSignal(int)
 
@@ -503,8 +450,12 @@ class stage_widget(QtWidgets.QWidget):
         self.data_layout.addWidget(self.percent_label)
 
     def show_comment(self):
-        if self.stage_row['tracking_comment'] and self.stage_row['tracking_comment'] != '':
-            self.show_comment_signal.emit(self.stage_row)
+        if self.isActiveWindow():
+            tracking_events = project.get_asset_tracking_events(self.stage_row['id'])
+            if len(tracking_events) == 0:
+                return
+            user = tracking_events[-1]['creation_user']
+            self.show_comment_signal.emit(self.stage_row['tracking_comment'], user)
 
     def hide_comment(self):
         self.hide_comment_signal.emit(1)
@@ -512,7 +463,7 @@ class stage_widget(QtWidgets.QWidget):
     def fill_ui(self):
         self.color_frame.setStyleSheet('background-color:%s;'%ressources._stages_colors_[self.stage_row['name']])
         self.state_label.setText(self.stage_row['state'])
-        self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:13px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
+        self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:4px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
         self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])
         self.percent_label.setText(f"{int(self.stage_row['progress'])} %")
 
@@ -532,6 +483,7 @@ class state_widget(QtWidgets.QLabel):
         self.setMouseTracking(True)
         self.setFixedWidth(60)
         self.setObjectName('bold_label')
+        self.setAlignment(QtCore.Qt.AlignCenter)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.RightButton:
