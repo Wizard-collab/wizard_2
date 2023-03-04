@@ -200,6 +200,8 @@ _state_rtk_ = path_utils.join(_icons_path_, 'state_rtk.svg')
 _available_icons_list_.append(_state_rtk_)
 _state_wfa_ = path_utils.join(_icons_path_, 'state_wfa.svg')
 _available_icons_list_.append(_state_wfa_)
+_state_omt_ = path_utils.join(_icons_path_, 'state_omt.svg')
+_available_icons_list_.append(_state_omt_)
 _estimated_time_icon_ = path_utils.join(_icons_path_, 'estimated_time.svg')
 _available_icons_list_.append(_estimated_time_icon_)
 _work_time_icon_ = path_utils.join(_icons_path_, 'work_time.svg')
@@ -369,6 +371,8 @@ _states_colors_['done'] = '#7ca657'
 _states_colors_['error'] = '#d16666'
 _states_colors_['rtk'] = '#4768b5'
 _states_colors_['wfa'] = '#8047b5'
+_states_colors_['omt'] = '#2e2e2e'
+
 _states_icons_ = dict()
 _states_icons_['todo'] = _state_todo_
 _states_icons_['wip'] = _state_wip_
@@ -376,6 +380,7 @@ _states_icons_['done'] = _state_done_
 _states_icons_['error'] = _state_error_
 _states_icons_['rtk'] = _state_rtk_
 _states_icons_['wfa'] = _state_wfa_
+_states_icons_['omt'] = _state_omt_
 
 _stages_colors_ = dict()
 _stages_colors_['modeling'] = '#f87474'

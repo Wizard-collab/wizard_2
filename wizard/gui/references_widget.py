@@ -17,6 +17,7 @@ from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import comment_widget
 from wizard.gui import tag_label
+from wizard.gui import current_asset_viewer
 
 # Wizard modules
 from wizard.core import assets
@@ -45,6 +46,7 @@ class references_widget(QtWidgets.QWidget):
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
+        self.quick_import_buttons = dict()
 
         self.build_ui()
         self.connect_functions()
@@ -175,21 +177,21 @@ class references_widget(QtWidgets.QWidget):
             gui_server.refresh_team_ui()
 
     def change_work_env(self, work_env_id):
-        start_time = time.perf_counter()
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
         self.group_item = None
         self.list_view.clear()
         self.parent_instance_id = work_env_id
-        self.update_quick_import_buttons()
-        self.refresh(start_time)
+        if self.context == 'work_env':
+            self.current_asset_viewer.refresh('work_env', work_env_id)
+        self.refresh()
 
     def refresh(self, start_time=None):
         QtWidgets.QApplication.processEvents()
-        if start_time is None:
-            start_time = time.perf_counter()
+        start_time = time.perf_counter()
         if self.isVisible():
+            self.update_quick_import_buttons()
             if self.parent_instance_id is not None and self.parent_instance_id != 0:
                 if self.context == 'work_env':
                     self.reference_rows = project.get_references(self.parent_instance_id)
@@ -408,12 +410,11 @@ class references_widget(QtWidgets.QWidget):
             self.focus_on_group_signal.emit(item.referenced_group_row['group_id'])
 
     def update_quick_import_buttons(self):
-        if not self.isVisible():
-            return
-        self.clear_quick_imports_buttons()
         if self.parent_instance_id is None or self.parent_instance_id == 0:
+            self.clear_quick_imports_buttons()
             return
         if self.context != 'work_env':
+            self.clear_quick_imports_buttons()
             return
         variant_id = project.get_work_env_data(self.parent_instance_id, 'variant_id')
         variant_row = project.get_variant_data(variant_id)
@@ -421,22 +422,43 @@ class references_widget(QtWidgets.QWidget):
         asset_row = project.get_asset_data(stage_row['asset_id'])
         domain_name = project.get_domain_data(stage_row['domain_id'], 'name')
         stages_rows = project.get_asset_childs(asset_row['id'])
+        project_stages = []
         for row in stages_rows:
+            project_stages.append(row['name'])
             if row['name'] == stage_row['name']:
-                continue
-            button = quick_import_button(row['name'])
-            button.quick_import_signal.connect(self.quick_import)
-            self.quick_import_layout.addWidget(button)
+                self.remove_quick_button(row['name'])
+                continue 
+            if row['name'] not in self.quick_import_buttons.keys():
+                button = quick_import_button(row['name'])
+                button.quick_import_signal.connect(self.quick_import)
+                self.quick_import_layout.addWidget(button)
+                self.quick_import_buttons[row['name']] = button
+        buttons_list = list(self.quick_import_buttons.keys())
+        for stage in buttons_list:
+            if stage not in project_stages:
+                self.remove_quick_button(stage)
+
+    def remove_quick_button(self, stage):
+        if stage not in self.quick_import_buttons.keys():
+            return
+        self.quick_import_buttons[stage].setParent(None)
+        self.quick_import_buttons[stage].deleteLater()
+        del self.quick_import_buttons[stage]
 
     def clear_quick_imports_buttons(self):
-        for i in reversed(range(self.quick_import_layout.count())): 
-            self.quick_import_layout.itemAt(i).widget().setParent(None)
+        buttons_list = list(self.quick_import_buttons.keys())
+        for stage in buttons_list:
+            self.remove_quick_button(stage)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
+
+        if self.context == 'work_env':
+            self.current_asset_viewer = current_asset_viewer.current_asset_viewer()
+            self.main_layout.addWidget(self.current_asset_viewer)
 
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)

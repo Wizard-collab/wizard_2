@@ -31,6 +31,7 @@ from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
 from wizard.gui import tag_label
+from wizard.gui import current_asset_viewer
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +95,7 @@ class videos_widget(QtWidgets.QWidget):
         self.list_view.clear()
         self.icon_view.clear()
         self.variant_id = variant_id
+        self.current_asset_viewer.refresh('variant', variant_id)
         self.refresh()
 
     def show_info_mode(self, text, image):
@@ -260,6 +262,9 @@ class videos_widget(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
+
+        self.current_asset_viewer = current_asset_viewer.current_asset_viewer()
+        self.main_layout.addWidget(self.current_asset_viewer)
 
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)

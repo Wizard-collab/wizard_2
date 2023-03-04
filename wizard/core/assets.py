@@ -453,7 +453,7 @@ def create_references_from_variant_id(work_env_id, variant_id):
     if not at_least_one:
         logger.warning('No export found')
         return
-    return
+    return 1
 
 def create_reference(work_env_id,
                         export_version_id,
