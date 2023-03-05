@@ -115,39 +115,51 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.edit_estimation_button.setFixedSize(16,16)
         self.time_infos_layout.addWidget(self.edit_estimation_button)
 
-        self.progress_bar_widget = QtWidgets.QWidget()
-        self.progress_bar_widget.setObjectName('transparent_widget')
-        self.progress_bar_layout = QtWidgets.QHBoxLayout()
-        self.progress_bar_layout.setContentsMargins(0,0,0,0)
-        self.progress_bar_layout.setSpacing(6)
-        self.progress_bar_widget.setLayout(self.progress_bar_layout)
-        self.progress_layout.addWidget(self.progress_bar_widget)
+        self.separation_widget_1 = QtWidgets.QWidget()
+        self.separation_layout_1 = QtWidgets.QHBoxLayout()
+        self.separation_layout_1.setContentsMargins(0,0,0,0)
+        self.separation_layout_1.setSpacing(6)
+        self.separation_widget_1.setLayout(self.separation_layout_1)
+        self.main_layout.addWidget(self.separation_widget_1)
 
-        self.time_progress_bar = QtWidgets.QProgressBar()
-        self.time_progress_bar.setMaximumHeight(6)
-        self.progress_bar_layout.addWidget(self.time_progress_bar)
+        self.note_label = QtWidgets.QLabel('Note')
+        self.note_label.setObjectName("bold_label")
+        self.separation_layout_1.addWidget(self.note_label)
 
-        self.percent_label = QtWidgets.QLabel()
-        self.progress_bar_layout.addWidget(self.percent_label)
+        self.separation_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.separation_widget = QtWidgets.QWidget()
-        self.separation_layout = QtWidgets.QHBoxLayout()
-        self.separation_layout.setContentsMargins(0,0,0,0)
-        self.separation_layout.setSpacing(6)
-        self.separation_widget.setLayout(self.separation_layout)
-        self.main_layout.addWidget(self.separation_widget)
+        self.edit_note_button = QtWidgets.QPushButton('Edit note')
+        self.edit_note_button.setMaximumHeight(24)
+        self.edit_note_button.setStyleSheet('padding:3px;')
+        self.separation_layout_1.addWidget(self.edit_note_button)
+
+        self.note_content = gui_utils.minimum_height_textEdit()
+        self.note_content.setText('fwpeofkew fpokwe fopwekf pwoekfp weokf wepfoewfwefwefewfwejf weof ewofj wsdpofkew fpoewkf powefk ewopfk ewpofk wepof kwepof kwepof wekfpowekfeoifj eo')
+        self.note_content.setReadOnly(True)
+        self.note_content.setObjectName('gray_label')
+        self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
+        self.main_layout.addWidget(self.note_content)
+
+        self.separation_widget_2 = QtWidgets.QWidget()
+        self.separation_layout_2 = QtWidgets.QHBoxLayout()
+        self.separation_layout_2.setContentsMargins(0,0,0,0)
+        self.separation_layout_2.setSpacing(6)
+        self.separation_widget_2.setLayout(self.separation_layout_2)
+        self.main_layout.addWidget(self.separation_widget_2)
 
         self.asset_history_label = QtWidgets.QLabel('Asset history')
-        self.separation_layout.addWidget(self.asset_history_label)
+        self.asset_history_label.setObjectName("bold_label")
+        self.separation_layout_2.addWidget(self.asset_history_label)
 
-        self.separation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.separation_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.add_comment_button = QtWidgets.QPushButton('Add comment')
         self.add_comment_button.setMaximumHeight(24)
         self.add_comment_button.setStyleSheet('padding:3px;')
-        self.separation_layout.addWidget(self.add_comment_button)
+        self.separation_layout_2.addWidget(self.add_comment_button)
 
         self.events_scrollArea = QtWidgets.QScrollArea()
+        self.events_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
 
         self.events_scrollArea_widget = QtWidgets.QWidget()
@@ -221,20 +233,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.work_time_label.setText(string_time)
             if self.stage_row['estimated_time'] is not None:
                 self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.stage_row['estimated_time'])))
-            percent = self.stage_row['progress']
-            self.percent_label.setText(f"{str(int(percent))}%")
-            if self.stage_row['state'] != 'done':
-                self.time_progress_bar.setStyleSheet('::chunk{background-color:#ff5d5d;}')
-            else:
-                self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
-            if self.stage_row['state'] == 'done':
-                self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
-            self.time_progress_bar.setValue(int(percent))
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')
-            self.time_progress_bar.setValue(0)
-            self.percent_label.setText("0%")
 
     def remove_tracking_event(self, event_id):
         if event_id in self.tracking_event_ids.keys():
@@ -417,6 +418,7 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.main_widget = QtWidgets.QWidget()
         self.main_widget.setObjectName('asset_tracking_event_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(8,8,8,8)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.widget_layout.addWidget(self.main_widget)
@@ -512,7 +514,7 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.state_frame.setObjectName('asset_tracking_event_frame')
         self.state_frame.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.state_frame_layout = QtWidgets.QHBoxLayout()
-        self.state_frame_layout.setContentsMargins(8,8,8,8)
+        self.state_frame_layout.setContentsMargins(4,4,4,4)
         self.state_frame.setLayout(self.state_frame_layout)
         self.main_layout.addWidget(self.state_frame)
 

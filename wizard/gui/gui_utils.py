@@ -590,3 +590,28 @@ class transparent_button(QtWidgets.QPushButton):
 
     def reset_stylesheet(self):
         self.setStyleSheet('background-color: transparent;border: none;')
+
+class minimum_height_textEdit(QtWidgets.QTextEdit):
+    def __init__(self, max_height=100, parent=None):
+        super(minimum_height_textEdit, self).__init__(parent)
+        self.max_height = max_height
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.connect_functions()
+        self.update_height()
+
+    def set_max_height(self, max_height):
+        self.max_height = max_height
+        self.update_height()
+
+    def connect_functions(self):
+        self.textChanged.connect(self.update_height)
+
+    def showEvent(self, event):
+        self.update_height()
+
+    def update_height(self):
+        doc_height = self.document().size().height()
+        if int(doc_height) > self.max_height:
+            doc_height = self.max_height
+        self.setMinimumHeight(int(doc_height))
+        self.setMaximumHeight(int(doc_height))
