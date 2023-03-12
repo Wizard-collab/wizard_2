@@ -49,7 +49,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.users_images_dic = dict()
         for user_row in repository.get_users_list():
             user_image =  user_row['profile_picture']
-            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 22)
+            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def build_ui(self):
@@ -293,7 +293,7 @@ class production_table_widget(QtWidgets.QWidget):
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, preview_row, parent=None):
         super(asset_widget, self).__init__(parent)
-        self.thumbnail_width = 110
+        self.thumbnail_width = 150
         self.type = 'asset'
         self.asset_row = asset_row
         self.preview_row = preview_row
@@ -429,25 +429,27 @@ class stage_widget(QtWidgets.QWidget):
         self.color_frame.setFixedWidth(4)
         self.main_layout.addWidget(self.color_frame)
 
-        self.data_widget = QtWidgets.QWidget()
-        self.data_widget.setObjectName('transparent_widget')
         self.data_layout = QtWidgets.QHBoxLayout()
-        self.data_layout.setSpacing(6)
-        self.data_layout.setContentsMargins(6,6,6,6)
-        self.data_widget.setLayout(self.data_layout)
-        self.main_layout.addWidget(self.data_widget)
+        self.data_layout.setSpacing(3)
+        self.data_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.data_layout.setContentsMargins(3,3,3,3)
+        self.main_layout.addLayout(self.data_layout)
 
         self.state_label = state_widget()
         self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.state_label.setMinimumHeight(22)
+        self.state_label.setFixedHeight(30)
         self.data_layout.addWidget(self.state_label)
 
         self.user_image_label = assignment_widget()
-        self.user_image_label.setFixedSize(QtCore.QSize(24,24))
+        self.user_image_label.setFixedSize(QtCore.QSize(30,30))
         self.data_layout.addWidget(self.user_image_label)
 
-        self.percent_label = QtWidgets.QLabel()
-        self.data_layout.addWidget(self.percent_label)
+        self.note_content = gui_utils.minimum_height_textEdit(77)
+        self.note_content.setFixedWidth(150)
+        self.note_content.setReadOnly(True)
+        self.note_content.setObjectName('gray_label')
+        self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
+        self.data_layout.addWidget(self.note_content)
 
     def show_comment(self):
         if self.isActiveWindow():
@@ -465,7 +467,10 @@ class stage_widget(QtWidgets.QWidget):
         self.state_label.setText(self.stage_row['state'])
         self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:4px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
         self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])
-        self.percent_label.setText(f"{int(self.stage_row['progress'])} %")
+        if self.stage_row['note'] is None or self.stage_row['note'] == '':
+            self.note_content.setText('Missing note')
+        else:
+            self.note_content.setText(self.stage_row['note'])
 
     def refresh(self, stage_row):
         self.stage_row = stage_row
