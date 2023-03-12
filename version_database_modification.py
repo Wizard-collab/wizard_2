@@ -26,9 +26,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Python modules
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
+
 # Wizard modules
 from wizard.core import environment
 from wizard.core import project
+from wizard.core import db_utils
 
 def main():
-	pass
+	sql_cmd = """ALTER TABLE stages ADD COLUMN IF NOT EXISTS note text DEFAULT '';"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)

@@ -12,6 +12,7 @@ from wizard.core import user
 from wizard.core import repository
 from wizard.core import assets
 from wizard.core import project
+from wizard.core import image
 from wizard.vars import ressources
 from wizard.vars import assets_vars
 from wizard.vars import user_vars
@@ -43,8 +44,12 @@ class asset_tracking_widget(QtWidgets.QFrame):
         users_ids = project.get_users_ids_list()
         for user_id in users_ids:
             if user_id not in self.users_ids.keys():
-                self.users_ids[user_id] = repository.get_user_data(user_id, 'user_name')
-                self.assignment_comboBox.addItem(self.users_ids[user_id])
+                user_row = repository.get_user_data(user_id)
+                self.users_ids[user_id] = user_row['user_name']
+                icon = QtGui.QIcon()
+                pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 18)
+                icon.addPixmap(pm)
+                self.assignment_comboBox.addItem(icon, self.users_ids[user_id])
 
     def edit_estimation(self):
         self.estimation_widget = estimation_widget()
@@ -56,29 +61,34 @@ class asset_tracking_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(6)
+        self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 
         self.setup_widget = QtWidgets.QFrame()
         self.setup_widget.setObjectName('asset_tracking_event_frame')
         self.setup_layout = QtWidgets.QHBoxLayout()
+        self.setup_layout.setContentsMargins(6,6,6,6)
         self.setup_layout.setSpacing(6)
         self.setup_widget.setLayout(self.setup_layout)
         self.main_layout.addWidget(self.setup_widget)
 
         self.assignment_comboBox = gui_utils.QComboBox()
+        self.assignment_comboBox.setIconSize(QtCore.QSize(16,16))
         self.setup_layout.addWidget(self.assignment_comboBox)
 
         self.state_comboBox = gui_utils.QComboBox()
-        self.state_comboBox.setIconSize(QtCore.QSize(14,14))
+        self.state_comboBox.setIconSize(QtCore.QSize(16,16))
         self.state_comboBox.setFixedWidth(100)
         self.setup_layout.addWidget(self.state_comboBox)
-        for state in assets_vars._asset_states_list_:
-            self.state_comboBox.addItem(QtGui.QIcon(ressources._states_icons_[state]), state)
+        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_todo_), assets_vars._asset_state_todo_)
+        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_wip_), assets_vars._asset_state_wip_)
+        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_done_), assets_vars._asset_state_done_ )
+        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_error_), assets_vars._asset_state_error_)
 
         self.progress_widget = QtWidgets.QFrame()
         self.progress_widget.setObjectName('asset_tracking_event_frame')
         self.progress_layout = QtWidgets.QVBoxLayout()
+        self.progress_layout.setContentsMargins(6,6,6,6)
         self.progress_layout.setSpacing(6)
         self.progress_widget.setLayout(self.progress_layout)
         self.main_layout.addWidget(self.progress_widget)
@@ -134,7 +144,6 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.separation_layout_1.addWidget(self.edit_note_button)
 
         self.note_content = gui_utils.minimum_height_textEdit()
-        self.note_content.setText('fwpeofkew fpokwe fopwekf pwoekfp weokf wepfoewfwefwefewfwejf weof ewofj wsdpofkew fpoewkf powefk ewopfk ewpofk wepof kwepof kwepof wekfpowekfeoifj eo')
         self.note_content.setReadOnly(True)
         self.note_content.setObjectName('gray_label')
         self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
@@ -218,6 +227,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.stage_row = None
         self.refresh_tracking_events()
         self.refresh_state()
+        self.refresh_note()
         self.refresh_users_dic()
         self.refresh_user()
         self.refresh_time()
@@ -313,6 +323,15 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.state_comboBox.setCurrentText('todo')
         self.apply_state_modification = 1
 
+    def refresh_note(self):
+        if self.stage_row is not None:
+            if self.stage_row['note'] is None or self.stage_row['note'] == '':
+                self.note_content.setText('Missing note')
+                return
+            self.note_content.setText(self.stage_row['note'])
+        else:
+            self.note_content.setText('')
+
     def modify_state(self, state):
         if self.stage_id is not None:
             if self.apply_state_modification:
@@ -336,6 +355,17 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 assets.add_stage_comment(self.stage_id, comment)
                 gui_server.refresh_team_ui()
 
+    def edit_note(self):
+        if self.stage_id is not None:
+            self.comment_widget = comment_widget.comment_widget(title='Edit note',
+                                                                old_comment=self.stage_row['note'],
+                                                                propose_tags=False,
+                                                                button_text='Edit')
+            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                note = self.comment_widget.comment
+                assets.edit_stage_note(self.stage_id, note)
+                gui_server.refresh_team_ui()
+
     def change_count(self):
         self.clear_all_tracking_events()
         self.refresh_tracking_events()
@@ -347,6 +377,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.event_count_spinBox.valueChanged.connect(self.change_count)
         self.edit_estimation_button.clicked.connect(self.edit_estimation)
         self.add_comment_button.clicked.connect(self.add_comment)
+        self.edit_note_button.clicked.connect(self.edit_note)
 
 class time_widget(QtWidgets.QWidget):
     def __init__(self, time_float, parent = None):

@@ -42,7 +42,7 @@ QPushButton::checked{
 
 QLineEdit, QSpinBox, QTextEdit{
 	background-color:#24242b;
-	padding: 0px;
+	padding: 4px;
 	border-radius: 5px;
 }
 

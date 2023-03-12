@@ -370,6 +370,10 @@ def add_stage_comment(stage_id, comment):
     asset_tracking.add_comment_event(stage_id, comment)
     return 1
 
+def edit_stage_note(stage_id, note):
+    project.set_stage_data(stage_id, 'note', note)
+    return 1
+
 def modify_stage_assignment(stage_id, user_name):
     user_id = repository.get_user_row_by_name(user_name, 'id')
     if user_id not in project.get_users_ids_list():
