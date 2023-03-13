@@ -80,10 +80,8 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.state_comboBox.setIconSize(QtCore.QSize(16,16))
         self.state_comboBox.setFixedWidth(100)
         self.setup_layout.addWidget(self.state_comboBox)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_todo_), assets_vars._asset_state_todo_)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_wip_), assets_vars._asset_state_wip_)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_done_), assets_vars._asset_state_done_ )
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_error_), assets_vars._asset_state_error_)
+        for state in assets_vars._asset_states_list_:
+            self.state_comboBox.addItem(QtGui.QIcon(ressources._states_icons_[state]), state)
 
         self.progress_widget = QtWidgets.QFrame()
         self.progress_widget.setObjectName('asset_tracking_event_frame')
@@ -146,7 +144,6 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.note_content = gui_utils.minimum_height_textEdit()
         self.note_content.setReadOnly(True)
         self.note_content.setObjectName('gray_label')
-        self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
         self.main_layout.addWidget(self.note_content)
 
         self.separation_widget_2 = QtWidgets.QWidget()
@@ -181,7 +178,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_content_widget = QtWidgets.QWidget()
         self.events_content_layout = QtWidgets.QVBoxLayout()
         self.events_content_layout.setContentsMargins(0,0,0,0)
-        self.events_content_layout.setSpacing(6)
+        self.events_content_layout.setSpacing(3)
         self.events_content_widget.setLayout(self.events_content_layout)
         self.events_scrollArea_layout.addWidget(self.events_content_widget)
 
@@ -219,7 +216,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh()
 
     def refresh(self):
-        QtWidgets.QApplication.processEvents()
+        #QtWidgets.QApplication.processEvents()
         start_time = time.perf_counter()
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)

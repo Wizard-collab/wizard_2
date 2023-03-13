@@ -610,7 +610,7 @@ class minimum_height_textEdit(QtWidgets.QTextEdit):
         self.update_height()
 
     def update_height(self):
-        doc_height = self.document().size().height()
+        doc_height = self.document().size().height() + 8
         if int(doc_height) > self.max_height:
             doc_height = self.max_height
         self.setMinimumHeight(int(doc_height))

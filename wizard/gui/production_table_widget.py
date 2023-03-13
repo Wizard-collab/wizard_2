@@ -7,12 +7,16 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import time
 import logging
+import traceback
+import copy
 
 # Wizard gui modules
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import logging_widget
 from wizard.gui import tag_label
+from wizard.gui import comment_widget
+from wizard.gui import asset_tracking_widget
 
 # Wizard modules
 from wizard.core import repository
@@ -40,6 +44,8 @@ class production_table_widget(QtWidgets.QWidget):
         self.category = None
         self.domain_ids = []
         self.category_ids = []
+        self.old_thread_id = None
+        self.search_threads = dict()
         self.view_comment_widget = tag_label.view_comment_widget(self)
         self.init_users_images()
         self.build_ui()
@@ -72,7 +78,15 @@ class production_table_widget(QtWidgets.QWidget):
         self.category_comboBox.setMinimumHeight(36)
         self.header_layout.addWidget(self.category_comboBox)
 
+        self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43)
+        self.header_layout.addWidget(self.search_bar)
+
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.content_layout = QtWidgets.QHBoxLayout()
+        self.content_layout.setContentsMargins(0,0,0,0)
+        self.content_layout.setSpacing(1)
+        self.main_layout.addLayout(self.content_layout)
 
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setObjectName('dark_widget')
@@ -82,10 +96,12 @@ class production_table_widget(QtWidgets.QWidget):
         self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
         self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
         self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.main_layout.addWidget(self.table_widget)
+        self.content_layout.addWidget(self.table_widget)
+
+        self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget()
+        self.content_layout.addWidget(self.asset_tracking_widget)
 
         self.infos_widget = QtWidgets.QWidget()
-        self.infos_widget.setObjectName('dark_widget')
         self.infos_layout = QtWidgets.QHBoxLayout()
         self.infos_layout.setContentsMargins(11,11,11,11)
         self.infos_layout.setSpacing(4)
@@ -99,19 +115,27 @@ class production_table_widget(QtWidgets.QWidget):
         self.infos_layout.addWidget(self.refresh_label)
 
     def update_state(self, state):
+        comment = ''
+        self.comment_widget = comment_widget.comment_widget()
+        if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+            comment = self.comment_widget.comment
         for modelIndex in self.table_widget.selectedIndexes():
             widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
             if widget and widget.type == 'stage':
+                if not widget.isVisible():
+                    continue
                 stage_row = widget.stage_row
                 stage_id = stage_row['id']
                 if stage_row['state'] != state:
-                    assets.modify_stage_state(stage_id, state)
+                    assets.modify_stage_state(stage_id, state, comment)
         gui_server.refresh_team_ui()
 
     def update_assignment(self, assignment):
         for modelIndex in self.table_widget.selectedIndexes():
             widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
             if widget and widget.type == 'stage':
+                if not widget.isVisible():
+                    continue
                 stage_row = widget.stage_row
                 stage_id = stage_row['id']
                 if stage_row['assignment'] != assignment:
@@ -121,6 +145,8 @@ class production_table_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.domain_comboBox.currentTextChanged.connect(self.refresh_categories)
         self.category_comboBox.currentTextChanged.connect(self.refresh_assets)
+        self.table_widget.itemSelectionChanged.connect(self.change_stage_asset_tracking_widget)
+        self.search_bar.textChanged.connect(self.update_search)
 
     def showEvent(self, event):
         self.refresh()
@@ -135,10 +161,26 @@ class production_table_widget(QtWidgets.QWidget):
                     self.domain_ids.append(domain_row['id'])
             self.update_categories = True
             self.refresh_categories()
+            self.asset_tracking_widget.refresh()
 
     def clear_categories(self):
         self.category_ids = []
         self.category_comboBox.clear()
+
+    def change_stage_asset_tracking_widget(self):
+        if len(self.table_widget.selectedIndexes()) != 1:
+            self.asset_tracking_widget.change_stage(None)
+            return
+        modelIndex = self.table_widget.selectedIndexes()[0]
+        widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+        if not widget:
+            self.asset_tracking_widget.change_stage(None)
+            return
+        if widget.type != 'stage':
+            self.asset_tracking_widget.change_stage(None)
+            return
+        stage_id = widget.stage_row['id']
+        self.asset_tracking_widget.change_stage(stage_id)
 
     def refresh_categories(self):
         if self.update_categories:
@@ -171,7 +213,7 @@ class production_table_widget(QtWidgets.QWidget):
 
         if category != "":
             category_id = project.get_category_data_by_name(category, 'id')
-            asset_rows = project.get_category_childs(category_id)
+            self.asset_rows = project.get_category_childs(category_id)
 
             project_asset_ids = []
             assets_preview_rows = project.get_all_assets_preview()
@@ -181,12 +223,12 @@ class production_table_widget(QtWidgets.QWidget):
             
             if self.domain == assets_vars._assets_:
                 labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading"]
-                stages_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
+                self.task_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
             elif self.domain == assets_vars._sequences_:
                 labels_names = ["Name", "Frame range", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Compositing"]
-                stages_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
+                self.task_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
 
-            project_asset_ids = [asset_row['id'] for asset_row in asset_rows]
+            project_asset_ids = [asset_row['id'] for asset_row in self.asset_rows]
 
             asset_ids = list(self.asset_ids.keys())
             for asset_id in asset_ids:
@@ -195,12 +237,12 @@ class production_table_widget(QtWidgets.QWidget):
 
             self.table_widget.setColumnCount(len(labels_names))
             self.table_widget.setHorizontalHeaderLabels(labels_names)
-            self.table_widget.setRowCount(len(asset_rows))
+            self.table_widget.setRowCount(len(self.asset_rows))
 
-            for asset_row in asset_rows:
+            for asset_row in self.asset_rows:
                 project_asset_ids.append(asset_row['id'])
                 if asset_row['id'] not in self.asset_ids.keys():
-                    index = asset_rows.index(asset_row)
+                    index = self.asset_rows.index(asset_row)
                     item = QtWidgets.QTableWidgetItem()
                     item.setFlags(item.flags() ^ QtCore.Qt.ItemIsSelectable)
                     self.table_widget.setItem(index, 0, item)
@@ -208,6 +250,7 @@ class production_table_widget(QtWidgets.QWidget):
                     self.table_widget.setCellWidget(index, 0, widget)
                     self.asset_ids[asset_row['id']] = dict()
                     self.asset_ids[asset_row['id']]['row'] = asset_row
+                    self.asset_ids[asset_row['id']]['table_row'] = index
                     self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
                     self.asset_ids[asset_row['id']]['widget'] = widget
                     if self.domain == assets_vars._sequences_:
@@ -226,11 +269,13 @@ class production_table_widget(QtWidgets.QWidget):
                             self.asset_ids[asset_row['id']]['frame_range_widget'].refresh(asset_row)
 
             stage_rows = project.get_all_stages()
+            self.stage_rows = []
             project_stage_ids = []
 
             for stage_row in stage_rows:
                 project_stage_ids.append(stage_row['id'])
                 if stage_row['asset_id'] in self.asset_ids.keys():
+                    self.stage_rows.append(stage_row)
                     if stage_row['id'] not in self.stage_ids.keys():
                         row_index = self.get_asset_coord(stage_row['asset_id']).row()
                         widget = stage_widget(stage_row, self.users_images_dic)
@@ -239,7 +284,7 @@ class production_table_widget(QtWidgets.QWidget):
                         widget.move_comment.connect(self.view_comment_widget.move_ui)
                         widget.state_signal.connect(self.update_state)
                         widget.assignment_signal.connect(self.update_assignment)
-                        self.table_widget.setCellWidget(row_index, stages_list.index(stage_row['name']), widget)
+                        self.table_widget.setCellWidget(row_index, self.task_list.index(stage_row['name']), widget)
                         self.stage_ids[stage_row['id']] = dict()
                         self.stage_ids[stage_row['id']]['row'] = stage_row
                         self.stage_ids[stage_row['id']]['widget'] = widget
@@ -271,11 +316,23 @@ class production_table_widget(QtWidgets.QWidget):
             model_index = self.table_widget.indexAt(widget.pos())
             return model_index
 
+    def get_asset_row(self, asset_id):
+        if asset_id in self.asset_ids.keys():
+            widget = self.asset_ids[asset_id]['widget']
+            row = self.table_widget.rowAt(widget.pos().y())
+            return row
+
     def get_stage_coord(self, stage_id):
         if stage_id in self.stage_ids.keys():
             widget = self.stage_ids[stage_id]['widget']
             model_index = self.table_widget.indexAt(widget.pos())
             return model_index
+
+    def get_stage_item(self, stage_id):
+        if stage_id in self.stage_ids.keys():
+            widget = self.stage_ids[stage_id]['widget']
+            item = self.table_widget.itemAt(widget.pos())
+            return item
 
     def remove_stage(self, stage_id):
         if stage_id in self.stage_ids.keys():
@@ -286,9 +343,82 @@ class production_table_widget(QtWidgets.QWidget):
     def remove_asset(self, asset_id):
         if asset_id in self.asset_ids.keys():
             row_index = self.get_asset_coord(asset_id).row()
-            print(row_index)
             self.table_widget.removeRow(row_index)
             del self.asset_ids[asset_id]
+
+    def update_search(self):
+        search_data = self.search_bar.text()
+        self.search_start_time = time.perf_counter()
+        self.accept_item_from_thread = False
+        if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
+            self.search_threads[self.old_thread_id].show_stage_signal.disconnect()
+            self.search_threads[self.old_thread_id].hide_stage_signal.disconnect()
+            self.search_threads[self.old_thread_id].show_asset_signal.disconnect()
+            self.search_threads[self.old_thread_id].hide_asset_signal.disconnect()
+            self.search_threads[self.old_thread_id].hide_task_signal.disconnect()
+            self.search_threads[self.old_thread_id].show_task_signal.disconnect()
+        thread_id = time.time()
+        self.search_threads[thread_id] = search_thread()
+        self.search_threads[thread_id].show_stage_signal.connect(self.show_stage)
+        self.search_threads[thread_id].hide_stage_signal.connect(self.hide_stage)
+        self.search_threads[thread_id].show_asset_signal.connect(self.show_asset)
+        self.search_threads[thread_id].hide_asset_signal.connect(self.hide_asset)
+        self.search_threads[thread_id].hide_task_signal.connect(self.hide_task)
+        self.search_threads[thread_id].show_task_signal.connect(self.show_task)
+        self.old_thread_id = thread_id
+        if len(search_data) > 0:
+            self.accept_item_from_thread = True
+            self.search_threads[thread_id].update_search(self.asset_rows, self.stage_rows, self.task_list, search_data)
+        else:
+            self.search_threads[thread_id].running=False
+            self.show_all_stages()
+            self.show_all_assets()
+            self.show_all_tasks()
+        self.clean_threads()
+
+    def clean_threads(self):
+        ids = list(self.search_threads.keys())
+        for thread_id in ids:
+            if not self.search_threads[thread_id].running:
+                self.search_threads[thread_id].terminate()
+                del self.search_threads[thread_id]
+
+    def hide_stage(self, stage_id):
+        if stage_id in self.stage_ids.keys():
+            self.stage_ids[stage_id]['widget'].setVisible(False)
+
+    def show_stage(self, stage_id):
+        if stage_id in self.stage_ids.keys():
+            self.stage_ids[stage_id]['widget'].setVisible(True)
+
+    def show_all_stages(self):
+        for stage_id in self.stage_ids.keys():
+            self.show_stage(stage_id)
+
+    def hide_asset(self, asset_id):
+        if asset_id in self.asset_ids.keys():
+            model_index = self.get_asset_coord(asset_id)
+            self.table_widget.hideRow(self.asset_ids[asset_id]['table_row'])
+
+    def show_asset(self, asset_id):
+        if asset_id in self.asset_ids.keys():
+            self.table_widget.showRow(self.asset_ids[asset_id]['table_row'])
+
+    def show_all_assets(self):
+        for asset_id in self.asset_ids.keys():
+            self.show_asset(asset_id)
+
+    def hide_task(self, task):
+        task_index = self.task_list.index(task)
+        self.table_widget.hideColumn(task_index)
+
+    def show_task(self, task):
+        task_index = self.task_list.index(task)
+        self.table_widget.showColumn(task_index)
+
+    def show_all_tasks(self):
+        for task in self.task_list:
+            self.show_task(task)
 
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, preview_row, parent=None):
@@ -423,6 +553,7 @@ class stage_widget(QtWidgets.QWidget):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.color_frame = QtWidgets.QFrame()
@@ -431,7 +562,6 @@ class stage_widget(QtWidgets.QWidget):
 
         self.data_layout = QtWidgets.QHBoxLayout()
         self.data_layout.setSpacing(3)
-        self.data_layout.setAlignment(QtCore.Qt.AlignTop)
         self.data_layout.setContentsMargins(3,3,3,3)
         self.main_layout.addLayout(self.data_layout)
 
@@ -536,3 +666,79 @@ class assignment_widget(QtWidgets.QLabel):
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             self.assignment_signal.emit(action.text())
+
+class search_thread(QtCore.QThread):
+
+    show_stage_signal = pyqtSignal(int)
+    hide_stage_signal = pyqtSignal(int)
+    show_asset_signal = pyqtSignal(int)
+    hide_asset_signal = pyqtSignal(int)
+    show_task_signal = pyqtSignal(str)
+    hide_task_signal = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def update_search(self, asset_rows, stage_rows, tasks, search_data):
+        self.search_data = search_data
+        self.asset_rows = copy.deepcopy(asset_rows)
+        self.stage_rows = copy.deepcopy(stage_rows)
+        self.tasks = copy.deepcopy(tasks)
+        self.start()
+
+    def run(self):
+        try:
+            asset_ids = []
+            stages_to_show = []
+            stages_to_hide = []
+            task_to_show = []
+
+            keywords_sets = self.search_data.split('+')
+            
+            for stage_row in self.stage_rows:
+
+                stage_id = stage_row['id']
+                values = []
+                for key in stage_row:
+                    if key in ['id', 'creation_time', 'creation_user']:
+                        continue
+                    values.append(stage_row[key])
+
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
+
+                for keywords_set in keywords_sets:
+                    if keywords_set == '':
+                        continue
+                    keywords = keywords_set.split('&')
+                    if all(keyword.upper() in data.upper() for keyword in keywords):
+                        stages_to_show.append(stage_id)
+                        task_to_show.append(stage_row['name'])
+                        asset_ids.append(stage_row['asset_id'])
+
+            for asset_row in self.asset_rows:
+                if asset_row['id'] in asset_ids:
+                    self.show_asset_signal.emit(asset_row['id'])
+                else:
+                    self.hide_asset_signal.emit(asset_row['id'])
+            for task in self.tasks:
+                if task == '':
+                    continue
+                if task in set(task_to_show):
+                    self.show_task_signal.emit(task)
+                else:
+                    self.hide_task_signal.emit(task)
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+            for stage_row in self.stage_rows:
+                if stage_row['id'] in stages_to_show:
+                    self.show_stage_signal.emit(stage_row['id'])
+                else:
+                    self.hide_stage_signal.emit(stage_row['id'])
+
+        except:
+            logger.info(str(traceback.format_exc()))
+        self.running = False

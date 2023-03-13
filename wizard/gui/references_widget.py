@@ -744,8 +744,11 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
 
     def modify_state(self, state):
         if self.stage_row['state'] != state:
-            assets.modify_stage_state(self.stage_row['id'], state)
-            gui_server.refresh_team_ui()
+            self.comment_widget = comment_widget.comment_widget()
+            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                comment = self.comment_widget.comment
+                assets.modify_stage_state(self.stage_row['id'], state, comment)
+                gui_server.refresh_team_ui()
 
 class editable_data_widget(QtWidgets.QFrame):
 
