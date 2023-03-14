@@ -40,3 +40,5 @@ from wizard.core import db_utils
 def main():
 	sql_cmd = """ALTER TABLE stages ADD COLUMN IF NOT EXISTS note text DEFAULT '';"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
+	sql_cmd = """ALTER TABLE stages ADD COLUMN IF NOT EXISTS priority text NOT NULL DEFAULT 'normal';"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)

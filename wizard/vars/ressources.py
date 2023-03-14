@@ -283,6 +283,10 @@ _update_icon_ = path_utils.join(_icons_path_, 'update_icon.svg')
 _available_icons_list_.append(_update_icon_)
 _tag_icon_ = path_utils.join(_icons_path_, 'tag.svg')
 _available_icons_list_.append(_tag_icon_)
+_important_icon_ = path_utils.join(_icons_path_, 'important.svg')
+_available_icons_list_.append(_important_icon_)
+_urgent_icon_ = path_utils.join(_icons_path_, 'urgent.svg')
+_available_icons_list_.append(_urgent_icon_)
 
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')
@@ -398,3 +402,9 @@ _stages_colors_['lighting'] = '#63f191'
 _stages_colors_['compositing'] = '#676fa3'
 
 _whatsnew_html_ = path_utils.join(_ressources_path_, 'whatsnew.html')
+
+# Urgence icons
+_priority_icons_list_ = dict()
+_priority_icons_list_['normal'] = ''
+_priority_icons_list_['high'] = _important_icon_
+_priority_icons_list_['urgent'] = _urgent_icon_

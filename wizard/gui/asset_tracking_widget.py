@@ -410,6 +410,8 @@ class tracking_event_widget(QtWidgets.QFrame):
 
         if self.tracking_event_row['event_type'] == 'state_switch':
             self.build_state_switch_ui()
+        elif self.tracking_event_row['event_type'] == 'priority_switch':
+            self.build_priority_switch_ui()
         elif self.tracking_event_row['event_type'] == 'assignment':
             self.build_assignment_ui()
         elif self.tracking_event_row['event_type'] == 'work_session':
@@ -553,6 +555,28 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.state_label.setObjectName('bold_label')
         self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.state_frame_layout.addWidget(self.state_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+    def build_priority_switch_ui(self):
+        self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.user_label)
+
+        self.info_label = QtWidgets.QLabel('switched priority to')
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.info_label)
+        
+        self.priority_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())
+        self.priority_label.setObjectName('bold_label')
+        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.priority_label)
+
+        self.priority_icon = QtWidgets.QLabel()
+        self.priority_icon.setFixedSize(14,14)
+        self.priority_icon.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[self.tracking_event_row['data']]).pixmap(14))
+        self.main_layout.addWidget(self.priority_icon)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 

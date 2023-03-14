@@ -217,3 +217,11 @@ _asset_states_list_ = [_asset_state_todo_,
 						_asset_state_rtk_,
 						_asset_state_wfa_,
 						_asset_state_omt_]
+
+# Asset urgence
+_priority_normal_ = 'normal'
+_priority_high_ = 'high'
+_priority_urgent_ = 'urgent'
+_priority_list_ = [_priority_normal_,
+				_priority_high_,
+				_priority_urgent_]

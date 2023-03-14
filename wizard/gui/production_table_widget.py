@@ -47,6 +47,10 @@ class production_table_widget(QtWidgets.QWidget):
         self.old_thread_id = None
         self.search_threads = dict()
         self.view_comment_widget = tag_label.view_comment_widget(self)
+        self.show_notes = 1
+        self.show_states = 1
+        self.show_assignments = 1
+        self.show_priorities = 1
         self.init_users_images()
         self.build_ui()
         self.connect_functions()
@@ -57,6 +61,58 @@ class production_table_widget(QtWidgets.QWidget):
             user_image =  user_row['profile_picture']
             pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
+
+    def context_menu_requested(self, point):
+        menu = gui_utils.QMenu(self)
+        menu.addSeparator()
+        show_notes_icon = ressources._uncheck_icon_
+        if self.show_notes:
+            show_notes_icon = ressources._check_icon_
+        show_states_icon = ressources._uncheck_icon_
+        if self.show_states:
+            show_states_icon = ressources._check_icon_
+        show_assignments_icon = ressources._uncheck_icon_
+        if self.show_assignments:
+            show_assignments_icon = ressources._check_icon_
+        show_priorities_icon = ressources._uncheck_icon_
+        if self.show_priorities:
+            show_priorities_icon = ressources._check_icon_
+
+        show_states_item = menu.addAction(QtGui.QIcon(show_states_icon), f'Show states')
+        show_assignment_item = menu.addAction(QtGui.QIcon(show_assignments_icon), f'Show assignments')
+        show_notes_item = menu.addAction(QtGui.QIcon(show_notes_icon), f'Show notes')
+        show_priorities_item = menu.addAction(QtGui.QIcon(show_priorities_icon), f'Show priorities')
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action == show_notes_item:
+                self.show_notes = 1-self.show_notes
+                self.update_stage_datas_visibility()
+                self.update_layout()
+            if action == show_states_item:
+                self.show_states = 1-self.show_states
+                self.update_stage_datas_visibility()
+                self.update_layout()
+            if action == show_assignment_item:
+                self.show_assignments = 1-self.show_assignments
+                self.update_stage_datas_visibility()
+                self.update_layout()
+            if action == show_priorities_item:
+                self.show_priorities = 1-self.show_priorities
+                self.update_stage_datas_visibility()
+                self.update_layout()
+
+    def update_stage_datas_visibility(self):
+        for stage_id in self.stage_ids.keys():
+            self.stage_ids[stage_id]['widget'].update_notes_visibility(self.show_notes)
+            self.stage_ids[stage_id]['widget'].update_states_visibility(self.show_states)
+            self.stage_ids[stage_id]['widget'].update_assignments_visibility(self.show_assignments)
+            self.stage_ids[stage_id]['widget'].update_priorities_visibility(self.show_priorities)
+
+    def update_layout(self):
+        QtWidgets.QApplication.processEvents()
+        self.table_widget.resizeColumnsToContents()
+        self.table_widget.resizeRowsToContents()
 
     def build_ui(self):
         self.resize(1400,800)
@@ -130,6 +186,18 @@ class production_table_widget(QtWidgets.QWidget):
                     assets.modify_stage_state(stage_id, state, comment)
         gui_server.refresh_team_ui()
 
+    def update_priority(self, priority):
+        for modelIndex in self.table_widget.selectedIndexes():
+            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            if widget and widget.type == 'stage':
+                if not widget.isVisible():
+                    continue
+                stage_row = widget.stage_row
+                stage_id = stage_row['id']
+                if stage_row['priority'] != priority:
+                    assets.modify_stage_priority(stage_id, priority)
+        gui_server.refresh_team_ui()
+
     def update_assignment(self, assignment):
         for modelIndex in self.table_widget.selectedIndexes():
             widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
@@ -147,6 +215,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.category_comboBox.currentTextChanged.connect(self.refresh_assets)
         self.table_widget.itemSelectionChanged.connect(self.change_stage_asset_tracking_widget)
         self.search_bar.textChanged.connect(self.update_search)
+        self.table_widget.customContextMenuRequested.connect(self.context_menu_requested)
 
     def showEvent(self, event):
         self.refresh()
@@ -283,6 +352,7 @@ class production_table_widget(QtWidgets.QWidget):
                         widget.hide_comment_signal.connect(self.view_comment_widget.close)
                         widget.move_comment.connect(self.view_comment_widget.move_ui)
                         widget.state_signal.connect(self.update_state)
+                        widget.priority_signal.connect(self.update_priority)
                         widget.assignment_signal.connect(self.update_assignment)
                         self.table_widget.setCellWidget(row_index, self.task_list.index(stage_row['name']), widget)
                         self.stage_ids[stage_row['id']] = dict()
@@ -298,9 +368,8 @@ class production_table_widget(QtWidgets.QWidget):
                 if stage_id not in project_stage_ids:
                     self.remove_stage(stage_id)
 
-            QtWidgets.QApplication.processEvents()
-            self.table_widget.resizeColumnsToContents()
-            self.table_widget.resizeRowsToContents()
+            self.update_stage_datas_visibility()
+            self.update_layout()
         else:
             self.clear_assets()
 
@@ -529,6 +598,7 @@ class stage_widget(QtWidgets.QWidget):
 
     state_signal = pyqtSignal(str)
     assignment_signal = pyqtSignal(str)
+    priority_signal = pyqtSignal(str)
     show_comment_signal = pyqtSignal(str, str)
     hide_comment_signal = pyqtSignal(int)
     move_comment = pyqtSignal(int)
@@ -542,12 +612,25 @@ class stage_widget(QtWidgets.QWidget):
         self.fill_ui()
         self.connect_functions()
 
+    def update_notes_visibility(self, show_notes):
+        self.note_content.setVisible(show_notes)
+
+    def update_states_visibility(self, show_states):
+        self.state_label.setVisible(show_states)
+
+    def update_assignments_visibility(self, show_assignments):
+        self.user_image_label.setVisible(show_assignments)
+
+    def update_priorities_visibility(self, show_priorities):
+        self.priority_label.setVisible(show_priorities)
+
     def connect_functions(self):
         self.state_label.state_signal.connect(self.state_signal.emit)
         self.state_label.enter.connect(self.show_comment)
         self.state_label.leave.connect(self.hide_comment)
         self.state_label.move_event.connect(self.move_comment.emit)
         self.user_image_label.assignment_signal.connect(self.assignment_signal.emit)
+        self.priority_label.priority_signal.connect(self.priority_signal.emit)
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -565,6 +648,11 @@ class stage_widget(QtWidgets.QWidget):
         self.data_layout.setContentsMargins(3,3,3,3)
         self.main_layout.addLayout(self.data_layout)
 
+        self.priority_label = priority_widget()
+        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.priority_label.setFixedSize(30, 30)
+        self.data_layout.addWidget(self.priority_label)
+
         self.state_label = state_widget()
         self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.state_label.setFixedHeight(30)
@@ -577,6 +665,8 @@ class stage_widget(QtWidgets.QWidget):
         self.note_content = gui_utils.minimum_height_textEdit(77)
         self.note_content.setFixedWidth(150)
         self.note_content.setReadOnly(True)
+        self.note_content.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        self.note_content.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         self.note_content.setObjectName('gray_label')
         self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
         self.data_layout.addWidget(self.note_content)
@@ -594,6 +684,7 @@ class stage_widget(QtWidgets.QWidget):
 
     def fill_ui(self):
         self.color_frame.setStyleSheet('background-color:%s;'%ressources._stages_colors_[self.stage_row['name']])
+        self.priority_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[self.stage_row['priority']]).pixmap(22))
         self.state_label.setText(self.stage_row['state'])
         self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:4px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
         self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])
@@ -605,6 +696,33 @@ class stage_widget(QtWidgets.QWidget):
     def refresh(self, stage_row):
         self.stage_row = stage_row
         self.fill_ui()
+
+class priority_widget(QtWidgets.QLabel):
+
+    priority_signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(priority_widget, self).__init__(parent)
+        self.setFixedWidth(60)
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setObjectName('priority_label')
+        self.setStyleSheet('#priority_label{border-radius:4px;background-color:rgba(0,0,0,40);}')
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.states_menu_requested()
+
+    def states_menu_requested(self):
+        menu = gui_utils.QMenu(self)
+        for priority in assets_vars._priority_list_:
+            menu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            self.priority_signal.emit(action.text())
+
+    def contextMenuEvent(self, event):
+        event.accept()
 
 class state_widget(QtWidgets.QLabel):
 
@@ -619,6 +737,7 @@ class state_widget(QtWidgets.QLabel):
         self.setFixedWidth(60)
         self.setObjectName('bold_label')
         self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.RightButton:
@@ -642,12 +761,16 @@ class state_widget(QtWidgets.QLabel):
     def leaveEvent(self, event):
         self.leave.emit(1)
 
+    def contextMenuEvent(self, event):
+        event.accept()
+
 class assignment_widget(QtWidgets.QLabel):
 
     assignment_signal = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(assignment_widget, self).__init__(parent)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.RightButton:
@@ -666,6 +789,9 @@ class assignment_widget(QtWidgets.QLabel):
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             self.assignment_signal.emit(action.text())
+
+    def contextMenuEvent(self, event):
+        event.accept()
 
 class search_thread(QtCore.QThread):
 

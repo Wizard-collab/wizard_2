@@ -429,7 +429,9 @@ def add_stage(name, asset_id):
                             'progress',
                             'string',
                             'asset_id',
-                            'domain_id'), 
+                            'domain_id',
+                            'priority',
+                            'note'), 
                         (name,
                             time.time(),
                             environment.get_user(),
@@ -440,7 +442,9 @@ def add_stage(name, asset_id):
                             0.0,
                             string_asset,
                             asset_id,
-                            domain_id))
+                            domain_id,
+                            'normal',
+                            ''))
     if not stage_id:
         return
     logger.info(f"Stage {name} added to project")
@@ -2529,6 +2533,8 @@ def create_stages_table(database):
                                         string text NOT NULL,
                                         asset_id integer NOT NULL,
                                         domain_id integer NOT NULL,
+                                        priority text NOT NULL,
+                                        note text,
                                         FOREIGN KEY (asset_id) REFERENCES assets (id),
                                         FOREIGN KEY (domain_id) REFERENCES domains_data (id)
                                     );"""

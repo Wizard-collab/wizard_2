@@ -56,6 +56,11 @@ def add_state_switch_event(stage_id, new_state, comment=''):
 	data = new_state
 	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
 
+def add_priority_switch_event(stage_id, new_priority, comment=''):
+	event_type = 'priority_switch'
+	data = new_priority
+	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 def add_work_session_event(stage_id, work_time, comment=''):
 	if work_time > 120:
 		event_type = 'work_session'
