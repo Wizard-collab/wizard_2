@@ -31,31 +31,31 @@ def main(nspace_list, frange):
 
 def main_fur(nspace_list, frange):
     at_least_one = False
-    grooming_references = get_grooming_nspaces()
-    if grooming_references:
-        for grooming_reference in grooming_references:
-            percent_factor = (grooming_references.index(grooming_reference), len(grooming_references))
-            if grooming_reference['namespace'] in nspace_list:
+    references = get_nspaces()
+    if references:
+        for reference in references:
+            percent_factor = (references.index(reference), len(references))
+            if reference['namespace'] in nspace_list:
                 at_least_one = True
-                export_fur(grooming_reference, frange, percent_factor)
+                export_fur(reference, frange, percent_factor)
         if not at_least_one:
             logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
     else:
-        logger.warning("No grooming references found in wizard description")
+        logger.warning("No references found in wizard description")
 
 def main_abc(nspace_list, frange):
     at_least_one = False
-    rigging_references = get_rigging_nspaces()
-    if rigging_references:
-        for rigging_reference in rigging_references:
-            percent_factor = (rigging_references.index(rigging_reference), len(rigging_references))
-            if rigging_reference['namespace'] in nspace_list:
+    references = get_nspaces()
+    if references:
+        for reference in references:
+            percent_factor = (references.index(reference), len(references))
+            if reference['namespace'] in nspace_list:
                 at_least_one = True
-                export_cfx_abc(rigging_reference, frange, percent_factor)
+                export_cfx_abc(reference, frange, percent_factor)
         if not at_least_one:
             logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
     else:
-        logger.warning("No rigging references found in wizard description")
+        logger.warning("No references found in wizard description")
 
 def invoke_settings_widget():
     from PySide2 import QtWidgets, QtCore, QtGui
@@ -83,22 +83,22 @@ def export_fur(grooming_reference, frange, percent_factor):
         else:
             logger.warning("No objects to export in '{}:yeti_nodes_set'".format(grooming_nspace))
 
-def export_cfx_abc(rigging_reference, frange, percent_factor):
-    rig_nspace = rigging_reference['namespace']
-    asset_name = rigging_reference['asset_name']
-    variant_name = rigging_reference['variant_name']
-    exported_string_asset = rigging_reference['string_variant']
-    count = rigging_reference['count']
-    if is_referenced(rig_nspace):
-        export_GRP_list = get_objects_to_export(rig_nspace)
+def export_cfx_abc(reference, frange, percent_factor):
+    nspace = reference['namespace']
+    asset_name = reference['asset_name']
+    variant_name = reference['variant_name']
+    exported_string_asset = reference['string_variant']
+    count = reference['count']
+    if is_referenced(nspace):
+        export_GRP_list = get_objects_to_export(nspace)
         if export_GRP_list:
-            logger.info("Exporting {}".format(rig_nspace))
+            logger.info("Exporting {}".format(nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, variant_name, count)
             wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
         else:
-            logger.warning("No objects to export in '{}:render_set'".format(rig_nspace))
+            logger.warning("No objects to export in '{}:render_set'".format(nspace))
 
 def buid_export_name(asset_name, variant_name, count):
     if variant_name == 'main':
@@ -149,6 +149,17 @@ def get_grooming_nspaces():
     else:
         logger.warning("No grooming references found")
         return None
+
+def get_nspaces():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    refs = []
+    for stage in references.keys():
+        if stage in ['grooming', 'rigging']:
+            refs += references[stage]
+    if refs == []:
+        logger.warning("No grooming or rigging references found")
+        return None
+    return refs
 
 def get_rigging_nspaces():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
