@@ -5,16 +5,17 @@ import os
 
 export_name = 'xgen'
 work_env_id = int(os.environ['wizard_work_env_id'])
-export_dir = wizard_communicate.add_export_version(export_name,
-                                        [],
-                                        work_env_id,
-                                        int(os.environ['wizard_version_id']))
+
 for node in pm.ls():
     relatives = pm.listRelatives(node, shapes=True)
     if len(relatives) != 1:
         continue
     if pm.nodeType(relatives[0]) != 'xgmSplineDescription':
         continue
+    export_dir = wizard_communicate.add_export_version(node.getName(),
+                                        [],
+                                        work_env_id,
+                                        int(os.environ['wizard_version_id']))
     file_path = os.path.join(export_dir, f'xgen_cache__{node.getName()}.abc')
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
     command = f"-obj {node.getName()} "
