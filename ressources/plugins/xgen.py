@@ -22,5 +22,5 @@ for node in pm.ls():
     command += f"-file {file_path} "
     command += f"-df 'ogawa' "
     command += f"-fr {frame_range[1]} {frame_range[2]} "
-    command += "-step 1 -mxf -wfw"
+    command += "-step 1 -wfw"
     cmds.xgmSplineCache(export=True, j=command)
