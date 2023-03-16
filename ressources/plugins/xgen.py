@@ -1,5 +1,7 @@
 import maya.cmds as cmds
 import pymel.core as pm
+import maya.cmds as cmds
+import pymel.core as pm
 import wizard_communicate
 import os
 
@@ -22,5 +24,6 @@ for node in pm.ls():
     command += f"-file {file_path} "
     command += f"-df 'ogawa' "
     command += f"-fr {frame_range[1]} {frame_range[2]} "
+    command += f"-frs -0.2 -frs 0.2 "
     command += "-step 1 -wfw"
     cmds.xgmSplineCache(export=True, j=command)
