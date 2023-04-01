@@ -610,6 +610,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.type = 'reference'
         self.reference_row = reference_row
         self.signal_handler = signal_handler()
+        self.apply_auto_update_change = False
         self.fill_ui()
         self.connect_functions()
 
