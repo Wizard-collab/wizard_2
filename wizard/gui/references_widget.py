@@ -809,6 +809,8 @@ class reference_infos_thread(QtCore.QThread):
             if self.reference_rows is not None:
                 for reference_row in self.reference_rows:
                     export_version_row = project.get_export_version_data(reference_row['export_version_id'])
+                    if not export_version_row:
+                        continue
                     files = json.loads(export_version_row['files'])
                     if len(files)>0:
                         extension = files[0].split('.')[-1]

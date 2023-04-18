@@ -118,9 +118,15 @@ def get_wizard_ref_node():
 def apply_tags(out_node):
     out_node_parent = out_node.parent()
     out_node_input = out_node.inputs()[0]
+    
 
-    tags_node = create_node_without_duplicate('attribcreate', 'wizardTags', out_node_parent)
-    tags_node.parm('name1').set('wizardTags')
+    if out_node_input.name().startswith('wizardTags_'):
+        return
+
+    name = f"wizardTags_{out_node.name()}"
+
+    tags_node = create_node_without_duplicate('attribcreate', name, out_node_parent)
+    tags_node.parm('name1').set(name)
     tags_node.parm('class1').set('detail')
     tags_node.parm('type1').set('index')
 

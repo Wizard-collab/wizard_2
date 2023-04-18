@@ -102,6 +102,7 @@ class db_access_singleton(metaclass=Singleton):
                     if not as_dict and fetch != 1:
                         if rows != 1:
                             rows = [r[0] for r in rows]
+                    cursor.close()
                     return rows
                 else:
                     logger.error("No connection")
@@ -147,6 +148,7 @@ def create_database(database):
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = conn.cursor()
         cur.execute(f"CREATE DATABASE {database};")
+        cur.close()
         conn.commit()
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
@@ -161,6 +163,7 @@ def create_table(database, cmd):
         conn = create_connection(database)
         cursor = conn.cursor()
         cursor.execute(cmd)
+        curosr.close()
         conn.commit()
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
