@@ -64,60 +64,61 @@ class db_access_singleton(metaclass=Singleton):
     def set_project(self, project_name):
         self.project_name = project_name
 
-    def execute_signal(self, level,
+    def execute_sql_command(self, conn,
                             sql_cmd,
                             as_dict=1,
                             data=None,
                             fetch=2):
-        rows = None
-        retry_count = 0
-        while rows is None:
-            try:
-                if level == 'repository':
-                    if not self.repository_conn:
-                        if self.repository:
-                            self.repository_conn = create_connection(self.repository)
-                    conn = self.repository_conn
+            cursor_factory = psycopg2.extras.RealDictCursor if as_dict else None
+            with conn.cursor(cursor_factory=cursor_factory) as cursor:
+                if data:
+                    cursor.execute(sql_cmd, data)
                 else:
-                    if not self.project_conn:
-                        if self.project_name:
-                            self.project_conn = create_connection(self.project_name)
-                    conn = self.project_conn
+                    cursor.execute(sql_cmd)
+                if fetch == 2:
+                    rows = cursor.fetchall()
+                elif fetch == 1:
+                    rows = cursor.fetchone()[0] if cursor.rowcount > 0 else None
+                else:
+                    rows = 1
+                if not as_dict and fetch != 1:
+                    if rows != 1:
+                        rows = [r[0] for r in rows]
+            return rows
+
+    def execute_signal(self, level, sql_cmd, as_dict=True, data=None, fetch=2):
+        retries = 5
+        while retries > 0:
+            try:
+                conn = self.get_connection(level)
                 if conn:
-                    rows = None
-                    if as_dict:
-                        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-                    else:
-                        cursor = conn.cursor()
-                    if data:
-                        cursor.execute(sql_cmd, data)
-                    else:
-                        cursor.execute(sql_cmd)
-                    if fetch == 2:
-                        rows = cursor.fetchall()
-                    elif fetch == 1:
-                        rows = cursor.fetchone()[0]
-                    else:
-                        rows = 1
-                    if not as_dict and fetch != 1:
-                        if rows != 1:
-                            rows = [r[0] for r in rows]
-                    cursor.close()
+                    rows = self.execute_sql_command(conn, sql_cmd, as_dict, data, fetch)
                     return rows
                 else:
-                    logger.error("No connection")
-                    self.repository_conn = None
-                    self.project_conn = None
+                    retries -= 1
+                    if retries == 0:
+                        raise error
+                    time.sleep(0.02)
             except (Exception, psycopg2.DatabaseError) as error:
-                logger.error(error)
-                self.repository_conn = None
-                self.project_conn = None
-            if retry_count == 5:
-                logger.error("Database max retry reached ( 5 ). Can't access database")
-                time.sleep(0.02)
-                return None
-            retry_count += 1
-            logger.error(f"Can't reach database, retrying ( {retry_count} )")
+                logger.error(f"Failed to execute SQL command: {error}")
+                raise
+    
+    def get_connection(self, level):
+        conn = None
+        try:
+            if level == 'repository':
+                if not self.repository_conn:
+                    if self.repository:
+                        self.repository_conn = create_connection(self.repository)
+                conn = self.repository_conn
+            else:
+                if not self.project_conn:
+                    if self.project_name:
+                        self.project_conn = create_connection(self.project_name)
+                conn = self.project_conn
+        except (Exception, psycopg2.DatabaseError) as error:
+            logger.error(f"Failed to get a {level} database connection")
+        return conn
 
 def create_connection(database=None):
     try:
@@ -163,7 +164,7 @@ def create_table(database, cmd):
         conn = create_connection(database)
         cursor = conn.cursor()
         cursor.execute(cmd)
-        curosr.close()
+        cursor.close()
         conn.commit()
         return 1
     except (Exception, psycopg2.DatabaseError) as error:
