@@ -21,6 +21,7 @@ from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.core import repository
 from wizard.core import tools
+from wizard.core import image
 from wizard.vars import user_vars
 from wizard.vars import assets_vars
 from wizard.vars import ressources
@@ -41,8 +42,9 @@ class tree_widget(QtWidgets.QFrame):
         super(tree_widget, self).__init__(parent)
 
         self.creation_items_visibility = 1
-        self.progress_visibility = 1
+        self.assignment_visibility = 1
         self.state_visibility = 1
+        self.priority_visibility = 1
 
         self.domain_ids=dict()
         self.category_ids=dict()
@@ -50,8 +52,18 @@ class tree_widget(QtWidgets.QFrame):
         self.stage_ids=dict()
         self.creation_items=[]
 
+        self.users_icons_dic = dict()
+
         self.build_ui()
         self.connect_functions()
+
+    def refresh_users_icons_dic(self):
+        for user_row in repository.get_users_list():
+            if user_row['user_name'] not in self.users_icons_dic.keys():
+                user_icon = QtGui.QIcon()
+                pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 16)
+                user_icon.addPixmap(pm)
+                self.users_icons_dic[user_row['user_name']] = user_icon
 
     def build_ui(self):
         self.icons_dic = dict()
@@ -76,8 +88,11 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
         self.icons_dic['stage']['custom'] = QtGui.QIcon(ressources._custom_icon_)
         self.icons_dic['stage']['camrig'] = QtGui.QIcon(ressources._camera_rig_icon_)
+        self.icons_dic['priority'] = dict()
+        for priority in assets_vars._priority_list_:
+            self.icons_dic['priority'][priority] = QtGui.QIcon(ressources._priority_icons_list_[priority])
 
-        self.setFixedWidth(300)
+        self.setFixedWidth(330)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(2)
@@ -104,10 +119,11 @@ class tree_widget(QtWidgets.QFrame):
 
         self.tree.setObjectName('tree_widget')
         self.tree.setAnimated(0)
-        self.tree.setColumnCount(3)
+        self.tree.setColumnCount(4)
         self.tree.header().resizeSection(0, 190)
-        self.tree.header().resizeSection(1, 8)
-        self.tree.header().resizeSection(2, 20)
+        self.tree.header().resizeSection(1, 16)
+        self.tree.header().resizeSection(2, 16)
+        self.tree.header().resizeSection(3, 32)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setAlternatingRowColors(True)
@@ -148,8 +164,9 @@ class tree_widget(QtWidgets.QFrame):
     def set_context(self):
         context_dic = dict()
         context_dic['creation_items_visibility'] = self.creation_items_visibility
-        context_dic['progress_visibility'] = self.progress_visibility
+        context_dic['assignment_visibility'] = self.assignment_visibility
         context_dic['state_visibility'] = self.state_visibility
+        context_dic['priority_visibility'] = self.priority_visibility
         context_dic['expanded_domains'] = []
         context_dic['expanded_categories'] = []
         context_dic['expanded_assets'] = []
@@ -199,8 +216,11 @@ class tree_widget(QtWidgets.QFrame):
             self.search_bar.setText(context_dic['search_string'])
             self.apply_search()
             self.creation_items_visibility = context_dic['creation_items_visibility']
-            self.progress_visibility = context_dic['progress_visibility']
             self.state_visibility = context_dic['state_visibility']
+            if 'assignment_visibility' in context_dic.keys():
+                self.assignment_visibility = context_dic['assignment_visibility']
+            if 'priority_visibility' in context_dic.keys():
+                self.priority_visibility = context_dic['priority_visibility']
             self.update_creation_items_visibility()
             self.update_columns_visibility()
 
@@ -208,6 +228,8 @@ class tree_widget(QtWidgets.QFrame):
         start_time = time.perf_counter()
         if hard:
             self.init_tree()
+
+        self.refresh_users_icons_dic()
 
         self.project_category_ids = []
         self.project_asset_ids = []
@@ -304,15 +326,20 @@ class tree_widget(QtWidgets.QFrame):
         self.asset_ids[asset_id].sortChildren(50, QtCore.Qt.AscendingOrder)
 
     def update_columns_visibility(self):
-        self.tree.setColumnHidden(2, not self.progress_visibility)
-        self.tree.setColumnHidden(1, not self.state_visibility)
+        self.tree.setColumnHidden(1, not self.assignment_visibility)
+        self.tree.setColumnHidden(2, not self.state_visibility)
+        self.tree.setColumnHidden(3, not self.priority_visibility)
 
-    def toggle_progress_visibility(self):
-        self.progress_visibility = not self.progress_visibility
+    def toggle_assignment_visibility(self):
+        self.assignment_visibility = not self.assignment_visibility
         self.update_columns_visibility()
 
     def toggle_state_visibility(self):
         self.state_visibility = not self.state_visibility
+        self.update_columns_visibility()
+
+    def toggle_priority_visibility(self):
+        self.priority_visibility = not self.priority_visibility
         self.update_columns_visibility()
 
     def update_creation_items_visibility(self):
@@ -352,15 +379,15 @@ class tree_widget(QtWidgets.QFrame):
                                                         instance_name = row['name'],
                                                         instance_type = 'category',
                                                         instance_id = row['id'])
-                category_item.add_indicator('error')
-                category_item.set_indicator_visibility(0)
                 category_item.setIcon(0, self.icons_dic['folder'])
                 category_item.setText(0, row['name'])
                 self.category_ids[row['id']] = category_item
                 parent_widget.addChild(category_item)
+                category_item.add_indicators()
                 self.add_creation_item(category_item, 'new', 'asset_creation')
             else:
-                self.category_ids[row['id']].set_indicator_visibility(0)
+                self.category_ids[row['id']].state_indicator.clear_states()
+                self.category_ids[row['id']].priority_indicator.clear_priorities()
 
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -370,17 +397,17 @@ class tree_widget(QtWidgets.QFrame):
                                                         instance_name = row['name'],
                                                         instance_type = 'asset',
                                                         instance_id = row['id'])
-                asset_item.add_indicator('error')
-                asset_item.set_indicator_visibility(0)
                 asset_item.setIcon(0, self.icons_dic['folder'])
                 asset_item.setText(0, row['name'])
                 self.asset_ids[row['id']] = asset_item
                 parent_widget.addChild(asset_item)
+                asset_item.add_indicators()
                 domain_id = project.get_category_data(row['category_id'], 'domain_id')
                 domain_name = project.get_domain_data(domain_id, 'name')
                 self.add_creation_item(asset_item, 'new', 'stage_creation')
             else:
-                self.asset_ids[row['id']].set_indicator_visibility(0)
+                self.asset_ids[row['id']].state_indicator.clear_states()
+                self.asset_ids[row['id']].priority_indicator.clear_priorities()
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
@@ -395,14 +422,19 @@ class tree_widget(QtWidgets.QFrame):
                 self.stage_ids[row['id']] = stage_item
 
                 parent_widget.addChild(stage_item)
+                stage_item.add_indicators()
 
-                stage_item.add_indicator()
                 self.remove_stage_creation_item(parent_widget)
-            self.stage_ids[row['id']].set_state_indicator(row['state'])
-            self.stage_ids[row['id']].setText(2, f"{int(row['progress'])}%")
-            if row['state'] == 'error':
-                self.stage_ids[row['id']].parent().set_indicator_visibility(1)
-                self.stage_ids[row['id']].parent().parent().set_indicator_visibility(1)
+            self.stage_ids[row['id']].state_indicator.set_state(row['state'])
+            self.stage_ids[row['id']].priority_indicator.set_priority(row['priority'])
+            self.stage_ids[row['id']].setIcon(1, self.users_icons_dic[row['assignment']])
+            if row['state'] in ['error', 'rtk']:
+                self.stage_ids[row['id']].parent().state_indicator.add_state(row['state'])
+                self.stage_ids[row['id']].parent().parent().state_indicator.add_state(row['state'])
+            if row['priority'] != assets_vars._priority_normal_:
+                self.stage_ids[row['id']].parent().priority_indicator.add_priority(row['priority'])
+                self.stage_ids[row['id']].parent().parent().priority_indicator.add_priority(row['priority'])
+
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
@@ -616,17 +648,22 @@ class tree_widget(QtWidgets.QFrame):
         if self.creation_items_visibility:
             creation_items_visibility_icon = ressources._check_icon_
 
-        progress_visibility_icon = ressources._uncheck_icon_
-        if self.progress_visibility:
-            progress_visibility_icon = ressources._check_icon_
+        assignment_visibility_icon = ressources._uncheck_icon_
+        if self.assignment_visibility:
+            assignment_visibility_icon = ressources._check_icon_
 
         state_visibility_icon = ressources._uncheck_icon_
         if self.state_visibility:
             state_visibility_icon = ressources._check_icon_
 
+        priority_visibility_icon = ressources._uncheck_icon_
+        if self.priority_visibility:
+            priority_visibility_icon = ressources._check_icon_
+
         hide_creation_items = menu.addAction(QtGui.QIcon(creation_items_visibility_icon), f'Creation items')
-        hide_progress = menu.addAction(QtGui.QIcon(progress_visibility_icon), f'Progress')
+        hide_assignment = menu.addAction(QtGui.QIcon(assignment_visibility_icon), f'Assignment')
         hide_state = menu.addAction(QtGui.QIcon(state_visibility_icon), f'State')
+        hide_priority = menu.addAction(QtGui.QIcon(priority_visibility_icon), f'Priority')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -644,10 +681,12 @@ class tree_widget(QtWidgets.QFrame):
                 self.open_sandbox_folder(item)
             elif action == hide_creation_items:
                 self.toggle_creation_items_visibility()
-            elif action == hide_progress:
-                self.toggle_progress_visibility()
+            elif action == hide_assignment:
+                self.toggle_assignment_visibility()
             elif action == hide_state:
                 self.toggle_state_visibility()
+            elif action == hide_priority:
+                self.toggle_priority_visibility()
             elif action == edit_frame_range_action:
                 self.edit_frame_range(item)
 
@@ -751,33 +790,93 @@ class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
         self.instance_type = instance_type
         self.instance_id = instance_id
         self.instance_parent_id = parent_id
-        self.state = None
 
-    def add_indicator(self, state='todo'):
-        self.state_indicator = indicator(assets_vars._state_colors_dic_[state])
-        self.treeWidget().setItemWidget(self, 1, self.state_indicator)
+    def add_indicators(self):
+        self.state_indicator = state_indicator()
+        self.treeWidget().setItemWidget(self, 2, self.state_indicator)
+        self.priority_indicator = priority_indicator()
+        self.treeWidget().setItemWidget(self, 3, self.priority_indicator)
 
-    def set_indicator_visibility(self, visibility):
-        self.state_indicator.indicator_frame.setVisible(visibility)
-
-    def set_state_indicator(self, state):
-        if state != self.state:
-            self.state_indicator.update(assets_vars._state_colors_dic_[state])
-            self.state = state
-
-class indicator(QtWidgets.QWidget):
-    def __init__(self, color):
-        super(indicator, self).__init__()
+class state_indicator(QtWidgets.QWidget):
+    def __init__(self):
+        super(state_indicator, self).__init__()
+        self.setFixedWidth(18)
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
-        self.indicator_frame = QtWidgets.QFrame()
-        self.indicator_frame.setFixedSize(8,8)
-        self.indicator_frame.setStyleSheet(f'background-color:{color};border-radius:4px;')
-        self.main_layout.addWidget(self.indicator_frame)
+        self.states = []
+        self.indicators = dict()
 
-    def update(self, color):
-        self.indicator_frame.setStyleSheet(f'background-color:{color};border-radius:4px;')
+    def update_indicators(self):
+        for state in self.states:
+            if state in self.indicators.keys():
+                continue
+            indicator_frame = QtWidgets.QFrame()
+            indicator_frame.setFixedSize(8,8)
+            indicator_frame.setStyleSheet(f'background-color:{ressources._states_colors_[state]};border-radius:4px;')
+            self.main_layout.addWidget(indicator_frame)
+            self.indicators[state] = indicator_frame
+        current_states = list(self.indicators.keys())
+        for current_state in current_states:
+            if current_state not in self.states:
+                self.indicators[current_state].setParent(None)
+                self.indicators[current_state].deleteLater()
+                del self.indicators[current_state]
+
+    def set_state(self, state):
+        self.states = [state]
+        self.update_indicators()
+
+    def add_state(self, state):
+        if state in self.states:
+            return
+        self.states.append(state)
+        self.update_indicators()
+
+    def clear_states(self):
+        self.states = []
+        self.update_indicators()
+
+class priority_indicator(QtWidgets.QWidget):
+    def __init__(self):
+        super(priority_indicator, self).__init__()
+        self.setFixedWidth(32)
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setSpacing(2)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+        self.priorities = []
+        self.indicators = dict()
+
+    def update_indicators(self):
+        for priority in self.priorities:
+            if priority in self.indicators.keys():
+                continue
+            indicator_label = QtWidgets.QLabel()
+            indicator_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[priority]).pixmap(18))
+            self.main_layout.addWidget(indicator_label)
+            self.indicators[priority] = indicator_label
+        current_priorities = list(self.indicators.keys())
+        for current_priority in current_priorities:
+            if current_priority not in self.priorities:
+                self.indicators[current_priority].setParent(None)
+                self.indicators[current_priority].deleteLater()
+                del self.indicators[current_priority]
+
+    def set_priority(self, priority):
+        self.priorities = [priority]
+        self.update_indicators()
+
+    def add_priority(self, priority):
+        if priority in self.priorities:
+            return
+        self.priorities.append(priority)
+        self.update_indicators()
+
+    def clear_priorities(self):
+        self.priorities = []
+        self.update_indicators()
 
 class instance_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, request_frames=1, title=''):

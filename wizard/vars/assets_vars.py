@@ -207,10 +207,21 @@ _asset_state_todo_ = 'todo'
 _asset_state_wip_ = 'wip'
 _asset_state_done_ = 'done'
 _asset_state_error_ = 'error'
-_asset_states_list_ = ['todo', 'wip', 'done', 'error']
+_asset_state_rtk_ = 'rtk'
+_asset_state_wfa_ = 'wfa'
+_asset_state_omt_ = 'omt'
+_asset_states_list_ = [_asset_state_todo_,
+						_asset_state_wip_,
+						_asset_state_done_,
+						_asset_state_error_,
+						_asset_state_rtk_,
+						_asset_state_wfa_,
+						_asset_state_omt_]
 
-_state_colors_dic_ = dict()
-_state_colors_dic_['todo'] = '#8a8a8a'
-_state_colors_dic_['wip'] = '#ffad4d'
-_state_colors_dic_['done'] = '#95d859'
-_state_colors_dic_['error'] = '#ff5d5d'
+# Asset urgence
+_priority_normal_ = 'normal'
+_priority_high_ = 'high'
+_priority_urgent_ = 'urgent'
+_priority_list_ = [_priority_normal_,
+				_priority_high_,
+				_priority_urgent_]

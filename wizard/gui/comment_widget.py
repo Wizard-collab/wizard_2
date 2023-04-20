@@ -13,9 +13,10 @@ from wizard.gui import gui_utils
 from wizard.gui import tags_widget
 
 class comment_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None, title='Add comment', old_comment='', pos=None, propose_tags=True):
+    def __init__(self, parent=None, title='Add comment', old_comment='', pos=None, propose_tags=True, button_text='Comment'):
         super(comment_widget, self).__init__(parent)
         self.old_comment = old_comment
+        self.button_text = button_text
         self.pos = pos
         self.build_ui(title)
         self.connect_functions()
@@ -67,7 +68,7 @@ class comment_widget(QtWidgets.QDialog):
         self.comment_field.moveCursor(QtGui.QTextCursor.End)
         self.frame_layout.addWidget(self.comment_field)
 
-        self.accept_button = QtWidgets.QPushButton('Comment')
+        self.accept_button = QtWidgets.QPushButton(self.button_text)
         self.accept_button.setObjectName("blue_button")
         self.accept_button.setDefault(True)
         self.accept_button.setAutoDefault(True)

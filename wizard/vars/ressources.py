@@ -196,6 +196,12 @@ _state_done_ = path_utils.join(_icons_path_, 'state_done.svg')
 _available_icons_list_.append(_state_done_)
 _state_error_ = path_utils.join(_icons_path_, 'state_error.svg')
 _available_icons_list_.append(_state_error_)
+_state_rtk_ = path_utils.join(_icons_path_, 'state_rtk.svg')
+_available_icons_list_.append(_state_rtk_)
+_state_wfa_ = path_utils.join(_icons_path_, 'state_wfa.svg')
+_available_icons_list_.append(_state_wfa_)
+_state_omt_ = path_utils.join(_icons_path_, 'state_omt.svg')
+_available_icons_list_.append(_state_omt_)
 _estimated_time_icon_ = path_utils.join(_icons_path_, 'estimated_time.svg')
 _available_icons_list_.append(_estimated_time_icon_)
 _work_time_icon_ = path_utils.join(_icons_path_, 'work_time.svg')
@@ -332,6 +338,10 @@ _available_icons_list_.append(_market_icon_)
 _key_icon_ = path_utils.join(_icons_path_, 'key.png')
 _available_icons_list_.append(_key_icon_)
 
+_important_icon_ = path_utils.join(_icons_path_, 'important.svg')
+_available_icons_list_.append(_important_icon_)
+_urgent_icon_ = path_utils.join(_icons_path_, 'urgent.svg')
+_available_icons_list_.append(_urgent_icon_)
 
 _references_icon_ = path_utils.join(_icons_path_, 'reference_icon.svg')
 _work_icon_ = path_utils.join(_icons_path_, 'work_icon.svg')
@@ -418,6 +428,18 @@ _states_colors_['todo'] = '#3a3a41'
 _states_colors_['wip'] = '#b6864e'
 _states_colors_['done'] = '#7ca657'
 _states_colors_['error'] = '#d16666'
+_states_colors_['rtk'] = '#4768b5'
+_states_colors_['wfa'] = '#8047b5'
+_states_colors_['omt'] = '#2e2e2e'
+
+_states_icons_ = dict()
+_states_icons_['todo'] = _state_todo_
+_states_icons_['wip'] = _state_wip_
+_states_icons_['done'] = _state_done_
+_states_icons_['error'] = _state_error_
+_states_icons_['rtk'] = _state_rtk_
+_states_icons_['wfa'] = _state_wfa_
+_states_icons_['omt'] = _state_omt_
 
 _stages_colors_ = dict()
 _stages_colors_['modeling'] = '#f87474'
@@ -435,3 +457,9 @@ _stages_colors_['lighting'] = '#63f191'
 _stages_colors_['compositing'] = '#676fa3'
 
 _whatsnew_html_ = path_utils.join(_ressources_path_, 'whatsnew.html')
+
+# Urgence icons
+_priority_icons_list_ = dict()
+_priority_icons_list_['normal'] = ''
+_priority_icons_list_['high'] = _important_icon_
+_priority_icons_list_['urgent'] = _urgent_icon_

@@ -16,6 +16,8 @@ from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import comment_widget
+from wizard.gui import tag_label
+from wizard.gui import current_asset_viewer
 
 # Wizard modules
 from wizard.core import assets
@@ -36,6 +38,7 @@ class references_widget(QtWidgets.QWidget):
         super(references_widget, self).__init__(parent)
         self.reference_infos_thread = reference_infos_thread()
         self.search_thread = search_thread()
+        self.view_comment_widget = tag_label.view_comment_widget(self)
 
         self.context = context
         self.group_item = None
@@ -43,6 +46,7 @@ class references_widget(QtWidgets.QWidget):
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
+        self.quick_import_buttons = dict()
 
         self.build_ui()
         self.connect_functions()
@@ -173,21 +177,21 @@ class references_widget(QtWidgets.QWidget):
             gui_server.refresh_team_ui()
 
     def change_work_env(self, work_env_id):
-        start_time = time.perf_counter()
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
         self.group_item = None
         self.list_view.clear()
         self.parent_instance_id = work_env_id
-        self.update_quick_import_buttons()
-        self.refresh(start_time)
+        if self.context == 'work_env':
+            self.current_asset_viewer.refresh('work_env', work_env_id)
+        self.refresh()
 
     def refresh(self, start_time=None):
         QtWidgets.QApplication.processEvents()
-        if start_time is None:
-            start_time = time.perf_counter()
+        start_time = time.perf_counter()
         if self.isVisible():
+            self.update_quick_import_buttons()
             if self.parent_instance_id is not None and self.parent_instance_id != 0:
                 if self.context == 'work_env':
                     self.reference_rows = project.get_references(self.parent_instance_id)
@@ -222,6 +226,9 @@ class references_widget(QtWidgets.QWidget):
                     stage_item = custom_stage_tree_item(stage, self.list_view.invisibleRootItem())
                     self.stage_dic[stage] = stage_item
                 reference_item = custom_reference_tree_item(reference_row, self.context, self.stage_dic[stage])
+                reference_item.signal_handler.enter.connect(self.view_comment_widget.show_comment)
+                reference_item.signal_handler.leave.connect(self.view_comment_widget.close)
+                reference_item.signal_handler.move_event.connect(self.view_comment_widget.move_ui)
                 self.reference_ids[reference_row['id']] = reference_item
             else:
                 self.reference_ids[reference_row['id']].reference_row = reference_row
@@ -316,9 +323,10 @@ class references_widget(QtWidgets.QWidget):
             if selected_item.type == 'reference':
                 export_id = selected_item.reference_row['export_id']
                 variant_id = project.get_export_data(export_id, 'variant_id')
+                stage_id = project.get_variant_data(variant_id, 'stage_id')
                 self.comment_widget = comment_widget.comment_widget()
                 if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
-                    assets.modify_variant_state(variant_id, 'error', self.comment_widget.comment)
+                    assets.modify_stage_state(variant_id, 'error', self.comment_widget.comment)
                     gui_server.refresh_team_ui()
 
     def remove_reference_item(self, reference_id):
@@ -402,12 +410,11 @@ class references_widget(QtWidgets.QWidget):
             self.focus_on_group_signal.emit(item.referenced_group_row['group_id'])
 
     def update_quick_import_buttons(self):
-        if not self.isVisible():
-            return
-        self.clear_quick_imports_buttons()
         if self.parent_instance_id is None or self.parent_instance_id == 0:
+            self.clear_quick_imports_buttons()
             return
         if self.context != 'work_env':
+            self.clear_quick_imports_buttons()
             return
         variant_id = project.get_work_env_data(self.parent_instance_id, 'variant_id')
         variant_row = project.get_variant_data(variant_id)
@@ -415,22 +422,43 @@ class references_widget(QtWidgets.QWidget):
         asset_row = project.get_asset_data(stage_row['asset_id'])
         domain_name = project.get_domain_data(stage_row['domain_id'], 'name')
         stages_rows = project.get_asset_childs(asset_row['id'])
+        project_stages = []
         for row in stages_rows:
+            project_stages.append(row['name'])
             if row['name'] == stage_row['name']:
-                continue
-            button = quick_import_button(row['name'])
-            button.quick_import_signal.connect(self.quick_import)
-            self.quick_import_layout.addWidget(button)
+                self.remove_quick_button(row['name'])
+                continue 
+            if row['name'] not in self.quick_import_buttons.keys():
+                button = quick_import_button(row['name'])
+                button.quick_import_signal.connect(self.quick_import)
+                self.quick_import_layout.addWidget(button)
+                self.quick_import_buttons[row['name']] = button
+        buttons_list = list(self.quick_import_buttons.keys())
+        for stage in buttons_list:
+            if stage not in project_stages:
+                self.remove_quick_button(stage)
+
+    def remove_quick_button(self, stage):
+        if stage not in self.quick_import_buttons.keys():
+            return
+        self.quick_import_buttons[stage].setParent(None)
+        self.quick_import_buttons[stage].deleteLater()
+        del self.quick_import_buttons[stage]
 
     def clear_quick_imports_buttons(self):
-        for i in reversed(range(self.quick_import_layout.count())): 
-            self.quick_import_layout.itemAt(i).widget().setParent(None)
+        buttons_list = list(self.quick_import_buttons.keys())
+        for stage in buttons_list:
+            self.remove_quick_button(stage)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
+
+        if self.context == 'work_env':
+            self.current_asset_viewer = current_asset_viewer.current_asset_viewer()
+            self.main_layout.addWidget(self.current_asset_viewer)
 
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)
@@ -443,14 +471,15 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setColumnCount(8)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Version', 'Format', 'Auto update', 'ID'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Version', 'Format', 'Auto update', 'State', 'ID'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
         self.list_view.header().resizeSection(3, 250)
-        self.list_view.header().resizeSection(4, 100)
-        self.list_view.header().resizeSection(5, 100)
+        self.list_view.header().resizeSection(4, 80)
+        self.list_view.header().resizeSection(5, 60)
         self.list_view.header().resizeSection(6, 100)
-        self.list_view.header().resizeSection(7, 40)
+        self.list_view.header().resizeSection(7, 80)
+        self.list_view.header().resizeSection(8, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -565,12 +594,23 @@ class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.group_row = group_row
         self.fill_ui()
 
+class signal_handler(QtCore.QObject):
+
+    enter = pyqtSignal(str, str)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(signal_handler, self).__init__(parent)
+
 class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, context, parent=None):
         super(custom_reference_tree_item, self).__init__(parent)
         self.context = context
         self.type = 'reference'
         self.reference_row = reference_row
+        self.signal_handler = signal_handler()
+        self.apply_auto_update_change = False
         self.fill_ui()
         self.connect_functions()
 
@@ -591,9 +631,12 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
 
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
         self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))
+
+        self.state_widget = state_widget()
+        self.treeWidget().setItemWidget(self, 7, self.state_widget)
         
-        self.setText(7, str(self.reference_row['id']))
-        self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setText(8, str(self.reference_row['id']))
+        self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
         self.setText(2, infos_list[1])
@@ -601,17 +644,31 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_widget.setText(infos_list[3])
         self.set_auto_update(infos_list[5])
         self.setText(0, infos_list[6])
-        self.setText(5, infos_list[7])
+        self.stage_row = infos_list[7]
+        self.state_widget.set_state(self.stage_row['state'])
+        self.setText(5, infos_list[8])
         if infos_list[4]:
             self.version_widget.setColor('#9ce87b')
         else:
             self.version_widget.setColor('#f79360')
+
+    def show_comment(self):
+        if self.state_widget.isActiveWindow():
+            tracking_events = project.get_asset_tracking_events(self.stage_row['id'])
+            if len(tracking_events) == 0:
+                return
+            user = tracking_events[-1]['creation_user']
+            self.signal_handler.enter.emit(self.stage_row['tracking_comment'], user)
 
     def connect_functions(self):
         self.version_widget.button_clicked.connect(self.version_modification_requested)
         self.export_widget.button_clicked.connect(self.export_modification_requested)
         #self.variant_widget.button_clicked.connect(self.variant_modification_requested)
         self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
+        self.state_widget.enter.connect(self.show_comment)
+        self.state_widget.leave.connect(self.signal_handler.leave.emit)
+        self.state_widget.move_event.connect(self.signal_handler.move_event.emit)
+        self.state_widget.modify_state_signal.connect(self.modify_state)
 
     '''
     def variant_modification_requested(self, point):
@@ -686,14 +743,13 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             project.modify_grouped_reference_export(self.reference_row['id'], export_id)
         gui_server.refresh_team_ui()
 
-    '''
-    def modify_variant(self, variant_id):
-        if self.context == 'work_env':
-            project.modify_reference_variant(self.reference_row['id'], variant_id)
-        else:
-            project.modify_grouped_reference_variant(self.reference_row['id'], variant_id)
-        gui_server.refresh_team_ui()
-    '''
+    def modify_state(self, state):
+        if self.stage_row['state'] != state:
+            self.comment_widget = comment_widget.comment_widget()
+            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                comment = self.comment_widget.comment
+                assets.modify_stage_state(self.stage_row['id'], state, comment)
+                gui_server.refresh_team_ui()
 
 class editable_data_widget(QtWidgets.QFrame):
 
@@ -753,6 +809,8 @@ class reference_infos_thread(QtCore.QThread):
             if self.reference_rows is not None:
                 for reference_row in self.reference_rows:
                     export_version_row = project.get_export_version_data(reference_row['export_version_id'])
+                    if not export_version_row:
+                        continue
                     files = json.loads(export_version_row['files'])
                     if len(files)>0:
                         extension = files[0].split('.')[-1]
@@ -781,6 +839,7 @@ class reference_infos_thread(QtCore.QThread):
                                                         up_to_date, 
                                                         reference_row['auto_update'],
                                                         asset_name,
+                                                        stage_row,
                                                         extension])
         except:
             logger.error(str(traceback.format_exc()))
@@ -858,6 +917,50 @@ class search_thread(QtCore.QThread):
                     self.hide_group_signal.emit(referenced_group_id)
         except:
             logger.info(str(traceback.format_exc()))
+
+class state_widget(QtWidgets.QLabel):
+
+    enter = pyqtSignal(int)
+    leave = pyqtSignal(int)
+    move_event = pyqtSignal(int)
+    modify_state_signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(state_widget, self).__init__(parent)
+        self.setObjectName('state_widget')
+        self.setMouseTracking(True)
+        self.setFixedWidth(60)
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.customContextMenuRequested.connect(self.states_menu_requested)
+        
+    def set_state(self, state):
+        self.setText(state)
+        self.setStyleSheet('#state_widget{padding:3px;background-color:%s;border-radius:4px;}'%ressources._states_colors_[state])
+
+    def states_menu_requested(self):
+        menu = gui_utils.QMenu(self)
+        for state in assets_vars._asset_states_list_:
+            menu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            self.modify_state_signal.emit(action.text())
+
+    def mouseMoveEvent(self, event):
+        self.move_event.emit(1)
+        super().mouseMoveEvent(event)
+
+    def enterEvent(self, event):
+        self.enter.emit(1)
+
+    def leaveEvent(self, event):
+        self.leave.emit(1)
+
+    def contextMenuEvent(self, event):
+        event.accept()
 
 class quick_import_button(QtWidgets.QPushButton):
 

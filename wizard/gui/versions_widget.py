@@ -32,6 +32,7 @@ from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
 from wizard.gui import video_settings_widget
 from wizard.gui import tag_label
+from wizard.gui import current_asset_viewer
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,7 @@ class versions_widget(QtWidgets.QWidget):
         self.list_view.clear()
         self.icon_view.clear()
         self.work_env_id = work_env_id
+        self.current_asset_viewer.refresh('work_env', work_env_id)
         self.refresh_camera_button()
         self.refresh()
 
@@ -383,6 +385,9 @@ class versions_widget(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
+
+        self.current_asset_viewer = current_asset_viewer.current_asset_viewer()
+        self.main_layout.addWidget(self.current_asset_viewer)
 
         self.info_widget = gui_utils.info_widget()
         self.info_widget.setVisible(0)
@@ -918,3 +923,4 @@ class search_thread(QtCore.QThread):
                     self.hide_id_signal.emit(version_id)
         except:
             logger.debug(str(traceback.format_exc()))
+

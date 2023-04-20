@@ -12,6 +12,7 @@ from wizard.core import user
 from wizard.core import repository
 from wizard.core import assets
 from wizard.core import project
+from wizard.core import image
 from wizard.vars import ressources
 from wizard.vars import assets_vars
 from wizard.vars import user_vars
@@ -43,8 +44,12 @@ class asset_tracking_widget(QtWidgets.QFrame):
         users_ids = project.get_users_ids_list()
         for user_id in users_ids:
             if user_id not in self.users_ids.keys():
-                self.users_ids[user_id] = repository.get_user_data(user_id, 'user_name')
-                self.assignment_comboBox.addItem(self.users_ids[user_id])
+                user_row = repository.get_user_data(user_id)
+                self.users_ids[user_id] = user_row['user_name']
+                icon = QtGui.QIcon()
+                pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 18)
+                icon.addPixmap(pm)
+                self.assignment_comboBox.addItem(icon, self.users_ids[user_id])
 
     def edit_estimation(self):
         self.estimation_widget = estimation_widget()
@@ -56,31 +61,32 @@ class asset_tracking_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setSpacing(6)
+        self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 
         self.setup_widget = QtWidgets.QFrame()
         self.setup_widget.setObjectName('asset_tracking_event_frame')
         self.setup_layout = QtWidgets.QHBoxLayout()
+        self.setup_layout.setContentsMargins(6,6,6,6)
         self.setup_layout.setSpacing(6)
         self.setup_widget.setLayout(self.setup_layout)
         self.main_layout.addWidget(self.setup_widget)
 
         self.assignment_comboBox = gui_utils.QComboBox()
+        self.assignment_comboBox.setIconSize(QtCore.QSize(16,16))
         self.setup_layout.addWidget(self.assignment_comboBox)
 
         self.state_comboBox = gui_utils.QComboBox()
-        self.state_comboBox.setIconSize(QtCore.QSize(14,14))
+        self.state_comboBox.setIconSize(QtCore.QSize(16,16))
         self.state_comboBox.setFixedWidth(100)
         self.setup_layout.addWidget(self.state_comboBox)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_todo_), assets_vars._asset_state_todo_)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_wip_), assets_vars._asset_state_wip_)
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_done_), assets_vars._asset_state_done_ )
-        self.state_comboBox.addItem(QtGui.QIcon(ressources._state_error_), assets_vars._asset_state_error_)
+        for state in assets_vars._asset_states_list_:
+            self.state_comboBox.addItem(QtGui.QIcon(ressources._states_icons_[state]), state)
 
         self.progress_widget = QtWidgets.QFrame()
         self.progress_widget.setObjectName('asset_tracking_event_frame')
         self.progress_layout = QtWidgets.QVBoxLayout()
+        self.progress_layout.setContentsMargins(6,6,6,6)
         self.progress_layout.setSpacing(6)
         self.progress_widget.setLayout(self.progress_layout)
         self.main_layout.addWidget(self.progress_widget)
@@ -117,39 +123,49 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.edit_estimation_button.setFixedSize(16,16)
         self.time_infos_layout.addWidget(self.edit_estimation_button)
 
-        self.progress_bar_widget = QtWidgets.QWidget()
-        self.progress_bar_widget.setObjectName('transparent_widget')
-        self.progress_bar_layout = QtWidgets.QHBoxLayout()
-        self.progress_bar_layout.setContentsMargins(0,0,0,0)
-        self.progress_bar_layout.setSpacing(6)
-        self.progress_bar_widget.setLayout(self.progress_bar_layout)
-        self.progress_layout.addWidget(self.progress_bar_widget)
+        self.separation_widget_1 = QtWidgets.QWidget()
+        self.separation_layout_1 = QtWidgets.QHBoxLayout()
+        self.separation_layout_1.setContentsMargins(0,0,0,0)
+        self.separation_layout_1.setSpacing(6)
+        self.separation_widget_1.setLayout(self.separation_layout_1)
+        self.main_layout.addWidget(self.separation_widget_1)
 
-        self.time_progress_bar = QtWidgets.QProgressBar()
-        self.time_progress_bar.setMaximumHeight(6)
-        self.progress_bar_layout.addWidget(self.time_progress_bar)
+        self.note_label = QtWidgets.QLabel('Note')
+        self.note_label.setObjectName("bold_label")
+        self.separation_layout_1.addWidget(self.note_label)
 
-        self.percent_label = QtWidgets.QLabel()
-        self.progress_bar_layout.addWidget(self.percent_label)
+        self.separation_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.separation_widget = QtWidgets.QWidget()
-        self.separation_layout = QtWidgets.QHBoxLayout()
-        self.separation_layout.setContentsMargins(0,0,0,0)
-        self.separation_layout.setSpacing(6)
-        self.separation_widget.setLayout(self.separation_layout)
-        self.main_layout.addWidget(self.separation_widget)
+        self.edit_note_button = QtWidgets.QPushButton('Edit note')
+        self.edit_note_button.setMaximumHeight(24)
+        self.edit_note_button.setStyleSheet('padding:3px;')
+        self.separation_layout_1.addWidget(self.edit_note_button)
+
+        self.note_content = gui_utils.minimum_height_textEdit()
+        self.note_content.setReadOnly(True)
+        self.note_content.setObjectName('gray_label')
+        self.main_layout.addWidget(self.note_content)
+
+        self.separation_widget_2 = QtWidgets.QWidget()
+        self.separation_layout_2 = QtWidgets.QHBoxLayout()
+        self.separation_layout_2.setContentsMargins(0,0,0,0)
+        self.separation_layout_2.setSpacing(6)
+        self.separation_widget_2.setLayout(self.separation_layout_2)
+        self.main_layout.addWidget(self.separation_widget_2)
 
         self.asset_history_label = QtWidgets.QLabel('Asset history')
-        self.separation_layout.addWidget(self.asset_history_label)
+        self.asset_history_label.setObjectName("bold_label")
+        self.separation_layout_2.addWidget(self.asset_history_label)
 
-        self.separation_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.separation_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.add_comment_button = QtWidgets.QPushButton('Add comment')
         self.add_comment_button.setMaximumHeight(24)
         self.add_comment_button.setStyleSheet('padding:3px;')
-        self.separation_layout.addWidget(self.add_comment_button)
+        self.separation_layout_2.addWidget(self.add_comment_button)
 
         self.events_scrollArea = QtWidgets.QScrollArea()
+        self.events_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
 
         self.events_scrollArea_widget = QtWidgets.QWidget()
@@ -162,7 +178,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_content_widget = QtWidgets.QWidget()
         self.events_content_layout = QtWidgets.QVBoxLayout()
         self.events_content_layout.setContentsMargins(0,0,0,0)
-        self.events_content_layout.setSpacing(6)
+        self.events_content_layout.setSpacing(3)
         self.events_content_widget.setLayout(self.events_content_layout)
         self.events_scrollArea_layout.addWidget(self.events_content_widget)
 
@@ -200,7 +216,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh()
 
     def refresh(self):
-        QtWidgets.QApplication.processEvents()
+        #QtWidgets.QApplication.processEvents()
         start_time = time.perf_counter()
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
@@ -208,6 +224,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.stage_row = None
         self.refresh_tracking_events()
         self.refresh_state()
+        self.refresh_note()
         self.refresh_users_dic()
         self.refresh_user()
         self.refresh_time()
@@ -223,20 +240,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.work_time_label.setText(string_time)
             if self.stage_row['estimated_time'] is not None:
                 self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.stage_row['estimated_time'])))
-            percent = self.stage_row['progress']
-            self.percent_label.setText(f"{str(int(percent))}%")
-            if self.stage_row['state'] != 'done':
-                self.time_progress_bar.setStyleSheet('::chunk{background-color:#ff5d5d;}')
-            else:
-                self.time_progress_bar.setStyleSheet('::chunk{background-color:#ffad4d;}')
-            if self.stage_row['state'] == 'done':
-                self.time_progress_bar.setStyleSheet('::chunk{background-color:#95d859;}')
-            self.time_progress_bar.setValue(int(percent))
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')
-            self.time_progress_bar.setValue(0)
-            self.percent_label.setText("0%")
 
     def remove_tracking_event(self, event_id):
         if event_id in self.tracking_event_ids.keys():
@@ -314,6 +320,15 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.state_comboBox.setCurrentText('todo')
         self.apply_state_modification = 1
 
+    def refresh_note(self):
+        if self.stage_row is not None:
+            if self.stage_row['note'] is None or self.stage_row['note'] == '':
+                self.note_content.setText('Missing note')
+                return
+            self.note_content.setText(self.stage_row['note'])
+        else:
+            self.note_content.setText('')
+
     def modify_state(self, state):
         if self.stage_id is not None:
             if self.apply_state_modification:
@@ -337,6 +352,17 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 assets.add_stage_comment(self.stage_id, comment)
                 gui_server.refresh_team_ui()
 
+    def edit_note(self):
+        if self.stage_id is not None:
+            self.comment_widget = comment_widget.comment_widget(title='Edit note',
+                                                                old_comment=self.stage_row['note'],
+                                                                propose_tags=False,
+                                                                button_text='Edit')
+            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                note = self.comment_widget.comment
+                assets.edit_stage_note(self.stage_id, note)
+                gui_server.refresh_team_ui()
+
     def change_count(self):
         self.clear_all_tracking_events()
         self.refresh_tracking_events()
@@ -348,6 +374,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.event_count_spinBox.valueChanged.connect(self.change_count)
         self.edit_estimation_button.clicked.connect(self.edit_estimation)
         self.add_comment_button.clicked.connect(self.add_comment)
+        self.edit_note_button.clicked.connect(self.edit_note)
 
 class time_widget(QtWidgets.QWidget):
     def __init__(self, time_float, parent = None):
@@ -383,6 +410,8 @@ class tracking_event_widget(QtWidgets.QFrame):
 
         if self.tracking_event_row['event_type'] == 'state_switch':
             self.build_state_switch_ui()
+        elif self.tracking_event_row['event_type'] == 'priority_switch':
+            self.build_priority_switch_ui()
         elif self.tracking_event_row['event_type'] == 'assignment':
             self.build_assignment_ui()
         elif self.tracking_event_row['event_type'] == 'work_session':
@@ -419,6 +448,7 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.main_widget = QtWidgets.QWidget()
         self.main_widget.setObjectName('asset_tracking_event_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(8,8,8,8)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.widget_layout.addWidget(self.main_widget)
@@ -514,24 +544,39 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.state_frame.setObjectName('asset_tracking_event_frame')
         self.state_frame.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.state_frame_layout = QtWidgets.QHBoxLayout()
-        self.state_frame_layout.setContentsMargins(8,8,8,8)
+        self.state_frame_layout.setContentsMargins(4,4,4,4)
         self.state_frame.setLayout(self.state_frame_layout)
         self.main_layout.addWidget(self.state_frame)
 
-        if self.tracking_event_row['data'] == 'todo':
-            color = '#8a8a8a'
-        elif self.tracking_event_row['data'] == 'wip':
-            color = '#ffad4d'
-        elif self.tracking_event_row['data'] == 'done':
-            color = '#95d859'
-        elif self.tracking_event_row['data'] == 'error':
-            color = '#ff5d5d'
+        color = ressources._states_colors_[self.tracking_event_row['data']]
         self.state_frame.setStyleSheet(f'background-color:{color};')
         
         self.state_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())
         self.state_label.setObjectName('bold_label')
         self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.state_frame_layout.addWidget(self.state_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+    def build_priority_switch_ui(self):
+        self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.user_label)
+
+        self.info_label = QtWidgets.QLabel('switched priority to')
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.info_label)
+        
+        self.priority_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())
+        self.priority_label.setObjectName('bold_label')
+        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.priority_label)
+
+        self.priority_icon = QtWidgets.QLabel()
+        self.priority_icon.setFixedSize(14,14)
+        self.priority_icon.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[self.tracking_event_row['data']]).pixmap(14))
+        self.main_layout.addWidget(self.priority_icon)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 

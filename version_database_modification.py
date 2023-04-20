@@ -26,15 +26,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Python modules
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
+
 # Wizard modules
 from wizard.core import environment
 from wizard.core import project
 from wizard.core import db_utils
 
 def main():
-	pass
+	sql_cmd = """ALTER TABLE stages ADD COLUMN IF NOT EXISTS note text DEFAULT '';"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+	sql_cmd = """ALTER TABLE stages ADD COLUMN IF NOT EXISTS priority text NOT NULL DEFAULT 'normal';"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
 
-def alter_repository_users_table():
 	sql_cmd = """ALTER TABLE users ADD COLUMN coins int DEFAULT 0;"""
 	db_utils.create_table(environment.get_repository(), sql_cmd)
 	sql_cmd = """ALTER TABLE users ADD COLUMN artefacts text DEFAULT '[]';"""

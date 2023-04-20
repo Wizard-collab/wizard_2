@@ -55,3 +55,5 @@ class tabs_widget(QtWidgets.QFrame):
         if context_dic is not None and context_dic != dict():
             index = context_dic['index']
             self.setCurrentIndex(index)
+
+

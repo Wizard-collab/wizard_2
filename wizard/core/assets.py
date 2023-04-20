@@ -370,9 +370,21 @@ def modify_stage_state(stage_id, state, comment=''):
         repository.add_user_coins(stage_row['assignment'], amount)
     return 1
 
+def modify_stage_priority(stage_id, priority):
+    if priority not in assets_vars._priority_list_:
+        logger.warning(f"Unknown priority {priority}")
+        return
+    project.set_stage_data(stage_id, 'priority', priority)
+    asset_tracking.add_priority_switch_event(stage_id, priority)
+    return 1
+
 def add_stage_comment(stage_id, comment):
     project.set_stage_data(stage_id, 'tracking_comment', comment)
     asset_tracking.add_comment_event(stage_id, comment)
+    return 1
+
+def edit_stage_note(stage_id, note):
+    project.set_stage_data(stage_id, 'note', note)
     return 1
 
 def modify_stage_assignment(stage_id, user_name):
