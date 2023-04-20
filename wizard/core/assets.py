@@ -175,7 +175,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     hooks.after_asset_creation_hook(asset_row['string'], name)
     events.add_creation_event('asset', asset_id)
     game.add_xps(game_vars._creation_xp_)
-    game.add_coins(game._creation_coins_)
+    game.add_coins(game_vars._creation_coins_)
     return asset_id
 
 def modify_asset_frame_range(asset_id, inframe, outframe, preroll, postroll):

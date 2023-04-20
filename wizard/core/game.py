@@ -33,6 +33,7 @@
 # remove levels and remove life
 
 # Python modules
+import random
 import logging
 logger = logging.getLogger(__name__)
 
@@ -100,6 +101,7 @@ def analyse_comment(comment, life_amount):
 		logger.info(f"Comment with more than 5 characters to avoid loosing life.")
 	else:
 		repository.increase_user_comments_count(environment.get_user())
+		add_coins(len(comment)/random.randint(2, 5))
 	return 1
 	
 def add_coins(amount):
