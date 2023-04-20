@@ -37,6 +37,9 @@ def save():
         return
     project_path = wizard_communicate.get_project_path()
     local_file_path = local_path+file_path[len(project_path):]
+    if local_file_path is None:
+        logging.error("Local path not found, no file path to save to.")
+        return
     substance_painter.project.save_as(local_file_path,
                                       substance_painter.project.ProjectSaveMode.Full)
             
