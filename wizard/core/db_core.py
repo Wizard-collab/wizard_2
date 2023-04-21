@@ -97,9 +97,9 @@ class db_access_singleton(metaclass=Singleton):
                 else:
                     retries -= 1
                     if retries == 0:
-                        raise error
+                        raise
                     time.sleep(0.02)
-            except (Exception, psycopg2.DatabaseError) as error:
+            except:
                 logger.error(f"Failed to execute SQL command: {error}")
                 raise
     
@@ -118,6 +118,8 @@ class db_access_singleton(metaclass=Singleton):
                 conn = self.project_conn
         except (Exception, psycopg2.DatabaseError) as error:
             logger.error(f"Failed to get a {level} database connection")
+            self.repository_conn = None
+            self.project_conn = None
         return conn
 
 def create_connection(database=None):
