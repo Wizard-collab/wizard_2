@@ -611,6 +611,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.reference_row = reference_row
         self.signal_handler = signal_handler()
         self.apply_auto_update_change = False
+        self.stage_row = None
         self.fill_ui()
         self.connect_functions()
 
@@ -654,6 +655,8 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
 
     def show_comment(self):
         if self.state_widget.isActiveWindow():
+            if not self.stage_row:
+                return
             tracking_events = project.get_asset_tracking_events(self.stage_row['id'])
             if len(tracking_events) == 0:
                 return
