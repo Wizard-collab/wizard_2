@@ -97,9 +97,9 @@ class db_access_singleton(metaclass=Singleton):
                 else:
                     retries -= 1
                     if retries == 0:
-                        raise
+                        raise Exception("Max connection retry reached (5)")
                     time.sleep(0.02)
-            except:
+            except (Exception, psycopg2.DatabaseError) as error:
                 logger.error(f"Failed to execute SQL command: {error}")
                 raise
     
@@ -107,11 +107,19 @@ class db_access_singleton(metaclass=Singleton):
         conn = None
         try:
             if level == 'repository':
+                if self.repository_conn:
+                    if self.repository_conn.closed:
+                        logger.info(f"{level} db connection closed, reconnecting")
+                        self.repository_conn = None
                 if not self.repository_conn:
                     if self.repository:
                         self.repository_conn = create_connection(self.repository)
                 conn = self.repository_conn
             else:
+                if self.project_conn:
+                    if self.project_conn.closed:
+                        logger.info(f"{level} db connection closed, reconnecting")
+                        self.project_conn = None
                 if not self.project_conn:
                     if self.project_name:
                         self.project_conn = create_connection(self.project_name)
