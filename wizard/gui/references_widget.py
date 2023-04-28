@@ -317,6 +317,13 @@ class references_widget(QtWidgets.QWidget):
             if selected_item.type == 'reference':
                 self.focus_export.emit(selected_item.reference_row['export_version_id'])
 
+    def open_folder(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            if selected_item.type == 'reference':
+                path = assets.get_export_version_path(selected_item.reference_row['export_version_id'])
+                path_utils.startfile(path)
+
     def declare_error(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
@@ -377,6 +384,7 @@ class references_widget(QtWidgets.QWidget):
         launch_action = None
         focus_action = None
         declare_error_action = None
+        open_folder_action = None
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         if len(selection)>=1:
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
@@ -386,6 +394,7 @@ class references_widget(QtWidgets.QWidget):
                     launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
                     focus_action = menu.addAction(QtGui.QIcon(ressources._tool_focus_), 'Focus on export instance')
                     declare_error_action = menu.addAction(QtGui.QIcon(ressources._tool_error_), 'Declare error on this asset')
+                    open_folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
         add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
 
         action = menu.exec_(QtGui.QCursor().pos())
@@ -404,6 +413,8 @@ class references_widget(QtWidgets.QWidget):
                 self.focus_on_export_version()
             elif action == declare_error_action:
                 self.declare_error()
+            elif action == open_folder_action:
+                self.open_folder()
 
     def item_double_clicked(self, item):
         if item.type == 'group':
@@ -620,8 +631,6 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
-        #self.variant_widget = editable_data_widget()
-        #self.treeWidget().setItemWidget(self, 2, self.variant_widget)
         self.export_widget = editable_data_widget()
         self.treeWidget().setItemWidget(self, 3, self.export_widget)
         self.version_widget = editable_data_widget(bold=True)
@@ -666,27 +675,11 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def connect_functions(self):
         self.version_widget.button_clicked.connect(self.version_modification_requested)
         self.export_widget.button_clicked.connect(self.export_modification_requested)
-        #self.variant_widget.button_clicked.connect(self.variant_modification_requested)
         self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
         self.state_widget.enter.connect(self.show_comment)
         self.state_widget.leave.connect(self.signal_handler.leave.emit)
         self.state_widget.move_event.connect(self.signal_handler.move_event.emit)
         self.state_widget.modify_state_signal.connect(self.modify_state)
-
-    '''
-    def variant_modification_requested(self, point):
-        variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
-        stage_id = project.get_variant_data(variant_id, 'stage_id')
-        variants_list = project.get_stage_childs(stage_id)
-        if variants_list is not None and variants_list != []:
-            menu = gui_utils.QMenu()
-            for variant in variants_list:
-                action = menu.addAction(variant['name'])
-                action.id = variant['id']
-            action = menu.exec_(QtGui.QCursor().pos())
-            if action is not None:
-                self.modify_variant(action.id)
-    '''
 
     def export_modification_requested(self, point):
         variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')

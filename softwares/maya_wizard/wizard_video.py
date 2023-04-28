@@ -25,20 +25,32 @@ def invoke_settings_widget(*args):
 
 def create_videos(frange, nspace_list):
     if nspace_list == []:
-        logger.info("No camera namespace given, creating video from default scene camera.")
-        create_video(frange)
+        camera = select_default_cam()
+        if not camera:
+            logger.warning(f"No camera found.")
+            return
+        create_video(frange, camera)
         return
     for nspace in nspace_list:
-        if not select_cam(nspace):
+        camera = select_cam(nspace)
+        if not camera:
             logger.warning(f"Skipping video for {nspace}, camera not found")
-        else:
-            create_video(frange)
+            return
+        create_video(frange, camera)
 
-def create_video(frange):
+def create_video(frange, camera):
     directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
     logger.info("Playblasting at {}...".format(directory))
     playblast(directory, frange)
-    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']))
+    focal_lengths_dic = get_focal_length(frange, camera)
+    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']), focal_lengths_dic=focal_lengths_dic)
+
+def get_focal_length(frange, camera):
+    focal_lengths_dic = dict()
+    for frame in range(frange[0], frange[1]+1):
+        pm.currentTime(frame)
+        focal_lengths_dic[frame] = round(pm.getAttr(camera+'.focalLength'), 1)
+    return focal_lengths_dic
 
 def playblast(directory, frange):
     image_format = wizard_communicate.get_image_format()
@@ -49,16 +61,29 @@ def select_cam(nspace):
     camera_shape = list_cam(nspace)
     if camera_shape is None:
         return
+    set_cam_as_renderable(camera_shape)
+    logger.info(f"Creating video trough {camera_shape}")
+    return camera_shape
+
+def select_default_cam():
+    perspCameras = pm.listCameras( p=True )
+    print(perspCameras)
+    if len(perspCameras) > 1:
+        perspCameras.remove('persp')
+    camera = perspCameras[0]
+    set_cam_as_renderable(camera)
+    logger.info(f"No namespace given, creating video trough {camera}")
+    return camera
+
+def set_cam_as_renderable(camera_to_ren):
     cameras = pm.ls(type='camera')
     for camera in cameras:
         pm.setAttr(camera + '.rnd', 0)
-    pm.setAttr(camera_shape + '.rnd', 1)
+    pm.setAttr(camera_to_ren + '.rnd', 1)
     try:
-        pm.lookThru(camera_shape)
+        pm.lookThru(camera_to_ren)
     except:
         pass
-    logger.info(f"Creating video trough {camera_shape}")
-    return True
 
 def list_cam(nspace):
     render_set = "{}:render_set".format(nspace)
