@@ -43,8 +43,8 @@ from wizard.core import image
 
 logger = logging.getLogger(__name__)
 
-def add_video(variant_id, images_directory, frange, version_id, comment=''):
-    temp_video_file, to_thumbnail = merge_video(images_directory, frange, version_id)
+def add_video(variant_id, images_directory, frange, version_id, focal_lengths_dic=None, comment=''):
+    temp_video_file, to_thumbnail = merge_video(images_directory, frange, version_id, focal_lengths_dic)
     if not temp_video_file:
         return
     video_id = assets.add_video(variant_id)
@@ -64,7 +64,7 @@ def request_video(variant_id):
     logger.info(f"Temporary directory created : {temp_video_dir}, if something goes wrong in the video process please go there to find your temporary video file")
     return temp_video_dir
 
-def merge_video(images_directory, frange, version_id):
+def merge_video(images_directory, frange, version_id, focal_lengths_dic=None):
     temp_video_file = path_utils.join(images_directory, "temp.mp4")
 
     files_list = []
@@ -79,9 +79,9 @@ def merge_video(images_directory, frange, version_id):
         return
     
     frame_rate = project.get_frame_rate()
-    img_array, size = merge_with_overlay(files_list, frange, frame_rate, version_id)
+    img_array, size = merge_with_overlay(files_list, frange, frame_rate, version_id, focal_lengths_dic)
 
-    out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*'MP4V'), frame_rate, size)
+    out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*"X264"), frame_rate, size)
     logger.info("Adding video overlay")
     for i in range(len(img_array)):
         out.write(img_array[i])
@@ -94,12 +94,16 @@ def merge_video(images_directory, frange, version_id):
     if path_utils.isfile(temp_video_file):
         return temp_video_file, to_thumbnail
 
-def merge_with_overlay(files_list, frange, frame_rate, version_id):
+def merge_with_overlay(files_list, frange, frame_rate, version_id, focal_lengths_dic=None):
     img_array = []
     string_asset = project.get_version_data(version_id, 'string')
     for file in files_list:
         frame_number = frange[0] + files_list.index(file)
-        pil_img = add_overlay(file, string_asset, frame_number, frange, frame_rate)
+        focal_len = 'Focal not found'
+        if focal_lengths_dic:
+            if str(frame_number) in focal_lengths_dic.keys():
+                focal_len = focal_lengths_dic[str(frame_number)]
+        pil_img = add_overlay(file, string_asset, frame_number, frange, frame_rate, focal_len)
         img = np.asarray(pil_img)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         height, width, layers = img.shape
@@ -116,7 +120,7 @@ def merge_only(files_list):
         img_array.append(img)
     return img_array, size
 
-def add_overlay(file, string_asset, frame_number, frange, frame_rate):
+def add_overlay(file, string_asset, frame_number, frange, frame_rate, focal_len):
     pil_image = Image.open(file)
     pil_image = pil_image.convert('RGBA')
 
@@ -136,7 +140,7 @@ def add_overlay(file, string_asset, frame_number, frange, frame_rate):
     string_asset_position = ( margin_percent, im_height - (font_height + margin_percent) )
     draw.text(string_asset_position, string_asset, font = font, fill = "white")
     # Draw frame text
-    frame_text = f"[{frange[0]}-{frange[1]}] - f{frame_number} - {frame_rate}fps"
+    frame_text = f"[{frange[0]}-{frange[1]}] - f{frame_number} - {frame_rate}fps - focal : {focal_len}"
     font_width, font_height = font.getsize(frame_text)
     frame_text_position = ( im_width/2 - font_width/2, im_height - (font_height + margin_percent) )
     draw.text(frame_text_position, frame_text, font = font, fill = "white")
