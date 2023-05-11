@@ -55,7 +55,7 @@ def get_focal_length(frange, camera):
 def playblast(directory, frange):
     image_format = wizard_communicate.get_image_format()
     file = os.path.join(directory, 'tmp_playblast').replace('\\', '/')
-    cmds.playblast(st=frange[0], et=frange[1], p= 100, f=file, wh=image_format, qlt= 100, fp= 4, fmt='image', compression='png', fo=1, v=False)
+    cmds.playblast(st=frange[0], et=frange[1], p=100, f=file, wh=image_format, qlt= 100, fp= 4, fmt='image', compression='png', fo=1, v=False)
 
 def select_cam(nspace):
     camera_shape = list_cam(nspace)

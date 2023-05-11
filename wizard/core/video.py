@@ -81,7 +81,7 @@ def merge_video(images_directory, frange, version_id, focal_lengths_dic=None):
     frame_rate = project.get_frame_rate()
     img_array, size = merge_with_overlay(files_list, frange, frame_rate, version_id, focal_lengths_dic)
 
-    out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*'MP4V'), frame_rate, size)
+    out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*"X264"), frame_rate, size)
     logger.info("Adding video overlay")
     for i in range(len(img_array)):
         out.write(img_array[i])
