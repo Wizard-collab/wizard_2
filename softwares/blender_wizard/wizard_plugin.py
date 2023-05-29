@@ -17,6 +17,8 @@ from blender_wizard import wizard_tools
 from blender_wizard import wizard_export
 from blender_wizard import wizard_reference
 from blender_wizard.export import modeling
+from blender_wizard.export import layout
+from blender_wizard.export import custom
 
 def save_increment():
     wizard_tools.save_increment()
@@ -25,6 +27,10 @@ def export():
     stage_name = os.environ['wizard_stage_name']
     if stage_name == 'modeling':
         modeling.main()
+    elif stage_name == 'layout':
+        layout.main()
+    elif stage_name == 'custom':
+        custom.main()
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
 
@@ -73,7 +79,7 @@ def reference_animation():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'animation' in references.keys():
         for reference in references['animation']:
-            wizard_reference.update_animation(reference)
+            wizard_reference.import_animation(reference)
 
 def refupdate_animation():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
@@ -85,9 +91,9 @@ def reference_custom():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for reference in references['custom']:
-            wizard_reference.update_custom(reference)
+            wizard_reference.import_custom(reference)
 
-def refupdate_custom():
+def update_custom():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'custom' in references.keys():
         for reference in references['custom']:
