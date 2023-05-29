@@ -43,44 +43,94 @@ def update_texturing(reference_dic):
                                 wizard_tools.get_new_objects(old_objects),
                                 reference_dic['string_variant'])
 
-def import_modeling_hard(reference_dic):
-    old_objects = wizard_tools.get_all_nodes()
-    for file in reference_dic['files']:
-        if file.endswith('.abc'):
-            wizard_tools.import_abc(file)
-        else:
-            logger.info('{} extension is unknown'.format(file))
-    trigger_after_reference_hook('modeling',
-                                reference_dic['files'],
-                                reference_dic['namespace'],
-                                wizard_tools.get_new_objects(old_objects),
-                                reference_dic['string_variant'])
+def import_modeling(reference_dic):
+    create_reference(reference_dic, 'MODELING') 
 
-def import_layout_hard(reference_dic):
-    old_objects = wizard_tools.get_all_nodes()
-    for file in reference_dic['files']:
-        if file.endswith('.abc'):
-            wizard_tools.import_abc(file)
-        else:
-            logger.info('{} extension is unknown'.format(file))
-    trigger_after_reference_hook('layout',
-                                reference_dic['files'],
-                                reference_dic['namespace'],
-                                wizard_tools.get_new_objects(old_objects),
-                                reference_dic['string_variant'])
+def update_modeling(reference_dic):
+    update_reference(reference_dic, 'MODELING')   
 
-def import_animation_hard(reference_dic):
+def import_layout(reference_dic):
+    create_reference(reference_dic, 'LAYOUT')  
+
+def update_layout(reference_dic):
+    update_reference(reference_dic, 'LAYOUT')  
+
+def import_animation(reference_dic):
+    create_reference(reference_dic, 'ANIMATION')  
+
+def update_animation(reference_dic):
+    update_reference(reference_dic, 'ANIMATION')  
+
+def import_custom(reference_dic):
+    create_reference(reference_dic, 'CUSTOM')  
+
+def update_custom(reference_dic):
+    update_reference(reference_dic, 'CUSTOM')  
+
+def create_reference(reference_dic, referenced_stage):
     old_objects = wizard_tools.get_all_nodes()
-    for file in reference_dic['files']:
-        if file.endswith('.abc'):
-            wizard_tools.import_abc(file)
-        else:
-            logger.info('{} extension is unknown'.format(file))
-    trigger_after_reference_hook('animation',
-                                reference_dic['files'],
-                                reference_dic['namespace'],
-                                wizard_tools.get_new_objects(old_objects),
-                                reference_dic['string_variant'])
+    if not wizard_tools.namespace_exists(reference_dic['namespace']):
+        group_collection = wizard_tools.create_collection_if_not_exists(referenced_stage, parent=None)
+        namespace_collection = wizard_tools.create_collection_if_not_exists(reference_dic['namespace'], parent=group_collection)
+        wizard_tools.set_collection_active(namespace_collection)
+        for file in reference_dic['files']:
+            if file.endswith('.abc'):
+                import_abc(file, namespace_collection)
+            elif file.endswith('.blend'):
+                link_blend(file, reference_dic['namespace'], namespace_collection)
+            else:
+                logger.info('{} extension is unknown'.format(file))
+        trigger_after_reference_hook(referenced_stage.lower(),
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
+
+def update_reference(reference_dic, referenced_stage):
+    old_objects = wizard_tools.get_all_nodes()
+    if wizard_tools.namespace_exists(reference_dic['namespace']):
+        for file in reference_dic['files']:
+            if file.endswith('.blend'):
+                update_blend(file, reference_dic['namespace'])
+            else:
+                logger.info('{} extension is not updatable'.format(file))
+        trigger_after_reference_hook(referenced_stage.lower(),
+                                    reference_dic['files'],
+                                    reference_dic['namespace'],
+                                    wizard_tools.get_new_objects(old_objects),
+                                    reference_dic['string_variant'])
+
+def import_abc(file_path, parent_collection=None):
+    if parent_collection is None:
+        parent_collection = bpy.context.scene.collection
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False)
+
+def link_blend(file_path, namespace, parent_collection=None):
+    if wizard_tools.find_library(file_path):
+        logger.warning(f"Ressource already existing, skipping...")
+        return
+
+    if parent_collection is None:
+        parent_collection = bpy.context.scene.collection
+    with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
+        data_to.collections = [c for c in data_from.collections]
+    for coll in data_to.collections:
+        if coll is not None:
+            parent_collection.children.link(coll)
+
+    lib = bpy.data.libraries[os.path.basename(file_path)]
+    lib.name = namespace
+
+def update_blend(file_path, namespace):
+    try:
+        lib = bpy.data.libraries[namespace]
+        lib.filepath = file_path
+        lib.reload()
+        lib = bpy.data.libraries[os.path.basename(file_path)]
+        lib.name = namespace
+    except KeyError:
+        logger.error(f"Library {namespace} not found")
 
 def trigger_after_reference_hook(referenced_stage_name,
                                     files_list,

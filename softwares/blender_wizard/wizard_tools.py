@@ -48,10 +48,10 @@ def check_obj_list_existence(object_list):
             success = False
     return success
 
-def get_direct_children(object): 
+def get_direct_children(obj): 
     children = [] 
     for ob in bpy.data.objects: 
-        if ob.parent == object: 
+        if ob.parent == obj: 
             children.append(ob) 
     return children
 
@@ -70,69 +70,146 @@ def get_all_nodes():
 def get_new_objects(old_objects):
     all_objects = get_all_nodes()
     new_objects = []
-    for object in all_objects:
-        if object not in old_objects:
-            new_objects.append(object)
+    for obj in all_objects:
+        if obj not in old_objects:
+            new_objects.append(obj)
     return new_objects
 
-def get_all_children(object, meshes=0):
-    children = []
-    all_objects = []
-    for ob in bpy.data.objects:
-        ancestor = ob
-        while 1:
-            ancestor = ancestor.parent
-            if ancestor == None:
-                break
-            if ancestor == object:
-                children.append(ob)
-                if meshes:
-                    children.append(ob.data)
-                break
-    return(children)
+def get_all_children(obj, meshes=0):
+    if type(obj) == bpy.types.Collection:
+        return obj.all_objects
+    else:
+        children = []
+        all_objects = []
+        for ob in bpy.data.objects:
+            ancestor = ob
+            while 1:
+                ancestor = ancestor.parent
+                if ancestor == None:
+                    break
+                if ancestor == obj:
+                    children.append(ob)
+                    if meshes:
+                        children.append(ob.data)
+                    break
+        return(children)
 
-def select_GRP_list_and_all_children(GRP_list):
+def select_all_children(objects_list):
     bpy.ops.object.select_all(action='DESELECT')
-    for GRP in GRP_list:
-        GRP.select_set(True)
-        for object in get_all_children(GRP):
-            object.select_set(True)
-        bpy.context.view_layer.objects.active = GRP
+    for obj in objects_list:
+        if type(obj) != bpy.types.Collection:
+            obj.select_set(True)
+        for obj in get_all_children(obj):
+            obj.select_set(True)
+        #bpy.context.view_layer.objects.active = GRP
 
 def clear_all_materials_of_selection():
     selection = bpy.context.selected_objects
-    for object in get_all_children(selection):
-        object.data.materials.clear()
+    for obj in get_all_children(selection):
+        obj.data.materials.clear()
 
-def import_abc(file_path):
-    bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False)
+def namespace_exists(namespace):
+    return namespace in bpy.data.collections
 
-def remove_LOD_from_names(object_list):
+def create_collection_if_not_exists(collection_name, parent=None):
+    if parent is None:
+        parent = bpy.context.scene.collection
+    if collection_name not in bpy.data.collections:
+        new_collection = bpy.data.collections.new(collection_name)
+        parent.children.link(new_collection)
+    else:
+        new_collection = bpy.data.collections[collection_name]
+    return new_collection
+
+def set_collection_active(collection):
+    if not collection:
+        return
+    layer_collection = bpy.context.view_layer.layer_collection
+    layerColl = recurLayerCollection(layer_collection, collection.name)
+    bpy.context.view_layer.active_layer_collection = layerColl
+
+def find_library(file_path):
+    for lib in bpy.data.libraries:
+        if lib.filepath == file_path:
+            return 1
+    return 0
+
+def recurLayerCollection(layerColl, collName):
+    found = None
+    if (layerColl.name == collName):
+        return layerColl
+    for layer in layerColl.children:
+        found = recurLayerCollection(layer, collName)
+        if found:
+            return found
+            
+def remove_export_name_from_names(object_list, export_name):
     objects_dic = dict()
-    for object in object_list:
-        old_name = object.name
-        for NUM in range(1,4):
-            LOD = '_LOD{}'.format(str(NUM))
-            if object.name.endswith(LOD):
-                object.name = old_name.replace(LOD, '')
-        objects_dic[object] = old_name
+    for obj in object_list:
+        old_name = obj.name
+        if obj.name.endswith(f'_{export_name}'):
+            obj.name = old_name.replace(f'_{export_name}', '')
+        objects_dic[obj] = old_name
     return objects_dic
 
 def reassign_old_name_to_objects(objects_dic):
-    for object in objects_dic.keys():
-        object.name = objects_dic[object]
+    for obj in objects_dic.keys():
+        obj.name = objects_dic[obj]
 
 def apply_tags(object_list):
     all_objects = []
-    for object in object_list:
-        all_objects.append(object)
-        all_objects += get_all_children(object, meshes=1)
-    for object in all_objects:
-        if 'wizardTags' not in object.keys():
+    for obj in object_list:
+        all_objects.append(obj)
+        all_objects += get_all_children(obj, meshes=1)
+    for obj in all_objects:
+        if type(obj) == bpy.types.Collection:
+            continue
+        if 'wizardTags' not in obj.keys():
             existing_tags = []
         else:
-            existing_tags = object['wizardTags'].split(',')
+            existing_tags = obj['wizardTags'].split(',')
         asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
-        to_tag = [os.environ['wizard_category_name'], asset_tag, object.name]
+        to_tag = [os.environ['wizard_category_name'], asset_tag, obj.name]
         tags = existing_tags + to_tag
-        object['wizardTags'] = (',').join(set(tags))
+        obj['wizardTags'] = (',').join(set(tags))
+
+def get_all_collections():
+    collections = bpy.data.collections
+    return collections
+
+def get_export_grps(base_name):
+    grp_dic = dict()
+    tokens_len = len(base_name.split('_'))
+    for collection in get_all_collections():
+        collection_name = collection.name
+        if base_name in collection_name:
+            object_name_tokens = collection_name.split('_')
+            if len(object_name_tokens) == tokens_len:
+                export_name = 'main'
+            elif len(object_name_tokens) > tokens_len:
+                export_name = object_name_tokens[-1]
+            if export_name in grp_dic.values():
+                logger.warning(f'{collection_name} already found.')
+                continue
+            grp_dic[collection_name] = export_name
+    return grp_dic
+
+def group_objects_before_export(export_GRP_list):
+    new_export_GRP_list = []
+    for obj in export_GRP_list:
+        if type(obj) == bpy.types.Collection:
+            bpy.ops.object.empty_add(location=(0, 0, 0))
+            empty_object = bpy.context.object
+            empty_object.name = obj.name
+
+            for child in obj.all_objects:
+                if child == empty_object:
+                    continue
+                if child.parent is None:
+                    child.parent = empty_object
+
+            new_export_GRP_list.append(empty_object)
+        else:
+            new_export_GRP_list.append(obj)
+    return new_export_GRP_list
+

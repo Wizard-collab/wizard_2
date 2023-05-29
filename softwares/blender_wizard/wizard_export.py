@@ -23,6 +23,8 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list):
                                                                     export_name)
         if export_file.endswith('.abc'):
             export_abc(export_GRP_list, export_file)
+        elif export_file.endswith('.blend'):
+            export_blend(export_GRP_list, export_file)
         export_dir = wizard_communicate.add_export_version(export_name,
                                                             [export_file],
                                                             int(os.environ['wizard_work_env_id']),
@@ -30,10 +32,29 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list):
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def export_abc(export_GRP_list, export_file):
+    export_GRP_list = wizard_tools.group_objects_before_export(export_GRP_list)
     abc_command = wizard_hooks.get_abc_command("blender")
     if abc_command is None:
         abc_command = default_abc_command
     abc_command(export_GRP_list, export_file)
+
+def export_blend(export_GRP_list, export_file): 
+    file_name = bpy.data.filepath
+    bpy.ops.wm.save_as_mainfile(filepath=export_file)
+    collection_name = export_GRP_list[0].name
+    bpy.ops.wm.read_homefile()
+    objects = bpy.data.objects
+    for obj in objects:
+        bpy.data.objects.remove(obj, do_unlink=True)
+    collections = bpy.data.collections
+    for collection in collections:
+        bpy.data.collections.remove(collection, do_unlink=True)
+    with bpy.data.libraries.load(export_file, link=False) as (data_from, data_to):
+        data_to.collections = [collection_name]
+    for collection in data_to.collections:
+        bpy.context.collection.children.link(collection)
+    bpy.ops.wm.save_as_mainfile(filepath=export_file)
+    reopen(file_name)
 
 def reopen(scene):
     bpy.ops.wm.open_mainfile(filepath=scene)
@@ -71,6 +92,6 @@ def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
     wizard_hooks.after_export_hooks('blender', stage_name, export_dir, string_asset, exported_string_asset)
 
 def default_abc_command(export_GRP_list, export_file):
-    wizard_tools.select_GRP_list_and_all_children(export_GRP_list)
+    wizard_tools.select_all_children(export_GRP_list)
     bpy.ops.wm.alembic_export(filepath=export_file, 
                       selected=True, export_custom_properties=True)

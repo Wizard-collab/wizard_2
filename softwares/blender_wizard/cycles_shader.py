@@ -77,7 +77,7 @@ def find_image(full_name):
         if full_name.split('.')[0] in image_name:
             return bpy.data.images[image_name]
 
-def get_textures_dic(files_list):
+def get_textures_dic(files_list, namespace):
     textures_dic = dict()
 
     diffuse_maps = []
@@ -105,7 +105,7 @@ def get_textures_dic(files_list):
         bpy.ops.image.open(filepath=diffuse_maps[0], directory=os.path.dirname(diffuse_maps[0]), use_udim_detecting=True)
         image = find_image(os.path.basename(diffuse_maps[0]))
         if image:
-            image.name = 'diffuse_maps'
+            image.name = f'{namespace}:diffuse_maps'
             textures_dic['diffuse'] = image
         else:
             textures_dic['diffuse'] = None
@@ -118,7 +118,7 @@ def get_textures_dic(files_list):
         bpy.ops.image.open(filepath=roughness_maps[0], directory=os.path.dirname(roughness_maps[0]), use_udim_detecting=True)
         image = find_image(os.path.basename(roughness_maps[0]))
         if image:
-            image.name = 'roughness_maps'
+            image.name = f'{namespace}:roughness_maps'
             textures_dic['roughness'] = image
         else:
             textures_dic['roughness'] = None
@@ -131,7 +131,7 @@ def get_textures_dic(files_list):
         bpy.ops.image.open(filepath=metalness_maps[0], directory=os.path.dirname(metalness_maps[0]), use_udim_detecting=True)
         image = find_image(os.path.basename(metalness_maps[0]))
         if image:
-            image.name = 'metalness_maps'
+            image.name = f'{namespace}:metalness_maps'
             textures_dic['metalness'] = image
         else:
             textures_dic['metalness'] = None
@@ -144,7 +144,7 @@ def get_textures_dic(files_list):
         bpy.ops.image.open(filepath=normal_maps[0], directory=os.path.dirname(normal_maps[0]), use_udim_detecting=True)
         image = find_image(os.path.basename(normal_maps[0]))
         if image:
-            image.name = 'normal_maps'
+            image.name = f'{namespace}:normal_maps'
             textures_dic['normal_map'] = image
         else:
             textures_dic['normal_map'] = None
@@ -157,7 +157,7 @@ def get_textures_dic(files_list):
         bpy.ops.image.open(filepath=height_maps[0], directory=os.path.dirname(height_maps[0]), use_udim_detecting=True)
         image = find_image(os.path.basename(height_maps[0]))
         if image:
-            image.name = 'height_maps'
+            image.name = f'{namespace}:height_maps'
             textures_dic['height_map'] = image
         else:
             textures_dic['height_map'] = None
@@ -170,7 +170,7 @@ def plug_textures(namespace, files_list, update=None):
     material = get_blender_material(namespace, update)
 
     if material:
-        textures_dic = get_textures_dic(files_list)
+        textures_dic = get_textures_dic(files_list, namespace)
         # Plug diffuse
         if textures_dic['diffuse']:
             diffuse_texture_node = material.node_tree.nodes['Wizard Diffuse Texture']

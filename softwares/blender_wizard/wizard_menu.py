@@ -49,7 +49,7 @@ class import_modeling(bpy.types.Operator):
 
     bl_idname = "wizard.import_modeling"
     bl_label = "Import modeling"
-    bl_description = "Import modleing ( hard )"
+    bl_description = "Import modleing"
     
     def execute(self, context):
         wizard_plugin.reference_modeling()
@@ -60,7 +60,7 @@ class import_layout(bpy.types.Operator):
 
     bl_idname = "wizard.import_layout"
     bl_label = "Import layout"
-    bl_description = "Import layout ( hard )"
+    bl_description = "Import layout"
     
     def execute(self, context):
         wizard_plugin.reference_layout()
@@ -71,10 +71,21 @@ class import_animation(bpy.types.Operator):
 
     bl_idname = "wizard.import_animation"
     bl_label = "Import animation"
-    bl_description = "Import animation ( hard )"
+    bl_description = "Import animation"
     
     def execute(self, context):
         wizard_plugin.reference_animation()
+        return {'FINISHED'}
+
+class import_custom(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_custom"
+    bl_label = "Import custom"
+    bl_description = "Import custom"
+    
+    def execute(self, context):
+        wizard_plugin.reference_custom()
         return {'FINISHED'}
 
 class import_texturing(bpy.types.Operator):
@@ -86,6 +97,50 @@ class import_texturing(bpy.types.Operator):
     
     def execute(self, context):
         wizard_plugin.reference_texturing()
+        return {'FINISHED'}
+
+class update_modeling(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_modeling"
+    bl_label = "Update modeling"
+    bl_description = "Update existing modeling"
+    
+    def execute(self, context):
+        wizard_plugin.update_modeling()
+        return {'FINISHED'}
+
+class update_layout(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_layout"
+    bl_label = "Update layout"
+    bl_description = "Update existing layout"
+    
+    def execute(self, context):
+        wizard_plugin.update_layout()
+        return {'FINISHED'}
+
+class update_animation(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_animation"
+    bl_label = "Update update_animation"
+    bl_description = "Update existing animation"
+    
+    def execute(self, context):
+        wizard_plugin.update_animation()
+        return {'FINISHED'}
+
+class update_custom(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_custom"
+    bl_label = "Update custom"
+    bl_description = "Update existing_custom"
+    
+    def execute(self, context):
+        wizard_plugin.update_custom()
         return {'FINISHED'}
 
 class update_texturing(bpy.types.Operator):
@@ -130,13 +185,18 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
         layout.operator("wizard.import_texturing", icon_value=wizard_icons["texturing"].icon_id)
         layout.operator("wizard.import_layout", icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.import_animation", icon_value=wizard_icons["animation"].icon_id)
+        layout.operator("wizard.import_custom", icon_value=wizard_icons["custom"].icon_id)
 
 class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
     bl_label = "Update"
 
     def draw(self, context):
         layout = self.layout
+        layout.operator("wizard.update_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.update_texturing", icon_value=wizard_icons["texturing"].icon_id)
+        layout.operator("wizard.update_layout", icon_value=wizard_icons["layout"].icon_id)
+        layout.operator("wizard.update_animation", icon_value=wizard_icons["animation"].icon_id)
+        layout.operator("wizard.update_custom", icon_value=wizard_icons["custom"].icon_id)
 
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
@@ -164,8 +224,13 @@ classes = (save_increment,
                 import_modeling,
                 import_layout,
                 import_animation,
+                import_custom,
                 import_texturing,
                 update_texturing,
+                update_modeling,
+                update_layout,
+                update_animation,
+                update_custom,
                 set_image_size,
                 clear_all_materials,
                 TOPBAR_MT_wizard_import_submenu,
@@ -188,6 +253,7 @@ def register():
     wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
     wizard_icons.load("layout", 'icons/wlayout.png', 'IMAGE')
     wizard_icons.load("animation", 'icons/animation.png', 'IMAGE')
+    wizard_icons.load("custom", 'icons/custom.png', 'IMAGE')
     wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("clear_all_materials", 'icons/remove_all_materials.png', 'IMAGE')

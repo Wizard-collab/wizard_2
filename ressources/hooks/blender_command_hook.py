@@ -12,6 +12,6 @@ def abc_command(export_GRP_list, export_file):
     a default alembic export command.
     You can modify it from here
     Be carreful on what you are modifying'''
-    wizard_tools.select_GRP_list_and_all_children(export_GRP_list)
+    wizard_tools.select_all_children(export_GRP_list)
     bpy.ops.wm.alembic_export(filepath=export_file, 
                       selected=True, export_custom_properties=True)
