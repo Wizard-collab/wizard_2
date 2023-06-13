@@ -91,6 +91,14 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
+			command_line = "PyInstaller change_repository.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
+			command_line = "PyInstaller change_db_server.spec"
+			p = subprocess.Popen(command_line)
+			p.wait()
+
 			command_line = "PyInstaller PyWizard.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
@@ -115,10 +123,6 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller table_viewer.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
 			folders_list = ['ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
@@ -132,6 +136,10 @@ class compile():
 							#'dist/PyWizard/PyWizard.exe.manifest',
 							'dist/Create Repository/Create Repository.exe',
 							#'dist/Create Repository/Create Repository.exe.manifest',
+							'dist/Change Repository/Change Repository.exe',
+							#'dist/Change Repository/Change Repository.exe.manifest',
+							'dist/Connect Server/Connect Server.exe',
+							#'dist/Connect Server/Connect Server.exe.manifest',
 							'dist/wizard_cmd/wizard_cmd.exe',
 							#'dist/wizard_cmd/wizard_cmd.exe.manifest',
 							'dist/server/server.exe',
@@ -139,10 +147,9 @@ class compile():
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
 							#'dist/Project Manager/Project Manager.exe.manifest',
-							'dist/error_handler/error_handler.exe',
-							#'dist/error_handler/error_handler.exe.manifest',
-							'dist/Table Viewer/Table Viewer.exe']
-							#'dist/Table Viewer/Table Viewer.exe.manifest']
+							'dist/error_handler/error_handler.exe'
+							#'dist/error_handler/error_handler.exe.manifest'
+							]
 							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))

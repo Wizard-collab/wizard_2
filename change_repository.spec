@@ -3,11 +3,11 @@
 block_cipher = None
 
 
-a = Analysis(['table_viewer.py'],
+a = Analysis(['change_repository.py'],
              pathex=['D:\\SCRIPT\\Wizard_2'],
              binaries=[],
              datas=[],
-             hiddenimports=['PyQt5.QtPrintSupport', 'server'],
+             hiddenimports=['PyQt5.QtPrintSupport'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
@@ -21,7 +21,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='Table Viewer',
+          name='Change Repository',
           debug=False,
           bootloader_ignore_signals=True,
           strip=False,
@@ -36,4 +36,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='Table Viewer')
+               name='Change Repository')

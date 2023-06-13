@@ -50,7 +50,8 @@ class app():
     def __init__(self, project_manager,
                         log_user,
                         change_repo, 
-                        change_psql):
+                        change_psql,
+                        table_viewer):
         self.stats_schedule = None
 
         # Init
@@ -71,6 +72,8 @@ class app():
 
         version_database_modification.main()
 
+        if table_viewer:
+            self.table_viewer = table_viewer_widget.table_viewer_widget()
         self.main_widget = main_widget.main_widget()
         self.main_widget.stop_threads.connect(self.stats_schedule.stop)
         self.main_widget.refresh()
@@ -94,13 +97,15 @@ class app():
 def main(project_manager=False,
             log_user=False,
             change_repo=False,
-            change_psql=False):
+            change_psql=False,
+            table_viewer=False):
     sys.excepthook = app_utils.excepthook
     application.log_app_infos()
     wizard_app = app(project_manager,
                         log_user,
                         change_repo,
-                        change_psql)
+                        change_psql,
+                        table_viewer)
     ret = wizard_app.app.exec_()
     sys.exit(ret)
 
