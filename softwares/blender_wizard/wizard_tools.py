@@ -102,12 +102,7 @@ def select_all_children(objects_list):
         for obj in get_all_children(obj):
             obj.select_set(True)
         #bpy.context.view_layer.objects.active = GRP
-
-def clear_all_materials_of_selection():
-    selection = bpy.context.selected_objects
-    for obj in get_all_children(selection):
-        obj.data.materials.clear()
-
+        
 def namespace_exists(namespace):
     return namespace in bpy.data.collections
 
@@ -213,3 +208,19 @@ def group_objects_before_export(export_GRP_list):
             new_export_GRP_list.append(obj)
     return new_export_GRP_list
 
+def get_meshes_in_collection(collection):
+    meshes = []
+    for obj in collection.objects:
+        if obj.type == 'MESH':
+            meshes.append(obj)
+    for child_collection in collection.children:
+        meshes.extend(get_meshes_in_collection(child_collection))
+    return meshes
+
+def get_objects_in_collection(collection):
+    objects = []
+    for obj in collection.objects:
+        objects.append(obj)
+    for child_collection in collection.children:
+        objects.extend(get_objects_in_collection(child_collection))
+    return objects

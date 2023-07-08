@@ -59,14 +59,42 @@ def exr_list_to_paths_list(exr_list):
     paths_list = []
     paths_dic = dict()
     for file in exr_list:
-        file_tokens = file.split('.')
+        directory = os.path.dirname(file)
+        full_file_name = os.path.basename(file)
+        extension = os.path.splitext(full_file_name)[-1].replace('.', '')
+        file_name_without_extension = os.path.splitext(full_file_name)[0]
+        digits = ''.join(filter(str.isdigit, file_name_without_extension))
+        if digits != '':
+            file_name_without_extension = file_name_without_extension.replace(digits, replace_digits(digits))
+            digits = int(digits)
+        file = f"{directory}/{file_name_without_extension}.{extension}"
+        logger.info(file)
+        '''
+
+        logger.info(directory)
+        logger.info(full_file_name)
+        logger.info(extension)
+        logger.info(file_name_without_extension)
+        logger.info(filter(str.isdigit, file_name_without_extension))
+
+
+
+
+
+        file_tokens = os.path.basename(file).split('.')
+        logger.info(file_tokens)
+        file_name = os.path.basename(file_tokens[-2])
+        file_tokens.insert(0, os.path.dirname(file_tokens[-2]))
+        file_tokens[-2] = file_name
         frame_number = file_tokens[-2]
         digits_string = replace_digits(frame_number)
         file_tokens[-2] = digits_string
-        file = ('.').join(file_tokens)
+        filename = ('.').join([file_tokens[-2], file_tokens[-1]])
+        file = ('/').join([file_tokens[0], filename])
+        '''
         if file not in paths_dic.keys():
             paths_dic[file] = []
-        paths_dic[file].append(int(frame_number))
+        paths_dic[file].append(digits)
         paths_list.append(file)
     for path in paths_dic.keys():
         paths_dic[path].sort()
@@ -139,11 +167,14 @@ def add_namespace_knob(node, namespace):
     node['wizard_namespace'].setEnabled(False)
 
 def set_read_data(read, file_path, frange):
+
     read['file'].setValue(file_path)
-    read['first'].setValue(frange[0])
-    read['last'].setValue(frange[1])
-    read['origfirst'].setValue(frange[0])
-    read['origlast'].setValue(frange[1])
+    if frange[0] != '':
+        read['first'].setValue(frange[0])
+        read['origfirst'].setValue(frange[0])
+    if frange[1] != '':
+        read['last'].setValue(frange[1])
+        read['origlast'].setValue(frange[1])
 
 def get_all_namespaces():
     namespaces_dic = dict()

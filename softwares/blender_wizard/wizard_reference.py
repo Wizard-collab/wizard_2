@@ -11,6 +11,7 @@ import wizard_hooks
 from blender_wizard import redshift_shader
 from blender_wizard import cycles_shader
 from blender_wizard import wizard_tools
+from blender_wizard import animation
 
 # Python modules
 import traceback
@@ -49,6 +50,12 @@ def import_modeling(reference_dic):
 def update_modeling(reference_dic):
     update_reference(reference_dic, 'MODELING')   
 
+def import_shading(reference_dic):
+    create_reference(reference_dic, 'SHADING') 
+
+def update_shading(reference_dic):
+    update_reference(reference_dic, 'SHADING')   
+
 def import_layout(reference_dic):
     create_reference(reference_dic, 'LAYOUT')  
 
@@ -56,10 +63,18 @@ def update_layout(reference_dic):
     update_reference(reference_dic, 'LAYOUT')  
 
 def import_animation(reference_dic):
-    create_reference(reference_dic, 'ANIMATION')  
+    #create_reference(reference_dic, 'ANIMATION')  
+    animation.import_animation_cache(reference_dic)
 
 def update_animation(reference_dic):
-    update_reference(reference_dic, 'ANIMATION')  
+    #update_reference(reference_dic, 'ANIMATION')  
+    animation.update_animation_cache(reference_dic)
+
+def import_camera(reference_dic):
+    create_reference(reference_dic, 'CAMERA')  
+
+def update_camera(reference_dic):
+    update_reference(reference_dic, 'CAMERA')  
 
 def import_custom(reference_dic):
     create_reference(reference_dic, 'CUSTOM')  
@@ -77,7 +92,7 @@ def create_reference(reference_dic, referenced_stage):
             if file.endswith('.abc'):
                 import_abc(file, namespace_collection)
             elif file.endswith('.blend'):
-                link_blend(file, reference_dic['namespace'], namespace_collection)
+                link_blend(file, reference_dic, namespace_collection)
             else:
                 logger.info('{} extension is unknown'.format(file))
         trigger_after_reference_hook(referenced_stage.lower(),
@@ -106,21 +121,26 @@ def import_abc(file_path, parent_collection=None):
     bpy.ops.object.select_all(action='DESELECT')
     bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False)
 
-def link_blend(file_path, namespace, parent_collection=None):
+def link_blend(file_path, reference_dic, parent_collection=None):
     if wizard_tools.find_library(file_path):
         logger.warning(f"Ressource already existing, skipping...")
         return
 
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection
+    wizard_tools.set_collection_active(parent_collection)
     with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
         data_to.collections = [c for c in data_from.collections]
     for coll in data_to.collections:
         if coll is not None:
-            parent_collection.children.link(coll)
+            if coll.name != reference_dic['asset_name']:
+                continue
+            override_collection = coll.override_hierarchy_create(bpy.context.scene, bpy.context.view_layer, do_fully_editable=True)
+            bpy.context.scene.collection.children.unlink(override_collection)
+            parent_collection.children.link(override_collection)
 
     lib = bpy.data.libraries[os.path.basename(file_path)]
-    lib.name = namespace
+    lib.name = reference_dic['namespace']
 
 def update_blend(file_path, namespace):
     try:

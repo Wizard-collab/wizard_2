@@ -132,6 +132,8 @@ class communicate_server(Thread):
             returned = get_project_path()
         elif signal_dic['function'] == 'request_video':
             returned = request_video(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'get_export_name_from_reference_namespace':
+            returned = get_export_name_from_reference_namespace(signal_dic['reference_namespace'], signal_dic['work_env_id'])
         elif signal_dic['function'] == 'add_video':
             returned = add_video(signal_dic['work_env_id'],
                                     signal_dic['temp_dir'],
@@ -234,3 +236,8 @@ def get_local_path():
 
 def get_project_path():
     return environment.get_project_path()
+
+def get_export_name_from_reference_namespace(reference_namespace, work_env_id):
+    reference_row = project.get_reference_by_namespace(work_env_id, reference_namespace)
+    export_name = project.get_export_data(reference_row['export_id'], 'name')
+    return export_name
