@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 def get_connection(DNS, timeout=5.0, only_debug=False):
     try:
         connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        connection.settimeout(timeout)
         connection.connect((DNS[0], DNS[1]))
         return connection
     except ConnectionRefusedError:

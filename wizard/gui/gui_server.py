@@ -122,7 +122,7 @@ class gui_server(QThread):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
 
 def try_connection():
-    conn = socket_utils.get_connection(_DNS_, timeout=0.1, only_debug=True)
+    conn = socket_utils.get_connection(_DNS_, timeout=0.5, only_debug=True)
     if conn:
         conn.close()
         return 1

@@ -317,6 +317,7 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
 
         self.check_existence_thread.missing_file_signal.connect(self.missing_file)
+        self.check_existence_thread.missing_folder_signal.connect(self.missing_folder)
         self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
         self.check_existence_thread.extension_signal.connect(self.extension_signal)
 
@@ -428,6 +429,10 @@ class exports_widget(QtWidgets.QWidget):
         number = tuple_signal[-1]
         if export_version_id in self.export_versions_ids.keys():
             self.export_versions_ids[export_version_id].set_missing(number)
+
+    def missing_folder(self, export_version_id):
+        if export_version_id in self.export_versions_ids.keys():
+            self.export_versions_ids[export_version_id].set_missing_folder()
 
     def not_missing_file(self, tuple_signal):
         export_version_id = tuple_signal[0]
@@ -679,6 +684,10 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setText(7, f'missing {number} files')
         self.setForeground(7, QtGui.QBrush(QtGui.QColor('#f79360')))
 
+    def set_missing_folder(self):
+        self.setText(7, f"missing folder")
+        self.setForeground(7, QtGui.QBrush(QtGui.QColor('#ff4b3b')))
+
     def set_not_missing(self, number):
         if number > 0:
             self.setText(7, f'{number} files')
@@ -698,6 +707,7 @@ class signal_handler(QtCore.QObject):
 class check_existence_thread(QtCore.QThread):
 
     missing_file_signal = pyqtSignal(tuple)
+    missing_folder_signal = pyqtSignal(int)
     not_missing_file_signal = pyqtSignal(tuple)
     extension_signal = pyqtSignal(tuple)
 
@@ -707,29 +717,36 @@ class check_existence_thread(QtCore.QThread):
         self.running = True
 
     def run(self):
-        if self.export_versions_rows is not None:
-            for export_version_row in self.export_versions_rows:
-                files_list = json.loads(export_version_row['files'])
-                if files_list == []:
-                    missing_files = 0
+        try:
+            if self.export_versions_rows is not None:
+                for export_version_row in self.export_versions_rows:
+                    files_list = json.loads(export_version_row['files'])
                     export_version_dir = assets.get_export_version_path(export_version_row['id'])
-                    files_list = os.listdir(export_version_dir)
-                    if len(files_list) > 0:
-                        self.extension_signal.emit((export_version_row['id'], files_list[0].split('.')[-1]))
-                else:
-                    missing_files = 0
-                    for file in files_list:
-                        if not path_utils.isfile(file):
-                            missing_files += 1
-                if not self.running:
-                    break
+                    if not path_utils.isdir(export_version_dir):
+                        self.missing_folder_signal.emit(export_version_row['id'])
+                        continue
+                    if files_list == []:
+                        missing_files = 0
+                        export_version_dir = assets.get_export_version_path(export_version_row['id'])
+                        files_list = os.listdir(export_version_dir)
+                        if len(files_list) > 0:
+                            self.extension_signal.emit((export_version_row['id'], files_list[0].split('.')[-1]))
+                    else:
+                        missing_files = 0
+                        for file in files_list:
+                            if not path_utils.isfile(file):
+                                missing_files += 1
+                    if not self.running:
+                        break
 
-                if missing_files:
-                    self.missing_file_signal.emit((export_version_row['id'], missing_files))
-                else:
-                    self.not_missing_file_signal.emit((export_version_row['id'], len(files_list)))
-                if not self.running:
-                    break
+                    if missing_files:
+                        self.missing_file_signal.emit((export_version_row['id'], missing_files))
+                    else:
+                        self.not_missing_file_signal.emit((export_version_row['id'], len(files_list)))
+                    if not self.running:
+                        break
+        except:
+            logger.debug(str(traceback.format_exc()))
 
     def update_versions_rows(self, export_versions_rows):
         self.running = False

@@ -38,6 +38,7 @@ from wizard.core import path_utils
 def get_root_logger():
     create_prefs_folder()
     root_logger = logging.getLogger()
+    print(sys.argv)
     if 'DEBUG' in sys.argv:
         root_logger.setLevel(logging.DEBUG)
     else:

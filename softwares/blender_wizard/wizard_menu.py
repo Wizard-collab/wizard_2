@@ -10,18 +10,6 @@ import bpy.utils.previews
 from blender_wizard import wizard_plugin
 from blender_wizard import wizard_tools
 
-bl_info = {
-    "name": "Wizard",
-    "author": "Auguste Lefort",
-    "version": (2, 0),
-    "blender": (2, 93, 3),
-    "location": "View3D > Wizard",
-    "description": "Provide Wizard's tools",
-    "warning": "",
-    "doc_url": "wizard-pipeline-manager.webflow.io",
-    "category": "User",
-}
-
 class save_increment(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
