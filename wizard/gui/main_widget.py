@@ -60,6 +60,7 @@ from wizard.gui import groups_manager_widget
 from wizard.gui import quotes_manager
 from wizard.gui import table_viewer_widget
 from wizard.gui import floating_widgets_layout
+from wizard.gui import pranks
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +105,7 @@ class main_widget(QtWidgets.QWidget):
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.quotes_manager = quotes_manager.quotes_manager()
         self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
+        self.pranks = pranks.pranks()
 
         self.build_ui()
         self.connect_functions()
@@ -238,6 +240,7 @@ class main_widget(QtWidgets.QWidget):
         self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
         self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
         self.team_client.refresh_signal.connect(self.refresh)
+        self.team_client.prank_signal.connect(self.pranks.execute_attack)
         self.team_client.new_user_signal.connect(self.team_widget.add_user)
         self.team_client.remove_user_signal.connect(self.team_widget.remove_user)
 

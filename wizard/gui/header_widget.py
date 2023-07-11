@@ -69,7 +69,7 @@ class header_widget(QtWidgets.QFrame):
         self.groups_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._group_icon_), "Groups manager")
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
         self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
-        self.championship_action = self.window_action.addAction(QtGui.QIcon(ressources._ranking_icon_), "Championship")
+        self.championship_action = self.window_action.addAction(QtGui.QIcon(ressources._artefacts_icon_), "Championship")
         self.quotes_action = self.window_action.addAction(QtGui.QIcon(ressources._quote_icon_), "Quotes")
         self.table_viewer_action = self.window_action.addAction(QtGui.QIcon(ressources._table_viewer_icon_), "Tables editor")
         self.pywizard_action = self.window_action.addAction(QtGui.QIcon(ressources._python_icon_), "PyWizard")

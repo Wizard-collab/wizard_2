@@ -33,6 +33,7 @@
 # remove levels and remove life
 
 # Python modules
+import random
 import logging
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,15 @@ def remove_levels(amount):
 	repository.add_death(user_row['user_name'])
 	return 1
 
+def remove_levels_to_user(amount, user):
+	user_row = repository.get_user_row_by_name(user)
+	new_level = user_row['level'] - amount
+	if new_level <= 0:
+		new_level = 0
+	repository.modify_user_level(user_row['user_name'], new_level)
+	repository.add_death(user_row['user_name'])
+	return 1
+
 def remove_life(amount):
 	# Remove the given amount of life of
 	# the current user
@@ -91,5 +101,8 @@ def analyse_comment(comment, life_amount):
 		logger.info(f"Comment with more than 5 characters to avoid loosing life.")
 	else:
 		repository.increase_user_comments_count(environment.get_user())
+		add_coins(len(comment)/random.randint(2, 5))
 	return 1
 	
+def add_coins(amount):
+	return repository.add_user_coins(environment.get_user(), amount)
