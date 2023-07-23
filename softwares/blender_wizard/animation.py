@@ -62,6 +62,9 @@ def add_sequences_caches(animation_namespace, meshes, cache_file):
         for object_path in cache_file.object_paths.values():
             if mesh.name in object_path.path:
                 modifier.object_path = object_path.path
+                modifier.read_data = {'VERT'}
+                modifier.use_vertex_interpolation = False
+
                 break
         if modifier.object_path == '':
             mesh.modifiers.remove(modifier)
