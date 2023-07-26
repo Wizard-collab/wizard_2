@@ -41,6 +41,7 @@ from wizard.core import environment
 from wizard.vars import assets_vars
 
 def add_progress_event():
+    start_time = time.time()
     domains_rows = project.get_domains()
     domains = dict()
     for domain_row in domains_rows:
@@ -66,29 +67,42 @@ def add_progress_event():
         stage = stage_row['name']
         category = assets_categories[stage_row['asset_id']]
         domain = domains[stage_row['domain_id']]
-        if domain != assets_vars._library_:
-            if 'total' not in total_progresses_dic.keys():
-                total_progresses_dic['total'] = []
-            total_progresses_dic['total'].append(stage_row['progress'])
-            if stage not in total_progresses_dic.keys():
-                total_progresses_dic[stage] = []
-            total_progresses_dic[stage].append(stage_row['progress'])
-            if category not in categories_progresses_dic.keys():
-                categories_progresses_dic[category] = dict()
-            if 'total' not in categories_progresses_dic[category].keys():
-                categories_progresses_dic[category]['total'] = []
-            categories_progresses_dic[category]['total'].append(stage_row['progress'])
+        if domain == assets_vars._library_:
+            continue
+        if stage_row['state'] == 'omt':
+            continue
+        if 'total' not in total_progresses_dic.keys():
+            total_progresses_dic['total'] = []
+        total_progresses_dic['total'].append(stage_row['progress'])
+        if stage not in total_progresses_dic.keys():
+            total_progresses_dic[stage] = []
+        total_progresses_dic[stage].append(stage_row['progress'])
+        if category not in categories_progresses_dic.keys():
+            categories_progresses_dic[category] = dict()
+        if 'total' not in categories_progresses_dic[category].keys():
+            categories_progresses_dic[category]['total'] = []
+        categories_progresses_dic[category]['total'].append(stage_row['progress'])
+        if stage not in categories_progresses_dic[category].keys():
+            categories_progresses_dic[category][stage] = []
+        categories_progresses_dic[category][stage].append(stage_row['progress'])
+        if domain not in domains_progresses_dic.keys():
+            domains_progresses_dic[domain] = dict()
+        if 'total' not in domains_progresses_dic[domain].keys():
+            domains_progresses_dic[domain]['total'] = []
+        domains_progresses_dic[domain]['total'].append(stage_row['progress'])
+        if stage not in domains_progresses_dic[domain].keys():
+            domains_progresses_dic[domain][stage] = []
+        domains_progresses_dic[domain][stage].append(stage_row['progress'])
+
+    for stage in (assets_vars._assets_stages_list_ + assets_vars._sequences_stages_list_):
+        if stage not in total_progresses_dic.keys():
+            total_progresses_dic[stage] = []
+        for category in categories_progresses_dic.keys():
             if stage not in categories_progresses_dic[category].keys():
                 categories_progresses_dic[category][stage] = []
-            categories_progresses_dic[category][stage].append(stage_row['progress'])
-            if domain not in domains_progresses_dic.keys():
-                domains_progresses_dic[domain] = dict()
-            if 'total' not in domains_progresses_dic[domain].keys():
-                domains_progresses_dic[domain]['total'] = []
-            domains_progresses_dic[domain]['total'].append(stage_row['progress'])
+        for domain in domains_progresses_dic.keys():
             if stage not in domains_progresses_dic[domain].keys():
                 domains_progresses_dic[domain][stage] = []
-            domains_progresses_dic[domain][stage].append(stage_row['progress'])
 
     for stage in total_progresses_dic.keys():
         total_progresses_dic[stage] = get_mean(total_progresses_dic[stage])
@@ -103,6 +117,7 @@ def add_progress_event():
         for stage in categories_progresses_dic[category].keys():
             categories_progresses_dic[category][stage] = get_mean(categories_progresses_dic[category][stage])
         project.add_progress_event('category', category, json.dumps(categories_progresses_dic[category]))
+    print(f"stats : {time.time()-start_time}")
 
 def get_mean(data_list):
     if data_list == []:

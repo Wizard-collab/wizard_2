@@ -1420,14 +1420,10 @@ def add_stage_work_time(stage_id, time_to_add):
 
 def update_stage_progress(stage_id):
     stage_row = get_stage_data(stage_id)
-    progress = 0
-    if stage_row['state'] != 'done':
-        if stage_row['estimated_time'] is not None and stage_row['estimated_time'] > 0:
-            progress = (stage_row['work_time']/float(stage_row['estimated_time']))*100
-            if progress > 100:
-                progress = 100
-    else:
+    if stage_row['state'] == 'done' or stage_row['state'] == 'omit' :
         progress = 100
+    else:
+        progress = 0
     if progress == stage_row['progress']:
         return
     return db_utils.update_data('project',
@@ -1437,23 +1433,37 @@ def update_stage_progress(stage_id):
 
 def add_progress_event(type, name, datas_dic):
     day, hour = tools.convert_time(time.time())
+    '''
     if db_utils.check_existence_by_multiple_data('project', 
                                     'progress_events',
                                     ('name', 'day'),
                                     (name, day)):
-        return
+        row_id = db_utils.get_row_by_multiple_data('project',
+                                                'progress_events',
+                                                ('name', 'day'),
+                                                (name, day), 'id')
+        db_utils.update_data('project',
+                                'progress_events',
+                                ('datas_dic', datas_dic),
+                                ('id', row_id[0]))
+        db_utils.update_data('project',
+                                'progress_events',
+                                ('creation_time', time.time()),
+                                ('id', row_id[0]))
+    else:
+    '''
     return db_utils.create_row('project',
-                                'progress_events', 
-                                ('creation_time',
-                                    'day',
-                                    'type',
-                                    'name',
-                                    'datas_dic'),
-                                (time.time(),
-                                    day,
-                                    type,
-                                    name,
-                                    datas_dic))
+                            'progress_events', 
+                            ('creation_time',
+                                'day',
+                                'type',
+                                'name',
+                                'datas_dic'),
+                            (time.time(),
+                                day,
+                                type,
+                                name,
+                                datas_dic))
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     if (db_utils.check_existence_by_multiple_data('project', 
@@ -1776,7 +1786,7 @@ def create_settings_row(frame_rate, image_format, deadline):
                                         (frame_rate,
                                             json.dumps(image_format),
                                             deadline,
-                                            json.dumps(list()))):
+                                            json.dumps([]))):
         logger.warning("Project settings not initiated")
         return
     logger.info("Project settings initiated")
@@ -1847,9 +1857,8 @@ def get_users_ids_list():
                                                         'settings',
                                                         ('id', 1),
                                                         'users_ids')
-    if users_ids_list is None or len(users_ids_list) < 1:
-        logger.error("Project settings not found")
-        return
+    if users_ids_list is None :
+        return []
     return json.loads(users_ids_list[0])
 
 def add_user(user_id):
@@ -2421,7 +2430,6 @@ def create_project(project_name, project_path, project_password, project_image =
         repository.remove_project_row(project_id)
         return
     logger.info(f"{project_name} created")
-    environment.build_project_env(project_name, project_path)
     return 1
 
 def init_project(project_path, project_name):
@@ -2771,7 +2779,7 @@ def create_settings_table(database):
                                         frame_rate text NOT NULL,
                                         image_format text NOT NULL,
                                         deadline real NOT NULL,
-                                        users_ids text
+                                        users_ids text NOT NULL
                                     );"""
     if not db_utils.create_table(database, sql_cmd):
         return

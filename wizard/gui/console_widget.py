@@ -29,8 +29,11 @@ class custom_stdout(QtCore.QObject):
         super(custom_stdout, self).__init__(parent)
 
     def write(self, buf):
-        self.stdout_signal.emit(buf)
-        sys.__stdout__.write(buf)
+        try:
+            self.stdout_signal.emit(buf)
+        except RuntimeError:
+            pass
+            sys.__stdout__.write(buf)
 
     def flush(self):
         sys.__stdout__.flush()

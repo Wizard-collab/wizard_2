@@ -217,8 +217,11 @@ class main_progress_widget(QtWidgets.QFrame):
         stage_rows = project.get_all_stages()
         all_progresses = []
         for stage_row in stage_rows:
-            if stage_row['domain_id'] != 2:
-                all_progresses.append(stage_row['progress'])
+            if stage_row['domain_id'] == 2:
+                continue
+            if stage_row['state'] == 'omt':
+                continue
+            all_progresses.append(stage_row['progress'])
         if all_progresses == []:
             all_progresses = [0]
         mean = statistics.mean(all_progresses)
@@ -367,23 +370,26 @@ class user_progress_widget(QtWidgets.QFrame):
         stages_dic = dict()
 
         for stage_row in stage_rows:
-            if stage_row['domain_id'] != 2:
-                if stage_row['assignment'] == environment.get_user():
-                    all_progresses.append(stage_row['progress'])
-                    all_work_times.append(stage_row['work_time'])
-                    total_work_time += stage_row['work_time']
-                    if stage_row['state'] == 'done':
-                        tasks_done+=1
+            if stage_row['domain_id'] == 2:
+                continue
+            if stage_row['state'] == 'omt':
+                continue
+            if stage_row['assignment'] == environment.get_user():
+                all_progresses.append(stage_row['progress'])
+                all_work_times.append(stage_row['work_time'])
+                total_work_time += stage_row['work_time']
+                if stage_row['state'] == 'done':
+                    tasks_done+=1
 
-                    if stage_row['name'] not in stages_dic.keys():
-                        stages_dic[stage_row['name']] = dict()
-                        stages_dic[stage_row['name']]['all_progresses'] = []
-                        stages_dic[stage_row['name']]['all_work_times'] = []
-                        stages_dic[stage_row['name']]['total_work_time'] = 0
+                if stage_row['name'] not in stages_dic.keys():
+                    stages_dic[stage_row['name']] = dict()
+                    stages_dic[stage_row['name']]['all_progresses'] = []
+                    stages_dic[stage_row['name']]['all_work_times'] = []
+                    stages_dic[stage_row['name']]['total_work_time'] = 0
 
-                    stages_dic[stage_row['name']]['all_progresses'].append(stage_row['progress'])
-                    stages_dic[stage_row['name']]['all_work_times'].append(stage_row['work_time'])
-                    stages_dic[stage_row['name']]['total_work_time'] += stage_row['work_time']
+                stages_dic[stage_row['name']]['all_progresses'].append(stage_row['progress'])
+                stages_dic[stage_row['name']]['all_work_times'].append(stage_row['work_time'])
+                stages_dic[stage_row['name']]['total_work_time'] += stage_row['work_time']
 
         if all_progresses == []:
             all_progresses = [0]
@@ -939,6 +945,8 @@ class progress_overview_widget(QtWidgets.QFrame):
         domains_progresses_dic = dict()
 
         for stage_row in stages_rows:
+            if stage_row['state'] == 'omt':
+                continue
             if stage_row['name'] in assets_vars._assets_stages_list_ or stage_row['name'] in assets_vars._sequences_stages_list_:
                 if stage_row['name'] not in stages_progresses_dic.keys():
                     stages_progresses_dic[stage_row['name']] = []

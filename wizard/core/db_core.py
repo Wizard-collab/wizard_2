@@ -60,9 +60,11 @@ class db_access_singleton(metaclass=Singleton):
 
     def set_repository(self, repository):
         self.repository = repository
+        self.repository_conn = None
 
     def set_project(self, project_name):
         self.project_name = project_name
+        self.project_conn = None
 
     def execute_signal(self, level,
                             sql_cmd,

@@ -155,6 +155,7 @@ class main_widget(QtWidgets.QWidget):
         self.softwares_server.start()
 
     def init_widgets_pos(self):
+        logger.info("Loading user interface")
         floating_widgets_layout.init_widget_pos(self, 'main_widget', force_show=1, maximized=1)
         floating_widgets_layout.init_widget_pos(self.console_widget, 'console_widget')
         floating_widgets_layout.init_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
@@ -167,6 +168,7 @@ class main_widget(QtWidgets.QWidget):
         floating_widgets_layout.init_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
 
     def init_contexts(self):
+        logger.info("Loading user context")
         self.tree_widget.get_context()
         self.tabs_widget.get_context()
         self.versions_widget.get_context()
@@ -176,6 +178,7 @@ class main_widget(QtWidgets.QWidget):
         self.production_manager_widget.get_context()
 
     def save_widgets_pos(self):
+        logger.info("Saving user interface")
         floating_widgets_layout.save_widget_pos(self, 'main_widget')
         floating_widgets_layout.save_widget_pos(self.console_widget, 'console_widget')
         floating_widgets_layout.save_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
@@ -188,6 +191,7 @@ class main_widget(QtWidgets.QWidget):
         floating_widgets_layout.save_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
 
     def save_contexts(self):
+        logger.info("Saving user context")
         self.tree_widget.set_context()
         self.tabs_widget.set_context()
         self.versions_widget.set_context()
@@ -365,6 +369,7 @@ class main_widget(QtWidgets.QWidget):
         self.videos_widget.refresh()
 
     def quit_threads(self):
+        logger.info("Stopping threads")
         self.stop_threads.emit(1)
         self.gui_server.stop()
         self.team_client.stop()
@@ -373,6 +378,8 @@ class main_widget(QtWidgets.QWidget):
         self.communicate_server.stop()
         self.subtask_manager.tasks_server.stop()
         self.softwares_server.stop()
+        self.championship_widget.refresh_thread.stop()
+        time.sleep(0.5)
 
     def prepare_close(self):
         close = False

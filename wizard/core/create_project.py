@@ -91,6 +91,7 @@ def create_project(project_name,
     if not project.create_project(project_name, project_path, project_password, project_image):
         return
     db_utils.modify_db_name('project', project_name)
+    environment.build_project_env(project_name, project_path)
     init_project(project_name, project_path, project_password, frame_rate, image_format, deadline_float)
     if old_project_name is not None:
         user.log_project_without_cred(old_project_name)

@@ -93,6 +93,7 @@ def create_domain(name):
     if not tools.create_folder(dir_name):
         project.remove_domain(domain_id)
         return
+    stats.add_progress_event()
     return domain_id
 
 def archive_domain(domain_id):
@@ -109,6 +110,7 @@ def archive_domain(domain_id):
         return
     path_utils.rmtree(dir_name)
     logger.info(f"{dir_name} deleted")
+    stats.add_progress_event()
     return project.remove_domain(domain_id)
 
 def create_category(name, domain_id):
@@ -129,6 +131,7 @@ def create_category(name, domain_id):
     hooks.after_category_creation_hook(category_row['string'], name)
     events.add_creation_event('category', category_id)
     game.add_xps(game_vars._creation_xp_)
+    stats.add_progress_event()
     return category_id
 
 def archive_category(category_id):
@@ -150,6 +153,7 @@ def archive_category(category_id):
         return
     events.add_archive_event(f"Archived {instance_to_string(('domain', category_row['domain_id']))}/{category_row['name']}",
                                 archive_file)
+    stats.add_progress_event()
     return 1
 
 def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postroll=0):
@@ -176,6 +180,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     events.add_creation_event('asset', asset_id)
     game.add_xps(game_vars._creation_xp_)
     game.add_coins(game_vars._creation_coins_)
+    stats.add_progress_event()
     return asset_id
 
 def modify_asset_frame_range(asset_id, inframe, outframe, preroll, postroll):
@@ -208,6 +213,7 @@ def archive_asset(asset_id):
         return
     events.add_archive_event(f"Archived {instance_to_string(('category', asset_row['category_id']))}/{asset_row['name']}",
                                 archive_file)
+    stats.add_progress_event()
     return 1
 
 def get_asset_data_from_work_env_id(work_env_id, column='*'):
@@ -288,6 +294,7 @@ def create_stage(name, asset_id):
     variant_id = create_variant('main', stage_id, 'default variant')
     if variant_id:
         project.set_stage_default_variant(stage_id, variant_id)
+    stats.add_progress_event()
     return stage_id
 
 def archive_stage(stage_id):
@@ -309,6 +316,7 @@ def archive_stage(stage_id):
         return
     events.add_archive_event(f"Archived {instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}",
                                 archive_file)
+    stats.add_progress_event()
     return 1
 
 def create_variant(name, stage_id, comment=''):
@@ -368,6 +376,7 @@ def modify_stage_state(stage_id, state, comment=''):
         stage_row = project.get_stage_data(stage_id)
         amount = int((stage_row['work_time']/400)*game_vars._task_done_coins_)
         repository.add_user_coins(stage_row['assignment'], amount)
+    stats.add_progress_event()
     return 1
 
 def modify_stage_priority(stage_id, priority):
@@ -401,7 +410,6 @@ def modify_stage_estimation(stage_id, seconds):
         logger.warning(f'{seconds} is not a int')
         return
     project.set_stage_data(stage_id, 'estimated_time', seconds)
-    project.update_stage_progress(stage_id)
     asset_tracking.add_estimation_event(stage_id, seconds)
     return 1
 
@@ -410,7 +418,6 @@ def add_work_time(work_env_id, work_time):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     project.add_stage_work_time(stage_id, work_time)
-    project.update_stage_progress(stage_id)
     asset_tracking.add_work_session_event(stage_id, work_time)
     amount = int((work_time/200)*game_vars._work_coins_)
     repository.add_user_coins(environment.get_user(), amount)

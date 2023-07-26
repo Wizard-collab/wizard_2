@@ -339,4 +339,10 @@ class refresh_thread(QtCore.QThread):
                 refresh_ui = 1
             if refresh_ui:
                 self.refresh_signal.emit(1)
-            time.sleep(5)
+            for a in range(5):
+                if not self.running:
+                    break
+                time.sleep(1)
+
+    def stop(self):
+        self.running = False
