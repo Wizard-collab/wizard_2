@@ -52,12 +52,14 @@ class production_manager_widget(QtWidgets.QWidget):
         context_dic = dict()
         context_dic['current_tab'] = current_tab
         user.user().add_context(user_vars._production_manager_context_, context_dic)
+        self.production_table_widget.set_context()
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._production_manager_context_)
         if context_dic is not None and context_dic != dict():
             current_tab = context_dic['current_tab']
             self.tabs_widget.tab_selected(current_tab)
+        self.production_table_widget.get_context()
 
     def refresh(self):
         self.overview_widget.refresh()

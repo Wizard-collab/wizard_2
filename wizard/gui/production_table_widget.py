@@ -19,6 +19,7 @@ from wizard.gui import comment_widget
 from wizard.gui import asset_tracking_widget
 
 # Wizard modules
+from wizard.core import user
 from wizard.core import repository
 from wizard.core import tools
 from wizard.core import assets
@@ -29,6 +30,7 @@ from wizard.core import image
 from wizard.core import path_utils
 from wizard.vars import ressources
 from wizard.vars import assets_vars
+from wizard.vars import user_vars
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +63,28 @@ class production_table_widget(QtWidgets.QWidget):
             user_image =  user_row['profile_picture']
             pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
+
+    def set_context(self):
+        context_dic = dict()
+        context_dic['show_notes'] = self.show_notes 
+        context_dic['show_states'] = self.show_states 
+        context_dic['show_assignments'] = self.show_assignments 
+        context_dic['show_priorities'] = self.show_priorities 
+        context_dic['domain'] = self.domain 
+        context_dic['search_text'] = self.search_bar.text() 
+        user.user().add_context(user_vars._production_table_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._production_table_context_)
+        if context_dic is not None and context_dic != dict():
+            self.show_notes = context_dic['show_notes']
+            self.show_states = context_dic['show_states']
+            self.show_assignments = context_dic['show_assignments']
+            self.show_priorities = context_dic['show_priorities']
+            self.search_bar.setText(context_dic['search_text'])
+            self.update_stage_datas_visibility()
+            self.update_layout()
+            self.domain_comboBox.setCurrentText(context_dic['domain'])
 
     def context_menu_requested(self, point):
         menu = gui_utils.QMenu(self)
@@ -252,6 +276,9 @@ class production_table_widget(QtWidgets.QWidget):
 
         current_domain = self.domain_comboBox.currentText()
         if current_domain != self.domain:
+            self.show_all_stages()
+            self.show_all_assets()
+            #self.update_layout()
             self.table_widget.clear()
             self.asset_ids = dict()
             self.stage_ids = dict()
@@ -325,10 +352,8 @@ class production_table_widget(QtWidgets.QWidget):
 
         stage_rows = project.get_all_stages()
         self.stage_rows = []
-        project_stage_ids = []
 
         for stage_row in stage_rows:
-            project_stage_ids.append(stage_row['id'])
             if stage_row['asset_id'] in self.asset_ids.keys():
                 self.stage_rows.append(stage_row)
                 if stage_row['id'] not in self.stage_ids.keys():
@@ -344,12 +369,13 @@ class production_table_widget(QtWidgets.QWidget):
                     self.stage_ids[stage_row['id']]['widget'].priority_signal.connect(self.update_priority)
                     self.stage_ids[stage_row['id']]['widget'].assignment_signal.connect(self.update_assignment)
                 else:
-                    if stage_row == self.stage_ids[stage_row['id']]['row']:
+                    if stage_row != self.stage_ids[stage_row['id']]['row']:
                         self.stage_ids[stage_row['id']]['widget'].refresh(stage_row)
                         self.stage_ids[stage_row['id']]['row'] = stage_row
 
         self.update_stage_datas_visibility()
         self.update_layout()
+        self.update_search()
 
         self.update_refresh_time(start_time)
 
@@ -394,6 +420,8 @@ class production_table_widget(QtWidgets.QWidget):
             del self.asset_ids[asset_id]
 
     def update_search(self):
+        if not self.isVisible():
+            return
         search_data = self.search_bar.text()
         self.search_start_time = time.perf_counter()
         self.accept_item_from_thread = False
@@ -421,6 +449,7 @@ class production_table_widget(QtWidgets.QWidget):
             self.show_all_stages()
             self.show_all_assets()
             self.show_all_tasks()
+            self.update_layout()
         self.clean_threads()
 
     def clean_threads(self):
@@ -441,6 +470,7 @@ class production_table_widget(QtWidgets.QWidget):
     def show_all_stages(self):
         for stage_id in self.stage_ids.keys():
             self.show_stage(stage_id)
+        self.update_layout()
 
     def hide_asset(self, asset_id):
         if asset_id in self.asset_ids.keys():
