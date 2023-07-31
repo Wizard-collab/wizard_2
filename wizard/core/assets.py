@@ -294,7 +294,7 @@ def create_stage(name, asset_id):
     variant_id = create_variant('main', stage_id, 'default variant')
     if variant_id:
         project.set_stage_default_variant(stage_id, variant_id)
-    stats.add_progress_event()
+    stats.add_progress_event(new_stage=stage_id)
     return stage_id
 
 def archive_stage(stage_id):
@@ -316,7 +316,7 @@ def archive_stage(stage_id):
         return
     events.add_archive_event(f"Archived {instance_to_string(('asset', stage_row['asset_id']))}/{stage_row['name']}",
                                 archive_file)
-    stats.add_progress_event()
+    stats.add_progress_event(removed_stage=stage_row['name'])
     return 1
 
 def create_variant(name, stage_id, comment=''):

@@ -364,6 +364,14 @@ def get_all_assets(column='*'):
                                             column)
     return assets_rows
 
+def get_all_sequence_assets(column='*'):
+    domain_id = get_domain_by_name('sequences', 'id')
+    categories_ids = get_domain_childs(domain_id, 'id')
+    assets_rows = []
+    for category_id in categories_ids:
+        assets_rows += (get_category_childs(category_id))
+    return assets_rows
+
 def remove_asset(asset_id):
     if not repository.is_admin():
         return
@@ -1464,6 +1472,12 @@ def add_progress_event(type, name, datas_dic):
                                 type,
                                 name,
                                 datas_dic))
+
+def update_progress_event(progress_event_id, data_tuple):
+    return db_utils.update_data('project',
+                        'progress_events',
+                        data_tuple,
+                        ('id', progress_event_id))
 
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     if (db_utils.check_existence_by_multiple_data('project', 

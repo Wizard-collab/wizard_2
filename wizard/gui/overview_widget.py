@@ -215,16 +215,23 @@ class main_progress_widget(QtWidgets.QFrame):
 
     def refresh(self):
         stage_rows = project.get_all_stages()
+        all_frames = stats.get_all_frames()
         all_progresses = []
         for stage_row in stage_rows:
             if stage_row['domain_id'] == 2:
                 continue
             if stage_row['state'] == 'omt':
                 continue
-            all_progresses.append(stage_row['progress'])
+            if stage_row['name'] in assets_vars._assets_stages_list_:
+                progress = (stage_row['progress'],1)
+            elif stage_row['name'] in assets_vars._sequences_stages_list_:
+                asset_row = project.get_asset_data(stage_row['asset_id'])
+                asset_frames = asset_row['outframe'] - asset_row['inframe']
+                progress = (stage_row['progress'], asset_frames/all_frames)
+            all_progresses.append(progress)
         if all_progresses == []:
             all_progresses = [0]
-        mean = statistics.mean(all_progresses)
+        mean = stats.get_mean(all_progresses)
         self.progress_bar.setValue(int(mean))
         self.progress_label.setText(f"{round(mean, 1)} %")
 
@@ -366,7 +373,8 @@ class user_progress_widget(QtWidgets.QFrame):
         all_work_times = []
         tasks_done = 0
         total_work_time = 0
-
+        all_frames = stats.get_all_frames()
+        
         stages_dic = dict()
 
         for stage_row in stage_rows:
@@ -375,7 +383,14 @@ class user_progress_widget(QtWidgets.QFrame):
             if stage_row['state'] == 'omt':
                 continue
             if stage_row['assignment'] == environment.get_user():
-                all_progresses.append(stage_row['progress'])
+                if stage_row['name'] in assets_vars._assets_stages_list_:
+                    progress = (stage_row['progress'],1)
+                elif stage_row['name'] in assets_vars._sequences_stages_list_:
+                    asset_row = project.get_asset_data(stage_row['asset_id'])
+                    asset_frames = asset_row['outframe'] - asset_row['inframe']
+                    progress = (stage_row['progress'], asset_frames/all_frames)
+
+                all_progresses.append(progress)
                 all_work_times.append(stage_row['work_time'])
                 total_work_time += stage_row['work_time']
                 if stage_row['state'] == 'done':
@@ -387,7 +402,7 @@ class user_progress_widget(QtWidgets.QFrame):
                     stages_dic[stage_row['name']]['all_work_times'] = []
                     stages_dic[stage_row['name']]['total_work_time'] = 0
 
-                stages_dic[stage_row['name']]['all_progresses'].append(stage_row['progress'])
+                stages_dic[stage_row['name']]['all_progresses'].append(progress)
                 stages_dic[stage_row['name']]['all_work_times'].append(stage_row['work_time'])
                 stages_dic[stage_row['name']]['total_work_time'] += stage_row['work_time']
 
@@ -396,7 +411,7 @@ class user_progress_widget(QtWidgets.QFrame):
         if all_work_times == []:
             all_work_times = [0]
 
-        mean = statistics.mean(all_progresses)
+        mean = stats.get_mean(all_progresses)
         self.main_progress_bar.setValue(int(mean))
         self.main_progress_label.setText(f"{round(mean, 1)} %")
 
@@ -414,7 +429,7 @@ class user_progress_widget(QtWidgets.QFrame):
         self.tasks_done_widget.stat_label.setText(f"{tasks_done}/{len(all_progresses)}")
 
         for stage in stages_dic.keys():
-            mean = statistics.mean(stages_dic[stage]['all_progresses'])
+            mean = stats.get_mean(stages_dic[stage]['all_progresses'])
             work_time_mean = statistics.mean(stages_dic[stage]['all_work_times'])
             total_work_time = stages_dic[stage]['total_work_time']
             self.stages_widgets_dic[stage].progress_bar.setValue(int(mean))
@@ -515,7 +530,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.chart.setObjectName('quickstats_widget')
         self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.set_margin(40)
-        self.chart.set_points_thickness(4)
+        self.chart.set_points_thickness(0)
         self.chart.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.chart_layout.addWidget(self.chart)
 
@@ -532,11 +547,17 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.prevision_check_box.setChecked(True)
         self.settings_content_layout.addWidget(self.prevision_check_box)
 
-        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.stages_selection_list = QtWidgets.QListWidget()
+        self.stages_selection_list.setObjectName('transparent_widget')
+        self.stages_selection_list.setSelectionMode(QtWidgets.QListWidget.ExtendedSelection)
+        self.stages_selection_list.setFixedWidth(120)
+        self.stages_selection_list.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.settings_content_layout.addWidget(self.stages_selection_list)
 
     def connect_functions(self):
         self.prevision_check_box.stateChanged.connect(self.chart.set_prevision_visibility)
         self.context_comboBox.currentTextChanged.connect(lambda:self.context_changed(None))
+        self.stages_selection_list.itemSelectionChanged.connect(self.update_data_visibility)
 
     def refresh(self):
         all_progress_events_rows = project.get_all_progress_events()
@@ -595,6 +616,8 @@ class progress_curves_widget(QtWidgets.QFrame):
         for data in data_list:
             if data not in datas_dic.keys():
                 self.remove_data(data)
+            if data == 'total':
+                self.data_dic[data].setSelected(1)
 
         month = tools.get_month(start_time)
         day = tools.get_day(start_time)
@@ -625,10 +648,16 @@ class progress_curves_widget(QtWidgets.QFrame):
 
     def add_data(self, data, color):
         if data not in self.data_dic.keys():
-            item = data_item(data, color)
-            item.stateChanged.connect(self.update_data_visibility)
-            item.setChecked(True)
-            self.settings_content_layout.addWidget(item)
+            #item = data_item(data, color)
+            #item.stateChanged.connect(self.update_data_visibility)
+            #item.setChecked(True)
+            #self.settings_content_layout.addWidget(item)
+            if data in ressources._stage_icons_dic_.keys():
+                icon = gui_utils.QIcon_from_svg(ressources._stage_icons_dic_[data], color)
+            if data == 'total':
+                icon = gui_utils.QIcon_from_svg(ressources._guess_icon_, color)
+            item = QtWidgets.QListWidgetItem(QtGui.QIcon(icon), data)
+            self.stages_selection_list.addItem(item)
             self.data_dic[data] = item
 
     def clear_data(self):
@@ -638,61 +667,12 @@ class progress_curves_widget(QtWidgets.QFrame):
 
     def remove_data(self, data):
         if data in self.data_dic.keys():
-            self.data_dic[data].setVisible(False)
-            self.data_dic[data].setParent(None)
-            self.data_dic[data].deleteLater()
+            self.stages_selection_list.takeItem(self.stages_selection_list.row(self.data_dic[data]))
             del self.data_dic[data]
 
     def update_data_visibility(self):
-        pass
         for data in self.data_dic.keys():
-            self.chart.set_data_visible(data, self.data_dic[data].isChecked())
-
-class data_item(QtWidgets.QFrame):
-
-    stateChanged = pyqtSignal(bool)
-
-    def __init__(self, data_name, data_color, parent=None):
-        super(data_item, self).__init__(parent)
-        self.data_name = data_name
-        self.data_color = data_color
-        self.checked = False
-        self.setObjectName('quickstats_widget')
-        self.build_ui()
-        self.fill_ui()
-
-    def build_ui(self):
-        self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setSpacing(6)
-        self.main_layout.setContentsMargins(4,4,4,4)
-        self.setLayout(self.main_layout)
-        self.color_frame = QtWidgets.QFrame()
-        self.color_frame.setFixedSize(8,8)
-        self.main_layout.addWidget(self.color_frame)
-        self.data_name_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.data_name_label)
-
-    def mouseReleaseEvent(self, event):
-        self.checked = 1-self.checked
-        self.stateChanged.emit(self.checked)
-        self.update_state()
-
-    def fill_ui(self):
-        self.color_frame.setStyleSheet(f"background-color:{self.data_color};border-radius:4px;")
-        self.data_name_label.setText(self.data_name)
-
-    def update_state(self):
-        if self.checked:
-            self.setStyleSheet("#quickstats_widget{background-color:rgba(255,255,255,20);}")
-        else:
-            self.setStyleSheet("")
-
-    def setChecked(self, state):
-        self.checked = state
-        self.update_state()
-
-    def isChecked(self):
-        return self.checked
+            self.chart.set_data_visible(data, self.data_dic[data].isSelected())
 
 class stage_stats_widget(QtWidgets.QWidget):
     def __init__(self, stage, parent=None):
@@ -941,6 +921,7 @@ class progress_overview_widget(QtWidgets.QFrame):
 
     def refresh(self):
         stages_rows = project.get_all_stages()
+        all_frames = stats.get_all_frames()
         stages_progresses_dic = dict()
         domains_progresses_dic = dict()
 
@@ -950,23 +931,29 @@ class progress_overview_widget(QtWidgets.QFrame):
             if stage_row['name'] in assets_vars._assets_stages_list_ or stage_row['name'] in assets_vars._sequences_stages_list_:
                 if stage_row['name'] not in stages_progresses_dic.keys():
                     stages_progresses_dic[stage_row['name']] = []
-                stages_progresses_dic[stage_row['name']].append(stage_row['progress'])
+                if stage_row['name'] in assets_vars._assets_stages_list_:
+                    progress = (stage_row['progress'],1)
+                elif stage_row['name'] in assets_vars._sequences_stages_list_:
+                    asset_row = project.get_asset_data(stage_row['asset_id'])
+                    asset_frames = asset_row['outframe'] - asset_row['inframe']
+                    progress = (stage_row['progress'], asset_frames/all_frames)
+                stages_progresses_dic[stage_row['name']].append(progress)
                 if stage_row['name'] in assets_vars._assets_stages_list_:
                     if 'assets' not in domains_progresses_dic.keys():
                         domains_progresses_dic['assets'] = []
-                    domains_progresses_dic['assets'].append(stage_row['progress'])
+                    domains_progresses_dic['assets'].append(progress)
                 elif stage_row['name'] in assets_vars._sequences_stages_list_:
                     if 'sequences' not in domains_progresses_dic.keys():
                         domains_progresses_dic['sequences'] = []
-                    domains_progresses_dic['sequences'].append(stage_row['progress'])
+                    domains_progresses_dic['sequences'].append(progress)
 
         for stage in stages_progresses_dic.keys():
-            mean = statistics.mean(stages_progresses_dic[stage])
+            mean = stats.get_mean(stages_progresses_dic[stage])
             self.stages_dic[stage]['progress_bar'].setValue(int(mean))
             self.stages_dic[stage]['progress_label'].setText(f"{round(mean, 1)} %")
             self.stages_dic[stage]['widget'].setVisible(True)
 
         for domain in domains_progresses_dic.keys():
-            mean = statistics.mean(domains_progresses_dic[domain])
+            mean = stats.get_mean(domains_progresses_dic[domain])
             self.domains_dic[domain]['progress_bar'].setValue(int(mean))
             self.domains_dic[domain]['progress_label'].setText(f"{round(mean, 1)} %")
