@@ -4,6 +4,8 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import time
+import logging
 
 # Wizard modules
 from wizard.core import image
@@ -14,16 +16,20 @@ from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import logging_widget
 
 class loading_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(loading_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
+        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint |  QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Loading - {environment.get_project_name()}")
+
+        self.fixed_width = 600
+        self.fixed_height = 337
 
         self.build_ui()
         self.fill_ui()
@@ -36,6 +42,7 @@ class loading_widget(QtWidgets.QWidget):
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
         self.move(int((screenRect.x()+screen_maxX-self.width())/2), int((screenRect.y()+screen_maxY-self.height())/2))
+        event.accept()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -43,6 +50,7 @@ class loading_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.main_frame = QtWidgets.QFrame()
+        self.main_frame.setObjectName('transparent_widget')
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
         self.shadow.setBlurRadius(70)
@@ -51,7 +59,7 @@ class loading_widget(QtWidgets.QWidget):
         self.shadow.setYOffset(2)
         self.main_frame.setGraphicsEffect(self.shadow)
 
-        self.main_frame.setObjectName('loading_widget_frame')
+        #self.main_frame.setObjectName('loading_widget_frame')
         self.frame_layout = QtWidgets.QVBoxLayout()
         self.frame_layout.setContentsMargins(0,0,0,0)
         self.frame_layout.setSpacing(6)
@@ -59,19 +67,31 @@ class loading_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.main_frame)
 
         self.image_label = QtWidgets.QLabel()
-        #self.image_label.setFixedSize(400,226)
         self.frame_layout.addWidget(self.image_label)
 
+        self.overlap_widget = QtWidgets.QWidget(self.main_frame)
+        self.overlap_widget.setFixedSize(self.fixed_width, self.fixed_height)
+        self.overlap_widget.setObjectName('transparent_widget')
+        self.overlap_content_layout = QtWidgets.QVBoxLayout()
+        self.overlap_content_layout.setContentsMargins(0,0,0,0)
+        self.overlap_widget.setLayout(self.overlap_content_layout)
+        
+        self.overlap_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
         self.content_widget = QtWidgets.QWidget()
-        self.content_widget.setObjectName('transparent_widget')
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.content_widget.setObjectName('content_widget')
+        self.content_widget.setStyleSheet("#content_widget{background: qlineargradient(spread:pad, x1:1 y1:0, x2:1 y2:1, stop:0 rgba(0, 0, 0, 0), stop:1 #24242b);border-bottom-left-radius:8px;border-bottom-right-radius:8px}")
+
         self.content_layout = QtWidgets.QHBoxLayout()
-        self.content_layout.setContentsMargins(12,12,12,12)
+        self.content_layout.setContentsMargins(12,52,12,12)
         self.content_layout.setSpacing(4)
         self.content_widget.setLayout(self.content_layout)
-        self.frame_layout.addWidget(self.content_widget)
+        self.overlap_content_layout.addWidget(self.content_widget)
+        
 
         self.wizard_logo = QtWidgets.QLabel()
-        self.wizard_logo.setPixmap(QtGui.QIcon(ressources._wizard_ico_).pixmap(40))
+        self.wizard_logo.setPixmap(QtGui.QIcon(ressources._wizard_ico_).pixmap(50))
         self.content_layout.addWidget(self.wizard_logo)
 
         self.datas_widget = QtWidgets.QWidget()
@@ -85,7 +105,7 @@ class loading_widget(QtWidgets.QWidget):
         self.datas_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
         self.user_label = QtWidgets.QLabel()
-        self.user_label.setObjectName('gray_label')
+        #self.user_label.setObjectName('gray_label')
         self.datas_layout.addWidget(self.user_label)
 
         self.infos_widget = QtWidgets.QWidget()
@@ -95,7 +115,7 @@ class loading_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.datas_layout.addWidget(self.infos_widget)
 
-        self.info_label = QtWidgets.QLabel()
+        self.info_label = logging_label()
         self.info_label.setObjectName('bold_label')
         self.infos_layout.addWidget(self.info_label)
 
@@ -105,12 +125,12 @@ class loading_widget(QtWidgets.QWidget):
         self.infos_layout.addWidget(self.version_label)
 
         self.build_label = QtWidgets.QLabel()
-        self.build_label.setObjectName('gray_label')
+        #self.build_label.setObjectName('gray_label')
         self.infos_layout.addWidget(self.build_label)
 
     def fill_ui(self):
         self.user_label.setText(environment.get_user())
-        self.info_label.setText(f'Loading {environment.get_project_name()}...')
+        #self.info_label.setText(f'Loading {environment.get_project_name()}...')
         version_dic = application.get_version()
         self.version_label.setText(f"version {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
         self.build_label.setText(f"- build {version_dic['builds']}")
@@ -120,5 +140,27 @@ class loading_widget(QtWidgets.QWidget):
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(project_image)
         icon = QtGui.QIcon(pixmap)
-        pm = gui_utils.round_corners_image_button(project_image, (350,197), 0)
+        pm = gui_utils.round_corners_image_button(project_image, (self.fixed_width, self.fixed_height), 8)
         self.image_label.setPixmap(pm)
+
+class logging_label(QtWidgets.QLabel):
+    def __init__(self, long_formatter=False, parent=None):
+        super(logging_label, self).__init__(parent)
+
+        self.custom_handler = logging_widget.custom_handler(long_formatter, self)
+        root_logger = logging.getLogger()
+        root_logger.addHandler(self.custom_handler)
+
+        self.connect_functions()
+
+    def handle_record(self, record_tuple):
+        level = record_tuple[0]
+        record_msg = record_tuple[1]
+        if record_msg != '\r\n' and record_msg != '\r' and record_msg != '\n':
+            record_msg = record_msg.replace('\n', ' ')
+            record_msg = record_msg.replace('\r', ' ')
+            self.setText(record_msg)
+            QtWidgets.QApplication.processEvents()
+
+    def connect_functions(self):
+        self.custom_handler.log_record.connect(self.handle_record)

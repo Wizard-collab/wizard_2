@@ -93,7 +93,6 @@ def create_domain(name):
     if not tools.create_folder(dir_name):
         project.remove_domain(domain_id)
         return
-    stats.add_progress_event()
     return domain_id
 
 def archive_domain(domain_id):

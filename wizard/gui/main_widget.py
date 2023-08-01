@@ -54,7 +54,7 @@ from wizard.gui import championship_widget
 from wizard.gui import license_widget
 from wizard.gui import production_manager_widget
 from wizard.gui import confirm_widget
-from wizard.gui import whatsnew_widget
+from wizard.gui import splash_screen_widget
 from wizard.gui import new_build_widget
 from wizard.gui import groups_manager_widget
 from wizard.gui import quotes_manager
@@ -100,7 +100,7 @@ class main_widget(QtWidgets.QWidget):
         self.locks_widget = locks_widget.locks_widget()
         self.championship_widget = championship_widget.championship_widget()
         self.license_widget = license_widget.license_widget()
-        self.whatsnew_widget = whatsnew_widget.whatsnew_widget()
+        self.splash_screen_widget = splash_screen_widget.splash_screen_widget()
         self.production_manager_widget = production_manager_widget.production_manager_widget()
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.quotes_manager = quotes_manager.quotes_manager()
@@ -118,14 +118,14 @@ class main_widget(QtWidgets.QWidget):
     def whatsnew(self):
         current_build = application.get_version()['builds']
         last_user_build = user.user().get_user_build()
-        show_whatsnew = user.user().get_show_whatsnew()
+        show_splash_screen = user.user().get_show_splash_screen()
 
         if current_build != last_user_build:
-            self.whatsnew_widget.toggle()
+            self.splash_screen_widget.show()
             user.user().set_user_build(current_build)
         else:
-            if show_whatsnew:
-                self.whatsnew_widget.toggle()
+            if show_splash_screen:
+                self.splash_screen_widget.show()
 
     def is_latest_build(self, force=1):
         latest_build = support.get_latest_build()
@@ -214,7 +214,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_championship.connect(self.championship_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
         self.header_widget.show_license.connect(self.license_widget.toggle)
-        self.header_widget.show_whatsnew.connect(self.whatsnew_widget.toggle)
+        self.header_widget.show_splash_screen.connect(self.splash_screen_widget.show)
         self.header_widget.show_latest_build.connect(lambda:self.is_latest_build(force=1))
         self.header_widget.show_documentation.connect(self.show_documentation)
 

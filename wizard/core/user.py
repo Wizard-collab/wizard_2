@@ -162,13 +162,13 @@ class user:
             return
         return self.prefs_dic[type][environment.get_project_name()]
 
-    def get_show_whatsnew(self):
-        if user_vars._show_whatsnew_ not in self.prefs_dic.keys():
-            self.set_show_whatsnew(True)
-        return self.prefs_dic[user_vars._show_whatsnew_]
+    def get_show_splash_screen(self):
+        if user_vars._show_splash_screen_ not in self.prefs_dic.keys():
+            self.set_show_splash_screen(True)
+        return self.prefs_dic[user_vars._show_splash_screen_]
 
-    def set_show_whatsnew(self, show_whatsnew):
-        self.prefs_dic[user_vars._show_whatsnew_] = show_whatsnew
+    def set_show_splash_screen(self, show_splash_screen):
+        self.prefs_dic[user_vars._show_splash_screen_] = show_splash_screen
         self.write_prefs_dic()
 
     def get_show_latest_build(self):
@@ -260,7 +260,7 @@ class user:
             self.prefs_dic[user_vars._reference_settings_] = dict()
             self.prefs_dic[user_vars._reference_settings_]['auto_update_default'] = False
 
-            self.prefs_dic[user_vars._show_whatsnew_] = True
+            self.prefs_dic[user_vars._show_splash_screen_] = True
             self.prefs_dic[user_vars._user_build_] = None
             self.prefs_dic[user_vars._widgets_pos_] = dict()
             self.write_prefs_dic()

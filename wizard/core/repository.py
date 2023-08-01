@@ -185,8 +185,8 @@ def modify_project_image(project_name, project_image):
 def process_project_image(image_file):
     bytes_data = image.convert_image_to_bytes(image_file)
     pillow_image = image.convert_image_bytes_to_pillow(bytes_data)
-    pillow_image, fixed_width, height_size = image.resize_image_with_fixed_width(pillow_image, 500)
-    pillow_image = image.crop_image_height(pillow_image, 282)
+    pillow_image, fixed_width, height_size = image.resize_image_with_fixed_width(pillow_image, 600)
+    pillow_image = image.crop_image_height(pillow_image, 337)
     bytes_data = image.convert_PILLOW_image_to_bytes(pillow_image)
     return image.convert_bytes_to_str_data(bytes_data)
 

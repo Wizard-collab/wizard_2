@@ -230,7 +230,7 @@ class main_progress_widget(QtWidgets.QFrame):
                 progress = (stage_row['progress'], asset_frames/all_frames)
             all_progresses.append(progress)
         if all_progresses == []:
-            all_progresses = [0]
+            all_progresses = [(0, 1)]
         mean = stats.get_mean(all_progresses)
         self.progress_bar.setValue(int(mean))
         self.progress_label.setText(f"{round(mean, 1)} %")
@@ -407,7 +407,7 @@ class user_progress_widget(QtWidgets.QFrame):
                 stages_dic[stage_row['name']]['total_work_time'] += stage_row['work_time']
 
         if all_progresses == []:
-            all_progresses = [0]
+            all_progresses = [(0,1)]
         if all_work_times == []:
             all_work_times = [0]
 

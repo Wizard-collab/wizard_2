@@ -68,6 +68,7 @@ class app():
         start_time = time.perf_counter()
         self.loading_widget = loading_widget.loading_widget()
         self.loading_widget.show()
+        logger.info("Openning Wizard")
         QtWidgets.QApplication.processEvents()
 
         version_database_modification.main()

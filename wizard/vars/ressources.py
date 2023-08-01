@@ -456,7 +456,7 @@ _stages_colors_['camera'] = '#94b49f'
 _stages_colors_['lighting'] = '#63f191'
 _stages_colors_['compositing'] = '#676fa3'
 
-_whatsnew_html_ = path_utils.join(_ressources_path_, 'whatsnew.html')
+_whatsnew_yaml_ = path_utils.join(_ressources_path_, 'whatsnew.yaml')
 
 # Urgence icons
 _priority_icons_list_ = dict()

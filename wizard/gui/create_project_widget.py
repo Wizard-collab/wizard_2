@@ -4,11 +4,13 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+from wizard.gui import logging_widget
 
 # Wizard modules
 from wizard.core import user
@@ -190,6 +192,9 @@ class create_project_widget(QtWidgets.QDialog):
         self.create_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.create_button)
 
+        self.logging_widget = logging_widget.logging_widget()
+        self.main_layout.addWidget(self.logging_widget)
+
     def get_random_image(self, force=0):
         if not self.use_image_file or force:
             project_name = self.project_name_lineEdit.text()
@@ -262,13 +267,52 @@ class create_project_widget(QtWidgets.QDialog):
         width = self.format_width.value()
         height = self.format_height.value()
         if password == password_confirm:
-            if create_project.create_project(project_name=project_name,
+            self.thread = create_project_thread(project_name=project_name,
                                                 project_path=project_path,
                                                 project_password=password,
                                                 project_image=self.image,
                                                 frame_rate=frame_rate,
                                                 image_format=[width, height],
-                                                deadline=deadline_string):
-                self.accept()
+                                                deadline_string=deadline_string)
+            self.thread.done_signal.connect(self.created)
+            self.thread.start()
         else:
             logger.warning("Project passwords doesn't matches")
+
+    def created(self, done):
+        if done:
+            self.accept()
+
+class create_project_thread(QtCore.QThread):
+
+    done_signal = pyqtSignal(int)
+
+    def __init__(self, project_name,
+                        project_path,
+                        project_password,
+                        project_image,
+                        frame_rate,
+                        image_format,
+                        deadline_string,
+                        parent=None):
+
+        super(create_project_thread, self).__init__(parent)
+        self.deadline_string = deadline_string
+        self.project_name = project_name
+        self.project_path = project_name
+        self.project_password = project_password
+        self.project_image = project_image
+        self.frame_rate = frame_rate
+        self.image_format = image_format
+
+    def run(self):
+        if create_project.create_project(project_name=self.project_name,
+                                                project_path=self.project_path,
+                                                project_password=self.project_password,
+                                                project_image=self.project_image,
+                                                frame_rate=self.frame_rate,
+                                                image_format=self.image_format,
+                                                deadline=self.deadline_string):
+            self.done_signal.emit(1)
+        else:
+            self.done_signal.emit(0)

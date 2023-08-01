@@ -190,7 +190,7 @@ def add_progress_event(new_stage=None, removed_stage=None):
             categories_progresses_dic[category][stage] = get_mean(categories_progresses_dic[category][stage])
         project.add_progress_event('category', category, json.dumps(categories_progresses_dic[category]))
 
-    print(f"stats : {time.time()-start_time}")
+    logger.debug(f"Progress event calculation duration : {time.time()-start_time}s")
 
 def get_mean(data_list):
     if data_list == []:
