@@ -32,7 +32,7 @@ class current_asset_viewer(QtWidgets.QFrame):
         if instance_type == 'work_env':
             work_env_row = project.get_work_env_data(instance_id)
             variant_id = work_env_row['variant_id']
-            self.work_env_label.setPixmap(QtGui.QIcon(ressources._sofwares_icons_dic_[work_env_row['name']]).pixmap(12))
+            self.work_env_label.setPixmap(QtGui.QIcon(ressources._softwares_icons_dic_[work_env_row['name']]).pixmap(12))
             self.work_env_label.setVisible(1)
             self.arrow_4.setVisible(1)
             if not variant_id:

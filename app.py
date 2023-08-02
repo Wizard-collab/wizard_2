@@ -63,7 +63,7 @@ class app():
         app_utils.init_user(self, log_user)
         app_utils.init_project(self, project_manager)
         self.stats_schedule = app_utils.init_stats()
-        
+
         # Main gui app
         start_time = time.perf_counter()
         self.loading_widget = loading_widget.loading_widget()
@@ -75,6 +75,7 @@ class app():
 
         if table_viewer:
             self.table_viewer = table_viewer_widget.table_viewer_widget()
+
         self.main_widget = main_widget.main_widget()
         self.main_widget.stop_threads.connect(self.stats_schedule.stop)
         self.main_widget.refresh()

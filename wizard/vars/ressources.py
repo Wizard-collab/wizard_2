@@ -411,16 +411,16 @@ _stage_icons_dic_['custom'] = _custom_icon_
 _stage_icons_dic_['camrig'] = _camera_rig_icon_
 
 # Softwares icons
-_sofwares_icons_dic_ = dict()
-_sofwares_icons_dic_[_maya_] = path_utils.join(_icons_path_, 'maya.svg')
-_sofwares_icons_dic_[_guerilla_render_] = path_utils.join(_icons_path_, 'guerilla_render.svg')
-_sofwares_icons_dic_[_substance_painter_] = path_utils.join(_icons_path_, 'substance_painter.svg')
-_sofwares_icons_dic_[_substance_designer_] = path_utils.join(_icons_path_, 'substance_designer.svg')
-_sofwares_icons_dic_[_nuke_] = path_utils.join(_icons_path_, 'nuke.svg')
-_sofwares_icons_dic_[_houdini_] = path_utils.join(_icons_path_, 'houdini.svg')
-_sofwares_icons_dic_[_blender_] = path_utils.join(_icons_path_, 'blender.svg')
-for key in _sofwares_icons_dic_.keys():
-	_available_icons_list_.append(_sofwares_icons_dic_[key])
+_softwares_icons_dic_ = dict()
+_softwares_icons_dic_[_maya_] = path_utils.join(_icons_path_, 'maya.svg')
+_softwares_icons_dic_[_guerilla_render_] = path_utils.join(_icons_path_, 'guerilla_render.svg')
+_softwares_icons_dic_[_substance_painter_] = path_utils.join(_icons_path_, 'substance_painter.svg')
+_softwares_icons_dic_[_substance_designer_] = path_utils.join(_icons_path_, 'substance_designer.svg')
+_softwares_icons_dic_[_nuke_] = path_utils.join(_icons_path_, 'nuke.svg')
+_softwares_icons_dic_[_houdini_] = path_utils.join(_icons_path_, 'houdini.svg')
+_softwares_icons_dic_[_blender_] = path_utils.join(_icons_path_, 'blender.svg')
+for key in _softwares_icons_dic_.keys():
+	_available_icons_list_.append(_softwares_icons_dic_[key])
 
 # Production manager colors
 _states_colors_ = dict()

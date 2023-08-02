@@ -153,7 +153,7 @@ class versions_widget(QtWidgets.QWidget):
         if self.list_mode:
             if self.work_env_id is not None and self.work_env_id != 0:
                 software_name = project.get_work_env_data(self.work_env_id, 'name')
-                software_icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
+                software_icon = QtGui.QIcon(ressources._softwares_icons_dic_[software_name])
 
                 self.versions_rows = project.get_work_versions(self.work_env_id)
                 project_versions_id = []

@@ -71,7 +71,6 @@ class general_widget(QtWidgets.QWidget):
         super(general_widget, self).__init__(parent)
         self.ignore_admin_toggle = 0
         self.build_ui()
-        self.refresh()
         self.connect_functions()
 
     def refresh(self):

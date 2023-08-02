@@ -47,6 +47,7 @@ from threading import Thread
 import logging
 
 # Wizard modules
+from wizard.core import user
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import environment
@@ -111,6 +112,7 @@ def core_launch_version(version_id):
         return None, None
     file_path = work_version_row['file_path']
     work_env_id = work_version_row['work_env_id']
+    user.user().add_recent_scene((work_env_id, time.time()))
     if project.get_lock(work_env_id):
         return None, None
     project.set_work_env_lock(work_env_id)

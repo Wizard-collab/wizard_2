@@ -135,7 +135,7 @@ class context_widget(QtWidgets.QFrame):
         if self.variant_row is not None:
             self.variant_row = project.get_variant_data(self.variant_row['id'])
             for software_name in assets_vars._stage_softwares_rules_dic_[self.stage_row['name']]:
-                    icon = QtGui.QIcon(ressources._sofwares_icons_dic_[software_name])
+                    icon = QtGui.QIcon(ressources._softwares_icons_dic_[software_name])
                     self.work_env_comboBox.addItem(icon, software_name)
 
             if self.variant_row['default_work_env_id'] is not None:

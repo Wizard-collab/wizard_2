@@ -7,10 +7,17 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import yaml
 import logging
 
-# Wizard modules
-from wizard.vars import ressources
+# Wizard gui modules
+from wizard.gui import gui_utils
+from wizard.gui import gui_server
+
+# Wizard core modules
 from wizard.core import application
 from wizard.core import user
+from wizard.core import project
+from wizard.core import tools
+from wizard.core import launch
+from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +103,19 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.recent_scenes_label.setObjectName('title_label_2')
         self.recent_scenes_layout.addWidget(self.recent_scenes_label)
 
+        self.recent_scenes_list = QtWidgets.QTreeWidget()
+        self.recent_scenes_list.setObjectName('tree_as_list_widget')
+        self.recent_scenes_list.setStyleSheet('#tree_as_list_widget{background-color:transparent}')
+        self.recent_scenes_list.setColumnCount(3)
+        self.recent_scenes_list.header().resizeSection(0, 250)
+        self.recent_scenes_list.header().resizeSection(1, 250)
+        self.recent_scenes_list.setIndentation(0)
+        self.recent_scenes_list.setHeaderHidden(True)
+        self.recent_scenes_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.recent_scenes_list.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.recent_scenes_list.setFixedHeight(160)
+        self.recent_scenes_layout.addWidget(self.recent_scenes_list)
+
         self.updates_layout = QtWidgets.QVBoxLayout()
         self.updates_layout.setContentsMargins(20,0,20,20)
         self.updates_layout.setSpacing(20)
@@ -122,7 +142,6 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.updates_layout.addWidget(self.updates_scrollArea)
 
         self.updates_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
-        #self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.footer_layout = QtWidgets.QHBoxLayout()
         self.footer_layout.setContentsMargins(20,20,20,20)
@@ -136,13 +155,21 @@ class splash_screen_widget(QtWidgets.QDialog):
 
     def fill_ui(self):
         self.show_at_startup_checkbox.setChecked(user.user().get_show_splash_screen())
-
         self.version_dic = application.get_version()
         self.version_label.setText(f"{self.version_dic['MAJOR']}.{self.version_dic['MINOR']}.{self.version_dic['PATCH']} - build {self.version_dic['builds']}")
         self.fill_whats_new()
 
-    def fill_whats_new(self):
+    def refresh(self):
+        self.refresh_recent_scenes()
 
+    def refresh_recent_scenes(self):
+        self.recent_scenes_list.clear()
+        recent_work_env_ids = user.user().get_recent_scenes()
+        recent_work_env_ids.reverse()
+        for work_env_tuple in recent_work_env_ids:
+            item = recent_scene_item(work_env_tuple, self.recent_scenes_list.invisibleRootItem())
+
+    def fill_whats_new(self):
         with open(ressources._whatsnew_yaml_, 'r') as f:
             whats_new_dic = yaml.load(f, Loader=yaml.Loader)
 
@@ -154,13 +181,16 @@ class splash_screen_widget(QtWidgets.QDialog):
                 self.updates_list.append(widget)
                 self.updates_scrollArea_layout.insertWidget(0,widget)
 
-        #with open(ressources._whatsnew_yaml_, 'r') as f:
-        #    html_data = f.read()
-
-        #self.textedit.insertHtml(html_data)
-
     def connect_functions(self):
         self.show_at_startup_checkbox.stateChanged.connect(self.toggle_show_at_startup)
+        self.recent_scenes_list.itemDoubleClicked.connect(self.launch_recent_work_env)
+
+    def launch_recent_work_env(self, item):
+        work_env_id = item.work_env_id
+        last_work_version_id = project.get_last_work_version(work_env_id, 'id')
+        launch.launch_work_version(last_work_version_id[0])
+        gui_server.refresh_ui()
+        self.close()
 
     def toggle_show_at_startup(self, state):
         user.user().set_show_splash_screen(state)
@@ -207,11 +237,6 @@ class update_frame(QtWidgets.QFrame):
 
     def fill_ui(self):
         self.update_type_label.setText(self.update_type)
-        if self.update_type == 'new':
-            color = '#96ca69'
-        elif self.update_type == 'debug':
-            color = '#f79360'
-        #self.update_type_label.setStyleSheet(f"color:{color}")
         self.update_label.setText(self.update)
 
     def build_ui(self):
@@ -233,3 +258,26 @@ class update_frame(QtWidgets.QFrame):
         self.update_label = QtWidgets.QLabel()
         self.update_label.setAlignment(QtCore.Qt.AlignLeft)
         self.main_layout.addWidget(self.update_label)
+
+class recent_scene_item(QtWidgets.QTreeWidgetItem):
+    def __init__(self, work_env_tuple, parent = None):
+        super(recent_scene_item, self).__init__(parent)
+        self.work_env_id = work_env_tuple[0]
+        self.timestamp = work_env_tuple[1]
+        self.fill_ui()
+
+    def fill_ui(self):
+        work_env_row = project.get_work_env_data(self.work_env_id)
+        variant_row = project.get_variant_data(work_env_row['variant_id'])
+        stage_row = project.get_stage_data(variant_row['stage_id'])
+        asset_row = project.get_asset_data(stage_row['asset_id'])
+        category_row = project.get_category_data(asset_row['category_id'])
+        icon = gui_utils.QIcon_from_svg(ressources._stage_icons_dic_[stage_row['name']], 'gray')
+        software_icon = gui_utils.QIcon_from_svg(ressources._softwares_icons_dic_[work_env_row['name']], 'gray')
+        name = f"{category_row['name']} / {asset_row['name']} - {variant_row['name']}"
+        self.setIcon(0, icon)
+        self.setText(0, name)
+        self.setIcon(1, software_icon)
+        self.setText(1, work_env_row['name'])
+        self.setText(2, tools.time_ago_from_timestamp(self.timestamp))
+        self.setForeground(2, QtGui.QColor('gray'))

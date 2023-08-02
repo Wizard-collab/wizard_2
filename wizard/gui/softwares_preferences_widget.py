@@ -131,7 +131,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
     def fill_softwares(self):
         self.softwares_comboBox.clear()
         for software in softwares_vars._softwares_list_:
-            icon = ressources._sofwares_icons_dic_[software]
+            icon = ressources._softwares_icons_dic_[software]
             self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
 
     def refresh(self):

@@ -162,6 +162,22 @@ class user:
             return
         return self.prefs_dic[type][environment.get_project_name()]
 
+    def add_recent_scene(self, work_env_tuple):
+        if user_vars._recent_work_envs_ not in self.prefs_dic.keys():
+            self.prefs_dic[user_vars._recent_work_envs_] = []
+        while len(self.prefs_dic[user_vars._recent_work_envs_]) > 4:
+            self.prefs_dic[user_vars._recent_work_envs_].pop(0)
+        for existing_tuple in self.prefs_dic[user_vars._recent_work_envs_]:
+            if work_env_tuple[0] == existing_tuple[0]:
+                self.prefs_dic[user_vars._recent_work_envs_].remove(existing_tuple)
+        self.prefs_dic[user_vars._recent_work_envs_].append(work_env_tuple)
+        self.write_prefs_dic()
+
+    def get_recent_scenes(self):
+        if user_vars._recent_work_envs_ not in self.prefs_dic.keys():
+            return []
+        return self.prefs_dic[user_vars._recent_work_envs_]
+
     def get_show_splash_screen(self):
         if user_vars._show_splash_screen_ not in self.prefs_dic.keys():
             self.set_show_splash_screen(True)

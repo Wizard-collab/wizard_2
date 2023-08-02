@@ -143,19 +143,23 @@ class main_widget(QtWidgets.QWidget):
         self.popup_wall_widget.show()
 
     def init_gui_server(self):
+        logger.info('Starting gui server')
         self.gui_server.start()
 
     def init_communicate_server(self):
+        logger.info('Starting softwares communicate server')
         self.communicate_server.start()
 
     def init_team_client(self):
+        logger.info('Starting team server')
         self.team_client.start()
 
     def init_softwares_server(self):
+        logger.info('Starting softwares server')
         self.softwares_server.start()
 
     def init_widgets_pos(self):
-        logger.info("Loading user interface")
+        logger.info("Loading interface context")
         floating_widgets_layout.init_widget_pos(self, 'main_widget', force_show=1, maximized=1)
         floating_widgets_layout.init_widget_pos(self.console_widget, 'console_widget')
         floating_widgets_layout.init_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
@@ -424,9 +428,11 @@ class main_widget(QtWidgets.QWidget):
         self.project_preferences_widget.refresh()
         self.quotes_manager.refresh()
         self.championship_widget.refresh()
+        self.splash_screen_widget.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):
+        logger.info("Loading user interface")
         self.main_widget_layout = QtWidgets.QHBoxLayout()
         self.main_widget_layout.setContentsMargins(0,0,0,0)
         self.main_widget = QtWidgets.QWidget()

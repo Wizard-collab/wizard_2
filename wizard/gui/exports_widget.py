@@ -654,7 +654,7 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.comment_label.setText(self.export_version_row['comment'])
         if self.export_version_row['software'] is not None:
-            self.setIcon(5, QtGui.QIcon(ressources._sofwares_icons_dic_[self.export_version_row['software']]))
+            self.setIcon(5, QtGui.QIcon(ressources._softwares_icons_dic_[self.export_version_row['software']]))
         else:
             self.setIcon(5, QtGui.QIcon(ressources._manual_export_))
         files = json.loads(self.export_version_row['files'])

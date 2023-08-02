@@ -33,7 +33,7 @@ class project_hooks_widget(QtWidgets.QWidget):
     def fill_softwares(self):
         self.softwares_comboBox.clear()
         for software in softwares_vars._softwares_list_:
-            icon = ressources._sofwares_icons_dic_[software]
+            icon = ressources._softwares_icons_dic_[software]
             self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
         self.softwares_comboBox.addItem(QtGui.QIcon(ressources._wizard_icon_), 'wizard')
 

@@ -36,6 +36,7 @@ import shutil
 import tempfile
 import time
 import datetime
+from datetime import datetime, timezone
 import logging
 import psutil
 
@@ -76,6 +77,28 @@ def get_time_float_from_string_date(date_string):
     except:
         logger.warning(f"{date_string} not a valid date format\nPlease enter a date like following 'day/month/year'")
         return
+
+def time_ago_from_timestamp(timestamp):
+    now = datetime.utcfromtimestamp(time.time())
+    timestamp_datetime = datetime.utcfromtimestamp(timestamp)
+
+    time_diff = now - timestamp_datetime
+    days = time_diff.days
+    seconds = time_diff.seconds
+
+    if days > 6:
+        weeks = days // 7
+        return f"{weeks} week{'s' if weeks > 1 else ''} ago"
+    elif days > 0:
+        return f"{days} day{'s' if days > 1 else ''} ago"
+    elif seconds >= 3600:
+        hours = seconds // 3600
+        return f"{hours} hour{'s' if hours > 1 else ''} ago"
+    elif seconds >= 60:
+        minutes = seconds // 60
+        return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+    else:
+        return f"{seconds} second{'s' if seconds > 1 else ''} ago"
 
 def convert_seconds(time_float):
     hours = int(time_float/3600)

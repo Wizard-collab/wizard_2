@@ -42,6 +42,7 @@ _script_path_ = path_utils.join(_user_path_, 'script')
 _icons_path_ = path_utils.join(_user_path_, 'icons')
 _session_file_ = path_utils.join(_script_path_, 'session.py')
 
+
 # Dictionary keys
 _user_ = 'user'
 _repository_ = 'repository'
@@ -66,3 +67,4 @@ _user_build_ = 'user_build'
 _creation_items_visibility_ = 'creation_items_visibility'
 _widgets_pos_ = 'widgets_pos'
 _reference_settings_ = 'references_settings'
+_recent_work_envs_ = 'recent_work_envs'

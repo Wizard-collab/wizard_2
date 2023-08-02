@@ -160,7 +160,7 @@ class work_env_widget(QtWidgets.QFrame):
     def fill_ui(self):
         work_env_row = project.get_work_env_data(self.work_env_id)
         software = project.get_software_data(work_env_row['software_id'], 'name')
-        icon = ressources._sofwares_icons_dic_[software]
+        icon = ressources._softwares_icons_dic_[software]
         self.software_icon.setPixmap(QtGui.QIcon(icon).pixmap(26))
         work_env_label = assets.instance_to_string(('work_env', self.work_env_id))
         self.work_env_label.setText(work_env_label)
