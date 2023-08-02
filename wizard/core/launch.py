@@ -250,6 +250,7 @@ class software_thread(Thread):
         work_time = time.perf_counter()-self.start_time
         project.set_work_env_lock(self.work_env_id, 0)
         assets.add_work_time(self.work_env_id, work_time)
+        user.user().add_recent_scene((self.work_env_id, time.time()))
         logger.info(f"{self.software} closed")
 
     def kill(self):

@@ -164,19 +164,23 @@ class user:
 
     def add_recent_scene(self, work_env_tuple):
         if user_vars._recent_work_envs_ not in self.prefs_dic.keys():
-            self.prefs_dic[user_vars._recent_work_envs_] = []
+            self.prefs_dic[user_vars._recent_work_envs_] = dict()
+        if environment.get_project_name() not in self.prefs_dic[user_vars._recent_work_envs_].keys():
+            self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()] = []
         while len(self.prefs_dic[user_vars._recent_work_envs_]) > 4:
-            self.prefs_dic[user_vars._recent_work_envs_].pop(0)
-        for existing_tuple in self.prefs_dic[user_vars._recent_work_envs_]:
+            self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].pop(0)
+        for existing_tuple in self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()]:
             if work_env_tuple[0] == existing_tuple[0]:
-                self.prefs_dic[user_vars._recent_work_envs_].remove(existing_tuple)
-        self.prefs_dic[user_vars._recent_work_envs_].append(work_env_tuple)
+                self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].remove(existing_tuple)
+        self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].append(work_env_tuple)
         self.write_prefs_dic()
 
     def get_recent_scenes(self):
         if user_vars._recent_work_envs_ not in self.prefs_dic.keys():
             return []
-        return self.prefs_dic[user_vars._recent_work_envs_]
+        if environment.get_project_name() not in self.prefs_dic[user_vars._recent_work_envs_].keys():
+            return []
+        return self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()]
 
     def get_show_splash_screen(self):
         if user_vars._show_splash_screen_ not in self.prefs_dic.keys():

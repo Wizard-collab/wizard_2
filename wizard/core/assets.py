@@ -903,6 +903,7 @@ def add_version(work_env_id, comment="", do_screenshot=1, fresh=None, analyse_co
     game.add_xps(game_vars._save_xp_)
     if analyse_comment and not fresh:
         game.analyse_comment(comment, game_vars._save_penalty_)
+    user.user().add_recent_scene((work_env_id, time.time()))
     tags.analyse_comment(comment, 'work_version', version_id)
     return version_id
 

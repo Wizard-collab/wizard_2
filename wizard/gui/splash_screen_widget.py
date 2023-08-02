@@ -62,46 +62,52 @@ class splash_screen_widget(QtWidgets.QDialog):
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.header_widget.setObjectName('transparent_widget')
+        self.header_widget.setObjectName('splash_screen_header')
+        self.header_widget.setStyleSheet('#splash_screen_header{border-top-left-radius:8px;border-top-right-radius:8px;}')
+        #self.header_widget.setStyleSheet('#splash_screen_header{background-color:#646ca2;border-top-left-radius:8px;border-top-right-radius:8px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setContentsMargins(20,20,20,20)
-        self.header_layout.setSpacing(20)
+        self.header_layout.setSpacing(10)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
         self.wizard_icon = QtWidgets.QLabel()
-        self.wizard_icon.setPixmap(QtGui.QIcon(ressources._wizard_icon_).pixmap(50))
+        self.wizard_icon.setPixmap(QtGui.QIcon(ressources._wizard_icon_).pixmap(40))
         self.header_layout.addWidget(self.wizard_icon)
 
-        self.title_layout = QtWidgets.QVBoxLayout()
-        self.title_layout.setSpacing(2)
-        self.title_layout.setContentsMargins(0,0,0,0)
-        self.header_layout.addLayout(self.title_layout)
-
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        #self.title_layout = QtWidgets.QHBoxLayout()
+        #self.title_layout.setSpacing(2)
+        #self.title_layout.setContentsMargins(0,0,0,0)
+        #self.title_layout.setAlignment(QtCore.Qt.AlignTop)
+        #self.header_layout.addLayout(self.title_layout)
 
         self.title_label = QtWidgets.QLabel("Wizard")
-        self.title_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.title_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.title_label.setObjectName('title_label')
-        self.title_layout.addWidget(self.title_label)
-
-        self.version_label = QtWidgets.QLabel()
-        self.version_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.version_label.setObjectName('title_label_gray')
-        self.title_layout.addWidget(self.version_label)
-
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.title_label.setStyleSheet('font-size: 38px;')
+        self.header_layout.addWidget(self.title_label)
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
+        self.version_label = QtWidgets.QLabel()
+        self.version_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.version_label.setAlignment(QtCore.Qt.AlignTop)
+        self.version_label.setObjectName('')
+        self.header_layout.addWidget(self.version_label)
+
         self.recent_scenes_layout = QtWidgets.QVBoxLayout()
         self.recent_scenes_layout.setSpacing(20)
-        self.recent_scenes_layout.setContentsMargins(20,0,20,20)
+        self.recent_scenes_layout.setContentsMargins(20,20,20,20)
         self.main_layout.addLayout(self.recent_scenes_layout)
 
         self.recent_scenes_label = QtWidgets.QLabel("Recent scenes")
         self.recent_scenes_label.setObjectName('title_label_2')
         self.recent_scenes_layout.addWidget(self.recent_scenes_label)
+
+        self.no_recent_scenes_label = QtWidgets.QLabel('No recent scenes')
+        self.no_recent_scenes_label.setObjectName('gray_label')
+        self.recent_scenes_layout.addWidget(self.no_recent_scenes_label)
+        self.no_recent_scenes_label.setVisible(0)
 
         self.recent_scenes_list = QtWidgets.QTreeWidget()
         self.recent_scenes_list.setObjectName('tree_as_list_widget')
@@ -113,7 +119,7 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.recent_scenes_list.setHeaderHidden(True)
         self.recent_scenes_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.recent_scenes_list.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.recent_scenes_list.setFixedHeight(160)
+        #self.recent_scenes_list.setFixedHeight(160)
         self.recent_scenes_layout.addWidget(self.recent_scenes_list)
 
         self.updates_layout = QtWidgets.QVBoxLayout()
@@ -166,13 +172,21 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.recent_scenes_list.clear()
         recent_work_env_ids = user.user().get_recent_scenes()
         recent_work_env_ids.reverse()
+        if len(recent_work_env_ids) == 0:
+            self.no_recent_scenes_label.setVisible(1)
+            self.recent_scenes_list.setVisible(0)
+            return
+        self.no_recent_scenes_label.setVisible(0)
+        self.recent_scenes_list.setVisible(1)
         for work_env_tuple in recent_work_env_ids:
+            if not project.check_work_env_existence(work_env_tuple[0]):
+                continue
             item = recent_scene_item(work_env_tuple, self.recent_scenes_list.invisibleRootItem())
+        self.recent_scenes_list.setFixedHeight(self.recent_scenes_list.invisibleRootItem().childCount()*32)
 
     def fill_whats_new(self):
         with open(ressources._whatsnew_yaml_, 'r') as f:
             whats_new_dic = yaml.load(f, Loader=yaml.Loader)
-
         version_key = f"{self.version_dic['MAJOR']}.{self.version_dic['MINOR']}.{self.version_dic['PATCH']}"
         self.updates_list = []
         if version_key in whats_new_dic.keys():

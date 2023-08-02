@@ -35,7 +35,7 @@ import traceback
 import shutil
 import tempfile
 import time
-import datetime
+#import datetime
 from datetime import datetime, timezone
 import logging
 import psutil
@@ -60,7 +60,7 @@ def convert_time(time_float):
     return day, hour
 
 def get_month(time_float):
-    return datetime.datetime.fromtimestamp(time_float).strftime('%b')
+    return datetime.fromtimestamp(time_float).strftime('%b')
 
 def get_day(time_float):
     return time.strftime('%d', time.localtime(time_float))
@@ -71,7 +71,7 @@ def get_time_float_from_string_date(date_string):
         day = int(time_tokens[0])
         month = int(time_tokens[1])
         year = int(time_tokens[2])
-        dt = datetime.datetime(year=year, month=month, day=day)
+        dt = datetime(year=year, month=month, day=day)
         time_float = time.mktime(dt.timetuple())
         return time_float
     except:

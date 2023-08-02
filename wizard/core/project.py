@@ -603,6 +603,9 @@ def get_variant_work_env_child_by_name(variant_id, work_env_name, column='*'):
         return
     return work_envs_rows[0]
 
+def check_work_env_existence(work_env_id):
+    return db_utils.check_existence('project', 'work_envs', 'id', work_env_id)
+
 def remove_variant(variant_id):
     if not repository.is_admin():
         return
