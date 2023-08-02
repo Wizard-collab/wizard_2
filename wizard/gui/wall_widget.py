@@ -248,7 +248,7 @@ class wall_time_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         day, hour = tools.convert_time(self.time_float)
-        self.day_label = QtWidgets.QLabel(f"{day} - ")
+        self.day_label = QtWidgets.QLabel(f"{tools.time_ago_from_timestamp(self.time_float)} - ")
         self.day_label.setObjectName('gray_label')
         self.hour_label = QtWidgets.QLabel(hour)
         self.hour_label.setObjectName('bold_label')

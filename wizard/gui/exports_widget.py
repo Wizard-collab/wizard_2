@@ -602,8 +602,7 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font.setBold(True)
         self.setFont(0, bold_font)
         self.setText(2, self.export_row['creation_user'])
-        day, hour = tools.convert_time(self.export_row['creation_time'])
-        self.setText(3, f"{day} - {hour}")
+        self.setText(3, tools.time_ago_from_timestamp(self.export_row['creation_time']))
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
         self.setText(9, str(self.export_row['id']))
@@ -649,8 +648,7 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
 
         self.setFont(1, bold_font)
         self.setText(2, self.export_version_row['creation_user'])
-        day, hour = tools.convert_time(self.export_version_row['creation_time'])
-        self.setText(3, f"{day} - {hour}")
+        self.setText(3, tools.time_ago_from_timestamp(self.export_version_row['creation_time']))
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.comment_label.setText(self.export_version_row['comment'])
         if self.export_version_row['software'] is not None:
