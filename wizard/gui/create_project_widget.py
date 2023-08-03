@@ -299,7 +299,7 @@ class create_project_thread(QtCore.QThread):
         super(create_project_thread, self).__init__(parent)
         self.deadline_string = deadline_string
         self.project_name = project_name
-        self.project_path = project_name
+        self.project_path = project_path
         self.project_password = project_password
         self.project_image = project_image
         self.frame_rate = frame_rate

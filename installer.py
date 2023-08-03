@@ -39,8 +39,8 @@ from win32com.client import Dispatch
 import logging
 import yaml
 import time
+import traceback
 
-# CHECK ADMIN
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -208,12 +208,11 @@ class installer(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(installer, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
         self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.png')))
         self.setWindowTitle(f"Wizard installer")
         self.build_ui()
+        self.connect_functions()
+        self.startup()
 
     def showEvent(self, event):
         desktop = QtWidgets.QApplication.desktop()
@@ -222,99 +221,107 @@ class installer(QtWidgets.QWidget):
         screen_maxY = screenRect.bottomRight().y()
         self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))
 
-    def process(self):
-        version_dic = get_version()
-        version = f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}.{str(version_dic['builds']).zfill(4)}"
-        self.version_label.setText(version)
+    def connect_functions(self):
+        self.install_button.clicked.connect(self.process)
+        self.close_button.clicked.connect(self.close)
 
-        is_reg, version, is_files = get_current_install()
-        if (is_reg or version or is_files) is not None:
-            self.infos_label.setText('Installing Wizard')
-            self.progress_bar.setValue(0)
-            QtWidgets.QApplication.processEvents()
-            time.sleep(1)
-            self.infos_label.setText('Removing Wizard files')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(10)
-            remove_install_dir()
-            self.infos_label.setText('Deleting registery keys')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(30)
-            delete_reg_keys()
-            self.infos_label.setText('Deleting shortcuts')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(50)
-            delete_shortcuts()
-            self.infos_label.setText('Unpacking Wizard')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(70)
-            unpack_zip()
-            self.infos_label.setText('Creating registery keys')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(80)
-            create_reg_keys()
-            self.infos_label.setText('Creating shortcuts')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(90)
-            create_shortcuts()
-            self.infos_label.setText('Wizard updated')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(100)
-            time.sleep(1)
-            sys.exit()
-        elif (is_reg and version and is_files) is None:
-            self.infos_label.setText('Installing Wizard')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(0)
-            time.sleep(1)
-            self.infos_label.setText('Unpacking Wizard')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(40)
-            unpack_zip()
-            self.infos_label.setText('Creating registery keys')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(70)
-            create_reg_keys()
-            self.infos_label.setText('Creating shortcuts')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(90)
-            create_shortcuts()
-            self.infos_label.setText('Wizard installed')
-            QtWidgets.QApplication.processEvents()
-            self.progress_bar.setValue(100)
-            time.sleep(1)
-            sys.exit()
+    def is_done(self):
+        self.infos_label.setText('Successfully installed !')
+        self.progress_bar.setVisible(0)
+        self.close_button.setVisible(1)
+
+    def is_error(self, error):
+        self.infos_label.setText('An error occured')
+        self.progress_bar.setVisible(0)
+        self.error_label.setVisible(1)
+        self.close_button.setVisible(1)
+        self.error_label.setText(error)
+
+    def startup(self):
+        version_dic = get_version()
+        day = time.strftime('%Y-%m-%d', time.localtime(version_dic['date']))
+        version = f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}.{str(version_dic['builds']).zfill(4)} ( {day} )"
+        self.version_label.setText(version)
+        self.infos_label.setText('Install Wizard ?')
+
+    def process(self):
+        self.install_button.setVisible(0)
+        self.progress_bar.setVisible(1)
+        QtWidgets.QApplication.processEvents()
+        try:
+            is_reg, version, is_files = get_current_install()
+            if (is_reg or version or is_files) is not None:
+                self.infos_label.setText('Installing Wizard')
+                self.progress_bar.setValue(0)
+                QtWidgets.QApplication.processEvents()
+                time.sleep(1)
+                self.infos_label.setText('Removing Wizard files')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(10)
+                remove_install_dir()
+                self.infos_label.setText('Deleting registery keys')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(30)
+                delete_reg_keys()
+                self.infos_label.setText('Deleting shortcuts')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(50)
+                delete_shortcuts()
+                self.infos_label.setText('Unpacking Wizard')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(70)
+                unpack_zip()
+                self.infos_label.setText('Creating registery keys')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(80)
+                create_reg_keys()
+                self.infos_label.setText('Creating shortcuts')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(90)
+                create_shortcuts()
+                self.infos_label.setText('Wizard updated')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(100)
+                time.sleep(1)
+            elif (is_reg and version and is_files) is None:
+                self.infos_label.setText('Installing Wizard')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(0)
+                time.sleep(1)
+                self.infos_label.setText('Unpacking Wizard')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(40)
+                unpack_zip()
+                self.infos_label.setText('Creating registery keys')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(70)
+                create_reg_keys()
+                self.infos_label.setText('Creating shortcuts')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(90)
+                create_shortcuts()
+                self.infos_label.setText('Wizard installed')
+                QtWidgets.QApplication.processEvents()
+                self.progress_bar.setValue(100)
+                time.sleep(1)
+            self.is_done()
+        except:
+            self.is_error(str(traceback.format_exc()))
 
     def build_ui(self):
-        self.setStyleSheet('QWidget{background-color:#2c2c33;color:white;}')
-        self.setFixedWidth(600)
+        self.setFixedWidth(800)
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(18,18,18,18)
+        self.main_layout.setSpacing(20)
         self.setLayout(self.main_layout)
-
-        self.main_frame = QtWidgets.QFrame()
-        self.main_frame.setStyleSheet('QFrame{border-radius:10px;}')
-
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(70)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
-        self.shadow.setXOffset(2)
-        self.shadow.setYOffset(2)
-        self.main_frame.setGraphicsEffect(self.shadow)
-
-        self.frame_layout = QtWidgets.QVBoxLayout()
-        self.frame_layout.setContentsMargins(20,20,20,20)
-        self.frame_layout.setSpacing(6)
-        self.main_frame.setLayout(self.frame_layout)
-        self.main_layout.addWidget(self.main_frame)
 
         self.datas_widget = QtWidgets.QWidget()
         self.datas_layout = QtWidgets.QHBoxLayout()
         self.datas_layout.setContentsMargins(0,0,0,0)
         self.datas_layout.setSpacing(12)
         self.datas_widget.setLayout(self.datas_layout)
-        self.frame_layout.addWidget(self.datas_widget)
+        self.main_layout.addWidget(self.datas_widget)
 
         self.image_label = QtWidgets.QLabel()
         self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -329,16 +336,59 @@ class installer(QtWidgets.QWidget):
         self.datas_layout.addWidget(self.infos_widget)
 
         self.infos_label = QtWidgets.QLabel()
+        self.infos_label.setObjectName('title_label_2')
         self.infos_layout.addWidget(self.infos_label)
 
         self.version_label = QtWidgets.QLabel()
         self.version_label.setStyleSheet('color:gray;')
         self.infos_layout.addWidget(self.version_label)
 
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+        self.error_label = QtWidgets.QLabel()
+        self.error_label.setStyleSheet('color:#f0605b;')
+        self.main_layout.addWidget(self.error_label)
+        self.error_label.setVisible(0)
+
+        self.install_button = QtWidgets.QPushButton('Install')
+        self.install_button.setObjectName('blue_button')
+        self.main_layout.addWidget(self.install_button)
+        self.install_button.setVisible(1)
+
         self.progress_bar = QtWidgets.QProgressBar()
-        self.progress_bar.setStyleSheet('QProgressBar{height:6px;background-color: rgba(0,0,0,50);border-radius:3px;color: transparent;}QProgressBar::chunk {background-color: #7785de;border-radius:3px;}')
         self.progress_bar.setMaximumHeight(6)
-        self.frame_layout.addWidget(self.progress_bar)
+        self.progress_bar.setVisible(0)
+        self.main_layout.addWidget(self.progress_bar)
+
+        self.close_button = QtWidgets.QPushButton('Close')
+        self.close_button.setObjectName('blue_button')
+        self.main_layout.addWidget(self.close_button)
+        self.close_button.setVisible(0)
+
+stylesheet = """
+#title_label_2{
+    font: bold large;
+    font-size: 14px;}
+QWidget{background-color:#2c2c33;color:white;}
+QPushButton, QToolButton, #classic_button{
+    border: 2px solid #42424d;
+    background-color: #42424d;
+    padding: 12px;
+    border-radius: 5px;}
+#blue_button{
+    background-color: transparent;
+    border: 2px solid #7785de;}
+#blue_button::hover{
+    background-color: #8e9dfa;
+    border: 2px solid #8e9dfa;}
+#blue_button::pressed{
+    background-color: #6772b5;
+    border: 2px solid #6772b5;}
+QProgressBar{height:6px;background-color: rgba(0,0,0,50);
+    border-radius:3px;color: transparent;}
+QProgressBar::chunk {background-color:
+    #7785de;border-radius:3px;}
+"""
 
 def main():
     if is_admin():
@@ -346,10 +396,10 @@ def main():
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
         app = QtWidgets.QApplication(sys.argv)
+        app.setStyleSheet(stylesheet)
         installer_widget = installer()
         installer_widget.show()
         QtWidgets.QApplication.processEvents()
-        installer_widget.process()
         sys.exit(app.exec_())
     else:
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
