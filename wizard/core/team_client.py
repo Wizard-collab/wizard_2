@@ -96,7 +96,7 @@ class team_client(QThread):
                 except json.decoder.JSONDecodeError:
                     logger.debug("cannot read json data")
             else:
-                if self.running == True:
+                if self.running != True:
                     logger.warning('Team connection lost')
                     self.stop()
         self.team_connection_status_signal.emit(False)

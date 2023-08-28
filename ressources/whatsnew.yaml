@@ -1,37 +1,7 @@
-'3.0.0':
+'last':
   update_list:
   - !!python/tuple
-    - debug
-    - wefewfwe
-  - !!python/tuple
     - new
-    - weofkweopf
-  - !!python/tuple
-    - debug
-    - 'eowpfkeopfkweopfkewopfkewopf
-
-  fewfewfpwekfopwefkopwef
-  wefewpfkweopfkewopfkewf
-  
-  epofkewpofkewopfkweopfkwe'
-  - !!python/tuple
-    - new
-    - weofkweopf
-  - !!python/tuple
-    - debug
-    - wefewfwe
-  - !!python/tuple
-    - new
-    - weofkweopf
-  - !!python/tuple
-    - debug
-    - 'eowpfkeopfkweopfkewopfkewopf
-
-  fewfewfpwekfopwefkopwef
-  wefewpfkweopfkewopfkewf
-  
-  epofkewpofkewopfkweopfkwe'
-  - !!python/tuple
-    - new
-    - weofkweopf
+    - 2023 / 2024 New version of wizard !
   version: 3.0.0
+  time: 1692959389.4830549

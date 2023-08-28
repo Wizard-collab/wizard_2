@@ -138,7 +138,7 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.updates_scrollArea_widget.setObjectName('transparent_widget')
         self.updates_scrollArea_layout = QtWidgets.QVBoxLayout()
         self.updates_scrollArea_layout.setContentsMargins(0,0,0,0)
-        self.updates_scrollArea_layout.setSpacing(1)
+        self.updates_scrollArea_layout.setSpacing(6)
         self.updates_scrollArea_widget.setLayout(self.updates_scrollArea_layout)
 
         self.updates_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -182,19 +182,19 @@ class splash_screen_widget(QtWidgets.QDialog):
             if not project.check_work_env_existence(work_env_tuple[0]):
                 continue
             item = recent_scene_item(work_env_tuple, self.recent_scenes_list.invisibleRootItem())
-        self.recent_scenes_list.setFixedHeight(self.recent_scenes_list.invisibleRootItem().childCount()*32)
+        self.recent_scenes_list.setFixedHeight(self.recent_scenes_list.invisibleRootItem().childCount()*31)
 
     def fill_whats_new(self):
         with open(ressources._whatsnew_yaml_, 'r') as f:
             whats_new_dic = yaml.load(f, Loader=yaml.Loader)
         version_key = f"{self.version_dic['MAJOR']}.{self.version_dic['MINOR']}.{self.version_dic['PATCH']}"
         self.updates_list = []
-        if version_key in whats_new_dic.keys():
-            for update_tuple in whats_new_dic[version_key]['update_list']:
-                widget = update_frame(update_tuple[0], update_tuple[1])
-                self.updates_list.append(widget)
-                self.updates_scrollArea_layout.insertWidget(0,widget)
-
+        self.update_areas = []
+        for update in whats_new_dic.keys():
+            widget = update_area(whats_new_dic[update], update, version_key)
+            self.updates_scrollArea_layout.addWidget(widget)
+            self.update_areas.append(widget)
+            
     def connect_functions(self):
         self.show_at_startup_checkbox.stateChanged.connect(self.toggle_show_at_startup)
         self.recent_scenes_list.itemDoubleClicked.connect(self.launch_recent_work_env)
@@ -235,6 +235,51 @@ class splash_screen_widget(QtWidgets.QDialog):
             self.setFocus()
             return
         self.close()
+
+class update_area(QtWidgets.QFrame):
+    def __init__(self, update_dic, update, current_version_key, parent=None):
+        super(update_area, self).__init__(parent)
+        self.setObjectName('round_frame')
+        self.setStyleSheet("#round_frame{background-color:rgba(255,255,255,5)}")
+        self.update = update
+        self.current_version_key = current_version_key
+        self.update_dic = update_dic
+        self.updates_list = []
+        self.build_ui()
+        self.fill_ui()
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(10,10,10,10)
+        self.main_layout.setSpacing(2)
+        self.setLayout(self.main_layout)
+
+        self.version_label = QtWidgets.QLabel()
+        self.version_label.setObjectName('title_label')
+        self.main_layout.addWidget(self.version_label)
+
+        self.date_label = QtWidgets.QLabel()
+        self.date_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.date_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,12, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.updates_layout = QtWidgets.QVBoxLayout()
+        self.updates_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.updates_layout)
+
+    def fill_ui(self):
+        day, hour = tools.convert_time(self.update_dic['time'])
+        self.date_label.setText(f"{day} ( {tools.time_ago_from_timestamp(self.update_dic['time'])} )")
+        if self.update != 'last':
+            self.version_label.setText(self.update_dic['version'])
+        else:
+            self.version_label.setText(self.current_version_key)
+
+        for update_tuple in self.update_dic['update_list']:
+            widget = update_frame(update_tuple[0], update_tuple[1])
+            self.updates_list.append(widget)
+            self.updates_layout.insertWidget(0,widget)
 
 class update_frame(QtWidgets.QFrame):
     def __init__(self, update_type, update, parent=None):

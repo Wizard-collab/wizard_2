@@ -167,8 +167,9 @@ class user:
             self.prefs_dic[user_vars._recent_work_envs_] = dict()
         if environment.get_project_name() not in self.prefs_dic[user_vars._recent_work_envs_].keys():
             self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()] = []
-        while len(self.prefs_dic[user_vars._recent_work_envs_]) > 4:
+        while len(self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()]) > 4:
             self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].pop(0)
+            print(self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()])
         for existing_tuple in self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()]:
             if work_env_tuple[0] == existing_tuple[0]:
                 self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].remove(existing_tuple)
