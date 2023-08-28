@@ -143,7 +143,7 @@ class references_widget(QtWidgets.QWidget):
     def search_reference(self):
         if self.parent_instance_id is not None and self.parent_instance_id != 0:
             self.search_reference_widget = search_reference_widget.search_reference_widget(self.context, self)
-            self.search_reference_widget.variant_ids_signal.connect(self.create_references_from_variant_ids)
+            self.search_reference_widget.stage_ids_signal.connect(self.create_references_from_stage_ids)
             self.search_reference_widget.groups_ids_signal.connect(self.create_referenced_groups)
             self.search_reference_widget.show()
 
@@ -156,14 +156,14 @@ class references_widget(QtWidgets.QWidget):
             else:
                 self.search_reference_widget.search_asset(f"")
 
-    def create_references_from_variant_ids(self, variant_ids):
+    def create_references_from_stage_ids(self, stage_ids):
         if self.parent_instance_id is not None:
-            for variant_id in variant_ids:
+            for stage_id in stage_ids:
                 if self.context == 'work_env':
-                    if assets.create_references_from_variant_id(self.parent_instance_id, variant_id):
+                    if assets.create_references_from_stage_id(self.parent_instance_id, stage_id):
                         gui_server.refresh_team_ui()
                 else:
-                    if assets.create_grouped_references_from_variant_id(self.parent_instance_id, variant_id):
+                    if assets.create_grouped_references_from_stage_id(self.parent_instance_id, stage_id):
                         gui_server.refresh_team_ui()
 
     def quick_import(self, stage):
@@ -479,18 +479,18 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(8)
+        self.list_view.setColumnCount(7)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Variant', 'Exported asset', 'Version', 'Format', 'Auto update', 'State', 'ID'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Exported asset', 'Version', 'Format', 'Auto update', 'State', 'ID'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
-        self.list_view.header().resizeSection(3, 250)
-        self.list_view.header().resizeSection(4, 80)
-        self.list_view.header().resizeSection(5, 60)
-        self.list_view.header().resizeSection(6, 100)
-        self.list_view.header().resizeSection(7, 80)
-        self.list_view.header().resizeSection(8, 40)
+        self.list_view.header().resizeSection(2, 250)
+        self.list_view.header().resizeSection(3, 80)
+        self.list_view.header().resizeSection(4, 60)
+        self.list_view.header().resizeSection(5, 100)
+        self.list_view.header().resizeSection(6, 80)
+        self.list_view.header().resizeSection(7, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -632,32 +632,31 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font.setBold(True)
         self.setFont(1, bold_font)
         self.export_widget = editable_data_widget()
-        self.treeWidget().setItemWidget(self, 3, self.export_widget)
+        self.treeWidget().setItemWidget(self, 2, self.export_widget)
         self.version_widget = editable_data_widget(bold=True)
-        self.treeWidget().setItemWidget(self, 4, self.version_widget)
+        self.treeWidget().setItemWidget(self, 3, self.version_widget)
         self.auto_update_checkbox = QtWidgets.QCheckBox()
         self.auto_update_checkbox.setStyleSheet('background-color:transparent;')
-        self.treeWidget().setItemWidget(self, 6, self.auto_update_checkbox)
+        self.treeWidget().setItemWidget(self, 5, self.auto_update_checkbox)
 
         self.setIcon(0, QtGui.QIcon(ressources._stage_icons_dic_[self.reference_row['stage']]))
-        self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setForeground(4, QtGui.QBrush(QtGui.QColor('gray')))
 
         self.state_widget = state_widget()
-        self.treeWidget().setItemWidget(self, 7, self.state_widget)
+        self.treeWidget().setItemWidget(self, 6, self.state_widget)
         
-        self.setText(8, str(self.reference_row['id']))
-        self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
+        self.setText(7, str(self.reference_row['id']))
+        self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
-        self.setText(2, infos_list[1])
-        self.export_widget.setText(infos_list[2])
-        self.version_widget.setText(infos_list[3])
-        self.set_auto_update(infos_list[5])
-        self.setText(0, infos_list[6])
-        self.stage_row = infos_list[7]
+        self.export_widget.setText(infos_list[1])
+        self.version_widget.setText(infos_list[2])
+        self.set_auto_update(infos_list[4])
+        self.setText(0, infos_list[5])
+        self.stage_row = infos_list[6]
         self.state_widget.set_state(self.stage_row['state'])
-        self.setText(5, infos_list[8])
-        if infos_list[4]:
+        self.setText(4, infos_list[7])
+        if infos_list[3]:
             self.version_widget.setColor('#9ce87b')
         else:
             self.version_widget.setColor('#f79360')
@@ -682,8 +681,8 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.state_widget.modify_state_signal.connect(self.modify_state)
 
     def export_modification_requested(self, point):
-        variant_id = project.get_export_data(self.reference_row['export_id'], 'variant_id')
-        exports_list = project.get_variant_export_childs(variant_id)
+        stage_id = project.get_export_data(self.reference_row['export_id'], 'stage_id')
+        exports_list = project.get_stage_export_childs(stage_id)
         if exports_list is not None and exports_list != []:
             menu = gui_utils.QMenu()
             for export in exports_list:
@@ -818,8 +817,7 @@ class reference_infos_thread(QtCore.QThread):
                         else:
                             extension = '?'
                     export_row = project.get_export_data(export_version_row['export_id'])
-                    variant_row = project.get_variant_data(export_row['variant_id'])
-                    stage_row = project.get_stage_data(variant_row['stage_id'])
+                    stage_row = project.get_stage_data(export_row['stage_id'])
                     asset_name = project.get_asset_data(stage_row['asset_id'], 'name')
                     default_export_version_id = project.get_default_export_version(export_row['id'], 'id')
 
@@ -829,7 +827,6 @@ class reference_infos_thread(QtCore.QThread):
                         up_to_date = 1
 
                     self.reference_infos_signal.emit([reference_row['id'], 
-                                                        variant_row['name'], 
                                                         export_row['name'], 
                                                         export_version_row['name'], 
                                                         up_to_date, 
