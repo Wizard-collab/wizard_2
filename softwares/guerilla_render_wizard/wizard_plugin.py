@@ -109,7 +109,7 @@ def import_texturing(references=None):
             guerilla_shader.import_texturing(reference['namespace'],
                                                 reference['files'],
                                                 reference['asset_name'],
-                                                reference['string_variant'])
+                                                reference['string_stage'])
 
 def update_texturing(references=None):
     if not references:
@@ -119,7 +119,7 @@ def update_texturing(references=None):
             guerilla_shader.update_texturing(reference['namespace'],
                                                 reference['files'],
                                                 reference['asset_name'],
-                                                reference['string_variant'])
+                                                reference['string_stage'])
 
 def import_shading(references=None):
     if not references:

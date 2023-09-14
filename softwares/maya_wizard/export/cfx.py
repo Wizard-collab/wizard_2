@@ -70,7 +70,7 @@ def export_fur(grooming_reference, frange, percent_factor):
     grooming_nspace = grooming_reference['namespace']
     asset_name = grooming_reference['asset_name']
     variant_name = grooming_reference['variant_name']
-    exported_string_asset = grooming_reference['string_variant']
+    exported_string_asset = grooming_reference['string_stage']
     count = grooming_reference['count']
     if is_referenced(grooming_nspace):
         export_GRP_list = get_fur_objects_to_export(grooming_nspace)
@@ -87,7 +87,7 @@ def export_cfx_abc(reference, frange, percent_factor):
     nspace = reference['namespace']
     asset_name = reference['asset_name']
     variant_name = reference['variant_name']
-    exported_string_asset = reference['string_variant']
+    exported_string_asset = reference['string_stage']
     count = reference['count']
     if is_referenced(nspace):
         export_GRP_list = get_objects_to_export(nspace)

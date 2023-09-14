@@ -526,7 +526,7 @@ def quick_reference(work_env_id, stage):
         if len(project.get_export_versions_by_stage(stage_row['id'], 'id')) == 0:
             logger.warning(f"No export found for {asset_row['name']}/{stage}")
             return
-        return create_references_from_stage_id(work_env_id, stage_id)
+        return create_references_from_stage_id(work_env_id, stage_row['id'])
     logger.warning(f"Stage {stage} not found for {asset_row['name']}")
 
 def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None):
@@ -603,11 +603,11 @@ def get_references_files(work_env_id):
                                                                             'files'))
         if reference_files_list == []:
             reference_files_list = get_export_files_list(reference_row['export_version_id'])
-        variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
-        variant_row = project.get_variant_data(variant_id)
-        variant_name = variant_row['name']
-        string_variant = variant_row['string']
-        asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
+        stage_id = project.get_export_data(reference_row['export_id'], 'stage_id')
+        stage_row = project.get_stage_data(stage_id)
+        stage_name = stage_row['name']
+        string_stage = stage_row['string']
+        asset_id = stage_row['asset_id']
         asset_row = project.get_asset_data(asset_id)
         asset_name = asset_row['name']
         category_name = project.get_category_data(asset_row['category_id'], 'name')
@@ -617,8 +617,8 @@ def get_references_files(work_env_id):
         reference_dic['count'] = reference_row['count']
         reference_dic['category_name'] = category_name
         reference_dic['asset_name'] = asset_name
-        reference_dic['variant_name'] = variant_name
-        reference_dic['string_variant'] = string_variant
+        reference_dic['stage_name'] = stage_name
+        reference_dic['string_stage'] = string_stage
         if reference_row['stage'] not in references_dic.keys():
             references_dic[reference_row['stage']] = []
         references_dic[reference_row['stage']].append(reference_dic)
@@ -630,11 +630,11 @@ def get_references_files(work_env_id):
                                                                                 'files'))
             if reference_files_list == []:
                 reference_files_list = get_export_files_list(reference_row['export_version_id'])
-            variant_id = project.get_export_data(grouped_reference_row['export_id'], 'variant_id')
-            variant_row = project.get_variant_data(variant_id)
-            variant_name = variant_row['name']
-            string_variant = variant_row['string']
-            asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
+            stage_id = project.get_export_data(grouped_reference_row['export_id'], 'stage_id')
+            stage_row = project.get_stage_data(stage_id)
+            stage_name = stage_row['name']
+            string_stage = stage_row['string']
+            asset_id = stage_row['asset_id']
             asset_row = project.get_asset_data(asset_id)
             asset_name = asset_row['name']
             category_name = project.get_category_data(asset_row['category_id'], 'name')
@@ -644,8 +644,8 @@ def get_references_files(work_env_id):
             reference_dic['count'] = f"{referenced_group_row['count']}_{grouped_reference_row['count']}"
             reference_dic['category_name'] = category_name
             reference_dic['asset_name'] = asset_name
-            reference_dic['variant_name'] = variant_name
-            reference_dic['string_variant'] = string_variant
+            reference_dic['stage_name'] = stage_name
+            reference_dic['string_stage'] = string_stage
             if grouped_reference_row['stage'] not in references_dic.keys():
                 references_dic[grouped_reference_row['stage']] = []
             references_dic[grouped_reference_row['stage']].append(reference_dic)
