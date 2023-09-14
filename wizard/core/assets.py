@@ -287,6 +287,7 @@ def create_stage(name, asset_id):
     if not tools.create_folder(dir_name):
         project.remove_stage(stage_id)
         return
+    tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
     stage_row = project.get_stage_data(stage_id)
     hooks.after_stage_creation_hook(string_stage = stage_row['string'],
                                     stage_name = name)
@@ -332,7 +333,6 @@ def create_variant(name, stage_id, comment=''):
     if not tools.create_folder(dir_name):
         project.remove_variant(variant_id)
         return
-    tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_SANDBOX')))
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_VIDEOS')))
     variant_row = project.get_variant_data(variant_id)
@@ -461,9 +461,8 @@ def force_unlock(work_env_id):
     project.set_work_env_lock(work_env_id, 0, 1)
     return 1
 
-def create_references_from_variant_id(work_env_id, variant_id):
-    export_rows = project.get_variant_export_childs(variant_id)
-    stage_id = project.get_variant_data(variant_id, 'stage_id')
+def create_references_from_stage_id(work_env_id, stage_id):
+    export_rows = project.get_stage_export_childs(stage_id)
     stage = project.get_stage_data(stage_id, 'name')
     if not export_rows:
         return
@@ -524,12 +523,10 @@ def quick_reference(work_env_id, stage):
     for stage_row in stages_rows:
         if stage_row['name'] != stage:
             continue
-        default_variant_id = stage_row['default_variant_id']
-        default_variant_row = project.get_variant_data(default_variant_id)
-        if len(project.get_export_versions_by_variant(default_variant_id, 'id')) == 0:
-            logger.warning(f"No export found for {asset_row['name']}/{stage}/{default_variant_row['name']}")
+        if len(project.get_export_versions_by_stage(stage_row['id'], 'id')) == 0:
+            logger.warning(f"No export found for {asset_row['name']}/{stage}")
             return
-        return create_references_from_variant_id(work_env_id, default_variant_id)
+        return create_references_from_stage_id(work_env_id, stage_row['id'])
     logger.warning(f"Stage {stage} not found for {asset_row['name']}")
 
 def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None):
@@ -606,11 +603,11 @@ def get_references_files(work_env_id):
                                                                             'files'))
         if reference_files_list == []:
             reference_files_list = get_export_files_list(reference_row['export_version_id'])
-        variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
-        variant_row = project.get_variant_data(variant_id)
-        variant_name = variant_row['name']
-        string_variant = variant_row['string']
-        asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
+        stage_id = project.get_export_data(reference_row['export_id'], 'stage_id')
+        stage_row = project.get_stage_data(stage_id)
+        stage_name = stage_row['name']
+        string_stage = stage_row['string']
+        asset_id = stage_row['asset_id']
         asset_row = project.get_asset_data(asset_id)
         asset_name = asset_row['name']
         category_name = project.get_category_data(asset_row['category_id'], 'name')
@@ -620,8 +617,8 @@ def get_references_files(work_env_id):
         reference_dic['count'] = reference_row['count']
         reference_dic['category_name'] = category_name
         reference_dic['asset_name'] = asset_name
-        reference_dic['variant_name'] = variant_name
-        reference_dic['string_variant'] = string_variant
+        reference_dic['stage_name'] = stage_name
+        reference_dic['string_stage'] = string_stage
         if reference_row['stage'] not in references_dic.keys():
             references_dic[reference_row['stage']] = []
         references_dic[reference_row['stage']].append(reference_dic)
@@ -633,11 +630,11 @@ def get_references_files(work_env_id):
                                                                                 'files'))
             if reference_files_list == []:
                 reference_files_list = get_export_files_list(reference_row['export_version_id'])
-            variant_id = project.get_export_data(grouped_reference_row['export_id'], 'variant_id')
-            variant_row = project.get_variant_data(variant_id)
-            variant_name = variant_row['name']
-            string_variant = variant_row['string']
-            asset_id = project.get_stage_data(variant_row['stage_id'], 'asset_id')
+            stage_id = project.get_export_data(grouped_reference_row['export_id'], 'stage_id')
+            stage_row = project.get_stage_data(stage_id)
+            stage_name = stage_row['name']
+            string_stage = stage_row['string']
+            asset_id = stage_row['asset_id']
             asset_row = project.get_asset_data(asset_id)
             asset_name = asset_row['name']
             category_name = project.get_category_data(asset_row['category_id'], 'name')
@@ -647,8 +644,8 @@ def get_references_files(work_env_id):
             reference_dic['count'] = f"{referenced_group_row['count']}_{grouped_reference_row['count']}"
             reference_dic['category_name'] = category_name
             reference_dic['asset_name'] = asset_name
-            reference_dic['variant_name'] = variant_name
-            reference_dic['string_variant'] = string_variant
+            reference_dic['stage_name'] = stage_name
+            reference_dic['string_stage'] = string_stage
             if grouped_reference_row['stage'] not in references_dic.keys():
                 references_dic[grouped_reference_row['stage']] = []
             references_dic[grouped_reference_row['stage']].append(reference_dic)
@@ -661,24 +658,33 @@ def get_export_files_list(export_version_id):
         files_list.append(path_utils.join(export_version_path, file))
     return files_list
 
-def merge_file_as_export_version(export_name, files, variant_id, comment='', execute_xp=True):
-    return add_export_version(export_name, files, variant_id, None, comment, skip_temp_purge=True)
+def merge_file_as_export_version(export_name, files, stage_id, comment='', execute_xp=True):
+    return add_export_version(export_name, files, stage_id, None, comment, skip_temp_purge=True)
 
 def add_export_version_from_version_id(export_name, files, version_id, comment='', execute_xp=True):
     work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))
     if not work_env_row:
         return
     variant_id = work_env_row['variant_id']
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
     return add_export_version(export_name,
                                 files,
-                                variant_id,
+                                stage_id,
                                 version_id,
                                 comment,
                                 execute_xp)
 
-def add_export_version(export_name, files, variant_id, version_id, comment='', execute_xp=True, skip_temp_purge=False):
-    variant_row = project.get_variant_data(variant_id)
-    stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
+def add_export_version(raw_export_name, files, stage_id, version_id, comment='', execute_xp=True, skip_temp_purge=False):
+    if version_id:
+        version_row = project.get_version_data(version_id)
+        work_env_row = project.get_work_env_data(version_row['work_env_id'])
+        variant_row = project.get_variant_data(work_env_row['variant_id'])
+        export_name = f"{variant_row['name']}_{raw_export_name}"
+    else:
+        export_name = raw_export_name
+
+    stage_row = project.get_stage_data(stage_id)
+    stage_name = stage_row['name']
     extension_errors = []
 
     extensions_rules = []
@@ -693,9 +699,9 @@ def add_export_version(export_name, files, variant_id, version_id, comment='', e
         for file in extension_errors:
             logger.warning(f"{file} format doesn't math the stage export rules ( {(', ').join(extensions_rules)} )")
         return
-    if not variant_row:
+    if not stage_row:
         return
-    export_id = get_or_add_export(export_name, variant_id)
+    export_id = get_or_add_export(export_name, stage_row['id'])
     if not export_id:
         return
     last_version_name = project.get_last_export_version(export_id, 'name')
@@ -761,11 +767,14 @@ def modify_video_comment(video_id, comment):
     tags.analyse_comment(comment, 'video', video_id)
     return 1
 
-def request_export(work_env_id, export_name, multiple=None, only_dir=None):
+def request_export(work_env_id, raw_export_name, multiple=None, only_dir=None):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     if not variant_id:
         return
-    export_id = get_or_add_export(export_name, variant_id)
+    variant_row = project.get_variant_data(variant_id)
+    stage_id = project.get_stage_data(variant_row['stage_id'], 'id')
+    export_name = f"{variant_row['name']}_{raw_export_name}"
+    export_id = get_or_add_export(export_name, stage_id)
     if not export_id:
         return
     export_path = get_temp_export_path(export_id)
@@ -785,7 +794,10 @@ def request_render(version_id, export_name, comment=''):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     if not variant_id:
         return
-    export_version_id = add_export_version(export_name, [], variant_id, version_id, comment)
+    stage_id = project.get_variant_data(variant_id, 'stage_id')
+    if not stage_id:
+        return
+    export_version_id = add_export_version(export_name, [], stage_id, version_id, comment)
     if not export_version_id:
         return
     export_version_path = get_export_version_path(export_version_id)
@@ -808,28 +820,28 @@ def archive_export(export_id):
         archive_file = ''
     if not project.remove_export(export_id):
         return
-    events.add_archive_event(f"Archived {instance_to_string(('variant', export_row['variant_id']))}/{export_row['name']}",
+    events.add_archive_event(f"Archived {instance_to_string(('stage', export_row['stage_id']))}/{export_row['name']}",
                                 archive_file)
     return 1
 
-def get_or_add_export(name, variant_id):
+def get_or_add_export(name, stage_id):
     if not tools.is_safe(name):
         return
-    variant_path = get_variant_path(variant_id)
-    if not variant_path:
+    stage_path = get_stage_path(stage_id)
+    if not stage_path:
         logger.error("Can't create export")
         return
-    dir_name = path_utils.clean_path(path_utils.join(variant_path,
+    dir_name = path_utils.clean_path(path_utils.join(stage_path,
                                                         '_EXPORTS',
                                                         name))
-    is_export = project.is_export(name, variant_id)
+    is_export = project.is_export(name, stage_id)
     if not is_export:
-        export_id = project.add_export(name, variant_id)
+        export_id = project.add_export(name, stage_id)
         if not tools.create_folder(dir_name):
             project.remove_export(export_id)
             return
     else:
-        export_id = project.get_export_by_name(name, variant_id)['id']
+        export_id = project.get_export_by_name(name, stage_id)['id']
     return export_id
 
 def archive_export_version(export_version_id):
@@ -1098,9 +1110,8 @@ def create_referenced_group(work_env_id, group_id):
 def remove_referenced_group(referenced_group_id):
     return project.remove_referenced_group(referenced_group_id)
 
-def create_grouped_references_from_variant_id(group_id, variant_id):
-    export_rows = project.get_variant_export_childs(variant_id)
-    stage_id = project.get_variant_data(variant_id, 'stage_id')
+def create_grouped_references_from_stage_id(group_id, stage_id):
+    export_rows = project.get_stage_export_childs(stage_id)
     stage = project.get_stage_data(stage_id, 'name')
     if not export_rows:
         return
@@ -1225,15 +1236,15 @@ def get_variant_path(variant_id):
         return
     return path_utils.join(stage_path, variant_name)
 
-def get_variant_export_path(variant_id):
-    variant_row = project.get_variant_data(variant_id)
-    if not variant_row:
+def get_stage_export_path(stage_id):
+    stage_row = project.get_stage_data(stage_id)
+    if not stage_row:
         return
-    variant_name = variant_row['name']
-    stage_path = get_stage_path(variant_row['stage_id'])
+    stage_name = stage_row['name']
+    stage_path = get_stage_path(stage_id)
     if not stage_path:
         return
-    return path_utils.join(stage_path, variant_name, '_EXPORTS')
+    return path_utils.join(stage_path, '_EXPORTS')
 
 def get_work_env_path(work_env_id):
     work_env_row = project.get_work_env_data(work_env_id)
@@ -1259,10 +1270,10 @@ def get_export_path(export_id):
     if not export_row:
         return
     export_name = export_row['name']
-    variant_path = get_variant_path(export_row['variant_id'])
-    if not variant_path:
+    stage_path = get_stage_path(export_row['stage_id'])
+    if not stage_path:
         return
-    return path_utils.join(variant_path,
+    return path_utils.join(stage_path,
                             '_EXPORTS',
                             export_name)
 
@@ -1277,10 +1288,10 @@ def get_temp_export_path(export_id):
     if not export_row:
         return
     export_name = export_row['name']
-    variant_path = get_variant_path(export_row['variant_id'])
-    if not variant_path:
+    stage_path = get_stage_path(export_row['stage_id'])
+    if not stage_path:
         return
-    dir_name = path_utils.join(variant_path, '_EXPORTS', export_name, 'temp')
+    dir_name = path_utils.join(stage_path, '_EXPORTS', export_name, 'temp')
     dir_name = local_path+dir_name[len(project_path):]
     return dir_name
 
@@ -1342,7 +1353,6 @@ def build_video_file_name(variant_id, name):
     file_name += f".{extension}"
     return file_name
 
-
 def build_export_file_name(work_env_id, export_name, multiple=None):
     work_env_row = project.get_work_env_data(work_env_id)
     variant_row = project.get_variant_data(work_env_row['variant_id'])
@@ -1370,8 +1380,7 @@ def build_export_file_name(work_env_id, export_name, multiple=None):
 def build_namespace(export_version_id):
     export_version_row = project.get_export_version_data(export_version_id)
     export_row = project.get_export_data(export_version_row['export_id'])
-    variant_row = project.get_variant_data(export_row['variant_id'])
-    stage_row = project.get_stage_data(variant_row['stage_id'])
+    stage_row = project.get_stage_data(export_row['stage_id'])
     asset_row = project.get_asset_data(stage_row['asset_id'])
     category_row = project.get_category_data(asset_row['category_id'])
     domain_row = project.get_domain_data(category_row['domain_id'])
@@ -1383,7 +1392,6 @@ def build_namespace(export_version_id):
     if stage_row['name'] == 'animation' or stage_row['name'] == 'cfx':
         namespace += f"_{export_row['name']}"
     namespace += f"_{stage_row['name'][:3]}"
-    namespace += f"_{variant_row['name']}"
     return namespace
 
 def instance_to_string(instance_tuple):
@@ -1446,10 +1454,10 @@ def string_to_work_instance(string):
 
 def string_to_export_instance(string):
     instances_list = string.split('/')
-    if len(instances_list) == 6:
+    if len(instances_list) == 5:
         instance_type = 'export'
         instance_id = project.get_export_data_by_string(string, 'id')
-    elif len(instances_list) == 7:
+    elif len(instances_list) == 6:
         instance_type = 'export_version'
         instance_id = project.get_export_version_data_by_string(string, 'id')
     else:

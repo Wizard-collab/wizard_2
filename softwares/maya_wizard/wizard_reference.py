@@ -26,7 +26,7 @@ def reference_modeling(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_modeling(reference_dic):
     old_objects = pm.ls()
@@ -38,7 +38,7 @@ def update_modeling(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_rigging(reference_dic):
     old_objects = pm.ls()
@@ -50,7 +50,7 @@ def reference_rigging(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_rigging(reference_dic):
     old_objects = pm.ls()
@@ -62,7 +62,7 @@ def update_rigging(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 
 def reference_grooming(reference_dic):
@@ -75,7 +75,7 @@ def reference_grooming(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_grooming(reference_dic):
     old_objects = pm.ls()
@@ -87,7 +87,7 @@ def update_grooming(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_custom(reference_dic):
     old_objects = pm.ls()
@@ -99,7 +99,7 @@ def reference_custom(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_custom(reference_dic):
     old_objects = pm.ls()
@@ -111,7 +111,7 @@ def update_custom(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_camrig(reference_dic):
     old_objects = pm.ls()
@@ -123,7 +123,7 @@ def reference_camrig(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_camrig(reference_dic):
     old_objects = pm.ls()
@@ -135,7 +135,7 @@ def update_camrig(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_layout(reference_dic):
     old_objects = pm.ls()
@@ -147,7 +147,7 @@ def reference_layout(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_layout(reference_dic):
     old_objects = pm.ls()
@@ -159,7 +159,7 @@ def update_layout(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_animation(reference_dic):
     old_objects = pm.ls()
@@ -171,7 +171,7 @@ def reference_animation(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_animation(reference_dic):
     old_objects = pm.ls()
@@ -183,7 +183,7 @@ def update_animation(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_cfx(reference_dic):
     old_objects = pm.ls()
@@ -195,7 +195,7 @@ def reference_cfx(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_cfx(reference_dic):
     old_objects = pm.ls()
@@ -207,7 +207,7 @@ def update_cfx(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def reference_camera(reference_dic):
     old_objects = pm.ls()
@@ -219,7 +219,7 @@ def reference_camera(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_camera(reference_dic):
     old_objects = pm.ls()
@@ -231,7 +231,7 @@ def update_camera(reference_dic):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     new_nodes,
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def create_reference(file, namespace, group):
     if not pm.objExists(group):

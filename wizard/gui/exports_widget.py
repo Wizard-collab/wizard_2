@@ -59,7 +59,7 @@ class exports_widget(QtWidgets.QWidget):
 
         self.view_comment_widget = tag_label.view_comment_widget(self)
 
-        self.variant_id = None
+        self.stage_id = None
         self.export_versions_rows = None
         self.export_ids = dict()
         self.export_versions_ids = dict()
@@ -194,10 +194,9 @@ class exports_widget(QtWidgets.QWidget):
         string = None
         if len(project.get_references_by_export_version(export_version_row['id'], 'id'))!=0:
             export_row = project.get_export_data(export_version_row['export_id'])
-            variant_row = project.get_variant_data(export_version_row['variant_id'])
             stage_row = project.get_stage_data(export_version_row['stage_id'])
             asset_row = project.get_asset_data(stage_row['asset_id'])
-            string = f"{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{export_row['name']}/{export_version_row['name']}"
+            string = f"{asset_row['name']}/{stage_row['name']}/{export_row['name']}/{export_version_row['name']}"
         return string
 
     def archive(self):
@@ -246,8 +245,8 @@ class exports_widget(QtWidgets.QWidget):
                         subtasks_library.archive_export_versions(export_version_ids)
 
     def open_folder(self):
-        if self.variant_id is not None:
-            folder = assets.get_variant_export_path(self.variant_id)
+        if self.stage_id is not None:
+            folder = assets.get_stage_export_path(self.stage_id)
             selection = self.list_view.selectedItems()
             if selection is not None:
                 if len(selection)==1:
@@ -343,12 +342,11 @@ class exports_widget(QtWidgets.QWidget):
         QtWidgets.QApplication.processEvents()
         start_time = time.perf_counter()
         if self.isVisible():
-            if self.variant_id is not None:
+            if self.stage_id is not None:
                 self.setAcceptDrops(True)
-                stage_id = project.get_variant_data(self.variant_id, 'stage_id')
-                stage_name = project.get_stage_data(stage_id, 'name')
+                stage_name = project.get_stage_data(self.stage_id, 'name')
                 stage_icon = QtGui.QIcon(self.icons_dic[stage_name])
-                exports_rows = project.get_variant_export_childs(self.variant_id)
+                exports_rows = project.get_stage_export_childs(self.stage_id)
                 project_export_id = []
 
                 if exports_rows is not None:
@@ -368,7 +366,7 @@ class exports_widget(QtWidgets.QWidget):
                                                                 ressources._empty_info_image_)
 
                     project_export_versions_id = []
-                    self.export_versions_rows = project.get_export_versions_by_variant(self.variant_id)
+                    self.export_versions_rows = project.get_export_versions_by_stage(self.stage_id)
                     if self.export_versions_rows is not None:
                         if self.export_versions_rows != []:
                             for export_version_row in self.export_versions_rows:
@@ -544,12 +542,11 @@ class exports_widget(QtWidgets.QWidget):
                         gui_server.refresh_ui()
 
     def merge_files(self, files=[]):
-        if self.variant_id is not None:
+        if self.stage_id is not None:
             self.manual_export_widget = manual_export_widget.manual_export_widget()
             self.manual_export_widget.add_files(files)
 
-            variant_row = project.get_variant_data(self.variant_id)
-            stage_row = project.get_stage_data(variant_row['stage_id'])
+            stage_row = project.get_stage_data(self.stage_id)
             asset_row = project.get_asset_data(stage_row['asset_id'])
 
             self.manual_export_widget.set_export_name('main')
@@ -558,7 +555,7 @@ class exports_widget(QtWidgets.QWidget):
                 files = self.manual_export_widget.files
                 export_name = self.manual_export_widget.export_name
                 comment = self.manual_export_widget.comment
-                if assets.merge_file_as_export_version(export_name, files, self.variant_id, comment):
+                if assets.merge_file_as_export_version(export_name, files, self.stage_id, comment):
                     gui_server.refresh_ui()
 
     def focus_export_version(self, export_version_id):
@@ -578,13 +575,13 @@ class exports_widget(QtWidgets.QWidget):
         self.info_widget.setVisible(0)
         self.list_view.setVisible(1)
 
-    def change_variant(self, variant_id):
+    def change_stage(self, stage_id):
         self.check_existence_thread.running = False
         self.export_ids = dict()
         self.export_versions_ids = dict()
         self.list_view.clear()
-        self.variant_id = variant_id
-        self.current_asset_viewer.refresh('variant', variant_id)
+        self.stage_id = stage_id
+        self.current_asset_viewer.refresh('stage', stage_id)
         self.refresh()
         
 class custom_export_tree_item(QtWidgets.QTreeWidgetItem):

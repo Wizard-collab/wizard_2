@@ -17,52 +17,52 @@ from houdini_wizard import wizard_tools
 import hou
 
 def reference_modeling(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_stage'])
 
 def update_modeling(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_stage'])
 
 def reference_rigging(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_stage'])
 
 def update_rigging(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'RIGGING', 'rigging', reference_dic['string_stage'])
 
 def reference_grooming(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_stage'])
 
 def update_grooming(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_stage'])
 
 def reference_custom(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_stage'])
 
 def update_custom(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_stage'])
 
 def reference_layout(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_stage'])
 
 def update_layout(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_stage'])
 
 def reference_animation(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_stage'])
 
 def update_animation(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_stage'])
 
 def reference_cfx(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_stage'])
 
 def update_cfx(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_stage'])
 
 def reference_camera(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_stage'])
 
 def update_camera(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_stage'])
 
 def import_from_extension(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_nodes = wizard_tools.get_all_nodes()
