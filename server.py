@@ -45,7 +45,7 @@ import struct
 logger = logging.getLogger('WIZARD-SERVER')
 logger.setLevel(logging.DEBUG)
 
-user_path = os.path.expanduser('~/Documents/wizard_2/')
+user_path = os.path.expanduser('~/Documents/wizard/')
 if not os.path.isdir(user_path):
     os.mkdir(user_path)
 log_file = os.path.join(user_path, "wizard_server.log")
@@ -171,6 +171,15 @@ class server(threading.Thread):
             logger.info('test_conn')
         elif data['type'] == 'new_client':
             self.add_client(data['user_name'], conn, addr, data['project'])
+        elif data['type'] == 'prank':
+            client_id = next((client_id for client_id, client_dic in self.client_ids.items() if client_dic['user_name'] == data['prank_data']['destination_user']), None)
+            if client_id:
+                client_dic = dict()
+                client_dic['id'] = None
+                send_signal_with_conn(conn, True)
+                self.broadcast(data, client_dic)
+            else:
+                send_signal_with_conn(conn, False)
         else:
             client_dic = dict()
             client_dic['id'] = None
@@ -229,9 +238,9 @@ class server(threading.Thread):
     def broadcast(self, data, client_dic):
         logger.debug("Broadcasting : " + str(data))
         for client in self.client_ids.keys(): 
-            #if client != client_dic['id']:
-            if not send_signal_with_conn(self.client_ids[client]['conn'], data):
-                self.remove_client(self.client_ids[client])
+            if client != client_dic['id']:
+                if not send_signal_with_conn(self.client_ids[client]['conn'], data):
+                    self.remove_client(self.client_ids[client])
 
     def remove_client(self, client_dic): 
         if client_dic['id'] in self.client_ids.keys(): 

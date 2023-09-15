@@ -18,6 +18,10 @@ from wizard.vars import ressources
 from wizard.vars import game_vars
 
 def buy_artefact(artefact_name):
+	championship_participation = repository.get_user_row_by_name(environment.get_user(), 'championship_participation')
+	if not championship_participation:
+		logger.warning("You don't participate to the championship.")
+		return
 	if artefact_name not in game_vars.artefacts_dic.keys():
 		return
 	user_row = repository.get_user_row_by_name(environment.get_user())
@@ -34,6 +38,10 @@ def buy_artefact(artefact_name):
 	return 1
 
 def use_artefact(artefact_name, destination_user=None):
+	championship_participation = repository.get_user_row_by_name(environment.get_user(), 'championship_participation')
+	if not championship_participation:
+		logger.warning("You don't participate to the championship.")
+		return
 	if (destination_user == environment.get_user()) and game_vars.artefacts_dic[artefact_name]['usage'] == 'keep':
 		keeped_artefacts_dic = json.loads(repository.get_user_row_by_name(environment.get_user(), 'keeped_artefacts'))
 		if artefact_name in keeped_artefacts_dic.values():
@@ -47,20 +55,29 @@ def use_artefact(artefact_name, destination_user=None):
 		logger.warning(f"You don't have this artefact : {artefact_name}")
 		return
 	artefact_index = artefacts_list.index(artefact_name)
-	artefacts_list.pop(artefact_index)
-	if not repository.modify_user_artefacts(environment.get_user(), artefacts_list):
-		return
 	if game_vars.artefacts_dic[artefact_name]['type'] == 'attack':
+		user_participation = repository.get_user_row_by_name(destination_user, 'championship_participation')
+		if not user_participation:
+			logger.warning(f"{destination_user} doens't participate to the championship.")
+			return
 		if check_immunity(destination_user):
 			return
+
+		if not send_attack(destination_user, artefact_name):
+			return
+
 		if 'steal_attack_1' in artefact_name:
 			steal_attack_1(destination_user)
 		if 'steal_attack_2' in artefact_name:
 			if not steal_attack_2(destination_user):
 				return
-		send_attack(destination_user, artefact_name)
+		
 	if 'heal' in artefact_name:
 		heal(game_vars.artefacts_dic[artefact_name]['amount'])
+	artefacts_list.pop(artefact_index)
+	if not repository.modify_user_artefacts(environment.get_user(), artefacts_list):
+		return
+	return 1
 
 def check_immunity(destination_user):
 	destination_user_row = repository.get_user_row_by_name(destination_user)
@@ -100,8 +117,13 @@ def heal(amount):
 	logger.info(f"You just drank a heal potion, your life is now at {life}% !")
 
 def steal_attack_1(destination_user):
+	destination_user_level = repository.get_user_row_by_name(destination_user, 'level')
+	if destination_user_level == 0:
+		logger.warning(f"{destination_user} doesn't have levels for you, attack failed.")
+		return
 	game.remove_levels_to_user(1, destination_user)
 	game.add_levels(1)
+	return 1
 
 def steal_attack_2(destination_user):
 	destination_user_coins = repository.get_user_row_by_name(destination_user, 'coins')
@@ -126,5 +148,8 @@ def send_attack(destination_user, attack_name):
 	signal_dic['attack_type'] = attack_name
 	signal_dic['from_user'] = environment.get_user()
 	signal_dic['destination_user'] = destination_user
-	team_client.send_prank(environment.get_team_dns(), signal_dic)
+	if not team_client.send_prank(environment.get_team_dns(), signal_dic):
+		logger.warning(f"Can't reach {destination_user}, not using artefact.")
+		return
 	logger.info(f"Attack sent to {destination_user}")
+	return 1

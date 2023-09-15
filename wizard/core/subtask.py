@@ -40,6 +40,7 @@ import traceback
 import sys
 import logging
 import uuid
+import yaml
 
 # Wizard modules
 from wizard.vars import user_vars
@@ -56,6 +57,11 @@ class subtask(Thread):
         self.process_id = str(uuid.uuid4())
         self.process = None
         self.command = cmd
+        self.task_time = 0
+        self.status = 'Running'
+        self.creation_time = time.time()
+        self.current_task = ''
+        self.percent = 0
         self.pycmd = pycmd
         if env is None:
             self.env = os.environ.copy()
@@ -154,15 +160,18 @@ class subtask(Thread):
             try:
                 percent = round(float(out.split(':')[-1]), 0)
                 self.communicate_thread.send_percent([self.process_id, 'percent', percent])
+                self.percent = percent
             except:
                 logger.error(str(traceback.format_exc()))
         elif 'wizard_task_name:' in out:
             task = out.split(':')[-1]
             self.communicate_thread.send_signal([self.process_id, 'current_task', task])
+            self.current_task = task
         elif 'wizard_task_status:' in out:
             status = out.split(':')[-1]
             if status == 'done':
                 self.communicate_thread.send_signal([self.process_id, 'status', 'Done'])
+                self.status = 'Done'
                 self.set_done()
         else:
             self.out+='\n'+out
@@ -191,14 +200,33 @@ class subtask(Thread):
             child.kill()
         self.process.kill()
         self.communicate_thread.send_signal([self.process_id, 'status', 'Killed'])
+        self.status = 'Killed'
         self.running = False
 
     def write_log(self):
         log_name = f"subtask_{self.process_id}.log"
         log_file = path_utils.join(user_vars._subtasks_logs_, log_name)
+        subtasks_datas_file = path_utils.join(user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
         tools.create_folder_if_not_exist(user_vars._subtasks_logs_)
         with open(log_file, 'w') as f:
             f.write(self.out)
+        if path_utils.isfile(subtasks_datas_file):
+            with open(subtasks_datas_file, 'r') as f:
+                datas_dic = yaml.load(f, Loader = yaml.Loader)
+        else:
+            datas_dic = dict()
+        datas_dic[self.process_id] = dict()
+        datas_dic[self.process_id]['project'] = environment.get_project_name()
+        datas_dic[self.process_id]['time'] = self.task_time
+        datas_dic[self.process_id]['status'] = self.status
+        datas_dic[self.process_id]['creation_time'] = self.creation_time
+        datas_dic[self.process_id]['current_task'] = self.current_task
+        datas_dic[self.process_id]['percent'] = self.percent
+        datas_dic[self.process_id]['log_file'] = log_file
+        print(datas_dic)
+        with open(subtasks_datas_file, 'w') as f:
+            yaml.dump(datas_dic, f)
+
         self.communicate_thread.send_signal([self.process_id, 'log_file', log_file])
 
     def build_pycmd(self):
@@ -230,6 +258,7 @@ class subtask(Thread):
 
     def run(self):
         try:
+            start_time = time.perf_counter()
             self.running = True
 
             self.communicate_thread = communicate_thread(self)
@@ -246,10 +275,13 @@ class subtask(Thread):
             
             self.check_realtime_output()
             self.analyse_missed_stdout()
+            self.task_time = time.perf_counter()-start_time
+            logger.info(self.task_time)
             self.running = False
             self.write_log()
             self.communicate_thread.send_signal([self.process_id, 'end', 1])
             self.communicate_thread.stop()
+            
         except:
             logger.error(str(traceback.format_exc()))
 
@@ -400,3 +432,16 @@ class task_thread(Thread):
                 pass
         except json.decoder.JSONDecodeError:
             logger.debug("cannot read json data")
+
+def remove_task_from_subtasks_datas_file(task_id):
+    subtasks_datas_file = path_utils.join(user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
+    if not path_utils.isfile(subtasks_datas_file):
+        return
+    with open(subtasks_datas_file, 'r') as f:
+        datas_dic = yaml.load(f, Loader=yaml.Loader)
+    if task_id not in datas_dic.keys():
+        return
+    del datas_dic[task_id]
+    with open(subtasks_datas_file, 'w') as f:
+        yaml.dump(datas_dic, f)
+    return 1

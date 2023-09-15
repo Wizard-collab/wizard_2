@@ -77,6 +77,17 @@ class create_user_widget(QtWidgets.QDialog):
         self.profile_picture_button.setIconSize(QtCore.QSize(54,54))
         self.main_layout.addWidget(self.profile_picture_button)
 
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
+                                                    QtWidgets.QSizePolicy.MinimumExpanding)
+        self.main_layout.addSpacerItem(self.spaceItem)
+
+        self.championship_label = QtWidgets.QLabel("Championship")
+        self.main_layout.addWidget(self.championship_label)
+
+        self.championship_participation = QtWidgets.QCheckBox('Championship participation')
+        self.championship_participation.setObjectName('android_checkbox')
+        self.main_layout.addWidget(self.championship_participation)
+
         self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed,
                                                     QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
@@ -87,7 +98,6 @@ class create_user_widget(QtWidgets.QDialog):
         self.admin_password_lineEdit = gui_utils.password_lineEdit()
         self.admin_password_lineEdit.setPlaceholderText('Administrator Password')
         self.main_layout.addWidget(self.admin_password_lineEdit)
-
 
         self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
                                                     QtWidgets.QSizePolicy.MinimumExpanding)
@@ -122,12 +132,14 @@ class create_user_widget(QtWidgets.QDialog):
         confirm_password = self.password_confirm_lineEdit.text()
         email = self.email_lineEdit.text()
         admin_password = self.admin_password_lineEdit.text()
+        championship_participation = self.championship_participation.isChecked()
         if confirm_password == password:
             if repository.create_user(user_name,
                                     password,
                                     email,
                                     admin_password,
-                                    self.image_file):
+                                    self.image_file,
+                                    championship_participation):
                 self.accept()
         else:
             logger.warning("User passwords doesn't matches")

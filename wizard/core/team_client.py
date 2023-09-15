@@ -97,7 +97,7 @@ class team_client(QThread):
                     logger.debug("cannot read json data")
             else:
                 if self.running != True:
-                    logger.warning('Team connection lost')
+                    logger.info('Team connection closed')
                     self.stop()
         self.team_connection_status_signal.emit(False)
 
@@ -129,4 +129,4 @@ def send_prank(DNS, prank_data):
     signal_dic = dict()
     signal_dic['type'] = 'prank'
     signal_dic['prank_data'] = prank_data
-    return socket_utils.send_bottle(DNS, signal_dic)
+    return socket_utils.send_signal(DNS, signal_dic)

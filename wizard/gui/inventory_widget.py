@@ -97,7 +97,8 @@ class inventory_widget(QtWidgets.QWidget):
                 return
         else:
             user = environment.get_user()
-        artefacts.use_artefact(artefact, user)
+        if not artefacts.use_artefact(artefact, user):
+            return
         gui_server.refresh_ui()
         gui_server.custom_popup(f"Inventory", f"You just used {game_vars.artefacts_dic[artefact]['name']} on {user}", ressources._purse_icon_)
 

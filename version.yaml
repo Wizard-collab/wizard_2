@@ -1,7 +1,7 @@
-BUILDS: 256
+BUILDS: 257
 MAJOR: 3
 MINOR: 0
 PATCH: 0
-builds: 256
-date: 1691057001.5094259
-setup_name: 3.0.0.0256-setup.exe
+builds: 257
+date: 1694813527.7200325
+setup_name: 3.0.0.0257-setup.exe

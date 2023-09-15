@@ -232,6 +232,7 @@ class championship_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.tabs_widget.currentChanged.connect(self.tab_changed)
         self.refresh_thread.refresh_signal.connect(self.refresh)
+        self.refresh_thread.refresh_signal.connect(gui_server.refresh_ui)
 
     def tab_changed(self):
         self.market_widget.refresh()

@@ -350,7 +350,7 @@ class assets:
 
     # References commands
 
-    def create_reference(self, destination_work_env, variant_to_reference):
+    def create_reference(self, destination_work_env, stage_to_reference):
         # Reference the given variant in the given work env
         new_references = None
 
@@ -359,18 +359,18 @@ class assets:
         else:
             work_env_id = destination_work_env
 
-        if type(variant_to_reference) == str:
-            orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+        if type(stage_to_reference) == str:
+            orig_instance_type, stage_id = core.assets.string_to_instance(stage_to_reference)
         else:
-            variant_id = variant_to_reference
+            stage_id = stage_to_reference
 
-        if work_env_id and variant_id:
+        if work_env_id and stage_id:
             old_references = core.project.get_references(work_env_id, 'namespace')
-            core.assets.create_references_from_variant_id(work_env_id, variant_id)
+            core.assets.create_references_from_stage_id(work_env_id, stage_id)
             new_references = list(set(core.project.get_references(work_env_id, 'namespace')) - set(old_references))
         return new_references
 
-    def create_grouped_reference(self, destination_group, variant_to_reference):
+    def create_grouped_reference(self, destination_group, stage_to_reference):
         # Reference the given variant in the given group
         new_references = None
 
@@ -379,14 +379,14 @@ class assets:
         else:
             group_id = destination_group
 
-        if type(variant_to_reference) == str:
-            orig_instance_type, variant_id = core.assets.string_to_instance(variant_to_reference)
+        if type(stage_to_reference) == str:
+            orig_instance_type, stage_id = core.assets.string_to_instance(stage_to_reference)
         else:
-            variant_id = variant_to_reference
+            stage_id = stage_to_reference
 
-        if group_id and variant_id:
+        if group_id and stage_id:
             old_references = core.project.get_grouped_references(group_id, 'namespace')
-            core.assets.create_grouped_references_from_variant_id(group_id, variant_id)
+            core.assets.create_grouped_references_from_stage_id(group_id, stage_id)
             new_references = list(set(core.project.get_grouped_references(group_id, 'namespace')) - set(old_references))
         return new_references
 

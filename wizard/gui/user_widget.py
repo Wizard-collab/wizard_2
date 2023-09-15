@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+import json
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -14,10 +15,13 @@ from wizard.core import environment
 from wizard.core import repository
 from wizard.core import image
 from wizard.vars import ressources
+from wizard.vars import game_vars
 
 class user_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(user_widget, self).__init__(parent)
+        self.items = dict()
+        self.keeped_artefacts = []
         self.build_ui()
 
     def build_ui(self):
@@ -28,16 +32,13 @@ class user_widget(QtWidgets.QFrame):
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
-        self.items_widget = QtWidgets.QWidget()
-        self.items_widget.setObjectName('transparent_widget')
+        self.items_widget = QtWidgets.QFrame()
+        self.items_widget.setObjectName('dark_round_frame')
         self.items_layout = QtWidgets.QHBoxLayout()
-        self.items_layout.setContentsMargins(0,0,0,0)
+        self.items_layout.setContentsMargins(8,2,8,2)
         self.items_layout.setSpacing(6)
         self.items_widget.setLayout(self.items_layout)
         self.main_layout.addWidget(self.items_widget)
-
-        self.crown_label = QtWidgets.QLabel()
-        self.items_layout.addWidget(self.crown_label)
 
         self.level_widget = QtWidgets.QFrame()
         self.level_widget.setObjectName('dark_round_frame')
@@ -106,22 +107,46 @@ class user_widget(QtWidgets.QFrame):
         self.admin_badge_label.setVisible(user_row['administrator'])
         pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 28, custom_radius=14)
         self.profile_picture.setPixmap(pm)
-        self.crown_check(user_row, user_rows)
+        self.refresh_crown(user_row, user_rows)
+        self.refresh_keeped_artefacts(user_row)
 
-    def crown_check(self, user_row, user_rows):
-        icon = None
-        message = None
+    def refresh_keeped_artefacts(self, user_row):
+        keeped_artefacts_dic = json.loads(user_row['keeped_artefacts'])
+        for artefact in list(set(keeped_artefacts_dic.values())):
+            if artefact in self.keeped_artefacts:
+                continue
+            self.add_item(artefact, game_vars.artefacts_dic[artefact]['icon'])
+            self.keeped_artefacts.append(artefact)
+        for artefact in self.keeped_artefacts:
+            if artefact not in list(set(keeped_artefacts_dic.values())):
+                self.remove_item(artefact)
+                self.keeped_artefacts.remove(artefact)
+
+    def refresh_crown(self, user_row, user_rows):
         if user_row['id'] == user_rows[0]['id']:
-            icon = ressources._gold_icon_
+            self.add_item('crown', ressources._gold_icon_)
+            return
         if len(user_rows)>=2:
             if (user_row['id'] ==  user_rows[1]['id']):
-                icon = ressources._silver_icon_
+                self.add_item('crown', ressources._silver_icon_)
+                return
         if len(user_rows)>=3:
             if (user_row['id'] == user_rows[2]['id']):
-                icon = ressources._bronze_icon_
-        if icon is not None:
-            self.crown_label.setVisible(1)
-            self.crown_label.setPixmap(QtGui.QIcon(icon).pixmap(22))
-        else:
-            self.crown_label.setVisible(0)
+                self.add_item('crown', ressources._bronze_icon_)
+                return
+        self.remove_item('crown')
+
+    def add_item(self, name, icon):
+        if name not in self.items.keys():
+            label = QtWidgets.QLabel()
+            self.items[name] = label
+            self.items_layout.addWidget(self.items[name])
+        self.items[name].setPixmap(QtGui.QIcon(icon).pixmap(22))
+
+    def remove_item(self, name):
+        if name not in self.items.keys():
+            return
+        self.items[name].setParent(None)
+        self.items[name].deleteLater()
+        del self.items[name]
     

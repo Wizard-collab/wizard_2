@@ -194,7 +194,8 @@ def create_user(user_name,
                     password,
                     email,
                     administrator_pass='',
-                    profile_picture=None):
+                    profile_picture=None,
+                    championship_participation=1):
     do_creation = 1
     if user_name == '':
         logger.warning('Please provide a user name')
@@ -234,7 +235,10 @@ def create_user(user_name,
                     'level',
                     'life',
                     'administrator',
-                    'coins'), 
+                    'coins',
+                    'championship_participation',
+                    'artefacts',
+                    'keeped_artefacts'), 
                 (user_name,
                     tools.encrypt_string(password),
                     email,
@@ -247,7 +251,10 @@ def create_user(user_name,
                     0,
                     100,
                     administrator,
-                    0)):
+                    0,
+                    int(championship_participation),
+                    json.dumps([]),
+                    json.dumps({}))):
         return
     info = f"User {user_name} created"
     if administrator:
@@ -691,7 +698,9 @@ def get_current_ip_data(column='*'):
     return ip_rows[0]
 
 def init_repository(admin_password, admin_email):
+    print('zizi')
     create_admin_user(admin_password, admin_email)
+    print('lol')
     for quote in repository_vars._default_quotes_list_:
         db_utils.create_row('repository',
                             'quotes', 
@@ -723,6 +732,7 @@ def is_repository_database(repository_name = None):
 
 def create_admin_user(admin_password, admin_email):
     profile_picture = image.convert_image_to_str_data(image.user_random_image('admin'), 100)
+    print('caca')
     if not db_utils.create_row('repository',
                             'users', 
                             ('user_name', 
@@ -738,6 +748,7 @@ def create_admin_user(admin_password, admin_email):
                                 'life', 
                                 'administrator',
                                 'coins',
+                                'championship_participation',
                                 'artefacts',
                                 'keeped_artefacts'), 
                             ('admin',
@@ -753,8 +764,9 @@ def create_admin_user(admin_password, admin_email):
                                 100,
                                 1,
                                 0,
-                                '[]',
-                                '{}')):
+                                1,
+                                json.dumps([]),
+                                json.dumps({}))):
         return
     logger.info('Admin user created')
     return 1
@@ -775,6 +787,7 @@ def create_users_table():
                                         life integer NOT NULL,
                                         administrator integer NOT NULL,
                                         coins integer NOT NULL,
+                                        championship_participation integer NOT NULL,
                                         artefacts text NOT NULL,
                                         keeped_artefacts text NOT NULL
                                     );"""

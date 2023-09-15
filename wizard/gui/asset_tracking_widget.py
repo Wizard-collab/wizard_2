@@ -78,10 +78,17 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.state_comboBox = gui_utils.QComboBox()
         self.state_comboBox.setIconSize(QtCore.QSize(16,16))
-        self.state_comboBox.setFixedWidth(100)
+        self.state_comboBox.setFixedWidth(90)
         self.setup_layout.addWidget(self.state_comboBox)
         for state in assets_vars._asset_states_list_:
             self.state_comboBox.addItem(QtGui.QIcon(ressources._states_icons_[state]), state)
+
+        self.priority_comboBox = gui_utils.QComboBox()
+        self.priority_comboBox.setIconSize(QtCore.QSize(16,16))
+        self.priority_comboBox.setFixedWidth(90)
+        self.setup_layout.addWidget(self.priority_comboBox)
+        for priority in assets_vars._priority_list_:
+            self.priority_comboBox.addItem(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
 
         self.progress_widget = QtWidgets.QFrame()
         self.progress_widget.setObjectName('asset_tracking_event_frame')
@@ -224,6 +231,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.stage_row = None
         self.refresh_tracking_events()
         self.refresh_state()
+        self.refresh_priority()
         self.refresh_note()
         self.refresh_users_dic()
         self.refresh_user()
@@ -320,6 +328,14 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.state_comboBox.setCurrentText('todo')
         self.apply_state_modification = 1
 
+    def refresh_priority(self):
+        self.apply_priority_modification = None
+        if self.stage_row is not None:
+            self.priority_comboBox.setCurrentText(self.stage_row['priority'])
+        else:
+            self.priority_comboBox.setCurrentText('normal')
+        self.apply_priority_modification = 1
+
     def refresh_note(self):
         if self.stage_row is not None:
             if self.stage_row['note'] is None or self.stage_row['note'] == '':
@@ -337,6 +353,12 @@ class asset_tracking_widget(QtWidgets.QFrame):
                     comment = self.comment_widget.comment
                     assets.modify_stage_state(self.stage_id, state, comment)
                     gui_server.refresh_team_ui()
+
+    def modify_priority(self, priority):
+        if self.stage_id is not None:
+            if self.apply_priority_modification:
+                assets.modify_stage_priority(self.stage_id, priority)
+                gui_server.refresh_team_ui()
 
     def modify_assignment(self, user_name):
         if self.stage_id is not None:
@@ -369,6 +391,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.state_comboBox.currentTextChanged.connect(self.modify_state)
+        self.priority_comboBox.currentTextChanged.connect(self.modify_priority)
         self.assignment_comboBox.currentTextChanged.connect(self.modify_assignment)
         self.events_scrollBar.rangeChanged.connect(lambda: self.events_scrollBar.setValue(self.events_scrollBar.maximum()))
         self.event_count_spinBox.valueChanged.connect(self.change_count)

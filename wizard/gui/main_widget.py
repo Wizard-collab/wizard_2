@@ -180,6 +180,7 @@ class main_widget(QtWidgets.QWidget):
         self.asset_tracking_widget.get_context()
         self.console_widget.get_context()
         self.production_manager_widget.get_context()
+        self.subtask_manager.load_old_tasks()
 
     def save_widgets_pos(self):
         logger.info("Saving user interface")
@@ -391,9 +392,16 @@ class main_widget(QtWidgets.QWidget):
             close = True
         else:
             self.confirm_widget = confirm_widget.confirm_widget('Softwares are running...\nKill all softwares ?',
-                                                                accept_text='Kill')
+                                                                accept_text='Kill softwares')
             if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
                 launch.kill_all()
+                close = True
+        if self.subtask_manager.is_task_running():
+            close = False
+            self.confirm_widget = confirm_widget.confirm_widget('Subtasks are running...\nDo you want to conitnue ?',
+                                                                accept_text='Kill tasks')
+            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                self.subtask_manager.kill_all()
                 close = True
         if close:
             self.quit_threads()
@@ -429,6 +437,7 @@ class main_widget(QtWidgets.QWidget):
         self.quotes_manager.refresh()
         self.championship_widget.refresh()
         self.splash_screen_widget.refresh()
+        self.subtask_manager.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

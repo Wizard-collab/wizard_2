@@ -68,6 +68,8 @@ class attack_user_widget(QtWidgets.QDialog):
         user_rows = repository.get_users_list()
         self.user_rows = user_rows
         for user_row in user_rows:
+            if not user_row['championship_participation']:
+                continue
             if user_row['id'] not in self.user_ids.keys():
                 user_item = custom_item(user_row, self.icons_dic, self.list_view.invisibleRootItem())
                 self.user_ids[user_row['id']] = user_item

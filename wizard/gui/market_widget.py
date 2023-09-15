@@ -140,6 +140,7 @@ class artefact_item(QtWidgets.QFrame):
             self.buy_button.setStyleSheet('color:gray;padding:2px')
 
     def buy_artefact(self):
-        artefacts.buy_artefact(self.artefact)
+        if not artefacts.buy_artefact(self.artefact):
+            return
         gui_server.refresh_ui()
         gui_server.custom_popup(f"Market", f"You just bought {self.artefact_dic['name']} for {self.artefact_dic['price']} coins", ressources._market_icon_)
