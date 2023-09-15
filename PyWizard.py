@@ -93,8 +93,6 @@ class app():
         self.quit()
             
     def quit(self):
-        if self.db_server:
-            self.db_server.stop()
         if self.stats_schedule:
             self.stats_schedule.stop()
         if self.softwares_server:
