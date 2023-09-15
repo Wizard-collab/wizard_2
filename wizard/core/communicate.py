@@ -199,7 +199,8 @@ def add_export_version(export_name, files, work_env_id, version_id, comment):
     # Add an export version using the 'assets' module and return the export_version_id 
     # of the new export version
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
-    export_version_id = assets.add_export_version(export_name, files, variant_id, version_id, comment, execute_xp=False)
+    variant_row = project.get_variant_data(variant_id)
+    export_version_id = assets.add_export_version(export_name, files, variant_row['stage_id'], version_id, comment, execute_xp=False)
     export_dir = assets.get_export_version_path(export_version_id)
     gui_server.refresh_ui()
     return export_dir

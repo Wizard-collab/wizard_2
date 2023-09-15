@@ -355,11 +355,11 @@ class main_widget(QtWidgets.QWidget):
         self.console_widget.handle_record(tuple)
 
     def stage_changed(self, stage_id):
+        self.exports_widget.change_stage(stage_id)
         self.context_widget.change_stage(stage_id)
         self.asset_tracking_widget.change_stage(stage_id)
 
     def variant_changed(self, variant_id):
-        self.exports_widget.change_variant(variant_id)
         self.videos_widget.change_variant(variant_id)
 
     def work_env_changed(self, work_env_id):

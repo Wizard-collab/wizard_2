@@ -609,8 +609,6 @@ def check_work_env_existence(work_env_id):
 def remove_variant(variant_id):
     if not repository.is_admin():
         return
-    for export_id in get_variant_export_childs(variant_id, 'id'):
-        remove_export(export_id)
     for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
         remove_work_env(work_env_id)
     for video_id in get_videos(variant_id, 'id'):
@@ -734,18 +732,18 @@ def get_work_env_variant_child_by_name(variant_id, work_env_name, column='*'):
         return
     return work_envs_rows[0]
 
-def get_variant_export_childs(variant_id, column='*'):
+def get_stage_export_childs(stage_id, column='*'):
     exports_rows = db_utils.get_row_by_column_data('project', 
                                                         'exports', 
-                                                        ('variant_id', variant_id), 
+                                                        ('stage_id', stage_id), 
                                                         column)
     return exports_rows
 
-def get_export_by_name(name, variant_id):
+def get_export_by_name(name, stage_id):
     export_row = db_utils.get_row_by_multiple_data('project', 
                                                         'exports', 
-                                                        ('name', 'variant_id'), 
-                                                        (name, variant_id))
+                                                        ('name', 'stage_id'), 
+                                                        (name, stage_id))
     if export_row is None and len(export_row) < 1:
         logger.error("Export not found")
         return
@@ -768,38 +766,38 @@ def get_export_childs(export_id, column='*'):
                                                         column)
     return exports_versions_rows
 
-def is_export(name, variant_id):
+def is_export(name, stage_id):
     return db_utils.check_existence_by_multiple_data('project', 
                                     'exports',
-                                    ('name', 'variant_id'),
-                                    (name, variant_id))
+                                    ('name', 'stage_id'),
+                                    (name, stage_id))
 
-def add_export(name, variant_id):
+def add_export(name, stage_id):
     if (db_utils.check_existence_by_multiple_data('project', 
                                     'exports',
-                                    ('name', 'variant_id'),
-                                    (name, variant_id))):
+                                    ('name', 'stage_id'),
+                                    (name, stage_id))):
         logger.warning(f"{name} already exists")
         return
-    variant_row = get_variant_data(variant_id)
-    stage_row = get_stage_data(variant_row['stage_id'])
+    #variant_row = get_variant_data(variant_id)
+    stage_row = get_stage_data(stage_id)
     asset_row = get_asset_data(stage_row['asset_id'])
     category_row = get_category_data(asset_row['category_id'])
     domain_name = get_domain_data(category_row['domain_id'], 'name')
-    string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{variant_row['name']}/{name}"
+    string_asset = f"{domain_name}/{category_row['name']}/{asset_row['name']}/{stage_row['name']}/{name}"
     export_id = db_utils.create_row('project',
                         'exports', 
                         ('name',
                             'creation_time',
                             'creation_user',
                             'string',
-                            'variant_id',
+                            'stage_id',
                             'default_export_version'), 
                         (name,
                             time.time(),
                             environment.get_user(),
                             string_asset,
-                            variant_id,
+                            stage_id,
                             None))
     if not export_id:
         return
@@ -894,8 +892,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                                     (name, export_id))):
         logger.warning(f"{name} already exists")
         return
-    variant_id = get_export_data(export_id, 'variant_id')
-    stage_id = get_variant_data(variant_id, 'stage_id')
+    stage_id = get_export_data(export_id, 'stage_id')
     if work_version_id is not None:
         version_row = get_version_data(work_version_id)
         work_version_thumbnail = version_row['thumbnail_path']
@@ -906,8 +903,8 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
         software = None
         work_version_thumbnail = None
     export_row = get_export_data(export_id)
-    variant_row = get_variant_data(export_row['variant_id'])
-    stage_row = get_stage_data(variant_row['stage_id'])
+    #variant_row = get_variant_data(export_row['variant_id'])
+    stage_row = get_stage_data(export_row['stage_id'])
     asset_row = get_asset_data(stage_row['asset_id'])
     category_row = get_category_data(asset_row['category_id'])
     domain_name = get_domain_data(category_row['domain_id'], 'name')
@@ -915,7 +912,7 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
     string_asset += f"{category_row['name']}/"
     string_asset += f"{asset_row['name']}/"
     string_asset += f"{stage_row['name']}/"
-    string_asset += f"{variant_row['name']}/"
+    #string_asset += f"{variant_row['name']}/"
     string_asset += f"{export_row['name']}/"
     string_asset += f"{name}"
     export_version_id = db_utils.create_row('project',
@@ -925,7 +922,6 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                             'creation_user',
                             'comment',
                             'files',
-                            'variant_id',
                             'stage_id',
                             'work_version_id',
                             'work_version_thumbnail_path',
@@ -937,7 +933,6 @@ def add_export_version(name, files, export_id, work_version_id=None, comment='')
                             environment.get_user(),
                             comment,
                             json.dumps(files),
-                            variant_id,
                             stage_id,
                             work_version_id,
                             work_version_thumbnail,
@@ -995,10 +990,10 @@ def get_grouped_export_version_destination(export_version_id, column='*'):
                                                         column)
     return grouped_references_rows
 
-def get_export_versions_by_variant(variant_id, column='*'):
+def get_export_versions_by_stage(stage_id, column='*'):
     export_versions_rows = db_utils.get_row_by_column_data('project',
                                                         'export_versions',
-                                                        ('variant_id', variant_id),
+                                                        ('stage_id', stage_id),
                                                         column)
     return export_versions_rows
 
@@ -1122,7 +1117,7 @@ def get_work_env_data_by_string(string, column='*'):
 
 def create_reference(work_env_id, export_version_id, namespace, count=None, auto_update=0):
     export_id = get_export_version_data(export_version_id, 'export_id')
-    stage_name = get_stage_data(get_variant_data(get_export_data(export_id, 'variant_id'), 'stage_id'),
+    stage_name = get_stage_data(get_export_data(export_id, 'stage_id'),
                                     'name')
     if (db_utils.check_existence_by_multiple_data('project', 
                                                     'references_data',
@@ -2277,7 +2272,7 @@ def get_referenced_group_by_namespace(work_env_id, namespace, column='*'):
 
 def create_grouped_reference(group_id, export_version_id, namespace, count=None):
     export_id = get_export_version_data(export_version_id, 'export_id')
-    stage_name = get_stage_data(get_variant_data(get_export_data(export_id, 'variant_id'), 'stage_id'),
+    stage_name = get_stage_data(get_export_data(export_id, 'stage_id'),
                                                     'name')
     if (db_utils.check_existence_by_multiple_data('project', 
                                     'grouped_references_data',
@@ -2373,8 +2368,9 @@ def modify_grouped_reference_export(grouped_reference_id, export_id):
     update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
     return 1  
 
+'''
 def modify_grouped_reference_variant(grouped_reference_id, variant_id):
-    exports_list = get_variant_export_childs(variant_id, 'id')
+    exports_list = get_stage_export_childs(variant_id, 'id')
     if exports_list is None or exports_list == []:
         logger.warning("No export found")
         return
@@ -2385,6 +2381,7 @@ def modify_grouped_reference_variant(grouped_reference_id, variant_id):
     update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
     update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
     return 1
+'''
 
 def modify_grouped_reference_auto_update(grouped_reference_id, auto_update):
     if auto_update:
@@ -2700,10 +2697,10 @@ def create_exports_table(database):
                                         name text NOT NULL,
                                         creation_time real NOT NULL,
                                         creation_user text NOT NULL,
-                                        variant_id integer NOT NULL,
+                                        stage_id integer NOT NULL,
                                         string text NOT NULL,
                                         default_export_version integer,
-                                        FOREIGN KEY (variant_id) REFERENCES variants (id)
+                                        FOREIGN KEY (stage_id) REFERENCES stages (id)
                                     );"""
     if not db_utils.create_table(database, sql_cmd):
         return
@@ -2754,14 +2751,12 @@ def create_export_versions_table(database):
                                         creation_user text NOT NULL,
                                         comment text,
                                         files text NOT NULL,
-                                        variant_id integer NOT NULL,
                                         stage_id integer NOT NULL,
                                         work_version_id integer,
                                         work_version_thumbnail_path text,
                                         software text,
                                         string text NOT NULL,
                                         export_id integer NOT NULL,
-                                        FOREIGN KEY (variant_id) REFERENCES variants (id),
                                         FOREIGN KEY (stage_id) REFERENCES stages (id),
                                         FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (work_version_id) REFERENCES versions (id)

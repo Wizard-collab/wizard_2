@@ -17,71 +17,71 @@ from guerilla_render_wizard import wizard_tools
 from guerilla import Document, Modifier, pynode, Node, Plug
 
 def reference_modeling(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_modeling(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'MODELING', 'modeling', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def reference_grooming(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_grooming(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'GROOMING', 'grooming', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
     
 def reference_shading(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_stage'])
 
 def update_shading(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'SHADING', 'shading', reference_dic['string_stage'])
 
 def reference_custom(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_stage'])
 
 def update_custom(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'CUSTOM', 'custom', reference_dic['string_stage'])
 
 def reference_layout(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_layout(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'LAYOUT', 'layout', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def reference_animation(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_animation(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'ANIMATION', 'animation', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def reference_cfx(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_cfx(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'CFX', 'cfx', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def reference_fx(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'FX', 'fx', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'FX', 'fx', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_fx(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'FX', 'fx', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'FX', 'fx', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def reference_camera(reference_dic):
-    import_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
+    import_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def update_camera(reference_dic):
-    update_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_variant'])
+    update_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
 def import_file(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):

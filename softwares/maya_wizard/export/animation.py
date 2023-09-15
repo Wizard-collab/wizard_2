@@ -50,7 +50,7 @@ def export_animation(rigging_reference, frange, percent_factor):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
-    exported_string_asset = rigging_reference['string_variant']
+    exported_string_asset = rigging_reference['string_stage']
     count = rigging_reference['count']
     if is_referenced(rig_nspace):
         export_GRP_list = get_objects_to_export(rig_nspace)

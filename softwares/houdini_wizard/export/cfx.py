@@ -45,7 +45,7 @@ def export_cfx(rigging_reference, frange):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
-    exported_string_asset = rigging_reference['string_variant']
+    exported_string_asset = rigging_reference['string_stage']
     count = rigging_reference['count']
 
     out_nodes_dic = wizard_tools.get_export_nodes('wizard_cfx_output', parent=wizard_tools.look_for_node(rig_nspace))

@@ -30,7 +30,7 @@ def reference_texturing(reference_dic):
                                 reference_dic['files'],
                                 reference_dic['namespace'],
                                 wizard_tools.get_new_objects(old_objects),
-                                reference_dic['string_variant'])
+                                reference_dic['string_stage'])
 
 def update_texturing(reference_dic):
     old_objects = wizard_tools.get_all_nodes()
@@ -42,7 +42,7 @@ def update_texturing(reference_dic):
                                 reference_dic['files'],
                                 reference_dic['namespace'],
                                 wizard_tools.get_new_objects(old_objects),
-                                reference_dic['string_variant'])
+                                reference_dic['string_stage'])
 
 def import_modeling(reference_dic):
     create_reference(reference_dic, 'MODELING') 
@@ -99,7 +99,7 @@ def create_reference(reference_dic, referenced_stage):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     wizard_tools.get_new_objects(old_objects),
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def update_reference(reference_dic, referenced_stage):
     old_objects = wizard_tools.get_all_nodes()
@@ -113,7 +113,7 @@ def update_reference(reference_dic, referenced_stage):
                                     reference_dic['files'],
                                     reference_dic['namespace'],
                                     wizard_tools.get_new_objects(old_objects),
-                                    reference_dic['string_variant'])
+                                    reference_dic['string_stage'])
 
 def import_abc(file_path, parent_collection=None):
     if parent_collection is None:

@@ -18,22 +18,22 @@ from nuke_wizard import wizard_mirror
 import nuke
 
 def reference_custom(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
 
 def update_custom(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
 
 def reference_camera(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
 
 def update_camera(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_variant'])
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
 
 def reference_lighting(reference_dic, local):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_variant'], local)
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_stage'], local)
 
 def update_lighting(reference_dic, local):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_variant'], local)
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_stage'], local)
 
 def import_from_extension(namespace, files_list, stage_name, referenced_string_asset, local=True):
     old_nodes = wizard_tools.get_all_nodes()

@@ -25,7 +25,7 @@ def get_mesh_file():
     return mesh_file_path
 
 def import_texturing(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_variant'])
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
 
 def import_from_extension(namespace, files_list, stage_name, referenced_string_asset):
     extension = files_list[0].split('.')[-1]

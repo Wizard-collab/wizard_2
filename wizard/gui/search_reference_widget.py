@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 class search_reference_widget(QtWidgets.QWidget):
 
-    variant_ids_signal = pyqtSignal(list)
+    stage_ids_signal = pyqtSignal(list)
     groups_ids_signal = pyqtSignal(list)
 
     def __init__(self, context, parent = None):
@@ -43,7 +43,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)       
 
-        self.variant_ids = dict()
+        self.stage_ids = dict()
         self.groups_ids = dict()
 
         self.build_ui()
@@ -131,7 +131,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.search_threads[thread_id].search_ended.connect(self.search_ended)
         self.old_thread_id = thread_id
         self.list_view.clear()
-        self.variant_ids = dict()
+        self.stage_ids = dict()
         self.groups_ids = dict()
         if len(search) > 0:
             self.accept_item_from_thread = True
@@ -143,9 +143,9 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def add_item(self, item_list):
         if self.accept_item_from_thread:
-            if item_list[3]['id'] not in self.variant_ids.keys():
-                variant_item = custom_item(item_list[0], item_list[1], item_list[2], item_list[3], self.icons_dic, self.list_view.invisibleRootItem())
-                self.variant_ids[item_list[3]['id']] = variant_item
+            if item_list[2]['id'] not in self.stage_ids.keys():
+                stage_item = custom_item(item_list[0], item_list[1], item_list[2], self.icons_dic, self.list_view.invisibleRootItem())
+                self.stage_ids[item_list[2]['id']] = stage_item
 
     def add_group(self, group_row):
         if self.accept_item_from_thread:
@@ -170,15 +170,15 @@ class search_reference_widget(QtWidgets.QWidget):
     def return_references(self):
         selected_items = self.list_view.selectedItems()
         if selected_items is not None and len(selected_items)>=1:
-            variant_ids = []
+            stage_ids = []
             groups_ids = []
             for selected_item in selected_items:
-                if selected_item.type == 'variant':
-                    variant_ids.append(selected_item.variant_row['id'])
+                if selected_item.type == 'stage':
+                    stage_ids.append(selected_item.stage_row['id'])
                 elif selected_item.type == 'group':
                     groups_ids.append(selected_item.group_row['id'])
-            if variant_ids != []:
-                self.variant_ids_signal.emit(variant_ids)
+            if stage_ids != []:
+                self.stage_ids_signal.emit(stage_ids)
             if groups_ids != []:
                 self.groups_ids_signal.emit(groups_ids)
             self.close()
@@ -276,8 +276,8 @@ class search_thread(QtCore.QThread):
 
     def run(self):
         keywords = self.string.split('&') 
-        all_export_versions_variant_ids = project.get_all_export_versions('variant_id')
-        all_variants = project.get_all_variants()
+        all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
+        #all_variants = project.get_all_variants()
         all_stages = project.get_all_stages()
         all_assets = project.get_all_assets()
         all_categories = project.get_all_categories()
@@ -290,13 +290,12 @@ class search_thread(QtCore.QThread):
         categories = dict()
         for category_row in all_categories:
             categories[category_row['id']] = category_row
-        for variant_row in all_variants:
-            if variant_row['id'] in all_export_versions_variant_ids:
-                if all(keyword.upper() in variant_row['string'].upper() for keyword in keywords):
-                    stage_row = stages[variant_row['stage_id']]
+        for stage_row in all_stages:
+            if stage_row['id'] in all_export_versions_stage_ids:
+                if all(keyword.upper() in stage_row['string'].upper() for keyword in keywords):
                     asset_row = assets[stage_row['asset_id']]
                     category_row = categories[asset_row['category_id']]
-                    self.item_signal.emit([category_row, asset_row, stage_row, variant_row])
+                    self.item_signal.emit([category_row, asset_row, stage_row])
         if (self.context == 'work_env'):
                 groups_rows = project.get_groups()
                 for group_row in groups_rows:
@@ -306,14 +305,13 @@ class search_thread(QtCore.QThread):
         self.running = False
 
 class custom_item(QtWidgets.QTreeWidgetItem):
-    def __init__(self, category_row, asset_row, stage_row, variant_row, icons_dic, parent=None):
+    def __init__(self, category_row, asset_row, stage_row, icons_dic, parent=None):
         super(custom_item, self).__init__(parent)
-        self.type = 'variant'
+        self.type = 'stage'
         self.icons_dic = icons_dic
         self.category_row = category_row
         self.asset_row = asset_row
         self.stage_row = stage_row
-        self.variant_row = variant_row
         self.fill_ui()
 
     def fill_ui(self):
@@ -324,7 +322,6 @@ class custom_item(QtWidgets.QTreeWidgetItem):
         self.setFont(1, bold_font)
         self.setText(2, self.stage_row['name'])
         self.setIcon(2, self.icons_dic[self.stage_row['name']])
-        self.setText(3, self.variant_row['name'])
 
 class custom_group_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, group_row, parent=None):

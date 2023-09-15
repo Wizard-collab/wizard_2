@@ -37,14 +37,27 @@ class current_asset_viewer(QtWidgets.QFrame):
             self.arrow_4.setVisible(1)
             if not variant_id:
                 return
+            variant_row = project.get_variant_data(variant_id)
+            self.variant_label.setText(variant_row['name'])
+            stage_row = project.get_stage_data(variant_row['stage_id'])
+
+        elif instance_type == 'stage':
+            self.work_env_label.setVisible(0)
+            self.arrow_4.setVisible(0)
+            self.variant_label.setVisible(0)
+            self.arrow_3.setVisible(0)
+            stage_row = project.get_stage_data(instance_id)
+
         else:
             variant_id = instance_id
             self.work_env_label.setVisible(0)
             self.arrow_4.setVisible(0)
-        variant_row = project.get_variant_data(variant_id)
-        if not variant_row:
-            return
-        stage_row = project.get_stage_data(variant_row['stage_id'])
+            variant_row = project.get_variant_data(variant_id)
+            if not variant_row:
+                return
+            self.variant_label.setText(variant_row['name'])
+            stage_row = project.get_stage_data(variant_row['stage_id'])
+            
         if not stage_row:
             return
         asset_row = project.get_asset_data(stage_row['asset_id'])
@@ -56,7 +69,6 @@ class current_asset_viewer(QtWidgets.QFrame):
         self.category_label.setText(category_row['name'])
         self.asset_label.setText(asset_row['name'])
         self.stage_label.setText(stage_row['name'])
-        self.variant_label.setText(variant_row['name'])
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()

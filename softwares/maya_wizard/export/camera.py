@@ -49,7 +49,7 @@ def export_camera(camrig_reference, frange):
     camrig_nspace = camrig_reference['namespace']
     asset_name = camrig_reference['asset_name']
     variant_name = camrig_reference['variant_name']
-    exported_string_asset = camrig_reference['string_variant']
+    exported_string_asset = camrig_reference['string_stage']
     count = camrig_reference['count']
     if is_referenced(camrig_nspace):
         if os.environ['wizard_stage_name'] != 'camera':
