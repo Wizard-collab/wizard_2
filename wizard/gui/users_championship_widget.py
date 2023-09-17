@@ -44,7 +44,7 @@ class users_championship_widget(QtWidgets.QWidget):
         self.list_view.setAlternatingRowColors(True)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
-        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time', 'Deaths', 'Life', 'Coins'])
+        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time', 'Deaths', 'Life', 'Coins', 'Participation'])
         self.main_layout.addWidget(self.list_view)
 
     def refresh(self):
@@ -155,3 +155,11 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.setIcon(7, self.icons_dic['life'])
         self.setText(8, f"{str(self.user_row['coins'])}")
         self.setIcon(8, self.icons_dic['coins'])
+        if self.user_row['championship_participation']:
+            participation = 'Yes'
+            self.setForeground(9, QtGui.QColor('#7ca657'))
+        else:
+            participation = 'No'
+            self.setForeground(9, QtGui.QColor('#f0605b'))
+        self.setText(9, participation)
+

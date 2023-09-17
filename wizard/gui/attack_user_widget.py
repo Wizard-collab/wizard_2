@@ -79,6 +79,7 @@ class attack_user_widget(QtWidgets.QDialog):
 
     def showEvent(self, event):
         gui_utils.move_ui(self)
+        self.refresh()
         self.search_bar.search_bar.setFocus()
         event.accept()
 
@@ -86,6 +87,8 @@ class attack_user_widget(QtWidgets.QDialog):
         self.search_bar.setText('')
 
     def leaveEvent(self, event):
+        if self.rect().contains(self.mapFromGlobal(QtCore.QPoint(QtGui.QCursor.pos()))):
+            return
         self.reject()
 
     def connect_functions(self):

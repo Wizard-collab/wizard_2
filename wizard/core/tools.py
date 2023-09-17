@@ -108,6 +108,16 @@ def convert_seconds(time_float):
     seconds = int(time_float)
     return hours, minutes, seconds
 
+def convert_seconds_with_days(time_float):
+    days = int(time_float/(3600*24))
+    time_float = time_float - (days*3600*24)
+    hours = int(time_float/3600)
+    time_float = time_float - (hours*3600)
+    minutes = int(time_float/60)
+    time_float = time_float - (minutes*60)
+    seconds = int(time_float)
+    return days, hours, minutes, seconds
+
 def convert_seconds_to_string_time(time_float):
     hours, minutes, seconds = convert_seconds(time_float)
     if int(hours) != 0:
@@ -117,6 +127,21 @@ def convert_seconds_to_string_time(time_float):
     if int(minutes) == 0 and int(hours) == 0:
         string_time = f"{seconds}s"
     return string_time
+
+def convert_seconds_to_string_time_with_days(time_float):
+    days, hours, minutes, seconds = convert_seconds_with_days(time_float)
+    if int(days) != 0:
+        string_time = f"{days} days, {hours}h, {minutes}m"
+        return string_time
+    if int(hours) != 0:
+        string_time = f"{hours}h, {minutes}m"
+        return string_time
+    if int(minutes) != 0:
+        string_time = f"{minutes}m, {seconds}s"
+        return string_time
+    if int(minutes) == 0:
+        string_time = f"{seconds}s"
+        return string_time
 
 def encrypt_string(string):
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')

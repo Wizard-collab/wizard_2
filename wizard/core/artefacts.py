@@ -148,6 +148,10 @@ def send_attack(destination_user, attack_name):
 	signal_dic['attack_type'] = attack_name
 	signal_dic['from_user'] = environment.get_user()
 	signal_dic['destination_user'] = destination_user
+	DNS = environment.get_team_dns()
+	if not DNS:
+		logger.warning("You're not connected to the team server, can't reach other users.")
+		return
 	if not team_client.send_prank(environment.get_team_dns(), signal_dic):
 		logger.warning(f"Can't reach {destination_user}, not using artefact.")
 		return

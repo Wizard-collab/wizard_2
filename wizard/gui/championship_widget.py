@@ -13,11 +13,13 @@ from wizard.gui import gui_server
 from wizard.gui import market_widget
 from wizard.gui import inventory_widget
 from wizard.gui import users_championship_widget
+from wizard.gui import confirm_widget
 
 # Wizard modules
 from wizard.core import environment
 from wizard.core import repository
 from wizard.core import artefacts
+from wizard.core import tools
 from wizard.vars import ressources
 from wizard.vars import game_vars
 
@@ -32,6 +34,7 @@ class championship_widget(QtWidgets.QWidget):
         self.old_level = user_row['level']
         self.old_icon = None
 
+        self.modify_participation = True
         self.keeped_artefacts_dic = dict()
         self.coins = None
         self.is_first_comments_count = None
@@ -168,9 +171,18 @@ class championship_widget(QtWidgets.QWidget):
 
         self.footer_layout = QtWidgets.QHBoxLayout()
         self.footer_layout.setContentsMargins(6,6,6,6)
+        self.footer_layout.setSpacing(20)
         self.main_layout.addLayout(self.footer_layout)
 
+        self.participation_info_label = QtWidgets.QLabel()
+        self.participation_info_label.setObjectName('orange_label')
+        self.footer_layout.addWidget(self.participation_info_label)
+
         self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.participation_checkbox = QtWidgets.QCheckBox("Participation")
+        self.participation_checkbox.setObjectName('android_checkbox')
+        self.footer_layout.addWidget(self.participation_checkbox)
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
@@ -183,6 +195,7 @@ class championship_widget(QtWidgets.QWidget):
     def refresh(self):
         start_time = time.perf_counter()
         user_row = repository.get_user_row_by_name(environment.get_user())
+        self.refresh_championship_participation(user_row)
         self.refresh_infos(user_row)
         self.market_widget.refresh()
         self.inventory_widget.refresh()
@@ -190,6 +203,15 @@ class championship_widget(QtWidgets.QWidget):
         self.refresh_items(user_row)
         self.refresh_keeped_artefacts(user_row)
         self.update_refresh_time(start_time)
+
+    def refresh_championship_participation(self, user_row):
+        self.modify_participation = False
+        self.participation_checkbox.setChecked(user_row['championship_participation'])
+        if not user_row['championship_participation']:
+            self.participation_info_label.setText("You don't participate to championship. You can't attack or be attacked.")
+        else:
+            self.participation_info_label.setText("")
+        self.modify_participation = True
 
     def refresh_infos(self, user_row):
         user_coins = user_row['coins']
@@ -221,6 +243,19 @@ class championship_widget(QtWidgets.QWidget):
         else:
             self.keeped_artefacts_frame.setVisible(1)
 
+    def modify_championship_participation(self):
+        if not self.modify_participation:
+            return
+        user_row = repository.get_user_row_by_name(environment.get_user())
+        self.refresh_championship_participation(user_row)
+        current_participation = user_row['championship_participation']
+        if current_participation:
+            self.confirm_widget = confirm_widget.confirm_widget(f"If you turn off your participation to the game, you won't be able to participate again within {tools.convert_seconds_to_string_time_with_days(game_vars._default_ban_time_)}.\nDo you want to continue ?", parent=self)
+            if self.confirm_widget.exec_() != QtWidgets.QDialog.Accepted:
+                return
+        repository.modify_user_championship_participation(environment.get_user(), 1-current_participation)
+        gui_server.refresh_ui()
+
     def remove_keeped_artefact(self, artefact):
         if artefact not in self.keeped_artefacts_dic.keys():
             return
@@ -233,6 +268,7 @@ class championship_widget(QtWidgets.QWidget):
         self.tabs_widget.currentChanged.connect(self.tab_changed)
         self.refresh_thread.refresh_signal.connect(self.refresh)
         self.refresh_thread.refresh_signal.connect(gui_server.refresh_ui)
+        self.participation_checkbox.stateChanged.connect(self.modify_championship_participation)
 
     def tab_changed(self):
         self.market_widget.refresh()

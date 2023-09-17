@@ -50,6 +50,7 @@ from wizard.core import environment
 from wizard.core import image
 from wizard.vars import repository_vars
 from wizard.vars import ressources
+from wizard.vars import game_vars
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +238,7 @@ def create_user(user_name,
                     'administrator',
                     'coins',
                     'championship_participation',
+                    'championship_ban_time',
                     'artefacts',
                     'keeped_artefacts'), 
                 (user_name,
@@ -253,6 +255,7 @@ def create_user(user_name,
                     administrator,
                     0,
                     int(championship_participation),
+                    None,
                     json.dumps([]),
                     json.dumps({}))):
         return
@@ -401,6 +404,24 @@ def modify_user_total_xp(user_name, total_xp):
                                 'users',
                                 ('total_xp', total_xp),
                                 ('user_name', user_name))
+
+def modify_user_championship_participation(user_name, championship_participation, ban_time = game_vars._default_ban_time_):
+    user_row = get_user_row_by_name(user_name)
+    championship_ban_time = user_row['championship_ban_time']
+    if championship_ban_time:
+        if time.time() < championship_ban_time:
+            time_left = tools.convert_seconds_to_string_time_with_days(championship_ban_time - time.time())
+            logger.warning(f"You can't modify your participation for now. You will be able to switch again in {time_left}")
+            return
+    db_utils.update_data('repository',
+                            'users',
+                            ('championship_ban_time', time.time()+ban_time),
+                            ('user_name', user_name))
+    db_utils.update_data('repository',
+                            'users',
+                            ('championship_participation', championship_participation),
+                            ('user_name', user_name))
+    logger.info(f"{user_name} participation modified, ban time : {tools.convert_seconds_to_string_time_with_days(ban_time)}")
 
 def increase_user_comments_count(user_name):
     old_comments_count = db_utils.get_row_by_column_data('repository',
@@ -749,6 +770,7 @@ def create_admin_user(admin_password, admin_email):
                                 'administrator',
                                 'coins',
                                 'championship_participation',
+                                'championship_ban_time',
                                 'artefacts',
                                 'keeped_artefacts'), 
                             ('admin',
@@ -765,6 +787,7 @@ def create_admin_user(admin_password, admin_email):
                                 1,
                                 0,
                                 1,
+                                None,
                                 json.dumps([]),
                                 json.dumps({}))):
         return
@@ -788,6 +811,7 @@ def create_users_table():
                                         administrator integer NOT NULL,
                                         coins integer NOT NULL,
                                         championship_participation integer NOT NULL,
+                                        championship_ban_time real,
                                         artefacts text NOT NULL,
                                         keeped_artefacts text NOT NULL
                                     );"""
