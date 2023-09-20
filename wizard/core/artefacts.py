@@ -24,6 +24,10 @@ def buy_artefact(artefact_name):
 		return
 	if artefact_name not in game_vars.artefacts_dic.keys():
 		return
+	stock = repository.get_artefact_stock(artefact_name)
+	if stock == 0:
+		logger.warning(f"{artefact_name} stocks are empty until someone use it.")
+		return
 	user_row = repository.get_user_row_by_name(environment.get_user())
 	if 'coins' not in user_row.keys():
 		return
@@ -34,6 +38,7 @@ def buy_artefact(artefact_name):
 	current_artefacts.append(artefact_name)
 	if not repository.modify_user_artefacts(environment.get_user(), current_artefacts):
 		return
+	repository.remove_artefact_stock(artefact_name)
 	repository.modify_user_coins(environment.get_user(), user_row['coins']-game_vars.artefacts_dic[artefact_name]['price'])
 	return 1
 
@@ -56,27 +61,28 @@ def use_artefact(artefact_name, destination_user=None):
 		return
 	artefact_index = artefacts_list.index(artefact_name)
 	if game_vars.artefacts_dic[artefact_name]['type'] == 'attack':
+		
 		user_participation = repository.get_user_row_by_name(destination_user, 'championship_participation')
 		if not user_participation:
 			logger.warning(f"{destination_user} doens't participate to the championship.")
 			return
 		if check_immunity(destination_user):
 			return
-
 		if not send_attack(destination_user, artefact_name):
 			return
-
 		if 'steal_attack_1' in artefact_name:
 			steal_attack_1(destination_user)
 		if 'steal_attack_2' in artefact_name:
 			if not steal_attack_2(destination_user):
 				return
+		repository.add_attack_event(environment.get_user(), destination_user, artefact_name)
 		
 	if 'heal' in artefact_name:
 		heal(game_vars.artefacts_dic[artefact_name]['amount'])
 	artefacts_list.pop(artefact_index)
 	if not repository.modify_user_artefacts(environment.get_user(), artefacts_list):
 		return
+	repository.add_artefact_stock(artefact_name)
 	return 1
 
 def check_immunity(destination_user):

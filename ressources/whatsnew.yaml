@@ -1,6 +1,22 @@
 'last':
   update_list:
   - !!python/tuple
+    - debug
+    - LOD switch fixed in maya
+  - !!python/tuple
+    - debug
+    - auto archive when asset can't be created fixed.
+  - !!python/tuple
+    - new
+    - Limited stocks in the championship market.
+  - !!python/tuple
+    - new
+    - New attacks history interface.
+  version: 3.0.1
+  time: 1695221079.1765022
+'3.0.0':
+  update_list:
+  - !!python/tuple
     - new
     - 2023 / 2024 New version of wizard !
   version: 3.0.0

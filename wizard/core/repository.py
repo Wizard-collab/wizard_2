@@ -707,6 +707,59 @@ def unlog_project():
     logger.debug("Project unlogged")
     return 1
 
+def add_attack_event(user, destination_user, artefact):
+    if not db_utils.create_row('repository',
+                        'attack_events', 
+                        ('creation_user', 'destination_user', 'artefact', 'attack_date'), 
+                        (user, destination_user, artefact, time.time())):
+        return
+
+def get_all_attack_events(column='*'):
+    return db_utils.get_rows('repository', 'attack_events', column)
+
+def get_all_artefacts_stocks(column='*'):
+    return db_utils.get_rows('repository', 'artefacts', column)
+
+def init_artefacts_stock():
+    repository_artefacts = get_all_artefacts_stocks('artefact')
+    for artefact in game_vars.artefacts_dic.keys():
+        if artefact not in repository_artefacts:
+            db_utils.create_row('repository',
+                                'artefacts',
+                                ('artefact',
+                                    'stock'),
+                                (artefact,
+                                    game_vars.artefacts_dic[artefact]['stock']))
+
+def get_artefact_stock(artefact):
+    artefact_rows = db_utils.get_row_by_column_data('repository',
+                                            'artefacts',
+                                            ('artefact', artefact),
+                                            'stock')
+    if artefact_rows is None or len(artefact_rows) < 1:
+        logger.error(f"Artefact {artefact} not found")
+        return
+    return artefact_rows[0]
+
+def remove_artefact_stock(artefact):
+    stock = get_artefact_stock(artefact)
+    if stock > 0:
+        new_stock = stock - 1
+    else:
+        logger.warning(f"{artefact} stock already empty")
+        return
+    return db_utils.update_data('repository',
+                                'artefacts',
+                                ('stock', new_stock),
+                                ('artefact', artefact))
+
+def add_artefact_stock(artefact):
+    stock = get_artefact_stock(artefact)
+    return db_utils.update_data('repository',
+                                'artefacts',
+                                ('stock', stock+1),
+                                ('artefact', artefact))
+
 def get_current_ip_data(column='*'):
     ip = socket.gethostbyname(socket.gethostname())
     ip_rows = db_utils.get_row_by_column_data('repository',
@@ -719,9 +772,7 @@ def get_current_ip_data(column='*'):
     return ip_rows[0]
 
 def init_repository(admin_password, admin_email):
-    print('zizi')
     create_admin_user(admin_password, admin_email)
-    print('lol')
     for quote in repository_vars._default_quotes_list_:
         db_utils.create_row('repository',
                             'quotes', 
@@ -742,6 +793,8 @@ def create_repository_database():
     create_projects_table()
     create_ip_wrap_table()
     create_quotes_table()
+    create_attack_events_table()
+    create_artefacts_table()
     return 1
 
 def is_repository_database(repository_name = None):
@@ -861,4 +914,27 @@ def create_quotes_table():
         return
     logger.info("Quotes table created")
     return 1
-    
+
+def create_attack_events_table():
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS attack_events (
+                                        id serial PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        destination_user text NOT NULL,
+                                        artefact text NOT NULL,
+                                        attack_date real NOT NULL
+                                    );"""
+    if not db_utils.create_table(environment.get_repository(), sql_cmd):
+        return
+    logger.info("Attack events table created")
+    return 1
+
+def create_artefacts_table():
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS artefacts (
+                                        id serial PRIMARY KEY,
+                                        artefact text NOT NULL,
+                                        stock real NOT NULL
+                                    );"""
+    if not db_utils.create_table(environment.get_repository(), sql_cmd):
+        return
+    logger.info("Attack events table created")
+    return 1

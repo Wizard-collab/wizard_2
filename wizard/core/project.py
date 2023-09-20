@@ -173,11 +173,12 @@ def add_category(name, domain_id):
     logger.info(f"Category {name} added to project")
     return category_id
 
-def remove_category(category_id):
-    if not repository.is_admin():
-        return
+def remove_category(category_id, force=0):
+    if not force:
+        if not repository.is_admin():
+            return
     for asset_id in get_category_childs(category_id, 'id'):
-        remove_asset(asset_id)
+        remove_asset(asset_id, force)
     success = db_utils.delete_row('project', 'categories', category_id)
     if not db_utils.delete_row('project', 'categories', category_id):
         logger.warning(f"Category NOT removed from project")
@@ -372,11 +373,12 @@ def get_all_sequence_assets(column='*'):
         assets_rows += (get_category_childs(category_id))
     return assets_rows
 
-def remove_asset(asset_id):
-    if not repository.is_admin():
-        return
+def remove_asset(asset_id, force=0):
+    if not force:
+        if not repository.is_admin():
+            return
     for stage_id in get_asset_childs(asset_id, 'id'):
-        remove_stage(stage_id)
+        remove_stage(stage_id, force)
     remove_asset_preview(asset_id)
     if not db_utils.delete_row('project', 'assets', asset_id):  
         logger.warning(f"Asset NOT removed from project")
@@ -474,11 +476,14 @@ def get_all_stages(column='*'):
                                         column)
     return stages_rows
 
-def remove_stage(stage_id):
-    if not repository.is_admin():
-        return
+def remove_stage(stage_id, force = 0):
+    if not force:
+        if not repository.is_admin():
+            return
     for variant_id in get_stage_childs(stage_id, 'id'):
-        remove_variant(variant_id)
+        remove_variant(variant_id, force)
+    for export_id in get_stage_export_childs(stage_id, 'id'):
+        remove_export(export_id, force)
     for asset_tracking_event_id in get_asset_tracking_events(stage_id, 'id'):
         remove_asset_tracking_event(asset_tracking_event_id)
     if not db_utils.delete_row('project', 'stages', stage_id):
@@ -606,11 +611,12 @@ def get_variant_work_env_child_by_name(variant_id, work_env_name, column='*'):
 def check_work_env_existence(work_env_id):
     return db_utils.check_existence('project', 'work_envs', 'id', work_env_id)
 
-def remove_variant(variant_id):
-    if not repository.is_admin():
-        return
+def remove_variant(variant_id, force = 0):
+    if not force:
+        if not repository.is_admin():
+            return
     for work_env_id in get_variant_work_envs_childs(variant_id, 'id'):
-        remove_work_env(work_env_id)
+        remove_work_env(work_env_id, force)
     for video_id in get_videos(variant_id, 'id'):
         remove_video(video_id)
     for stage_id in db_utils.get_row_by_column_data('project', 
@@ -814,11 +820,12 @@ def get_export_data_by_string(string, column='*'):
         return
     return export_rows[0]
 
-def remove_export(export_id):
-    if not repository.is_admin():
-        return
+def remove_export(export_id, force = 0):
+    if not force:
+        if not repository.is_admin():
+            return
     for export_version_id in get_export_childs(export_id, 'id'):
-        remove_export_version(export_version_id)
+        remove_export_version(export_version_id, force)
     if not db_utils.delete_row('project', 'exports', export_id):
         logger.warning("Export NOT removed from project")
         return
@@ -997,9 +1004,10 @@ def get_export_versions_by_stage(stage_id, column='*'):
                                                         column)
     return export_versions_rows
 
-def remove_export_version(export_version_id):
-    if not repository.is_admin():
-        return
+def remove_export_version(export_version_id, force = 0):
+    if not force:
+        if not repository.is_admin():
+            return
     export_row = get_export_data(get_export_version_data(export_version_id, 'export_id'))
     if export_row['default_export_version'] == export_version_id:
         set_default_export_version(export_row['id'], None)
@@ -1257,9 +1265,10 @@ def update_reference(reference_id, export_version_id):
     logger.info('Reference modified')
     return 1
 
-def remove_work_env(work_env_id):
-    if not repository.is_admin():
-        return
+def remove_work_env(work_env_id, force = 0):
+    if not force:
+        if not repository.is_admin():
+            return
     for version_id in get_work_versions(work_env_id, 'id'):
         remove_version(version_id)
     for reference_id in get_references(work_env_id, 'id'):
@@ -1612,9 +1621,10 @@ def modify_version_screen(version_id, screenshot_path, thumbnail_path):
         logger.info('Version screen modified')
     return screenshot_path_success*thumbnail_path_success
 
-def remove_version(version_id):
-    if not repository.is_admin():
-        return
+def remove_version(version_id, force = 0):
+    if not force:
+        if not repository.is_admin():
+            return
     for export_version_id in get_export_versions_by_work_version_id(version_id, 'id'):
         update_export_version_data(export_version_id, ('work_version_id', None))
         update_export_version_data(export_version_id, ('software', None))

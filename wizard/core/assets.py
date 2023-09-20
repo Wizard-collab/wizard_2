@@ -124,7 +124,7 @@ def create_category(name, domain_id):
         return
     dir_name = path_utils.clean_path(path_utils.join(domain_path, name))
     if not tools.create_folder(dir_name):
-        project.remove_category(category_id)
+        project.remove_category(category_id, force=1)
         return
     category_row = project.get_category_data(category_id)
     hooks.after_category_creation_hook(category_row['string'], name)
@@ -172,7 +172,7 @@ def create_asset(name, category_id, inframe=100, outframe=220, preroll=0, postro
     if not asset_id:
         return
     if not tools.create_folder(dir_name):
-        project.remove_asset(asset_id)
+        project.remove_asset(asset_id, force=1)
         return
     asset_row = project.get_asset_data(asset_id)
     hooks.after_asset_creation_hook(asset_row['string'], name)
@@ -285,7 +285,7 @@ def create_stage(name, asset_id):
     if not stage_id:
         return
     if not tools.create_folder(dir_name):
-        project.remove_stage(stage_id)
+        project.remove_stage(stage_id, force=1)
         return
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_EXPORTS')))
     stage_row = project.get_stage_data(stage_id)
@@ -331,7 +331,7 @@ def create_variant(name, stage_id, comment=''):
     if not variant_id:
         return
     if not tools.create_folder(dir_name):
-        project.remove_variant(variant_id)
+        project.remove_variant(variant_id, force=1)
         return
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_SANDBOX')))
     tools.create_folder(path_utils.clean_path(path_utils.join(dir_name, '_VIDEOS')))
@@ -588,9 +588,9 @@ def modify_reference_LOD(work_env_id, LOD, namespaces_list):
         if reference_row['namespace'] not in namespaces_list:
             continue
         export_row = project.get_export_data(reference_row['export_id'])
-        export_rows = project.get_variant_export_childs(export_row['variant_id'])
+        export_rows = project.get_stage_export_childs(export_row['stage_id'])
         for export_row in export_rows:
-            if export_row['name'] != LOD:
+            if LOD not in export_row['name']:
                 continue
             project.modify_reference_export(reference_row['id'], export_row['id'])
     return 1

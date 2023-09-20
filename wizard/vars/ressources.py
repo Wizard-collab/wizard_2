@@ -335,6 +335,8 @@ _purse_icon_ = path_utils.join(_icons_path_, 'purse.png')
 _available_icons_list_.append(_purse_icon_)
 _market_icon_ = path_utils.join(_icons_path_, 'market.png')
 _available_icons_list_.append(_market_icon_)
+_attacks_history_icon_ = path_utils.join(_icons_path_, 'attack_history.png')
+_available_icons_list_.append(_attacks_history_icon_)
 _key_icon_ = path_utils.join(_icons_path_, 'key.png')
 _available_icons_list_.append(_key_icon_)
 

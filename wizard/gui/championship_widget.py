@@ -14,6 +14,7 @@ from wizard.gui import market_widget
 from wizard.gui import inventory_widget
 from wizard.gui import users_championship_widget
 from wizard.gui import confirm_widget
+from wizard.gui import attack_history_widget
 
 # Wizard modules
 from wizard.core import environment
@@ -169,6 +170,9 @@ class championship_widget(QtWidgets.QWidget):
         self.market_widget = market_widget.market_widget()
         self.tabs_widget.addTab(self.market_widget, QtGui.QIcon(ressources._market_icon_), 'Market')
 
+        self.attack_history_widget = attack_history_widget.attack_history_widget()
+        self.tabs_widget.addTab(self.attack_history_widget, QtGui.QIcon(ressources._attacks_history_icon_), 'Attacks History')
+
         self.footer_layout = QtWidgets.QHBoxLayout()
         self.footer_layout.setContentsMargins(6,6,6,6)
         self.footer_layout.setSpacing(20)
@@ -200,6 +204,7 @@ class championship_widget(QtWidgets.QWidget):
         self.market_widget.refresh()
         self.inventory_widget.refresh()
         self.users_championship_widget.refresh()
+        self.attack_history_widget.refresh()
         self.refresh_items(user_row)
         self.refresh_keeped_artefacts(user_row)
         self.update_refresh_time(start_time)
