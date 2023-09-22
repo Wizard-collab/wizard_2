@@ -23,6 +23,8 @@ http://54.39.96.76/
 	* psutil
 	* QScintilla
 	* requests
+	* pywin32
+	* rotate-screen
 
 * Database dependency:
 	* PostgreSQL
