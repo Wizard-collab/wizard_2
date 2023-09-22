@@ -42,14 +42,17 @@ import os
 from wizard.core import tools
 from wizard.core import path_utils
 
+
 def screenshot(file, thumbnail_file):
     screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
     rect = screen.availableGeometry()
-    x=rect.x()
-    y=rect.y()
-    width=rect.width()
-    height=rect.height()
-    pixmap = screen.grabWindow(QtWidgets.QApplication.desktop().winId(), x=x, y=y, width=width, height=height)
+    x = rect.x()
+    y = rect.y()
+    width = rect.width()
+    height = rect.height()
+    pixmap = screen.grabWindow(
+        QtWidgets.QApplication.desktop().winId(), x=x, y=y, width=width, height=height
+    )
     base_image = pixmap_to_PIL(pixmap)
 
     image = resize_image(base_image, 1000)
@@ -63,6 +66,7 @@ def screenshot(file, thumbnail_file):
     thumbnail.save(save_thumbnail_file, format="JPEG")
     return save_file, save_thumbnail_file
 
+
 def pixmap_to_PIL(pixmap):
     buffer = QtCore.QBuffer()
     buffer.open(QtCore.QBuffer.ReadWrite)
@@ -70,7 +74,8 @@ def pixmap_to_PIL(pixmap):
     PIL_image = Image.open(io.BytesIO(buffer.data()))
     return PIL_image
 
-def resize_preview(file, destination, size=200, image_format='PNG'):
+
+def resize_preview(file, destination, size=200, image_format="PNG"):
     if not path_utils.isfile(file):
         return
     image = Image.open(file)
@@ -79,29 +84,33 @@ def resize_preview(file, destination, size=200, image_format='PNG'):
     preview.save(preview_file, format=image_format)
     return preview_file
 
+
 def convert_image_to_bytes(image_file, resize=None):
     # Resize the given file to 100*100
     # and return the png bytes
     image = Image.open(image_file)
     return convert_PILLOW_image_to_bytes(image, resize)
 
+
 def convert_PILLOW_image_to_bytes(image, resize=None):
     if resize is not None:
         image = resize_image(image, resize)
-    icc = image.info.get('icc_profile', '')
+    icc = image.info.get("icc_profile", "")
     if icc:
         icc_io_handle = io.BytesIO(icc)
         src_profile = ImageCms.ImageCmsProfile(icc_io_handle)
-        dst_profile = ImageCms.createProfile('sRGB')
+        dst_profile = ImageCms.createProfile("sRGB")
         image = ImageCms.profileToProfile(image, src_profile, dst_profile)
     stream = io.BytesIO()
     image.save(stream, format="PNG")
     imagebytes = stream.getvalue()
     return imagebytes
 
+
 def convert_image_bytes_to_pillow(image_bytes):
     image = Image.open(io.BytesIO(image_bytes))
     return image
+
 
 def convert_screenshot(image_file, resize=300):
     # Resize the given file to 100*100
@@ -113,79 +122,114 @@ def convert_screenshot(image_file, resize=300):
     imagebytes = stream.getvalue()
     return imagebytes, width, height
 
+
 def convert_image_to_str_data(image_file, resize=None):
     image_bytes = convert_image_to_bytes(image_file, resize)
     return convert_bytes_to_str_data(image_bytes)
 
+
 def convert_bytes_to_str_data(image_bytes):
-    encoded = base64.b64encode(image_bytes).decode('ascii')
+    encoded = base64.b64encode(image_bytes).decode("ascii")
     return encoded
+
 
 def convert_str_data_to_image_bytes(str_data):
     return base64.b64decode(str_data)
 
+
 def resize_image(image, fixed_height):
-    height_percent = (fixed_height / float(image.size[1]))
+    height_percent = fixed_height / float(image.size[1])
     width_size = int((float(image.size[0]) * float(height_percent)))
     image = image.resize((width_size, fixed_height), Image.ANTIALIAS)
     return image
 
+
 def resize_image_file(image_file, fixed_height):
-    if image_file.endswith('.svg'):
+    if image_file.endswith(".svg"):
         return
     image = Image.open(image_file)
     image = resize_image(image, fixed_height)
     image.save(image_file, format="PNG")
+
 
 def crop_image_height(pillow_image, height):
     area = (0, 0, pillow_image.size[0], height)
     cropped_img = pillow_image.crop(area)
     return cropped_img
 
+
 def resize_image_with_fixed_width(image, fixed_width):
-    width_percent = (fixed_width / float(image.size[0]))
+    width_percent = fixed_width / float(image.size[0])
     height_size = int((float(image.size[1]) * float(width_percent)))
     image = image.resize((fixed_width, height_size), Image.ANTIALIAS)
     return image, fixed_width, height_size
-    
+
+
 def project_random_image(project_name):
     letter = project_name[0].upper()
-    hue = random.randint(0,100)/100.0
-    saturation = random.randint(10,50)/100.0
-    value = random.randint(30,60)/100.0
-    rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value))
-    img = Image.new('RGB', (500, 282), color = rgb_tuple)
+    hue = random.randint(0, 100) / 100.0
+    saturation = random.randint(10, 50) / 100.0
+    value = random.randint(30, 60) / 100.0
+    rgb_tuple = tuple(
+        round(i * 255) for i in colorsys.hsv_to_rgb(hue, saturation, value)
+    )
+    img = Image.new("RGB", (500, 282), color=rgb_tuple)
 
     draw = ImageDraw.Draw(img)
-    circle_rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value+0.04))
-    draw.ellipse(((500-500)/2, (282-500)/2, (500+500)/2, (282+500)/2), fill=circle_rgb_tuple, width=0)
-    circle_rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value+0.08))
-    draw.ellipse(((500-350)/2, (282-350)/2, (500+350)/2, (282+350)/2), fill=circle_rgb_tuple, width=0)
-    circle_rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value+0.12))
-    draw.ellipse(((500-200)/2, (282-200)/2, (500+200)/2, (282+200)/2), fill=circle_rgb_tuple, width=0)
-    
-    font = ImageFont.truetype("ressources/fonts/Poppins-Black.ttf", 100)
-    w, h = draw.textsize(letter, font=font)
-    draw.text(((500-w)/2,(282-h-30)/2), letter, (255, 255, 255), font=font)
+    circle_rgb_tuple = tuple(
+        round(i * 255) for i in colorsys.hsv_to_rgb(hue, saturation, value + 0.04)
+    )
+    draw.ellipse(
+        ((500 - 500) / 2, (282 - 500) / 2, (500 + 500) / 2, (282 + 500) / 2),
+        fill=circle_rgb_tuple,
+        width=0,
+    )
+    circle_rgb_tuple = tuple(
+        round(i * 255) for i in colorsys.hsv_to_rgb(hue, saturation, value + 0.08)
+    )
+    draw.ellipse(
+        ((500 - 350) / 2, (282 - 350) / 2, (500 + 350) / 2, (282 + 350) / 2),
+        fill=circle_rgb_tuple,
+        width=0,
+    )
+    circle_rgb_tuple = tuple(
+        round(i * 255) for i in colorsys.hsv_to_rgb(hue, saturation, value + 0.12)
+    )
+    draw.ellipse(
+        ((500 - 200) / 2, (282 - 200) / 2, (500 + 200) / 2, (282 + 200) / 2),
+        fill=circle_rgb_tuple,
+        width=0,
+    )
 
-    img_file = path_utils.join(tools.temp_dir(),'temp_img.png')
+    font = ImageFont.truetype("ressources/fonts/Poppins-Black.ttf", 100)
+    size = font.getbbox(letter)
+    w, h = size[2], size[3]
+
+    draw.text(((500 - w) / 2, (282 - h - 30) / 2), letter, (255, 255, 255), font=font)
+
+    img_file = path_utils.join(tools.temp_dir(), "temp_img.png")
     img.save(img_file)
     return img_file
 
+
 def user_random_image(user_name):
     letter = user_name[0].upper()
-    hue = random.randint(0,100)/100.0
-    saturation = random.randint(10,50)/100.0
-    value = random.randint(30,60)/100.0
-    rgb_tuple = tuple(round(i * 255) for i in colorsys.hsv_to_rgb(hue,saturation,value))
-    img = Image.new('RGB', (100, 100), color = rgb_tuple)
+    hue = random.randint(0, 100) / 100.0
+    saturation = random.randint(10, 50) / 100.0
+    value = random.randint(30, 60) / 100.0
+    rgb_tuple = tuple(
+        round(i * 255) for i in colorsys.hsv_to_rgb(hue, saturation, value)
+    )
+    img = Image.new("RGB", (100, 100), color=rgb_tuple)
 
     draw = ImageDraw.Draw(img)
 
     font = ImageFont.truetype("ressources/fonts/Poppins-Black.ttf", 40)
-    w, h = draw.textsize(letter, font=font)
-    draw.text(((100-w)/2,(100-h-10)/2), letter, (255, 255, 255), font=font)
+    size = font.getbbox(letter)
+    w, h = size[2], size[3]
 
-    img_file = path_utils.join(tools.temp_dir(),'temp_img.png')
+    draw.text(((100 - w) / 2, (100 - h - 10) / 2), letter, (255, 255, 255), font=font)
+
+    img_file = path_utils.join(tools.temp_dir(), "temp_img.png")
     img.save(img_file)
     return img_file
