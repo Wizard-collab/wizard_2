@@ -37,6 +37,9 @@ def setup_render_directory(stage_name, export_name):
 def setup_frame_range(render_type, frame_range=None):
     if not frame_range:
         frame_range = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
+    if len(frame_range) == 2:
+        frame_range.append(frame_range[1])
+        frame_range.insert(0, frame_range[0])
     if render_type == 'FML':
         frames = "{0},{1},{2}".format(frame_range[1], int((frame_range[1]+frame_range[2])/2), frame_range[2])
     elif render_type == 'HD' or render_type == 'LD':

@@ -61,6 +61,7 @@ def export_project(file, export_GRP_list):
     gproject_command = wizard_hooks.get_gproject_command("guerilla_render")
     if gproject_command is None:
         gproject_command = default_gproject_command
+
     gproject_command(export_GRP_list, file)
 
 def reopen(scene):
@@ -103,11 +104,18 @@ def default_gnode_command(export_GRP_list, export_file):
     grp_node.savefile(export_file)
 
 def default_gproject_command(export_GRP_list, export_file):
-    for object in wizard_tools.get_all_nodes():
-        if object not in export_GRP_list:
+    all_objects_to_keep = []
+    for obj in export_GRP_list:
+        node = pynode(obj)
+        all_objects_to_keep.append(obj)
+        for child in node.children(recursive=True):
+            name = child.getname()
+            all_objects_to_keep.append(name)
+    for obj in wizard_tools.get_all_nodes(name=True):
+        if obj in all_objects_to_keep:
             continue
         try:
-            pynode(object).delete()
+            pynode(obj).delete()
         except:
             pass
     Document().save(export_file)

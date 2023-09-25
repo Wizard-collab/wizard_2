@@ -2,6 +2,16 @@
   update_list:
   - !!python/tuple
     - debug
+    - AbcImport and AbcExport loaded by wizard
+  - !!python/tuple
+    - update
+    - Wizard console ( shell ) now visible
+  version: 3.0.2
+  time: 1695677091.5589147
+'3.0.2':
+  update_list:
+  - !!python/tuple
+    - debug
     - LOD switch fixed in maya
   - !!python/tuple
     - debug
@@ -12,7 +22,7 @@
   - !!python/tuple
     - new
     - New attacks history interface.
-  version: 3.0.1
+  version: 3.0.2
   time: 1695221079.1765022
 '3.0.0':
   update_list:

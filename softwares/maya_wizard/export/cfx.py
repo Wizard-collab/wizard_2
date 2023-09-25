@@ -69,7 +69,6 @@ def invoke_settings_widget():
 def export_fur(grooming_reference, frange, percent_factor):
     grooming_nspace = grooming_reference['namespace']
     asset_name = grooming_reference['asset_name']
-    variant_name = grooming_reference['variant_name']
     exported_string_asset = grooming_reference['string_stage']
     count = grooming_reference['count']
     if is_referenced(grooming_nspace):
@@ -78,7 +77,7 @@ def export_fur(grooming_reference, frange, percent_factor):
             logger.info("Exporting {}".format(grooming_nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
             export_GRP_list += additionnal_objects
-            export_name = buid_export_name(asset_name, variant_name, count)
+            export_name = buid_export_name(asset_name, count)
             wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
         else:
             logger.warning("No objects to export in '{}:yeti_nodes_set'".format(grooming_nspace))
@@ -86,7 +85,6 @@ def export_fur(grooming_reference, frange, percent_factor):
 def export_cfx_abc(reference, frange, percent_factor):
     nspace = reference['namespace']
     asset_name = reference['asset_name']
-    variant_name = reference['variant_name']
     exported_string_asset = reference['string_stage']
     count = reference['count']
     if is_referenced(nspace):
@@ -95,16 +93,13 @@ def export_cfx_abc(reference, frange, percent_factor):
             logger.info("Exporting {}".format(nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
             export_GRP_list += additionnal_objects
-            export_name = buid_export_name(asset_name, variant_name, count)
+            export_name = buid_export_name(asset_name, count)
             wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(nspace))
 
-def buid_export_name(asset_name, variant_name, count):
-    if variant_name == 'main':
-        export_name = asset_name
-    else:
-        export_name = "{}_{}".format(asset_name, variant_name)
+def buid_export_name(asset_name, count):
+    export_name = asset_name
     if count != '0':
         export_name += "_{}".format(count)
     return export_name

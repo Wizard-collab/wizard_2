@@ -16,6 +16,11 @@ from maya_wizard import wizard_tools
 # Maya modules
 import pymel.core as pm
 
+def load_plugins():
+    logger.info("Loading plugins")
+    pm.loadPlugin("AbcImport.dll")
+    pm.loadPlugin("AbcExport.dll")
+
 def reference_modeling(reference_dic):
     old_objects = pm.ls()
     if not pm.namespace(exists=reference_dic['namespace']):
@@ -234,6 +239,7 @@ def update_camera(reference_dic):
                                     reference_dic['string_stage'])
 
 def create_reference(file, namespace, group):
+    load_plugins()
     if not pm.objExists(group):
         pm.group( em=True, name=group )
     new_nodes = pm.createReference(file,
@@ -247,6 +253,7 @@ def create_reference(file, namespace, group):
     return new_nodes
 
 def update_reference(files_list, namespace):
+    load_plugins()
     fileReference = pm.FileReference(namespace=namespace, refnode=True)
     if os.path.normpath(files_list[0]) == os.path.normpath(fileReference.path):
         logger.info(f"{namespace} already up to date, skipping")

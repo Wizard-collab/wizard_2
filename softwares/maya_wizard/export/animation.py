@@ -49,7 +49,6 @@ def invoke_settings_widget():
 def export_animation(rigging_reference, frange, percent_factor):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
-    variant_name = rigging_reference['variant_name']
     exported_string_asset = rigging_reference['string_stage']
     count = rigging_reference['count']
     if is_referenced(rig_nspace):
@@ -58,16 +57,13 @@ def export_animation(rigging_reference, frange, percent_factor):
             logger.info("Exporting {}".format(rig_nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('animation', exported_string_asset)
             export_GRP_list += additionnal_objects
-            export_name = buid_export_name(asset_name, variant_name, count)
+            export_name = buid_export_name(asset_name, count)
             wizard_export.export('animation', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(rig_nspace))
 
-def buid_export_name(asset_name, variant_name, count):
-    if variant_name == 'main':
-        export_name = asset_name
-    else:
-        export_name = "{}_{}".format(asset_name, variant_name)
+def buid_export_name(asset_name, count):
+    export_name = asset_name
     if count != '0':
         export_name += "_{}".format(count)
     return export_name

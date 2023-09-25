@@ -20,11 +20,18 @@ def gproject_command(export_GRP_list, export_file):
     a default gproject export command.
     You can modify it from here
     Be carreful on what you are modifying'''
-    for object in wizard_tools.get_all_nodes():
-        if object not in export_GRP_list:
+    all_objects_to_keep = []
+    for obj in export_GRP_list:
+        node = pynode(obj)
+        all_objects_to_keep.append(obj)
+        for child in node.children(recursive=True):
+            name = child.getname()
+            all_objects_to_keep.append(name)
+    for obj in wizard_tools.get_all_nodes(name=True):
+        if obj in all_objects_to_keep:
             continue
         try:
-            pynode(object).delete()
+            pynode(obj).delete()
         except:
             pass
     Document().save(export_file)

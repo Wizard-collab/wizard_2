@@ -26,7 +26,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-ip_address = 'localhost'
+ip_address = '192.168.1.45'
 port = 50333
 
 # Python modules
