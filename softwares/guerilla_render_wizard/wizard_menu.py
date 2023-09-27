@@ -145,6 +145,11 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.set_image_format()
 
+    class set_frame_rate(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.set_frame_rate()
+
     class set_frame_range(command):
         @staticmethod
         def action(luaObj, window, x, y, suffix):
@@ -236,6 +241,8 @@ class menu():
     cmd.install('Wizard', ' Update')
     command.addseparator ('Wizard')
     cmd = set_image_format('Set image size', 'icons/set_image_size.png')
+    cmd.install('Wizard')
+    cmd = set_frame_rate('Set frame rate', 'icons/set_frame_rate.png')
     cmd.install('Wizard')
     cmd = set_frame_range('Set frame range', 'icons/set_frame_range.png')
     cmd.install('Wizard')

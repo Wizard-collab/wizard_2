@@ -91,6 +91,10 @@ def update_lighting(references=None, local=True):
         for reference in references['lighting']:
             wizard_reference.update_lighting(reference, local)
 
+def set_frame_rate():
+    frame_rate = wizard_communicate.get_frame_rate()
+    nuke.root()['fps'].setValue(frame_rate)
+
 def set_frame_range(rolls=0):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
     if rolls:

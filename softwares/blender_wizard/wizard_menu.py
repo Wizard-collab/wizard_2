@@ -208,8 +208,17 @@ class set_image_size(bpy.types.Operator):
         wizard_plugin.set_image_size()
         return {'FINISHED'}
 
+class set_frame_rate(bpy.types.Operator):
+
+    bl_idname = "wizard.set_frame_rate"
+    bl_label = "Set frame rate"
+    bl_description = "Apply wizard project frame rate"
+    
+    def execute(self, context):
+        wizard_plugin.set_frame_rate()
+        return {'FINISHED'}
+
 class set_frame_range(bpy.types.Operator):
-    '''The set image size operator that call wizard function'''
 
     bl_idname = "wizard.set_frame_range"
     bl_label = "Set frame range"
@@ -217,6 +226,16 @@ class set_frame_range(bpy.types.Operator):
     
     def execute(self, context):
         wizard_plugin.set_frame_range()
+        return {'FINISHED'}
+
+class set_frame_range_with_rolls(bpy.types.Operator):
+
+    bl_idname = "wizard.set_frame_range_with_rolls"
+    bl_label = "Set frame range with rolls"
+    bl_description = "Apply wizard project frame range with rolls"
+    
+    def execute(self, context):
+        wizard_plugin.set_frame_range_with_rolls()
         return {'FINISHED'}
 
 class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
@@ -262,7 +281,9 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
         layout.separator()
 
         layout.operator("wizard.set_image_size", icon_value=wizard_icons["set_image_size"].icon_id)
+        layout.operator("wizard.set_frame_rate", icon_value=wizard_icons["set_frame_rate"].icon_id)
         layout.operator("wizard.set_frame_range", icon_value=wizard_icons["set_frame_range"].icon_id)
+        layout.operator("wizard.set_frame_range_with_rolls", icon_value=wizard_icons["set_frame_range"].icon_id)
 
     def menu_draw(self, context):
         self.layout.menu("TOPBAR_MT_wizard_menu")
@@ -285,7 +306,9 @@ classes = (save_increment,
                 update_camera,
                 update_custom,
                 set_image_size,
+                set_frame_rate,
                 set_frame_range,
+                set_frame_range_with_rolls,
                 TOPBAR_MT_wizard_import_submenu,
                 TOPBAR_MT_wizard_update_submenu,
                 TOPBAR_MT_wizard_menu)
@@ -312,6 +335,7 @@ def register():
     wizard_icons.load("custom", 'icons/custom.png', 'IMAGE')
     wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
+    wizard_icons.load("set_frame_rate", 'icons/set_frame_rate.png', 'IMAGE')
     wizard_icons.load("set_frame_range", 'icons/set_frame_range.png', 'IMAGE')
 
 def unregister():

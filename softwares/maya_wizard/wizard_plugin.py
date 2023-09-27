@@ -227,6 +227,14 @@ def set_frame_range(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
     pm.playbackOptions(animationStartTime=frame_range[1], animationEndTime=frame_range[2], minTime=frame_range[1], maxTime=frame_range[2])
 
+def set_frame_rate(*args):
+    frame_rate = wizard_communicate.get_frame_rate()
+    frame_rate_string = f"{frame_rate}fps"
+    try:
+        pm.currentUnit(time=frame_rate_string)
+    except RuntimeError:
+        logger.warning(f"{frame_rate_string} doesn't exists.")
+
 def set_frame_range_with_rolls(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
 

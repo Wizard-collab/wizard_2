@@ -195,3 +195,7 @@ def set_frame_range(rolls=0):
         f1 = frame_range[1]
         f2 = frame_range[2]
     hou.playbar.setFrameRange(f1, f2)
+
+def set_frame_rate():
+    frame_rate = wizard_communicate.get_frame_rate()
+    hou.setFps(frame_rate)

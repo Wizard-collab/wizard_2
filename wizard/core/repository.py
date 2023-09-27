@@ -795,6 +795,7 @@ def create_repository_database():
     create_quotes_table()
     create_attack_events_table()
     create_artefacts_table()
+    init_artefacts_stock()
     return 1
 
 def is_repository_database(repository_name = None):

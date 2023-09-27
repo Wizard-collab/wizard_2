@@ -239,3 +239,7 @@ def set_image_format(*args):
     Document().ProjectWidth.set(width)
     Document().ProjectHeight.set(height)
     Document().ProjectAspectRatio.set(1)
+
+def set_frame_rate(*args):
+    frame_rate = wizard_communicate.get_frame_rate()
+    Document().Preferences.FrameRate.set(frame_rate)

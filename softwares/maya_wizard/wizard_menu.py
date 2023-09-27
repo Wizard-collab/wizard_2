@@ -92,6 +92,7 @@ class menu():
         pm.menuItem(divider=True, parent=mainMenu)
 
         pm.menuItem(l='Set image size', c=wizard_plugin.set_image_format, i='icons/set_image_size.png', parent=mainMenu)
+        pm.menuItem(l='Set frame rate', c=wizard_plugin.set_frame_rate, i='icons/set_frame_rate.png', parent=mainMenu)
         pm.menuItem(l='Set frame range', c=wizard_plugin.set_frame_range, i='icons/set_frame_range.png', parent=mainMenu)
         pm.menuItem(l='Set frame range with rolls', c=wizard_plugin.set_frame_range_with_rolls, i='icons/set_frame_range.png', parent=mainMenu)
 

@@ -43,6 +43,7 @@ class references_widget(QtWidgets.QWidget):
         self.context = context
         self.group_item = None
         self.parent_instance_id = None
+        self.reference_rows = None
         self.reference_ids = dict()
         self.referenced_group_ids = dict()
         self.stage_dic = dict()
@@ -81,6 +82,8 @@ class references_widget(QtWidgets.QWidget):
         self.search_thread.hide_group_signal.connect(self.hide_search_referenced_group)
 
     def update_search(self):
+        if not self.reference_rows:
+            return
         search_data = self.search_bar.text()
         if search_data != '':
             self.search_thread.update_search(self.reference_rows, self.referenced_groups_rows, search_data)

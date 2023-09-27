@@ -121,6 +121,14 @@ def get_image_format():
     image_format = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return image_format
 
+def get_frame_rate():
+    # Request the project image format
+    # Return a [width, height] list
+    signal_dic=dict()
+    signal_dic['function'] = 'get_frame_rate'
+    image_format = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return image_format
+
 def get_user_folder():
     # Request the user folder ( Documents/Wizard )
     signal_dic=dict()

@@ -110,6 +110,8 @@ class communicate_server(Thread):
             returned = get_frame_range(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'get_image_format':
             returned = get_image_format()
+        elif signal_dic['function'] == 'get_frame_rate':
+            returned = get_frame_rate()
         elif signal_dic['function'] == 'get_user_folder':
             returned = get_user_folder()
         elif signal_dic['function'] == 'get_references':
@@ -225,6 +227,9 @@ def modify_reference_LOD(work_env_id, LOD, namespaces_list):
 
 def get_image_format():
     return project.get_image_format()
+
+def get_frame_rate():
+    return project.get_frame_rate()
 
 def get_user_folder():
     return user_vars._user_path_

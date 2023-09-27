@@ -187,7 +187,7 @@ class splash_screen_widget(QtWidgets.QDialog):
     def fill_whats_new(self):
         with open(ressources._whatsnew_yaml_, 'r') as f:
             whats_new_dic = yaml.load(f, Loader=yaml.Loader)
-        version_key = f"{self.version_dic['MAJOR']}.{self.version_dic['MINOR']}.{self.version_dic['PATCH']}"
+        version_key = f"{self.version_dic['MAJOR']}.{self.version_dic['MINOR']}.{self.version_dic['PATCH']}.{self.version_dic['builds']}"
         self.updates_list = []
         self.update_areas = []
         for update in whats_new_dic.keys():
@@ -272,7 +272,7 @@ class update_area(QtWidgets.QFrame):
         day, hour = tools.convert_time(self.update_dic['time'])
         self.date_label.setText(f"{day} ( {tools.time_ago_from_timestamp(self.update_dic['time'])} )")
         if self.update != 'last':
-            self.version_label.setText(self.update_dic['version'])
+            self.version_label.setText(self.update)
         else:
             self.version_label.setText(self.current_version_key)
 

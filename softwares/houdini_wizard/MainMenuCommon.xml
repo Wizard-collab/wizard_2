@@ -146,6 +146,13 @@ wizard_plugin.update_camera()]]>
       <separatorItem/>
 
       <scriptItem>
+        <label>Set frame rate</label>
+         <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.set_frame_rate()]]>
+        </scriptCode>
+      </scriptItem>
+
+      <scriptItem>
         <label>Set frame range</label>
          <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
 wizard_plugin.set_frame_range()]]>

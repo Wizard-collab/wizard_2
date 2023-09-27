@@ -59,10 +59,19 @@ def set_image_size():
     bpy.context.scene.render.resolution_x = image_format[0]
     bpy.context.scene.render.resolution_y = image_format[1]
 
+def set_frame_rate():
+    frame_rate = wizard_communicate.get_frame_rate()
+    bpy.context.scene.render.fps = frame_rate
+
 def set_frame_range():
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
     bpy.context.scene.frame_start = frame_range[1]
     bpy.context.scene.frame_end = frame_range[2]
+
+def set_frame_range_with_rolls():
+    frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
+    bpy.context.scene.frame_start = frame_range[1]-frame_range[0]
+    bpy.context.scene.frame_end = frame_range[2]+frame_range[3]
 
 def reference_texturing(references=None):
     if not references:
