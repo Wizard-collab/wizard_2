@@ -48,3 +48,9 @@ def analyse_comment(comment, instance_type, instance_id):
 				events.add_tag_event(instance_type, instance_id, comment, user)
 		elif user == 'all':
 			events.add_tag_event(instance_type, instance_id, comment, user)
+		all_tag_groups = project.get_all_tag_groups()
+		for tag_group_row in all_tag_groups:
+			if user in tag_group_row['name']:
+				events.add_tag_event(instance_type, instance_id, comment, user)
+
+

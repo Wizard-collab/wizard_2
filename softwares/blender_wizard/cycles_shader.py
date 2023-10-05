@@ -102,7 +102,7 @@ def get_textures_dic(files_list, namespace):
     if len(diffuse_maps) >=1:
         if f'{namespace}:diffuse_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images[f'{namespace}:diffuse_maps'])
-        bpy.ops.image.open(filepath=diffuse_maps[0], directory=os.path.dirname(diffuse_maps[0]), use_udim_detecting=True)
+        bpy.ops.image.open(filepath=diffuse_maps[0], directory=os.path.dirname(diffuse_maps[0]), use_udim_detecting=True, relative_path=False)
         image = find_image(os.path.basename(diffuse_maps[0]))
         if image:
             image.name = f'{namespace}:diffuse_maps'
@@ -115,7 +115,7 @@ def get_textures_dic(files_list, namespace):
     if len(roughness_maps) >=1:
         if f'{namespace}:roughness_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images[f'{namespace}:roughness_maps'])
-        bpy.ops.image.open(filepath=roughness_maps[0], directory=os.path.dirname(roughness_maps[0]), use_udim_detecting=True)
+        bpy.ops.image.open(filepath=roughness_maps[0], directory=os.path.dirname(roughness_maps[0]), use_udim_detecting=True, relative_path=False)
         image = find_image(os.path.basename(roughness_maps[0]))
         if image:
             image.name = f'{namespace}:roughness_maps'
@@ -128,7 +128,7 @@ def get_textures_dic(files_list, namespace):
     if len(metalness_maps) >=1:
         if f'{namespace}:metalness_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images[f'{namespace}:metalness_maps'])
-        bpy.ops.image.open(filepath=metalness_maps[0], directory=os.path.dirname(metalness_maps[0]), use_udim_detecting=True)
+        bpy.ops.image.open(filepath=metalness_maps[0], directory=os.path.dirname(metalness_maps[0]), use_udim_detecting=True, relative_path=False)
         image = find_image(os.path.basename(metalness_maps[0]))
         if image:
             image.name = f'{namespace}:metalness_maps'
@@ -141,7 +141,7 @@ def get_textures_dic(files_list, namespace):
     if len(normal_maps) >=1:
         if f'{namespace}:normal_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images[f'{namespace}:normal_maps'])
-        bpy.ops.image.open(filepath=normal_maps[0], directory=os.path.dirname(normal_maps[0]), use_udim_detecting=True)
+        bpy.ops.image.open(filepath=normal_maps[0], directory=os.path.dirname(normal_maps[0]), use_udim_detecting=True, relative_path=False)
         image = find_image(os.path.basename(normal_maps[0]))
         if image:
             image.name = f'{namespace}:normal_maps'
@@ -154,7 +154,7 @@ def get_textures_dic(files_list, namespace):
     if len(height_maps) >=1:
         if f'{namespace}:height_maps' in bpy.data.images:
             bpy.data.images.remove(bpy.data.images[f'{namespace}:height_maps'])
-        bpy.ops.image.open(filepath=height_maps[0], directory=os.path.dirname(height_maps[0]), use_udim_detecting=True)
+        bpy.ops.image.open(filepath=height_maps[0], directory=os.path.dirname(height_maps[0]), use_udim_detecting=True, relative_path=False)
         image = find_image(os.path.basename(height_maps[0]))
         if image:
             image.name = f'{namespace}:height_maps'

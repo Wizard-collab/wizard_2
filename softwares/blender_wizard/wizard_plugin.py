@@ -18,8 +18,12 @@ from blender_wizard import wizard_export
 from blender_wizard import wizard_reference
 from blender_wizard.export import modeling
 from blender_wizard.export import shading
+from blender_wizard.export import rigging
 from blender_wizard.export import layout
 from blender_wizard.export import custom
+from blender_wizard.export import animation
+from blender_wizard.export import camrig
+from blender_wizard.export import camera
 
 def save_increment():
     wizard_tools.save_increment()
@@ -30,29 +34,44 @@ def export():
         modeling.main()
     elif stage_name == 'shading':
         shading.main()
+    elif stage_name == 'rigging':
+        rigging.main()
+    elif stage_name == 'camrig':
+        camrig.main()
     elif stage_name == 'layout':
         layout.main()
     elif stage_name == 'custom':
         custom.main()
+    elif stage_name == 'animation':
+        animation.invoke_settings_widget()
+    elif stage_name == 'camera':
+        camera.invoke_settings_widget()
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
+
+def export_camera():
+    camera.invoke_settings_widget()
 
 def import_and_update_all():
     references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     reference_texturing(references)
     reference_modeling(references)
+    reference_rigging(references)
     reference_shading(references)
     reference_layout(references)
     reference_animation(references)
     reference_camera(references)
     reference_custom(references)
+    reference_camrig(references)
     update_texturing(references)
     update_modeling(references)
+    update_rigging(references)
     update_shading(references)
     refupdate_layout(references)
     refupdate_animation(references)
     refupdate_camera(references)
     update_custom(references)
+    update_camrig(references)
 
 def set_image_size():
     image_format = wizard_communicate.get_image_format()
@@ -100,6 +119,34 @@ def update_modeling(references=None):
     if 'modeling' in references.keys():
         for reference in references['modeling']:
             wizard_reference.update_modeling(reference)
+
+def reference_rigging(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'rigging' in references.keys():
+        for reference in references['rigging']:
+            wizard_reference.import_rigging(reference)
+
+def update_rigging(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'rigging' in references.keys():
+        for reference in references['rigging']:
+            wizard_reference.update_rigging(reference)
+
+def reference_camrig(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'camrig' in references.keys():
+        for reference in references['camrig']:
+            wizard_reference.import_camrig(reference)
+
+def update_camrig(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'camrig' in references.keys():
+        for reference in references['camrig']:
+            wizard_reference.update_camrig(reference)
 
 def reference_shading(references=None):
     if not references:

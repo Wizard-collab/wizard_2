@@ -26,7 +26,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-ip_address = '192.168.1.45'
+import socket
+host_name = socket.gethostname()
+local_ip = socket.gethostbyname(host_name)
+
+ip_address = local_ip
 port = 50333
 
 # Python modules

@@ -46,9 +46,6 @@ def main():
             wizard_tools.apply_tags(export_GRP_list)
 
             wizard_export.export('modeling', export_name, exported_string_asset, export_GRP_list)
-            #collection_obj.name = collection_name
-            #wizard_tools.reassign_old_name_to_objects(objects_dic)
-
     except:
         logger.error(str(traceback.format_exc()))
     finally:

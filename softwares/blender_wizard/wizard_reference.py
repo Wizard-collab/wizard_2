@@ -48,7 +48,19 @@ def import_modeling(reference_dic):
     create_reference(reference_dic, 'MODELING') 
 
 def update_modeling(reference_dic):
-    update_reference(reference_dic, 'MODELING')   
+    update_reference(reference_dic, 'MODELING')
+
+def import_rigging(reference_dic):
+    create_reference(reference_dic, 'RIGGING') 
+
+def update_rigging(reference_dic):
+    update_reference(reference_dic, 'RIGGING')   
+
+def import_camrig(reference_dic):
+    create_reference(reference_dic, 'CAMRIG') 
+
+def update_camrig(reference_dic):
+    update_reference(reference_dic, 'CAMRIG')   
 
 def import_shading(reference_dic):
     create_reference(reference_dic, 'SHADING') 

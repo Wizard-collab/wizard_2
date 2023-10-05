@@ -472,6 +472,12 @@ QTableCornerButton::section {
 	border: 1px solid rgba(0,0,0,80);
 }
 
+#tag_label{
+	background-color: rgba(119, 133, 222, 100);
+	padding: 3px;
+	border-radius: 5px;
+}
+
 #tree_widget{
 	background-color: transparent;
 	alternate-background-color: rgba(0,0,0,20);

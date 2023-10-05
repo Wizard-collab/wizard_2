@@ -35,6 +35,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+def get_local_ip():
+    try:
+        host_name = socket.gethostname()
+        local_ip = socket.gethostbyname(host_name)
+        return local_ip
+    except:
+        logger.error(str(traceback.format_exc()))
+
 def get_connection(DNS, timeout=5.0, only_debug=False):
     try:
         connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 

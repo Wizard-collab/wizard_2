@@ -2413,24 +2413,93 @@ def search_group(name, column='*'):
                                                         column)
     return groups_rows
 
-def add_tag(name, icon_path=ressources._tag_icon_):
-    if name == '' or name is None:
-        logger.warning(f"Please provide a tag name")
+def get_all_tag_groups(column='*'):
+    tag_groups_rows = db_utils.get_rows('project',
+                                            'tag_groups',
+                                            column)
+    return tag_groups_rows
+
+def get_tag_group_by_name(name, column='*'):
+    tag_groups_rows = db_utils.get_row_by_column_part_data('project',
+                                                        'tag_groups',
+                                                        ('name', name),
+                                                        column)
+    if tag_groups_rows is None or len(tag_groups_rows) < 1:
+        logger.error("Tag group not found")
         return
-    if (db_utils.check_existence('project', 
-                                    'tags',
-                                    'name',
-                                    name)):
-        logger.warning(f"{name} already exists")
+    return tag_groups_rows[0]
+
+def get_tag_group_data(tag_group_id, column='*'):
+    tag_groups_rows = db_utils.get_row_by_column_part_data('project',
+                                                        'tag_groups',
+                                                        ('id', tag_group_id),
+                                                        column)
+    if tag_groups_rows is None or len(tag_groups_rows) < 1:
+        logger.error("Tag group not found")
         return
-    tag_id = db_utils.create_row('project',
-                        'tags',
-                        ('name', 'creation_time', 'creation_user', 'icon', 'user_ids'), 
-                        (name, time.time(), environment.get_user(), icon_path, json.dumps([])))
-    if not tag_id:
+    return tag_groups_rows[0]
+
+def create_tag_group(group_name):
+    if not tools.is_safe(group_name):
         return
-    logger.info(f"Tag {name} added to project")
-    return tag_id
+    if group_name in get_all_tag_groups('name'):
+        logger.warning(f"{group_name} already exists")
+        return
+    tag_group_id = db_utils.create_row('project',
+                            'tag_groups', 
+                            ('creation_time',
+                                'creation_user',
+                                'name',
+                                'user_ids'),
+                            (time.time(),
+                                environment.get_user(),
+                                group_name,
+                                json.dumps([])))
+    if not tag_group_id:
+        return
+    logger.info(f"Tag groups created")
+    return tag_group_id
+
+def delete_tag_group(group_name):
+    tag_group_row = get_tag_group_by_name(group_name)
+    if not tag_group_row:
+        return
+    if not db_utils.delete_row('project', 'tag_groups', tag_group_row['id']):
+        logger.warning(f"Tag group {group_name} NOT removed from project")
+        return
+    logger.info(f"{group_name} deleted")
+
+def suscribe_to_tag_group(group_name):
+    tag_group_row = get_tag_group_by_name(group_name)
+    if not tag_group_row:
+        return
+    user_ids = json.loads(tag_group_row['user_ids'])
+    user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
+    if user_id in user_ids:
+        logger.info("You already suscribed to this tag group")
+        return
+    user_ids.append(user_id)
+    if db_utils.update_data('project',
+                            'tag_groups',
+                            ('user_ids', json.dumps(user_ids)),
+                            ('id', tag_group_row['id'])):
+        logger.info(f"{environment.get_user()} suscribed to {group_name} tag group.")
+
+def unsuscribe_from_tag_group(group_name):
+    tag_group_row = get_tag_group_by_name(group_name)
+    if not tag_group_row:
+        return
+    user_ids = json.loads(tag_group_row['user_ids'])
+    user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
+    if user_id not in user_ids:
+        logger.info("You didn't suscribed to this tag group")
+        return
+    user_ids.remove(user_id)
+    if db_utils.update_data('project',
+                            'tag_groups',
+                            ('user_ids', json.dumps(user_ids)),
+                            ('id', tag_group_row['id'])):
+        logger.info(f"{environment.get_user()} unsuscribed from {group_name} tag group.")
 
 def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1
@@ -2486,7 +2555,7 @@ def init_project(project_path, project_name):
     create_grouped_references_table(project_name)
     create_progress_events_table(project_name)
     create_videos_table(project_name)
-    #create_tags_table(project_name)
+    create_tag_groups_table(project_name)
     return project_name
 
 def create_domains_table(database):
@@ -2851,18 +2920,17 @@ def create_progress_events_table(database):
     logger.info("Progress table created")
     return 1
 
-def create_tags_table(database):
-    sql_cmd = """ CREATE TABLE IF NOT EXISTS tags (
+def create_tag_groups_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS tag_groups (
                                         id serial PRIMARY KEY,
                                         creation_user text NOT NULL,
                                         creation_time real NOT NULL,
                                         name text NOT NULL,
-                                        icon text NOT NULL,
                                         user_ids text NOT NULL
                                     );"""
     if not db_utils.create_table(database, sql_cmd):
         return
-    logger.info("Tags table created")
+    logger.info("Tag groups table created")
     return 1
 
 def create_shelf_scripts_table(database):

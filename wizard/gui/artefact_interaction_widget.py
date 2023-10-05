@@ -18,10 +18,10 @@ from wizard.vars import ressources
 # Wizard gui modules
 from wizard.gui import gui_utils
 
-class attack_user_widget(QtWidgets.QDialog):
+class artefact_interaction_widget(QtWidgets.QDialog):
 
     def __init__(self, parent = None):
-        super(attack_user_widget, self).__init__(parent)
+        super(artefact_interaction_widget, self).__init__(parent)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Choose target")

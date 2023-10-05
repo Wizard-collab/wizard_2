@@ -197,6 +197,14 @@ class wall_widget(QtWidgets.QWidget):
                         if event_row['type'] == 'tag':
                             if (environment.get_user() in event_row['title']) or ('all' in event_row['title']):
                                 self.popup.emit(event_row)
+                            all_tag_groups = project.get_all_tag_groups()
+                            for tag_group_row in all_tag_groups:
+                                if tag_group_row['name'] not in event_row['title']:
+                                    continue
+                                user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
+                                if user_id not in json.loads(tag_group_row['user_ids']):
+                                    continue
+                                self.popup.emit(event_row)
                         else:
                             self.popup.emit(event_row)
                 else:

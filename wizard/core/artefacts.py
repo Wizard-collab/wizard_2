@@ -42,6 +42,45 @@ def buy_artefact(artefact_name):
 	repository.modify_user_coins(environment.get_user(), user_row['coins']-game_vars.artefacts_dic[artefact_name]['price'])
 	return 1
 
+def give_artefact(artefact_name, destination_user):
+	user_row = repository.get_user_row_by_name(environment.get_user())
+	championship_participation = user_row['championship_participation']
+	if not championship_participation:
+		logger.warning("You don't participate to the championship.")
+		return
+	if artefact_name not in game_vars.artefacts_dic.keys():
+		return
+	artefacts_list = json.loads(user_row['artefacts'])
+	if artefact_name not in artefacts_list:
+		logger.warning(f"You don't have this artefact : {artefact_name}")
+		return
+	artefacts_list.remove(artefact_name)
+	if not repository.modify_user_artefacts(environment.get_user(), artefacts_list):
+		return
+	destination_user_artefacts_list = json.loads(repository.get_user_row_by_name(destination_user, 'artefacts'))
+	destination_user_artefacts_list.append(artefact_name)
+	if not repository.modify_user_artefacts(destination_user, destination_user_artefacts_list):
+		return
+	logger.info(f"{artefact_name} given to {destination_user}")
+
+def give_coins(amount, destination_user):
+	user_row = repository.get_user_row_by_name(environment.get_user())
+	championship_participation = user_row['championship_participation']
+	if not championship_participation:
+		logger.warning("You don't participate to the championship.")
+		return
+	if user_row['coins'] < amount:
+		logger.warning("You don't have enough coins")
+		return
+	new_coins = user_row['coins'] - amount
+	if not repository.modify_user_coins(environment.get_user(), new_coins):
+		return
+	destination_user_coins = repository.get_user_row_by_name(destination_user, 'coins')
+	new_destination_user_coins = destination_user_coins + amount
+	if not repository.modify_user_coins(destination_user, new_destination_user_coins):
+		return
+	logger.info(f"{amount} coins given to {destination_user}")
+
 def use_artefact(artefact_name, destination_user=None):
 	championship_participation = repository.get_user_row_by_name(environment.get_user(), 'championship_participation')
 	if not championship_participation:

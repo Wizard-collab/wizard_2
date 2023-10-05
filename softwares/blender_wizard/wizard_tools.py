@@ -75,6 +75,17 @@ def get_new_objects(old_objects):
             new_objects.append(obj)
     return new_objects
 
+def get_render_set_collection(namespace_collection):
+    all_children = namespace_collection.children_recursive
+    for child in all_children:
+        if type(child) != bpy.types.Collection:
+            continue
+        if 'render_set' not in child.name:
+            continue
+        return child
+    logger.warning(f"{namespace_collection}/render_set not found")
+    return
+
 def get_all_children(obj, meshes=0):
     if type(obj) == bpy.types.Collection:
         return obj.all_objects

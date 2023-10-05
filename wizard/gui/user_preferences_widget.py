@@ -19,6 +19,7 @@ from wizard.core import repository
 from wizard.core import environment
 from wizard.core import image
 from wizard.core import path_utils
+from wizard.core import socket_utils
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +113,9 @@ class general_widget(QtWidgets.QWidget):
 
         repository_db = environment.get_repository()[11:]
         self.repository_data.setText(repository_db)
+
+        local_ip = socket_utils.get_local_ip()
+        self.local_ip_label.setText(f"My local ip : {local_ip}")
 
     def apply_popups_settings(self):
         popups_enabled = self.enable_popups_checkbox.isChecked()
@@ -284,6 +288,10 @@ class general_widget(QtWidgets.QWidget):
         self.team_ip_title = QtWidgets.QLabel('Team server DNS')
         self.team_ip_title.setObjectName('bold_label')
         self.team_ip_layout.addWidget(self.team_ip_title)
+
+        self.local_ip_label = QtWidgets.QLabel()
+        self.local_ip_label.setObjectName('gray_label')
+        self.team_ip_layout.addWidget(self.local_ip_label)
 
         self.team_host_lineEdit = QtWidgets.QLineEdit()
         self.team_host_lineEdit.setPlaceholderText('Host ( ex: 127.0.0.1 )')

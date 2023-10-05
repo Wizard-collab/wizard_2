@@ -46,7 +46,6 @@ def main():
             wizard_tools.apply_tags(export_GRP_list)
 
             wizard_export.export('shading', export_name, exported_string_asset, export_GRP_list)
-
     except:
         logger.error(str(traceback.format_exc()))
     finally:

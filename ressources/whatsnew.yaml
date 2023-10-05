@@ -1,6 +1,36 @@
 'last':
   update_list:
   - !!python/tuple
+    - new
+    - Wizard server automatically get the local ip. Local ip also visible in user preferences.
+  - !!python/tuple
+    - debug
+    - Blender I/O problems fixed
+  - !!python/tuple
+    - debug
+    - Blender shading export fixed (image path are now absolute)
+  - !!python/tuple
+    - new
+    - Blender rigging export and import added
+  time: 1696323428.0839753
+'3.1.0.270':
+  update_list:
+  - !!python/tuple
+    - new
+    - Added set frame rate in Maya, Blender, Nuke, Houdini and Guerilla
+  - !!python/tuple
+    - new
+    - Added custom tag groups
+  - !!python/tuple
+    - new
+    - You can now give your artefacts to anyone
+  - !!python/tuple
+    - new
+    - You can now give coins to anyone
+  time: 1695912547.2622368
+'3.0.2.269':
+  update_list:
+  - !!python/tuple
     - debug
     - Search in group manager no longer crash if no group exists.
   time: 1695765263.4424381

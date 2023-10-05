@@ -71,6 +71,11 @@ class tags_widget(gui_utils.QMenu):
                     icon.addPixmap(pm)
                     action = self.addAction(icon, f"{user_row['user_name']}")
                     self.actions.append(action)
+            self.addSeparator()
+            for tag_group_name in project.get_all_tag_groups('name'):
+                if token in tag_group_name:
+                    action = self.addAction(QtGui.QIcon(ressources._tag_icon_), tag_group_name)
+                    self.actions.append(action)
             if len(self.actions) > 0:
                 self.setActiveAction(self.actions[0])
 

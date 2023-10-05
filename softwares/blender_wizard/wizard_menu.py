@@ -2,6 +2,9 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# Python modules
+import os
+
 # Blender modules
 import bpy
 import bpy.utils.previews
@@ -30,6 +33,17 @@ class export(bpy.types.Operator):
     
     def execute(self, context):
         wizard_plugin.export()
+        return {'FINISHED'}
+
+class export_camera(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.export_camera"
+    bl_label = "Export camera"
+    bl_description = "Export camera file in Wizard's hierarchy"
+    
+    def execute(self, context):
+        wizard_plugin.export_camera()
         return {'FINISHED'}
 
 class import_and_update_all(bpy.types.Operator):
@@ -63,6 +77,28 @@ class import_shading(bpy.types.Operator):
     
     def execute(self, context):
         wizard_plugin.reference_shading()
+        return {'FINISHED'}
+
+class import_rigging(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_rigging"
+    bl_label = "Import rigging"
+    bl_description = "Import rigging"
+    
+    def execute(self, context):
+        wizard_plugin.reference_rigging()
+        return {'FINISHED'}
+
+class import_camrig(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_camrig"
+    bl_label = "Import camrig"
+    bl_description = "Import camrig"
+    
+    def execute(self, context):
+        wizard_plugin.reference_camrig()
         return {'FINISHED'}
 
 class import_layout(bpy.types.Operator):
@@ -140,6 +176,28 @@ class update_shading(bpy.types.Operator):
     
     def execute(self, context):
         wizard_plugin.update_shading()
+        return {'FINISHED'}
+
+class update_rigging(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_rigging"
+    bl_label = "Update rigging"
+    bl_description = "Update existing rigging"
+    
+    def execute(self, context):
+        wizard_plugin.update_rigging()
+        return {'FINISHED'}
+
+class update_camrig(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_camrig"
+    bl_label = "Update camrig"
+    bl_description = "Update existing camrig"
+    
+    def execute(self, context):
+        wizard_plugin.update_camrig()
         return {'FINISHED'}
 
 class update_layout(bpy.types.Operator):
@@ -245,11 +303,13 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
         layout = self.layout
         layout.operator("wizard.import_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.import_shading", icon_value=wizard_icons["shading"].icon_id)
+        layout.operator("wizard.import_rigging", icon_value=wizard_icons["rigging"].icon_id)
         layout.operator("wizard.import_texturing", icon_value=wizard_icons["texturing"].icon_id)
         layout.operator("wizard.import_layout", icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.import_animation", icon_value=wizard_icons["animation"].icon_id)
         layout.operator("wizard.import_camera", icon_value=wizard_icons["camera"].icon_id)
         layout.operator("wizard.import_custom", icon_value=wizard_icons["custom"].icon_id)
+        layout.operator("wizard.import_camrig", icon_value=wizard_icons["camrig"].icon_id)
 
 class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
     bl_label = "Update"
@@ -258,11 +318,13 @@ class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
         layout = self.layout
         layout.operator("wizard.update_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.update_shading", icon_value=wizard_icons["shading"].icon_id)
+        layout.operator("wizard.update_rigging", icon_value=wizard_icons["rigging"].icon_id)
         layout.operator("wizard.update_texturing", icon_value=wizard_icons["texturing"].icon_id)
         layout.operator("wizard.update_layout", icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.update_animation", icon_value=wizard_icons["animation"].icon_id)
         layout.operator("wizard.update_camera", icon_value=wizard_icons["camera"].icon_id)
         layout.operator("wizard.update_custom", icon_value=wizard_icons["custom"].icon_id)
+        layout.operator("wizard.update_camrig", icon_value=wizard_icons["camrig"].icon_id)
 
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
@@ -274,6 +336,10 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
         layout.separator()
 
         layout.operator("wizard.export", icon_value=wizard_icons["export"].icon_id)
+        stage_name = os.environ['wizard_stage_name']
+        camera_export_stage_names = ['animation', 'layout']
+        if stage_name in camera_export_stage_names:
+            layout.operator("wizard.export_camera", icon_value=wizard_icons["export"].icon_id)
         layout.operator("wizard.import_and_update_all", icon_value=wizard_icons["import_and_update_all"].icon_id)
         layout.menu("TOPBAR_MT_wizard_import_submenu", icon_value=wizard_icons["import"].icon_id)
         layout.menu("TOPBAR_MT_wizard_update_submenu", icon_value=wizard_icons["update"].icon_id)
@@ -290,21 +356,26 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
 classes = (save_increment,
                 export,
+                export_camera,
                 import_and_update_all,
                 import_modeling,
                 import_shading,
+                import_rigging,
                 import_layout,
                 import_animation,
                 import_camera,
                 import_custom,
+                import_camrig,
                 import_texturing,
                 update_texturing,
                 update_modeling,
                 update_shading,
+                update_rigging,
                 update_layout,
                 update_animation,
                 update_camera,
                 update_custom,
+                update_camrig,
                 set_image_size,
                 set_frame_rate,
                 set_frame_range,
@@ -329,10 +400,12 @@ def register():
     wizard_icons.load("update", 'icons/update.png', 'IMAGE')
     wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
     wizard_icons.load("shading", 'icons/shading.png', 'IMAGE')
+    wizard_icons.load("rigging", 'icons/rigging.png', 'IMAGE')
     wizard_icons.load("layout", 'icons/wlayout.png', 'IMAGE')
     wizard_icons.load("animation", 'icons/animation.png', 'IMAGE')
     wizard_icons.load("camera", 'icons/camera.png', 'IMAGE')
     wizard_icons.load("custom", 'icons/custom.png', 'IMAGE')
+    wizard_icons.load("camrig", 'icons/camera_rig.png', 'IMAGE')
     wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("set_frame_rate", 'icons/set_frame_rate.png', 'IMAGE')

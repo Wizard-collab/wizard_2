@@ -135,8 +135,7 @@ def create_shortcuts():
 def delete_shortcuts():
     delete_shortcut('Wizard')
     delete_shortcut('PyWizard')
-    delete_shortcut('Wizard Console')
-    delete_shortcut('Wizard Server')
+    delete_shortcut('Server')
 
 def create_shortcut(name, exe):
     install_dir = get_install_dir()
