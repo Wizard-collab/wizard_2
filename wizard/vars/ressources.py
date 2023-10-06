@@ -35,6 +35,7 @@ from wizard.core import path_utils
 _web_server_url_ = 'http://54.39.96.76/'
 _documentation_url_ = _web_server_url_ + 'documentation/'
 
+
 # Softwares
 _maya_ = 'maya'
 _guerilla_render_ = 'guerilla_render'
@@ -47,6 +48,7 @@ _blender_ = 'blender'
 _available_icons_list_ = []
 
 _ressources_path_ = path_utils.abspath('ressources')
+_stylesheet_ = path_utils.join(_ressources_path_, 'stylesheet.css')
 _icons_path_ = path_utils.abspath('ressources/icons')
 _default_script_shelf_icon_ = path_utils.join(_icons_path_, 'shelf_script.png')
 _running_gif_ = path_utils.join(_icons_path_, 'running.gif')

@@ -556,6 +556,7 @@ class versions_widget(QtWidgets.QWidget):
         archive_action = None
         comment_action = None
         batch_action = None
+        batch_camera_action = None
         batch_video_action = None
         copy_action = None
         if len(selection)>=1:
@@ -566,6 +567,9 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch version')
             batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export version')
+            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
+            if stage in assets_vars._camera_export_stages_:
+                batch_camera_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_camera_), 'Batch export camera')
             batch_video_action = menu.addAction(QtGui.QIcon(ressources._tool_video_), 'Batch video version')
             copy_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Copy version to clipboard')
         paste_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard')
@@ -590,6 +594,8 @@ class versions_widget(QtWidgets.QWidget):
                 self.open_files()
             elif action == batch_action:
                 self.batch_export()
+            elif action == batch_camera_action:
+                self.batch_export_camera()
             elif action == batch_video_action:
                 self.batch_video()
             elif action == copy_action:

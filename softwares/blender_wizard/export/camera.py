@@ -39,11 +39,9 @@ def main(nspace_list, frange):
         wizard_export.reopen(scene)
 
 def invoke_settings_widget():
-    from PyQt5 import QtWidgets, QtCore, QtGui
-    from blender_wizard.widgets import export_settings_widget
-    app=QtWidgets.QApplication(sys.argv)
+    from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('camera')
-    if export_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+    if export_settings_widget_win.exec_() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)

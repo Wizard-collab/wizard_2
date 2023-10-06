@@ -209,6 +209,13 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
         additionnal_script_paths = additionnal_script_paths.split('\n')
     for script_path in additionnal_script_paths:
         env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+script_path
+
+    if software_row['name'] == 'blender':
+        import PyQt5
+        pyqt5_path = path_utils.dirname(path_utils.dirname(PyQt5.__file__))
+        logger.info(pyqt5_path)
+        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+pyqt5_path
+
     for key in additionnal_env.keys():
         if key in env.keys():
             env[key] += os.pathsep+additionnal_env[key]

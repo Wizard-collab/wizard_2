@@ -12,6 +12,21 @@
   - !!python/tuple
     - new
     - Blender rigging export and import added
+  - !!python/tuple
+    - new
+    - Blender camrig export and import added
+  - !!python/tuple
+    - new
+    - Blender animation export added
+  - !!python/tuple
+    - new
+    - Blender camera export added
+  - !!python/tuple
+    - new
+    - Blender playblast added ( Workbench render )
+  - !!python/tuple
+    - debug
+    - Added batch export camera in work versions tab right click menu
   time: 1696323428.0839753
 '3.1.0.270':
   update_list:

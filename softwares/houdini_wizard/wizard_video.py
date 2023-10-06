@@ -15,10 +15,9 @@ import wizard_communicate
 from houdini_wizard import wizard_tools
 
 def invoke_settings_widget():
-    from PySide2 import QtWidgets, QtCore, QtGui
-    from houdini_wizard.widgets import video_settings_widget
+    from wizard_widgets import video_settings_widget
     video_settings_widget_win = video_settings_widget.video_settings_widget()
-    if video_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+    if video_settings_widget_win.exec_() == video_settings_widget.dialog_accepted:
         frange = video_settings_widget_win.frange
         nspace_list = video_settings_widget_win.nspace_list
         create_videos(frange, nspace_list)
@@ -38,12 +37,22 @@ def create_videos(frange, nspace_list):
 def create_video(frange, camera):
     directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
     logger.info("Flipbooking at {}...".format(directory))
-    flipbook(directory, frange, camera)
+    focal_lengths_dic = get_focal_length(frange, camera)
+    logger.info(focal_lengths_dic)
+    flipbook(directory, frange, camera, focal_lengths_dic)
 
-def publish_video_script(directory, frange):
+def get_focal_length(frange, camera):
+    focal_lengths_dic = dict()
+    for frame in range(frange[0], frange[1]+1):
+        hou.setFrame(frame)
+        camera_node = hou.node("/obj").node(camera)
+        focal_lengths_dic[frame] = round(camera_node.parm("focal").eval(), 1)
+    return focal_lengths_dic
+
+def publish_video_script(directory, frange, focal_lengths_dic):
     command = """import wizard_communicate\n"""
     command += """import os\n"""
-    command += f"""wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), "{directory}", {frange}, int(os.environ['wizard_version_id']))"""
+    command += f"""wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), "{directory}", {frange}, int(os.environ['wizard_version_id']), focal_lengths_dic={focal_lengths_dic})"""
     return command
 
 def progress_script(frange):
@@ -55,7 +64,7 @@ def progress_script(frange):
     command+= 'print("wizard_task_percent:{}".format(percent))\n'
     return command
 
-def flipbook(directory, frange, camera):
+def flipbook(directory, frange, camera, focal_lengths_dic):
     image_format = wizard_communicate.get_image_format()
     file = os.path.join(directory, "tmp_flipbook.$F4.png")
     opengl_node = create_rop_network()
@@ -71,7 +80,7 @@ def flipbook(directory, frange, camera):
     opengl_node.parm('lpostframe').set("python")
     opengl_node.parm('postframe').set(wizard_tools.by_frame_progress_script())
     opengl_node.parm('lpostrender').set("python")
-    opengl_node.parm('postrender').set(publish_video_script(directory, frange))
+    opengl_node.parm('postrender').set(publish_video_script(directory, frange, focal_lengths_dic))
     opengl_node.parm('execute').pressButton()
 
 def get_default_camera():

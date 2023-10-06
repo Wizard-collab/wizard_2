@@ -11,7 +11,15 @@ logger = logging.getLogger('batch_startup')
 # Wizard modules
 from blender_wizard import wizard_plugin
 from blender_wizard import wizard_tools
+from blender_wizard import wizard_video
 from blender_wizard.export import modeling
+from blender_wizard.export import rigging
+from blender_wizard.export import custom
+from blender_wizard.export import camrig
+from blender_wizard.export import layout
+from blender_wizard.export import animation
+from blender_wizard.export import camera
+from blender_wizard.export import shading
 
 wizard_tools.trigger_after_scene_openning_hook()
 
@@ -35,7 +43,8 @@ def main():
         if 'nspace_list' not in settings_dic.keys():
             logger.error("nspace_list parameter not found")
             return
-        logger.warning("Video not plugged for blender. Quitting")
+        wizard_video.create_videos(settings_dic['frange'],
+                                    settings_dic['nspace_list'])
     if settings_dic['batch_type'] == 'export':
         if 'frange' not in settings_dic.keys():
             logger.error("frange parameter not found")
@@ -49,6 +58,22 @@ def main():
         stage_name = settings_dic['stage_to_export']
         if stage_name == 'modeling':
             modeling.main()
+        elif stage_name == 'rigging':
+            rigging.main()
+        elif stage_name == 'shading':
+            shading.main()
+        elif stage_name == 'custom':
+            custom.main()
+        elif stage_name == 'camrig':
+            camrig.main()
+        elif stage_name == 'layout':
+            layout.main()
+        elif stage_name == 'animation':
+            animation.main(nspace_list=settings_dic['nspace_list'],
+                                frange=settings_dic['frange'])
+        elif stage_name == 'camera':
+            camera.main(nspace_list=settings_dic['nspace_list'],
+                                frange=settings_dic['frange'])
         else:
             logger.warning("Unplugged stage : {}".format(stage_name))
             return

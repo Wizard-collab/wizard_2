@@ -15,11 +15,11 @@ import wizard_communicate
 from nuke_wizard import wizard_tools
 
 def invoke_settings_widget(*args):
-    from PySide2 import QtWidgets, QtCore, QtGui
-    from nuke_wizard.widgets import video_settings_widget
+    from wizard_widgets import video_settings_widget
     video_settings_widget_win = video_settings_widget.video_settings_widget()
-    if video_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+    if video_settings_widget_win.exec_() == video_settings_widget.dialog_accepted:
         frange = video_settings_widget_win.frange
+        nspace_list = video_settings_widget_win.nspace_list
         create_video(frange)
 
 def create_video(frange):

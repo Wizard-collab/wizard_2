@@ -15,7 +15,6 @@ from houdini_wizard import wizard_export
 
 # Houdini modules
 
-
 def main():
     scene = wizard_export.save_or_save_increment()
     try:

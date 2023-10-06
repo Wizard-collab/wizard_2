@@ -201,11 +201,16 @@ def screen_over_version(version_id):
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
 
-
 def get_export_name_from_reference_namespace(reference_namespace, work_env_id):
     signal_dic=dict()
     signal_dic['function'] = 'get_export_name_from_reference_namespace'
     signal_dic['reference_namespace'] = reference_namespace
     signal_dic['work_env_id'] = work_env_id
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+
+def get_stylesheet():
+    signal_dic=dict()
+    signal_dic['function'] = 'get_stylesheet'
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned

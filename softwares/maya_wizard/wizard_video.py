@@ -13,12 +13,12 @@ import pymel.core as pm
 
 # Wizard modules
 import wizard_communicate
+from maya_wizard import wizard_tools
 
 def invoke_settings_widget(*args):
-    from PySide2 import QtWidgets, QtCore, QtGui
-    from maya_wizard.widgets import video_settings_widget
-    video_settings_widget_win = video_settings_widget.video_settings_widget()
-    if video_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+    from wizard_widgets import video_settings_widget
+    video_settings_widget_win = video_settings_widget.video_settings_widget(wizard_tools.maya_main_window())
+    if video_settings_widget_win.exec_() == video_settings_widget.dialog_accepted:
         frange = video_settings_widget_win.frange
         nspace_list = video_settings_widget_win.nspace_list
         create_videos(frange, nspace_list)

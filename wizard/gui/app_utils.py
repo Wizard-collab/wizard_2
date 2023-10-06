@@ -21,6 +21,7 @@ from wizard.core import hooks
 from wizard.core import stats
 from wizard.core import tools
 from wizard.core import create_project
+from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import warning_tooltip
@@ -49,7 +50,7 @@ def get_app():
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Thin.ttf")
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-ThinItalic.ttf")
-    with open('ressources/stylesheet.css', 'r') as f:
+    with open(ressources._stylesheet_, 'r') as f:
         app.setStyleSheet(f.read())
     QtCore.qInstallMessageHandler(customQtMsgHandler)
     return app

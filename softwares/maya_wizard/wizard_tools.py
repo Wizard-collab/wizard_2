@@ -19,6 +19,13 @@ def get_file_dir(file):
     directory.replace('\\', '/')
     return directory
 
+def maya_main_window():
+    from maya import OpenMayaUI as omui
+    from PySide2 import QtWidgets, QtCore, QtGui
+    from shiboken2 import wrapInstance 
+    main_window_ptr = omui.MQtUtil.mainWindow()
+    return wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
+
 def get_new_objects(old_objects):
     new_objects = []
     all_objects = pm.ls()

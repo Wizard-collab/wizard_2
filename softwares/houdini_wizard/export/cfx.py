@@ -33,10 +33,9 @@ def main(nspace_list, frange):
         wizard_export.reopen(scene)
 
 def invoke_settings_widget():
-    from PySide2 import QtWidgets, QtCore, QtGui
-    from houdini_wizard.widgets import export_settings_widget
+    from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('cfx')
-    if export_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+    if export_settings_widget_win.exec_() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)

@@ -11,6 +11,7 @@ import bpy.utils.previews
 
 # Wizard modules
 from blender_wizard import wizard_plugin
+from blender_wizard import wizard_video
 from blender_wizard import wizard_tools
 
 class save_increment(bpy.types.Operator):
@@ -296,6 +297,16 @@ class set_frame_range_with_rolls(bpy.types.Operator):
         wizard_plugin.set_frame_range_with_rolls()
         return {'FINISHED'}
 
+class create_video(bpy.types.Operator):
+
+    bl_idname = "wizard.create_video"
+    bl_label = "Create video"
+    bl_description = "Create a video in wizard"
+    
+    def execute(self, context):
+        wizard_video.invoke_settings_widget()
+        return {'FINISHED'}
+
 class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
     bl_label = "Import"
 
@@ -350,6 +361,10 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
         layout.operator("wizard.set_frame_rate", icon_value=wizard_icons["set_frame_rate"].icon_id)
         layout.operator("wizard.set_frame_range", icon_value=wizard_icons["set_frame_range"].icon_id)
         layout.operator("wizard.set_frame_range_with_rolls", icon_value=wizard_icons["set_frame_range"].icon_id)
+        
+        layout.separator()
+
+        layout.operator("wizard.create_video", icon_value=wizard_icons["video"].icon_id)
 
     def menu_draw(self, context):
         self.layout.menu("TOPBAR_MT_wizard_menu")
@@ -380,6 +395,7 @@ classes = (save_increment,
                 set_frame_rate,
                 set_frame_range,
                 set_frame_range_with_rolls,
+                create_video,
                 TOPBAR_MT_wizard_import_submenu,
                 TOPBAR_MT_wizard_update_submenu,
                 TOPBAR_MT_wizard_menu)
@@ -410,6 +426,7 @@ def register():
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("set_frame_rate", 'icons/set_frame_rate.png', 'IMAGE')
     wizard_icons.load("set_frame_range", 'icons/set_frame_range.png', 'IMAGE')
+    wizard_icons.load("video", 'icons/video.png', 'IMAGE')
 
 def unregister():
     # Unregister classes

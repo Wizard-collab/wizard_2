@@ -54,6 +54,7 @@ from wizard.core import project
 from wizard.core import path_utils
 from wizard.core import video
 from wizard.vars import user_vars
+from wizard.vars import ressources
 logger = logging.getLogger(__name__)
 
 class communicate_server(Thread):
@@ -144,6 +145,8 @@ class communicate_server(Thread):
                                     signal_dic['focal_lengths_dic'])
         elif signal_dic['function'] == 'screen_over_version':
             returned = screen_over_version(signal_dic['version_id'])
+        elif signal_dic['function'] == 'get_stylesheet':
+            returned = get_stylesheet()
 
         socket_utils.send_signal_with_conn(conn, returned)
 
@@ -247,3 +250,6 @@ def get_export_name_from_reference_namespace(reference_namespace, work_env_id):
     reference_row = project.get_reference_by_namespace(work_env_id, reference_namespace)
     export_name = project.get_export_data(reference_row['export_id'], 'name')
     return export_name
+
+def get_stylesheet():
+    return ressources._stylesheet_

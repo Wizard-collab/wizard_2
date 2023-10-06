@@ -10,11 +10,12 @@ a = Analysis(['change_db_server.py'],
              hiddenimports=['PyQt5.QtPrintSupport'],
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['PyQt5'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
@@ -37,3 +38,5 @@ coll = COLLECT(exe,
                upx=True,
                upx_exclude=[],
                name='Connect Server')
+
+

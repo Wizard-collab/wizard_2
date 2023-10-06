@@ -133,27 +133,23 @@ class compile():
 							'LICENSE',
 							'wapi.py',
 							'dist/PyWizard/PyWizard.exe',
-							#'dist/PyWizard/PyWizard.exe.manifest',
 							'dist/Create Repository/Create Repository.exe',
-							#'dist/Create Repository/Create Repository.exe.manifest',
 							'dist/Change Repository/Change Repository.exe',
-							#'dist/Change Repository/Change Repository.exe.manifest',
 							'dist/Connect Server/Connect Server.exe',
-							#'dist/Connect Server/Connect Server.exe.manifest',
 							'dist/wizard_cmd/wizard_cmd.exe',
-							#'dist/wizard_cmd/wizard_cmd.exe.manifest',
 							'dist/server/server.exe',
-							#'dist/server/server.exe.manifest',
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
-							#'dist/Project Manager/Project Manager.exe.manifest',
 							'dist/error_handler/error_handler.exe'
-							#'dist/error_handler/error_handler.exe.manifest'
 							]
 							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))
 				shutil.copyfile(file, destination)
+
+			import PyQt5
+			qt5_dir = os.path.dirname(PyQt5.__file__)
+			shutil.copytree(qt5_dir, f"{dist_folder}/PyQt5")
 
 			shutil.copytree(dist_folder, self.build_folder)
 

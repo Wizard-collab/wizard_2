@@ -4,7 +4,11 @@
 
 # Python modules
 import os
-from PySide2 import QtWidgets, QtCore, QtGui
+import sys
+try:
+    from PyQt5 import QtWidgets, QtCore, QtGui
+except ModuleNotFoundError:
+    from PySide2 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -12,11 +16,21 @@ import wizard_communicate
 
 logger = logging.getLogger(__name__)
 
+dialog_accepted = QtWidgets.QDialog.Accepted
+
+if not QtWidgets.QApplication.instance():
+    app = QtWidgets.QApplication(sys.argv)
+
 class export_settings_widget(QtWidgets.QDialog):
     def __init__(self, stage_to_export, parent=None):
         super(export_settings_widget, self).__init__(parent)
 
-        self.setWindowTitle(f"Wizard - Batch settings")
+        self.setWindowTitle("Wizard - Batch settings")
+
+        self.icons_dic = dict()
+        self.icons_dic['rigging'] = "icons/rigging.png"
+        self.icons_dic['grooming'] = "icons/grooming.png"
+        self.icons_dic['camrig'] = "icons/camera_rig.png"
 
         self.stages_relations_dic = dict()
         self.stages_relations_dic['animation'] = ['rigging']
@@ -71,7 +85,7 @@ class export_settings_widget(QtWidgets.QDialog):
             for stage in all_references.keys():
                 if stage in stages_list:
                     for reference_row in all_references[stage]:
-                        item = QtWidgets.QListWidgetItem(reference_row['namespace'])
+                        item = QtWidgets.QListWidgetItem(QtGui.QIcon(self.icons_dic[stage]), reference_row['namespace'])
                         self.assets_list.addItem(item)
         else:
             self.need_nspace_list=False
