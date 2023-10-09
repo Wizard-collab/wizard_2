@@ -144,7 +144,8 @@ class communicate_server(Thread):
                                     signal_dic['temp_dir'],
                                     signal_dic['frange'],
                                     signal_dic['version_id'],
-                                    signal_dic['focal_lengths_dic'])
+                                    signal_dic['focal_lengths_dic'],
+                                    signal_dic['comment'])
         elif signal_dic['function'] == 'screen_over_version':
             returned = screen_over_version(signal_dic['version_id'])
         elif signal_dic['function'] == 'get_stylesheet':
@@ -190,9 +191,9 @@ def request_video(work_env_id):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     return video.request_video(variant_id)
 
-def add_video(work_env_id, temp_dir, frange, version_id, focal_lengths_dic=None):
+def add_video(work_env_id, temp_dir, frange, version_id, focal_lengths_dic=None, comment=''):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
-    video_path = video.add_video(variant_id, temp_dir, frange, version_id, focal_lengths_dic)
+    video_path = video.add_video(variant_id, temp_dir, frange, version_id, focal_lengths_dic, comment=comment)
     gui_server.refresh_ui()
     return video_path
 

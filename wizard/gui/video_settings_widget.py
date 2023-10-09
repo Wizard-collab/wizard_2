@@ -37,6 +37,7 @@ class video_settings_widget(QtWidgets.QDialog):
         self.frange = [self.inrollframe_spinBox.value(), self.outrollframe_spinBox.value()]
         self.refresh_assets = self.refresh_assets_checkbox.isChecked()
         self.nspace_list = self.get_selected_nspaces()
+        self.comment = self.comment_textEdit.toPlainText()
         self.accept()
 
     def get_selected_nspaces(self):
@@ -197,6 +198,12 @@ class video_settings_widget(QtWidgets.QDialog):
         self.warning_label.setWordWrap(True)
         self.warning_label.setStyleSheet('color:#ffad4d;')
         self.nspace_list_layout.addWidget(self.warning_label)
+
+        # Comment section
+
+        self.comment_textEdit = QtWidgets.QTextEdit('')
+        self.comment_textEdit.setPlaceholderText("Your comment")
+        self.main_layout.addWidget(self.comment_textEdit)
 
         # Buttons sections
 

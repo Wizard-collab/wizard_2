@@ -22,19 +22,19 @@ def invoke_settings_widget(*args):
         nspace_list = video_settings_widget_win.nspace_list
         create_video(frange)
 
-def create_video(frange):
+def create_video(frange, comment=''):
     directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
     logger.info("Creating video files at {}...".format(directory))
-    if not export_pngs(directory, frange):
+    if not export_pngs(directory, frange, comment=comment):
         return
 
-def after_render(directory, frange, video_node):
-    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']))
+def after_render(directory, frange, video_node, comment=''):
+    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']), comment=comment)
     nuke.removeAfterRender(after_render, args=(directory, frange, video_node))
     nuke.removeAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
     nuke.delete(video_node)
 
-def export_pngs(directory, frange):
+def export_pngs(directory, frange, comment=''):
     image_format = wizard_communicate.get_image_format()
 
     viewer = get_viewer()
@@ -45,7 +45,7 @@ def export_pngs(directory, frange):
     file = f"{directory}/tmp_%04d.png"
     video_node['file'].setValue(file)
     video_node.knob('afterRender')
-    nuke.addAfterRender(after_render, args=(directory, frange, video_node))
+    nuke.addAfterRender(after_render, args=(directory, frange, video_node, comment))
     nuke.addAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
     nuke.execute(video_node, frange[0], frange[1], 1)
 

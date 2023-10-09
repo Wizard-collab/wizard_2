@@ -183,6 +183,7 @@ class popup_save_widget(QtWidgets.QFrame):
     def fill_ui(self):
         version_row = project.get_version_data(self.version_id)
         self.comment_textEdit.setText(version_row['comment'])
+        self.update_comment_validity()
         self.version_name_label.setText(f"Version {version_row['name']}")
         if user.user().get_popups_blink_enabled():
             self.start_blink()
@@ -364,6 +365,9 @@ class popup_event_widget(QtWidgets.QFrame):
             profile_color = '#B988F3'
             if self.event_row['creation_user'] == environment.get_user():
                 self.comment_widget.setVisible(True)
+                if self.event_row['message'] is not None and self.event_row['message'] != '':
+                    self.comment_textEdit.setText(self.event_row['message'])
+                    self.update_comment_validity()
                 self.is_comment = True
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'

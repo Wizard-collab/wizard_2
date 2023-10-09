@@ -50,7 +50,8 @@ def main():
             logger.error("nspace_list parameter not found")
             return
         wizard_video.create_videos(settings_dic['frange'],
-                                    settings_dic['nspace_list'])
+                                    settings_dic['nspace_list'],
+                                    comment=comment)
     if settings_dic['batch_type'] == 'import_update_and_save':
         wizard_plugin.reference_and_update_all()
         wizard_plugin.save_increment(comment=comment)

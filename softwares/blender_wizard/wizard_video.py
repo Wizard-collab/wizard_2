@@ -22,28 +22,28 @@ def invoke_settings_widget(*args):
         nspace_list = video_settings_widget_win.nspace_list
         create_videos(frange, nspace_list)
 
-def create_videos(frange, nspace_list):
+def create_videos(frange, nspace_list, comment=''):
     if nspace_list == []:
         camera = select_default_cam()
         if not camera:
             logger.warning(f"No camera found.")
             return
-        create_video(frange, camera)
+        create_video(frange, camera, comment=comment)
         return
     for nspace in nspace_list:
         camera = select_cam(nspace)
         if not camera:
             logger.warning(f"Skipping video for {nspace}, camera not found")
             return
-        create_video(frange, camera)
+        create_video(frange, camera, comment=comment)
 
-def create_video(frange, camera):
+def create_video(frange, camera, comment=''):
     directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
     logger.info("Playblasting at {}...".format(directory))
     bpy.context.scene.camera = camera
     playblast(directory, frange)
     focal_lengths_dic = get_focal_length(frange, camera)
-    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']), focal_lengths_dic=focal_lengths_dic)
+    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']), focal_lengths_dic=focal_lengths_dic, comment=comment)
 
 def get_focal_length(frange, camera):
     focal_lengths_dic = dict()

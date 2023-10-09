@@ -47,7 +47,7 @@ def add_video(variant_id, images_directory, frange, version_id, focal_lengths_di
     temp_video_file, to_thumbnail = merge_video(images_directory, frange, version_id, focal_lengths_dic)
     if not temp_video_file:
         return
-    video_id = assets.add_video(variant_id)
+    video_id = assets.add_video(variant_id, comment=comment)
     video_row = project.get_video_data(video_id)
     video_path = video_row['file_path']
     thumbnail_path = video_row['thumbnail_path']
