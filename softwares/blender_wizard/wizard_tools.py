@@ -19,8 +19,8 @@ def get_file_dir(file):
     directory.replace('\\', '/')
     return directory
 
-def save_increment():
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
+def save_increment(comment=''):
+    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']), comment)
     if file_path and version_id:
         logger.info("Saving file {}".format(file_path))
         bpy.ops.wm.save_as_mainfile(filepath=file_path)

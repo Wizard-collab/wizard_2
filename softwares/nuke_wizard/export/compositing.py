@@ -15,14 +15,14 @@ from nuke_wizard import wizard_export
 
 # Nuke modules
 
-def main(frange):
+def main(frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         export_name = 'main'
         asset_name = os.environ['wizard_asset_name']
         exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
         wizard_export.trigger_before_export_hook('lighting', exported_string_asset)
-        wizard_export.export('lighting', export_name, exported_string_asset, frange)
+        wizard_export.export('lighting', export_name, exported_string_asset, frange, comment=comment)
     except:
         logger.error(str(traceback.format_exc()))
     finally:

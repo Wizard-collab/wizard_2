@@ -23,8 +23,8 @@ from houdini_wizard.export import layout
 from houdini_wizard.export import cfx
 from houdini_wizard.export import fx
 
-def save_increment():
-    wizard_tools.save_increment()
+def save_increment(comment=''):
+    wizard_tools.save_increment(comment=comment)
 
 def export():
     stage_name = os.environ['wizard_stage_name']

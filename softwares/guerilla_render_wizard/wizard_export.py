@@ -20,7 +20,7 @@ from guerilla_render_wizard import wizard_tools
 def __init__():
     pass
 
-def export(stage_name, export_name, exported_string_asset, export_GRP_list):
+def export(stage_name, export_name, exported_string_asset, export_GRP_list, comment=''):
     if trigger_sanity_hook(stage_name, exported_string_asset):
         export_file = wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                                                     export_name)
@@ -28,7 +28,8 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list):
         export_dir = wizard_communicate.add_export_version(export_name,
                                                             [export_file],
                                                             int(os.environ['wizard_work_env_id']),
-                                                            int(os.environ['wizard_version_id']))
+                                                            int(os.environ['wizard_version_id']),
+                                                            comment=comment)
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def prepare_render(stage_name, export_name):

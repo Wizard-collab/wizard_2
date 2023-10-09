@@ -223,7 +223,6 @@ class subtask(Thread):
         datas_dic[self.process_id]['current_task'] = self.current_task
         datas_dic[self.process_id]['percent'] = self.percent
         datas_dic[self.process_id]['log_file'] = log_file
-        print(datas_dic)
         with open(subtasks_datas_file, 'w') as f:
             yaml.dump(datas_dic, f)
 
@@ -276,7 +275,6 @@ class subtask(Thread):
             self.check_realtime_output()
             self.analyse_missed_stdout()
             self.task_time = time.perf_counter()-start_time
-            logger.info(self.task_time)
             self.running = False
             self.write_log()
             self.communicate_thread.send_signal([self.process_id, 'end', 1])

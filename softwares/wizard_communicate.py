@@ -29,11 +29,12 @@ def get_port():
         logging.error('No communicate server port defined')
         return None
 
-def add_version(work_env_id):
+def add_version(work_env_id, comment=''):
     # Send a new version request to wizard
     # Wizard return a file path 
     signal_dic=dict()
     signal_dic['function'] = 'add_version'
+    signal_dic['comment'] = comment
     signal_dic['work_env_id'] = work_env_id
     file_path, version_id = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return file_path, version_id

@@ -25,8 +25,8 @@ from blender_wizard.export import animation
 from blender_wizard.export import camrig
 from blender_wizard.export import camera
 
-def save_increment():
-    wizard_tools.save_increment()
+def save_increment(comment=''):
+    wizard_tools.save_increment(comment)
 
 def export():
     stage_name = os.environ['wizard_stage_name']
@@ -63,6 +63,18 @@ def import_and_update_all():
     reference_camera(references)
     reference_custom(references)
     reference_camrig(references)
+    update_texturing(references)
+    update_modeling(references)
+    update_rigging(references)
+    update_shading(references)
+    refupdate_layout(references)
+    refupdate_animation(references)
+    refupdate_camera(references)
+    update_custom(references)
+    update_camrig(references)
+
+def update_all():
+    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     update_texturing(references)
     update_modeling(references)
     update_rigging(references)

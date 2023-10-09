@@ -31,6 +31,9 @@ def main():
         logger.error("Batch settings dic not found")
         return
     settings_dic = json.loads(os.environ['wizard_json_settings'])
+    comment=''
+    if 'comment' in settings_dic.keys():
+        comment = settings_dic['comment']
     if 'refresh_assets' in settings_dic.keys():
         if settings_dic['refresh_assets']:
             wizard_plugin.update_all()
@@ -46,6 +49,9 @@ def main():
             logger.error("nspace_list parameter not found")
             return
         wizard_video.create_video(settings_dic['frange'])
+    if settings_dic['batch_type'] == 'import_update_and_save':
+        wizard_plugin.reference_and_update_all()
+        wizard_plugin.save_increment(comment=comment)
     if settings_dic['batch_type'] == 'export':
         if 'frange' not in settings_dic.keys():
             logger.error("frange parameter not found")
@@ -58,9 +64,9 @@ def main():
             return
         stage_name = settings_dic['stage_to_export']
         if stage_name == 'compositing':
-            compositing.main(frange=settings_dic['frange'])
+            compositing.main(frange=settings_dic['frange'], comment=comment)
         elif stage_name == 'custom':
-            custom.main()
+            custom.main(comment=comment)
         else:
             logger.warning("Unplugged stage : {}".format(stage_name))
             return

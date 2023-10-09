@@ -18,8 +18,8 @@ import nukescripts
 import wizard_communicate
 import wizard_hooks
 
-def save_increment():
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
+def save_increment(comment=''):
+    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']), comment=comment)
     if file_path and version_id:
         logger.debug("Saving file {}".format(file_path))
         nuke.scriptSaveAs(file_path)

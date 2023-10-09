@@ -16,7 +16,7 @@ from blender_wizard import wizard_export
 # Blender modules
 import bpy
 
-def main():
+def main(comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
 
@@ -45,7 +45,7 @@ def main():
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
 
-            wizard_export.export('shading', export_name, exported_string_asset, export_GRP_list)
+            wizard_export.export('shading', export_name, exported_string_asset, export_GRP_list, comment=comment)
     except:
         logger.error(str(traceback.format_exc()))
     finally:

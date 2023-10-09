@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - debug
+    - Animation import and update in blender
+  time: 1696605543.4413295
+'3.2.0.279':
+  update_list:
+  - !!python/tuple
     - new
     - Wizard server automatically get the local ip. Local ip also visible in user preferences.
   - !!python/tuple

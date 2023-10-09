@@ -13,7 +13,7 @@ import wizard_communicate
 from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard import wizard_export
 
-def main():
+def main(comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         groups_dic = wizard_tools.get_export_grps('custom_GRP')
@@ -29,7 +29,7 @@ def main():
             export_GRP_node.rename(asset_name)
             additionnal_objects = wizard_export.trigger_before_export_hook('custom', exported_string_asset)
             export_objects_list = [asset_name]+additionnal_objects
-            wizard_export.export('custom', export_name, exported_string_asset, export_objects_list)
+            wizard_export.export('custom', export_name, exported_string_asset, export_objects_list, comment=comment)
             export_GRP_node.rename(grp_name)
     except:
         logger.error(str(traceback.format_exc()))

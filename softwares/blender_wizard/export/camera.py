@@ -18,7 +18,7 @@ from blender_wizard import wizard_export
 # Blender modules
 import bpy
 
-def main(nspace_list, frange):
+def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         at_least_one = False
@@ -28,7 +28,7 @@ def main(nspace_list, frange):
                 percent_factor = (camrig_references.index(camrig_reference), len(camrig_references))
                 if camrig_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_camera(camrig_reference, frange, percent_factor)
+                    export_camera(camrig_reference, frange, percent_factor, comment)
             if not at_least_one:
                 logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
         else:
@@ -46,7 +46,7 @@ def invoke_settings_widget():
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
 
-def export_camera(camrig_reference, frange, percent_factor):
+def export_camera(camrig_reference, frange, percent_factor, comment=''):
     camrig_nspace = camrig_reference['namespace']
     asset_name = camrig_reference['asset_name']
     exported_string_asset = camrig_reference['string_stage']
@@ -62,7 +62,7 @@ def export_camera(camrig_reference, frange, percent_factor):
             additionnal_objects = wizard_export.trigger_before_export_hook('camera', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, count)
-            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list, frange, custom_work_env_id = camera_work_env_id)
+            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list, frange, custom_work_env_id = camera_work_env_id, comment=comment)
         else:
             logger.warning("No objects to export in '{}/render_set' collection".format(camrig_nspace))
 

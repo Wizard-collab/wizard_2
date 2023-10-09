@@ -11,7 +11,6 @@ import wizard_hooks
 from blender_wizard import redshift_shader
 from blender_wizard import cycles_shader
 from blender_wizard import wizard_tools
-from blender_wizard import animation
 
 # Python modules
 import traceback
@@ -75,12 +74,10 @@ def update_layout(reference_dic):
     update_reference(reference_dic, 'LAYOUT')  
 
 def import_animation(reference_dic):
-    #create_reference(reference_dic, 'ANIMATION')  
-    animation.import_animation_cache(reference_dic)
+    create_reference(reference_dic, 'ANIMATION')  
 
 def update_animation(reference_dic):
-    #update_reference(reference_dic, 'ANIMATION')  
-    animation.update_animation_cache(reference_dic)
+    update_reference(reference_dic, 'ANIMATION')  
 
 def import_camera(reference_dic):
     create_reference(reference_dic, 'CAMERA')  
@@ -102,7 +99,7 @@ def create_reference(reference_dic, referenced_stage):
         wizard_tools.set_collection_active(namespace_collection)
         for file in reference_dic['files']:
             if file.endswith('.abc'):
-                import_abc(file, namespace_collection)
+                import_abc(file, reference_dic, namespace_collection)
             elif file.endswith('.blend'):
                 link_blend(file, reference_dic, namespace_collection)
             else:
@@ -119,6 +116,8 @@ def update_reference(reference_dic, referenced_stage):
         for file in reference_dic['files']:
             if file.endswith('.blend'):
                 update_blend(file, reference_dic['namespace'])
+            if file.endswith('.abc'):
+                update_abc(file, reference_dic['namespace'])
             else:
                 logger.info('{} extension is not updatable'.format(file))
         trigger_after_reference_hook(referenced_stage.lower(),
@@ -127,11 +126,22 @@ def update_reference(reference_dic, referenced_stage):
                                     wizard_tools.get_new_objects(old_objects),
                                     reference_dic['string_stage'])
 
-def import_abc(file_path, parent_collection=None):
+def import_abc(file_path, reference_dic, parent_collection=None):
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection
     bpy.ops.object.select_all(action='DESELECT')
-    bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False)
+    bpy.ops.wm.alembic_import(filepath=file_path, as_background_job=False, always_add_cache_reader=True)
+    cache = bpy.data.cache_files[os.path.basename(file_path)]
+    cache.name = f"{reference_dic['namespace']}:cache_file"
+    return cache
+
+def update_abc(file_path, namespace):
+    file_cache_name = f"{namespace}:cache_file"
+    if file_cache_name not in bpy.data.cache_files.keys():
+        logger.warning(f"{file_cache_name} not found. Can't update Alembic file.")
+        return
+    cache = bpy.data.cache_files[file_cache_name]
+    cache.filepath = file_path
 
 def link_blend(file_path, reference_dic, parent_collection=None):
     if wizard_tools.find_library(file_path):

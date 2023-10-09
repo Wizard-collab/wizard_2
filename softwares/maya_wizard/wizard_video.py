@@ -68,7 +68,6 @@ def select_cam(nspace):
 
 def select_default_cam():
     perspCameras = pm.listCameras( p=True )
-    print(perspCameras)
     if len(perspCameras) > 1:
         perspCameras.remove('persp')
     camera = perspCameras[0]

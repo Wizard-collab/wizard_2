@@ -18,7 +18,7 @@ import substance_painter.logging as logging
 import wizard_communicate
 import wizard_hooks
 
-def export_textures(material, size, file_type) :
+def export_textures(material, size, file_type, comment='') :
     if file_type == 'exr':
         bitdepth = '32'
     else:
@@ -44,7 +44,8 @@ def export_textures(material, size, file_type) :
         export_dir = wizard_communicate.add_export_version(export_name,
                                                                 exported_files,
                                                                 int(os.environ['wizard_work_env_id']),
-                                                                int(os.environ['wizard_version_id']))
+                                                                int(os.environ['wizard_version_id']),
+                                                                comment=comment)
 
         trigger_after_export_hook('texturing', export_dir)
 

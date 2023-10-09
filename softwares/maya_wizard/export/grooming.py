@@ -16,7 +16,7 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main():
+def main(comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         groups_dic = wizard_tools.get_export_grps('grooming_GRP')
@@ -33,7 +33,7 @@ def main():
             exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
             additionnal_objects = wizard_export.trigger_before_export_hook('grooming', exported_string_asset)
             export_GRP_list += additionnal_objects
-            wizard_export.export('grooming', export_name, exported_string_asset, export_GRP_list)
+            wizard_export.export('grooming', export_name, exported_string_asset, export_GRP_list, comment=comment)
             grooming_GRP_node.rename(grp_name)
     except:
         logger.error(str(traceback.format_exc()))

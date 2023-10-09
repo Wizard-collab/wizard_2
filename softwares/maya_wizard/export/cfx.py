@@ -17,13 +17,13 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main(nspace_list, frange):
+def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         if wizard_communicate.get_export_format(os.environ['wizard_work_env_id']) == 'fur':
-            main_fur(nspace_list, frange)
+            main_fur(nspace_list, frange, comment=comment)
         elif wizard_communicate.get_export_format(os.environ['wizard_work_env_id']) == 'abc':
-            main_abc(nspace_list, frange)
+            main_abc(nspace_list, frange, comment=comment)
     except:
         logger.error(str(traceback.format_exc()))
     finally:
@@ -37,7 +37,7 @@ def main_fur(nspace_list, frange):
             percent_factor = (references.index(reference), len(references))
             if reference['namespace'] in nspace_list:
                 at_least_one = True
-                export_fur(reference, frange, percent_factor)
+                export_fur(reference, frange, percent_factor, comment=comment)
         if not at_least_one:
             logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
     else:
@@ -51,7 +51,7 @@ def main_abc(nspace_list, frange):
             percent_factor = (references.index(reference), len(references))
             if reference['namespace'] in nspace_list:
                 at_least_one = True
-                export_cfx_abc(reference, frange, percent_factor)
+                export_cfx_abc(reference, frange, percent_factor, comment=comment)
         if not at_least_one:
             logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
     else:
@@ -66,7 +66,7 @@ def invoke_settings_widget():
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
 
-def export_fur(grooming_reference, frange, percent_factor):
+def export_fur(grooming_reference, frange, percent_factor, comment=''):
     grooming_nspace = grooming_reference['namespace']
     asset_name = grooming_reference['asset_name']
     exported_string_asset = grooming_reference['string_stage']
@@ -78,11 +78,11 @@ def export_fur(grooming_reference, frange, percent_factor):
             additionnal_objects = wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, count)
-            wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
+            wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor, comment=comment)
         else:
             logger.warning("No objects to export in '{}:yeti_nodes_set'".format(grooming_nspace))
 
-def export_cfx_abc(reference, frange, percent_factor):
+def export_cfx_abc(reference, frange, percent_factor, comment=''):
     nspace = reference['namespace']
     asset_name = reference['asset_name']
     exported_string_asset = reference['string_stage']
@@ -94,7 +94,7 @@ def export_cfx_abc(reference, frange, percent_factor):
             additionnal_objects = wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, count)
-            wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
+            wizard_export.export('cfx', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor, comment=comment)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(nspace))
 

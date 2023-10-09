@@ -68,8 +68,8 @@ def check_obj_list_existence(object_list):
             success = False
     return success
 
-def save_increment(*args):
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']))
+def save_increment(comment=''):
+    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']), comment=comment)
     if file_path and version_id:
         logger.info("Saving file {}".format(file_path))
         pm.saveAs(file_path)

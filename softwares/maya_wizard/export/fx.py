@@ -16,7 +16,7 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main(frange):
+def main(frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         groups_dic = wizard_tools.get_export_grps('fx_GRP')
@@ -39,7 +39,7 @@ def main(frange):
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
 
-            wizard_export.export('fx', export_name, exported_string_asset, export_GRP_list, frange=frange)
+            wizard_export.export('fx', export_name, exported_string_asset, export_GRP_list, frange=frange, comment=comment)
             grp_obj.rename(grp_name)
     except:
         logger.error(str(traceback.format_exc()))

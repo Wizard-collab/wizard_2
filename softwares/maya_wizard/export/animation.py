@@ -17,7 +17,7 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main(nspace_list, frange):
+def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         at_least_one = False
@@ -27,7 +27,7 @@ def main(nspace_list, frange):
                 percent_factor = (rigging_references.index(rigging_reference), len(rigging_references))
                 if rigging_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_animation(rigging_reference, frange, percent_factor)
+                    export_animation(rigging_reference, frange, percent_factor, comment=comment)
             if not at_least_one:
                 logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
         else:
@@ -45,7 +45,7 @@ def invoke_settings_widget():
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
 
-def export_animation(rigging_reference, frange, percent_factor):
+def export_animation(rigging_reference, frange, percent_factor, comment=''):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     exported_string_asset = rigging_reference['string_stage']
@@ -57,7 +57,7 @@ def export_animation(rigging_reference, frange, percent_factor):
             additionnal_objects = wizard_export.trigger_before_export_hook('animation', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, count)
-            wizard_export.export('animation', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor)
+            wizard_export.export('animation', export_name, exported_string_asset, export_GRP_list, frange, percent_factor=percent_factor, comment=comment)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(rig_nspace))
 

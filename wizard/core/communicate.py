@@ -90,7 +90,8 @@ class communicate_server(Thread):
         signal_dic = json.loads(signal_as_str)
 
         if signal_dic['function'] == 'add_version':
-            returned = add_version(signal_dic['work_env_id'])
+            returned = add_version(signal_dic['work_env_id'],
+                                    signal_dic['comment'])
         elif signal_dic['function'] == 'get_file':
             returned = get_file(signal_dic['version_id'])
         elif signal_dic['function'] == 'request_export':
@@ -163,10 +164,10 @@ def screen_over_version(version_id):
     success = assets.screen_over_version(version_id)
     return success
 
-def add_version(work_env_id):
+def add_version(work_env_id, comment):
     # Add a version using the 'assets' module and return the file path 
     # of the new version
-    version_id = assets.add_version(work_env_id, analyse_comment=False)
+    version_id = assets.add_version(work_env_id, comment=comment, analyse_comment=False)
     if not version_id:
         return (None, None)
     version_path = project.get_version_data(version_id,

@@ -18,8 +18,8 @@ from nuke_wizard import wizard_reference
 from nuke_wizard.export import compositing
 from nuke_wizard.export import custom
 
-def save_increment():
-    wizard_tools.save_increment()
+def save_increment(comment=''):
+    wizard_tools.save_increment(comment=comment)
 
 def export():
     stage_name = os.environ['wizard_stage_name']

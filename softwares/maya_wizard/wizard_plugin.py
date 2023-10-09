@@ -26,8 +26,8 @@ from maya_wizard.export import cfx
 from maya_wizard.export import fx
 from maya_wizard.export import camera
 
-def save_increment(*args):
-    wizard_tools.save_increment()
+def save_increment(comment=''):
+    wizard_tools.save_increment(comment=comment)
 
 def export(*args):
     stage_name = os.environ['wizard_stage_name']

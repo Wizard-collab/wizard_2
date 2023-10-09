@@ -90,6 +90,10 @@ QComboBox::down-arrow {
     height: 15px;
 }
 
+QCheckBox {
+	background-color: transparent;
+}
+
 QCheckBox::indicator {
     width: 20px;
     height: 20px;

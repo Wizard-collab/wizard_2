@@ -16,7 +16,7 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main():
+def main(comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         groups_dic = wizard_tools.get_export_grps('camrig_GRP')
@@ -40,7 +40,7 @@ def main():
                 exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
                 additionnal_objects = wizard_export.trigger_before_export_hook('camrig', exported_string_asset)
                 export_GRP_list += additionnal_objects
-                wizard_export.export('camrig', export_name, exported_string_asset, export_GRP_list)
+                wizard_export.export('camrig', export_name, exported_string_asset, export_GRP_list, comment=comment)
                 rigging_GRP_node.rename(grp_name)
                 render_set_node.rename(render_set)
                 if main_render_set_obj is not None:

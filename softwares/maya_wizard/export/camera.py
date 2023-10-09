@@ -17,7 +17,7 @@ from maya_wizard import wizard_export
 # Maya modules
 import pymel.core as pm
 
-def main(nspace_list, frange):
+def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         at_least_one = False
@@ -26,7 +26,7 @@ def main(nspace_list, frange):
             for camrig_reference in camrig_references:
                 if camrig_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_camera(camrig_reference, frange)
+                    export_camera(camrig_reference, frange, comment=comment)
             if not at_least_one:
                 logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
         else:
@@ -60,7 +60,7 @@ def export_camera(camrig_reference, frange):
             additionnal_objects = wizard_export.trigger_before_export_hook('camera', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, count)
-            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list, frange, custom_work_env_id = camera_work_env_id)
+            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list, frange, custom_work_env_id = camera_work_env_id, comment=comment)
         else:
             logger.warning("No objects to export in '{}:render_set'".format(camrig_nspace))
 

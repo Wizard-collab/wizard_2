@@ -16,7 +16,7 @@ import wizard_hooks
 import wizard_communicate
 from nuke_wizard import wizard_tools
 
-def export(stage_name, export_name, exported_string_asset, frange=[0,0], custom_work_env_id = None):
+def export(stage_name, export_name, exported_string_asset, frange=[0,0], custom_work_env_id = None, comment=''):
     if trigger_sanity_hook(stage_name, exported_string_asset):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
@@ -33,7 +33,8 @@ def export(stage_name, export_name, exported_string_asset, frange=[0,0], custom_
             export_dir = wizard_communicate.add_export_version(export_name,
                                                     [export_file],
                                                     work_env_id,
-                                                    int(os.environ['wizard_version_id']))
+                                                    int(os.environ['wizard_version_id']),
+                                                    comment=comment)
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
 def export_by_extension(export_file, frange):

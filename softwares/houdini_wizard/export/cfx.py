@@ -13,7 +13,7 @@ import wizard_communicate
 from houdini_wizard import wizard_tools
 from houdini_wizard import wizard_export
 
-def main(nspace_list, frange):
+def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
         at_least_one = False
@@ -22,7 +22,7 @@ def main(nspace_list, frange):
             for rigging_reference in rigging_references:
                 if rigging_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_cfx(rigging_reference, frange)
+                    export_cfx(rigging_reference, frange, comment=comment)
             if not at_least_one:
                 logger.warning(f"Nothing to export from namespace list : {nspace_list}")
         else:
@@ -40,7 +40,7 @@ def invoke_settings_widget():
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
 
-def export_cfx(rigging_reference, frange):
+def export_cfx(rigging_reference, frange, comment=''):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
@@ -55,7 +55,7 @@ def export_cfx(rigging_reference, frange):
         logger.info(f"Exporting {rig_nspace} | {out_node_name}")
         wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
         export_name = buid_export_name(asset_name, variant_name, count, out_nodes_dic[out_node_name])
-        wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name, exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace)
+        wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name, exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace, comment=comment)
 
 def buid_export_name(asset_name, variant_name, count, additionnal_name):
     if variant_name == 'main':

@@ -34,6 +34,8 @@ class tag_label(QtWidgets.QWidget):
         self.tokens = []
 
     def setText(self, text):
+        if text is None:
+            text = ''
         self.text = text
         self.parse_tokens()
         self.calculate_height()

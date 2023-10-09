@@ -24,6 +24,9 @@ def main():
         logger.error("Batch settings dic not found")
         return
     settings_dic = json.loads(os.environ['wizard_json_settings'])
+    comment=''
+    if 'comment' in settings_dic.keys():
+        comment = settings_dic['comment']
     if 'refresh_assets' in settings_dic.keys():
         if settings_dic['refresh_assets']:
             wizard_plugin.update_all()
@@ -40,6 +43,9 @@ def main():
             return
         logger.warning("Video not plugged for guerilla render. Quitting")
         return
+    if settings_dic['batch_type'] == 'import_update_and_save':
+        wizard_plugin.reference_and_update_all()
+        wizard_plugin.save_increment(comment=comment)
     if settings_dic['batch_type'] == 'export':
         if 'frange' not in settings_dic.keys():
             logger.error("frange parameter not found")
@@ -52,9 +58,9 @@ def main():
             return
         stage_name = settings_dic['stage_to_export']
         if stage_name == 'shading':
-            shading.main()
+            shading.main(comment=comment)
         elif stage_name == 'custom':
-            custom.main()
+            custom.main(comment=comment)
         elif stage_name == 'lighting':
             if 'render_type' not in settings_dic.keys():
                 logger.error("render_type parameter not found")

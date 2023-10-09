@@ -1,7 +1,7 @@
-BUILDS: 278
+BUILDS: 280
 MAJOR: 3
 MINOR: 2
-PATCH: 0
-builds: 278
-date: 1696537628.7046094
-setup_name: 3.2.0.0278-setup.exe
+PATCH: 1
+builds: 280
+date: 1696605618.3616092
+setup_name: 3.2.1.0280-setup.exe

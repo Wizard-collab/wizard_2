@@ -20,8 +20,8 @@ from guerilla_render_wizard.export import lighting
 # Guerilla modules
 from guerilla import Document, pynode
 
-def save_increment():
-    wizard_tools.save_increment()
+def save_increment(comment=''):
+    wizard_tools.save_increment(comment=comment)
 
 def export():
     stage_name = os.environ['wizard_stage_name']
