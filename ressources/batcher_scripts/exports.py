@@ -111,8 +111,8 @@ then click on execute""")
     def execute(self):
         stage_ids = self.get_selected_stages_ids()
         refresh_assets = self.refresh_assets_checkbox.isChecked()
-        command = "from ressources.batcher_scripts import update_and_export\n"
-        command += f"update_and_export.main({stage_ids}, {refresh_assets})"
+        command = "from ressources.batcher_scripts import exports\n"
+        command += f"exports.main({stage_ids}, {refresh_assets})"
         on_deadline = self.deadline_checkbox.isChecked()
         if on_deadline:
             deadline.submit_job(command, "TEST BATCHER")

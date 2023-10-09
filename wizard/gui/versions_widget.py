@@ -316,6 +316,7 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['frange'] = self.batch_settings_widget.frange
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
+                settings_dic['comment'] = self.batch_settings_widget.comment
                 settings_dic['stage_to_export'] = stage
 
                 if self.batch_settings_widget.need_render_type:
@@ -349,6 +350,7 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['frange'] = self.batch_settings_widget.frange
                 settings_dic['refresh_assets'] = self.batch_settings_widget.refresh_assets
                 settings_dic['nspace_list'] = self.batch_settings_widget.nspace_list
+                settings_dic['comment'] = self.batch_settings_widget.comment
                 settings_dic['stage_to_export'] = 'camera'
 
                 if self.batch_settings_widget.deadline:

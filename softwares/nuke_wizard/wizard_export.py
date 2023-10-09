@@ -24,7 +24,7 @@ def export(stage_name, export_name, exported_string_asset, frange=[0,0], custom_
             work_env_id = int(os.environ['wizard_work_env_id'])
 
         if wizard_communicate.get_export_format(work_env_id) == 'exr':
-            export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']), export_name)
+            export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']), export_name, comment=comment)
             export_exr(export_dir, frange)
         else:
             export_file = wizard_communicate.request_export(work_env_id,

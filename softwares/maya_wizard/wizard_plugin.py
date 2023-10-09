@@ -26,7 +26,7 @@ from maya_wizard.export import cfx
 from maya_wizard.export import fx
 from maya_wizard.export import camera
 
-def save_increment(comment=''):
+def save_increment(*args, comment=''):
     wizard_tools.save_increment(comment=comment)
 
 def export(*args):

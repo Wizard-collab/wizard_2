@@ -49,6 +49,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.render_type = self.render_type_combo.currentText()
         self.guerilla_deadline = self.guerilla_deadline_checkbox.isChecked()
         self.deadline = self.deadline_checkbox.isChecked()
+        self.comment = self.comment_textEdit.toPlainText()
         if (len(self.nspace_list) > 0) and self.need_nspace_list:
             self.accept()
         elif not self.need_nspace_list:
@@ -274,6 +275,12 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.deadline_checkbox = QtWidgets.QCheckBox('Submit to deadline')
         self.deadline_checkbox.setObjectName('transparent_widget')
         self.deadline_layout.addWidget(self.deadline_checkbox)
+
+        # Comment section
+
+        self.comment_textEdit = QtWidgets.QTextEdit('')
+        self.comment_textEdit.setPlaceholderText("Your comment")
+        self.main_layout.addWidget(self.comment_textEdit)
 
         # Buttons sections
 
