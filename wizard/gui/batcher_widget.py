@@ -23,12 +23,26 @@ class batcher_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(batcher_widget, self).__init__(parent)
         self.current_script_widget = None
+        self.scripts_dic = dict()
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Batcher")
 
         self.build_ui()
         self.connect_functions()
+
+    def toggle(self):
+        if self.isVisible():
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+                self.refresh()
+            else:
+                self.hide()
+        else:
+            self.show()
+            self.raise_()
+            self.refresh()
 
     def build_ui(self):
         self.resize(1000, 600)
@@ -51,23 +65,27 @@ class batcher_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.scripts_widgets_frame)
 
     def connect_functions(self):
-        self.scripts_comboBox.currentTextChanged.connect(self.current_batch_script_changed)
+        self.scripts_comboBox.currentTextChanged.connect(self.current_script_item_changed)
 
     def refresh(self):
         scripts = []
-        self.scripts_dic = dict()
         for file in path_utils.listdir("ressources/batcher_scripts"):
             if not file.endswith('.py'):
                 continue
-            scripts.append(path_utils.join("ressources/batcher_scripts", file))
+            script_path = path_utils.join("ressources/batcher_scripts", file)
+            if script_path in scripts:
+                continue
+            scripts.append(script_path)
 
         for script in scripts:
             module = load_module(script)
             batch_script_name = module.name
+            if batch_script_name in self.scripts_dic.keys():
+                continue
             self.scripts_dic[batch_script_name] = module
             self.scripts_comboBox.addItem(QtGui.QIcon(module.icon), batch_script_name)
 
-    def current_batch_script_changed(self):
+    def current_script_item_changed(self):
         if self.current_script_widget is not None:
             self.current_script_widget.setVisible(False)
             self.current_script_widget.setParent(None)

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="500"
+   height="500"
+   viewBox="0 0 132.29167 132.29167"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="assembly_icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="px"
+     inkscape:zoom="0.56057251"
+     inkscape:cx="409.40288"
+     inkscape:cy="142.71124"
+     inkscape:window-width="1920"
+     inkscape:window-height="1121"
+     inkscape:window-x="-7"
+     inkscape:window-y="-7"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5"
+     inkscape:showpageshadow="0"
+     inkscape:deskcolor="#505050" />
+  <defs
+     id="defs2" />
+  <path
+     id="rect2457"
+     style="fill:#ffffff;fill-opacity:0.85;stroke-width:1.49606;stroke-linecap:round;paint-order:stroke fill markers"
+     d="m 50.290989,19.183066 c -3.636813,0 -6.564457,2.928161 -6.564457,6.564974 v 31.709176 c 0,3.636813 2.927644,6.564974 6.564457,6.564974 h 31.709693 c 3.636813,0 6.564457,-2.928161 6.564457,-6.564974 V 25.74804 c 0,-3.636813 -2.927644,-6.564974 -6.564457,-6.564974 z M 25.275462,68.269993 c -3.63681,0 -6.564457,2.927647 -6.564457,6.564457 v 31.70969 c 0,3.63681 2.927647,6.56446 6.564457,6.56446 h 31.709692 c 3.63681,0 6.564457,-2.92765 6.564457,-6.56446 V 74.83445 c 0,-3.63681 -2.927647,-6.564457 -6.564457,-6.564457 z m 50.031054,0 c -3.636809,0 -6.564973,2.927647 -6.564973,6.564457 v 31.70969 c 0,3.63681 2.928164,6.56446 6.564973,6.56446 h 31.709174 c 3.63682,0 6.56497,-2.92765 6.56497,-6.56446 V 74.83445 c 0,-3.63681 -2.92815,-6.564457 -6.56497,-6.564457 z"
+     inkscape:label="assembly_icon" />
+</svg>

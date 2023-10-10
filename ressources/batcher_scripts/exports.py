@@ -45,6 +45,12 @@ then click on execute""")
         self.project_tree.setAlternatingRowColors(True)
         self.main_layout.addWidget(self.project_tree)
 
+        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit.setPlaceholderText("Your comment")
+        self.comment_textEdit.setStyleSheet("background-color:rgba(0,0,0,50)")
+        self.comment_textEdit.setFixedHeight(50)
+        self.main_layout.addWidget(self.comment_textEdit)
+
         self.footer_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.footer_layout)
 
@@ -111,8 +117,9 @@ then click on execute""")
     def execute(self):
         stage_ids = self.get_selected_stages_ids()
         refresh_assets = self.refresh_assets_checkbox.isChecked()
+        comment = self.comment_textEdit.toPlainText()
         command = "from ressources.batcher_scripts import exports\n"
-        command += f"exports.main({stage_ids}, {refresh_assets})"
+        command += f"exports.main({stage_ids}, {refresh_assets}, comment='{comment}')"
         on_deadline = self.deadline_checkbox.isChecked()
         if on_deadline:
             deadline.submit_job(command, "TEST BATCHER")
@@ -120,7 +127,7 @@ then click on execute""")
         task = subtask.subtask(pycmd=command, print_stdout=False)
         task.start()
 
-def main(stages_ids_list, refresh_assets):
+def main(stages_ids_list, refresh_assets, comment=''):
     logger.info("Starting update_and_export batcher script")
     percent = 0.0
     percent_step = 100/len(stages_ids_list)
@@ -158,6 +165,7 @@ def main(stages_ids_list, refresh_assets):
         settings_dic['frange'] = frange
         settings_dic['refresh_assets'] = refresh_assets
         settings_dic['nspace_list'] = namespaces_list
+        settings_dic['comment'] = comment
         settings_dic['stage_to_export'] = stage_row['name']
 
         print(f"wizard_task_name:Exporting {asset_row['name']}/{stage_row['name']}")

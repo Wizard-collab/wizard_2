@@ -3,6 +3,12 @@
   - !!python/tuple
     - debug
     - Animation import and update in blender
+  - !!python/tuple
+    - new
+    - You can now comment before a batch export or a batch video
+  - !!python/tuple
+    - new
+    - Batcher widget
   time: 1696605543.4413295
 '3.2.0.279':
   update_list:

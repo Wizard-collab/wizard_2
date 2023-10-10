@@ -25,6 +25,7 @@ class header_widget(QtWidgets.QFrame):
     show_quotes_manager = pyqtSignal(object)
     show_tables_viewer = pyqtSignal(object)
     show_groups_manager = pyqtSignal(object)
+    show_batcher = pyqtSignal(object)
     show_console = pyqtSignal(object)
     show_user_preferences = pyqtSignal(object)
     show_project_preferences = pyqtSignal(object)
@@ -67,6 +68,7 @@ class header_widget(QtWidgets.QFrame):
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
         self.production_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._production_manager_icon_), "Production manager")
         self.groups_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._group_icon_), "Groups manager")
+        self.batcher_action = self.window_action.addAction(QtGui.QIcon(ressources._batcher_icon_), "Batcher")
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
         self.subtask_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._tasks_icon_), "Subtask manager")
         self.championship_action = self.window_action.addAction(QtGui.QIcon(ressources._artefacts_icon_), "Championship")
@@ -111,6 +113,7 @@ class header_widget(QtWidgets.QFrame):
         self.production_manager_action.triggered.connect(self.show_production_manager.emit)
         self.table_viewer_action.triggered.connect(self.show_tables_viewer.emit)
         self.groups_manager_action.triggered.connect(self.show_groups_manager.emit)
+        self.batcher_action.triggered.connect(self.show_batcher.emit)
         self.documentation_action.triggered.connect(self.show_documentation.emit)
 
     def change_user(self):

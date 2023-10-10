@@ -18,7 +18,7 @@ from wizard.vars import assets_vars
 from wizard.vars import ressources
 
 name = "Create lighting assembly"
-icon = ressources._lighting_icon_
+icon = ressources._assembly_icon_
 description = """For all the lighting stages selected, reference the animation, layout, camera, fx and cfx export and save the scene
 """
 
@@ -59,6 +59,12 @@ class widget(QtWidgets.QWidget):
         self.additionnal_references_stages_project_tree.setHeaderHidden(True)
         self.additionnal_references_stages_project_tree.setAlternatingRowColors(True)
         self.additionnal_references_stages_layout.addWidget(self.additionnal_references_stages_project_tree)
+
+        self.comment_textEdit = QtWidgets.QTextEdit()
+        self.comment_textEdit.setPlaceholderText("Your comment")
+        self.comment_textEdit.setStyleSheet("background-color:rgba(0,0,0,50)")
+        self.comment_textEdit.setFixedHeight(50)
+        self.main_layout.addWidget(self.comment_textEdit)
 
         self.footer_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.footer_layout)
@@ -160,9 +166,10 @@ class widget(QtWidgets.QWidget):
 
     def execute(self):
         stage_ids = self.get_selected_stages_ids()
+        comment = self.comment_textEdit.toPlainText()
         additionnal_references_stages_ids = self.get_additionnal_references_stages_ids()
         command = "from ressources.batcher_scripts import assembly_lighting\n"
-        command += f"assembly_lighting.main({stage_ids}, {additionnal_references_stages_ids})"
+        command += f"assembly_lighting.main({stage_ids}, {additionnal_references_stages_ids}, comment='{comment}')"
         on_deadline = self.deadline_checkbox.isChecked()
         if on_deadline:
             deadline.submit_job(command, "TEST BATCHER")
@@ -170,7 +177,7 @@ class widget(QtWidgets.QWidget):
         task = subtask.subtask(pycmd=command, print_stdout=False)
         task.start()
 
-def main(stages_ids_list, additionnal_references_stages_ids_list):
+def main(stages_ids_list, additionnal_references_stages_ids_list, comment=''):
     logger.info("Starting update_and_export batcher script")
     percent = 0.0
     percent_step = 100/len(stages_ids_list)
@@ -226,7 +233,7 @@ def main(stages_ids_list, additionnal_references_stages_ids_list):
 
         settings_dic = dict()
         settings_dic['batch_type'] = 'import_update_and_save'
-        settings_dic['comment'] = 'Lighting auto assembly from batcher'
+        settings_dic['comment'] = comment
 
         print(f"wizard_task_name:Exporting camera for {asset_row['name']}/{stage_row['name']}")
         launch_batch.batch_export(last_version_id, settings_dic)

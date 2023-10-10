@@ -60,6 +60,7 @@ from wizard.gui import groups_manager_widget
 from wizard.gui import quotes_manager
 from wizard.gui import table_viewer_widget
 from wizard.gui import floating_widgets_layout
+from wizard.gui import batcher_widget
 from wizard.gui import pranks
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,7 @@ class main_widget(QtWidgets.QWidget):
         self.groups_manager_widget = groups_manager_widget.groups_manager_widget()
         self.quotes_manager = quotes_manager.quotes_manager()
         self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
+        self.batcher_widget = batcher_widget.batcher_widget()
         self.pranks = pranks.pranks()
 
         self.build_ui()
@@ -214,6 +216,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_project_preferences.connect(self.project_preferences_widget.toggle)
         self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
         self.header_widget.show_groups_manager.connect(self.groups_manager_widget.toggle)
+        self.header_widget.show_batcher.connect(self.batcher_widget.toggle)
         self.header_widget.show_tables_viewer.connect(self.table_viewer_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
         self.header_widget.show_championship.connect(self.championship_widget.toggle)

@@ -110,6 +110,7 @@ class subtask(Thread):
             if self.process.poll() is not None:
                 self.running = False
                 self.communicate_thread.send_signal([self.process_id, 'status', 'Done'])
+                self.set_done()
                 break
 
     def analyse_missed_stdout(self):
@@ -148,6 +149,7 @@ class subtask(Thread):
             print(buffered_stdout)
 
     def set_done(self):
+        self.status = 'Done'
         if self.running != True:
             return
         if self.process is None:
