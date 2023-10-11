@@ -578,7 +578,8 @@ def get_variant_by_name(stage_id, name, column='*'):
     variant_row = db_utils.get_row_by_multiple_data('project', 
                                                         'variants', 
                                                         ('name', 'stage_id'), 
-                                                        (name, stage_id))
+                                                        (name, stage_id),
+                                                        column)
     if variant_row is None or len(variant_row) < 1:
         logger.debug("Variant not found")
         return

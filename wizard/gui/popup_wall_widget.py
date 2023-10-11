@@ -212,7 +212,7 @@ class popup_save_widget(QtWidgets.QFrame):
             self.warning_text.setText('Warning, your comment is too short')
         else:
             color = '#95d859'
-            self.warning_text.setText("That's better !")
+            self.warning_text.setText("Perfect !")
         self.comment_textEdit.setStyleSheet('#comment_textEdit{border:1px solid %s}' %color)
         self.warning_text.setStyleSheet('color: %s' %color)
 
@@ -405,7 +405,7 @@ class popup_event_widget(QtWidgets.QFrame):
             self.warning_text.setText('Warning, your comment is too short')
         else:
             color = '#95d859'
-            self.warning_text.setText("That's better !")
+            self.warning_text.setText("Perfect !")
         self.comment_textEdit.setStyleSheet('#comment_textEdit{border:1px solid %s}' %color)
         self.warning_text.setStyleSheet('color: %s' %color)
 

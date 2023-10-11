@@ -23,6 +23,7 @@ from wizard.core import launch
 from wizard.core import team_client
 from wizard.core import path_utils
 from wizard.core import support
+from wizard.core import launch_batch
 
 # Wizard gui modules
 from wizard.gui import gui_utils
