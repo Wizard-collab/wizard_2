@@ -2,6 +2,33 @@
   update_list:
   - !!python/tuple
     - debug
+    - Added 'gproject' for Guerilla Render shading exports
+  - !!python/tuple
+    - new
+    - Popup comment section hidden if there already is a comment
+  - !!python/tuple
+    - new
+    - Possibility to add group in lighting assembly batch script references
+  - !!python/tuple
+    - new
+    - Fbx export from blender now available
+  - !!python/tuple
+    - new
+    - Substance Painter template selection available
+  - !!python/tuple
+    - new
+    - Substance Painter export preset is now selectable from a list
+  - !!python/tuple
+    - new
+    - You can't buy all the stock of an artefact anymore.
+  - !!python/tuple
+    - new
+    - There is now a tax when you give money to a user ( 5% )
+  time: 1697533157.6866894  
+'3.3.0.284':
+  update_list:
+  - !!python/tuple
+    - debug
     - Animation import and update in blender
   - !!python/tuple
     - new

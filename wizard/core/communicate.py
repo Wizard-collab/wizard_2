@@ -169,7 +169,11 @@ def screen_over_version(version_id):
 def add_version(work_env_id, comment):
     # Add a version using the 'assets' module and return the file path 
     # of the new version
-    version_id = assets.add_version(work_env_id, comment=comment, analyse_comment=False)
+    if comment is None or comment == '':
+        analyse_comment = False
+    else:
+        analyse_comment = True
+    version_id = assets.add_version(work_env_id, comment=comment, analyse_comment=analyse_comment)
     if not version_id:
         return (None, None)
     version_path = project.get_version_data(version_id,
@@ -193,7 +197,11 @@ def request_video(work_env_id):
 
 def add_video(work_env_id, temp_dir, frange, version_id, focal_lengths_dic=None, comment=''):
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
-    video_path = video.add_video(variant_id, temp_dir, frange, version_id, focal_lengths_dic, comment=comment)
+    if comment is None or comment == '':
+        analyse_comment = False
+    else:
+        analyse_comment = True
+    video_path = video.add_video(variant_id, temp_dir, frange, version_id, focal_lengths_dic, comment=comment, analyse_comment=analyse_comment)
     gui_server.refresh_ui()
     return video_path
 
@@ -208,7 +216,11 @@ def add_export_version(export_name, files, work_env_id, version_id, comment):
     # of the new export version
     variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     variant_row = project.get_variant_data(variant_id)
-    export_version_id = assets.add_export_version(export_name, files, variant_row['stage_id'], version_id, comment, execute_xp=False)
+    if comment is None or comment == '':
+        analyse_comment = False
+    else:
+        analyse_comment = True
+    export_version_id = assets.add_export_version(export_name, files, variant_row['stage_id'], version_id, comment, analyse_comment=analyse_comment)
     export_dir = assets.get_export_version_path(export_version_id)
     gui_server.refresh_ui()
     return export_dir

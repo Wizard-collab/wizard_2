@@ -116,6 +116,7 @@ class widget(QtWidgets.QWidget):
 
     def fill_additionnal_references_project_tree(self):
         self.additionnal_references_stages_dic = dict()
+        self.additionnal_references_groups_dic = dict()
         all_domains = project.get_domains()
         for domain_row in all_domains:
             categories = project.get_domain_childs(domain_row['id'])
@@ -138,6 +139,18 @@ class widget(QtWidgets.QWidget):
                         self.additionnal_references_stages_dic[stage_row['id']]['row'] = stage_row
                         self.additionnal_references_stages_dic[stage_row['id']]['item'] = stage_item
                         self.additionnal_references_stages_dic[stage_row['id']]['check_box'] = check_box
+        groups_item = QtWidgets.QTreeWidgetItem(self.additionnal_references_stages_project_tree.invisibleRootItem())
+        groups_item.setText(0, "groups")
+        groups = project.get_groups()
+        for group_row in groups:
+            group_item = QtWidgets.QTreeWidgetItem(groups_item)
+            check_box = QtWidgets.QCheckBox(group_row['name'])
+            check_box.stateChanged.connect(self.refresh)
+            self.additionnal_references_stages_project_tree.setItemWidget(group_item, 0, check_box)
+            self.additionnal_references_groups_dic[group_row['id']] = dict()
+            self.additionnal_references_groups_dic[group_row['id']]['row'] = group_row
+            self.additionnal_references_groups_dic[group_row['id']]['item'] = group_item
+            self.additionnal_references_groups_dic[group_row['id']]['check_box'] = check_box
 
     def refresh(self):
         stage_ids = self.get_selected_stages_ids()
@@ -164,12 +177,21 @@ class widget(QtWidgets.QWidget):
             stage_ids.append(stage_id)
         return stage_ids
 
+    def get_additionnal_references_groups_ids(self):
+        groups_ids = []
+        for group_id in self.additionnal_references_groups_dic.keys():
+            if not self.additionnal_references_groups_dic[group_id]['check_box'].isChecked():
+                continue
+            groups_ids.append(group_id)
+        return groups_ids
+
     def execute(self):
         stage_ids = self.get_selected_stages_ids()
+        additionnal_references_groups_ids = self.get_additionnal_references_groups_ids()
         comment = self.comment_textEdit.toPlainText()
         additionnal_references_stages_ids = self.get_additionnal_references_stages_ids()
         command = "from ressources.batcher_scripts import assembly_lighting\n"
-        command += f"assembly_lighting.main({stage_ids}, {additionnal_references_stages_ids}, comment='{comment}')"
+        command += f"assembly_lighting.main({stage_ids}, {additionnal_references_stages_ids}, {additionnal_references_groups_ids}, comment='''{comment}''')"
         on_deadline = self.deadline_checkbox.isChecked()
         if on_deadline:
             deadline.submit_job(command, "TEST BATCHER")
@@ -177,7 +199,7 @@ class widget(QtWidgets.QWidget):
         task = subtask.subtask(pycmd=command, print_stdout=False)
         task.start()
 
-def main(stages_ids_list, additionnal_references_stages_ids_list, comment=''):
+def main(stages_ids_list, additionnal_references_stages_ids_list, additionnal_references_groups_ids, comment=''):
     logger.info("Starting update_and_export batcher script")
     percent = 0.0
     percent_step = 100/len(stages_ids_list)
@@ -220,7 +242,6 @@ def main(stages_ids_list, additionnal_references_stages_ids_list, comment=''):
 
         # CREATE ADDITIONNAL REFERENCES
         for additionnal_reference_stage_id in additionnal_references_stages_ids_list:
-
             export_rows = project.get_stage_export_childs(additionnal_reference_stage_id)
             if not export_rows:
                 continue
@@ -231,11 +252,15 @@ def main(stages_ids_list, additionnal_references_stages_ids_list, comment=''):
                 if export_version_id:
                     assets.create_reference(default_work_env_row['id'], export_version_id)
 
+        # CREATE ADDITIONNAL REFERENCED GROUPS
+        for additionnal_reference_group_id in additionnal_references_groups_ids:
+            assets.create_referenced_group(default_work_env_row['id'], additionnal_reference_group_id)
+
         settings_dic = dict()
         settings_dic['batch_type'] = 'import_update_and_save'
         settings_dic['comment'] = comment
 
-        print(f"wizard_task_name:Exporting camera for {asset_row['name']}/{stage_row['name']}")
+        print(f"wizard_task_name:Openning scene, importing references and saving scene")
         launch_batch.batch_export(last_version_id, settings_dic)
         tools.wait_for_child_processes()
 

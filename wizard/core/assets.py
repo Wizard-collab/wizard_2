@@ -658,10 +658,10 @@ def get_export_files_list(export_version_id):
         files_list.append(path_utils.join(export_version_path, file))
     return files_list
 
-def merge_file_as_export_version(export_name, files, stage_id, comment='', execute_xp=True):
-    return add_export_version(export_name, files, stage_id, None, comment, skip_temp_purge=True)
+def merge_file_as_export_version(export_name, files, stage_id, comment='', analyse_comment=True):
+    return add_export_version(export_name, files, stage_id, comment, analyse_comment, skip_temp_purge=True)
 
-def add_export_version_from_version_id(export_name, files, version_id, comment='', execute_xp=True):
+def add_export_version_from_version_id(export_name, files, version_id, comment='', analyse_comment=True):
     work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))
     if not work_env_row:
         return
@@ -672,9 +672,9 @@ def add_export_version_from_version_id(export_name, files, version_id, comment='
                                 stage_id,
                                 version_id,
                                 comment,
-                                execute_xp)
+                                analyse_comment)
 
-def add_export_version(raw_export_name, files, stage_id, version_id, comment='', execute_xp=True, skip_temp_purge=False):
+def add_export_version(raw_export_name, files, stage_id, version_id, comment='', analyse_comment=True, skip_temp_purge=False):
     if version_id:
         version_row = project.get_version_data(version_id)
         work_env_row = project.get_work_env_data(version_row['work_env_id'])
@@ -744,7 +744,7 @@ def add_export_version(raw_export_name, files, stage_id, version_id, comment='',
                                                     comment)
     game.add_xps(game_vars._export_xp_)
     game.add_coins(game_vars._export_coins_)
-    if execute_xp:
+    if analyse_comment:
         game.analyse_comment(comment, game_vars._export_penalty_)
     events.add_export_event(export_version_id)
     tags.analyse_comment(comment, 'export_version', export_version_id)

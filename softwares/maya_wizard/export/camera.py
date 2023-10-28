@@ -44,7 +44,7 @@ def invoke_settings_widget():
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
 
-def export_camera(camrig_reference, frange):
+def export_camera(camrig_reference, frange, comment=''):
     camrig_nspace = camrig_reference['namespace']
     asset_name = camrig_reference['asset_name']
     exported_string_asset = camrig_reference['string_stage']

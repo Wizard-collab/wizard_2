@@ -265,3 +265,4 @@ _export_penalty_ = 10
 _task_done_coins_ = 1
 _work_coins_ = 1
 _default_ban_time_ = 3600*24*14
+_transaction_tax_ = 0.05

@@ -77,7 +77,7 @@ def save_or_save_increment():
 def init_project():
     mesh_file_path = wizard_reference.get_mesh_file()
     if mesh_file_path:
-        wizard_project.init_project(mesh_file_path)
+        wizard_project.invoke_init_project_widget(mesh_file_path)
 
 def update_mesh():
     mesh_file_path = wizard_reference.get_mesh_file()

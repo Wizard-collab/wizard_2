@@ -302,6 +302,7 @@ class update_frame(QtWidgets.QFrame):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,6,6,6)
         self.main_layout.setSpacing(2)
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
         self.setLayout(self.main_layout)
 
         self.header_layout = QtWidgets.QHBoxLayout()

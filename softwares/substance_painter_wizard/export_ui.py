@@ -11,6 +11,7 @@ import json
 import substance_painter.logging as logging
 
 # Wizard modules
+from substance_painter_wizard import wizard_tools
 import wizard_communicate
 
 image_sizes = ['128',
@@ -47,6 +48,7 @@ class export_ui(QtWidgets.QDialog):
         super(export_ui, self).__init__()
         self.setWindowTitle('Wizard export')
         self.build_ui()
+        self.fill_presets()
         self.get_settings_file()
         self.load_settings()
         self.connect_functions()
@@ -55,9 +57,11 @@ class export_ui(QtWidgets.QDialog):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.main_layout)
 
-        self.material_lineEdit = QtWidgets.QLineEdit()
-        self.material_lineEdit.setPlaceholderText('Material')
-        self.main_layout.addWidget(self.material_lineEdit)
+        self.preset_label = QtWidgets.QLabel("Preset")
+        self.main_layout.addWidget(self.preset_label)
+
+        self.presets_comboBox = QtWidgets.QComboBox()
+        self.main_layout.addWidget(self.presets_comboBox)
 
         self.image_sizes_comboBox = QtWidgets.QComboBox()
         self.image_sizes_comboBox.addItems(image_sizes)
@@ -79,6 +83,11 @@ class export_ui(QtWidgets.QDialog):
         self.export_button.setDefault(True)
         self.export_button.setAutoDefault(True)
 
+    def fill_presets(self):
+        self.presets_list = wizard_tools.get_export_presets_list()
+        for preset in self.presets_list:
+            self.presets_comboBox.addItem(preset)
+
     def get_settings_file(self):
         user_folder = os.path.join(wizard_communicate.get_user_folder(),
                                     'substance_painter')
@@ -91,12 +100,13 @@ class export_ui(QtWidgets.QDialog):
             self.save_preferences('PBR Metallic Roughness', '4096', 'exr')
         with open(self.settings_file, 'r') as f:
             preferences_dic = json.load(f)
-        self.material_lineEdit.setText(preferences_dic['material'])
+        if preferences_dic['material'] in self.presets_list:
+            self.presets_comboBox.setCurrentText(preferences_dic['material'])
         self.image_sizes_comboBox.setCurrentText(preferences_dic['size'])
         self.file_formats_comboBox.setCurrentText(preferences_dic['type'])
 
     def export(self):
-        self.material = self.material_lineEdit.text()
+        self.material = self.presets_comboBox.currentText()
         self.size = self.image_sizes_comboBox.currentText()
         self.type = self.file_formats_comboBox.currentText()
         self.save_preferences(material=None, size=None, type=None)
@@ -104,13 +114,13 @@ class export_ui(QtWidgets.QDialog):
 
     def save_preferences(self, material=None, size=None, type=None):
         if not material:
-            material = self.material_lineEdit.text()
+            preset = self.presets_comboBox.currentText()
         if not size:
             size = self.image_sizes_comboBox.currentText()
         if not type:
             type = self.file_formats_comboBox.currentText()
         preferences_dic = dict()
-        preferences_dic['material'] = material
+        preferences_dic['material'] = preset
         preferences_dic['size'] = size
         preferences_dic['type'] = type
         with open(self.settings_file, 'w') as f:

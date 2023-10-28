@@ -22,3 +22,13 @@ def abc_command(export_GRP_list, export_file, frange):
                     end=frange[1],
                     sh_open=-0.2,
                     sh_close=0.2)
+
+def fbx_command(export_GRP_list, export_file, frange):
+    ''' This function is used to store 
+    a default fbx export command.
+    You can modify it from here
+    Be carreful on what you are modifying'''
+    wizard_tools.select_all_children(export_GRP_list)
+    bpy.ops.export_scene.fbx(filepath=export_file,
+                                use_selection=True,
+                                use_custom_props=True)

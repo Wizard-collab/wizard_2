@@ -27,6 +27,8 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
                                                             export_name)
         if export_file.endswith('.abc'):
             export_abc(export_GRP_list, export_file, frange)
+        elif export_file.endswith('.fbx'):
+            export_fbx(export_GRP_list, export_file, frange)
         elif export_file.endswith('.blend'):
             export_blend(export_GRP_list, export_file)
         export_dir = wizard_communicate.add_export_version(export_name,
@@ -42,6 +44,13 @@ def export_abc(export_GRP_list, export_file, frange):
     if abc_command is None:
         abc_command = default_abc_command
     abc_command(export_GRP_list, export_file, frange)
+
+def export_fbx(export_GRP_list, export_file, frange):
+    export_GRP_list = wizard_tools.group_objects_before_export(export_GRP_list)
+    fbx_command = wizard_hooks.get_fbx_command("blender")
+    if fbx_command is None:
+        fbx_command = default_fbx_command
+    fbx_command(export_GRP_list, export_file, frange)
 
 def export_blend(export_GRP_list, export_file): 
     file_name = bpy.data.filepath
@@ -107,3 +116,9 @@ def default_abc_command(export_GRP_list, export_file, frange):
                     end=frange[1],
                     sh_open=-0.2,
                     sh_close=0.2)
+
+def default_fbx_command(export_GRP_list, export_file, frange):
+    wizard_tools.select_all_children(export_GRP_list)
+    bpy.ops.export_scene.fbx(filepath=export_file,
+                                use_selection=True,
+                                use_custom_props=True)

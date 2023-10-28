@@ -176,16 +176,26 @@ class popup_save_widget(QtWidgets.QFrame):
     
     def start_clock(self):
         keep_until_comment = user.user().get_keep_until_comment()
-        if not keep_until_comment:
-            duration = user.user().get_popups_duration()
-            self.timer.start(duration*1000)
+        if keep_until_comment and self.is_comment:
+            return
+        duration = user.user().get_popups_duration()
+        self.timer.start(duration*1000)
 
     def fill_ui(self):
         version_row = project.get_version_data(self.version_id)
         self.comment_textEdit.setText(version_row['comment'])
+        self.comment_label.setText(version_row['comment'])
+        if version_row['comment'] is None or version_row['comment'] == '':
+            self.is_comment = True
+        else:
+            self.is_comment = False
+        self.comment_widget.setVisible(self.is_comment)
+        self.comment_label.setVisible(1-self.is_comment)
         self.update_comment_validity()
-        self.version_name_label.setText(f"Version {version_row['name']}")
+        self.version_name_label.setText(f"Saved {version_row['string']}")
         if user.user().get_popups_blink_enabled():
+            if not self.is_comment:
+                return
             self.start_blink()
 
     def connect_functions(self):
@@ -260,6 +270,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.header_layout.addWidget(self.save_image)
 
         self.version_name_label = QtWidgets.QLabel()
+        self.version_name_label.setWordWrap(True)
         self.version_name_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.header_layout.addWidget(self.version_name_label)
 
@@ -276,20 +287,31 @@ class popup_save_widget(QtWidgets.QFrame):
         self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout.addWidget(self.quit_button)
+
+        self.comment_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.comment_label)
         
         self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+
+        self.comment_widget = QtWidgets.QWidget()
+        self.comment_widget.setObjectName('transparent_widget')
+        self.comment_layout = QtWidgets.QVBoxLayout()
+        self.comment_layout.setContentsMargins(0,0,0,0)
+        self.comment_layout.setSpacing(6)
+        self.comment_widget.setLayout(self.comment_layout)
+        self.main_layout.addWidget(self.comment_widget)
 
         self.comment_textEdit = gui_utils.no_return_textEdit()
         self.comment_textEdit.setObjectName('comment_textEdit')
         self.comment_textEdit.setPlaceholderText('Your comment')
         self.comment_textEdit.setMaximumHeight(50)
-        self.main_layout.addWidget(self.comment_textEdit)
+        self.comment_layout.addWidget(self.comment_textEdit)
 
         self.warning_text = QtWidgets.QLabel("")
-        self.main_layout.addWidget(self.warning_text)
+        self.comment_layout.addWidget(self.warning_text)
 
         self.update_comment_button = QtWidgets.QPushButton('Comment')
-        self.main_layout.addWidget(self.update_comment_button)
+        self.comment_layout.addWidget(self.update_comment_button)
 
 class popup_event_widget(QtWidgets.QFrame):
 
@@ -354,26 +376,27 @@ class popup_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
             if self.event_row['creation_user'] == environment.get_user():
-                self.comment_widget.setVisible(True)
+                self.is_comment = True
                 if self.event_row['message'] is not None and self.event_row['message'] != '':
                     self.comment_textEdit.setText(self.event_row['message'])
                     self.update_comment_validity()
-                self.is_comment = True
+                    self.is_comment = False
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
         elif self.event_row['type'] == 'video':
             profile_color = '#B988F3'
             if self.event_row['creation_user'] == environment.get_user():
-                self.comment_widget.setVisible(True)
+                self.is_comment = True
                 if self.event_row['message'] is not None and self.event_row['message'] != '':
                     self.comment_textEdit.setText(self.event_row['message'])
                     self.update_comment_validity()
-                self.is_comment = True
+                    self.is_comment = False
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 
         self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
         if self.is_comment:
+            self.comment_widget.setVisible(True)
             if user.user().get_popups_blink_enabled():
                 self.start_blink()
 

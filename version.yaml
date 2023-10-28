@@ -1,7 +1,7 @@
-BUILDS: 282
+BUILDS: 285
 MAJOR: 3
-MINOR: 3
+MINOR: 4
 PATCH: 0
-builds: 282
-date: 1696965894.57082
-setup_name: 3.3.0.0282-setup.exe
+builds: 285
+date: 1698502363.2817633
+setup_name: 3.4.0.0285-setup.exe

@@ -119,7 +119,7 @@ then click on execute""")
         refresh_assets = self.refresh_assets_checkbox.isChecked()
         comment = self.comment_textEdit.toPlainText()
         command = "from ressources.batcher_scripts import exports\n"
-        command += f"exports.main({stage_ids}, {refresh_assets}, comment='{comment}')"
+        command += f"exports.main({stage_ids}, {refresh_assets}, comment='''{comment}''')"
         on_deadline = self.deadline_checkbox.isChecked()
         if on_deadline:
             deadline.submit_job(command, "TEST BATCHER")

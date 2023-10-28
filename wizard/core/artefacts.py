@@ -35,6 +35,11 @@ def buy_artefact(artefact_name):
 		logger.warning(f'Not enough coins to buy this artefact : {artefact_name}')
 		return
 	current_artefacts = json.loads(user_row['artefacts'])
+	if (current_artefacts.count(artefact_name) + stock == game_vars.artefacts_dic[artefact_name]['stock'])\
+			and (stock == 1)\
+			and (game_vars.artefacts_dic[artefact_name]['stock'] > 1):
+		logger.warning(f"You can't buy all the artefacts.")
+		return
 	current_artefacts.append(artefact_name)
 	if not repository.modify_user_artefacts(environment.get_user(), current_artefacts):
 		return
@@ -76,7 +81,8 @@ def give_coins(amount, destination_user):
 	if not repository.modify_user_coins(environment.get_user(), new_coins):
 		return
 	destination_user_coins = repository.get_user_row_by_name(destination_user, 'coins')
-	new_destination_user_coins = destination_user_coins + amount
+	amount_without_tax = amount - (int(amount*game_vars._transaction_tax_))
+	new_destination_user_coins = destination_user_coins + amount_without_tax
 	if not repository.modify_user_coins(destination_user, new_destination_user_coins):
 		return
 	logger.info(f"{amount} coins given to {destination_user}")
