@@ -11,6 +11,9 @@ def get_current_day_id():
     today_id = today.strftime("%Y_%m_%W_%d")
     return today_id
 
+def timestamp_to_datetime(timestamp):
+    return datetime.fromtimestamp(timestamp)
+
 def get_days_in_range(start_date, end_date):
     days_dic = dict()
     years_dic = dict()
@@ -52,7 +55,3 @@ def get_days_in_range(start_date, end_date):
         weeks_dic[week].append(day_index)
 
     return years_dic, months_dic, weeks_dic, days_dic
-
-
-#days_dic = get_days_in_range(start_date, end_date)
-#print(days_dic)

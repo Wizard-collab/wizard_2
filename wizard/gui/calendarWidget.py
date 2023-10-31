@@ -1,57 +1,95 @@
+# coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
+
+# Python modules
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
-import test_calendar
 import traceback
-
-from wizard.gui import app_utils
-
 from datetime import datetime, timedelta
 
-start_date = datetime(2023, 10, 18)
-end_date = datetime(2023, 10, 31)
-
-# Create the application object
-app = app_utils.get_app()
+# Wizard modules
+from wizard.core import calendar_utils
 
 class calendarWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(calendarWidget, self).__init__(parent)
         self.setMouseTracking(True)
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.init_days_range()
         self.display_type = 2
         self.selection_region_drag = False
         self.selection_region_start = None
         self.dragging = False
         self.drag_start_x = 0
         self.drag_start_y = 0
-        self.start_date = start_date
-        self.end_date = end_date
         self.viewport_pos_y = 0
         self.items = []
 
-    def add_item(self, date, duration, color):
-        self.item = item_object(date, duration, color, parent=self)
-        self.item.select_signal.connect(self.update_selection)
-        self.items.append(self.item)
+    def init_days_range(self):
+        today = datetime.today()
+        self.start_date = today - timedelta(days=50)
+        self.end_date = today + timedelta(days=50)
 
-    def update_selection(self):
-        pass
-        #for other_item in self.items:
-        #    other_item.selected = False
-        #    other_item.update()
-        #item.selected = True
+    def add_item(self, date, duration, color, widget):
+        self.item = item_object(date, duration, color, widget, parent=self)
+        self.item.select_signal.connect(self.select_item)
+        self.items.append(self.item)
 
     def select_region(self, pos):
         rect = QtCore.QRectF(self.selection_region_start, pos)
+        under_region = []
         for item in self.items:
             if rect.contains(QtCore.QRectF(item.x(), item.y(), item.width(), item.height())):
-                item.selected = True
-            else:
-                item.selected = False
+                under_region.append(item)
+        self.select_multiple_items(under_region)
+
+    def toggle_item_selection(self, item):
+        item.selected = 1-item.selected
+        item.update()
+
+    def select_item(self, item):
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if not modifiers & QtCore.Qt.ShiftModifier:
+            self.deselect_all()
+        if modifiers & QtCore.Qt.ShiftModifier:
+            item.selected = 1-item.selected
+            item.update()
+        else:
+            item.selected = True
             item.update()
 
+    def select_multiple_items(self, items):
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if not modifiers & QtCore.Qt.ShiftModifier:
+            self.deselect_all()
+        if modifiers & QtCore.Qt.ShiftModifier:
+            for item in items:
+                item.selected = 1 - item.selected 
+                item.update()
+        else:
+            for item in items:
+                item.selected = True
+                item.update()
+
+    def deselect_all(self):
+        for item in self.items:
+            self.deselect_item(item)
+
+    def deselect_item(self, item):
+        item.selected = False
+        item.update()
+
+    def get_selected_items(self):
+        selected_items = []
+        for item in self.items:
+            if item.selected:
+                selected_items.append(item)
+        return selected_items
+
     def paintEvent(self, event):
-        self.years_dic, self.months_dic, self.weeks_dic, self.days_dic = test_calendar.get_days_in_range(self.start_date, self.end_date)
+        self.years_dic, self.months_dic, self.weeks_dic, self.days_dic = calendar_utils.get_days_in_range(self.start_date, self.end_date)
         try:
             painter = QtGui.QPainter(self)
             painter.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -80,38 +118,24 @@ class calendarWidget(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
-        first_day_dic = self.days_dic[list(self.days_dic.keys())[0]]
-        first_day_id = list(self.days_dic.keys())[0]
-        first_day_datetime = datetime(int(first_day_dic['year']),
-                                        int(first_day_dic['month_number']),
-                                        int(first_day_dic['day_number']))
 
         pos_y = self.years_section_height + self.month_section_height + self.day_section_height + self.weeks_section_height
 
-        for item in self.items[:self.viewport_pos_y]:
-            item.setVisible(False)
-
-        for item in self.items[self.viewport_pos_y:]:
-            date_id = item.date.strftime("%Y_%m_%W_%d")
-            duration = item.duration
-            if item.date < first_day_datetime:
-                date_id = first_day_id
-                duration = item.duration - (first_day_datetime - item.date).days
-            end_date_id = (item.date + timedelta(days=item.duration)).strftime("%Y_%m_%W_%d")
-            if date_id not in self.days_dic.keys() and end_date_id not in self.days_dic.keys():
-                item.setVisible(False)
-                continue
-            pos_x_1 = self.get_day_position(date_id)
-            width = duration * self.day_width
+        for item in self.items:
             self.items_height = self.day_width
             if self.items_height > 40:
                 self.items_height = 40
-
-            item.day_width = self.day_width
-            item.move(int(pos_x_1), int(pos_y))
-            item.resize(int(width), int(self.items_height))
-            item.setVisible(True)
             pos_y += self.items_height+4
+            pos_x_1 = self.get_pos_from_date(item.date)
+            width = item.duration * self.day_width
+            item.day_width = self.day_width
+            item_pos_y = int(pos_y-self.viewport_pos_y)
+            item.move(int(pos_x_1), item_pos_y)
+            item.resize(int(width), int(self.items_height))
+            if item_pos_y < (self.years_section_height + self.month_section_height + self.day_section_height + self.weeks_section_height):
+                item.setVisible(False)
+            else:
+                item.setVisible(True)
 
     def get_day_position(self, day_id):
         index = list(self.days_dic.keys()).index(day_id)
@@ -122,7 +146,7 @@ class calendarWidget(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
-        today_id = test_calendar.get_current_day_id()
+        today_id = calendar_utils.get_current_day_id()
         if today_id not in self.days_dic.keys():
             return
         rectangle = QtCore.QRectF(self.get_day_position(today_id), self.years_section_height + self.month_section_height, self.day_width, self.height())
@@ -231,6 +255,7 @@ class calendarWidget(QtWidgets.QWidget):
             for item in self.items:
                 if item.rect().contains(event.pos()):
                     self.selection_region_drag = False
+                    break
             self.dragging = False
             self.selection_region_drag = True
             self.selection_region_start = event.pos()
@@ -239,45 +264,61 @@ class calendarWidget(QtWidgets.QWidget):
         self.selection_region_drag = False
 
     def get_day_from_pos(self, pos_x):
-        day_index = int(pos_x/self.day_width)
-        keys_list = list(self.days_dic.keys())
-        if len(keys_list) <= day_index or day_index < 0 :
-            return
-        day_key = list(self.days_dic.keys())[day_index]
-        date = datetime(int(self.days_dic[day_key]['year']),
-                        int(self.days_dic[day_key]['month_number']),
-                        int(self.days_dic[day_key]['day_number']))
+        first_day_dic = self.days_dic[list(self.days_dic.keys())[0]]
+        first_day_id = list(self.days_dic.keys())[0]
+        first_day_datetime = datetime(int(first_day_dic['year']),
+                                        int(first_day_dic['month_number']),
+                                        int(first_day_dic['day_number']))
+        delta = int(pos_x/self.day_width)
+        date = first_day_datetime + timedelta(days=delta)
         return date
 
+    def get_pos_from_date(self, date):
+        first_day_dic = self.days_dic[list(self.days_dic.keys())[0]]
+        first_day_id = list(self.days_dic.keys())[0]
+        first_day_datetime = datetime(int(first_day_dic['year']),
+                                        int(first_day_dic['month_number']),
+                                        int(first_day_dic['day_number']))
+        delta = (date - first_day_datetime).days
+        pos = delta*self.day_width
+        return pos
+
     def mouseMoveEvent(self, event):
+        selected_items = self.get_selected_items()
+        move_items = False
+        scale_items = False
+        move_offset = 0
         for item in self.items:
-            if item.move_dragging or item.selected:
+            if item.move_dragging:
                 date_from_pos = self.get_day_from_pos(event.pos().x() - item.move_dragging_offset)
                 if not date_from_pos:
                     continue
-                item.date = date_from_pos
-                self.update()
+                move_offset = date_from_pos - item.date
+                move_items = True
             if item.scale_dragging:
                 date_from_pos = self.get_day_from_pos(event.pos().x())
                 if not date_from_pos:
                     continue
-                item.duration = (date_from_pos - item.date).days
+                scale_offset = (date_from_pos - item.date).days - item.duration
+                scale_items = True
+        if move_items:
+            for item in selected_items:
+                item.date += move_offset
+                item.update()
+        if scale_items:
+            for item in selected_items:
+                item.duration += scale_offset
                 if item.duration <= 0:
                     item.duration = 1
-                self.update()
+                item.update()
 
         if self.dragging:
             delta_x = event.x() - self.drag_start_x
             delta_y = event.y() - self.drag_start_y
-            delta_y = int((delta_y/self.items_height)*2)
 
             self.start_date -= timedelta(days=0.2*delta_x/(self.day_width/5))
             self.end_date -= timedelta(days=0.2*delta_x/(self.day_width/5))
             self.viewport_pos_y -= delta_y
-            if self.viewport_pos_y < 0:
-                self.viewport_pos_y = 0
-            if self.viewport_pos_y > len(self.items):
-                self.viewport_pos_y = len(self.items)
             self.drag_start_x = event.x()
             self.drag_start_y = event.y()
             self.update()
@@ -286,15 +327,35 @@ class calendarWidget(QtWidgets.QWidget):
             self.update()
 
     def keyPressEvent(self, event):
+        super().keyPressEvent(event)
         if event.key() == QtCore.Qt.Key_F:
-            self.center_around_current_date()
+            self.center_around_selection()
             self.update()
 
-    def center_around_current_date(self):
-        current_date = datetime.today()
-        days_to_center = len(self.days_dic.keys())/2
-        self.start_date = (current_date - timedelta(days=days_to_center))
-        self.end_date = (current_date + timedelta(days=days_to_center))
+    def center_around_selection(self):
+        min_pos_x = 10000
+        max_pos_x = 0
+        selected_items = self.get_selected_items()
+        if selected_items:
+            for item in selected_items:
+                if not item.selected:
+                    continue
+                if item.x() < min_pos_x:
+                    min_pos_x = item.x()
+                if item.x()+item.width() > max_pos_x:
+                    max_pos_x = item.x()+item.width()
+
+            width = max_pos_x - min_pos_x
+            min_pos_x -= width/2
+            max_pos_x += width/2
+
+            self.start_date = self.get_day_from_pos(min_pos_x)
+            self.end_date = self.get_day_from_pos(max_pos_x)
+        else:
+            current_date = datetime.today()
+            days_to_center = len(self.days_dic.keys())/2
+            self.start_date = (current_date - timedelta(days=days_to_center))
+            self.end_date = (current_date + timedelta(days=days_to_center))
 
     def mouseReleaseEvent(self, event):
         if self.dragging:
@@ -308,8 +369,11 @@ class calendarWidget(QtWidgets.QWidget):
         if event.modifiers() & QtCore.Qt.ControlModifier:
             delta = event.angleDelta().y() / 10
 
-            start_date = self.start_date + timedelta(days=1*delta/(self.day_width/10))
-            end_date = self.end_date - timedelta(days=1*delta/(self.day_width/10))
+            left_space = self.width()/event.pos().x()
+            right_space = self.width()/(self.width() - event.pos().x())
+
+            start_date = self.start_date + timedelta(days=1*delta/(self.day_width/10)/left_space)
+            end_date = self.end_date - timedelta(days=1*delta/(self.day_width/10)/right_space)
 
             time_delta = end_date - start_date
 
@@ -321,12 +385,13 @@ class calendarWidget(QtWidgets.QWidget):
 
 class item_object(QtWidgets.QWidget):
 
-    select_signal = pyqtSignal(int)
+    select_signal = pyqtSignal(object)
 
-    def __init__(self, date, duration, color, parent=None):
+    def __init__(self, date, duration, color, widget, parent=None):
         super(item_object, self).__init__(parent)
         self.setMouseTracking(True)
         self.setObjectName('transparent_widget')
+        self.widget = widget
         self.date = date
         self.duration = duration
         self.color = color
@@ -350,23 +415,28 @@ class item_object(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(8,2,8,2)
         self.setLayout(self.main_layout)
-        self.label = QtWidgets.QLabel('bonsoir a tous')
-        self.main_layout.addWidget(self.label)
+        self.main_layout.addWidget(self.widget)
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
-        main_area = QtCore.QRectF(0,0,self.width(), self.height())
-        color = QtGui.QColor(self.color)
-        if self.hover and not self.selected:
-            color = color.lighter(120)
-        elif self.hover and self.selected:
-            color = color.lighter(80)
-        elif not self.hover and self.selected:
-            color = color.lighter(60)
 
-        draw_rect(painter, main_area, bg_color = color, radius=self.height()/4)
+        main_area = QtCore.QRectF(0,0,self.width(), self.height())
+        left_rect = QtCore.QRectF(0,0,5, self.height())
+        color = QtGui.QColor(self.color)
+        alpha_color = QtGui.QColor(color.red(), color.green(), color.blue(), 150)
+        if self.hover and not self.selected:
+            alpha_color = alpha_color.lighter(110)
+        elif self.hover and self.selected:
+            alpha_color = QtGui.QColor(color.red(), color.green(), color.blue(), 200)
+            alpha_color = alpha_color.lighter(125)
+        elif not self.hover and self.selected:
+            alpha_color = QtGui.QColor(color.red(), color.green(), color.blue(), 200)
+            alpha_color = alpha_color.lighter(120)
+
+        draw_rect(painter, main_area, bg_color = alpha_color, radius=1)
+        draw_rect(painter, left_rect, bg_color = color, radius=1)
 
         if self.show_right_handle:
             rect = QtCore.QRectF(self.width()-5,0,5, self.height())
@@ -395,14 +465,14 @@ class item_object(QtWidgets.QWidget):
         if self.width()-10 < event.pos().x() < self.width():
             self.move_dragging = False
             self.scale_dragging = True
+        if not self.selected:
+            self.select_signal.emit(self)
 
     def mouseReleaseEvent(self, event):
         if self.move_dragging:
             self.move_dragging = False
         if self.scale_dragging:
             self.scale_dragging = False
-        self.select_signal.emit(1)
-        self.selected = True
         super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
@@ -426,15 +496,3 @@ def draw_rect(painter, rectangle, bg_color, outline=QtGui.QColor('transparent'),
     painter.setPen(QtGui.QPen(outline, outline_width))
     painter.setBrush(QtGui.QBrush(bg_color))
     painter.drawRoundedRect(rectangle, radius, radius)
-
-
-w=calendarWidget()
-w.show()
-for a in range(0,5):
-    w.add_item(datetime(2023,10,30), 5, '#ff8666')
-    w.add_item(datetime(2023,10,24), 10, '#66a0ff')
-    w.add_item(datetime(2023,9,24), 56, '#b7da62')
-    w.add_item(datetime(2023,10,21), 1, '#ff8666')
-
-# Start the application event loop
-sys.exit(app.exec_())
