@@ -19,6 +19,7 @@ class calendarWidget(QtWidgets.QWidget):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.init_days_range()
         self.display_type = 2
+        self.zoom_factor = 1
         self.selection_region_drag = False
         self.selection_region_start = None
         self.dragging = False
@@ -123,9 +124,11 @@ class calendarWidget(QtWidgets.QWidget):
 
         for item in self.items:
             self.items_height = self.day_width
-            if self.items_height > 40:
-                self.items_height = 40
-            pos_y += self.items_height+4
+            #if self.items_height > 40:
+            #    self.items_height = 40
+            #if self.items_height < 10:
+            #    self.items_height = 10
+            pos_y += self.items_height#+4
             pos_x_1 = self.get_pos_from_date(item.date)
             width = item.duration * self.day_width
             item.day_width = self.day_width
@@ -316,8 +319,10 @@ class calendarWidget(QtWidgets.QWidget):
             delta_x = event.x() - self.drag_start_x
             delta_y = event.y() - self.drag_start_y
 
-            self.start_date -= timedelta(days=0.2*delta_x/(self.day_width/5))
-            self.end_date -= timedelta(days=0.2*delta_x/(self.day_width/5))
+            start_date = self.start_date - timedelta(days=0.2*delta_x/(self.day_width/5))
+            end_date = self.end_date - timedelta(days=0.2*delta_x/(self.day_width/5))
+            self.update_date_range(start_date, end_date)
+
             self.viewport_pos_y -= delta_y
             self.drag_start_x = event.x()
             self.drag_start_y = event.y()
@@ -331,6 +336,33 @@ class calendarWidget(QtWidgets.QWidget):
         if event.key() == QtCore.Qt.Key_F:
             self.center_around_selection()
             self.update()
+
+    def update_date_range(self, start_date, end_date):
+        old_days_range = (self.end_date - self.start_date).days
+        new_days_range = (end_date - start_date).days
+        self.start_date = start_date
+        self.end_date = end_date
+        if new_days_range == old_days_range:
+            return
+        self.zoom_factor = old_days_range/new_days_range
+
+        header_height = self.years_section_height + self.month_section_height + self.day_section_height + self.weeks_section_height
+        mouse_pos = self.mapFromGlobal(QtGui.QCursor().pos()).y() - header_height
+        y_range = self.height() - header_height
+        mouse_pos_factor = mouse_pos/y_range
+        bottom_space = y_range - mouse_pos
+
+        #middle_pos = y_range/2
+        #mouse_pos = (mouse_pos)-middle_pos
+        #if mouse_pos <=0:
+        #    mouse_pos = 0
+
+
+        if self.zoom_factor < 1:
+            self.viewport_pos_y -= ((y_range*self.zoom_factor)*mouse_pos_factor)/12
+        else:
+            self.viewport_pos_y += ((y_range*self.zoom_factor)*mouse_pos_factor)/12
+        self.viewport_pos_y *= self.zoom_factor
 
     def center_around_selection(self):
         min_pos_x = 10000
@@ -349,13 +381,14 @@ class calendarWidget(QtWidgets.QWidget):
             min_pos_x -= width/2
             max_pos_x += width/2
 
-            self.start_date = self.get_day_from_pos(min_pos_x)
-            self.end_date = self.get_day_from_pos(max_pos_x)
+            self.update_date_range(self.get_day_from_pos(min_pos_x),
+                                    self.get_day_from_pos(max_pos_x))
         else:
             current_date = datetime.today()
             days_to_center = len(self.days_dic.keys())/2
-            self.start_date = (current_date - timedelta(days=days_to_center))
-            self.end_date = (current_date + timedelta(days=days_to_center))
+
+            self.update_date_range((current_date - timedelta(days=days_to_center)),
+                                    (current_date + timedelta(days=days_to_center)))
 
     def mouseReleaseEvent(self, event):
         if self.dragging:
@@ -379,8 +412,9 @@ class calendarWidget(QtWidgets.QWidget):
 
             if time_delta.days < 8 or time_delta.days > 500:
                 return
-            self.start_date = start_date
-            self.end_date = end_date
+
+            self.update_date_range(start_date,
+                                    end_date)
             self.update()
 
 class item_object(QtWidgets.QWidget):
@@ -413,7 +447,8 @@ class item_object(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(8,2,8,2)
+        self.main_layout.setContentsMargins(6,1,1,1)
+        self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
         self.main_layout.addWidget(self.widget)
 
@@ -425,7 +460,7 @@ class item_object(QtWidgets.QWidget):
         main_area = QtCore.QRectF(0,0,self.width(), self.height())
         left_rect = QtCore.QRectF(0,0,5, self.height())
         color = QtGui.QColor(self.color)
-        alpha_color = QtGui.QColor(color.red(), color.green(), color.blue(), 150)
+        alpha_color = QtGui.QColor(color.red(), color.green(), color.blue(), 100)
         if self.hover and not self.selected:
             alpha_color = alpha_color.lighter(110)
         elif self.hover and self.selected:
