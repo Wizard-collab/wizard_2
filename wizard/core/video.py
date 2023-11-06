@@ -43,11 +43,11 @@ from wizard.core import image
 
 logger = logging.getLogger(__name__)
 
-def add_video(variant_id, images_directory, frange, version_id, focal_lengths_dic=None, comment=''):
+def add_video(variant_id, images_directory, frange, version_id, focal_lengths_dic=None, comment='', analyse_comment=None):
     temp_video_file, to_thumbnail = merge_video(images_directory, frange, version_id, focal_lengths_dic)
     if not temp_video_file:
         return
-    video_id = assets.add_video(variant_id, comment=comment)
+    video_id = assets.add_video(variant_id, comment=comment, analyse_comment=analyse_comment)
     video_row = project.get_video_data(video_id)
     video_path = video_row['file_path']
     thumbnail_path = video_row['thumbnail_path']

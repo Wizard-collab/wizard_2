@@ -16,14 +16,15 @@ class CalendarHeader(QtWidgets.QGraphicsView):
         self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pan = False
         self.column_width = 30
         self.last_mouse_pos = None
         self.zoom_factor = 1.0
-
-        x, y, width, height = 0, 0, 30, 120
-        red_box_item = RedBoxItem(x, y, width, height)
-        self.scene.addItem(red_box_item)
+        self.today_item = today_item()
+        self.today_item.setZValue(1.0)
+        self.scene.addItem(self.today_item)
 
         self.day_items = []
         self.week_items = []
@@ -39,10 +40,43 @@ class CalendarHeader(QtWidgets.QGraphicsView):
         leftmost_column, visible_columns = self.get_visible_columns()
         self.today = datetime.date.today()
         self.days_range = range(leftmost_column, leftmost_column + visible_columns)
+        self.pos_y = 0
+        self.create_dics()
+        self.update_years()
+        self.update_months()
         self.update_days()
         self.update_weeks()
-        self.update_months()
-        self.update_years()
+        self.update_today_item()
+        self.resize_header()
+
+    def update_today_item(self):
+        self.today_item.setRect(0,70,int(self.column_width*self.zoom_factor),self.height()-70)
+
+    def resize_header(self):
+        self.setFixedHeight(self.pos_y)
+        scene_rect = self.sceneRect()
+        scene_rect.setHeight(self.viewport().height())
+        self.setSceneRect(scene_rect)
+
+    def create_dics(self):
+        self.months_dic = dict()
+        self.years_dic = dict()
+        self.weeks_dic = dict()
+
+        for day_offset in self.days_range:
+            day = self.today + datetime.timedelta(days=day_offset)
+            year = day.strftime("%Y")
+            month = day.strftime("%Y%B")
+            week = day.strftime("%W")
+            if month not in self.months_dic.keys():
+                self.months_dic[month] = []
+            self.months_dic[month].append(day)
+            if year not in self.years_dic.keys():
+                self.years_dic[year] = []
+            self.years_dic[year].append(day)
+            if week not in self.weeks_dic.keys():
+                self.weeks_dic[week] = []
+            self.weeks_dic[week].append(day)
 
     def update_days(self):
         if self.column_width * self.zoom_factor <= 20:
@@ -59,12 +93,20 @@ class CalendarHeader(QtWidgets.QGraphicsView):
         for i, day_column_pos in enumerate(self.days_range):
             day_text = (self.today - datetime.timedelta(days=day_column_pos)).strftime("%d")
             x_pos = (day_column_pos * self.column_width)
-            self.day_items[i].setRect(x_pos*self.zoom_factor, 60, self.column_width*self.zoom_factor, 30)
+            height = 30
+            if self.column_width*self.zoom_factor <= 30:
+                height = 15
+            self.day_items[i].setRect(x_pos*self.zoom_factor,
+                                                self.pos_y,
+                                                self.column_width*self.zoom_factor,
+                                                height)
             self.day_items[i].setDate((self.today + datetime.timedelta(days=day_column_pos)))
 
         while len(self.day_items) > len(self.days_range):
             item = self.day_items.pop()
             self.scene.removeItem(item)
+
+        self.pos_y += height
 
     def get_day_position(self, day):
         pos = (day - self.today).days * self.column_width
@@ -77,82 +119,90 @@ class CalendarHeader(QtWidgets.QGraphicsView):
             self.week_items = []
             return
 
-        weeks_dic = dict()
-        days = []
-        for day_offset in self.days_range:
-            day = self.today + datetime.timedelta(days=day_offset)
-            week = day.strftime("%W")
-            if week not in weeks_dic.keys():
-                weeks_dic[week] = []
-            weeks_dic[week].append(day)
-
-        while len(self.week_items) < len(weeks_dic.keys()):
+        while len(self.week_items) < len(self.weeks_dic.keys()):
             item = week_item()
             self.week_items.append(item)
             self.scene.addItem(item)
 
-        for week in weeks_dic.keys():
-            index = list(weeks_dic.keys()).index(week)
-            x_pos = self.get_day_position(weeks_dic[week][0])
-            width = (weeks_dic[week][-1] - weeks_dic[week][0]).days * self.column_width + self.column_width
-            self.week_items[index].setRect(x_pos*self.zoom_factor, 94, width*self.zoom_factor, 25)
+        for week in self.weeks_dic.keys():
+            index = list(self.weeks_dic.keys()).index(week)
+            x_pos = self.get_day_position(self.weeks_dic[week][0])
+            left = self.mapToScene(self.viewport().rect()).boundingRect().left()
+            right = self.mapToScene(self.viewport().rect()).boundingRect().right()
+            if x_pos < left:
+                x_pos = left
+            x_2_pos = self.get_day_position(self.weeks_dic[week][-1]+datetime.timedelta(days=1))
+            if x_2_pos > right:
+                x_2_pos = right
+            width = x_2_pos-x_pos
+            self.week_items[index].setRect(x_pos*self.zoom_factor,
+                                            self.pos_y,
+                                            width*self.zoom_factor,
+                                            30)
             self.week_items[index].setText(week)
 
-        while len(self.week_items) > len(weeks_dic.keys()):
+        while len(self.week_items) > len(self.weeks_dic.keys()):
             item = self.week_items.pop()
             self.scene.removeItem(item)
 
-    def update_months(self):
-        months_dic = dict()
-        days = []
-        for day_offset in self.days_range:
-            day = self.today + datetime.timedelta(days=day_offset)
-            month = day.strftime("%B")
-            if month not in months_dic.keys():
-                months_dic[month] = []
-            months_dic[month].append(day)
+        self.pos_y += 30
 
-        while len(self.month_items) < len(months_dic.keys()):
+    def update_months(self):
+        while len(self.month_items) < len(self.months_dic.keys()):
             item = month_item()
             self.month_items.append(item)
             self.scene.addItem(item)
 
-        for month in months_dic.keys():
-            index = list(months_dic.keys()).index(month)
-            x_pos = self.get_day_position(months_dic[month][0])
-            width = (months_dic[month][-1] - months_dic[month][0]).days * self.column_width + self.column_width
-            self.month_items[index].setRect(x_pos*self.zoom_factor, 30, width*self.zoom_factor, 25)
+        for month in self.months_dic.keys():
+            index = list(self.months_dic.keys()).index(month)
+            x_pos = self.get_day_position(self.months_dic[month][0])
+            left = self.mapToScene(self.viewport().rect()).boundingRect().left()
+            right = self.mapToScene(self.viewport().rect()).boundingRect().right()
+            if x_pos < left:
+                x_pos = left
+            x_2_pos = self.get_day_position(self.months_dic[month][-1]+datetime.timedelta(days=1))
+            if x_2_pos > right:
+                x_2_pos = right
+            width = x_2_pos-x_pos
+            self.month_items[index].setRect(x_pos*self.zoom_factor,
+                                            self.pos_y,
+                                            width*self.zoom_factor,
+                                            30)
             self.month_items[index].setText(month)
 
-        while len(self.month_items) > len(months_dic.keys()):
+        while len(self.month_items) > len(self.months_dic.keys()):
             item = self.month_items.pop()
             self.scene.removeItem(item)
 
-    def update_years(self):
-        years_dic = dict()
-        days = []
-        for day_offset in self.days_range:
-            day = self.today + datetime.timedelta(days=day_offset)
-            year = day.strftime("%Y")
-            if year not in years_dic.keys():
-                years_dic[year] = []
-            years_dic[year].append(day)
+        self.pos_y += 30
 
-        while len(self.year_items) < len(years_dic.keys()):
+    def update_years(self):
+        while len(self.year_items) < len(self.years_dic.keys()):
             item = year_item()
             self.year_items.append(item)
             self.scene.addItem(item)
 
-        for year in years_dic.keys():
-            index = list(years_dic.keys()).index(year)
-            x_pos = self.get_day_position(years_dic[year][0])
-            width = (years_dic[year][-1] - years_dic[year][0]).days * self.column_width + self.column_width
-            self.year_items[index].setRect(x_pos*self.zoom_factor, 0, width*self.zoom_factor, 40)
+        for year in self.years_dic.keys():
+            index = list(self.years_dic.keys()).index(year)
+            x_pos = self.get_day_position(self.years_dic[year][0])
+            left = self.mapToScene(self.viewport().rect()).boundingRect().left()
+            right = self.mapToScene(self.viewport().rect()).boundingRect().right()
+            if x_pos < left:
+                x_pos = left
+            x_2_pos = self.get_day_position(self.years_dic[year][-1]+datetime.timedelta(days=1))
+            if x_2_pos > right:
+                x_2_pos = right
+            width = x_2_pos-x_pos
+            self.year_items[index].setRect(x_pos*self.zoom_factor,
+                                                self.pos_y,
+                                                width*self.zoom_factor,
+                                                40)
             self.year_items[index].setText(year)
 
-        while len(self.year_items) > len(years_dic.keys()):
+        while len(self.year_items) > len(self.years_dic.keys()):
             item = self.year_items.pop()
             self.scene.removeItem(item)
+        self.pos_y += 40
 
     def get_visible_columns(self):
         visible_rect = self.mapToScene(self.viewport().rect()).boundingRect()
@@ -162,7 +212,10 @@ class CalendarHeader(QtWidgets.QGraphicsView):
         return leftmost_column, visible_columns
 
     def update_rect(self, rect):
-        self.setSceneRect(rect.x(), self.sceneRect().y(), rect.width(), self.sceneRect().height())
+        self.setSceneRect(rect.x(),
+                        self.sceneRect().y(),
+                        rect.width(),
+                        self.sceneRect().height())
         self.update_header()
 
     def update_scale(self, scale_factor):
@@ -201,14 +254,21 @@ class day_item(QtWidgets.QGraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
 
-        rect = QtCore.QRectF(self.x, self.y, self.width, self.height/2)
+        number_height = self.height/2
+        if self.width <= 30:
+            number_height = self.height
+        rect = QtCore.QRectF(self.x, self.y, self.width, number_height)
         color = QtGui.QColor(255,255,255, int(255*0.85))
         if self.date.strftime("%A") in ['Saturday', 'Sunday']:
             color = QtGui.QColor(255,255,255,50)
         draw_text(painter, rect, self.date.strftime("%d"), color=color, bold=True)
         if self.width > 30:
             rect = QtCore.QRectF(self.x, self.y+self.height/2, self.width, self.height/2)
-            draw_text(painter, rect, self.date.strftime("%A")[:3], color=QtGui.QColor(255,255,255,50), bold=False)
+            draw_text(painter,
+                        rect,
+                        self.date.strftime("%A")[:3],
+                        color=QtGui.QColor(255,255,255,50),
+                        bold=False)
 
 class week_item(QtWidgets.QGraphicsItem):
     def __init__(self):
@@ -241,9 +301,16 @@ class week_item(QtWidgets.QGraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
 
-        rect = QtCore.QRectF(self.x + self.margin, self.y + self.margin, self.width - self.margin*2, self.height - self.margin*2)
+        text = f"Week {self.text}"
+        if self.width < 50:
+            text = self.text
+
+        rect = QtCore.QRectF(self.x + self.margin,
+                                self.y + self.margin,
+                                self.width - self.margin*2,
+                                self.height - self.margin*2)
         draw_rect(painter, rect, bg_color=QtGui.QColor('#232329'), radius=2)
-        draw_text(painter, rect, self.text, bold=False)
+        draw_text(painter, rect, text, bold=False)
 
 class month_item(QtWidgets.QGraphicsItem):
     def __init__(self):
@@ -276,9 +343,12 @@ class month_item(QtWidgets.QGraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
 
-        rect = QtCore.QRectF(self.x + self.margin, self.y + self.margin, self.width - self.margin*2, self.height - self.margin*2)
+        rect = QtCore.QRectF(self.x + self.margin,
+                                self.y + self.margin,
+                                self.width - self.margin*2,
+                                self.height - self.margin*2)
         draw_rect(painter, rect, bg_color=QtGui.QColor('#3d3d43'), radius=2)
-        draw_text(painter, rect, self.text, bold=False)
+        draw_text(painter, rect, self.text[4:], bold=False)
 
 class year_item(QtWidgets.QGraphicsItem):
     def __init__(self):
@@ -288,7 +358,7 @@ class year_item(QtWidgets.QGraphicsItem):
         self.y = 0
         self.width = 0
         self.height = 0
-        self.margin = 5
+        self.margin = 8
         self.text = ''
 
     def setRect(self, x, y , width, height):
@@ -311,8 +381,11 @@ class year_item(QtWidgets.QGraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
 
-        rect = QtCore.QRectF(self.x + self.margin, self.y + self.margin, self.width - self.margin*2, self.height - self.margin*2)
-        draw_text(painter, rect, self.text, size=16, bold=True, align=QtCore.Qt.AlignLeft)
+        rect = QtCore.QRectF(self.x + self.margin,
+                                self.y + self.margin,
+                                self.width - self.margin*2,
+                                self.height - self.margin*2)
+        draw_text(painter, rect, self.text, size=20, bold=True, align=QtCore.Qt.AlignLeft)
 
 class CalendarViewport(QtWidgets.QGraphicsView):
 
@@ -330,17 +403,37 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pan = False
+        self.column_width = 30
         self.last_mouse_pos = None
         self.zoom_factor = 1.0
+        self.today_item = today_item()
+        self.today_item.setZValue(1.0)
+        self.scene.addItem(self.today_item)
 
-        x, y, width, height = 0, 0, 120, 30  # Adjust the position and size as needed
-        red_box_item = RedBoxItem(x, y, width, height)
-        self.scene.addItem(red_box_item)    
+        item = empty_item()
+        self.scene.addItem(item)
+        self.move_scene_center_to_top()
+
+        date_item_1 = calendar_item(datetime.datetime(2023, 11, 6), 8)
+        self.scene.addItem(date_item_1)
+        date_item_2 = calendar_item(datetime.datetime(2023, 10, 2), 1)
+        self.scene.addItem(date_item_2)
+
+    def move_scene_center_to_top(self):
+        point = self.mapToScene(QtCore.QPoint(0,0))
+        if point.y() <= 0:
+            self.update_scene_rect(self.sceneRect().translated(0, -point.y()))
 
     def update_scene_rect(self, rect):
         self.setSceneRect(rect)
         self.scene_rect_update.emit(rect)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.move_scene_center_to_top()
 
     def wheelEvent(self, event):
         if event.modifiers() & QtCore.Qt.ControlModifier:
@@ -357,8 +450,12 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         if self.pan:
             delta = event.pos() - self.last_mouse_pos
             self.last_mouse_pos = event.pos()
-            # Translate the scene to achieve panning
-            self.update_scene_rect(self.sceneRect().translated(-delta.x()/self.zoom_factor, -delta.y()/self.zoom_factor))
+            dx = -delta.x() / self.zoom_factor
+            dy = -delta.y() / self.zoom_factor
+            point = self.mapToScene(QtCore.QPoint(0,0))
+            if point.y() + dy <= 0:
+                dy = -point.y()
+            self.update_scene_rect(self.sceneRect().translated(dx, dy))
         else:
             super().mouseMoveEvent(event)
 
@@ -370,7 +467,6 @@ class CalendarViewport(QtWidgets.QGraphicsView):
 
     def zoom(self, event):
         current_zoom = self.transform().m22()
-        # Calculate the zoom factor
         delta = event.angleDelta().y() / 120.0
         zoom_in_factor = 1.1  # Adjust as needed
         zoom_out_factor = 1 / zoom_in_factor
@@ -378,49 +474,39 @@ class CalendarViewport(QtWidgets.QGraphicsView):
             zoom = zoom_in_factor
         else:
             zoom = zoom_out_factor
-        # Limit the zoom factor to a certain range if desired
-        min_zoom = 0.05
+        min_zoom = 0.15
         max_zoom = 8.0
         new_zoom = current_zoom * zoom
         new_zoom = min(max(new_zoom, min_zoom), max_zoom)
-        # Calculate the scaling factor
         scale_factor = new_zoom / current_zoom
         self.scale_factor_update.emit(scale_factor)
         self.zoom_factor_update.emit(new_zoom)
-        # Get the mouse position in view coordinates
         mouse_view_pos = event.pos()
-        # Map the mouse position to scene coordinates
         mouse_scene_pos = self.mapToScene(mouse_view_pos)
-        # Apply the zoom transformation to the view, centered around the mouse position
         self.scale(scale_factor, scale_factor)
-        # Calculate the new position of the mouse in scene coordinates
         new_mouse_scene_pos = self.mapToScene(mouse_view_pos)
-        # Calculate the difference in position
         diff = new_mouse_scene_pos - mouse_scene_pos
-        # Adjust the scene to keep the mouse position fixed
-        self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff.x(), self.sceneRect().y() - diff.y(), self.sceneRect().width(), self.sceneRect().height()))
         self.zoom_factor = new_zoom
+        self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff.x(),
+                                self.sceneRect().y() - diff.y(),
+                                self.sceneRect().width(),
+                                self.sceneRect().height()))
+        self.move_scene_center_to_top()
+
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
         super(header_scene, self).__init__()
 
     def drawBackground(self, painter, rect):
-        # Define the alternating background colors
         color1 = QtGui.QColor('transparent')
         color2 = QtGui.QColor(0,0,0,10)
-        
-        # Define the width of each background column
-        column_width = 30  # Adjust as needed
-
-        # Calculate the starting and ending column positions
+        column_width = 30
         start_x = int(rect.left()) // column_width
         end_x = int(rect.right()) // column_width
-
-        # Iterate through the visible area and draw alternating columns
         for x in range(start_x, end_x + 1):
             x_pos = x * column_width
-            column_rect = QtCore.QRectF(x_pos, rect.top(), column_width, rect.height())
+            column_rect = QtCore.QRectF(x_pos, rect.top()+70, column_width, rect.height()-70)
             color = color1 if x % 2 == 0 else color2
             painter.fillRect(column_rect, color)
 
@@ -429,40 +515,37 @@ class scene(QtWidgets.QGraphicsScene):
         super(scene, self).__init__()
 
     def drawBackground(self, painter, rect):
-        # Define the alternating background colors
         color1 = QtGui.QColor('transparent')
         color2 = QtGui.QColor(0,0,0,20)
         line_color = QtGui.QColor(255, 255, 255, 5)
-        
-        # Define the width of each background column
-        column_width = 30  # Adjust as needed
+        column_width = 30 
         row_height = 30
-
-        # Calculate the starting and ending row positions
         start_y = int(rect.top()) // row_height
         end_y = int(rect.bottom()) // row_height
-
-        # Draw horizontal lines
-        for y in range(start_y, end_y + 2):  # +2 to ensure a line at both ends
+        for y in range(start_y, end_y + 2):
             y_pos = y * row_height
             line = QtCore.QLineF(rect.left(), y_pos, rect.right(), y_pos)
             painter.setPen(QtGui.QPen(line_color, 1, QtCore.Qt.SolidLine))
             painter.drawLine(line)
-
-        # Calculate the starting and ending column positions
         start_x = int(rect.left()) // column_width
         end_x = int(rect.right()) // column_width
-
-        # Iterate through the visible area and draw alternating columns
         for x in range(start_x, end_x + 1):
             x_pos = x * column_width
             column_rect = QtCore.QRectF(x_pos, rect.top(), column_width, rect.height())
             color = color1 if x % 2 == 0 else color2
             painter.fillRect(column_rect, color)
+            if x_pos == 0:
+                draw_rect(painter, column_rect, bg_color=QtGui.QColor(255,255,255,3), outline=QtGui.QColor(255,255,255,20))
         
-class RedBoxItem(QtWidgets.QGraphicsItem):
-    def __init__(self, x, y, width, height):
-        super(RedBoxItem, self).__init__()
+class empty_item(QtWidgets.QGraphicsItem):
+    def __init__(self):
+        super(empty_item, self).__init__()
+        self.x = 0
+        self.y = 0
+        self.width = 1
+        self.height = 1
+
+    def setRect(self, x, y , width, height):
         self.x = x
         self.y = y
         self.width = width
@@ -472,18 +555,89 @@ class RedBoxItem(QtWidgets.QGraphicsItem):
         return QtCore.QRectF(self.x, self.y, self.width, self.height)
 
     def paint(self, painter, option, widget):
-        red_color = QtGui.QColor(255, 0, 0, 30)  # Red color
-        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.SolidLine)
-        brush = QtGui.QBrush(red_color)
-
+        color = QtGui.QColor('transparent')
+        pen = QtGui.QPen(QtGui.QColor('red'), 1, QtCore.Qt.SolidLine)
+        brush = QtGui.QBrush(color)
         painter.setPen(pen)
         painter.setBrush(brush)
-
         painter.drawRect(self.x, self.y, self.width, self.height)
+
+class today_item(QtWidgets.QGraphicsItem):
+    def __init__(self):
+        super(today_item, self).__init__()
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
+        self.x = 0
+        self.y = 0
+        self.width = 0
+        self.height = 0
+
+    def setRect(self, x, y , width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+    def boundingRect(self):
+        return QtCore.QRectF(self.x, self.y, self.width, self.height)
+
+    def paint(self, painter, option, widget):
+        color = QtGui.QColor(QtGui.QColor(255,255,255,3))
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,20), 1, QtCore.Qt.SolidLine)
+        brush = QtGui.QBrush(color)
+        painter.setPen(pen)
+        painter.setBrush(brush)
+        painter.drawRect(self.x, self.y, self.width, self.height)
+
+class calendar_item(QtWidgets.QGraphicsItem):
+    def __init__(self, date, duration):
+        super(calendar_item, self).__init__()
+        self.date = date
+        self.duration = duration
+        self.move = False
+        self.set_rect()
+
+    def set_rect(self):
+        self.x = ((datetime.datetime.today() - self.date ).days) * -30
+        self.y = 0
+        self.width = (self.duration) * 30
+        self.height = 30
+
+    def mousePressEvent(self, event):
+        print('ZIZI')
+        if event.button() == QtCore.Qt.LeftButton:
+            self.move = True
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.move:
+            print(self.mapToItem(self, event.pos()).x())
+            delta = int((self.mapToScene(event.pos()).x())/30)
+            self.date = datetime.datetime.today() + datetime.timedelta(days=delta)
+            self.set_rect()
+            self.scene().update()
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.move = False
+        else:
+            super().mouseReleaseEvent(event)
+
+    def boundingRect(self):
+        return QtCore.QRectF(self.x, self.y, self.width, self.height)
+
+    def paint(self, painter, option, widget):
+        color = QtGui.QColor(QtGui.QColor(255,255,255,3))
+        rect = QtCore.QRectF(self.x, self.y, self.width, self.height)
+        draw_rect(painter, rect, bg_color = QtGui.QColor(255,0,0,60))
 
 class calendarWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(calendarWidget, self).__init__(parent)
+
+        self.resize(800, 600)
 
         self.header_view = CalendarHeader()
         self.view = CalendarViewport()
@@ -497,9 +651,10 @@ class calendarWidget(QtWidgets.QWidget):
         self.view.zoom_factor_update.connect(self.header_view.update_zoom_factor)
 
     def build_ui(self):
+        self.setObjectName('main_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(1)
+        self.main_layout.setSpacing(5)
         self.setLayout(self.main_layout)
 
         self.main_layout.addWidget(self.header_view)

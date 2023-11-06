@@ -40,6 +40,7 @@ import time
 import socket
 import json
 import logging
+import traceback
 
 # Wizard modules
 from wizard.core import db_utils
@@ -722,6 +723,8 @@ def get_all_artefacts_stocks(column='*'):
 
 def init_artefacts_stock():
     repository_artefacts = get_all_artefacts_stocks('artefact')
+    if repository_artefacts is None:
+        repository_artefacts = []
     for artefact in game_vars.artefacts_dic.keys():
         if artefact not in repository_artefacts:
             db_utils.create_row('repository',
@@ -753,7 +756,7 @@ def remove_artefact_stock(artefact):
                                 ('stock', new_stock),
                                 ('artefact', artefact))
 
-def add_artefact_stock(artefact):
+def add_artefact_stock(artefact):   
     stock = get_artefact_stock(artefact)
     return db_utils.update_data('repository',
                                 'artefacts',
@@ -773,6 +776,11 @@ def get_current_ip_data(column='*'):
 
 def init_repository(admin_password, admin_email):
     create_admin_user(admin_password, admin_email)
+    init_quotes()
+    init_artefacts_stock()
+    return 1
+
+def init_quotes():
     for quote in repository_vars._default_quotes_list_:
         db_utils.create_row('repository',
                             'quotes', 
@@ -784,7 +792,6 @@ def init_repository(admin_password, admin_email):
                                 quote,
                                 json.dumps([]),
                                 json.dumps([])))
-    return 1
 
 def create_repository_database():
     if not db_utils.create_database(environment.get_repository()):
@@ -795,7 +802,6 @@ def create_repository_database():
     create_quotes_table()
     create_attack_events_table()
     create_artefacts_table()
-    init_artefacts_stock()
     return 1
 
 def is_repository_database(repository_name = None):
@@ -807,7 +813,6 @@ def is_repository_database(repository_name = None):
 
 def create_admin_user(admin_password, admin_email):
     profile_picture = image.convert_image_to_str_data(image.user_random_image('admin'), 100)
-    print('caca')
     if not db_utils.create_row('repository',
                             'users', 
                             ('user_name', 
@@ -937,5 +942,5 @@ def create_artefacts_table():
                                     );"""
     if not db_utils.create_table(environment.get_repository(), sql_cmd):
         return
-    logger.info("Attack events table created")
+    logger.info("Artefacts table created")
     return 1
