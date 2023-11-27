@@ -2,6 +2,12 @@
   update_list:
   - !!python/tuple
     - debug
+    - Substance painter preset load fixed.
+  time: 1701098485.4675887  
+'3.4.1.287':
+  update_list:
+  - !!python/tuple
+    - debug
     - Create repository fixed
   - !!python/tuple
     - debug

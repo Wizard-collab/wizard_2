@@ -114,13 +114,13 @@ class export_ui(QtWidgets.QDialog):
 
     def save_preferences(self, material=None, size=None, type=None):
         if not material:
-            preset = self.presets_comboBox.currentText()
+            material = self.presets_comboBox.currentText()
         if not size:
             size = self.image_sizes_comboBox.currentText()
         if not type:
             type = self.file_formats_comboBox.currentText()
         preferences_dic = dict()
-        preferences_dic['material'] = preset
+        preferences_dic['material'] = material
         preferences_dic['size'] = size
         preferences_dic['type'] = type
         with open(self.settings_file, 'w') as f:
