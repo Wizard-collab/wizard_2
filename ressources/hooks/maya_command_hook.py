@@ -20,6 +20,7 @@ def abc_command(start,
     abc_command = "-frameRange {start} {end} "
     abc_command += "-step 1 -frameRelativeSample -0.2 -frameRelativeSample 0 -frameRelativeSample 0.2 "
     abc_command += "-attr wizardTags "
+    abc_command += "-attr ObjectName "
     abc_command += "-writeVisibility "
     abc_command += "-writeUVSets -uvWrite "
     abc_command += "-worldSpace "

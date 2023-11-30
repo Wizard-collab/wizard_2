@@ -63,7 +63,7 @@ def copy_save(evt):
     shutil.copyfile(saved_file, network_file_path)
 
 def export(material, size, file_type):
-    save_or_save_increment()
+    save()
     substance_painter_export.export_textures(material, size, file_type)
 
 def save_or_save_increment():

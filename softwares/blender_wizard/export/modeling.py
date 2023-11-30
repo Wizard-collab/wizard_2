@@ -17,7 +17,7 @@ from blender_wizard import wizard_export
 import bpy
 
 def main(comment=''):
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save_increment()
     try:
 
         collections_dic = wizard_tools.get_export_grps('modeling_GRP')

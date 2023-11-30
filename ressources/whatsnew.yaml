@@ -2,6 +2,15 @@
   update_list:
   - !!python/tuple
     - debug
+    - Maya cfx export fixed
+  - !!python/tuple
+    - new
+    - When exporting, the scene is incrementally saved.
+  time: 1701362608.1928096  
+'3.4.2.288':
+  update_list:
+  - !!python/tuple
+    - debug
     - Substance painter preset load fixed.
   time: 1701098485.4675887  
 '3.4.1.287':

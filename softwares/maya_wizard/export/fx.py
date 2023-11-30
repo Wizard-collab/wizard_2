@@ -17,7 +17,7 @@ from maya_wizard import wizard_export
 import pymel.core as pm
 
 def main(frange, comment=''):
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save_increment()
     try:
         groups_dic = wizard_tools.get_export_grps('fx_GRP')
         if groups_dic == dict():

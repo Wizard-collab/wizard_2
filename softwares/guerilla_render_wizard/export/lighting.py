@@ -18,7 +18,7 @@ from guerilla_render_wizard import wizard_render
 import wizard_communicate
 
 def main(render_type, frange, farm=0):
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save_increment()
     try:
         if render_type in ['FML', 'LD', 'HD']:
 

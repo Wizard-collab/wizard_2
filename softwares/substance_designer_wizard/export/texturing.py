@@ -10,6 +10,7 @@ import logging
 # Wizard modules
 import wizard_communicate
 from substance_designer_wizard import wizard_export
+from substance_designer_wizard import wizard_tools
 
 # Substance designer modules
 import sd
@@ -21,7 +22,7 @@ logger.propagate = False
 logger.setLevel(logging.INFO)
 
 def main():
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save()
     try:
         export_name = 'main'
         asset_name = os.environ['wizard_asset_name']

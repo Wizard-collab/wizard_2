@@ -58,6 +58,7 @@ def save():
     get_packageMgr().savePackageAs(pkg, file_path)
     os.environ['wizard_version_id'] = str(version_id)
     trigger_after_save_hook(file_path)
+    return file_path
 
 def trigger_after_save_hook(scene_path):
     stage_name = os.environ['wizard_stage_name']

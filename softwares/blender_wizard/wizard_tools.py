@@ -26,6 +26,7 @@ def save_increment(comment=''):
         bpy.ops.wm.save_as_mainfile(filepath=file_path)
         os.environ['wizard_version_id'] = str(version_id)
         trigger_after_save_hook(file_path)
+        return file_path
     else:
         logger.warning("Can't save increment")
 

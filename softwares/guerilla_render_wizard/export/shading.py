@@ -14,7 +14,7 @@ from guerilla_render_wizard import wizard_tools
 from guerilla_render_wizard import wizard_export
 
 def main(comment=''):
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save_increment()
     try:
         groups_dic = wizard_tools.get_export_grps('shading_GRP')
         if groups_dic == dict():

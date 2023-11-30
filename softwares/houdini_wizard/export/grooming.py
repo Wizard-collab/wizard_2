@@ -17,7 +17,7 @@ from houdini_wizard import wizard_export
 
 
 def main(comment=''):
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save_increment()
     try:
         if wizard_communicate.get_export_format(int(os.environ['wizard_work_env_id'])) == 'abc':
             out_nodes_dic = wizard_tools.get_export_nodes('wizard_grooming_output')

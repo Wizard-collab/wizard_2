@@ -16,7 +16,7 @@ from houdini_wizard import wizard_export
 # Houdini modules
 
 def main(comment=''):
-    scene = wizard_export.save_or_save_increment()
+    scene = wizard_tools.save_increment()
     try:
         out_nodes_dic = wizard_tools.get_export_nodes('wizard_layout_output')
         if out_nodes_dic == dict():
