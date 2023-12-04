@@ -16,7 +16,7 @@ from houdini_wizard import wizard_export
 # Houdini modules
 
 def main(comment=''):
-    scene = wizard_tools.save_increment()
+    scene = wizard_export.save_or_save_increment()
     try:
         export_name = 'main'
         asset_name = os.environ['wizard_asset_name']

@@ -167,6 +167,36 @@ QTreeView::item:selected:!active {
 	color:rgb(215,215,215);
 }
 
+#delegate_tree{
+	background-color: transparent;
+	alternate-background-color: #29292f;
+}
+
+#delegate_tree::item {
+	padding:4px;
+	border-radius:4px;
+	margin: 1px;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+#delegate_tree::item:hover {
+	background-color:rgba(255,255,255,0);
+}
+ 
+#delegate_tree::item:selected {
+	background-color:rgba(255,255,255,0);
+}
+ 
+#delegate_tree::item:selected:active{
+	background-color:rgba(255,255,255,0);
+}
+ 
+#delegate_tree::item:selected:!active {
+	background-color:rgba(255,255,255,0);
+	color:rgb(215,215,215);
+}
+
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
         image: url(ressources/icons/QTreeViewRight.svg);
@@ -482,15 +512,6 @@ QTableCornerButton::section {
 	border-radius: 5px;
 }
 
-#tree_widget{
-	background-color: transparent;
-	alternate-background-color: rgba(0,0,0,20);
-}
-
-#tree_widget::item{
-	margin-left: 0px;
-	margin-right: 0px;
-}
 
 #table_widget_horizontal_header_view::section{
 	border-top: 1px solid rgba(0,0,0,80);

@@ -14,7 +14,7 @@ from nuke_wizard import wizard_tools
 from nuke_wizard import wizard_export
 
 def main(comment=''):
-    scene = wizard_tools.save_increment()
+    scene = wizard_export.save_or_save_increment()
     try:
         export_name = 'main'
         asset_name = os.environ['wizard_asset_name']

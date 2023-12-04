@@ -115,9 +115,10 @@ class tree_widget(QtWidgets.QFrame):
         self.data_label.setObjectName('tree_datas_label')
         self.main_layout.addWidget(self.data_label)
 
-        self.tree = QtWidgets.QTreeWidget()
+        self.tree = tree()
+        self.tree.setObjectName('delegate_tree')
 
-        self.tree.setObjectName('tree_widget')
+        #self.tree.setObjectName('tree_widget')
         self.tree.setAnimated(0)
         self.tree.setColumnCount(4)
         self.tree.header().resizeSection(0, 190)
@@ -364,6 +365,10 @@ class tree_widget(QtWidgets.QFrame):
                                                     instance_name = row['name'],
                                                     instance_type = 'domain',
                                                     instance_id = row['id'])
+            self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[row['name']])
+            self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[row['name']])
+            self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[row['name']])
+            self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[row['name']])
             domain_item.setIcon(0, self.icons_dic['domain'][f"{row['name']}"])
             domain_item.setText(0, row['name'])
             self.domain_ids[row['id']] = domain_item
@@ -1160,6 +1165,52 @@ class search_thread(QtCore.QThread):
 
             if all(keyword.upper() in data.upper() for keyword in keywords):
                 self.item_signal.emit(stage_row['id'])
+
+class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super(ColoredItemDelegate, self).__init__(parent)
+
+    def paint(self, painter, option, index):
+        color_data = index.data(QtCore.Qt.UserRole + 1)
+
+        if color_data:
+            selected_color = QtGui.QColor(color_data)
+            hover_color = QtGui.QColor(color_data)
+            hover_color.setAlpha(150)
+            color = QtGui.QColor(color_data)
+            color.setAlpha(130)
+        else:
+            selected_color = QtGui.QColor(255, 255, 255, 30)
+            hover_color = QtGui.QColor(255, 255, 255, 10)
+            color = QtGui.QColor(255, 255, 255, 0)
+
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+        
+        if option.state & QtWidgets.QStyle.State_Selected and option.state & QtWidgets.QStyle.State_MouseOver:
+            painter.setBrush(QtGui.QBrush(selected_color))
+        elif option.state & QtWidgets.QStyle.State_MouseOver:
+            painter.setBrush(QtGui.QBrush(hover_color))
+        elif option.state & QtWidgets.QStyle.State_Selected:
+            painter.setBrush(QtGui.QBrush(selected_color))
+        else:
+            painter.setBrush(QtGui.QBrush(color))
+
+        painter.drawRoundedRect(option.rect, 4, 4)
+
+        # Let the default painting handle the column-specific content
+        super(ColoredItemDelegate, self).paint(painter, option, index)
+
+class tree(QtWidgets.QTreeWidget):
+    def __init__(self, parent=None):
+        super(tree, self).__init__(parent)
+
+        # Set the custom item delegate for the tree widget
+        self.setItemDelegate(ColoredItemDelegate(self))
+
+    def set_background_color(self, item, column, color):
+        # Set the background color for the specified column using a custom role
+        item.setData(column, QtCore.Qt.UserRole + 1, color)
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

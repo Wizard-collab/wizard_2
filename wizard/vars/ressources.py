@@ -432,6 +432,12 @@ _softwares_icons_dic_[_blender_] = path_utils.join(_icons_path_, 'blender.svg')
 for key in _softwares_icons_dic_.keys():
 	_available_icons_list_.append(_softwares_icons_dic_[key])
 
+# Domains colors
+_domains_colors_ = dict()
+_domains_colors_['assets'] = '#fb7771'
+_domains_colors_['library'] = '#edd753'
+_domains_colors_['sequences'] = '#90cc72'
+
 # Production manager colors
 _states_colors_ = dict()
 _states_colors_['todo'] = '#3a3a41'

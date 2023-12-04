@@ -18,7 +18,7 @@ from maya_wizard import wizard_export
 import pymel.core as pm
 
 def main(nspace_list, frange, comment=''):
-    scene = wizard_tools.save_increment()
+    scene = wizard_export.save_or_save_increment()
     try:
         if wizard_communicate.get_export_format(os.environ['wizard_work_env_id']) == 'fur':
             main_fur(nspace_list, frange, comment=comment)

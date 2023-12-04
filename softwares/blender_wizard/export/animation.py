@@ -19,7 +19,7 @@ from blender_wizard import wizard_export
 import bpy
 
 def main(nspace_list, frange, comment=''):
-    scene = wizard_tools.save_increment()
+    scene = wizard_export.save_or_save_increment()
     try:
         at_least_one = False
         rigging_references = get_rig_nspaces()

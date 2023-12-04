@@ -1,6 +1,15 @@
 'last':
   update_list:
   - !!python/tuple
+    - new
+    - Domain colors in the outliner
+  - !!python/tuple
+    - rollback
+    - When exporting the scene is only saved.
+  time: 1701684541.9175708  
+'3.4.3.289':
+  update_list:
+  - !!python/tuple
     - debug
     - Maya cfx export fixed
   - !!python/tuple
