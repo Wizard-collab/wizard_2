@@ -2,6 +2,12 @@
   update_list:
   - !!python/tuple
     - new
+    - You can choose if you want outliner colors or not
+  time: 1701767382.764739  
+'3.4.4.290':
+  update_list:
+  - !!python/tuple
+    - new
     - Domain colors in the outliner
   - !!python/tuple
     - rollback

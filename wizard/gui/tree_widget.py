@@ -45,6 +45,7 @@ class tree_widget(QtWidgets.QFrame):
         self.assignment_visibility = 1
         self.state_visibility = 1
         self.priority_visibility = 1
+        self.color_visibility = 1
 
         self.domain_ids=dict()
         self.category_ids=dict()
@@ -168,6 +169,7 @@ class tree_widget(QtWidgets.QFrame):
         context_dic['assignment_visibility'] = self.assignment_visibility
         context_dic['state_visibility'] = self.state_visibility
         context_dic['priority_visibility'] = self.priority_visibility
+        context_dic['priority_visibility'] = self.color_visibility
         context_dic['expanded_domains'] = []
         context_dic['expanded_categories'] = []
         context_dic['expanded_assets'] = []
@@ -222,6 +224,8 @@ class tree_widget(QtWidgets.QFrame):
                 self.assignment_visibility = context_dic['assignment_visibility']
             if 'priority_visibility' in context_dic.keys():
                 self.priority_visibility = context_dic['priority_visibility']
+            if 'color_visibility' in context_dic.keys():
+                self.color_visibility = context_dic['color_visibility']
             self.update_creation_items_visibility()
             self.update_columns_visibility()
 
@@ -343,6 +347,10 @@ class tree_widget(QtWidgets.QFrame):
         self.priority_visibility = not self.priority_visibility
         self.update_columns_visibility()
 
+    def toggle_color_visibility(self):
+        self.color_visibility = not self.color_visibility
+        self.refresh()
+
     def update_creation_items_visibility(self):
         for creation_item in self.creation_items:
             creation_item.setHidden(not self.creation_items_visibility)
@@ -365,16 +373,24 @@ class tree_widget(QtWidgets.QFrame):
                                                     instance_name = row['name'],
                                                     instance_type = 'domain',
                                                     instance_id = row['id'])
-            self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[row['name']])
-            self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[row['name']])
-            self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[row['name']])
-            self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[row['name']])
+            
             domain_item.setIcon(0, self.icons_dic['domain'][f"{row['name']}"])
             domain_item.setText(0, row['name'])
             self.domain_ids[row['id']] = domain_item
             self.tree.addTopLevelItem(domain_item)
             if row['id'] != 1:
                 self.add_creation_item(domain_item, 'new', 'category_creation')
+        domain_item = self.domain_ids[row['id']]
+        if self.color_visibility:
+            self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[row['name']], opacity=110)
+            self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[row['name']], opacity=110)
+            self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[row['name']], opacity=110)
+            self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[row['name']], opacity=110)
+        else:
+            self.tree.set_background_color(domain_item, 0, None)
+            self.tree.set_background_color(domain_item, 1, None)
+            self.tree.set_background_color(domain_item, 2, None)
+            self.tree.set_background_color(domain_item, 3, None)
 
     def add_category(self, row):
         if row['domain_id'] in self.domain_ids.keys():
@@ -393,6 +409,18 @@ class tree_widget(QtWidgets.QFrame):
             else:
                 self.category_ids[row['id']].state_indicator.clear_states()
                 self.category_ids[row['id']].priority_indicator.clear_priorities()
+            parent_widget = self.domain_ids[row['domain_id']]
+            category_item = self.category_ids[row['id']]
+            if self.color_visibility:
+                self.tree.set_background_color(category_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+            else:
+                self.tree.set_background_color(category_item, 0, None)
+                self.tree.set_background_color(category_item, 1, None)
+                self.tree.set_background_color(category_item, 2, None)
+                self.tree.set_background_color(category_item, 3, None)
 
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -413,6 +441,19 @@ class tree_widget(QtWidgets.QFrame):
             else:
                 self.asset_ids[row['id']].state_indicator.clear_states()
                 self.asset_ids[row['id']].priority_indicator.clear_priorities()
+            parent_widget = self.category_ids[row['category_id']]
+            domain_widget = parent_widget.parent()
+            asset_item = self.asset_ids[row['id']]
+            if self.color_visibility:
+                self.tree.set_background_color(asset_item, 0, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 1, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 2, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 3, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
+            else:
+                self.tree.set_background_color(asset_item, 0, None)
+                self.tree.set_background_color(asset_item, 1, None)
+                self.tree.set_background_color(asset_item, 2, None)
+                self.tree.set_background_color(asset_item, 3, None)
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
@@ -665,10 +706,15 @@ class tree_widget(QtWidgets.QFrame):
         if self.priority_visibility:
             priority_visibility_icon = ressources._check_icon_
 
+        color_visibility_icon = ressources._uncheck_icon_
+        if self.color_visibility:
+            color_visibility_icon = ressources._check_icon_
+
         hide_creation_items = menu.addAction(QtGui.QIcon(creation_items_visibility_icon), f'Creation items')
         hide_assignment = menu.addAction(QtGui.QIcon(assignment_visibility_icon), f'Assignment')
         hide_state = menu.addAction(QtGui.QIcon(state_visibility_icon), f'State')
         hide_priority = menu.addAction(QtGui.QIcon(priority_visibility_icon), f'Priority')
+        hide_colors = menu.addAction(QtGui.QIcon(color_visibility_icon), f'Color')
 
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
@@ -692,6 +738,8 @@ class tree_widget(QtWidgets.QFrame):
                 self.toggle_state_visibility()
             elif action == hide_priority:
                 self.toggle_priority_visibility()
+            elif action == hide_colors:
+                self.toggle_color_visibility()
             elif action == edit_frame_range_action:
                 self.edit_frame_range(item)
 
@@ -1172,13 +1220,15 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         color_data = index.data(QtCore.Qt.UserRole + 1)
+        opacity = index.data(QtCore.Qt.UserRole + 2)
 
         if color_data:
             selected_color = QtGui.QColor(color_data)
+            selected_color.setAlpha(int(opacity*2))
             hover_color = QtGui.QColor(color_data)
-            hover_color.setAlpha(150)
+            hover_color.setAlpha(int(opacity*1.4))
             color = QtGui.QColor(color_data)
-            color.setAlpha(130)
+            color.setAlpha(opacity)
         else:
             selected_color = QtGui.QColor(255, 255, 255, 30)
             hover_color = QtGui.QColor(255, 255, 255, 10)
@@ -1196,7 +1246,33 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
         else:
             painter.setBrush(QtGui.QBrush(color))
 
-        painter.drawRoundedRect(option.rect, 4, 4)
+        view = option.widget
+        if view is not None:
+            visible_columns = []
+            for col in range(view.model().columnCount()):
+                if not view.isColumnHidden(col):
+                    visible_columns.append(col)
+
+        if len(visible_columns) == 1:
+            painter.drawRoundedRect(option.rect, 4, 4)
+        elif index.column() == visible_columns[0]:
+            rect = QtCore.QRectF(option.rect)
+            left_path = QtGui.QPainterPath()
+            left_path.addRoundedRect(rect.adjusted(0, 0, -rect.width() + 4*2, 0), 4, 4)
+            right_path = QtGui.QPainterPath()
+            right_path.addRoundedRect(rect.adjusted(4, 0, 0, 0), 0, 0)
+            path = left_path + right_path
+            painter.drawPath(path)
+        elif index.column() not in [visible_columns[0], visible_columns[-1]]:
+            painter.drawRoundedRect(option.rect, 0, 0)
+        elif index.column() == visible_columns[-1]:
+            rect = QtCore.QRectF(option.rect)
+            left_path = QtGui.QPainterPath()
+            left_path.addRoundedRect(rect.adjusted(0, 0, -4, 0), 0, 0)
+            right_path = QtGui.QPainterPath()
+            right_path.addRoundedRect(rect.adjusted(rect.width(), 0, -rect.width() + 4*2, 0), 4, 4)
+            path = left_path + right_path
+            painter.drawPath(path)
 
         # Let the default painting handle the column-specific content
         super(ColoredItemDelegate, self).paint(painter, option, index)
@@ -1208,9 +1284,10 @@ class tree(QtWidgets.QTreeWidget):
         # Set the custom item delegate for the tree widget
         self.setItemDelegate(ColoredItemDelegate(self))
 
-    def set_background_color(self, item, column, color):
+    def set_background_color(self, item, column, color, opacity=255):
         # Set the background color for the specified column using a custom role
         item.setData(column, QtCore.Qt.UserRole + 1, color)
+        item.setData(column, QtCore.Qt.UserRole + 2, opacity)
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
