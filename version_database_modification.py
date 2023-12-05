@@ -38,4 +38,6 @@ from wizard.core import project
 from wizard.core import db_utils
 
 def main():
-	project.create_tag_groups_table(environment.get_project_name())
+	project.create_assets_groups_table(environment.get_project_name())
+	sql_cmd = """ALTER TABLE assets ADD COLUMN IF NOT EXISTS assets_group_id integer REFERENCES assets_groups (id);"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)

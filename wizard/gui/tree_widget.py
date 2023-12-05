@@ -49,6 +49,7 @@ class tree_widget(QtWidgets.QFrame):
 
         self.domain_ids=dict()
         self.category_ids=dict()
+        self.assets_groups_ids=dict()
         self.asset_ids=dict()
         self.stage_ids=dict()
         self.creation_items=[]
@@ -70,6 +71,7 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic = dict()
         self.icons_dic['add'] = QtGui.QIcon(ressources._add_icon_small_)
         self.icons_dic['folder'] = QtGui.QIcon(ressources._folder_icon_small_)
+        self.icons_dic['assets_groups'] = QtGui.QIcon(ressources._assets_group_icon_)
         self.icons_dic['domain'] = dict()
         self.icons_dic['domain']['assets'] = QtGui.QIcon(ressources._assets_icon_)
         self.icons_dic['domain']['library'] = QtGui.QIcon(ressources._library_icon_)
@@ -128,6 +130,8 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setDragEnabled(True)
+        #self.tree.setDropIndicatorShown(True)
+        self.tree.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.tree.setAlternatingRowColors(True)
         self.tree.setHeaderHidden(True)
         self.tree.setIndentation(16)
@@ -144,6 +148,8 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.itemDoubleClicked.connect(self.double_click)
         self.tree.itemSelectionChanged.connect(self.item_changed)
         self.tree.customContextMenuRequested.connect(self.context_menu_requested)
+        self.tree.move_asset_to_assets_group.connect(self.move_asset_to_assets_group)
+        self.tree.remove_asset_from_assets_group.connect(self.remove_asset_from_assets_group)
 
     def item_changed(self):#, item):
         item = self.tree.currentItem()
@@ -237,6 +243,7 @@ class tree_widget(QtWidgets.QFrame):
         self.refresh_users_icons_dic()
 
         self.project_category_ids = []
+        self.project_assets_groups_ids = []
         self.project_asset_ids = []
         self.project_stage_ids = []
 
@@ -245,6 +252,9 @@ class tree_widget(QtWidgets.QFrame):
         for category_row in project.get_all_categories():
             self.add_category(category_row)
             self.project_category_ids.append(category_row['id'])
+        for group_row in project.get_all_assets_groups():
+            self.add_assets_group(group_row)
+            self.project_assets_groups_ids.append(group_row['id'])
         for asset_row in project.get_all_assets():
             self.add_asset(asset_row)
             self.project_asset_ids.append(asset_row['id'])
@@ -264,6 +274,10 @@ class tree_widget(QtWidgets.QFrame):
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
+        #assets_groups_ids = list(self.assets_groups_ids.keys())
+        #for id in assets_groups_ids:
+        #    if id not in self.project_assets_groups_ids:
+        #        self.remove_assets_group(id)
         
         for domain_id in self.domain_ids.keys():
             self.sort_domain_children(domain_id)
@@ -278,6 +292,14 @@ class tree_widget(QtWidgets.QFrame):
             self.get_context()
         self.update_creation_items_visibility()
         self.update_refresh_time(start_time)
+
+    def move_asset_to_assets_group(self, tuple):
+        project.add_asset_to_assets_group(tuple[0], tuple[1])
+        gui_server.refresh_team_ui()
+
+    def remove_asset_from_assets_group(self, asset_id):
+        project.remove_asset_from_assets_group(asset_id)
+        gui_server.refresh_team_ui()
 
     def sort_domain_children(self, domain_id):
         if self.domain_ids[domain_id].instance_name == 'assets':
@@ -422,10 +444,44 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(category_item, 2, None)
                 self.tree.set_background_color(category_item, 3, None)
 
+    def add_assets_group(self, row):
+        if row['category_id'] in self.category_ids.keys():
+            if row['id'] not in self.assets_groups_ids.keys():
+                parent_widget = self.category_ids[row['category_id']]
+                assets_group_item = custom_treeWidgetItem(parent_widget, 
+                                                        instance_name = row['name'],
+                                                        instance_type = 'assets_group',
+                                                        instance_id = row['id'])
+                assets_group_item.setIcon(0, self.icons_dic['assets_groups'])
+                assets_group_item.setText(0, row['name'])
+                self.assets_groups_ids[row['id']] = assets_group_item
+                parent_widget.addChild(assets_group_item)
+                assets_group_item.add_indicators()
+            else:
+                self.assets_groups_ids[row['id']].state_indicator.clear_states()
+                self.assets_groups_ids[row['id']].priority_indicator.clear_priorities()
+            
+            category_item = self.category_ids[row['category_id']]
+            parent_widget = category_item.parent()
+            assets_group_item = self.assets_groups_ids[row['id']]
+            if self.color_visibility:
+                self.tree.set_background_color(assets_group_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+            else:
+                self.tree.set_background_color(assets_group_item, 0, None)
+                self.tree.set_background_color(assets_group_item, 1, None)
+                self.tree.set_background_color(assets_group_item, 2, None)
+                self.tree.set_background_color(assets_group_item, 3, None)
+
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
             if row['id'] not in self.asset_ids.keys():
-                parent_widget = self.category_ids[row['category_id']]
+                if row['assets_group_id']:
+                    parent_widget = self.assets_groups_ids[row['assets_group_id']]
+                else:
+                    parent_widget = self.category_ids[row['category_id']]
                 asset_item = custom_treeWidgetItem(parent_widget, 
                                                         instance_name = row['name'],
                                                         instance_type = 'asset',
@@ -441,6 +497,8 @@ class tree_widget(QtWidgets.QFrame):
             else:
                 self.asset_ids[row['id']].state_indicator.clear_states()
                 self.asset_ids[row['id']].priority_indicator.clear_priorities()
+                self.move_asset(row)
+
             parent_widget = self.category_ids[row['category_id']]
             domain_widget = parent_widget.parent()
             asset_item = self.asset_ids[row['id']]
@@ -454,6 +512,20 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(asset_item, 1, None)
                 self.tree.set_background_color(asset_item, 2, None)
                 self.tree.set_background_color(asset_item, 3, None)
+
+    def move_asset(self, row):
+        if row['assets_group_id']:
+            parent_widget = self.assets_groups_ids[row['assets_group_id']]
+        else:
+            parent_widget = self.category_ids[row['category_id']]
+
+        if parent_widget == self.asset_ids[row['id']].parent():
+            return
+        self.asset_ids[row['id']].parent().takeChild(self.asset_ids[row['id']].parent().indexOfChild(self.asset_ids[row['id']]))
+        parent_widget.addChild(self.asset_ids[row['id']])
+        self.asset_ids[row['id']].add_indicators()
+        for i in range(self.asset_ids[row['id']].childCount()):
+            self.asset_ids[row['id']].child(i).add_indicators()
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
@@ -484,7 +556,11 @@ class tree_widget(QtWidgets.QFrame):
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
-        domain_name = parent_widget.parent().parent().instance_name
+        great_parent = parent_widget.parent()
+        if great_parent.instance_type == 'assets_group':
+            domain_name = great_parent.parent().parent().instance_name
+        else:
+            domain_name = parent_widget.parent().parent().instance_name
         if child_count == len(assets_vars._stages_list_[domain_name]) + 1:
             for i in range(child_count):
                 if parent_widget.child(i).instance_type == 'stage_creation':
@@ -1271,14 +1347,100 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
         super(ColoredItemDelegate, self).paint(painter, option, index)
 
 class tree(QtWidgets.QTreeWidget):
+
+    move_asset_to_assets_group = pyqtSignal(tuple)
+    remove_asset_from_assets_group = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super(tree, self).__init__(parent)
         self.setItemDelegate(ColoredItemDelegate(self))
+        self._dragroot = self.itemRootIndex()
 
     def set_background_color(self, item, column, color, opacity=255):
         # Set the background color for the specified column using a custom role
         item.setData(column, QtCore.Qt.UserRole + 1, color)
         item.setData(column, QtCore.Qt.UserRole + 2, opacity)
+
+    def itemRootIndex(self, item=None):
+        root = self.invisibleRootItem()
+        while item is not None:
+            item = item.parent()
+            if item is not None:
+                root = item
+        return QtCore.QPersistentModelIndex(
+            self.indexFromItem(root))
+
+    def startDrag(self, supportedActions):
+        item = self.currentItem()
+        if item.instance_type != 'asset':
+            return
+        self._dragroot = self.itemRootIndex(item)
+        super(tree, self).startDrag(supportedActions)
+
+    def dragEnterEvent(self, event):
+        self._drag_event(event, True)
+
+    def dragMoveEvent(self, event):
+        self._drag_event(event, False)
+
+    def _drag_event(self, event, enter=True):
+        items = []
+        disable = False
+        item = self.itemAt(event.pos())
+        asset_item = self.currentItem()
+        if item is not None:
+            if item.instance_type not in ['assets_group', 'category']:
+                disable = True
+            elif item.instance_type in ['assets_group']:
+                asset_item_category_parent = asset_item.parent()
+                if asset_item_category_parent.instance_type != 'category':
+                    asset_item_category_parent = asset_item_category_parent.parent()
+                item_category_parent = item.parent()
+                if asset_item_category_parent != item_category_parent:
+                    disable = True
+                else:
+                    disable = False
+            elif item.instance_type in ['category']:
+                asset_item_category_parent = asset_item.parent()
+                if asset_item_category_parent.instance_type != 'category':
+                    asset_item_category_parent = asset_item_category_parent.parent()
+                if asset_item_category_parent != item:
+                    disable = True
+                else:
+                    disable = False
+
+        if disable:
+            parent = item.parent()
+            if parent is None:
+                parent=self.invisibleRootItem()
+            for item in item, parent:
+                if item is not None:
+                    flags = item.flags()
+                    item.setFlags(flags & ~QtCore.Qt.ItemIsDropEnabled)
+                    items.append((item, flags))
+        if enter:
+            QtWidgets.QTreeWidget.dragEnterEvent(self, event)
+        else:
+            QtWidgets.QTreeWidget.dragMoveEvent(self, event)
+        for item, flags in items:
+            item.setFlags(flags)
+
+    def dropEvent(self, event):
+        if isinstance(event.source(), tree):
+            destination_assets_group_item = self.itemAt(event.pos())
+            asset_item = self.currentItem()
+            if not asset_item:
+                return
+            if asset_item.instance_type != 'asset':
+                return
+            if not destination_assets_group_item:
+                return
+            if destination_assets_group_item.instance_type not in ['assets_group', 'category']:
+                return
+            if destination_assets_group_item.instance_type == 'category':
+                self.remove_asset_from_assets_group.emit(asset_item.instance_id)
+                return
+            self.move_asset_to_assets_group.emit((asset_item.instance_id, destination_assets_group_item.instance_id))
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
