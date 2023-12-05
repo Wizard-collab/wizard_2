@@ -3,6 +3,12 @@
   - !!python/tuple
     - new
     - You can choose if you want outliner colors or not
+  - !!python/tuple
+    - new
+    - Assets groups added ( right click on a category )
+  - !!python/tuple
+    - debug
+    - Setup render ( HD, LD, FML ) doesn't hurt anymore.
   time: 1701767382.764739  
 '3.4.4.290':
   update_list:

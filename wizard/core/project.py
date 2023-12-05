@@ -2379,21 +2379,6 @@ def modify_grouped_reference_export(grouped_reference_id, export_id):
     update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
     return 1  
 
-'''
-def modify_grouped_reference_variant(grouped_reference_id, variant_id):
-    exports_list = get_stage_export_childs(variant_id, 'id')
-    if exports_list is None or exports_list == []:
-        logger.warning("No export found")
-        return
-    export_id = exports_list[0]
-    export_version_id = get_default_export_version(export_id, 'id')
-    if not export_version_id:
-        return
-    update_grouped_reference_data(grouped_reference_id, ('export_id', export_id))
-    update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
-    return 1
-'''
-
 def modify_grouped_reference_auto_update(grouped_reference_id, auto_update):
     if auto_update:
         auto_update = 1
@@ -2502,6 +2487,101 @@ def unsuscribe_from_tag_group(group_name):
                             ('id', tag_group_row['id'])):
         logger.info(f"{environment.get_user()} unsuscribed from {group_name} tag group.")
 
+def create_assets_group(asset_group_name, category_id):
+    if not tools.is_safe(asset_group_name):
+        return
+    if asset_group_name in get_category_asset_groups(category_id, 'name'):
+        logger.warning(f"{asset_group_name} already exists")
+        return
+    asset_group_id = db_utils.create_row('project',
+                            'assets_groups', 
+                            ('creation_time',
+                                'creation_user',
+                                'name',
+                                'color',
+                                'category_id'),
+                            (time.time(),
+                                environment.get_user(),
+                                asset_group_name,
+                                '#9c9c9c',
+                                category_id))
+    if not asset_group_id:
+        return
+    logger.info(f"Asset group created")
+    return asset_group_id
+
+def get_category_asset_groups(category_id, column='*'):
+    assets_groups_rows = db_utils.get_row_by_column_data('project',
+                                                        'assets_groups',
+                                                        ('category_id', category_id),
+                                                        column)
+    return assets_groups_rows
+
+def get_all_assets_groups(column='*'):
+    assets_groups_rows = db_utils.get_rows('project',
+                                            'assets_groups',
+                                            column)
+    return assets_groups_rows
+
+def get_assets_group_data(assets_group_id, column='*'):
+    assets_groups_rows = db_utils.get_row_by_column_data('project',
+                                                        'assets_groups',
+                                                        ('id', assets_group_id),
+                                                        column)
+    if assets_groups_rows is None or len(assets_groups_rows) < 1:
+        logger.error("Assets group not found")
+        return
+    return assets_groups_rows[0] 
+
+def add_asset_to_assets_group(asset_id, assets_group_id):
+    asset_row = get_asset_data(asset_id)
+    assets_group_row = get_assets_group_data(assets_group_id)
+    if not asset_row:
+        return
+    if not assets_group_row:
+        return
+    if asset_row['category_id'] != assets_group_row['category_id']:
+        logger.warning(f"Asset and group doesn't have the same category, can't move asset")
+        return
+    if asset_row['assets_group_id'] == assets_group_id:
+        return
+    if db_utils.update_data('project',
+                            'assets',
+                            ('assets_group_id', assets_group_id),
+                            ('id', asset_id)):
+        logger.info(f"Asset added to {assets_group_row['name']} assets group")
+        return 1
+
+def get_assets_group_childs(assets_group_id, column='*'):
+    assets_rows = db_utils.get_row_by_column_data('project',
+                                                    'assets',
+                                                    ('assets_group_id', assets_group_id),
+                                                    column)
+    return assets_rows
+
+def remove_asset_from_assets_group(asset_id):
+    asset_row = get_asset_data(asset_id)
+    if not asset_row:
+        return
+    if asset_row['assets_group_id'] is None:
+        return
+    if db_utils.update_data('project',
+                            'assets',
+                            ('assets_group_id', None),
+                            ('id', asset_id)):
+        logger.info(f"Asset removed from group")
+        return 1
+
+def remove_assets_group(assets_group_id):
+    child_assets_ids = get_assets_group_childs(assets_group_id, 'id')
+    for asset_id in child_assets_ids:
+        remove_asset_from_assets_group(asset_id)
+    if not db_utils.delete_row('project', 'assets_groups', assets_group_id):
+        logger.warning(f"Assets group NOT removed from project")
+        return
+    logger.info(f"Assets group removed from project")
+    return 1
+
 def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1
 
@@ -2556,6 +2636,7 @@ def init_project(project_path, project_name):
     create_grouped_references_table(project_name)
     create_progress_events_table(project_name)
     create_videos_table(project_name)
+    create_assets_groups_table(project_name)
     create_tag_groups_table(project_name)
     return project_name
 
@@ -2599,7 +2680,9 @@ def create_assets_table(database):
                                         postroll integer NOT NULL,
                                         string text NOT NULL,
                                         category_id integer NOT NULL,
-                                        FOREIGN KEY (category_id) REFERENCES categories (id)
+                                        assets_group_id integer,
+                                        FOREIGN KEY (category_id) REFERENCES categories (id),
+                                        FOREIGN KEY (assets_group_id) REFERENCES assets_groups (id)
                                     );"""
     if not db_utils.create_table(database, sql_cmd):
         return
@@ -2932,6 +3015,21 @@ def create_tag_groups_table(database):
     if not db_utils.create_table(database, sql_cmd):
         return
     logger.info("Tag groups table created")
+    return 1
+
+def create_assets_groups_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS assets_groups (
+                                        id serial PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time real NOT NULL,
+                                        name text NOT NULL,
+                                        color text NOT NULL,
+                                        category_id integer NOT NULL,
+                                        FOREIGN KEY (category_id) REFERENCES categories (id)
+                                    );"""
+    if not db_utils.create_table(database, sql_cmd):
+        return
+    logger.info("Assets groups table created")
     return 1
 
 def create_shelf_scripts_table(database):

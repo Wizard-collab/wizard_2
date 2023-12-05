@@ -797,7 +797,7 @@ def request_render(version_id, export_name, comment=''):
     stage_id = project.get_variant_data(variant_id, 'stage_id')
     if not stage_id:
         return
-    export_version_id = add_export_version(export_name, [], stage_id, version_id, comment)
+    export_version_id = add_export_version(export_name, [], stage_id, version_id, comment, analyse_comment=False)
     if not export_version_id:
         return
     export_version_path = get_export_version_path(export_version_id)
