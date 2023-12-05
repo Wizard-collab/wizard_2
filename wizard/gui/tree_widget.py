@@ -151,7 +151,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.move_asset_to_assets_group.connect(self.move_asset_to_assets_group)
         self.tree.remove_asset_from_assets_group.connect(self.remove_asset_from_assets_group)
 
-    def item_changed(self):#, item):
+    def item_changed(self):
         item = self.tree.currentItem()
         if item:
             if item.instance_type == 'stage':
@@ -175,7 +175,7 @@ class tree_widget(QtWidgets.QFrame):
         context_dic['assignment_visibility'] = self.assignment_visibility
         context_dic['state_visibility'] = self.state_visibility
         context_dic['priority_visibility'] = self.priority_visibility
-        context_dic['priority_visibility'] = self.color_visibility
+        context_dic['color_visibility'] = self.color_visibility
         context_dic['expanded_domains'] = []
         context_dic['expanded_categories'] = []
         context_dic['expanded_assets'] = []
@@ -234,6 +234,7 @@ class tree_widget(QtWidgets.QFrame):
                 self.color_visibility = context_dic['color_visibility']
             self.update_creation_items_visibility()
             self.update_columns_visibility()
+            self.refresh_color_visibility()
 
     def refresh(self, hard=None):
         start_time = time.perf_counter()
@@ -371,7 +372,7 @@ class tree_widget(QtWidgets.QFrame):
 
     def toggle_color_visibility(self):
         self.color_visibility = not self.color_visibility
-        self.refresh()
+        self.refresh_color_visibility()
 
     def update_creation_items_visibility(self):
         for creation_item in self.creation_items:
@@ -402,17 +403,6 @@ class tree_widget(QtWidgets.QFrame):
             self.tree.addTopLevelItem(domain_item)
             if row['id'] != 1:
                 self.add_creation_item(domain_item, 'new', 'category_creation')
-        domain_item = self.domain_ids[row['id']]
-        if self.color_visibility:
-            self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[row['name']], opacity=110)
-            self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[row['name']], opacity=110)
-            self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[row['name']], opacity=110)
-            self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[row['name']], opacity=110)
-        else:
-            self.tree.set_background_color(domain_item, 0, None)
-            self.tree.set_background_color(domain_item, 1, None)
-            self.tree.set_background_color(domain_item, 2, None)
-            self.tree.set_background_color(domain_item, 3, None)
 
     def add_category(self, row):
         if row['domain_id'] in self.domain_ids.keys():
@@ -431,18 +421,6 @@ class tree_widget(QtWidgets.QFrame):
             else:
                 self.category_ids[row['id']].state_indicator.clear_states()
                 self.category_ids[row['id']].priority_indicator.clear_priorities()
-            parent_widget = self.domain_ids[row['domain_id']]
-            category_item = self.category_ids[row['id']]
-            if self.color_visibility:
-                self.tree.set_background_color(category_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-            else:
-                self.tree.set_background_color(category_item, 0, None)
-                self.tree.set_background_color(category_item, 1, None)
-                self.tree.set_background_color(category_item, 2, None)
-                self.tree.set_background_color(category_item, 3, None)
 
     def add_assets_group(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -460,20 +438,6 @@ class tree_widget(QtWidgets.QFrame):
             else:
                 self.assets_groups_ids[row['id']].state_indicator.clear_states()
                 self.assets_groups_ids[row['id']].priority_indicator.clear_priorities()
-            
-            category_item = self.category_ids[row['category_id']]
-            parent_widget = category_item.parent()
-            assets_group_item = self.assets_groups_ids[row['id']]
-            if self.color_visibility:
-                self.tree.set_background_color(assets_group_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-            else:
-                self.tree.set_background_color(assets_group_item, 0, None)
-                self.tree.set_background_color(assets_group_item, 1, None)
-                self.tree.set_background_color(assets_group_item, 2, None)
-                self.tree.set_background_color(assets_group_item, 3, None)
 
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -503,13 +467,41 @@ class tree_widget(QtWidgets.QFrame):
                 else:
                     parent_widget = self.category_ids[row['category_id']]
 
-                if parent_widget == self.asset_ids[row['id']].parent():
-                    return
-                self.move_asset(self.asset_ids[row['id']], parent_widget)
+                if parent_widget != self.asset_ids[row['id']].parent():
+                    self.move_asset(self.asset_ids[row['id']], parent_widget)
 
-            parent_widget = self.category_ids[row['category_id']]
+    def refresh_color_visibility(self):
+        for domain_id in self.domain_ids.keys():
+            domain_item = self.domain_ids[domain_id]
+            if self.color_visibility:
+                self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[domain_item.instance_name], opacity=110)
+            else:
+                self.tree.set_background_color(domain_item, 0, None)
+                self.tree.set_background_color(domain_item, 1, None)
+                self.tree.set_background_color(domain_item, 2, None)
+                self.tree.set_background_color(domain_item, 3, None)
+        for category_id in self.category_ids.keys():
+            category_item = self.category_ids[category_id]
+            parent_widget = category_item.parent()
+            if self.color_visibility:
+                self.tree.set_background_color(category_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+            else:
+                self.tree.set_background_color(category_item, 0, None)
+                self.tree.set_background_color(category_item, 1, None)
+                self.tree.set_background_color(category_item, 2, None)
+                self.tree.set_background_color(category_item, 3, None)
+        for asset_id in self.asset_ids.keys():
+            asset_item = self.asset_ids[asset_id]
+            parent_widget = asset_item.parent()
+            if parent_widget.instance_type == 'assets_group':
+                parent_widget = parent_widget.parent()
             domain_widget = parent_widget.parent()
-            asset_item = self.asset_ids[row['id']]
             if self.color_visibility:
                 self.tree.set_background_color(asset_item, 0, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
                 self.tree.set_background_color(asset_item, 1, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
@@ -520,6 +512,20 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(asset_item, 1, None)
                 self.tree.set_background_color(asset_item, 2, None)
                 self.tree.set_background_color(asset_item, 3, None)
+        for assets_group_id in self.assets_groups_ids.keys():
+            assets_group_item = self.assets_groups_ids[assets_group_id]
+            category_item = assets_group_item.parent()
+            parent_widget = category_item.parent()
+            if self.color_visibility:
+                self.tree.set_background_color(assets_group_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+            else:
+                self.tree.set_background_color(assets_group_item, 0, None)
+                self.tree.set_background_color(assets_group_item, 1, None)
+                self.tree.set_background_color(assets_group_item, 2, None)
+                self.tree.set_background_color(assets_group_item, 3, None)
 
     def move_asset(self, item, new_parent):
         item.parent().takeChild(item.parent().indexOfChild(item))
@@ -767,6 +773,8 @@ class tree_widget(QtWidgets.QFrame):
         isolate_action = None
         open_folder_action = None
         open_sandbox_folder_action = None
+        create_assets_group_action = None
+        edit_frame_range_action = None
         if item:
             if 'creation' not in item.instance_type:
                 open_folder_action = menu.addAction(QtGui.QIcon(ressources._folder_icon_), 'Open folder')
@@ -779,6 +787,9 @@ class tree_widget(QtWidgets.QFrame):
                 menu.addSeparator()
                 open_sandbox_folder_action = menu.addAction(QtGui.QIcon(ressources._sandbox_icon_), 'Open Sandbox folder')
                 launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type} (Double click)')
+            if 'creation' not in item.instance_type and item.instance_type == 'category':
+                create_assets_group_action = menu.addAction(QtGui.QIcon(ressources._assets_group_icon_), f'Create assets group')
+
         menu.addSeparator()
 
         creation_items_visibility_icon = ressources._uncheck_icon_
@@ -833,6 +844,8 @@ class tree_widget(QtWidgets.QFrame):
                 self.toggle_color_visibility()
             elif action == edit_frame_range_action:
                 self.edit_frame_range(item)
+            elif action == create_assets_group_action:
+                self.create_assets_group(item)
 
     def open_folder(self, item):
         if item.instance_type == 'domain':
@@ -847,6 +860,17 @@ class tree_widget(QtWidgets.QFrame):
             path_utils.startfile(path)
         else:
             logger.error(f"{path} not found")
+
+    def create_assets_group(self, item):
+        if item.instance_type != 'category':
+            return
+        category_id = item.instance_id
+        self.assets_group_creation_widget = assets_group_creation_widget(title='Create assets group')
+        if self.assets_group_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
+            assets_group_name = self.assets_group_creation_widget.name_field.text()
+            if project.create_assets_group(assets_group_name, category_id):
+                gui_server.refresh_team_ui()
+                return 1
 
     def open_sandbox_folder(self, item):
         variant_id = project.get_stage_data(item.instance_id, 'default_variant_id')
@@ -873,6 +897,7 @@ class tree_widget(QtWidgets.QFrame):
                 subtasks_library.archive_stage(item.instance_id)
             elif item.instance_type== 'assets_group':
                 project.remove_assets_group(item.instance_id)
+                gui_server.refresh_team_ui()
 
     def edit_frame_range(self, item):
         if item.instance_type == 'asset':
@@ -1181,6 +1206,70 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.preroll_spinBox.valueChanged.connect(self.update_range)
         self.postroll_spinBox.valueChanged.connect(self.update_range)
         self.close_pushButton.clicked.connect(self.reject)
+
+class assets_group_creation_widget(QtWidgets.QDialog):
+    def __init__(self, parent=None, title=''):
+        super(assets_group_creation_widget, self).__init__(parent)
+        self.title = title
+        self.build_ui()
+        self.connect_functions()
+        
+        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+    def showEvent(self, event):
+        corner = gui_utils.move_ui(self)
+        self.apply_round_corners(corner)
+        event.accept()
+        self.name_field.setFocus()
+
+    def apply_round_corners(self, corner):
+        self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(8,8,8,8)
+        self.setLayout(self.main_layout)
+        self.main_frame = QtWidgets.QFrame()
+        self.main_frame.setObjectName('instance_creation_frame')
+        self.frame_layout = QtWidgets.QVBoxLayout()
+        self.frame_layout.setSpacing(6)
+        self.main_frame.setLayout(self.frame_layout)
+        self.main_layout.addWidget(self.main_frame)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
+        self.main_frame.setGraphicsEffect(self.shadow)
+
+        self.close_frame = QtWidgets.QFrame()
+        self.close_layout = QtWidgets.QHBoxLayout()
+        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setSpacing(2)
+        self.close_frame.setLayout(self.close_layout)
+        self.title_label = QtWidgets.QLabel(self.title)
+        self.close_layout.addWidget(self.title_label)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.close_layout.addSpacerItem(self.spaceItem)
+        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16,16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_layout.addWidget(self.close_pushButton)
+        self.frame_layout.addWidget(self.close_frame)
+
+        self.name_field = QtWidgets.QLineEdit()
+        self.frame_layout.addWidget(self.name_field)
+
+        self.accept_button = QtWidgets.QPushButton('Create')
+        self.accept_button.setObjectName("blue_button")
+        self.accept_button.setDefault(True)
+        self.accept_button.setAutoDefault(True)
+        self.frame_layout.addWidget(self.accept_button)
+
+    def connect_functions(self):
+        self.accept_button.clicked.connect(self.accept)
 
 class edit_frame_range_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, asset_id=None):
