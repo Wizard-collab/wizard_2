@@ -119,7 +119,6 @@ class tree_widget(QtWidgets.QFrame):
         self.tree = tree()
         self.tree.setObjectName('delegate_tree')
 
-        #self.tree.setObjectName('tree_widget')
         self.tree.setAnimated(0)
         self.tree.setColumnCount(4)
         self.tree.header().resizeSection(0, 190)
@@ -128,6 +127,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.header().resizeSection(3, 32)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tree.setDragEnabled(True)
         self.tree.setAlternatingRowColors(True)
         self.tree.setHeaderHidden(True)
         self.tree.setIndentation(16)
@@ -1221,7 +1221,6 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
     def paint(self, painter, option, index):
         color_data = index.data(QtCore.Qt.UserRole + 1)
         opacity = index.data(QtCore.Qt.UserRole + 2)
-
         if color_data:
             selected_color = QtGui.QColor(color_data)
             selected_color.setAlpha(int(opacity*2))
@@ -1233,10 +1232,8 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
             selected_color = QtGui.QColor(255, 255, 255, 30)
             hover_color = QtGui.QColor(255, 255, 255, 10)
             color = QtGui.QColor(255, 255, 255, 0)
-
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtCore.Qt.NoPen))
-        
         if option.state & QtWidgets.QStyle.State_Selected and option.state & QtWidgets.QStyle.State_MouseOver:
             painter.setBrush(QtGui.QBrush(selected_color))
         elif option.state & QtWidgets.QStyle.State_MouseOver:
@@ -1245,14 +1242,12 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
             painter.setBrush(QtGui.QBrush(selected_color))
         else:
             painter.setBrush(QtGui.QBrush(color))
-
         view = option.widget
         if view is not None:
             visible_columns = []
             for col in range(view.model().columnCount()):
                 if not view.isColumnHidden(col):
                     visible_columns.append(col)
-
         if len(visible_columns) == 1:
             painter.drawRoundedRect(option.rect, 4, 4)
         elif index.column() == visible_columns[0]:
@@ -1273,15 +1268,11 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
             right_path.addRoundedRect(rect.adjusted(rect.width(), 0, -rect.width() + 4*2, 0), 4, 4)
             path = left_path + right_path
             painter.drawPath(path)
-
-        # Let the default painting handle the column-specific content
         super(ColoredItemDelegate, self).paint(painter, option, index)
 
 class tree(QtWidgets.QTreeWidget):
     def __init__(self, parent=None):
         super(tree, self).__init__(parent)
-
-        # Set the custom item delegate for the tree widget
         self.setItemDelegate(ColoredItemDelegate(self))
 
     def set_background_color(self, item, column, color, opacity=255):

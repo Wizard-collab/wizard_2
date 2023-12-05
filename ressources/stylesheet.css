@@ -167,6 +167,19 @@ QTreeView::item:selected:!active {
 	color:rgb(215,215,215);
 }
 
+#tree_widget{
+	background-color: transparent;
+	alternate-background-color: #29292f;
+}
+
+#tree_widget::item {
+	padding:4px;
+	border-radius:4px;
+	margin: 1px;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
 #delegate_tree{
 	background-color: transparent;
 	alternate-background-color: #29292f;
