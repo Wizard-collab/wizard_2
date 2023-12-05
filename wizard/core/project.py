@@ -2552,6 +2552,13 @@ def add_asset_to_assets_group(asset_id, assets_group_id):
         logger.info(f"Asset added to {assets_group_row['name']} assets group")
         return 1
 
+def get_assets_group_childs(assets_group_id, column='*'):
+    assets_rows = db_utils.get_row_by_column_data('project',
+                                                    'assets',
+                                                    ('assets_group_id', assets_group_id),
+                                                    column)
+    return assets_rows
+
 def remove_asset_from_assets_group(asset_id):
     asset_row = get_asset_data(asset_id)
     if not asset_row:
@@ -2564,6 +2571,16 @@ def remove_asset_from_assets_group(asset_id):
                             ('id', asset_id)):
         logger.info(f"Asset removed from group")
         return 1
+
+def remove_assets_group(assets_group_id):
+    child_assets_ids = get_assets_group_childs(assets_group_id, 'id')
+    for asset_id in child_assets_ids:
+        remove_asset_from_assets_group(asset_id)
+    if not db_utils.delete_row('project', 'assets_groups', assets_group_id):
+        logger.warning(f"Assets group NOT removed from project")
+        return
+    logger.info(f"Assets group removed from project")
+    return 1
 
 def create_project(project_name, project_path, project_password, project_image = None):
     do_creation = 1

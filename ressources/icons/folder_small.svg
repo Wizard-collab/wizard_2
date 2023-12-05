@@ -7,7 +7,7 @@
    viewBox="0 0 124.11158 121.93264"
    version="1.1"
    id="svg5"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
    sodipodi:docname="folder_small.svg"
    inkscape:export-filename="C:\Users\leo\Desktop\svgs\combobox.png"
    inkscape:export-xdpi="96"
@@ -27,8 +27,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="1.457584"
-     inkscape:cx="234.97788"
-     inkscape:cy="237.03608"
+     inkscape:cx="173.91794"
+     inkscape:cy="236.69305"
      inkscape:window-width="1920"
      inkscape:window-height="1121"
      inkscape:window-x="-7"
@@ -41,7 +41,9 @@
      fit-margin-bottom="50"
      lock-margins="true"
      units="px"
-     showguides="false" />
+     showguides="false"
+     inkscape:showpageshadow="0"
+     inkscape:deskcolor="#505050" />
   <defs
      id="defs2">
     <filter
@@ -119,7 +121,7 @@
   </defs>
   <path
      id="rect53865"
-     style="opacity:1;fill:#999999;fill-opacity:1;stroke:none;stroke-width:14;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:186.406;stroke-opacity:1;paint-order:markers fill stroke"
+     style="opacity:1;fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:14;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:186.406;stroke-opacity:1;paint-order:markers fill stroke"
      d="m 23.028461,21.031553 c -4.927595,0 -8.894547,3.966952 -8.894547,8.894546 v 9.620602 34.670754 17.789093 c 0,4.927595 3.966952,8.894552 8.894547,8.894552 h 78.054669 c 4.92759,0 8.89454,-3.966957 8.89454,-8.894552 V 39.546701 c 0,-4.927594 -3.96695,-8.894548 -8.89454,-8.894548 H 66.775145 v -0.726054 c 0,-4.927594 -3.966954,-8.894546 -8.894548,-8.894546 z"
      inkscape:label="folder_small" />
 </svg>

@@ -274,10 +274,10 @@ class tree_widget(QtWidgets.QFrame):
         for id in category_ids:
             if id not in self.project_category_ids:
                 self.remove_category(id)
-        #assets_groups_ids = list(self.assets_groups_ids.keys())
-        #for id in assets_groups_ids:
-        #    if id not in self.project_assets_groups_ids:
-        #        self.remove_assets_group(id)
+        assets_groups_ids = list(self.assets_groups_ids.keys())
+        for id in assets_groups_ids:
+            if id not in self.project_assets_groups_ids:
+                self.remove_assets_group(id)
         
         for domain_id in self.domain_ids.keys():
             self.sort_domain_children(domain_id)
@@ -497,7 +497,15 @@ class tree_widget(QtWidgets.QFrame):
             else:
                 self.asset_ids[row['id']].state_indicator.clear_states()
                 self.asset_ids[row['id']].priority_indicator.clear_priorities()
-                self.move_asset(row)
+
+                if row['assets_group_id']:
+                    parent_widget = self.assets_groups_ids[row['assets_group_id']]
+                else:
+                    parent_widget = self.category_ids[row['category_id']]
+
+                if parent_widget == self.asset_ids[row['id']].parent():
+                    return
+                self.move_asset(self.asset_ids[row['id']], parent_widget)
 
             parent_widget = self.category_ids[row['category_id']]
             domain_widget = parent_widget.parent()
@@ -513,19 +521,12 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(asset_item, 2, None)
                 self.tree.set_background_color(asset_item, 3, None)
 
-    def move_asset(self, row):
-        if row['assets_group_id']:
-            parent_widget = self.assets_groups_ids[row['assets_group_id']]
-        else:
-            parent_widget = self.category_ids[row['category_id']]
-
-        if parent_widget == self.asset_ids[row['id']].parent():
-            return
-        self.asset_ids[row['id']].parent().takeChild(self.asset_ids[row['id']].parent().indexOfChild(self.asset_ids[row['id']]))
-        parent_widget.addChild(self.asset_ids[row['id']])
-        self.asset_ids[row['id']].add_indicators()
-        for i in range(self.asset_ids[row['id']].childCount()):
-            self.asset_ids[row['id']].child(i).add_indicators()
+    def move_asset(self, item, new_parent):
+        item.parent().takeChild(item.parent().indexOfChild(item))
+        new_parent.addChild(item)
+        item.add_indicators()
+        for i in range(item.childCount()):
+            item.child(i).add_indicators()
 
     def add_stage(self, row):
         if row['asset_id'] in self.asset_ids.keys():
@@ -549,9 +550,13 @@ class tree_widget(QtWidgets.QFrame):
             if row['state'] in ['error', 'rtk']:
                 self.stage_ids[row['id']].parent().state_indicator.add_state(row['state'])
                 self.stage_ids[row['id']].parent().parent().state_indicator.add_state(row['state'])
+                if self.stage_ids[row['id']].parent().parent().instance_type == 'assets_group':
+                    self.stage_ids[row['id']].parent().parent().parent().state_indicator.add_state(row['state'])
             if row['priority'] != assets_vars._priority_normal_:
                 self.stage_ids[row['id']].parent().priority_indicator.add_priority(row['priority'])
                 self.stage_ids[row['id']].parent().parent().priority_indicator.add_priority(row['priority'])
+                if self.stage_ids[row['id']].parent().parent().instance_type == 'assets_group':
+                    self.stage_ids[row['id']].parent().parent().parent().priority_indicator.add_priority(row['priority'])
 
 
     def remove_stage_creation_item(self, parent_widget):
@@ -610,6 +615,8 @@ class tree_widget(QtWidgets.QFrame):
             self.asset_ids[id].setHidden(visibility)
         for id in self.stage_ids.keys():
             self.stage_ids[id].setHidden(visibility)
+        for id in self.assets_groups_ids.keys():
+            self.assets_groups_ids[id].setHidden(visibility)
 
     def filter_stage(self, string):
         if not string or len(string)<2:
@@ -651,14 +658,22 @@ class tree_widget(QtWidgets.QFrame):
 
     def isolate_item(self, item):
         search_text = ''
+        if item.instance_type == 'assets_group':
+            search_text = f"{item.instance_name}"
         if item.instance_type == 'category':
             search_text = f"{item.instance_name}/"
         elif item.instance_type == 'asset':
-            category_item = self.category_ids[item.parent().instance_id]
+            if item.parent().instance_type == 'assets_group':
+                category_item = self.category_ids[item.parent().parent().instance_id]
+            else:
+                category_item = self.category_ids[item.parent().instance_id]
             search_text = f"{category_item.instance_name}/{item.instance_name}"
         elif item.instance_type == 'stage':
             asset_item = self.asset_ids[item.parent().instance_id]
-            category_item = self.category_ids[asset_item.parent().instance_id]
+            if asset_item.parent().instance_type == 'assets_group':
+                category_item = self.category_ids[asset_item.parent().parent().instance_id]
+            else:
+                category_item = self.category_ids[asset_item.parent().instance_id]
             search_text = f"{category_item.instance_name}/{asset_item.instance_name}/{item.instance_name}"
         if search_text != '':
             self.search_bar.setText(search_text)
@@ -856,6 +871,8 @@ class tree_widget(QtWidgets.QFrame):
                 subtasks_library.archive_asset(item.instance_id)
             elif item.instance_type== 'stage':
                 subtasks_library.archive_stage(item.instance_id)
+            elif item.instance_type== 'assets_group':
+                project.remove_assets_group(item.instance_id)
 
     def edit_frame_range(self, item):
         if item.instance_type == 'asset':
@@ -868,6 +885,18 @@ class tree_widget(QtWidgets.QFrame):
         is_selected = item.isSelected()
         item.parent().removeChild(item)
         del self.category_ids[id]
+        if is_selected:
+            self.tree.clearSelection()
+
+    def remove_assets_group(self, id):
+        item = self.assets_groups_ids[id]
+        parent = item.parent()
+        for child in range(item.childCount()):
+            child_item = item.child(child)
+            move_asset(child_item, parent)
+        is_selected = item.isSelected()
+        item.parent().removeChild(item)
+        del self.assets_groups_ids[id]
         if is_selected:
             self.tree.clearSelection()
 
@@ -899,15 +928,38 @@ class tree_widget(QtWidgets.QFrame):
         if is_selected:
             self.tree.clearSelection()
 
-    def add_search_item(self, stage_id):
-        if stage_id in self.stage_ids.keys():
-            self.stage_ids[stage_id].setHidden(0)
-            self.stage_ids[stage_id].parent().setHidden(0)
-            self.stage_ids[stage_id].parent().setExpanded(1)
-            self.stage_ids[stage_id].parent().parent().setHidden(0)
-            self.stage_ids[stage_id].parent().parent().setExpanded(1)
-            self.stage_ids[stage_id].parent().parent().parent().setExpanded(1)
-            self.stage_ids[stage_id].parent().parent().parent().setHidden(0)
+    def add_search_item(self, instance_tuple):
+        instance_type = instance_tuple[0]
+        instance_id = instance_tuple[1]
+        if instance_type == 'stage':
+            if instance_id in self.stage_ids.keys():
+                self.stage_ids[instance_id].setHidden(0)
+                self.stage_ids[instance_id].parent().setHidden(0)
+                self.stage_ids[instance_id].parent().setExpanded(1)
+                self.stage_ids[instance_id].parent().parent().setHidden(0)
+                self.stage_ids[instance_id].parent().parent().setExpanded(1)
+                self.stage_ids[instance_id].parent().parent().parent().setExpanded(1)
+                self.stage_ids[instance_id].parent().parent().parent().setHidden(0)
+                if self.stage_ids[instance_id].parent().parent().instance_type == 'assets_group':
+                    self.stage_ids[instance_id].parent().parent().parent().parent().setExpanded(1)
+                    self.stage_ids[instance_id].parent().parent().parent().parent().setHidden(0)
+        elif instance_type == 'assets_group':
+            if instance_id in self.assets_groups_ids.keys():
+                self.assets_groups_ids[instance_id].setHidden(0)
+                self.assets_groups_ids[instance_id].setExpanded(1)
+                self.assets_groups_ids[instance_id].parent().setHidden(0)
+                self.assets_groups_ids[instance_id].parent().setExpanded(1)
+                self.assets_groups_ids[instance_id].parent().parent().setHidden(0)
+                self.assets_groups_ids[instance_id].parent().parent().setExpanded(1)
+                self.unhideAllDescendants(self.assets_groups_ids[instance_id])
+
+    def unhideAllDescendants(self, item):
+        if item is not None:
+            item.setHidden(0)
+            item.setExpanded(1)
+            for i in range(item.childCount()):
+                childItem = item.child(i)
+                self.unhideAllDescendants(childItem)
 
 class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent, instance_name, instance_type, instance_id=None, parent_id=None):
@@ -1250,7 +1302,7 @@ class edit_frame_range_widget(QtWidgets.QDialog):
 
 class search_thread(QtCore.QThread):
 
-    item_signal = pyqtSignal(int)
+    item_signal = pyqtSignal(tuple)
 
     def __init__(self):
         super().__init__()
@@ -1288,7 +1340,27 @@ class search_thread(QtCore.QThread):
             data = (' ').join(data_list)
 
             if all(keyword.upper() in data.upper() for keyword in keywords):
-                self.item_signal.emit(stage_row['id'])
+                self.item_signal.emit(('stage', stage_row['id']))
+
+        all_assets_groups = project.get_all_assets_groups()
+        for assets_group_row in all_assets_groups:
+
+            assets_group_row_cp = copy.deepcopy(assets_group_row)
+
+            del assets_group_row_cp['id']
+            del assets_group_row_cp['creation_time']
+            del assets_group_row_cp['creation_user']
+            del assets_group_row_cp['color']
+            del assets_group_row_cp['category_id']
+
+            values = list(assets_group_row_cp.values())
+            data_list = []
+            for data_block in values:
+                data_list.append(str(data_block))
+            data = (' ').join(data_list)
+
+            if all(keyword.upper() in data.upper() for keyword in keywords):
+                self.item_signal.emit(('assets_group', assets_group_row['id']))
 
 class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
@@ -1410,6 +1482,7 @@ class tree(QtWidgets.QTreeWidget):
                     disable = False
 
         if disable:
+            self.setDropIndicatorShown(True)
             parent = item.parent()
             if parent is None:
                 parent=self.invisibleRootItem()
@@ -1418,6 +1491,9 @@ class tree(QtWidgets.QTreeWidget):
                     flags = item.flags()
                     item.setFlags(flags & ~QtCore.Qt.ItemIsDropEnabled)
                     items.append((item, flags))
+        else:
+            self.setDropIndicatorShown(False)
+
         if enter:
             QtWidgets.QTreeWidget.dragEnterEvent(self, event)
         else:
