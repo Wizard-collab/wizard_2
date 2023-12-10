@@ -2618,6 +2618,7 @@ def init_project(project_path, project_name):
     create_softwares_table(project_name)
     create_domains_table(project_name)
     create_categories_table(project_name)
+    create_assets_groups_table(project_name)
     create_assets_table(project_name)
     create_assets_preview_table(project_name)
     create_stages_table(project_name)
@@ -2636,7 +2637,6 @@ def init_project(project_path, project_name):
     create_grouped_references_table(project_name)
     create_progress_events_table(project_name)
     create_videos_table(project_name)
-    create_assets_groups_table(project_name)
     create_tag_groups_table(project_name)
     return project_name
 

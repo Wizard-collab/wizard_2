@@ -417,7 +417,7 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         self.scene.addItem(item)
         self.move_scene_center_to_top()
 
-        date_item_1 = calendar_item(datetime.datetime(2023, 11, 6), 8)
+        date_item_1 = calendar_item(datetime.datetime(2023, 12, 10), 8)
         self.scene.addItem(date_item_1)
         date_item_2 = calendar_item(datetime.datetime(2023, 10, 2), 1)
         self.scene.addItem(date_item_2)
@@ -591,9 +591,11 @@ class today_item(QtWidgets.QGraphicsItem):
 class calendar_item(QtWidgets.QGraphicsItem):
     def __init__(self, date, duration):
         super(calendar_item, self).__init__()
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.date = date
         self.duration = duration
         self.move = False
+        self.mouse_delta = 0
         self.set_rect()
 
     def set_rect(self):
@@ -603,27 +605,23 @@ class calendar_item(QtWidgets.QGraphicsItem):
         self.height = 30
 
     def mousePressEvent(self, event):
-        print('ZIZI')
-        if event.button() == QtCore.Qt.LeftButton:
-            self.move = True
-        else:
-            super().mousePressEvent(event)
+        self.mouse_delta = event.pos().x()
+        self.move = True
+        super(calendar_item, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self.move:
-            print(self.mapToItem(self, event.pos()).x())
-            delta = int((self.mapToScene(event.pos()).x())/30)
-            self.date = datetime.datetime.today() + datetime.timedelta(days=delta)
-            self.set_rect()
-            self.scene().update()
-        else:
-            super().mouseMoveEvent(event)
+        if self.move is not None:
+            # Restrict the movement to the horizontal axis only
+            days_delta = int((self.mapToScene(event.pos()).x()-self.mouse_delta)/30)
+            #print(delta)
+            self.date = datetime.datetime.today() + datetime.timedelta(days=days_delta)
+            pos_x = days_delta*30
+            new_pos = QtCore.QPointF(pos_x, self.pos().y())
+            self.setPos(new_pos)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.move = False
-        else:
-            super().mouseReleaseEvent(event)
+        self.move = False
+        super(calendar_item, self).mouseReleaseEvent(event)
 
     def boundingRect(self):
         return QtCore.QRectF(self.x, self.y, self.width, self.height)
@@ -631,7 +629,8 @@ class calendar_item(QtWidgets.QGraphicsItem):
     def paint(self, painter, option, widget):
         color = QtGui.QColor(QtGui.QColor(255,255,255,3))
         rect = QtCore.QRectF(self.x, self.y, self.width, self.height)
-        draw_rect(painter, rect, bg_color = QtGui.QColor(255,0,0,60))
+        draw_text(painter, rect, str(self.date))
+        draw_rect(painter, rect, bg_color = QtGui.QColor(255,0,0,60), radius=4)
 
 class calendarWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
