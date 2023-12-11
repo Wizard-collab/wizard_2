@@ -4,6 +4,7 @@ from wizard.gui import app_utils
 
 import sys
 import datetime
+import time
 
 class CalendarHeader(QtWidgets.QGraphicsView):
     def __init__(self):
@@ -411,16 +412,18 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         self.zoom_factor = 1.0
         self.today_item = today_item()
         self.today_item.setZValue(1.0)
+        self.calendar_items = []
         self.scene.addItem(self.today_item)
 
         item = empty_item()
         self.scene.addItem(item)
         self.move_scene_center_to_top()
+        
 
-        date_item_1 = calendar_item(datetime.datetime(2023, 12, 10), 8)
-        self.scene.addItem(date_item_1)
-        date_item_2 = calendar_item(datetime.datetime(2023, 10, 2), 1)
-        self.scene.addItem(date_item_2)
+    def add_item(self, date, duration):
+        item = calendar_item(date, duration, len(self.calendar_items))
+        self.calendar_items.append(item)
+        self.scene.addItem(item)
 
     def move_scene_center_to_top(self):
         point = self.mapToScene(QtCore.QPoint(0,0))
@@ -589,18 +592,21 @@ class today_item(QtWidgets.QGraphicsItem):
         painter.drawRect(self.x, self.y, self.width, self.height)
 
 class calendar_item(QtWidgets.QGraphicsItem):
-    def __init__(self, date, duration):
+    def __init__(self, date, duration, y_pos):
         super(calendar_item, self).__init__()
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setAcceptHoverEvents(True)
         self.date = date
         self.duration = duration
+        self.hover = False
         self.move = False
         self.mouse_delta = 0
+        self.y = y_pos*30
         self.set_rect()
 
     def set_rect(self):
         self.x = ((datetime.datetime.today() - self.date ).days) * -30
-        self.y = 0
+        self.y = self.y
         self.width = (self.duration) * 30
         self.height = 30
 
@@ -611,26 +617,40 @@ class calendar_item(QtWidgets.QGraphicsItem):
 
     def mouseMoveEvent(self, event):
         if self.move is not None:
-            # Restrict the movement to the horizontal axis only
             days_delta = int((self.mapToScene(event.pos()).x()-self.mouse_delta)/30)
-            #print(delta)
-            self.date = datetime.datetime.today() + datetime.timedelta(days=days_delta)
             pos_x = days_delta*30
             new_pos = QtCore.QPointF(pos_x, self.pos().y())
             self.setPos(new_pos)
+            self.calculate_new_date()
+
+    def calculate_new_date(self):
+        absolute_pos_x = self.pos().x() + self.x
+        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(absolute_pos_x/30)
 
     def mouseReleaseEvent(self, event):
         self.move = False
         super(calendar_item, self).mouseReleaseEvent(event)
 
+    def hoverEnterEvent(self, event):
+        self.hover = True
+        self.update()
+
+    def hoverLeaveEvent(self, event):
+        self.hover = False
+        self.update()
+
     def boundingRect(self):
         return QtCore.QRectF(self.x, self.y, self.width, self.height)
 
     def paint(self, painter, option, widget):
+        margin = 2
         color = QtGui.QColor(QtGui.QColor(255,255,255,3))
-        rect = QtCore.QRectF(self.x, self.y, self.width, self.height)
-        draw_text(painter, rect, str(self.date))
-        draw_rect(painter, rect, bg_color = QtGui.QColor(255,0,0,60), radius=4)
+        bg_color = QtGui.QColor(255,0,0,60)
+        if self.hover:
+            bg_color.setAlpha(100)
+        rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
+        draw_text(painter, rect, f'{str(self.date.strftime("%m/%d"))} - {self.duration}')
+        draw_rect(painter, rect, bg_color = bg_color, radius=4)
 
 class calendarWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -658,6 +678,24 @@ class calendarWidget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.header_view)
         self.main_layout.addWidget(self.view)
+
+        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
+        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
+        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
+        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
+        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
+        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
+        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
+        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
+        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
+        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
 
 def draw_text(painter, rectangle, text, color=QtGui.QColor(255,255,255,int(255*0.85)), size=12, bold=False, align=QtCore.Qt.AlignCenter):
         font = QtGui.QFont()
