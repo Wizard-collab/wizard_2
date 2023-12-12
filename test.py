@@ -418,12 +418,23 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         item = empty_item()
         self.scene.addItem(item)
         self.move_scene_center_to_top()
-        
 
     def add_item(self, date, duration):
-        item = calendar_item(date, duration, len(self.calendar_items))
+        item = calendar_item(date,
+                                duration,
+                                len(self.calendar_items))
         self.calendar_items.append(item)
         self.scene.addItem(item)
+
+    def update_selection(self, item):
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if not modifiers & QtCore.Qt.ShiftModifier:
+            self.deselect_all()
+        item.set_selected(True)
+
+    def deselect_all(self):
+        for item in self.calendar_items:
+            item.set_selected(False)
 
     def move_scene_center_to_top(self):
         point = self.mapToScene(QtCore.QPoint(0,0))
@@ -446,8 +457,7 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         if event.button() == QtCore.Qt.MiddleButton:
             self.pan = True
             self.last_mouse_pos = event.pos()
-        else:
-            super().mousePressEvent(event)
+        super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self.pan:
@@ -496,6 +506,92 @@ class CalendarViewport(QtWidgets.QGraphicsView):
                                 self.sceneRect().height()))
         self.move_scene_center_to_top()
 
+class calendar_item(QtWidgets.QGraphicsItem):
+
+    def __init__(self, date, duration, y_pos):
+        super(calendar_item, self).__init__()
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setAcceptHoverEvents(True)
+        self.date = date
+        self.duration = duration
+
+        self.hover = False
+
+        self.start_move_pos = 0
+
+        self.moved = False
+        self.move = False
+
+        self.scale = False
+
+        self.selected = False
+        self.y_pos = y_pos
+        self.set_rect()
+
+    def set_rect(self):
+        self.x = 0
+        self.y = 0
+        self.width = self.duration*30
+        self.height = 30
+        pos_x = ((datetime.datetime.today() - self.date ).days) * -30
+        pos_y = self.y_pos*30
+        self.setPos(QtCore.QPointF(pos_x, pos_y))
+
+    def mousePressEvent(self, event):
+        self.start_move_pos = event.pos()
+        if event.pos().x() < self.width - 10:
+            self.move = True
+        else:
+            self.start_scale = self.width
+            self.scale = True
+
+    def mouseReleaseEvent(self, event):
+        self.move = False
+        self.scale = False
+
+    def mouseMoveEvent(self, event):
+        delta = int((event.pos().x() - self.start_move_pos.x())/30)*30
+        if self.move:
+            self.move_item(delta)
+        if self.scale:
+            self.scale_item(delta)
+
+    def move_item(self, delta):
+        self.moveBy(delta, 0)
+        self.calculate_new_date()
+
+    def scale_item(self, delta):
+        if self.start_scale + delta < 30:
+            return
+        self.width = self.start_scale + delta
+        self.update()
+        self.scene().update()
+
+    def calculate_new_date(self):
+        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(self.pos().x()/30)
+
+    def hoverEnterEvent(self, event):
+        self.hover = True
+        self.update()
+
+    def hoverLeaveEvent(self, event):
+        self.hover = False
+        self.update()
+
+    def boundingRect(self):
+        return QtCore.QRectF(self.x, self.y, self.width, self.height)
+
+    def paint(self, painter, option, widget):
+        margin = 2
+        color = QtGui.QColor(QtGui.QColor(255,255,255,3))
+        bg_color = QtGui.QColor(255,0,0,60)
+        if self.hover:
+            bg_color.setAlpha(100)
+        if self.selected:
+            bg_color.setAlpha(160)
+        rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
+        draw_text(painter, rect, f'{str(self.date.strftime("%m/%d"))} - {self.duration}')
+        draw_rect(painter, rect, bg_color = bg_color, radius=4)
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
@@ -590,67 +686,6 @@ class today_item(QtWidgets.QGraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
         painter.drawRect(self.x, self.y, self.width, self.height)
-
-class calendar_item(QtWidgets.QGraphicsItem):
-    def __init__(self, date, duration, y_pos):
-        super(calendar_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
-        self.setAcceptHoverEvents(True)
-        self.date = date
-        self.duration = duration
-        self.hover = False
-        self.move = False
-        self.mouse_delta = 0
-        self.y = y_pos*30
-        self.set_rect()
-
-    def set_rect(self):
-        self.x = ((datetime.datetime.today() - self.date ).days) * -30
-        self.y = self.y
-        self.width = (self.duration) * 30
-        self.height = 30
-
-    def mousePressEvent(self, event):
-        self.mouse_delta = event.pos().x()
-        self.move = True
-        super(calendar_item, self).mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        if self.move is not None:
-            days_delta = int((self.mapToScene(event.pos()).x()-self.mouse_delta)/30)
-            pos_x = days_delta*30
-            new_pos = QtCore.QPointF(pos_x, self.pos().y())
-            self.setPos(new_pos)
-            self.calculate_new_date()
-
-    def calculate_new_date(self):
-        absolute_pos_x = self.pos().x() + self.x
-        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(absolute_pos_x/30)
-
-    def mouseReleaseEvent(self, event):
-        self.move = False
-        super(calendar_item, self).mouseReleaseEvent(event)
-
-    def hoverEnterEvent(self, event):
-        self.hover = True
-        self.update()
-
-    def hoverLeaveEvent(self, event):
-        self.hover = False
-        self.update()
-
-    def boundingRect(self):
-        return QtCore.QRectF(self.x, self.y, self.width, self.height)
-
-    def paint(self, painter, option, widget):
-        margin = 2
-        color = QtGui.QColor(QtGui.QColor(255,255,255,3))
-        bg_color = QtGui.QColor(255,0,0,60)
-        if self.hover:
-            bg_color.setAlpha(100)
-        rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
-        draw_text(painter, rect, f'{str(self.date.strftime("%m/%d"))} - {self.duration}')
-        draw_rect(painter, rect, bg_color = bg_color, radius=4)
 
 class calendarWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
