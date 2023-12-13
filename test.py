@@ -414,15 +414,46 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         self.today_item.setZValue(1.0)
         self.calendar_items = []
         self.scene.addItem(self.today_item)
+        self.signal_manager = signal_manager()
 
         item = empty_item()
         self.scene.addItem(item)
         self.move_scene_center_to_top()
 
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.signal_manager.movement.connect(self.movement_on_selection)
+        self.signal_manager.start_move.connect(self.start_move_on_selection)
+        self.signal_manager.start_scale.connect(self.start_scale_on_selection)
+        self.signal_manager.stop_movement.connect(self.stop_movement_on_selection)
+        self.signal_manager.select.connect(self.update_selection)
+
+    def movement_on_selection(self, delta):
+        for item in self.calendar_items:
+            if item.selected:
+                item.movement(delta)
+
+    def start_move_on_selection(self):
+        for item in self.calendar_items:
+            if item.selected:
+                item.start_move()
+
+    def start_scale_on_selection(self):
+        for item in self.calendar_items:
+            if item.selected:
+                item.start_scale()
+
+    def stop_movement_on_selection(self):
+        for item in self.calendar_items:
+            if item.selected:
+                item.stop_movement()
+
     def add_item(self, date, duration):
         item = calendar_item(date,
                                 duration,
-                                len(self.calendar_items))
+                                len(self.calendar_items),
+                                signal_manager = self.signal_manager)
         self.calendar_items.append(item)
         self.scene.addItem(item)
 
@@ -508,23 +539,27 @@ class CalendarViewport(QtWidgets.QGraphicsView):
 
 class calendar_item(QtWidgets.QGraphicsItem):
 
-    def __init__(self, date, duration, y_pos):
+    def __init__(self, date, duration, y_pos, signal_manager):
         super(calendar_item, self).__init__()
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.setAcceptHoverEvents(True)
         self.date = date
         self.duration = duration
+        self.signal_manager = signal_manager
 
         self.hover = False
+        self.hover_scale_handle = False
 
         self.start_move_pos = 0
 
         self.moved = False
         self.move = False
 
+        self.actual_width = 0
         self.scale = False
 
         self.selected = False
+        self.moved_or_scaled = False
         self.y_pos = y_pos
         self.set_rect()
 
@@ -532,66 +567,114 @@ class calendar_item(QtWidgets.QGraphicsItem):
         self.x = 0
         self.y = 0
         self.width = self.duration*30
-        self.height = 30
+        self.height = 20
         pos_x = ((datetime.datetime.today() - self.date ).days) * -30
-        pos_y = self.y_pos*30
+        pos_y = self.y_pos*20
         self.setPos(QtCore.QPointF(pos_x, pos_y))
 
     def mousePressEvent(self, event):
+        if not self.selected:
+            self.signal_manager.select.emit(self)
         self.start_move_pos = event.pos()
         if event.pos().x() < self.width - 10:
-            self.move = True
+            self.signal_manager.start_move.emit(1)
         else:
-            self.start_scale = self.width
-            self.scale = True
+            self.signal_manager.start_scale.emit(1)
 
-    def mouseReleaseEvent(self, event):
+    def start_move(self):
+        self.move = True
+        self.moved_or_scaled = False
+    
+    def start_scale(self):
+        self.actual_width = self.width
+        self.scale = True
+        self.moved_or_scaled = False
+
+    def stop_movement(self):
         self.move = False
         self.scale = False
 
+    def mouseReleaseEvent(self, event):
+        self.signal_manager.stop_movement.emit(1)
+        if not self.moved_or_scaled:
+            self.signal_manager.select.emit(self)
+
     def mouseMoveEvent(self, event):
         delta = int((event.pos().x() - self.start_move_pos.x())/30)*30
+        self.signal_manager.movement.emit(delta)
+
+    def hoverLeaveEvent(self, event):
+        self.hover = False
+        self.hover_scale_handle = False
+        self.update()
+
+    def hoverMoveEvent(self, event):
+        if event.pos().x() < self.width - 10:
+            self.hover = True
+            self.hover_scale_handle = False
+        else:
+            self.hover = False
+            self.hover_scale_handle = True
+        self.update()
+
+    def movement(self, delta):
         if self.move:
             self.move_item(delta)
         if self.scale:
             self.scale_item(delta)
+        self.moved_or_scaled = True
 
     def move_item(self, delta):
         self.moveBy(delta, 0)
         self.calculate_new_date()
 
     def scale_item(self, delta):
-        if self.start_scale + delta < 30:
+        if self.actual_width + delta < 30:
             return
-        self.width = self.start_scale + delta
+        self.prepareGeometryChange()
+        self.width = self.actual_width + delta
+        self.duration = self.width/30
         self.update()
-        self.scene().update()
+
+    def set_selected(self, selected):
+        self.selected = selected
+        self.update()
 
     def calculate_new_date(self):
         self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(self.pos().x()/30)
-
-    def hoverEnterEvent(self, event):
-        self.hover = True
-        self.update()
-
-    def hoverLeaveEvent(self, event):
-        self.hover = False
-        self.update()
 
     def boundingRect(self):
         return QtCore.QRectF(self.x, self.y, self.width, self.height)
 
     def paint(self, painter, option, widget):
         margin = 2
-        color = QtGui.QColor(QtGui.QColor(255,255,255,3))
-        bg_color = QtGui.QColor(255,0,0,60)
+        color = QtGui.QColor(QtGui.QColor(255,255,255,255))
+        bg_color = QtGui.QColor(255,255,255,60)
         if self.hover:
             bg_color.setAlpha(100)
         if self.selected:
-            bg_color.setAlpha(160)
+            bg_color.setAlpha(120)
         rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
+        if self.hover or self.hover_scale_handle:
+            rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height*1.5-margin*2)
         draw_text(painter, rect, f'{str(self.date.strftime("%m/%d"))} - {self.duration}')
         draw_rect(painter, rect, bg_color = bg_color, radius=4)
+        if self.hover_scale_handle:
+            rect = QtCore.QRectF(self.width-margin-10, self.y+margin, 10, self.height*1.5-margin*2)
+            bg_color.setAlpha(120)
+            draw_rect(painter, rect, bg_color = bg_color, radius=4)
+        self.scene().update()
+
+class signal_manager(QtCore.QObject):
+
+    movement = pyqtSignal(int)
+    stop_movement = pyqtSignal(int)
+    start_move = pyqtSignal(int)
+    start_scale = pyqtSignal(int)
+    select = pyqtSignal(calendar_item)
+
+    def __init__(self, parent=None):
+        super(signal_manager, self).__init__(parent)
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
@@ -618,7 +701,7 @@ class scene(QtWidgets.QGraphicsScene):
         color2 = QtGui.QColor(0,0,0,20)
         line_color = QtGui.QColor(255, 255, 255, 5)
         column_width = 30 
-        row_height = 30
+        row_height = 20
         start_y = int(rect.top()) // row_height
         end_y = int(rect.bottom()) // row_height
         for y in range(start_y, end_y + 2):
@@ -655,7 +738,7 @@ class empty_item(QtWidgets.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         color = QtGui.QColor('transparent')
-        pen = QtGui.QPen(QtGui.QColor('red'), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.SolidLine)
         brush = QtGui.QBrush(color)
         painter.setPen(pen)
         painter.setBrush(brush)
