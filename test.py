@@ -5,6 +5,7 @@ from wizard.gui import app_utils
 import sys
 import datetime
 import time
+import random
 
 class CalendarHeader(QtWidgets.QGraphicsView):
     def __init__(self):
@@ -415,6 +416,7 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         self.calendar_items = []
         self.scene.addItem(self.today_item)
         self.signal_manager = signal_manager()
+        self.start_selection_drag = None
 
         item = empty_item()
         self.scene.addItem(item)
@@ -488,6 +490,9 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         if event.button() == QtCore.Qt.MiddleButton:
             self.pan = True
             self.last_mouse_pos = event.pos()
+        elif event.button() == QtCore.Qt.LeftButton:
+            if not self.itemAt(event.pos()):
+                self.start_selection_drag = event.pos()
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
@@ -506,8 +511,19 @@ class CalendarViewport(QtWidgets.QGraphicsView):
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MiddleButton:
             self.pan = False
-        else:
-            super().mouseReleaseEvent(event)
+
+        elif event.button() == QtCore.Qt.LeftButton:
+            if self.start_selection_drag:
+                rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
+                self.start_selection_drag = None
+                if not event.modifiers() & QtCore.Qt.ShiftModifier:
+                    self.deselect_all()
+                for item in self.calendar_items:
+                    item_scene_rect = QtCore.QRectF(item.pos().x(), item.pos().y(), item.width, item.height)
+                    if rect.intersects(item_scene_rect):
+                        item.set_selected(True)
+
+        super().mouseReleaseEvent(event)
 
     def zoom(self, event):
         current_zoom = self.transform().m22()
@@ -797,23 +813,8 @@ class calendarWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_view)
         self.main_layout.addWidget(self.view)
 
-        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
-        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
-        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
-        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
-        self.view.add_item(datetime.datetime(2023, 12, 11), 4)
-        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
-        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
-        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
-        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
-        self.view.add_item(datetime.datetime(2023, 12, 7), 6)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
-        self.view.add_item(datetime.datetime(2023, 12, 13), 3)
+        for a in range(10):
+            self.view.add_item(datetime.datetime(2023, 12, random.randint(5,25)), random.randint(1, 10))
 
 def draw_text(painter, rectangle, text, color=QtGui.QColor(255,255,255,int(255*0.85)), size=12, bold=False, align=QtCore.Qt.AlignCenter):
         font = QtGui.QFont()
