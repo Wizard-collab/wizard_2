@@ -11,3 +11,5 @@ pip install clipboard
 pip install opencv-python
 pip install rotate-screen
 pip install pywin32
+pip install PyInstaller
+pip install winshell

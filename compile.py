@@ -147,9 +147,9 @@ class compile():
 				destination = os.path.join(dist_folder, os.path.basename(file))
 				shutil.copyfile(file, destination)
 
-			import PyQt5
-			qt5_dir = os.path.dirname(PyQt5.__file__)
-			shutil.copytree(qt5_dir, f"{dist_folder}/PyQt5")
+			#import PyQt5
+			#qt5_dir = os.path.dirname(PyQt5.__file__)
+			#shutil.copytree(qt5_dir, f"{dist_folder}/PyQt5")
 
 			shutil.copytree(dist_folder, self.build_folder)
 

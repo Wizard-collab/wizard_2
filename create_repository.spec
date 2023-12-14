@@ -1,10 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
-
+import os
 
 a = Analysis(['create_repository.py'],
-             pathex=['D:\\SCRIPT\\Wizard_2'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -29,7 +28,7 @@ exe = EXE(pyz,
           upx=True,
           console=True,
           version = 'compile\\version.rc',
-          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\wizard_icon.ico")
+          icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

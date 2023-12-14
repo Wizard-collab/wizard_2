@@ -234,7 +234,7 @@ class tree_widget(QtWidgets.QFrame):
                 self.color_visibility = context_dic['color_visibility']
             self.update_creation_items_visibility()
             self.update_columns_visibility()
-            self.refresh_color_visibility()
+            self.update_color_visibility()
 
     def refresh(self, hard=None):
         start_time = time.perf_counter()
@@ -292,6 +292,7 @@ class tree_widget(QtWidgets.QFrame):
         if hard:
             self.get_context()
         self.update_creation_items_visibility()
+        self.update_color_visibility()
         self.update_refresh_time(start_time)
 
     def move_asset_to_assets_group(self, tuple):
@@ -372,7 +373,7 @@ class tree_widget(QtWidgets.QFrame):
 
     def toggle_color_visibility(self):
         self.color_visibility = not self.color_visibility
-        self.refresh_color_visibility()
+        self.update_color_visibility()
 
     def update_creation_items_visibility(self):
         for creation_item in self.creation_items:
@@ -470,7 +471,7 @@ class tree_widget(QtWidgets.QFrame):
                 if parent_widget != self.asset_ids[row['id']].parent():
                     self.move_asset(self.asset_ids[row['id']], parent_widget)
 
-    def refresh_color_visibility(self):
+    def update_color_visibility(self):
         for domain_id in self.domain_ids.keys():
             domain_item = self.domain_ids[domain_id]
             if self.color_visibility:
@@ -705,7 +706,10 @@ class tree_widget(QtWidgets.QFrame):
         if item.instance_type == 'stage_creation':
             existing_stages = project.get_asset_childs(item.instance_parent_id, 'name')
             menu = gui_utils.QMenu()
-            domain_name = item.parent().parent().parent().instance_name 
+            domain_item = item.parent().parent().parent() 
+            if domain_item.instance_type != 'domain':
+                domain_item=domain_item.parent()
+            domain_name = domain_item.instance_name 
             for stage in assets_vars._stages_list_[domain_name]:
                 if stage not in existing_stages:
                     action = menu.addAction(QtGui.QIcon(self.icons_dic['stage'][stage]), stage)

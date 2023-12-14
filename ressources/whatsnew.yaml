@@ -2,6 +2,18 @@
   update_list:
   - !!python/tuple
     - new
+    - XGen export from maya > cfx stage
+  - !!python/tuple
+    - debug
+    - Pil ANTIALIAS replaced by Resampling.LANCZOS
+  - !!python/tuple
+    - debug
+    - Maya fx export fixed
+  time: 1702561872.85756  
+'3.5.0.291':
+  update_list:
+  - !!python/tuple
+    - new
     - You can choose if you want outliner colors or not
   - !!python/tuple
     - new

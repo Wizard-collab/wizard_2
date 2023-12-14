@@ -1,16 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
-
+import os
 
 a = Analysis(['error_handler.py'],
-             pathex=['D:\\SCRIPT\\Wizard_2'],
              binaries=[],
              datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
-             excludes=["PyQt5"],
+             excludes=[],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
@@ -29,7 +28,7 @@ exe = EXE(pyz,
           upx=True,
           console=False,
           version = 'compile\\version.rc',
-          icon="D:\\SCRIPT\\Wizard_2\\ressources\\icons\\wizard_icon.ico")
+          icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,

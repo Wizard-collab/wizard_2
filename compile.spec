@@ -5,7 +5,6 @@ block_cipher = None
 
 
 a = Analysis(['compile.py'],
-             pathex=['C:\\Users\\conta\\Documents\\script\\wizard_2'],
              binaries=[],
              datas=[],
              hiddenimports=[],

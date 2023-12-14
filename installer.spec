@@ -1,10 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
-
+import os
 
 a = Analysis(['installer.py'],
-             pathex=['D:\\script\\wizard_2\\Installer'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -36,4 +35,4 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=False,
-          icon='D:\\script\\wizard_2\\ressources\\icons\\wizard_setup.ico')
+          icon=os.path.abspath('ressources\\icons\\wizard_setup.ico'))
