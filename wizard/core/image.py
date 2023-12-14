@@ -140,7 +140,7 @@ def convert_str_data_to_image_bytes(str_data):
 def resize_image(image, fixed_height):
     height_percent = fixed_height / float(image.size[1])
     width_size = int((float(image.size[0]) * float(height_percent)))
-    image = image.resize((width_size, fixed_height), Image.ANTIALIAS)
+    image = image.resize((width_size, fixed_height), Image.Resampling.LANCZOS)
     return image
 
 
@@ -161,7 +161,7 @@ def crop_image_height(pillow_image, height):
 def resize_image_with_fixed_width(image, fixed_width):
     width_percent = fixed_width / float(image.size[0])
     height_size = int((float(image.size[1]) * float(width_percent)))
-    image = image.resize((fixed_width, height_size), Image.ANTIALIAS)
+    image = image.resize((fixed_width, height_size), Image.Resampling.LANCZOS)
     return image, fixed_width, height_size
 
 

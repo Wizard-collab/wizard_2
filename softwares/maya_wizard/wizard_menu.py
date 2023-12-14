@@ -11,6 +11,7 @@ import pymel.core as pm
 # Wizard modules
 from maya_wizard import wizard_plugin
 from maya_wizard import wizard_video
+from maya_wizard.export import export_xgen_cache
 
 class menu():
     def __init__(self):
@@ -28,8 +29,13 @@ class menu():
         camera_export_stage_names = ['animation', 'layout']
         if stage_name in camera_export_stage_names:
             pm.menuItem(l='Export camera', c=wizard_plugin.export_camera, i='icons/export.png')
+
+        if stage_name == 'cfx':
+            custom_exports_menu = pm.menuItem(l='Custom exports', subMenu=True, parent=mainMenu, i='icons/export.png')
+            pm.menuItem(l='Xgen export cache', c=export_xgen_cache.export_xgen_dynamic_collections, i='icons/cfx.png')
+            pm.setParent(custom_exports_menu, menu=True)
         
-        pm.menuItem(divider=True)
+        pm.menuItem(divider=True, parent=mainMenu)
         
         pm.menuItem(l='Import and update all', c=wizard_plugin.reference_and_update_all, i='icons/all.png', parent=mainMenu)
 
@@ -100,3 +106,4 @@ class menu():
 
         pm.menuItem(l='Create video', c=wizard_video.invoke_settings_widget, i='icons/video.png', parent=mainMenu)
 
+        
