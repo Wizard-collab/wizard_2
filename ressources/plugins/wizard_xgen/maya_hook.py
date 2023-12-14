@@ -97,7 +97,7 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
             for parent in parents:
                 if 'grooming_GRP' in str(parent):
                     parents_names.append(str(parent))
-            if len(parent) == 0:
+            if len(parents) == 0:
                 continue
             fur_export_name = f"{node.getName().split(':')[-1]}"
             file_path = os.path.join(export_dir, f'xgen_cache__{fur_export_name}.abc')

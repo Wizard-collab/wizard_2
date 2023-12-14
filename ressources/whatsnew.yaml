@@ -4,6 +4,9 @@
     - new
     - XGen export from maya > cfx stage
   - !!python/tuple
+    - new
+    - Yeti export from maya > cfx stage
+  - !!python/tuple
     - debug
     - Pil ANTIALIAS replaced by Resampling.LANCZOS
   - !!python/tuple

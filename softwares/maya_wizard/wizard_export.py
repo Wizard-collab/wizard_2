@@ -42,8 +42,6 @@ def export_by_extension(export_GRP_list, export_file, frange, percent_factor):
         export_files_list = export_obj(export_GRP_list, export_file)
     elif export_file.endswith('.fbx'):
         export_files_list = export_fbx(export_GRP_list, export_file)
-    elif export_file.endswith('.fur'):
-        export_files_list = export_fur(export_GRP_list, export_file, frange, percent_factor)
     else:
         logger.info("{} extension is unkown".format(export_file))
         export_files_list = [export_file]
@@ -56,19 +54,6 @@ def export_ma(export_GRP_list, export_file):
         ma_command = default_ma_command
     ma_command(export_GRP_list, export_file)
     return [export_file]
-
-def export_fur(export_GRP_list, export_file, frange, percent_factor):
-    logger.info("Exporting .fur")
-    fur_command = wizard_hooks.get_fur_command('maya')
-    if fur_command is None:
-        fur_command = default_fur_command
-    fur_command(export_GRP_list,
-                export_file,
-                frange[0],
-                frange[1])
-    for file in os.listdir(export_directory):
-        files_list.append(os.path.join(export_directory, file))
-    return files_list
 
 def export_obj(export_GRP_list, export_file):
     logger.info("Exporting .obj")
@@ -173,18 +158,6 @@ def default_obj_command(export_GRP_list,
                 export_file):
     pm.select(export_GRP_list, replace=True, noExpand=True)
     pm.exportSelected(export_file, preserveReferences=0, shader=1)
-
-def default_fur_command(export_GRP_list,
-                export_file,
-                start,
-                end):
-    files_list = []
-    for yeti_node in export_GRP_list:
-        export_directory = os.path.dirname(export_file)
-        node_name = yeti_node.split(':')[-1]
-        file = os.path.join(export_directory, '{}.%04d.fur'.format(node_name))
-        pm.select(yeti_node, r=True)
-        cmds.pgYetiCommand(writeCache=file, range=(start, end), samples=3, sampleTimes= "-0.2 0.0 0.2")
 
 def default_ma_command(export_GRP_list,
                 export_file):

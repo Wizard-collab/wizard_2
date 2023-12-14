@@ -12,6 +12,7 @@ import pymel.core as pm
 from maya_wizard import wizard_plugin
 from maya_wizard import wizard_video
 from maya_wizard.export import export_xgen_cache
+from maya_wizard.export import export_yeti_cache
 
 class menu():
     def __init__(self):
@@ -32,7 +33,9 @@ class menu():
 
         if stage_name == 'cfx':
             custom_exports_menu = pm.menuItem(l='Custom exports', subMenu=True, parent=mainMenu, i='icons/export.png')
-            pm.menuItem(l='Xgen export cache', c=export_xgen_cache.export_xgen_dynamic_collections, i='icons/cfx.png')
+            pm.menuItem(l='Xgen export cache', c=export_xgen_cache.invoke_settings_widget, i='icons/cfx.png')
+            pm.setParent(custom_exports_menu, menu=True)
+            pm.menuItem(l='Yeti export cache', c=export_yeti_cache.invoke_settings_widget, i='icons/cfx.png')
             pm.setParent(custom_exports_menu, menu=True)
         
         pm.menuItem(divider=True, parent=mainMenu)

@@ -7,11 +7,7 @@ logger = logging.getLogger(__name__)
 import pymel.core as pm
 import maya.cmds as cmds
 
-# coding: utf-8
-# Wizard hook
-
-import logging
-logger = logging.getLogger(__name__)
+import os
 
 def after_scene_openning(stage_name, string_asset):
     ''' This function is triggered
@@ -55,18 +51,7 @@ def sanity(stage_name, string_asset, exported_string_asset):
 
         The "exported_string_asset" argument is the
         asset wizard will export represented as string'''
-    if stage_name == 'grooming':
-        # Grooming sanity
-        sanity_status = True
-        if not pm.objExists('yeti_scalps_set'):
-            logger.warning("yeti_scalps_set not found")
-            sanity_status = False
-        if not pm.objExists('yeti_nodes_set'):
-            logger.warning("yeti_nodes_set not found")
-            sanity_status = False
-        return sanity_status
-    else:
-        return True
+    return True
 
 def before_export(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -83,12 +68,7 @@ def before_export(stage_name, string_asset, exported_string_asset):
 
         The "exported_string_asset" argument is the
         asset wizard will export represented as string'''
-    if stage_name == 'grooming':
-        yeti_scalps_set = pm.PyNode('yeti_scalps_set')
-        yeti_nodes_set = pm.PyNode('yeti_nodes_set')
-        return [yeti_scalps_set, yeti_nodes_set]
-    else:
-        return []
+    return []
 
 def after_export(stage_name, export_dir, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -106,11 +86,24 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
         The "exported_string_asset" argument is the
         asset wizard just exported represented as string'''
     if stage_name == 'grooming':
-        yeti_nodes_list = cmds.sets( 'yeti_nodes_set', q=True )
-        for yeti_node in yeti_nodes_list:
-            fur_file = '{}/{}.fur'.format(export_dir, yeti_node)
-            logging.info("Exporting {}...".format(fur_file))
-            cmds.pgYetiCommand(yeti_node, writeCache=fur_file, range=(0,0), samples=1)
+        for node in pm.ls():
+            relatives = pm.listRelatives(node, shapes=True)
+            if len(relatives) != 1:
+                continue
+            if pm.nodeType(relatives[0]) != 'pgYetiMaya':
+                continue
+            parents = node.getAllParents()
+            parents_names = []
+            for parent in parents:
+                if 'grooming_GRP' in str(parent):
+                    parents_names.append(str(parent))
+            if len(parents) == 0:
+                continue
+            fur_export_name = f"{node.getName().split(':')[-1]}"
+            file_path = os.path.join(export_dir, f'yeti_cache__{fur_export_name}.fur')
+            yeti_node = pm.listRelatives(node, shapes=True)[0]
+            pm.select(yeti_node, r=True)
+            cmds.pgYetiCommand(writeCache=file_path, range=(0,0), samples=1)
 
 def after_reference(stage_name, 
                         referenced_stage_name, 
