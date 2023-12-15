@@ -417,6 +417,7 @@ class CalendarViewport(QtWidgets.QGraphicsView):
         self.scene.addItem(self.today_item)
         self.signal_manager = signal_manager()
         self.start_selection_drag = None
+        self.selection_item = selection_item()
 
         item = empty_item()
         self.scene.addItem(item)
@@ -491,7 +492,7 @@ class CalendarViewport(QtWidgets.QGraphicsView):
             self.pan = True
             self.last_mouse_pos = event.pos()
         elif event.button() == QtCore.Qt.LeftButton:
-            if not self.itemAt(event.pos()):
+            if self.itemAt(event.pos()) not in self.calendar_items:
                 self.start_selection_drag = event.pos()
         super().mousePressEvent(event)
 
@@ -505,6 +506,12 @@ class CalendarViewport(QtWidgets.QGraphicsView):
             if point.y() + dy <= 0:
                 dy = -point.y()
             self.update_scene_rect(self.sceneRect().translated(dx, dy))
+        if self.start_selection_drag:
+            rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
+            if not self.selection_item.scene():
+                self.scene.addItem(self.selection_item)
+            self.selection_item.setPos(rect.x(), rect.y())
+            self.selection_item.set_size(rect.width(), rect.height())
         else:
             super().mouseMoveEvent(event)
 
@@ -516,6 +523,8 @@ class CalendarViewport(QtWidgets.QGraphicsView):
             if self.start_selection_drag:
                 rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
                 self.start_selection_drag = None
+                if self.selection_item.scene():
+                    self.scene.removeItem(self.selection_item)
                 if not event.modifiers() & QtCore.Qt.ShiftModifier:
                     self.deselect_all()
                 for item in self.calendar_items:
@@ -759,6 +768,34 @@ class empty_item(QtWidgets.QGraphicsItem):
         painter.setPen(pen)
         painter.setBrush(brush)
         painter.drawRect(self.x, self.y, self.width, self.height)
+
+class selection_item(QtWidgets.QGraphicsItem):
+    def __init__(self):
+        super(selection_item, self).__init__()
+        self.x = 0
+        self.y = 0
+        self.width = 1
+        self.height = 1
+
+    def setRect(self, x, y , width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+    def boundingRect(self):
+        return QtCore.QRectF(self.x, self.y, self.width, self.height)
+
+    def set_size(self, width, height):
+        self.prepareGeometryChange()
+        self.width = width
+        self.height = height
+        self.update()
+
+    def paint(self, painter, option, widget):
+        bg_color = QtGui.QColor(255,255,255,20)
+        rect = QtCore.QRectF(self.x, self.y, self.width, self.height)
+        draw_rect(painter, rect, bg_color=bg_color)
 
 class today_item(QtWidgets.QGraphicsItem):
     def __init__(self):
