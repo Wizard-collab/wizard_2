@@ -408,10 +408,13 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.pan = False
         self.column_width = 100
         self.last_mouse_pos = None
+        self.min_zoom = 0.04
+        self.max_zoom = 2.0
         self.zoom_factor = 1.0
         self.today_item = today_item()
         self.today_item.setZValue(1.0)
         self.items = []
+        self.frames = []
         self.scene.addItem(self.today_item)
         self.scene.zoom_factor = self.zoom_factor
         self.start_selection_drag = None
@@ -449,7 +452,11 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         graphic_item.signal_manager.start_scale.connect(self.start_scale_on_selection)
         graphic_item.signal_manager.stop_movement.connect(self.stop_movement_on_selection)
         graphic_item.signal_manager.select.connect(self.update_selection)
-        graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), (len(self.items)-1)*40))
+        graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), (len(self.items))*40))
+
+    def add_frame(self, graphic_item):
+        self.frames.append(graphic_item)
+        self.scene.addItem(graphic_item)
 
     def remove_item(self, graphic_item):
         if graphic_item in self.items:
@@ -529,6 +536,27 @@ class calendar_viewport(QtWidgets.QGraphicsView):
 
         super().mouseReleaseEvent(event)
 
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_F:
+            self.focus_on_selection()
+        else:
+            super().keyPressEvent(event)
+
+    def focus_on_selection(self):
+        if len(self.items) == 0:
+            return
+        selected_items = []
+        for item in self.items:
+            if item.selected:
+                selected_items.append(item)
+        if len(selected_items) == 0:
+            selected_items = self.items
+
+        bounding_rect = selected_items[0].sceneBoundingRect()
+        for item in selected_items[1:]:
+            bounding_rect = bounding_rect.united(item.sceneBoundingRect())
+        self.focus_on_rect(bounding_rect)
+
     def zoom(self, event):
         current_zoom = self.transform().m22()
         delta = event.angleDelta().y() / 120.0
@@ -538,10 +566,8 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             zoom = zoom_in_factor
         else:
             zoom = zoom_out_factor
-        min_zoom = 0.04
-        max_zoom = 2.0
         new_zoom = current_zoom * zoom
-        new_zoom = min(max(new_zoom, min_zoom), max_zoom)
+        new_zoom = min(max(new_zoom, self.min_zoom), self.max_zoom)
         scale_factor = new_zoom / current_zoom
         self.scale_factor_update.emit(scale_factor)
         self.zoom_factor_update.emit(new_zoom)
@@ -557,6 +583,44 @@ class calendar_viewport(QtWidgets.QGraphicsView):
                                 self.sceneRect().height()))
         self.move_scene_center_to_top()
         self.scene.zoom_factor = self.zoom_factor
+
+    def set_zoom(self, zoom_factor):
+        if zoom_factor != self.zoom_factor:
+            zoom_factor = min(max(zoom_factor, self.min_zoom), self.max_zoom)
+            scale_factor = zoom_factor / self.zoom_factor
+            self.scale_factor_update.emit(scale_factor)
+            self.zoom_factor_update.emit(zoom_factor)
+            self.scale(scale_factor, scale_factor)
+            self.update_scene_rect(self.sceneRect())
+            self.move_scene_center_to_top()
+            self.zoom_factor = zoom_factor
+            self.scene.zoom_factor = self.zoom_factor
+
+    def focus_on_rect(self, focus_rect):
+        if focus_rect is not None:
+            # Calculate the necessary zoom factor to make focus_rect fill the view
+            target_width = focus_rect.width()
+            target_height = focus_rect.height()
+
+            view_width = self.viewport().width()
+            view_height = self.viewport().height()
+
+            zoom_factor_width = view_width / (target_width+200)
+            zoom_factor_height = view_height / (target_height+200)
+
+            # Choose the minimum of the two zoom factors to ensure the entire focus_rect is visible
+            zoom_factor = min(zoom_factor_width, zoom_factor_height)
+
+            # Apply the calculated zoom factor
+            self.set_zoom(zoom_factor)
+
+            focus_rect_center_scene = focus_rect.center().toPoint()
+
+            viewport_center_scene = self.mapToScene(self.viewport().rect().center())
+
+            translation = focus_rect_center_scene - viewport_center_scene
+            self.update_scene_rect(self.sceneRect().translated(translation.x(), translation.y()))
+            self.move_scene_center_to_top()
 
 class calendar_item(custom_graphic_item):
 
@@ -680,6 +744,17 @@ class calendar_item(custom_graphic_item):
             bg_color.setAlpha(160)
             draw_rect(painter, rect, bg_color = bg_color, radius=2)
         self.scene().update()
+
+class frame_item(custom_graphic_item):
+    def __init__(self, bg_color):
+        super(frame_item, self).__init__()
+        self.bg_color = bg_color
+
+    def paint(self, painter, option, widget):
+        bg_color = QtGui.QColor(self.bg_color)
+        bg_color.setAlpha(200)
+        rect = self.boundingRect()
+        draw_rect(painter, rect, bg_color=bg_color, radius=6)
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
