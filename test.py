@@ -71,7 +71,7 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pan = False
-        self.column_width = 30
+        self.column_width = 100
         self.last_mouse_pos = None
         self.zoom_factor = 1.0
         self.today_item = today_item()
@@ -102,7 +102,7 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.resize_header()
 
     def update_today_item(self):
-        self.today_item.setRect(0,70,int(self.column_width*self.zoom_factor),self.height()-70)
+        self.today_item.setRect(0,200,int(self.column_width*self.zoom_factor),self.height()-200)
 
     def resize_header(self):
         self.setFixedHeight(self.pos_y)
@@ -146,7 +146,7 @@ class calendar_header(QtWidgets.QGraphicsView):
             day_text = (self.today - datetime.timedelta(days=day_column_pos)).strftime("%d")
             x_pos = (day_column_pos * self.column_width)
             height = 30
-            if self.column_width*self.zoom_factor <= 30:
+            if self.column_width*self.zoom_factor <= 100:
                 height = 15
             self.day_items[i].setRect(x_pos*self.zoom_factor,
                                                 self.pos_y,
@@ -190,14 +190,14 @@ class calendar_header(QtWidgets.QGraphicsView):
             self.week_items[index].setRect(x_pos*self.zoom_factor,
                                             self.pos_y,
                                             width*self.zoom_factor,
-                                            30)
+                                            20)
             self.week_items[index].setText(week)
 
         while len(self.week_items) > len(self.weeks_dic.keys()):
             item = self.week_items.pop()
             self.scene.removeItem(item)
 
-        self.pos_y += 30
+        self.pos_y += 20
 
     def update_months(self):
         while len(self.month_items) < len(self.months_dic.keys()):
@@ -219,14 +219,14 @@ class calendar_header(QtWidgets.QGraphicsView):
             self.month_items[index].setRect(x_pos*self.zoom_factor,
                                             self.pos_y,
                                             width*self.zoom_factor,
-                                            30)
+                                            20)
             self.month_items[index].setText(month)
 
         while len(self.month_items) > len(self.months_dic.keys()):
             item = self.month_items.pop()
             self.scene.removeItem(item)
 
-        self.pos_y += 30
+        self.pos_y += 20
 
     def update_years(self):
         while len(self.year_items) < len(self.years_dic.keys()):
@@ -248,13 +248,13 @@ class calendar_header(QtWidgets.QGraphicsView):
             self.year_items[index].setRect(x_pos*self.zoom_factor,
                                                 self.pos_y,
                                                 width*self.zoom_factor,
-                                                40)
+                                                30)
             self.year_items[index].setText(year)
 
         while len(self.year_items) > len(self.years_dic.keys()):
             item = self.year_items.pop()
             self.scene.removeItem(item)
-        self.pos_y += 40
+        self.pos_y += 30
 
     def get_visible_columns(self):
         visible_rect = self.mapToScene(self.viewport().rect()).boundingRect()
@@ -286,7 +286,7 @@ class day_item(custom_graphic_item):
         self.date = date
 
     def paint(self, painter, option, widget):
-        red_color = QtGui.QColor(0, 255, 0, 30)  # Red color
+        red_color = QtGui.QColor(0, 255, 0, 40)  # Red color
         pen = QtGui.QPen(red_color, 1, QtCore.Qt.SolidLine)
         brush = QtGui.QBrush(red_color)
 
@@ -294,14 +294,14 @@ class day_item(custom_graphic_item):
         painter.setBrush(brush)
 
         number_height = self.height/2
-        if self.width <= 30:
+        if self.width <= 100:
             number_height = self.height
         rect = QtCore.QRectF(self.x, self.y, self.width, number_height)
         color = QtGui.QColor(255,255,255, int(255*0.85))
         if self.date.strftime("%A") in ['Saturday', 'Sunday']:
             color = QtGui.QColor(255,255,255,50)
         draw_text(painter, rect, self.date.strftime("%d"), color=color, bold=True)
-        if self.width > 30:
+        if self.width > 100:
             rect = QtCore.QRectF(self.x, self.y+self.height/2, self.width, self.height/2)
             draw_text(painter,
                         rect,
@@ -320,7 +320,7 @@ class week_item(custom_graphic_item):
         self.text = text
 
     def paint(self, painter, option, widget):
-        red_color = QtGui.QColor(0, 255, 0, 30)  # Red color
+        red_color = QtGui.QColor(0, 255, 0, 40)  # Red color
         pen = QtGui.QPen(red_color, 1, QtCore.Qt.SolidLine)
         brush = QtGui.QBrush(red_color)
 
@@ -328,7 +328,7 @@ class week_item(custom_graphic_item):
         painter.setBrush(brush)
 
         text = f"Week {self.text}"
-        if self.width < 50:
+        if self.width < 100:
             text = self.text
 
         rect = QtCore.QRectF(self.x + self.margin,
@@ -342,14 +342,14 @@ class month_item(custom_graphic_item):
     def __init__(self):
         super(month_item, self).__init__()
         self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
-        self.margin = 1
+        self.margin = 2
         self.text = ''
 
     def setText(self, text):
         self.text = text
 
     def paint(self, painter, option, widget):
-        red_color = QtGui.QColor(0, 255, 0, 30)  # Red color
+        red_color = QtGui.QColor(0, 255, 0, 40)  # Red color
         pen = QtGui.QPen(red_color, 1, QtCore.Qt.SolidLine)
         brush = QtGui.QBrush(red_color)
 
@@ -360,21 +360,21 @@ class month_item(custom_graphic_item):
                                 self.y + self.margin,
                                 self.width - self.margin*2,
                                 self.height - self.margin*2)
-        draw_rect(painter, rect, bg_color=QtGui.QColor('#3d3d43'), radius=2)
+        draw_rect(painter, rect, bg_color=QtGui.QColor('#3d3d43'), radius=4)
         draw_text(painter, rect, self.text[4:], bold=False)
 
 class year_item(custom_graphic_item):
     def __init__(self):
         super(year_item, self).__init__()
         self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
-        self.margin = 8
+        self.margin = 4
         self.text = ''
 
     def setText(self, text):
         self.text = text
 
     def paint(self, painter, option, widget):
-        red_color = QtGui.QColor(0, 255, 0, 30)  # Red color
+        red_color = QtGui.QColor(0, 255, 0, 40)  # Red color
         pen = QtGui.QPen(red_color, 1, QtCore.Qt.SolidLine)
         brush = QtGui.QBrush(red_color)
 
@@ -406,13 +406,14 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pan = False
-        self.column_width = 30
+        self.column_width = 100
         self.last_mouse_pos = None
         self.zoom_factor = 1.0
         self.today_item = today_item()
         self.today_item.setZValue(1.0)
         self.items = []
         self.scene.addItem(self.today_item)
+        self.scene.zoom_factor = self.zoom_factor
         self.start_selection_drag = None
         self.selection_item = selection_item()
 
@@ -448,7 +449,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         graphic_item.signal_manager.start_scale.connect(self.start_scale_on_selection)
         graphic_item.signal_manager.stop_movement.connect(self.stop_movement_on_selection)
         graphic_item.signal_manager.select.connect(self.update_selection)
-        graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), len(self.items)*20))
+        graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), (len(self.items)-1)*40))
 
     def remove_item(self, graphic_item):
         if graphic_item in self.items:
@@ -537,8 +538,8 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             zoom = zoom_in_factor
         else:
             zoom = zoom_out_factor
-        min_zoom = 0.15
-        max_zoom = 8.0
+        min_zoom = 0.04
+        max_zoom = 2.0
         new_zoom = current_zoom * zoom
         new_zoom = min(max(new_zoom, min_zoom), max_zoom)
         scale_factor = new_zoom / current_zoom
@@ -555,6 +556,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
                                 self.sceneRect().width(),
                                 self.sceneRect().height()))
         self.move_scene_center_to_top()
+        self.scene.zoom_factor = self.zoom_factor
 
 class calendar_item(custom_graphic_item):
 
@@ -585,16 +587,16 @@ class calendar_item(custom_graphic_item):
 
     def init_pos_and_size(self):
         self.prepareGeometryChange()
-        self.width = self.duration*30
-        self.height = 20
-        pos_x = ((datetime.datetime.today() - self.date ).days) * -30
+        self.width = self.duration*100
+        self.height = 40
+        pos_x = ((datetime.datetime.today() - self.date ).days) * -100
         self.setPos(QtCore.QPointF(pos_x, 0))
 
     def mousePressEvent(self, event):
         if not self.selected:
             self.signal_manager.select.emit(self)
         self.start_move_pos = event.pos()
-        if event.pos().x() < self.width - 10:
+        if event.pos().x() < self.width - 20:
             self.signal_manager.start_move.emit(1)
         else:
             self.signal_manager.start_scale.emit(1)
@@ -618,7 +620,7 @@ class calendar_item(custom_graphic_item):
             self.signal_manager.select.emit(self)
 
     def mouseMoveEvent(self, event):
-        delta = int((event.pos().x() - self.start_move_pos.x())/30)*30
+        delta = int((event.pos().x() - self.start_move_pos.x())/100)*100
         self.signal_manager.movement.emit(delta)
 
     def hoverLeaveEvent(self, event):
@@ -627,7 +629,7 @@ class calendar_item(custom_graphic_item):
         self.update()
 
     def hoverMoveEvent(self, event):
-        if event.pos().x() < self.width - 10:
+        if event.pos().x() < self.width - 20:
             self.hover = True
             self.hover_scale_handle = False
         else:
@@ -647,32 +649,36 @@ class calendar_item(custom_graphic_item):
         self.calculate_new_date()
 
     def scale_item(self, delta):
-        if self.actual_width + delta < 30:
+        if self.actual_width + delta < 100:
             return
         self.prepareGeometryChange()
         self.width = self.actual_width + delta
-        self.duration = self.width/30
+        self.duration = self.width/100
         self.update()
 
     def calculate_new_date(self):
-        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(self.pos().x()/30)
+        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(self.pos().x()/100)
+
+    def client_rect(self):
+        margin = 4
+        return QtCore.QRectF(self.x+margin, self.y+margin, self.width - margin*2 - 5, self.height - margin*2)
 
     def paint(self, painter, option, widget):
-        margin = 2
+        margin = 4
         bg_color = QtGui.QColor(self.bg_color)
-        bg_color.setAlpha(50)
+        bg_color.setAlpha(100)
         if self.hover:
-            bg_color.setAlpha(100)
-        if self.selected:
             bg_color.setAlpha(120)
+        if self.selected:
+            bg_color.setAlpha(140)
         rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
         #if self.hover or self.hover_scale_handle:
         #    rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height*1.5-margin*2)
-        draw_rect(painter, rect, bg_color = bg_color, radius=4)
+        draw_rect(painter, rect, bg_color = bg_color, radius=2)
         if self.hover_scale_handle:
             rect = QtCore.QRectF(self.width-margin-10, self.y+margin, 10, self.height-margin*2)
-            bg_color.setAlpha(120)
-            draw_rect(painter, rect, bg_color = bg_color, radius=4)
+            bg_color.setAlpha(160)
+            draw_rect(painter, rect, bg_color = bg_color, radius=2)
         self.scene().update()
 
 class header_scene(QtWidgets.QGraphicsScene):
@@ -682,12 +688,12 @@ class header_scene(QtWidgets.QGraphicsScene):
     def drawBackground(self, painter, rect):
         color1 = QtGui.QColor('transparent')
         color2 = QtGui.QColor(0,0,0,10)
-        column_width = 30
+        column_width = 100
         start_x = int(rect.left()) // column_width
         end_x = int(rect.right()) // column_width
         for x in range(start_x, end_x + 1):
             x_pos = x * column_width
-            column_rect = QtCore.QRectF(x_pos, rect.top()+70, column_width, rect.height()-70)
+            column_rect = QtCore.QRectF(x_pos, rect.top()+140, column_width, rect.height()-140)
             color = color1 if x % 2 == 0 else color2
             painter.fillRect(column_rect, color)
 
@@ -697,26 +703,44 @@ class scene(QtWidgets.QGraphicsScene):
 
     def drawBackground(self, painter, rect):
         color1 = QtGui.QColor('transparent')
-        color2 = QtGui.QColor(0,0,0,20)
+        color2 = QtGui.QColor(0, 0, 0, 20)
         line_color = QtGui.QColor(255, 255, 255, 5)
-        column_width = 30 
-        row_height = 20
+        column_width = 100
+        row_height = 40
+
+        if self.zoom_factor > 0.1:
+            start_x = int(rect.left()) // column_width
+            end_x = int(rect.right()) // column_width
+
+            for x in range(start_x, end_x + 1):
+                x_pos = x * column_width
+                column_rect = QtCore.QRectF(x_pos, rect.top(), column_width, rect.height())
+                color = color1 if x % 2 == 0 else color2
+                painter.fillRect(column_rect, color)
+        else:
+            start_x = int(rect.left()) // column_width*7
+            end_x = int(rect.right()) // column_width*7
+
+            for x in range(start_x, end_x + 1):
+                x_pos = x * column_width * 7
+                column_rect = QtCore.QRectF(x_pos, rect.top(), column_width*7, rect.height())
+                color = color1 if x % 2 == 0 else color2
+                painter.fillRect(column_rect, color)
+
         start_y = int(rect.top()) // row_height
         end_y = int(rect.bottom()) // row_height
-        for y in range(start_y, end_y + 2):
-            y_pos = y * row_height
-            line = QtCore.QLineF(rect.left(), y_pos, rect.right(), y_pos)
-            painter.setPen(QtGui.QPen(line_color, 1, QtCore.Qt.SolidLine))
-            painter.drawLine(line)
-        start_x = int(rect.left()) // column_width
-        end_x = int(rect.right()) // column_width
-        for x in range(start_x, end_x + 1):
-            x_pos = x * column_width
-            column_rect = QtCore.QRectF(x_pos, rect.top(), column_width, rect.height())
-            color = color1 if x % 2 == 0 else color2
-            painter.fillRect(column_rect, color)
-            if x_pos == 0:
-                draw_rect(painter, column_rect, bg_color=QtGui.QColor(255,255,255,3), outline=QtGui.QColor(255,255,255,20))
+
+        if len(list(range(start_y, end_y + 2))) < 50:
+            for y in range(start_y, end_y + 2):
+                y_pos = y * row_height
+                line = QtCore.QLineF(rect.left(), y_pos, rect.right(), y_pos)
+                painter.setPen(QtGui.QPen(line_color, 1, QtCore.Qt.SolidLine))
+                painter.drawLine(line)
+
+        # Highlight the first column
+        first_column_rect = QtCore.QRectF(0, rect.top(), column_width, rect.height())
+        draw_rect(painter, first_column_rect, bg_color=QtGui.QColor(255, 255, 255, 3),
+                  outline=QtGui.QColor(255, 255, 255, 20))
 
 class selection_item(custom_graphic_item):
     def __init__(self):
