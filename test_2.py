@@ -11,6 +11,13 @@ from wizard.gui import gui_utils
 from wizard.core import image
 from wizard.core import repository
 
+class signal_manager(QtCore.QObject):
+
+    item_updated = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(signal_manager, self).__init__(parent)
+
 class calendar_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(calendar_widget, self).__init__(parent)
@@ -19,12 +26,14 @@ class calendar_widget(QtWidgets.QWidget):
 
         self.header_view = test.calendar_header()
         self.view = test.calendar_viewport()
+        self.grouped_dic = dict()
 
         self.init_users_images()
         self.build_ui()
         self.connect_functions()
 
         self.view.set_zoom(0.5)
+        #self.refresh()
 
     def init_users_images(self):
         self.users_images_dic = dict()
@@ -48,48 +57,75 @@ class calendar_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_view)
         self.main_layout.addWidget(self.view)
 
-        for a in range(1):
-            domains = project.get_domains()
-            for category_row in project.get_domain_childs(domains[0]['id']):
+    def refresh(self):
+
+        self.grouped_dic = dict()
+        self.grouped_dic['frames'] = dict()
+
+        domains = project.get_domains()
+        for domain_row in domains:
+            if domain_row['name'] == 'library':
+                continue
+            for category_row in project.get_domain_childs(domain_row['id']):
                 assets = project.get_category_childs(category_row['id'])
                 for asset_row in assets:
                     stages = project.get_asset_childs(asset_row['id'])
-                    stage_items = []
+                    
                     for stage_row in stages:
+                        
+                        group_name = stage_row['name']
+                        if group_name not in self.grouped_dic['frames'].keys():
+                            self.grouped_dic['frames'][group_name] = dict()
+                            self.grouped_dic['frames'][group_name]['items'] = []
+
                         item = stage_item(stage_row, datetime.datetime.fromtimestamp(stage_row['creation_time']),
                                             int(stage_row['estimated_time']/24),
                                             bg_color = ressources._stages_colors_[stage_row['name']],
                                             users_images_dic = self.users_images_dic)
-                        stage_items.append(item)
-                        self.view.add_item(item)
+                        self.grouped_dic['frames'][group_name]['items'].append(item)
 
-                    bounding_rect = stage_items[0].sceneBoundingRect()
-                    for item in stage_items[1:]:
-                        bounding_rect = bounding_rect.united(item.sceneBoundingRect())
-                    frame_it = frame_item(asset_row, '#1d1d23')
-                    frame_it.setZValue(-1)
-                    frame_it.setPos(bounding_rect.x()-10, bounding_rect.y()-10)
-                    frame_it.prepareGeometryChange()
-                    frame_it.width = bounding_rect.width()+20
-                    frame_it.height = bounding_rect.height()+20
-                    self.view.add_frame(frame_it)
+        for group_name in self.grouped_dic['frames'].keys():
+            frame = frame_item(group_name, '#1d1d23')
+            frame.signal_manager.select.connect(self.select_frame_children)
+            self.grouped_dic['frames'][group_name]['frame_item'] = frame
+            self.view.add_frame(frame)
 
+            for item in self.grouped_dic['frames'][group_name]['items']:
+                self.view.add_item(item)
+                item.stage_item_signal_manager.item_updated.connect(self.update_frames)
+            
+            self.update_frame_bouding_rect(group_name)
+
+    def select_frame_children(self, group_name):
+        if not group_name in self.grouped_dic['frames'].keys():
+            return
+        for item in self.grouped_dic['frames'][group_name]['items']:
+            self.view.update_selection(item)
+
+    def update_frame_bouding_rect(self, group_name):
+        bounding_rect = self.grouped_dic['frames'][group_name]['items'][0].sceneBoundingRect()
+        for item in self.grouped_dic['frames'][group_name]['items'][1:]:
+            bounding_rect = bounding_rect.united(item.sceneBoundingRect())
+        self.grouped_dic['frames'][group_name]['frame_item'].update_rect(bounding_rect)
+
+    def update_frames(self):
+        for group_name in self.grouped_dic['frames'].keys():
+             self.update_frame_bouding_rect(group_name)
 
 class stage_item(test.calendar_item):
     def __init__(self, stage_row, date, duration, bg_color, users_images_dic):
         super(stage_item, self).__init__(date=date, duration=duration, bg_color=bg_color)
         self.stage_row = stage_row
         self.users_images_dic = users_images_dic
+        self.stage_item_signal_manager = signal_manager()
 
     def paint(self, painter, option, widget):
         super(stage_item, self).paint(painter, option, widget)
         if self.scene().zoom_factor > 0.15:
             rect = self.client_rect().toRect()
             margin = 2
-
             painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
             painter.drawPixmap(rect.x()+margin, rect.y()+margin, self.users_images_dic[self.stage_row['assignment']])
-
             state_rect = QtCore.QRect(rect.x() + 28 + margin*2, rect.y() + margin, 4, rect.height()-margin*2)
             test.draw_rect(painter, state_rect, bg_color=QtGui.QColor(ressources._states_colors_[self.stage_row['state']]), radius=2)
         if self.scene().zoom_factor > 0.23:
@@ -100,23 +136,26 @@ class stage_item(test.calendar_item):
             stage_text = f"{('/').join(stage_text)} - {int(self.duration)} day"
             test.draw_text(painter, text_rect, stage_text, size=20, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
+    def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
+        self.stage_item_signal_manager.item_updated.emit(self)
+
 class frame_item(test.frame_item):
-    def __init__(self, asset_row, bg_color):
-        super(frame_item, self).__init__(bg_color=bg_color)
-        self.asset_row = asset_row
+    def __init__(self, group_name, bg_color):
+        super(frame_item, self).__init__(bg_color=bg_color, frame_label=group_name)
+        self.margin = 10
+        self.group_name = group_name
+        self.setZValue(-1)
 
-    def paint(self, painter, option, widget):
-        super(frame_item, self).paint(painter, option, widget)
-        
-        rect = self.boundingRect().toRect()
-        font = self.scene().font()
-        font.setPixelSize(40)
+    def update_rect(self, rect):
+        self.setPos(rect.x()-self.margin, rect.y()-self.margin)
+        self.prepareGeometryChange()
+        self.width = rect.width()+self.margin*2
+        self.height = rect.height()+self.margin*2
 
-        font_metrics = QtGui.QFontMetrics(font)
-        text = self.asset_row['name']
-        text_width = font_metrics.horizontalAdvance(text)
-        text_rect = QtCore.QRect(rect.x() - 20 - text_width, rect.y(), 200, 50)
-        test.draw_text(painter, text_rect, text, size=40, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+    def mousePressEvent(self, event):
+        if event.button() & QtCore.Qt.LeftButton:
+            self.signal_manager.select.emit(self.group_name)
+        else:
+            super().mouseReleaseEvent(event)
 
-w= calendar_widget()
-w.show()

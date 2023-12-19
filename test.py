@@ -411,6 +411,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.min_zoom = 0.04
         self.max_zoom = 2.0
         self.zoom_factor = 1.0
+        self.y_pos = 0
         self.today_item = today_item()
         self.today_item.setZValue(1.0)
         self.items = []
@@ -452,9 +453,14 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         graphic_item.signal_manager.start_scale.connect(self.start_scale_on_selection)
         graphic_item.signal_manager.stop_movement.connect(self.stop_movement_on_selection)
         graphic_item.signal_manager.select.connect(self.update_selection)
-        graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), (len(self.items))*40))
+        graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), self.y_pos))
+        self.y_pos += 40
+
+    def add_space(self, space):
+        self.y_pos += space
 
     def add_frame(self, graphic_item):
+        self.add_space(80)
         self.frames.append(graphic_item)
         self.scene.addItem(graphic_item)
 
@@ -734,10 +740,8 @@ class calendar_item(custom_graphic_item):
         if self.hover:
             bg_color.setAlpha(120)
         if self.selected:
-            bg_color.setAlpha(140)
+            bg_color.setAlpha(255)
         rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
-        #if self.hover or self.hover_scale_handle:
-        #    rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height*1.5-margin*2)
         draw_rect(painter, rect, bg_color = bg_color, radius=2)
         if self.hover_scale_handle:
             rect = QtCore.QRectF(self.width-margin-10, self.y+margin, 10, self.height-margin*2)
@@ -746,15 +750,27 @@ class calendar_item(custom_graphic_item):
         self.scene().update()
 
 class frame_item(custom_graphic_item):
-    def __init__(self, bg_color):
+    def __init__(self, bg_color, frame_label):
         super(frame_item, self).__init__()
         self.bg_color = bg_color
+        self.frame_label = frame_label
+        self.signal_manager = signal_manager()
 
     def paint(self, painter, option, widget):
         bg_color = QtGui.QColor(self.bg_color)
-        bg_color.setAlpha(200)
-        rect = self.boundingRect()
+        bg_color.setAlpha(160)
+        rect = self.boundingRect().toRect()
         draw_rect(painter, rect, bg_color=bg_color, radius=6)
+
+        font = self.scene().font()
+        font.setPixelSize(40)
+
+        font_metrics = QtGui.QFontMetrics(font)
+        text = self.frame_label
+        text_height = font_metrics.height()
+
+        text_rect = QtCore.QRect(rect.x(), rect.y()-text_height-10, 1000, text_height)
+        draw_text(painter, text_rect, text, size=40, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
