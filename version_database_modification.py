@@ -35,9 +35,20 @@ logger = logging.getLogger(__name__)
 # Wizard modules
 from wizard.core import environment
 from wizard.core import project
+from wizard.core import assets
 from wizard.core import db_utils
 
 def main():
 	project.create_assets_groups_table(environment.get_project_name())
 	sql_cmd = """ALTER TABLE assets ADD COLUMN IF NOT EXISTS assets_group_id integer REFERENCES assets_groups (id);"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
+
+	import time
+	start_date = time.time()
+	sql_cmd = f"""ALTER TABLE stages ADD COLUMN IF NOT EXISTS start_date real NOT NULL DEFAULT {start_date};"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+
+def fix_stages_duration():
+	stage_rows = project.get_all_stages()
+	for stage in stage_rows:
+		assets.modify_stage_estimation(stage['id'], 3)

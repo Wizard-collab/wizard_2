@@ -54,8 +54,8 @@ class asset_tracking_widget(QtWidgets.QFrame):
     def edit_estimation(self):
         self.estimation_widget = estimation_widget()
         if self.estimation_widget.exec_() == QtWidgets.QDialog.Accepted:
-            seconds = self.estimation_widget.hours*3600
-            assets.modify_stage_estimation(self.stage_id, seconds)
+            days = self.estimation_widget.days
+            assets.modify_stage_estimation(self.stage_id, days)
             gui_server.refresh_team_ui()
 
     def build_ui(self):
@@ -247,7 +247,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             string_time = tools.convert_seconds_to_string_time(float(self.stage_row['work_time']))
             self.work_time_label.setText(string_time)
             if self.stage_row['estimated_time'] is not None:
-                self.estimated_time_label.setText(tools.convert_seconds_to_string_time(float(self.stage_row['estimated_time'])))
+                self.estimated_time_label.setText(f"{int(self.stage_row['estimated_time'])} days")
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')
@@ -511,9 +511,7 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
-        string_time = tools.convert_seconds_to_string_time(float(self.tracking_event_row['data']))
-
-        self.estimation_label = QtWidgets.QLabel(string_time)
+        self.estimation_label = QtWidgets.QLabel(f"{self.tracking_event_row['data']} days")
         self.estimation_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addWidget(self.estimation_label)
 
@@ -622,7 +620,7 @@ class estimation_widget(QtWidgets.QDialog):
         self.enter_sc.activated.connect(self.apply)
 
     def apply(self):
-        self.hours = self.hours_spinBox.value()
+        self.days = self.days_spinBox.value()
         self.accept()
 
     def build_ui(self):
@@ -643,14 +641,14 @@ class estimation_widget(QtWidgets.QDialog):
         self.shadow.setYOffset(2)
         self.main_frame.setGraphicsEffect(self.shadow)
 
-        self.hours_spinBox = QtWidgets.QSpinBox()
-        self.hours_spinBox.setRange(1, 200)
-        self.hours_spinBox.setValue(6)
-        self.hours_spinBox.setButtonSymbols(2)
-        self.frame_layout.addWidget(self.hours_spinBox)
+        self.days_spinBox = QtWidgets.QSpinBox()
+        self.days_spinBox.setRange(1, 200)
+        self.days_spinBox.setValue(6)
+        self.days_spinBox.setButtonSymbols(2)
+        self.frame_layout.addWidget(self.days_spinBox)
 
-        self.hours_label = QtWidgets.QLabel('hours')
-        self.frame_layout.addWidget(self.hours_label)
+        self.days_label = QtWidgets.QLabel('days')
+        self.frame_layout.addWidget(self.days_label)
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()

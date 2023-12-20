@@ -404,13 +404,20 @@ def modify_stage_assignment(stage_id, user_name):
     asset_tracking.add_assignment_event(stage_id, user_name)
     return 1
 
-def modify_stage_estimation(stage_id, seconds):
-    if type(seconds) != int:
-        logger.warning(f'{seconds} is not a int')
+def modify_stage_estimation(stage_id, days):
+    if type(days) != int:
+        logger.warning(f'{days} is not a int')
         return
-    project.set_stage_data(stage_id, 'estimated_time', seconds)
-    asset_tracking.add_estimation_event(stage_id, seconds)
+    project.set_stage_data(stage_id, 'estimated_time', days)
+    asset_tracking.add_estimation_event(stage_id, days)
+    return 1
 
+def modify_stage_start_date(stage_id, start_date_in_seconds):
+    if type(start_date_in_seconds) != int:
+        logger.warning(f'{start_date_in_seconds} is not a int')
+        return
+    project.set_stage_data(stage_id, 'start_date', start_date_in_seconds)
+    #asset_tracking.add_estimation_event(stage_id, days)
     return 1
 
 def add_work_time(work_env_id, work_time):
