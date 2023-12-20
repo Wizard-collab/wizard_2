@@ -410,6 +410,7 @@ def modify_stage_estimation(stage_id, seconds):
         return
     project.set_stage_data(stage_id, 'estimated_time', seconds)
     asset_tracking.add_estimation_event(stage_id, seconds)
+
     return 1
 
 def add_work_time(work_env_id, work_time):

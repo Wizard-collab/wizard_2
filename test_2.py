@@ -29,6 +29,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.grouped_dic = dict()
 
         self.init_users_images()
+        self.init_priority_images_dic()
         self.build_ui()
         self.connect_functions()
 
@@ -42,10 +43,15 @@ class calendar_widget(QtWidgets.QWidget):
             pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 28, 12)
             self.users_images_dic[user_row['user_name']] = pixmap
 
+            self.priority_images_dic[priority] = pixmap
+
     def connect_functions(self):
         self.view.scene_rect_update.connect(self.header_view.update_rect)
         self.view.scale_factor_update.connect(self.header_view.update_scale)
         self.view.zoom_factor_update.connect(self.header_view.update_zoom_factor)
+        self.search_bar.textChanged.connect(self.update_search)
+    def change_group_method(self):
+        self.refresh()
 
     def build_ui(self):
         self.setObjectName('main_widget')
@@ -54,9 +60,20 @@ class calendar_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(5)
         self.setLayout(self.main_layout)
 
+        self.group_label =  QtWidgets.QLabel('Group by')
+        self.header_layout.addWidget(self.group_label)
+        self.group_methods_comboBox = gui_utils.QComboBox()
+        self.header_layout.addWidget(self.group_methods_comboBox)
+
         self.main_layout.addWidget(self.header_view)
         self.main_layout.addWidget(self.view)
 
+    def update_search(self):
+        if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
+        self.search_threads[thread_id].show_stage_signal.connect(self.show_stage)
+        if len(search_data) > 0:
+            self.accept_item_from_thread = True
+            self.search_threads[thread_id].update_search(self.stage_rows, search_data)
     def refresh(self):
 
         self.grouped_dic = dict()

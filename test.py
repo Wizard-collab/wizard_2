@@ -46,6 +46,7 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
         self.height = height
         self.update()
 
+        self.selected = False
     def boundingRect(self):
         return QtCore.QRectF(self.x, self.y, self.width, self.height)
 
