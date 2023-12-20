@@ -1,17 +1,29 @@
-import test
-from wizard.gui import app_utils
+# coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
+
+# Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import datetime
 import time
-import random
+import copy
+import logging
+
+# Wizard gui modules
+from wizard.gui import calendar_utils
+from wizard.gui import gui_utils
+
+# Wizard core modules
+from wizard.core import user
 from wizard.core import project
 from wizard.core import assets
-from wizard.vars import ressources
-from wizard.gui import gui_utils
 from wizard.core import image
 from wizard.core import repository
-import copy
+from wizard.vars import ressources
+from wizard.vars import user_vars
+
+logger = logging.getLogger(__name__)
 
 class signal_manager(QtCore.QObject):
 
@@ -26,13 +38,16 @@ class calendar_widget(QtWidgets.QWidget):
 
         self.resize(800, 600)
 
-        self.header_view = test.calendar_header()
-        self.view = test.calendar_viewport()
+        self.header_view = calendar_utils.calendar_header()
+        self.view = calendar_utils.calendar_viewport()
         self.grouped_dic = dict()
         self.group_method = 'stage'
         self.group_methods_list = ['stage', 'domain', 'category', 'asset', 'state', 'assignment', 'priority']
+        self.update_group_method = True
         self.stage_ids = dict()
         self.grouped_dic['frames'] = dict()
+
+        self.stage_rows = []
 
         self.old_thread_id = None
         self.search_threads = dict()
@@ -43,7 +58,19 @@ class calendar_widget(QtWidgets.QWidget):
         self.connect_functions()
 
         self.view.set_zoom(0.5)
-        #self.refresh()
+
+    def set_context(self):
+        context_dic = dict()
+        context_dic['group_method'] = self.group_method 
+        context_dic['search_text'] = self.search_bar.text() 
+        user.user().add_context(user_vars._production_calendar_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._production_calendar_context_)
+        if context_dic is not None and context_dic != dict():
+            self.group_method  = context_dic['group_method']
+            self.search_bar.setText(context_dic['search_text'])
+            self.refresh()
 
     def init_users_images(self):
         self.users_images_dic = dict()
@@ -60,9 +87,22 @@ class calendar_widget(QtWidgets.QWidget):
             self.priority_images_dic[priority] = pixmap
 
     def showEvent(self, event):
-        self.group_methods_comboBox.clear()
+        self.init_group_method_comboBox()
+        self.refresh()
+
+    def init_group_method_comboBox(self):
+        self.update_group_method = False
+        total_items = self.group_methods_comboBox.count()
+        existing_items = []
+        for i in range(total_items):
+                item_text = self.group_methods_comboBox.itemText(i)
+                existing_items.append(item_text)
         for group_method in self.group_methods_list:
+            if group_method in existing_items:
+                continue
             self.group_methods_comboBox.addItem(group_method)
+        self.group_methods_comboBox.setCurrentText(self.group_method)
+        self.update_group_method = True
 
     def connect_functions(self):
         self.view.scene_rect_update.connect(self.header_view.update_rect)
@@ -72,6 +112,8 @@ class calendar_widget(QtWidgets.QWidget):
         self.search_bar.textChanged.connect(self.update_search)
 
     def change_group_method(self):
+        if not self.update_group_method:
+            return
         self.group_method = self.group_methods_comboBox.currentText()
         self.refresh()
 
@@ -101,6 +143,19 @@ class calendar_widget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.header_view)
         self.main_layout.addWidget(self.view)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(11,11,11,11)
+        self.infos_layout.setSpacing(4)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.refresh_label = QtWidgets.QLabel()
+        self.refresh_label.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.refresh_label)
 
     def update_search(self):
         if not self.isVisible():
@@ -178,6 +233,10 @@ class calendar_widget(QtWidgets.QWidget):
         return group_name
 
     def refresh(self):
+        if not self.isVisible():
+            return
+
+        start_time = time.perf_counter()
 
         project_stages = []
         self.stage_rows = []
@@ -238,7 +297,13 @@ class calendar_widget(QtWidgets.QWidget):
         for group_name in self.grouped_dic['frames'].keys():
             ordered_items.append(self.grouped_dic['frames'][group_name]['items'])
 
-        self.organize_items()        
+        self.organize_items()  
+        self.update_search()
+        self.update_refresh_time(start_time)
+
+    def update_refresh_time(self, start_time):
+        refresh_time = str(round((time.perf_counter()-start_time), 3))
+        self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def organize_items(self):
         self.view.reset_y_pos()
@@ -282,7 +347,7 @@ class calendar_widget(QtWidgets.QWidget):
         for group_name in self.grouped_dic['frames'].keys():
             self.update_frame_bouding_rect(group_name)
 
-class stage_item(test.calendar_item):
+class stage_item(calendar_utils.calendar_item):
     def __init__(self, stage_row, date, duration, bg_color, users_images_dic, priority_images_dic):
         super(stage_item, self).__init__(date=date, duration=duration, bg_color=bg_color)
         self.stage_row = stage_row
@@ -303,30 +368,31 @@ class stage_item(test.calendar_item):
         assets.modify_stage_estimation(self.stage_row['id'], int(self.duration))
 
     def paint(self, painter, option, widget):
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
         super(stage_item, self).paint(painter, option, widget)
-        if self.scene().zoom_factor > 0.15:
+        if self.scene().zoom_factor > 0.08:
             rect = self.client_rect().toRect()
             margin = 2
-            painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+            #painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
             painter.drawPixmap(rect.x()+margin, rect.y()+margin, self.users_images_dic[self.stage_row['assignment']])
             state_rect = QtCore.QRect(rect.x() + 28 + margin*2, rect.y() + margin, 50, rect.height()-margin*2)
-            test.draw_rect(painter, state_rect, bg_color=QtGui.QColor(ressources._states_colors_[self.stage_row['state']]), radius=2)
-            test.draw_text(painter, state_rect, self.stage_row['state'], size=18, align=QtCore.Qt.AlignCenter, bold=True)
+            calendar_utils.draw_rect(painter, state_rect, bg_color=QtGui.QColor(ressources._states_colors_[self.stage_row['state']]), radius=4)
+            calendar_utils.draw_text(painter, state_rect, self.stage_row['state'], size=18, align=QtCore.Qt.AlignCenter, bold=True)
             painter.drawPixmap(rect.x() + margin*4 + 50 + 28, rect.y(), self.priority_images_dic[self.stage_row['priority']])
 
-        if self.scene().zoom_factor > 0.23:
-            text_rect = QtCore.QRect(rect.x() + margin*6 + 50 + 28+28, rect.y(), 500, rect.height())
+        if self.scene().zoom_factor > 0.08:
+            text_rect = QtCore.QRect(rect.x() + margin*6 + 50 + 28+28, rect.y(), 1000, rect.height())
             zoom_factor = self.scene().zoom_factor
             stage_text = self.stage_row['string'].split('/')
             stage_text.pop(0)
             stage_text = f"{('/').join(stage_text)} - {int(self.duration)} day"
-            test.draw_text(painter, text_rect, stage_text, size=20, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+            calendar_utils.draw_text(painter, text_rect, stage_text, size=30, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
         self.stage_item_signal_manager.item_updated.emit(self)
 
-class frame_item(test.frame_item):
+class frame_item(calendar_utils.frame_item):
     def __init__(self, group_name, bg_color):
         super(frame_item, self).__init__(bg_color=bg_color, frame_label=group_name)
         self.margin = 20
@@ -373,8 +439,6 @@ class search_thread(QtCore.QThread):
                 for data_block in values:
                     data_list.append(str(data_block))
                 data = (' ').join(data_list)
-                data = data.replace('assets','')
-                data = data.replace('sequences','')
 
                 for keywords_set in keywords_sets:
                     if keywords_set == '':

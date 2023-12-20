@@ -14,6 +14,7 @@ from wizard.gui import gui_utils
 from wizard.gui import logging_widget
 from wizard.gui import overview_widget
 from wizard.gui import production_table_widget
+from wizard.gui import production_calendar_widget
 from wizard.gui import custom_tab_widget
 
 # Wizard core modules
@@ -32,6 +33,7 @@ class production_manager_widget(QtWidgets.QWidget):
 
         self.overview_widget = overview_widget.overview_widget()
         self.production_table_widget = production_table_widget.production_table_widget()
+        self.production_calendar_widget = production_calendar_widget.calendar_widget()
         self.build_ui()
 
     def build_ui(self):
@@ -45,6 +47,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tabs_widget)
 
         self.production_table_index = self.tabs_widget.addTab(self.production_table_widget, '', QtGui.QIcon(ressources._table_viewer_icon_))
+        self.production_calendar_index = self.tabs_widget.addTab(self.production_calendar_widget, '', QtGui.QIcon(ressources._calendar_icon_))
         self.overview_index = self.tabs_widget.addTab(self.overview_widget, '', QtGui.QIcon(ressources._chart_icon_))
 
     def set_context(self):
@@ -53,6 +56,7 @@ class production_manager_widget(QtWidgets.QWidget):
         context_dic['current_tab'] = current_tab
         user.user().add_context(user_vars._production_manager_context_, context_dic)
         self.production_table_widget.set_context()
+        self.production_calendar_widget.set_context()
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._production_manager_context_)
@@ -60,10 +64,12 @@ class production_manager_widget(QtWidgets.QWidget):
             current_tab = context_dic['current_tab']
             self.tabs_widget.tab_selected(current_tab)
         self.production_table_widget.get_context()
+        self.production_calendar_widget.get_context()
 
     def refresh(self):
         self.overview_widget.refresh()
         self.production_table_widget.refresh()
+        self.production_calendar_widget.refresh()
 
     def toggle(self):
         if self.isVisible():
