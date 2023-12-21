@@ -73,9 +73,9 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.setFixedHeight(120)
         self.scene = header_scene()
         self.setScene(self.scene)
-        self.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.setRenderHint(QtGui.QPainter.TextAntialiasing)
-        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+        self.setRenderHint(QtGui.QPainter.Antialiasing, False)
+        self.setRenderHint(QtGui.QPainter.TextAntialiasing, False)
+        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, False)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -93,6 +93,11 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.month_items = []
         self.year_items = []
         self.update_header()
+
+    def set_column_width(self, column_width):
+        self.column_width = column_width
+        self.scene.column_width = column_width
+        self.update()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -380,15 +385,15 @@ class calendar_viewport(QtWidgets.QGraphicsView):
 
         self.scene = scene()
         self.setScene(self.scene)
-        self.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.setRenderHint(QtGui.QPainter.TextAntialiasing)
-        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+        self.setRenderHint(QtGui.QPainter.Antialiasing, False)
+        self.setRenderHint(QtGui.QPainter.TextAntialiasing, False)
+        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, False)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pan = False
-        self.column_width = 100
+        self.column_width = 1000
         self.last_mouse_pos = None
         self.min_zoom = 0.04
         self.max_zoom = 2.0
@@ -403,6 +408,15 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         empty_item = custom_graphic_item()
         self.scene.addItem(empty_item)
         self.move_scene_center_to_top()
+
+    def set_column_width(self, column_width):
+        for item in self.items:
+            item.column_width = column_width
+            item.recalculate_pos_and_size()
+            item.update()
+        self.column_width = column_width
+        self.scene.column_width = column_width
+        self.update()
 
     def movement_on_selection(self, delta):
         for item in self.items:
@@ -496,10 +510,6 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.setSceneRect(rect)
         self.scene_rect_update.emit(rect)
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.move_scene_center_to_top()
-
     def wheelEvent(self, event):
         self.zoom(event)
 
@@ -519,8 +529,6 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             dx = -delta.x() / self.zoom_factor
             dy = -delta.y() / self.zoom_factor
             point = self.mapToScene(QtCore.QPoint(0,0))
-            if point.y() + dy <= 0:
-                dy = -point.y()
             self.update_scene_rect(self.sceneRect().translated(dx, dy))
         if self.start_selection_drag:
             rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
@@ -604,7 +612,6 @@ class calendar_viewport(QtWidgets.QGraphicsView):
                                 self.sceneRect().y() - diff.y(),
                                 self.sceneRect().width(),
                                 self.sceneRect().height()))
-        self.move_scene_center_to_top()
         self.scene.zoom_factor = self.zoom_factor
 
     def set_zoom(self, zoom_factor):
@@ -615,7 +622,6 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             self.zoom_factor_update.emit(zoom_factor)
             self.scale(scale_factor, scale_factor)
             self.update_scene_rect(self.sceneRect())
-            self.move_scene_center_to_top()
             self.zoom_factor = zoom_factor
             self.scene.zoom_factor = self.zoom_factor
 
@@ -633,7 +639,6 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             viewport_center_scene = self.mapToScene(self.viewport().rect().center())
             translation = focus_rect_center_scene - viewport_center_scene
             self.update_scene_rect(self.sceneRect().translated(translation.x(), translation.y()))
-            self.move_scene_center_to_top()
 
 class calendar_item(custom_graphic_item):
 
@@ -641,6 +646,8 @@ class calendar_item(custom_graphic_item):
         super(calendar_item, self).__init__()
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.setAcceptHoverEvents(True)
+
+        self.column_width = 100
 
         self.bg_color = bg_color
         self.date = date
@@ -662,12 +669,20 @@ class calendar_item(custom_graphic_item):
         self.moved = False
         self.scaled = False
         self.init_pos_and_size()
+        self.cache_scene_painting()
+
+    def recalculate_pos_and_size(self):
+        self.prepareGeometryChange()
+        self.width = self.duration*self.column_width
+        self.height = 40
+        pos_x = ((datetime.datetime.today() - self.date ).days) * -self.column_width
+        self.setPos(QtCore.QPointF(pos_x, self.pos().y()))
 
     def init_pos_and_size(self):
         self.prepareGeometryChange()
-        self.width = self.duration*100
+        self.width = self.duration*self.column_width
         self.height = 40
-        pos_x = ((datetime.datetime.today() - self.date ).days) * -100
+        pos_x = ((datetime.datetime.today() - self.date ).days) * -self.column_width
         self.setPos(QtCore.QPointF(pos_x, 0))
 
     def mousePressEvent(self, event):
@@ -705,7 +720,7 @@ class calendar_item(custom_graphic_item):
                 self.signal_manager.select.emit([self])
 
     def mouseMoveEvent(self, event):
-        delta = int((event.pos().x() - self.start_move_pos.x())/100)*100
+        delta = int((event.pos().x() - self.start_move_pos.x())/self.column_width)*self.column_width
         self.signal_manager.movement.emit(delta)
 
     def hoverLeaveEvent(self, event):
@@ -735,36 +750,49 @@ class calendar_item(custom_graphic_item):
         self.calculate_new_date()
 
     def scale_item(self, delta):
-        if self.actual_width + delta < 100:
+        if self.actual_width + delta < self.column_width:
             return
         self.prepareGeometryChange()
         self.width = self.actual_width + delta
-        self.duration = self.width/100
+        self.duration = self.width/self.column_width
         self.update()
 
     def calculate_new_date(self):
-        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(self.pos().x()/100)
+        self.date = datetime.datetime.combine(datetime.datetime.today().date(), datetime.time(0, 0)) + datetime.timedelta(self.pos().x()/self.column_width)
 
     def client_rect(self):
-        margin = 4
-        return QtCore.QRectF(self.x+margin, self.y+margin, self.width - margin*2 - 5, self.height - margin*2)
+        return QtCore.QRectF(self.x+self.margin, self.y+self.margin, self.width - self.margin*2 - 5, self.height - self.margin*2)
+
+    def cache_scene_painting(self):
+        self.margin = 4
+        self.qt_bg_color = QtGui.QColor(self.bg_color)
+        self.qt_bg_color.setAlpha(100)
+        self.qt_handle_color = QtGui.QColor('white')
+        self.qt_handle_color.setAlpha(100)
+        self.brush = QtGui.QBrush(self.qt_bg_color)
+        self.pen = QtGui.QPen(QtGui.QColor('transparent'), 0)
+        self.text_pen = QtGui.QPen(QtGui.QColor('white'), 1)
 
     def paint(self, painter, option, widget):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        margin = 4
-        bg_color = QtGui.QColor(self.bg_color)
-        bg_color.setAlpha(100)
+        painter.setPen(self.pen)
+
+        self.qt_bg_color.setAlpha(100)
         if self.hover:
-            bg_color.setAlpha(120)
+            self.qt_bg_color.setAlpha(120)
         if self.selected:
-            bg_color.setAlpha(255)
-        rect = QtCore.QRectF(self.x+margin, self.y+margin, self.width-margin*2, self.height-margin*2)
-        draw_rect(painter, rect, bg_color = bg_color, radius=4)
+            self.qt_bg_color.setAlpha(255)
+        
+        rect = QtCore.QRectF(self.x+self.margin, self.y+self.margin, self.width-self.margin*2, self.height-self.margin*2)
+        self.brush.setColor(self.qt_bg_color)
+        painter.setBrush(self.brush)
+        painter.drawRoundedRect(rect, 4, 4)
+
         if self.hover_scale_handle:
-            rect = QtCore.QRectF(self.width-margin-10, self.y+margin, 10, self.height-margin*2)
-            handle_color = QtGui.QColor('white')
-            handle_color.setAlpha(100)
-            draw_rect(painter, rect, bg_color = handle_color, radius=4)
+            rect = QtCore.QRectF(self.width-self.margin-10, self.y+self.margin, 10, self.height-self.margin*2)
+            self.brush.setColor(self.qt_handle_color)
+            painter.setBrush(self.brush)
+            painter.drawRoundedRect(rect, 4, 4)
+
         self.scene().update()
 
 class frame_item(custom_graphic_item):
@@ -773,88 +801,82 @@ class frame_item(custom_graphic_item):
         self.bg_color = bg_color
         self.frame_label = frame_label
         self.signal_manager = signal_manager()
+        self.cache_scene_painting()
+
+    def cache_scene_painting(self):
+        self.bg_color = QtGui.QColor(self.bg_color)
+        self.bg_color.setAlpha(160)
+        self.font = QtGui.QFont()
+        self.font.setPixelSize(50)
+        self.font.setBold(True)
+        font_metrics = QtGui.QFontMetrics(self.font)
+        self.text_height = font_metrics.height()
+        self.brush = QtGui.QBrush(self.bg_color)
+        self.pen = QtGui.QPen(QtGui.QColor('transparent'), 0)
+        self.text_pen = QtGui.QPen(QtGui.QColor('white'), 1)
 
     def paint(self, painter, option, widget):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        bg_color = QtGui.QColor(self.bg_color)
-        bg_color.setAlpha(160)
         rect = self.boundingRect().toRect()
-        draw_rect(painter, rect, bg_color=bg_color, radius=10)
-
-        font = self.scene().font()
-        font.setPixelSize(50)
-        font.setBold(True)
-
-        font_metrics = QtGui.QFontMetrics(font)
-        text = self.frame_label
-        text_height = font_metrics.height()
-
-        text_rect = QtCore.QRect(rect.x(), rect.y()-text_height-10, 1000, text_height)
-        draw_text(painter, text_rect, text, size=50, bold=True, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        painter.setPen(self.pen)
+        painter.setBrush(self.brush)
+        painter.drawRoundedRect(rect, 10, 10)
+        text_rect = QtCore.QRect(rect.x(), rect.y()-self.text_height-10, 1000, self.text_height)
+        painter.setPen(self.text_pen)
+        painter.setFont(self.font)
+        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, self.frame_label)
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
         super(header_scene, self).__init__()
+        self.column_width = 100
 
     def drawBackground(self, painter, rect):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
         color1 = QtGui.QColor('transparent')
         color2 = QtGui.QColor(0,0,0,10)
-        column_width = 100
-        start_x = int(rect.left()) // column_width
-        end_x = int(rect.right()) // column_width
+        start_x = int(rect.left()) // self.column_width
+        end_x = int(rect.right()) // self.column_width
         for x in range(start_x, end_x + 1):
-            x_pos = x * column_width
-            column_rect = QtCore.QRectF(x_pos, rect.top()+140, column_width, rect.height()-140)
+            x_pos = x * self.column_width
+            column_rect = QtCore.QRectF(x_pos, rect.top()+140, self.column_width, rect.height()-140)
             color = color1 if x % 2 == 0 else color2
             painter.fillRect(column_rect, color)
 
 class scene(QtWidgets.QGraphicsScene):
     def __init__(self):
         super(scene, self).__init__()
+        self.cache_scene_painting()
+
+    def cache_scene_painting(self):
+        self.color1 = QtGui.QColor('#2c2c33')
+        self.color2 = QtGui.QColor('#29292f')
+        self.line_color = QtGui.QColor('#36363b')
+        self.today_color = QtGui.QColor(255, 255, 255, 6)
+        self.today_line_color = QtGui.QColor(255, 255, 255, 40)
+        self.column_width = 100
+        self.row_height = 40
 
     def drawBackground(self, painter, rect):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
 
-        color1 = QtGui.QColor('transparent')
-        color2 = QtGui.QColor(0, 0, 0, 20)
-        line_color = QtGui.QColor(255, 255, 255, 15)
-        column_width = 100
-        row_height = 40
+        painter.fillRect(rect, self.color1)
 
         if self.zoom_factor > 0.1:
-            start_x = int(rect.left()) // column_width
-            end_x = int(rect.right()) // column_width
-
+            start_x = int(rect.left()) // self.column_width
+            end_x = int(rect.right()) // self.column_width
             for x in range(start_x, end_x + 1):
-                x_pos = x * column_width
-                column_rect = QtCore.QRectF(x_pos, rect.top(), column_width, rect.height())
-                color = color1 if x % 2 == 0 else color2
-                painter.fillRect(column_rect, color)
+                x_pos = x * self.column_width
+                column_rect = QtCore.QRectF(x_pos, rect.top(), self.column_width, rect.height())
+                if x % 2 == 0:
+                    painter.fillRect(column_rect, self.color2)
 
-        else:
-            painter.fillRect(rect, color2)
-
-        start_y = int(rect.top()) // row_height
-        end_y = int(rect.bottom()) // row_height
-
-        if len(list(range(start_y, end_y + 2))) < 50:
-            for y in range(start_y, end_y + 2):
-                y_pos = y * row_height
-                line = QtCore.QLineF(rect.left(), y_pos, rect.right(), y_pos)
-                painter.setPen(QtGui.QPen(line_color, 1, QtCore.Qt.SolidLine))
-                painter.drawLine(line)
-
-        first_column_rect = QtCore.QRectF(0, rect.top(), column_width, rect.height())
-        draw_rect(painter, first_column_rect, bg_color=QtGui.QColor(255, 255, 255, 6),
-                  outline=QtGui.QColor(255, 255, 255, 40))
+        first_column_rect = QtCore.QRectF(0, rect.top(), self.column_width, rect.height())
+        draw_rect(painter, first_column_rect, bg_color=self.today_color,
+                  outline=self.today_line_color)
 
 class selection_item(custom_graphic_item):
     def __init__(self):
         super(selection_item, self).__init__()
 
     def paint(self, painter, option, widget):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
         bg_color = QtGui.QColor(255,255,255,20)
         rect = QtCore.QRectF(self.x, self.y, self.width, self.height)
         draw_rect(painter, rect, bg_color=bg_color)
@@ -865,7 +887,6 @@ class today_item(custom_graphic_item):
         self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
 
     def paint(self, painter, option, widget):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
         color = QtGui.QColor(QtGui.QColor(255,255,255,20))
         pen = QtGui.QPen(QtGui.QColor(255,255,255,60), 1, QtCore.Qt.SolidLine)
         brush = QtGui.QBrush(color)
@@ -874,7 +895,6 @@ class today_item(custom_graphic_item):
         painter.drawRect(self.x, self.y, self.width, self.height)
 
 def draw_text(painter, rectangle, text, color=QtGui.QColor(255,255,255,int(255*0.85)), size=12, bold=False, align=QtCore.Qt.AlignCenter):
-    painter.setRenderHint(QtGui.QPainter.TextAntialiasing, False)
     font = QtGui.QFont()
     font.setBold(bold)
     font.setPixelSize(size)

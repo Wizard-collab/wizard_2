@@ -59,6 +59,11 @@ class calendar_widget(QtWidgets.QWidget):
 
         self.view.set_zoom(0.5)
 
+    def set_column_width(self, column_width):
+        self.view.set_column_width(column_width)
+        self.header_view.set_column_width(column_width)
+        self.update_frames()
+
     def set_context(self):
         context_dic = dict()
         context_dic['group_method'] = self.group_method 
@@ -355,6 +360,8 @@ class stage_item(calendar_utils.calendar_item):
         self.priority_images_dic = priority_images_dic
         self.stage_item_signal_manager = signal_manager()
         self.connect_functions()
+        self.cache_stage_item_painting()
+        self.update_stage_text()
 
     def connect_functions(self):
         self.signal_manager.start_date_modified.connect(self.apply_start_date)
@@ -367,30 +374,59 @@ class stage_item(calendar_utils.calendar_item):
     def apply_duration(self):
         assets.modify_stage_estimation(self.stage_row['id'], int(self.duration))
 
-    def paint(self, painter, option, widget):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        super(stage_item, self).paint(painter, option, widget)
-        if self.scene().zoom_factor > 0.08:
-            rect = self.client_rect().toRect()
-            margin = 2
-            #painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
-            painter.drawPixmap(rect.x()+margin, rect.y()+margin, self.users_images_dic[self.stage_row['assignment']])
-            state_rect = QtCore.QRect(rect.x() + 28 + margin*2, rect.y() + margin, 50, rect.height()-margin*2)
-            calendar_utils.draw_rect(painter, state_rect, bg_color=QtGui.QColor(ressources._states_colors_[self.stage_row['state']]), radius=4)
-            calendar_utils.draw_text(painter, state_rect, self.stage_row['state'], size=18, align=QtCore.Qt.AlignCenter, bold=True)
-            painter.drawPixmap(rect.x() + margin*4 + 50 + 28, rect.y(), self.priority_images_dic[self.stage_row['priority']])
+    def recalculate_pos_and_size(self):
+        super().recalculate_pos_and_size()
+        self.cache_stage_item_painting()
 
-        if self.scene().zoom_factor > 0.08:
-            text_rect = QtCore.QRect(rect.x() + margin*6 + 50 + 28+28, rect.y(), 1000, rect.height())
-            zoom_factor = self.scene().zoom_factor
-            stage_text = self.stage_row['string'].split('/')
-            stage_text.pop(0)
-            stage_text = f"{('/').join(stage_text)} - {int(self.duration)} day"
-            calendar_utils.draw_text(painter, text_rect, stage_text, size=30, align=QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+    def cache_stage_item_painting(self):
+        self.stage_item_margin = 2
+        rect = self.client_rect().toRect()
+        self.user_pixmap_point = QtCore.QPointF(rect.x()+self.stage_item_margin, rect.y()+self.stage_item_margin)
+        self.priority_pixmap_point = QtCore.QPointF(rect.x() + self.stage_item_margin*4 + 50 + 28, rect.y())
+        self.state_rect = QtCore.QRect(rect.x() + 28 + self.stage_item_margin*2, rect.y() + self.stage_item_margin, 50, rect.height()-self.stage_item_margin*2)
+        self.text_rect = QtCore.QRect(rect.width() + self.stage_item_margin + 15, rect.y(), 1000, rect.height())
+        self.stage_brush = QtGui.QBrush(QtGui.QColor())
+        self.stage_font = QtGui.QFont()
+
+    def update_stage_text(self):
+        self.stage_text = self.stage_row['string'].split('/')
+        self.stage_text.pop(0)
+        self.stage_text = f"{('/').join(self.stage_text)} - {int(self.duration)} days"
+
+    def paint(self, painter, option, widget):
+        super(stage_item, self).paint(painter, option, widget)
+        zoom_factor = self.scene().zoom_factor
+        if zoom_factor > 0.08:
+            # Draw state rect
+            self.stage_brush.setColor(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
+            painter.setBrush(self.stage_brush)
+            painter.setPen(self.pen)
+            painter.drawRoundedRect(self.state_rect, 4, 4)
+            # Draw state text
+            self.stage_font.setBold(True)
+            self.stage_font.setPixelSize(18)
+            painter.setFont(self.stage_font)
+            painter.setPen(self.text_pen)
+            painter.drawText(self.state_rect, QtCore.Qt.AlignCenter, self.stage_row['state'])
+            # Draw user pixmap
+            painter.drawPixmap(self.user_pixmap_point, self.users_images_dic[self.stage_row['assignment']])
+            # Draw priority pixmap
+            if self.stage_row['priority'] != 'normal':
+                painter.drawPixmap(self.priority_pixmap_point, self.priority_images_dic[self.stage_row['priority']])
+            # Draw stage text
+            self.stage_font.setBold(False)
+            self.stage_font.setPixelSize(30)
+            painter.setFont(self.stage_font)
+            painter.drawText(self.text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, self.stage_text)
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
         self.stage_item_signal_manager.item_updated.emit(self)
+
+    def movement(self, delta):
+        super().movement(delta)
+        self.update_stage_text()
+        self.cache_stage_item_painting()
 
 class frame_item(calendar_utils.frame_item):
     def __init__(self, group_name, bg_color):
