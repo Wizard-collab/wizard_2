@@ -137,7 +137,7 @@ class calendar_header(QtWidgets.QGraphicsView):
             day = self.today + datetime.timedelta(days=day_offset)
             year = day.strftime("%Y")
             month = day.strftime("%Y%B")
-            week = day.strftime("%W")
+            week = day.strftime("%Y%W")
             if month not in self.months_dic.keys():
                 self.months_dic[month] = []
             self.months_dic[month].append(day)
@@ -218,6 +218,12 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.pos_y += 20
 
     def update_months(self):
+        if self.column_width * self.zoom_factor <= 1:
+            for item in self.month_items:
+                self.scene.removeItem(item)
+            self.month_items = []
+            return
+
         while len(self.month_items) < len(self.months_dic.keys()):
             item = month_item()
             self.month_items.append(item)
@@ -331,9 +337,9 @@ class week_item(custom_graphic_item):
         self.text = text
 
     def paint(self, painter, option, widget):
-        text = f"Week {self.text}"
+        text = f"Week {self.text[4:]}"
         if self.width < 100:
-            text = self.text
+            text = self.text[4:]
 
         rect = QtCore.QRectF(self.x + self.margin,
                                 self.y + self.margin,
@@ -353,12 +359,16 @@ class month_item(custom_graphic_item):
         self.text = text
 
     def paint(self, painter, option, widget):
+        text = self.text[4:]
+        if self.width < 50:
+            text = text[:3]
+
         rect = QtCore.QRectF(self.x + self.margin,
                                 self.y + self.margin,
                                 self.width - self.margin*2,
                                 self.height - self.margin*2)
         draw_rect(painter, rect, bg_color=QtGui.QColor(61,61,67,60), radius=4)
-        draw_text(painter, rect, self.text[4:], bold=False)
+        draw_text(painter, rect, text, bold=False)
 
 class year_item(custom_graphic_item):
     def __init__(self):
@@ -380,6 +390,7 @@ class year_item(custom_graphic_item):
 class viewport_helper(QtWidgets.QWidget):
 
     reset_view = pyqtSignal(int)
+    goto_today = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(viewport_helper, self).__init__(parent)
@@ -389,6 +400,7 @@ class viewport_helper(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.reset_button.clicked.connect(self.reset_view.emit)
+        self.today_button.clicked.connect(self.goto_today.emit)
 
     def build_ui(self):
         self.all_layout = QtWidgets.QHBoxLayout()
@@ -401,6 +413,16 @@ class viewport_helper(QtWidgets.QWidget):
         self.all_layout.setContentsMargins(6,6,6,6)
         self.main_widget.setLayout(self.main_layout)
         self.all_layout.addWidget(self.main_widget)
+
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.infos_layout)
+
+        self.selected_label = QtWidgets.QLabel()
+        self.items_number_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selected_label)
+        self.infos_layout.addWidget(self.items_number_label)
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.helper_layout = QtWidgets.QHBoxLayout()
         self.helper_layout.setContentsMargins(0,0,0,0)
@@ -452,15 +474,10 @@ class viewport_helper(QtWidgets.QWidget):
         self.reset_button.setStyleSheet("QPushButton{padding:0px;padding-left:5px;padding-right:5px;}")
         self.helper_layout.addWidget(self.reset_button)
 
-        self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.addLayout(self.infos_layout)
-
-        self.selected_label = QtWidgets.QLabel()
-        self.items_number_label = QtWidgets.QLabel()
-        self.infos_layout.addWidget(self.selected_label)
-        self.infos_layout.addWidget(self.items_number_label)
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.today_button = QtWidgets.QPushButton("Today")
+        self.today_button.setFixedHeight(30)
+        self.today_button.setStyleSheet("QPushButton{padding:0px;padding-left:5px;padding-right:5px;}")
+        self.helper_layout.addWidget(self.today_button)
 
 class calendar_viewport(QtWidgets.QGraphicsView):
 
@@ -486,7 +503,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.column_width = 100
         self.row_height = 40
         self.last_mouse_pos = None
-        self.min_zoom = 0.04
+        self.min_zoom = 0.01
         self.max_zoom = 2.0
         self.zoom_factor = 1.0
         self.y_pos = 0
@@ -507,6 +524,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
 
     def connect_functions(self):
         self.viewport_helper.reset_view.connect(self.reset_view)
+        self.viewport_helper.goto_today.connect(self.goto_today)
 
     def update_infos(self):
         selection_list = []
@@ -524,6 +542,13 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.set_row_height(40)
         self.deselect_all()
         self.focus_on_selection()
+
+    def goto_today(self):
+        point = self.mapToScene(QtCore.QPoint(0,0))
+        #self.update_scene_rect(self.sceneRect().translated(-point.x(), 0))
+        viewport_center_scene = self.mapToScene(self.viewport().rect().center())
+        translation = point - viewport_center_scene
+        self.update_scene_rect(self.sceneRect().translated(-viewport_center_scene.x(), 0))
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

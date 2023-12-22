@@ -168,18 +168,18 @@ class calendar_widget(QtWidgets.QWidget):
         self.infos_layout.addWidget(self.refresh_label)
 
     def update_search(self):
-        if not self.isVisible():
-            return
         search_data = self.search_bar.text()
         self.search_start_time = time.perf_counter()
         self.accept_item_from_thread = False
         if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
             self.search_threads[self.old_thread_id].show_stage_signal.disconnect()
             self.search_threads[self.old_thread_id].hide_stage_signal.disconnect()
+            self.search_threads[self.old_thread_id].search_ended.disconnect()
         thread_id = time.time()
         self.search_threads[thread_id] = search_thread()
         self.search_threads[thread_id].show_stage_signal.connect(self.show_stage)
         self.search_threads[thread_id].hide_stage_signal.connect(self.hide_stage)
+        self.search_threads[thread_id].search_ended.connect(self.refresh_view)
         self.old_thread_id = thread_id
         if len(search_data) > 0:
             self.accept_item_from_thread = True
@@ -187,27 +187,35 @@ class calendar_widget(QtWidgets.QWidget):
         else:
             self.search_threads[thread_id].running=False
             self.show_all_stages()
+            self.refresh_view()
         self.clean_threads()
+
+    def clean_threads(self):
+        ids = list(self.search_threads.keys())
+        for thread_id in ids:
+            if not self.search_threads[thread_id].running:
+                self.search_threads[thread_id].terminate()
+                del self.search_threads[thread_id]
 
     def show_stage(self, stage_id):
         if stage_id not in self.stage_ids.keys():
             return
         self.stage_ids[stage_id].setVisible(True)
-        self.update_frames_visibility()
-        self.organize_items()       
         self.view.update_infos() 
 
     def hide_stage(self, stage_id):
         if stage_id not in self.stage_ids.keys():
             return
         self.stage_ids[stage_id].setVisible(False)
-        self.update_frames_visibility()
-        self.organize_items()        
         self.view.update_infos() 
 
     def show_all_stages(self):
         for stage_id in self.stage_ids.keys():
             self.show_stage(stage_id)
+
+    def refresh_view(self):
+        self.update_frames_visibility()
+        self.organize_items()   
 
     def update_frames_visibility(self):
         for group_name in self.grouped_dic['frames'].keys():
@@ -217,13 +225,6 @@ class calendar_widget(QtWidgets.QWidget):
                     continue
                 visibility = True
             self.grouped_dic['frames'][group_name]['frame_item'].setVisible(visibility)
-
-    def clean_threads(self):
-        ids = list(self.search_threads.keys())
-        for thread_id in ids:
-            if not self.search_threads[thread_id].running:
-                self.search_threads[thread_id].terminate()
-                del self.search_threads[thread_id]
 
     def get_group_name(self, domain_row, category_row, asset_row, stage_row):
         if self.group_method == 'stage':
@@ -307,7 +308,6 @@ class calendar_widget(QtWidgets.QWidget):
         for group_name in self.grouped_dic['frames'].keys():
             ordered_items.append(self.grouped_dic['frames'][group_name]['items'])
 
-        self.organize_items()  
         self.update_search()
         self.update_refresh_time(start_time)
 
@@ -461,6 +461,7 @@ class search_thread(QtCore.QThread):
 
     show_stage_signal = pyqtSignal(int)
     hide_stage_signal = pyqtSignal(int)
+    search_ended = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -500,12 +501,13 @@ class search_thread(QtCore.QThread):
                         stages_to_show.append(stage_id)
 
             QtWidgets.QApplication.processEvents()
-            time.sleep(0.1)
+            time.sleep(0.01)
             for stage_row in self.stage_rows:
                 if stage_row['id'] in stages_to_show:
                     self.show_stage_signal.emit(stage_row['id'])
                 else:
                     self.hide_stage_signal.emit(stage_row['id'])
+            self.search_ended.emit(1)
 
         except:
             logger.info(str(traceback.format_exc()))
