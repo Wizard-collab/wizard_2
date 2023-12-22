@@ -22,6 +22,7 @@ from wizard.core import image
 from wizard.core import repository
 from wizard.vars import ressources
 from wizard.vars import user_vars
+from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.update_group_method = True
         self.stage_ids = dict()
         self.grouped_dic['frames'] = dict()
+        self.filter_dic = dict()
 
         self.stage_rows = []
 
@@ -58,6 +60,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.connect_functions()
 
         self.view.set_zoom(0.5)
+
 
     def update_column_width(self, column_width):
         self.header_view.set_column_width(column_width)
@@ -254,16 +257,35 @@ class calendar_widget(QtWidgets.QWidget):
 
         domains = project.get_domains()
         for domain_row in domains:
+            # Aply filter
+            if 'domain' in self.filter_dic.keys():
+                if domain_row['name'] not in self.filter_dic['domain']:
+                    continue
             if domain_row['name'] == 'library':
                 continue
             for category_row in project.get_domain_childs(domain_row['id']):
+                # Aply filter
+                if 'category' in self.filter_dic.keys():
+                    if category_row['name'] not in self.filter_dic['category']:
+                        continue
                 assets = project.get_category_childs(category_row['id'])
                 for asset_row in assets:
+                    # Aply filter
+                    if 'asset' in self.filter_dic.keys():
+                        if asset_row['name'] not in self.filter_dic['asset']:
+                            continue
                     stages = project.get_asset_childs(asset_row['id'])
                     for stage_row in stages:
+                        # Aply filter
+                        if 'stage' in self.filter_dic.keys():
+                            if stage_row['name'] not in self.filter_dic['stage']:
+                                continue
+                        # Data filter
+                        if 'data' in self.filter_dic.keys():
+                            if not self.is_data_filter_match(stage_row):
+                                continue
                         self.stage_rows.append(stage_row)
                         project_stages.append(stage_row['id'])
-
                         group_name = self.get_group_name(domain_row, category_row, asset_row, stage_row)
                         if group_name not in self.grouped_dic['frames'].keys():
                             self.grouped_dic['frames'][group_name] = dict()
@@ -271,9 +293,7 @@ class calendar_widget(QtWidgets.QWidget):
                             self.grouped_dic['frames'][group_name]['frame_item'] = frame
                             self.grouped_dic['frames'][group_name]['items'] = []
                             self.view.add_frame(frame)
-
                         if stage_row['id'] not in self.stage_ids.keys():
-
                             item = stage_item(stage_row, datetime.datetime.fromtimestamp(stage_row['start_date']),
                                                 int(stage_row['estimated_time']),
                                                 bg_color = ressources._stages_colors_[stage_row['name']],
@@ -282,10 +302,8 @@ class calendar_widget(QtWidgets.QWidget):
                             self.view.add_item(item)
                             item.stage_item_signal_manager.item_updated.connect(self.update_frames)
                             self.stage_ids[stage_row['id']] = item
-
                         else:
                             self.stage_ids[stage_row['id']].update_row(stage_row)
-
                         for other_group in self.grouped_dic['frames'].keys():
                             if other_group != group_name:
                                 if self.stage_ids[stage_row['id']] in self.grouped_dic['frames'][other_group]['items']:
@@ -293,23 +311,34 @@ class calendar_widget(QtWidgets.QWidget):
                             else:
                                 if self.stage_ids[stage_row['id']] not in self.grouped_dic['frames'][other_group]['items']:
                                     self.grouped_dic['frames'][other_group]['items'].append(self.stage_ids[stage_row['id']])
-
         stage_ids = list(self.stage_ids.keys())
         for stage_id in stage_ids:
             if stage_id not in project_stages:
                 self.remove_stage(stage_id)
-
         groups_list = list(self.grouped_dic['frames'].keys())
         for group_name in groups_list:
             if len(self.grouped_dic['frames'][group_name]['items']) == 0:
                 self.remove_frame(group_name)
-
         ordered_items = []
         for group_name in self.grouped_dic['frames'].keys():
             ordered_items.append(self.grouped_dic['frames'][group_name]['items'])
 
         self.update_search()
         self.update_refresh_time(start_time)
+
+    def is_data_filter_match(self, stage_row):
+        values = []
+        for key in stage_row:
+            if key in ['id', 'creation_time', 'creation_user']:
+                continue
+            values.append(str(stage_row[key]))
+        filter_data = (' ').join(data_list)
+        is_match = False
+        for data_key in self.filter_dic['data']:
+            if data_key in value:
+                is_match = True
+                break
+        return is_match
 
     def update_refresh_time(self, start_time):
         refresh_time = str(round((time.perf_counter()-start_time), 3))
