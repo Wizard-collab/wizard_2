@@ -352,6 +352,18 @@ _available_icons_list_.append(_attacks_history_icon_)
 _key_icon_ = path_utils.join(_icons_path_, 'key.png')
 _available_icons_list_.append(_key_icon_)
 
+_pan_icon_ = path_utils.join(_icons_path_, 'pan_icon.svg')
+_available_icons_list_.append(_pan_icon_)
+_zoom_icon_ = path_utils.join(_icons_path_, 'zoom_icon.svg')
+_available_icons_list_.append(_zoom_icon_)
+_zoom_vertical_icon_ = path_utils.join(_icons_path_, 'zoom_vertical_icon.svg')
+_available_icons_list_.append(_zoom_vertical_icon_)
+_zoom_horizontal_icon_ = path_utils.join(_icons_path_, 'zoom_horizontal_icon.svg')
+_available_icons_list_.append(_zoom_horizontal_icon_)
+_focus_icon_ = path_utils.join(_icons_path_, 'focus_icon.svg')
+_available_icons_list_.append(_focus_icon_)
+
+
 _important_icon_ = path_utils.join(_icons_path_, 'important.svg')
 _available_icons_list_.append(_important_icon_)
 _urgent_icon_ = path_utils.join(_icons_path_, 'urgent.svg')

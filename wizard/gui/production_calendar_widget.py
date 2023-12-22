@@ -59,9 +59,12 @@ class calendar_widget(QtWidgets.QWidget):
 
         self.view.set_zoom(0.5)
 
-    def set_column_width(self, column_width):
-        self.view.set_column_width(column_width)
+    def update_column_width(self, column_width):
         self.header_view.set_column_width(column_width)
+        self.update_frames()
+
+    def update_row_height(self, row_height):
+        self.organize_items()
         self.update_frames()
 
     def set_context(self):
@@ -113,6 +116,8 @@ class calendar_widget(QtWidgets.QWidget):
         self.view.scene_rect_update.connect(self.header_view.update_rect)
         self.view.scale_factor_update.connect(self.header_view.update_scale)
         self.view.zoom_factor_update.connect(self.header_view.update_zoom_factor)
+        self.view.column_width_update.connect(self.update_column_width)
+        self.view.row_height_update.connect(self.update_row_height)
         self.group_methods_comboBox.currentTextChanged.connect(self.change_group_method)
         self.search_bar.textChanged.connect(self.update_search)
 
@@ -189,7 +194,8 @@ class calendar_widget(QtWidgets.QWidget):
             return
         self.stage_ids[stage_id].setVisible(True)
         self.update_frames_visibility()
-        self.organize_items()        
+        self.organize_items()       
+        self.view.update_infos() 
 
     def hide_stage(self, stage_id):
         if stage_id not in self.stage_ids.keys():
@@ -197,12 +203,11 @@ class calendar_widget(QtWidgets.QWidget):
         self.stage_ids[stage_id].setVisible(False)
         self.update_frames_visibility()
         self.organize_items()        
+        self.view.update_infos() 
 
     def show_all_stages(self):
         for stage_id in self.stage_ids.keys():
             self.show_stage(stage_id)
-        self.update_frames_visibility()
-        self.organize_items()        
 
     def update_frames_visibility(self):
         for group_name in self.grouped_dic['frames'].keys():
@@ -278,7 +283,7 @@ class calendar_widget(QtWidgets.QWidget):
                             self.stage_ids[stage_row['id']] = item
 
                         else:
-                            self.stage_ids[stage_row['id']].stage_row = stage_row
+                            self.stage_ids[stage_row['id']].update_row(stage_row)
 
                         for other_group in self.grouped_dic['frames'].keys():
                             if other_group != group_name:
@@ -314,7 +319,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.view.reset_y_pos()
         for group_name in self.grouped_dic['frames'].keys():
             if self.grouped_dic['frames'][group_name]['frame_item'].isVisible():
-                self.view.add_space(120)
+                self.view.add_space(3)
             self.view.organize_items(self.grouped_dic['frames'][group_name]['items'])
         self.update_frames()
 
@@ -363,6 +368,10 @@ class stage_item(calendar_utils.calendar_item):
         self.cache_stage_item_painting()
         self.update_stage_text()
 
+    def update_row(self, stage_row):
+        self.stage_row = stage_row
+        self.cache_stage_item_painting()
+
     def connect_functions(self):
         self.signal_manager.start_date_modified.connect(self.apply_start_date)
         self.signal_manager.duration_modified.connect(self.apply_duration)
@@ -381,12 +390,21 @@ class stage_item(calendar_utils.calendar_item):
     def cache_stage_item_painting(self):
         self.stage_item_margin = 2
         rect = self.client_rect().toRect()
-        self.user_pixmap_point = QtCore.QPointF(rect.x()+self.stage_item_margin, rect.y()+self.stage_item_margin)
-        self.priority_pixmap_point = QtCore.QPointF(rect.x() + self.stage_item_margin*4 + 50 + 28, rect.y())
-        self.state_rect = QtCore.QRect(rect.x() + 28 + self.stage_item_margin*2, rect.y() + self.stage_item_margin, 50, rect.height()-self.stage_item_margin*2)
-        self.text_rect = QtCore.QRect(rect.width() + self.stage_item_margin + 15, rect.y(), 1000, rect.height())
-        self.stage_brush = QtGui.QBrush(QtGui.QColor())
+        x_pos = rect.width() + 15
+        self.user_pixmap_rect = QtCore.QRect(x_pos, rect.y()+self.stage_item_margin, rect.height()-self.stage_item_margin*2, rect.height()-self.stage_item_margin*2)
+        x_pos += rect.height()-self.stage_item_margin*2 + self.stage_item_margin
         self.stage_font = QtGui.QFont()
+        self.stage_font.setBold(True)
+        self.state_text_font_size = int(self.row_height/1.6)
+        self.stage_font.setPixelSize(self.state_text_font_size)
+        font_metrics = QtGui.QFontMetrics(self.stage_font)
+        text_width = font_metrics.boundingRect(self.stage_row['state']).width()
+        self.state_rect = QtCore.QRect(x_pos, rect.y() + self.stage_item_margin, text_width+10, rect.height()-self.stage_item_margin*2)
+        x_pos += text_width + 10 + self.stage_item_margin
+        self.priority_pixmap_rect = QtCore.QRect(x_pos, rect.y(), rect.height()-self.stage_item_margin*2, rect.height()-self.stage_item_margin*2)
+        x_pos += rect.height()-self.stage_item_margin*2 + self.stage_item_margin
+        self.text_rect = QtCore.QRect(x_pos, rect.y(), 10000, rect.height())
+        self.stage_brush = QtGui.QBrush(QtGui.QColor())
 
     def update_stage_text(self):
         self.stage_text = self.stage_row['string'].split('/')
@@ -395,29 +413,27 @@ class stage_item(calendar_utils.calendar_item):
 
     def paint(self, painter, option, widget):
         super(stage_item, self).paint(painter, option, widget)
-        zoom_factor = self.scene().zoom_factor
-        if zoom_factor > 0.08:
-            # Draw state rect
-            self.stage_brush.setColor(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
-            painter.setBrush(self.stage_brush)
-            painter.setPen(self.pen)
-            painter.drawRoundedRect(self.state_rect, 4, 4)
-            # Draw state text
-            self.stage_font.setBold(True)
-            self.stage_font.setPixelSize(18)
-            painter.setFont(self.stage_font)
-            painter.setPen(self.text_pen)
-            painter.drawText(self.state_rect, QtCore.Qt.AlignCenter, self.stage_row['state'])
-            # Draw user pixmap
-            painter.drawPixmap(self.user_pixmap_point, self.users_images_dic[self.stage_row['assignment']])
-            # Draw priority pixmap
-            if self.stage_row['priority'] != 'normal':
-                painter.drawPixmap(self.priority_pixmap_point, self.priority_images_dic[self.stage_row['priority']])
-            # Draw stage text
-            self.stage_font.setBold(False)
-            self.stage_font.setPixelSize(30)
-            painter.setFont(self.stage_font)
-            painter.drawText(self.text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, self.stage_text)
+        # Draw state rect
+        self.stage_brush.setColor(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
+        painter.setBrush(self.stage_brush)
+        painter.setPen(self.pen)
+        painter.drawRoundedRect(self.state_rect, 4, 4)
+        # Draw state text
+        self.stage_font.setBold(True)
+        self.stage_font.setPixelSize(self.state_text_font_size)
+        painter.setFont(self.stage_font)
+        painter.setPen(self.text_pen)
+        painter.drawText(self.state_rect, QtCore.Qt.AlignCenter, self.stage_row['state'])
+        # Draw user pixmap
+        painter.drawPixmap(self.user_pixmap_rect, self.users_images_dic[self.stage_row['assignment']])
+        # Draw priority pixmap
+        if self.stage_row['priority'] != 'normal':
+            painter.drawPixmap(self.priority_pixmap_rect, self.priority_images_dic[self.stage_row['priority']])
+        # Draw stage text
+        self.stage_font.setBold(False)
+        self.stage_font.setPixelSize(self.row_height)
+        painter.setFont(self.stage_font)
+        painter.drawText(self.text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, self.stage_text)
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)

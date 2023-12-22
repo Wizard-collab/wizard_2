@@ -10,6 +10,9 @@ import datetime
 import time
 import random
 
+# Wizard modules
+from wizard.vars import ressources
+
 class signal_manager(QtCore.QObject):
 
     movement = pyqtSignal(int)
@@ -96,8 +99,8 @@ class calendar_header(QtWidgets.QGraphicsView):
 
     def set_column_width(self, column_width):
         self.column_width = column_width
-        self.scene.column_width = column_width
-        self.update()
+        self.scene.set_column_width(column_width)
+        self.update_header()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -374,11 +377,98 @@ class year_item(custom_graphic_item):
                                 self.height - self.margin*2)
         draw_text(painter, rect, self.text, size=20, bold=True, align=QtCore.Qt.AlignLeft)
 
+class viewport_helper(QtWidgets.QWidget):
+
+    reset_view = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(viewport_helper, self).__init__(parent)
+        self.setObjectName('transparent_widget')
+        self.build_ui()
+        self.connect_functions()
+
+    def connect_functions(self):
+        self.reset_button.clicked.connect(self.reset_view.emit)
+
+    def build_ui(self):
+        self.all_layout = QtWidgets.QHBoxLayout()
+        self.all_layout.setContentsMargins(4,4,4,4)
+        self.setLayout(self.all_layout)
+        self.main_widget = QtWidgets.QFrame()
+        self.main_widget.setObjectName('light_round_frame')
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setSpacing(4)
+        self.all_layout.setContentsMargins(6,6,6,6)
+        self.main_widget.setLayout(self.main_layout)
+        self.all_layout.addWidget(self.main_widget)
+
+        self.helper_layout = QtWidgets.QHBoxLayout()
+        self.helper_layout.setContentsMargins(0,0,0,0)
+        self.helper_layout.setSpacing(5)
+        self.main_layout.addLayout(self.helper_layout)
+
+        self.pan_image = QtWidgets.QLabel()
+        self.pan_image.setPixmap(QtGui.QIcon(ressources._pan_icon_).pixmap(20))
+        self.pan_label = QtWidgets.QLabel('Wheel button')
+        self.pan_label.setObjectName('gray_label')
+
+        self.zoom_image = QtWidgets.QLabel()
+        self.zoom_image.setPixmap(QtGui.QIcon(ressources._zoom_icon_).pixmap(20))
+        self.zoom_label = QtWidgets.QLabel('Wheel')
+        self.zoom_label.setObjectName('gray_label')
+
+        self.horizontal_zoom_image = QtWidgets.QLabel()
+        self.horizontal_zoom_image.setPixmap(QtGui.QIcon(ressources._zoom_horizontal_icon_).pixmap(20))
+        self.horizontal_zoom_label = QtWidgets.QLabel('Shift + Wheel')
+        self.horizontal_zoom_label.setObjectName('gray_label')
+
+        self.vertical_zoom_image = QtWidgets.QLabel()
+        self.vertical_zoom_image.setPixmap(QtGui.QIcon(ressources._zoom_vertical_icon_).pixmap(20))
+        self.vertical_zoom_label = QtWidgets.QLabel('Ctrl + Wheel')
+        self.vertical_zoom_label.setObjectName('gray_label')
+
+        self.focus_image = QtWidgets.QLabel()
+        self.focus_image.setPixmap(QtGui.QIcon(ressources._focus_icon_).pixmap(20))
+        self.focus_label = QtWidgets.QLabel('F')
+        self.focus_label.setObjectName('gray_label')
+
+        self.helper_layout.addWidget(self.pan_image)
+        self.helper_layout.addWidget(self.pan_label)
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addWidget(self.zoom_image)
+        self.helper_layout.addWidget(self.zoom_label)
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addWidget(self.horizontal_zoom_image)
+        self.helper_layout.addWidget(self.horizontal_zoom_label)
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addWidget(self.vertical_zoom_image)
+        self.helper_layout.addWidget(self.vertical_zoom_label)
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addWidget(self.focus_image)
+        self.helper_layout.addWidget(self.focus_label)
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.reset_button = QtWidgets.QPushButton("Default")
+        self.reset_button.setFixedHeight(30)
+        self.reset_button.setStyleSheet("QPushButton{padding:0px;padding-left:5px;padding-right:5px;}")
+        self.helper_layout.addWidget(self.reset_button)
+
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.infos_layout)
+
+        self.selected_label = QtWidgets.QLabel()
+        self.items_number_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.selected_label)
+        self.infos_layout.addWidget(self.items_number_label)
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
 class calendar_viewport(QtWidgets.QGraphicsView):
 
     scene_rect_update = pyqtSignal(object)
     scale_factor_update = pyqtSignal(object)
     zoom_factor_update = pyqtSignal(object)
+    column_width_update = pyqtSignal(object)
+    row_height_update = pyqtSignal(object)
 
     def __init__(self):
         super(calendar_viewport, self).__init__()
@@ -393,7 +483,8 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pan = False
-        self.column_width = 1000
+        self.column_width = 100
+        self.row_height = 40
         self.last_mouse_pos = None
         self.min_zoom = 0.04
         self.max_zoom = 2.0
@@ -409,13 +500,51 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.scene.addItem(empty_item)
         self.move_scene_center_to_top()
 
+        self.viewport_helper = viewport_helper(self)
+        self.viewport_helper.move(0, self.height()-self.viewport_helper.height())
+        self.connect_functions()
+        self.update_infos()
+
+    def connect_functions(self):
+        self.viewport_helper.reset_view.connect(self.reset_view)
+
+    def update_infos(self):
+        selection_list = []
+        visible_list = []
+        for item in self.items:
+            if item.selected:
+                selection_list.append(item)
+            if item.isVisible():
+                visible_list.append(item)
+        self.viewport_helper.selected_label.setText(f"{len(selection_list)} selected")
+        self.viewport_helper.items_number_label.setText(f"{len(visible_list)}/{len(self.items)} items")
+
+    def reset_view(self):
+        self.set_column_width(100)
+        self.set_row_height(40)
+        self.deselect_all()
+        self.focus_on_selection()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.viewport_helper.move(0, self.height()-self.viewport_helper.height())
+
     def set_column_width(self, column_width):
         for item in self.items:
-            item.column_width = column_width
-            item.recalculate_pos_and_size()
-            item.update()
+            item.set_column_width(column_width)
         self.column_width = column_width
-        self.scene.column_width = column_width
+        self.scene.set_column_width(column_width)
+        self.column_width_update.emit(column_width)
+        self.update()
+
+    def set_row_height(self, row_height):
+        for item in self.items:
+            item.set_row_height(row_height)
+        for frame in self.frames:
+            frame.set_row_height(row_height)
+        self.row_height = row_height
+        self.scene.set_row_height(row_height)
+        self.row_height_update.emit(row_height)
         self.update()
 
     def movement_on_selection(self, delta):
@@ -441,6 +570,8 @@ class calendar_viewport(QtWidgets.QGraphicsView):
     def add_item(self, graphic_item):
         self.items.append(graphic_item)
         self.scene.addItem(graphic_item)
+        graphic_item.set_column_width(self.column_width)
+        graphic_item.set_row_height(self.row_height)
         graphic_item.signal_manager.movement.connect(self.movement_on_selection)
         graphic_item.signal_manager.start_move.connect(self.start_move_on_selection)
         graphic_item.signal_manager.start_scale.connect(self.start_scale_on_selection)
@@ -448,8 +579,8 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         graphic_item.signal_manager.select.connect(self.update_selection)
         graphic_item.setPos(QtCore.QPointF(graphic_item.pos().x(), 0))
 
-    def add_space(self, space):
-        self.y_pos += space
+    def add_space(self, number=1):
+        self.y_pos += number*self.row_height
 
     def reset_y_pos(self):
         self.y_pos = 0
@@ -459,11 +590,12 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             if not item.isVisible():
                 continue
             item.setPos(item.pos().x(), self.y_pos)
-            self.add_space(40)
+            self.add_space(1)
 
     def add_frame(self, graphic_item):
         self.frames.append(graphic_item)
         self.scene.addItem(graphic_item)
+        graphic_item.set_row_height(self.row_height)
 
     def remove_item(self, graphic_item):
         if graphic_item in self.items:
@@ -483,6 +615,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             if not item.isVisible():
                 continue
             item.set_selected(True)
+        self.update_infos()
 
     def update_frames_selection(self, frames):
         items = []
@@ -511,7 +644,12 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.scene_rect_update.emit(rect)
 
     def wheelEvent(self, event):
-        self.zoom(event)
+        if event.modifiers() & QtCore.Qt.ShiftModifier:
+            self.zoom_column_width(event)
+        elif event.modifiers() & QtCore.Qt.ControlModifier:
+            self.zoom_row_height(event)
+        else:
+            self.zoom(event)
 
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
@@ -588,6 +726,34 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             bounding_rect = bounding_rect.united(item.sceneBoundingRect())
         self.focus_on_rect(bounding_rect)
 
+    def zoom_column_width(self, event):
+        delta = event.angleDelta().y() / 60.0
+        column_width = int(self.column_width+delta*3)
+        column_width = min(max(column_width, 20), 500)
+        mouse_view_pos = event.pos()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.column_width
+        self.set_column_width(column_width)
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.column_width
+        diff = (new_mouse_scene_pos - mouse_scene_pos) * self.column_width
+        self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff,
+                                        self.sceneRect().y(),
+                                        self.sceneRect().width(),
+                                        self.sceneRect().height()))
+
+    def zoom_row_height(self, event):
+        delta = event.angleDelta().y() / 60.0
+        row_height = int(self.row_height+delta*2)
+        row_height = min(max(row_height, 40), 200)
+        mouse_view_pos = event.pos()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos).y() / self.row_height
+        self.set_row_height(row_height)
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).y() / self.row_height
+        diff = (new_mouse_scene_pos - mouse_scene_pos) * self.row_height
+        self.update_scene_rect(QtCore.QRectF(self.sceneRect().x(),
+                                        self.sceneRect().y()- diff,
+                                        self.sceneRect().width(),
+                                        self.sceneRect().height()))
+
     def zoom(self, event):
         current_zoom = self.transform().m22()
         delta = event.angleDelta().y() / 60.0
@@ -648,6 +814,7 @@ class calendar_item(custom_graphic_item):
         self.setAcceptHoverEvents(True)
 
         self.column_width = 100
+        self.row_height = 40
 
         self.bg_color = bg_color
         self.date = date
@@ -656,6 +823,7 @@ class calendar_item(custom_graphic_item):
 
         self.hover = False
         self.hover_scale_handle = False
+        self.handle_size = 20
 
         self.start_move_pos = 0
 
@@ -671,17 +839,27 @@ class calendar_item(custom_graphic_item):
         self.init_pos_and_size()
         self.cache_scene_painting()
 
+    def set_column_width(self, column_width):
+        self.column_width = column_width
+        self.recalculate_pos_and_size()
+        self.update()
+
+    def set_row_height(self, row_height):
+        self.row_height = row_height
+        self.recalculate_pos_and_size()
+        self.update()
+
     def recalculate_pos_and_size(self):
         self.prepareGeometryChange()
         self.width = self.duration*self.column_width
-        self.height = 40
+        self.height = self.row_height
         pos_x = ((datetime.datetime.today() - self.date ).days) * -self.column_width
         self.setPos(QtCore.QPointF(pos_x, self.pos().y()))
 
     def init_pos_and_size(self):
         self.prepareGeometryChange()
         self.width = self.duration*self.column_width
-        self.height = 40
+        self.height = self.row_height
         pos_x = ((datetime.datetime.today() - self.date ).days) * -self.column_width
         self.setPos(QtCore.QPointF(pos_x, 0))
 
@@ -689,7 +867,7 @@ class calendar_item(custom_graphic_item):
         if not self.selected and event.button() == QtCore.Qt.LeftButton:
             self.signal_manager.select.emit([self])
         self.start_move_pos = event.pos()
-        if event.pos().x() < self.width - 20:
+        if event.pos().x() < self.width - self.handle_size:
             self.signal_manager.start_move.emit(1)
         else:
             self.signal_manager.start_scale.emit(1)
@@ -729,7 +907,8 @@ class calendar_item(custom_graphic_item):
         self.update()
 
     def hoverMoveEvent(self, event):
-        if event.pos().x() < self.width - 20:
+        self.handle_size = min(max(int(self.width/10+self.margin), 5), 20)
+        if event.pos().x() < self.width - self.handle_size:
             self.hover = True
             self.hover_scale_handle = False
         else:
@@ -766,9 +945,8 @@ class calendar_item(custom_graphic_item):
     def cache_scene_painting(self):
         self.margin = 4
         self.qt_bg_color = QtGui.QColor(self.bg_color)
-        self.qt_bg_color.setAlpha(100)
         self.qt_handle_color = QtGui.QColor('white')
-        self.qt_handle_color.setAlpha(100)
+        self.qt_handle_color.setAlpha(120)
         self.brush = QtGui.QBrush(self.qt_bg_color)
         self.pen = QtGui.QPen(QtGui.QColor('transparent'), 0)
         self.text_pen = QtGui.QPen(QtGui.QColor('white'), 1)
@@ -776,22 +954,22 @@ class calendar_item(custom_graphic_item):
     def paint(self, painter, option, widget):
         painter.setPen(self.pen)
 
-        self.qt_bg_color.setAlpha(100)
+        color = self.qt_bg_color.darker(100)
         if self.hover:
-            self.qt_bg_color.setAlpha(120)
+            color = self.qt_bg_color.darker(120)
         if self.selected:
-            self.qt_bg_color.setAlpha(255)
+            color = self.qt_bg_color.darker(255)
         
         rect = QtCore.QRectF(self.x+self.margin, self.y+self.margin, self.width-self.margin*2, self.height-self.margin*2)
-        self.brush.setColor(self.qt_bg_color)
+        self.brush.setColor(color)
         painter.setBrush(self.brush)
-        painter.drawRoundedRect(rect, 4, 4)
+        painter.drawRoundedRect(rect, self.row_height/10, self.row_height/10)
 
         if self.hover_scale_handle:
-            rect = QtCore.QRectF(self.width-self.margin-10, self.y+self.margin, 10, self.height-self.margin*2)
+            rect = QtCore.QRectF(self.width-self.margin-self.handle_size, self.y+self.margin, self.handle_size, self.height-self.margin*2)
             self.brush.setColor(self.qt_handle_color)
             painter.setBrush(self.brush)
-            painter.drawRoundedRect(rect, 4, 4)
+            painter.drawRoundedRect(rect, self.handle_size/4, self.handle_size/4)
 
         self.scene().update()
 
@@ -799,15 +977,20 @@ class frame_item(custom_graphic_item):
     def __init__(self, bg_color, frame_label):
         super(frame_item, self).__init__()
         self.bg_color = bg_color
+        self.row_height = 40
         self.frame_label = frame_label
         self.signal_manager = signal_manager()
+        self.cache_scene_painting()
+
+    def set_row_height(self, row_height):
+        self.row_height = row_height
         self.cache_scene_painting()
 
     def cache_scene_painting(self):
         self.bg_color = QtGui.QColor(self.bg_color)
         self.bg_color.setAlpha(160)
         self.font = QtGui.QFont()
-        self.font.setPixelSize(50)
+        self.font.setPixelSize(int(self.row_height*1.5))
         self.font.setBold(True)
         font_metrics = QtGui.QFontMetrics(self.font)
         self.text_height = font_metrics.height()
@@ -829,6 +1012,10 @@ class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
         super(header_scene, self).__init__()
         self.column_width = 100
+
+    def set_column_width(self, column_width):
+        self.column_width = column_width
+        self.update()
 
     def drawBackground(self, painter, rect):
         color1 = QtGui.QColor('transparent')
@@ -855,19 +1042,23 @@ class scene(QtWidgets.QGraphicsScene):
         self.column_width = 100
         self.row_height = 40
 
+    def set_column_width(self, column_width):
+        self.column_width = column_width
+        self.update()
+
+    def set_row_height(self, row_height):
+        self.row_height = row_height
+        self.update()
+
     def drawBackground(self, painter, rect):
-
         painter.fillRect(rect, self.color1)
-
-        if self.zoom_factor > 0.1:
-            start_x = int(rect.left()) // self.column_width
-            end_x = int(rect.right()) // self.column_width
-            for x in range(start_x, end_x + 1):
-                x_pos = x * self.column_width
-                column_rect = QtCore.QRectF(x_pos, rect.top(), self.column_width, rect.height())
-                if x % 2 == 0:
-                    painter.fillRect(column_rect, self.color2)
-
+        start_x = int(rect.left()) // self.column_width
+        end_x = int(rect.right()) // self.column_width
+        for x in range(start_x, end_x + 1):
+            x_pos = x * self.column_width
+            column_rect = QtCore.QRectF(x_pos, rect.top(), self.column_width, rect.height())
+            if x % 2 == 0:
+                painter.fillRect(column_rect, self.color2)
         first_column_rect = QtCore.QRectF(0, rect.top(), self.column_width, rect.height())
         draw_rect(painter, first_column_rect, bg_color=self.today_color,
                   outline=self.today_line_color)
