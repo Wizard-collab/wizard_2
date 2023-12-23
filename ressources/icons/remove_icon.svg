@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="469.08316"
+   height="460.84781"
+   viewBox="0 0 124.11158 121.93264"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="remove_icon.svg"
+   inkscape:export-filename="C:\Users\leo\Desktop\svgs\combobox.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.457584"
+     inkscape:cx="215.76801"
+     inkscape:cy="236.69305"
+     inkscape:window-width="1920"
+     inkscape:window-height="1121"
+     inkscape:window-x="-7"
+     inkscape:window-y="-7"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5"
+     fit-margin-top="50"
+     fit-margin-left="50"
+     fit-margin-right="50"
+     fit-margin-bottom="50"
+     lock-margins="true"
+     units="px"
+     showguides="false"
+     inkscape:showpageshadow="0"
+     inkscape:deskcolor="#505050" />
+  <defs
+     id="defs2">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Drop Shadow"
+       id="filter41397"
+       x="-0.4636397"
+       y="-0.4636397"
+       width="2.0236785"
+       height="2.0043981">
+      <feFlood
+         flood-opacity="0.498039"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood41387" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite41389" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="3"
+         result="blur"
+         id="feGaussianBlur41391" />
+      <feOffset
+         dx="1.49701"
+         dy="1.1976"
+         result="offset"
+         id="feOffset41393" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite41395" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Drop Shadow"
+       id="filter48262"
+       x="-0.11650321"
+       y="-0.11797703"
+       width="1.3759789"
+       height="1.3795844">
+      <feFlood
+         flood-opacity="0.211765"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood48252" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite48254" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="1"
+         result="blur"
+         id="feGaussianBlur48256" />
+      <feOffset
+         dx="0.7"
+         dy="0.7"
+         result="offset"
+         id="feOffset48258" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite48260" />
+    </filter>
+  </defs>
+  <path
+     id="rect53308"
+     style="opacity:1;fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:16.7886;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:186.406;stroke-opacity:1;paint-order:markers fill stroke"
+     inkscape:label="add_icon"
+     d="M 19.17299 48.232198 C 13.263898 48.232198 8.5069743 52.989122 8.5069743 58.898214 L 8.5069743 63.034395 C 8.5069743 68.943487 13.263898 73.700411 19.17299 73.700411 L 49.321537 73.700411 L 49.321537 73.879211 L 74.78975 73.879211 L 74.78975 73.700411 L 104.93881 73.700411 C 110.84791 73.700411 115.60483 68.943487 115.60483 63.034395 L 115.60483 58.898214 C 115.60483 52.989122 110.84791 48.232198 104.93881 48.232198 L 94.093481 48.232198 C 93.824363 48.265523 93.550769 48.284908 93.272343 48.284908 L 29.436446 48.284908 C 29.157941 48.284908 28.883984 48.265542 28.614791 48.232198 L 19.17299 48.232198 z " />
+</svg>

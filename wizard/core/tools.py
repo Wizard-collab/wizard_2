@@ -161,6 +161,9 @@ def decrypt_string(stored_string, provided_string):
     return pwdhash == stored_string
 
 def is_safe(input_string):
+    if input_string == '':
+        logger.warning(f"No data given")
+        return
     charRe = re.compile(r'[^a-zA-Z0-9._]')
     string = charRe.search(input_string)
     success = not bool(string)
