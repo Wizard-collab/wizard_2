@@ -353,6 +353,8 @@ _attacks_history_icon_ = path_utils.join(_icons_path_, 'attack_history.png')
 _available_icons_list_.append(_attacks_history_icon_)
 _key_icon_ = path_utils.join(_icons_path_, 'key.png')
 _available_icons_list_.append(_key_icon_)
+_filter_icon_ = path_utils.join(_icons_path_, 'filter_icon.svg')
+_available_icons_list_.append(_filter_icon_)
 
 _pan_icon_ = path_utils.join(_icons_path_, 'pan_icon.svg')
 _available_icons_list_.append(_pan_icon_)

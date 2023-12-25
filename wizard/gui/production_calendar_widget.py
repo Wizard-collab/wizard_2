@@ -13,6 +13,7 @@ import logging
 # Wizard gui modules
 from wizard.gui import calendar_utils
 from wizard.gui import gui_utils
+from wizard.gui import filter_sets_editor_widget
 
 # Wizard core modules
 from wizard.core import user
@@ -60,7 +61,6 @@ class calendar_widget(QtWidgets.QWidget):
         self.connect_functions()
 
         self.view.set_zoom(0.5)
-
 
     def update_column_width(self, column_width):
         self.header_view.set_column_width(column_width)
@@ -123,6 +123,13 @@ class calendar_widget(QtWidgets.QWidget):
         self.view.row_height_update.connect(self.update_row_height)
         self.group_methods_comboBox.currentTextChanged.connect(self.change_group_method)
         self.search_bar.textChanged.connect(self.update_search)
+        self.filter_sets_comboBox.currentTextChanged.connect(self.filter_set_changed)
+        self.filter_sets_checkBox.stateChanged.connect(self.filter_set_changed)
+        self.filter_set_editor_button.clicked.connect(self.open_filter_set_editor)
+
+    def open_filter_set_editor(self):
+        self.filter_sets_editor_widget = filter_sets_editor_widget.filter_sets_editor_widget('production_calendar_widget')
+        self.filter_sets_editor_widget.show()
 
     def change_group_method(self):
         if not self.update_group_method:
@@ -153,6 +160,16 @@ class calendar_widget(QtWidgets.QWidget):
         self.header_layout.addWidget(self.search_bar)
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.filter_sets_checkBox = QtWidgets.QCheckBox("Use filter set")
+        self.header_layout.addWidget(self.filter_sets_checkBox)
+        self.filter_sets_comboBox = gui_utils.QComboBox()
+        self.filter_sets_comboBox.setFixedWidth(300)
+        self.header_layout.addWidget(self.filter_sets_comboBox)
+        self.filter_set_editor_button = QtWidgets.QPushButton()
+        self.filter_set_editor_button.setIcon(QtGui.QIcon(ressources._filter_icon_))
+        self.filter_set_editor_button.setFixedSize(30,30)
+        self.header_layout.addWidget(self.filter_set_editor_button)
 
         self.main_layout.addWidget(self.header_view)
         self.main_layout.addWidget(self.view)
@@ -246,44 +263,69 @@ class calendar_widget(QtWidgets.QWidget):
             group_name = stage_row['priority']
         return group_name
 
+    def refresh_filter_sets(self):
+        self.update_filter_set = False
+        filter_sets = user.user().get_filters_sets('production_calendar_widget')
+        total_sets = self.filter_sets_comboBox.count()
+        existing_sets = []
+        for i in range(total_sets):
+                set_text = self.filter_sets_comboBox.itemText(i)
+                existing_sets.append(set_text)
+        for filter_set in filter_sets.keys():
+            if filter_set in existing_sets:
+                continue
+            self.filter_sets_comboBox.addItem(filter_set)
+        for i in range(total_sets):
+            set_text = self.filter_sets_comboBox.itemText(i)
+            if set_text not in filter_sets.keys():
+                self.filter_sets_comboBox.removeItem(i)
+        self.update_filter_set = True
+
+    def filter_set_changed(self):
+        if not self.update_filter_set:
+            return
+        self.refresh()
+
     def refresh(self):
         if not self.isVisible():
             return
 
         start_time = time.perf_counter()
 
+        self.refresh_filter_sets()
+        current_filter_set = self.filter_sets_comboBox.currentText()
+
+        filter_dic = dict()
+        if self.filter_sets_checkBox.isChecked():
+            filter_dic = user.user().get_filter_set('production_calendar_widget', current_filter_set)
+
         project_stages = []
         self.stage_rows = []
 
         domains = project.get_domains()
         for domain_row in domains:
-            # Aply filter
-            if 'domain' in self.filter_dic.keys():
-                if domain_row['name'] not in self.filter_dic['domain']:
-                    continue
             if domain_row['name'] == 'library':
                 continue
+            # Apply filter
+            if not self.is_instance_type_filter_match(filter_dic, 'domain', domain_row['name']):
+                continue
             for category_row in project.get_domain_childs(domain_row['id']):
-                # Aply filter
-                if 'category' in self.filter_dic.keys():
-                    if category_row['name'] not in self.filter_dic['category']:
-                        continue
+                # Apply filter
+                if not self.is_instance_type_filter_match(filter_dic, 'category', category_row['name']):
+                    continue
                 assets = project.get_category_childs(category_row['id'])
                 for asset_row in assets:
-                    # Aply filter
-                    if 'asset' in self.filter_dic.keys():
-                        if asset_row['name'] not in self.filter_dic['asset']:
-                            continue
+                    # Apply filter
+                    if not self.is_instance_type_filter_match(filter_dic, 'asset', asset_row['name']):
+                        continue
                     stages = project.get_asset_childs(asset_row['id'])
                     for stage_row in stages:
-                        # Aply filter
-                        if 'stage' in self.filter_dic.keys():
-                            if stage_row['name'] not in self.filter_dic['stage']:
-                                continue
+                        # Apply filter
+                        if not self.is_instance_type_filter_match(filter_dic, 'stage', stage_row['name']):
+                            continue
                         # Data filter
-                        if 'data' in self.filter_dic.keys():
-                            if not self.is_data_filter_match(stage_row):
-                                continue
+                        if not self.is_data_filter_match(filter_dic, stage_row):
+                            continue
                         self.stage_rows.append(stage_row)
                         project_stages.append(stage_row['id'])
                         group_name = self.get_group_name(domain_row, category_row, asset_row, stage_row)
@@ -324,20 +366,43 @@ class calendar_widget(QtWidgets.QWidget):
             ordered_items.append(self.grouped_dic['frames'][group_name]['items'])
 
         self.update_search()
+        self.view.update()
         self.update_refresh_time(start_time)
 
-    def is_data_filter_match(self, stage_row):
+    def is_instance_type_filter_match(self, filter_dic, instance_type, instance_name):
+        is_match = True
+        if 'include' in filter_dic.keys():
+            if instance_type in filter_dic['include'].keys():
+                is_match = False
+                if instance_name in filter_dic['include'][instance_type]:
+                    is_match = True
+        if 'exclude' in filter_dic.keys():
+            if instance_type in filter_dic['exclude'].keys():
+                if instance_name in filter_dic['exclude'][instance_type]:
+                    is_match = False
+        return is_match
+
+    def is_data_filter_match(self, filter_dic, stage_row):
+        is_match = True
         values = []
         for key in stage_row:
             if key in ['id', 'creation_time', 'creation_user']:
                 continue
             values.append(str(stage_row[key]))
-        filter_data = (' ').join(data_list)
-        is_match = False
-        for data_key in self.filter_dic['data']:
-            if data_key in value:
-                is_match = True
-                break
+        filter_data = (' ').join(values)
+        if 'include' in filter_dic.keys():
+            if 'data' in filter_dic['include'].keys():
+                is_match = False
+                for data_key in filter_dic['include']['data']:
+                    if data_key in values:
+                        is_match = True
+                        break
+        if 'exclude' in filter_dic.keys():
+            if 'data' in filter_dic['exclude'].keys():
+                for data_key in filter_dic['exclude']['data']:
+                    if data_key in values:
+                        is_match = False
+                        break
         return is_match
 
     def update_refresh_time(self, start_time):

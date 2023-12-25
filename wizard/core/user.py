@@ -159,11 +159,27 @@ class user:
         if filter_name in self.prefs_dic['filter_sets'][widget_name].keys():
             logger.warning(f"{filter_name} already exists")
             return
+        logger.info(f"{filter_name} created")
+        return self.edit_filter_set(widget_name, filter_name, filter_dic)
+
+    def edit_filter_set(self, widget_name, filter_name, filter_dic):
+        if 'filter_sets' not in self.prefs_dic.keys():
+            self.prefs_dic['filter_sets'] = dict()
+        if widget_name not in self.prefs_dic['filter_sets'].keys():
+            self.prefs_dic['filter_sets'][widget_name] = dict()
         self.prefs_dic['filter_sets'][widget_name][filter_name] = filter_dic
         self.write_prefs_dic()
+        logger.info(f"{filter_name} edited")
         return 1
 
-    def modify_filter_set(self, widget_name, filter_name, filter_dic):
+    def get_filters_sets(self, widget_name):
+        if 'filter_sets' not in self.prefs_dic.keys():
+            self.prefs_dic['filter_sets'] = dict()
+        if widget_name not in self.prefs_dic['filter_sets']:
+            self.prefs_dic['filter_sets'][widget_name] = dict()
+        return self.prefs_dic['filter_sets'][widget_name]
+
+    def get_filter_set(self, widget_name, filter_name):
         if 'filter_sets' not in self.prefs_dic.keys():
             self.prefs_dic['filter_sets'] = dict()
         if widget_name not in self.prefs_dic['filter_sets'].keys():
@@ -171,16 +187,7 @@ class user:
         if filter_name not in self.prefs_dic['filter_sets'][widget_name].keys():
             logger.warning(f"{filter_name} not found")
             return
-        self.prefs_dic['filter_sets'][widget_name][filter_name] = filter_dic
-        self.write_prefs_dic()
-        return 1
-
-    def get_filters_sets(self, widget_name):
-        if 'filter_sets' not in self.prefs_dic.keys():
-            self.prefs_dic['filter_sets'] = dict()
-        if widget_name not in self.prefs_dic['filter_sets']:
-            self.prefs_dic['filter_sets'][widget_name] = []
-        return self.prefs_dic['filter_sets'][widget_name]
+        return self.prefs_dic['filter_sets'][widget_name][filter_name]
 
     def delete_filter_set(self, widget_name, filter_name):
         if 'filter_sets' not in self.prefs_dic.keys():
@@ -192,6 +199,7 @@ class user:
             return
         del self.prefs_dic['filter_sets'][widget_name][filter_name]
         self.write_prefs_dic()
+        logger.info(f"{filter_name} deleted")
         return 1
 
     def add_context(self, type, context_dic):

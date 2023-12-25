@@ -8,6 +8,7 @@ import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 # Wizard core modules
 from wizard.core import user
@@ -18,10 +19,14 @@ from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
-class filter_creator_widget(QtWidgets.QWidget):
+class filter_sets_editor_widget(QtWidgets.QWidget):
     def __init__(self, context, parent=None):
-        super(filter_creator_widget, self).__init__(parent)
+        super(filter_sets_editor_widget, self).__init__(parent)
         self.context = context
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Wizard - Filter sets editor - {self.context}")
+
         self.build_ui()
         self.connect_functions()
 
@@ -32,26 +37,33 @@ class filter_creator_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.domain_add_button.clicked.connect(self.add_domain)
         self.category_add_button.clicked.connect(self.add_category)
-        self.asset_add_button.clicked.connect(self.add_asset)
         self.stage_add_button.clicked.connect(self.add_stage)
-        self.data_add_button.clicked.connect(self.add_data)
+        self.state_add_button.clicked.connect(self.add_state)
+        self.assignment_add_button.clicked.connect(self.add_assignment)
+        self.priority_add_button.clicked.connect(self.add_priority)
         self.domain_exclude_button.clicked.connect(self.exclude_domain)
         self.category_exclude_button.clicked.connect(self.exclude_category)
-        self.asset_exclude_button.clicked.connect(self.exclude_asset)
         self.stage_exclude_button.clicked.connect(self.exclude_stage)
-        self.data_exclude_button.clicked.connect(self.exclude_data)
-        self.trash_button.clicked.connect(self.delete_selection)
+        self.state_exclude_button.clicked.connect(self.exclude_state)
+        self.assignment_exclude_button.clicked.connect(self.exclude_assignment)
+        self.priority_exclude_button.clicked.connect(self.exclude_priority)
         self.save_button.clicked.connect(self.apply)
         self.filter_sets_add_button.clicked.connect(self.add_filter_set)
         self.delete_filter_set_button.clicked.connect(self.delete_selected_filter_set)
-
+        self.filter_sets_list.itemSelectionChanged.connect(self.refresh_filters)
 
     def build_ui(self):
+        self.setObjectName('main_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
+        self.second_widget = QtWidgets.QWidget()
+        self.second_widget.setFixedWidth(300)
         self.second_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.addLayout(self.second_layout)
+        self.second_widget.setLayout(self.second_layout)
+        self.main_layout.addWidget(self.second_widget)
 
         self.filter_sets_header = QtWidgets.QHBoxLayout()
         self.filter_sets_header.setContentsMargins(0,0,0,0)
@@ -63,35 +75,27 @@ class filter_creator_widget(QtWidgets.QWidget):
         self.filter_sets_add_button.setFixedSize(22,22)
         self.filter_sets_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.filter_sets_header.addWidget(self.filter_sets_add_button)
+        self.delete_filter_set_button = QtWidgets.QPushButton()
+        self.delete_filter_set_button.setFixedSize(22,22)
+        self.delete_filter_set_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
+        self.filter_sets_header.addWidget(self.delete_filter_set_button)
 
         self.filter_sets_list = QtWidgets.QListWidget()
         self.second_layout.addWidget(self.filter_sets_list)
 
-        self.filter_sets_footer = QtWidgets.QHBoxLayout()
-        self.filter_sets_footer.setContentsMargins(0,0,0,0)
-        self.second_layout.addLayout(self.filter_sets_footer)
-
-        self.filter_sets_footer.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-        self.delete_filter_set_button = QtWidgets.QPushButton()
-        self.delete_filter_set_button.setFixedSize(20,20)
-        self.delete_filter_set_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
-        self.filter_sets_footer.addWidget(self.delete_filter_set_button)
-
+        self.third_widget = QtWidgets.QWidget()
         self.third_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.addLayout(self.third_layout)
+        self.third_widget.setLayout(self.third_layout)
+        self.main_layout.addWidget(self.third_widget)
 
-        self.filters_list = QtWidgets.QListWidget()
-        self.filters_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.third_layout.addWidget(self.filters_list)
+        self.title_label = QtWidgets.QLabel("Choose your filters")
+        self.title_label.setObjectName('title_label_2')
+        self.third_layout.addWidget(self.title_label)
+        self.description_label = QtWidgets.QLabel("Click on + to filter via the selected item. Click on - to exclude the selected item.")
+        self.description_label.setObjectName('gray_label')
+        self.third_layout.addWidget(self.description_label)
 
-        self.trash_layout = QtWidgets.QHBoxLayout()
-        self.trash_layout.setContentsMargins(0,0,0,0)
-        self.third_layout.addLayout(self.trash_layout)
-        self.trash_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-        self.trash_button = QtWidgets.QPushButton()
-        self.trash_button.setFixedSize(30, 30)
-        self.trash_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
-        self.trash_layout.addWidget(self.trash_button)
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.combobox_layout = QtWidgets.QGridLayout()
         self.combobox_layout.setSpacing(4)
@@ -99,6 +103,7 @@ class filter_creator_widget(QtWidgets.QWidget):
         self.third_layout.addLayout(self.combobox_layout)
 
         self.domain_label = QtWidgets.QLabel('Domains')
+        self.domain_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.domain_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.domain_comboBox = gui_utils.QComboBox()
         self.domain_add_button = QtWidgets.QPushButton()
@@ -113,6 +118,7 @@ class filter_creator_widget(QtWidgets.QWidget):
         self.combobox_layout.addWidget(self.domain_exclude_button, 0, 3)
 
         self.category_label = QtWidgets.QLabel('Categories')
+        self.category_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.category_comboBox = gui_utils.QComboBox()
         self.category_add_button = QtWidgets.QPushButton()
         self.category_add_button.setFixedSize(30,30)
@@ -125,20 +131,8 @@ class filter_creator_widget(QtWidgets.QWidget):
         self.combobox_layout.addWidget(self.category_add_button, 1, 2)
         self.combobox_layout.addWidget(self.category_exclude_button, 1, 3)
 
-        self.asset_label = QtWidgets.QLabel('Assets')
-        self.asset_comboBox = gui_utils.QComboBox()
-        self.asset_add_button = QtWidgets.QPushButton()
-        self.asset_add_button.setFixedSize(30,30)
-        self.asset_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.asset_exclude_button = QtWidgets.QPushButton()
-        self.asset_exclude_button.setFixedSize(30,30)
-        self.asset_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
-        self.combobox_layout.addWidget(self.asset_label, 2, 0)
-        self.combobox_layout.addWidget(self.asset_comboBox, 2, 1)
-        self.combobox_layout.addWidget(self.asset_add_button, 2, 2)
-        self.combobox_layout.addWidget(self.asset_exclude_button, 2, 3)
-
         self.stage_label = QtWidgets.QLabel('Stages')
+        self.stage_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.stage_comboBox = gui_utils.QComboBox()
         self.stage_add_button = QtWidgets.QPushButton()
         self.stage_add_button.setFixedSize(30,30)
@@ -146,23 +140,74 @@ class filter_creator_widget(QtWidgets.QWidget):
         self.stage_exclude_button = QtWidgets.QPushButton()
         self.stage_exclude_button.setFixedSize(30,30)
         self.stage_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
-        self.combobox_layout.addWidget(self.stage_label, 3, 0)
-        self.combobox_layout.addWidget(self.stage_comboBox, 3, 1)
-        self.combobox_layout.addWidget(self.stage_add_button, 3, 2)
-        self.combobox_layout.addWidget(self.stage_exclude_button, 3, 3)
+        self.combobox_layout.addWidget(self.stage_label, 2, 0)
+        self.combobox_layout.addWidget(self.stage_comboBox, 2, 1)
+        self.combobox_layout.addWidget(self.stage_add_button, 2, 2)
+        self.combobox_layout.addWidget(self.stage_exclude_button, 2, 3)
 
-        self.data_label = QtWidgets.QLabel('Data')
-        self.data_comboBox = gui_utils.QComboBox()
-        self.data_add_button = QtWidgets.QPushButton()
-        self.data_add_button.setFixedSize(30,30)
-        self.data_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.data_exclude_button = QtWidgets.QPushButton()
-        self.data_exclude_button.setFixedSize(30,30)
-        self.data_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
-        self.combobox_layout.addWidget(self.data_label, 4, 0)
-        self.combobox_layout.addWidget(self.data_comboBox, 4, 1)
-        self.combobox_layout.addWidget(self.data_add_button, 4, 2)
-        self.combobox_layout.addWidget(self.data_exclude_button, 4, 3)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed), 0, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed), 1, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed), 2, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed), 3, 4)
+
+        self.state_label = QtWidgets.QLabel('State')
+        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.state_comboBox = gui_utils.QComboBox()
+        self.state_add_button = QtWidgets.QPushButton()
+        self.state_add_button.setFixedSize(30,30)
+        self.state_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.state_exclude_button = QtWidgets.QPushButton()
+        self.state_exclude_button.setFixedSize(30,30)
+        self.state_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.combobox_layout.addWidget(self.state_label, 0, 5)
+        self.combobox_layout.addWidget(self.state_comboBox, 0, 6)
+        self.combobox_layout.addWidget(self.state_add_button, 0, 7)
+        self.combobox_layout.addWidget(self.state_exclude_button, 0, 8)
+
+        self.assignment_label = QtWidgets.QLabel('Assignment')
+        self.assignment_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.assignment_comboBox = gui_utils.QComboBox()
+        self.assignment_add_button = QtWidgets.QPushButton()
+        self.assignment_add_button.setFixedSize(30,30)
+        self.assignment_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.assignment_exclude_button = QtWidgets.QPushButton()
+        self.assignment_exclude_button.setFixedSize(30,30)
+        self.assignment_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.combobox_layout.addWidget(self.assignment_label, 1, 5)
+        self.combobox_layout.addWidget(self.assignment_comboBox, 1, 6)
+        self.combobox_layout.addWidget(self.assignment_add_button, 1, 7)
+        self.combobox_layout.addWidget(self.assignment_exclude_button, 1, 8)
+
+        self.priority_label = QtWidgets.QLabel('Priority')
+        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.priority_comboBox = gui_utils.QComboBox()
+        self.priority_add_button = QtWidgets.QPushButton()
+        self.priority_add_button.setFixedSize(30,30)
+        self.priority_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.priority_exclude_button = QtWidgets.QPushButton()
+        self.priority_exclude_button.setFixedSize(30,30)
+        self.priority_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.combobox_layout.addWidget(self.priority_label, 2, 5)
+        self.combobox_layout.addWidget(self.priority_comboBox, 2, 6)
+        self.combobox_layout.addWidget(self.priority_add_button, 2, 7)
+        self.combobox_layout.addWidget(self.priority_exclude_button, 2, 8)
+
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+
+        self.title_label_2 = QtWidgets.QLabel("Your filters")
+        self.title_label_2.setObjectName('title_label_2')
+        self.third_layout.addWidget(self.title_label_2)
+        self.description_label_2 = QtWidgets.QLabel("Click on x to delete a filter.")
+        self.description_label_2.setObjectName('gray_label')
+        self.third_layout.addWidget(self.description_label_2)
+
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+
+        self.filters_list = QtWidgets.QListWidget()
+        self.filters_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.third_layout.addWidget(self.filters_list)
+
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.save_button = QtWidgets.QPushButton('Save')
         self.save_button.setObjectName('blue_button')
@@ -188,14 +233,17 @@ class filter_creator_widget(QtWidgets.QWidget):
     def add_category(self, category):
         self.add_item(f"category:{self.category_comboBox.currentText()}")
 
-    def add_asset(self, asset):
-        self.add_item(f"asset:{self.asset_comboBox.currentText()}")
-
     def add_stage(self, stage):
         self.add_item(f"stage:{self.stage_comboBox.currentText()}")
 
-    def add_data(self, data):
-        self.add_item(f"data:{self.data_comboBox.currentText()}")
+    def add_state(self, data):
+        self.add_item(f"data:{self.state_comboBox.currentText()}")
+
+    def add_assignment(self, data):
+        self.add_item(f"data:{self.assignment_comboBox.currentText()}")
+
+    def add_priority(self, data):
+        self.add_item(f"data:{self.priority_comboBox.currentText()}")
 
     def exclude_domain(self, domain):
         self.add_item(f"!domain:{self.domain_comboBox.currentText()}")
@@ -203,26 +251,31 @@ class filter_creator_widget(QtWidgets.QWidget):
     def exclude_category(self, category):
         self.add_item(f"!category:{self.category_comboBox.currentText()}")
 
-    def exclude_asset(self, asset):
-        self.add_item(f"!asset:{self.asset_comboBox.currentText()}")
-
     def exclude_stage(self, stage):
         self.add_item(f"!stage:{self.stage_comboBox.currentText()}")
 
-    def exclude_data(self, data):
-        self.add_item(f"!data:{self.data_comboBox.currentText()}")
+    def exclude_state(self, data):
+        self.add_item(f"!data:{self.state_comboBox.currentText()}")
+
+    def exclude_assignment(self, data):
+        self.add_item(f"!data:{self.assignment_comboBox.currentText()}")
+
+    def exclude_priority(self, data):
+        self.add_item(f"!data:{self.priority_comboBox.currentText()}")
 
     def add_filter_set(self):
         filter_set_name = self.filter_set_name_lineEdit.text()
         if user.user().add_filter_set(self.context, filter_set_name, dict()):
             self.filter_set_name_lineEdit.clear()
             self.refresh_filter_sets()
+            gui_server.refresh_ui()
 
     def delete_selected_filter_set(self):
         selected_items = self.filter_sets_list.selectedItems()
         for selected_item in selected_items:
             user.user().delete_filter_set(self.context, selected_item.text())
         self.refresh_filter_sets()
+        gui_server.refresh_ui()
 
     def refresh_filter_sets(self):
         filter_sets_dic = user.user().get_filters_sets(self.context)
@@ -259,17 +312,39 @@ class filter_creator_widget(QtWidgets.QWidget):
             self.domain_comboBox.addItem(domain_row['name'])
             for category_row in project.get_domain_childs(domain_row['id']):
                 self.category_comboBox.addItem(category_row['name'])
-                for asset_row in project.get_category_childs(category_row['id']):
-                    self.asset_comboBox.addItem(asset_row['name'])
         for stage in assets_vars._assets_stages_list_ + assets_vars._sequences_stages_list_:
             self.stage_comboBox.addItem(stage)
         for state in assets_vars._asset_states_list_:
-            self.data_comboBox.addItem(state)
+            self.state_comboBox.addItem(state)
         for priority in assets_vars._priority_list_:
-            self.data_comboBox.addItem(priority)
+            self.priority_comboBox.addItem(priority)
         for user_id in project.get_users_ids_list():
             user_name = repository.get_user_data(user_id, 'user_name')
-            self.data_comboBox.addItem(user_name)
+            self.assignment_comboBox.addItem(user_name)
+
+    def get_selected_filter_set(self):
+        selected_filter_set = self.filter_sets_list.selectedItems()
+        if selected_filter_set is None:
+            return
+        if selected_filter_set == []:
+            return
+        selected_filter_set = selected_filter_set[0].text()
+        return selected_filter_set
+
+    def refresh_filters(self):
+        self.filters_list.clear()
+        selected_filter_set = self.get_selected_filter_set()
+        if selected_filter_set is None:
+            return
+        filters_dic = user.user().get_filter_set(self.context, selected_filter_set)
+        if filters_dic == dict():
+            return
+        for key in filters_dic['include'].keys():
+            for data in filters_dic['include'][key]:
+                self.add_item(f"{key}:{data}")
+        for key in filters_dic['exclude'].keys():
+            for data in filters_dic['exclude'][key]:
+                self.add_item(f"!{key}:{data}")
 
     def apply(self):
         filter_dic = dict()
@@ -290,6 +365,8 @@ class filter_creator_widget(QtWidgets.QWidget):
                 dic[key] = []
             if data not in dic[key]:
                 dic[key].append(data)
-        filter_name = self.filter_name_lineEdit.text()
-        print(filter_dic)
-        print(filter_name)
+        selected_filter_set = self.get_selected_filter_set()
+        if selected_filter_set is None:
+            return
+        user.user().edit_filter_set(self.context, selected_filter_set, filter_dic)
+        gui_server.refresh_ui()
