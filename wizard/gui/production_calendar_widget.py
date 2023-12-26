@@ -286,21 +286,30 @@ class calendar_widget(QtWidgets.QWidget):
             return
         self.refresh()
 
+    def get_current_filter_dic(self):
+        filter_dic = dict()
+        self.refresh_filter_sets()
+        current_filter_set = self.filter_sets_comboBox.currentText()
+        if current_filter_set is None or current_filter_set == '':
+            return filter_dic
+
+        filter_dic = dict()
+        if self.filter_sets_checkBox.isChecked():
+            filter_dic = user.user().get_filter_set('production_calendar_widget', current_filter_set)
+        return filter_dic
+
     def refresh(self):
         if not self.isVisible():
             return
 
         start_time = time.perf_counter()
 
-        self.refresh_filter_sets()
-        current_filter_set = self.filter_sets_comboBox.currentText()
-
-        filter_dic = dict()
-        if self.filter_sets_checkBox.isChecked():
-            filter_dic = user.user().get_filter_set('production_calendar_widget', current_filter_set)
+        filter_dic = self.get_current_filter_dic()
 
         project_stages = []
         self.stage_rows = []
+
+        self.clear_frames()
 
         domains = project.get_domains()
         for domain_row in domains:
@@ -329,12 +338,14 @@ class calendar_widget(QtWidgets.QWidget):
                         self.stage_rows.append(stage_row)
                         project_stages.append(stage_row['id'])
                         group_name = self.get_group_name(domain_row, category_row, asset_row, stage_row)
+                        
                         if group_name not in self.grouped_dic['frames'].keys():
-                            self.grouped_dic['frames'][group_name] = dict()
                             frame = frame_item(group_name, '#1d1d23')
+                            self.view.add_frame(frame)
+                            self.grouped_dic['frames'][group_name] = dict()
                             self.grouped_dic['frames'][group_name]['frame_item'] = frame
                             self.grouped_dic['frames'][group_name]['items'] = []
-                            self.view.add_frame(frame)
+
                         if stage_row['id'] not in self.stage_ids.keys():
                             item = stage_item(stage_row, datetime.datetime.fromtimestamp(stage_row['start_date']),
                                                 int(stage_row['estimated_time']),
@@ -346,28 +357,24 @@ class calendar_widget(QtWidgets.QWidget):
                             self.stage_ids[stage_row['id']] = item
                         else:
                             self.stage_ids[stage_row['id']].update_row(stage_row)
-                        for other_group in self.grouped_dic['frames'].keys():
-                            if other_group != group_name:
-                                if self.stage_ids[stage_row['id']] in self.grouped_dic['frames'][other_group]['items']:
-                                    self.grouped_dic['frames'][other_group]['items'].remove(self.stage_ids[stage_row['id']])
-                            else:
-                                if self.stage_ids[stage_row['id']] not in self.grouped_dic['frames'][other_group]['items']:
-                                    self.grouped_dic['frames'][other_group]['items'].append(self.stage_ids[stage_row['id']])
+
+                        self.grouped_dic['frames'][group_name]['items'].append(self.stage_ids[stage_row['id']])
+
         stage_ids = list(self.stage_ids.keys())
         for stage_id in stage_ids:
             if stage_id not in project_stages:
                 self.remove_stage(stage_id)
-        groups_list = list(self.grouped_dic['frames'].keys())
-        for group_name in groups_list:
-            if len(self.grouped_dic['frames'][group_name]['items']) == 0:
-                self.remove_frame(group_name)
-        ordered_items = []
-        for group_name in self.grouped_dic['frames'].keys():
-            ordered_items.append(self.grouped_dic['frames'][group_name]['items'])
 
         self.update_search()
         self.view.update()
         self.update_refresh_time(start_time)
+
+    def clear_frames(self):
+        groups_list = list(self.grouped_dic['frames'].keys())
+        for group_name in groups_list:
+            self.remove_frame(group_name)
+        self.grouped_dic = dict()
+        self.grouped_dic['frames'] = dict()
 
     def is_instance_type_filter_match(self, filter_dic, instance_type, instance_name):
         is_match = True
@@ -393,10 +400,8 @@ class calendar_widget(QtWidgets.QWidget):
         if 'include' in filter_dic.keys():
             if 'data' in filter_dic['include'].keys():
                 is_match = False
-                for data_key in filter_dic['include']['data']:
-                    if data_key in values:
-                        is_match = True
-                        break
+                if all(data_key.upper() in filter_data.upper() for data_key in filter_dic['include']['data']):
+                    is_match = True
         if 'exclude' in filter_dic.keys():
             if 'data' in filter_dic['exclude'].keys():
                 for data_key in filter_dic['exclude']['data']:

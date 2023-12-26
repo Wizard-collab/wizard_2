@@ -4,6 +4,7 @@
 
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtSignal
 import logging
 
 # Wizard gui modules
@@ -64,6 +65,10 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         self.second_layout = QtWidgets.QVBoxLayout()
         self.second_widget.setLayout(self.second_layout)
         self.main_layout.addWidget(self.second_widget)
+
+        self.filter_sets_title_label = QtWidgets.QLabel("Your filter sets")
+        self.filter_sets_title_label.setObjectName('title_label_2')
+        self.second_layout.addWidget(self.filter_sets_title_label)
 
         self.filter_sets_header = QtWidgets.QHBoxLayout()
         self.filter_sets_header.setContentsMargins(0,0,0,0)
@@ -204,7 +209,14 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.filters_list = QtWidgets.QListWidget()
-        self.filters_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.filters_list.setSpacing(10)
+        self.filters_list.setContentsMargins(0,0,0,0)
+        self.filters_list.setStyleSheet("QListWidget:item{padding:0px;}QListWidget:item:hover{background-color:transparent;}")
+        self.filters_list.setObjectName('transparent_widget')
+        self.filters_list.setViewMode(QtWidgets.QListView.IconMode)
+        self.filters_list.setMovement(QtWidgets.QListView.Static)
+        self.filters_list.setResizeMode(QtWidgets.QListView.Adjust)
+        self.filters_list.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.third_layout.addWidget(self.filters_list)
 
         self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
@@ -213,19 +225,31 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         self.save_button.setObjectName('blue_button')
         self.third_layout.addWidget(self.save_button)
 
-    def delete_selection(self):
-        selected_items = self.filters_list.selectedItems()
-        for item in selected_items:
-            self.filters_list.takeItem(self.filters_list.row(item))
-            del item
+    def remove_filter(self, data):
+        for i in range(self.filters_list.count()):
+            item = self.filters_list.item(i)
+            widget = self.filters_list.itemWidget(item)
+            item_data = widget.data
+            if data == item_data:
+                widget.setVisible(False)
+                widget.setParent(None)
+                widget.deleteLater()
+                self.filters_list.takeItem(i)
+                del item
+                break
 
-    def add_item(self, text):
-        for item_index in range(self.filters_list.count()):
-            item_text = self.filters_list.item(item_index).text()
-            if text == item_text:
+    def add_item(self, data):
+        for i in range(self.filters_list.count()):
+            item_data = self.filters_list.itemWidget(self.filters_list.item(i)).data
+            if data == item_data:
                 return
-
-        self.filters_list.addItem(text)
+        item = QtWidgets.QListWidgetItem()
+        text = data.split(':')[-1]
+        widget = filter_item(data, text)
+        widget.remove_filter_signal.connect(self.remove_filter)
+        self.filters_list.addItem(item)
+        self.filters_list.setItemWidget(item, widget)
+        item.setSizeHint(widget.sizeHint())
 
     def add_domain(self, domain):
         self.add_item(f"domain:{self.domain_comboBox.currentText()}")
@@ -351,7 +375,9 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         filter_dic['include'] = dict()
         filter_dic['exclude'] = dict()
         for item_index in range(self.filters_list.count()):
-            item_text = self.filters_list.item(item_index).text()
+            item = self.filters_list.item(item_index)
+            widget = self.filters_list.itemWidget(item)
+            item_text = widget.data
             key = item_text.split(':')[0]
             data = item_text.split(':')[-1]
 
@@ -370,3 +396,48 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
             return
         user.user().edit_filter_set(self.context, selected_filter_set, filter_dic)
         gui_server.refresh_ui()
+
+class filter_item(QtWidgets.QFrame):
+
+    remove_filter_signal = pyqtSignal(str)
+
+    def __init__(self, data, text, parent=None):
+        super(filter_item, self).__init__(parent)
+        self.data = data
+        self.text = text
+        self.build_ui()
+        self.connect_functions()
+
+    def build_ui(self):
+        self.setObjectName('round_frame')
+        self.setFixedHeight(30)
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(11,3,11,3)
+        self.main_layout.setSpacing(20)
+        self.setLayout(self.main_layout)
+
+        if self.data.startswith("!"):
+            bg_color = '#d16666'
+        else:
+            bg_color = '#7ca657'
+
+        self.setStyleSheet("#round_frame{background-color:%s;border-radius:14px;}"%bg_color)
+
+        self.label = QtWidgets.QLabel(self.text)
+        self.label.setObjectName('bold_label')
+        self.label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.label)
+
+        self.delete_filter_button = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.delete_filter_button.setFixedSize(12,12)
+        self.delete_filter_button.setIconSize(QtCore.QSize(12,12))
+        self.main_layout.addWidget(self.delete_filter_button)
+
+    def connect_functions(self):
+        self.delete_filter_button.clicked.connect(self.remove_filter)
+
+    def remove_filter(self):
+        self.remove_filter_signal.emit(self.data)
+
+
+
