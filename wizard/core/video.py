@@ -133,20 +133,26 @@ def add_overlay(file, string_asset, frame_number, frange, frame_rate, focal_len)
     margin_percent = int((im_height*1)/100)
     font_size = int((im_width*1)/100)
     font = ImageFont.truetype('cour.ttf', font_size)
-    font_width, font_height = font.getsize(string_asset)
-    rectangle_xy = [im_width, im_height, 0, im_height-(margin_percent*2+font_height)]
+    #font_width, font_height = font.getsize(string_asset)
+    font_width = font.getbbox(string_asset)[2]
+    font_height = font.getbbox(string_asset)[3]
+    rectangle_xy = [0, im_height-(margin_percent*2+font_height), im_width, im_height]
     draw.rectangle(rectangle_xy, fill=(0,0,0,120), outline=None)
     # Draw string asset
     string_asset_position = ( margin_percent, im_height - (font_height + margin_percent) )
     draw.text(string_asset_position, string_asset, font = font, fill = "white")
     # Draw frame text
     frame_text = f"[{frange[0]}-{frange[1]}] - f{frame_number} - {frame_rate}fps - focal : {focal_len}"
-    font_width, font_height = font.getsize(frame_text)
+    #font_width, font_height = font.getsize(frame_text)
+    font_width = font.getbbox(frame_text)[2]
+    font_height = font.getbbox(frame_text)[3]
     frame_text_position = ( im_width/2 - font_width/2, im_height - (font_height + margin_percent) )
     draw.text(frame_text_position, frame_text, font = font, fill = "white")
     # Draw user text
     user_text = environment.get_user()
-    font_width, font_height = font.getsize(user_text)
+    #font_width, font_height = font.getsize(user_text)
+    font_width = font.getbbox(user_text)[2]
+    font_height = font.getbbox(user_text)[3]
     user_text_position = ( im_width - font_width - margin_percent, im_height - (font_height + margin_percent) )
     draw.text(user_text_position, user_text, font = font, fill = "white")
 
