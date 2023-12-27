@@ -72,6 +72,7 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
+        self.duplicate_selection_button.clicked.connect(self.duplicate_selection)
         self.update_button.clicked.connect(self.update_selection)
         self.add_reference_button.clicked.connect(self.search_reference)
 
@@ -285,6 +286,20 @@ class references_widget(QtWidgets.QWidget):
                 assets.remove_referenced_group(referenced_group_id)
         gui_server.refresh_team_ui()
 
+    def duplicate_selection(self):
+        selected_items = self.list_view.selectedItems()
+        for selected_item in selected_items:
+            if selected_item.type == 'reference':
+                reference_id = selected_item.reference_row['id']
+                if self.context == 'work_env':
+                    assets.duplicate_reference(reference_id)
+                else:
+                    assets.duplicate_grouped_reference(reference_id)
+            elif selected_item.type == 'group':
+                referenced_group_id = selected_item.referenced_group_row['id']
+                assets.duplicate_referenced_group(referenced_group_id)
+        gui_server.refresh_team_ui()
+
     def update_selection(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
@@ -388,10 +403,12 @@ class references_widget(QtWidgets.QWidget):
         focus_action = None
         declare_error_action = None
         open_folder_action = None
+        duplicate_action = None
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         if len(selection)>=1:
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
             remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected references')
+            duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate selected references')
             if len(selection) == 1:
                 if selection[0].type == 'reference':
                     launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
@@ -418,6 +435,8 @@ class references_widget(QtWidgets.QWidget):
                 self.declare_error()
             elif action == open_folder_action:
                 self.open_folder()
+            elif action == duplicate_action:
+                self.duplicate_selection()
 
     def item_double_clicked(self, item):
         if item.type == 'group':
@@ -482,10 +501,10 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setColumnCount(7)
+        self.list_view.setColumnCount(8)
         self.list_view.setIndentation(20)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Exported asset', 'Version', 'Format', 'Auto update', 'State', 'ID'])
+        self.list_view.setHeaderLabels(['Stage', 'Namespace', 'Exported asset', 'Version', 'Format', 'Auto update', 'State', 'On/Off', 'ID'])
         self.list_view.header().resizeSection(0, 200)
         self.list_view.header().resizeSection(1, 250)
         self.list_view.header().resizeSection(2, 250)
@@ -493,7 +512,8 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.header().resizeSection(4, 60)
         self.list_view.header().resizeSection(5, 100)
         self.list_view.header().resizeSection(6, 80)
-        self.list_view.header().resizeSection(7, 40)
+        self.list_view.header().resizeSection(7, 90)
+        self.list_view.header().resizeSection(8, 40)
         self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
@@ -550,6 +570,13 @@ class references_widget(QtWidgets.QWidget):
         self.remove_selection_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.remove_selection_button)
 
+        self.duplicate_selection_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(self.duplicate_selection_button, "Duplicate selected references")
+        self.duplicate_selection_button.setFixedSize(35,35)
+        self.duplicate_selection_button.setIconSize(QtCore.QSize(25,25))
+        self.duplicate_selection_button.setIcon(QtGui.QIcon(ressources._tool_duplicate_))
+        self.buttons_layout.addWidget(self.duplicate_selection_button)
+
         self.add_reference_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.add_reference_button, "Add references (Tab)")
         self.add_reference_button.setFixedSize(35,35)
@@ -603,6 +630,9 @@ class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.setFont(1, bold_font)
         self.setIcon(0, gui_utils.QIcon_from_svg(ressources._group_icon_,
                                                     self.group_row['color']))
+        self.on_off_checkbox = QtWidgets.QCheckBox()
+        self.on_off_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 7, self.on_off_checkbox)
 
     def update(self, group_row):
         self.group_row = group_row
@@ -647,9 +677,13 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
 
         self.state_widget = state_widget()
         self.treeWidget().setItemWidget(self, 6, self.state_widget)
-        
-        self.setText(7, str(self.reference_row['id']))
-        self.setForeground(7, QtGui.QBrush(QtGui.QColor('gray')))
+
+        self.on_off_checkbox = QtWidgets.QCheckBox()
+        self.on_off_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 7, self.on_off_checkbox)
+
+        self.setText(8, str(self.reference_row['id']))
+        self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
         self.export_widget.setText(infos_list[1])

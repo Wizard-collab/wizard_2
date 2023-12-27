@@ -2283,7 +2283,7 @@ def get_referenced_group_by_namespace(work_env_id, namespace, column='*'):
         return
     return referenced_groups_rows[0]
 
-def create_grouped_reference(group_id, export_version_id, namespace, count=None):
+def create_grouped_reference(group_id, export_version_id, namespace, count=None, auto_update=0):
     export_id = get_export_version_data(export_version_id, 'export_id')
     stage_name = get_stage_data(get_export_data(export_id, 'stage_id'),
                                                     'name')
@@ -2312,7 +2312,7 @@ def create_grouped_reference(group_id, export_version_id, namespace, count=None)
                                 group_id,
                                 export_id,
                                 export_version_id,
-                                0))
+                                auto_update))
     if not reference_id:
         return
     logger.info(f"Grouped reference created")

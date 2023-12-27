@@ -995,6 +995,23 @@ def mirror_references(work_env_id, destination_work_env_id):
                                 namespace_and_count=[reference_row['namespace'], reference_row['count']],
                                 auto_update=reference_row['auto_update'])
 
+def duplicate_reference(reference_id):
+    reference_row = project.get_reference_data(reference_id)
+    create_reference(reference_row['work_env_id'],
+                            reference_row['export_version_id'],
+                            auto_update=reference_row['auto_update'])
+
+def duplicate_grouped_reference(grouped_reference_id):
+    grouped_reference_row = project.get_grouped_reference_data(grouped_reference_id)
+    create_grouped_reference(grouped_reference_row['group_id'],
+                            grouped_reference_row['export_version_id'],
+                            auto_update=grouped_reference_row['auto_update'])
+
+def duplicate_referenced_group(referenced_group_id):
+    referenced_group_row = project.get_referenced_group_data(referenced_group_id)
+    create_referenced_group(referenced_group_row['work_env_id'],
+                            referenced_group_row['group_id'])
+
 def modify_version_comment(version_id, comment=''):
     if not project.modify_version_comment(version_id, comment):
         return
@@ -1131,7 +1148,7 @@ def create_grouped_references_from_stage_id(group_id, stage_id):
             create_grouped_reference(group_id, export_version_id)
     return 1
 
-def create_grouped_reference(group_id, export_version_id):
+def create_grouped_reference(group_id, export_version_id, auto_update=0):
     namespaces_list = project.get_grouped_references(group_id, 'namespace')
     count = 0
     namespace_raw = build_namespace(export_version_id)
@@ -1142,7 +1159,8 @@ def create_grouped_reference(group_id, export_version_id):
     return project.create_grouped_reference(group_id,
                                             export_version_id,
                                             namespace,
-                                            count)
+                                            count,
+                                            auto_update)
 
 def remove_grouped_reference(grouped_reference_id):
     return project.remove_grouped_reference(grouped_reference_id)

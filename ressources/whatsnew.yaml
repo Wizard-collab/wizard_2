@@ -2,6 +2,15 @@
   update_list:
   - !!python/tuple
     - new
+    - Production Gantt diagram
+  - !!python/tuple
+    - new
+    - You can now duplicate references
+  time: 1703670899.5258627
+'3.5.7.299':
+  update_list:
+  - !!python/tuple
+    - new
     - XGen export from maya > cfx stage
   - !!python/tuple
     - new
