@@ -39,7 +39,6 @@ from wizard.core import assets
 from wizard.core import db_utils
 
 def main():
-	'''
 	project.create_assets_groups_table(environment.get_project_name())
 	sql_cmd = """ALTER TABLE assets ADD COLUMN IF NOT EXISTS assets_group_id integer REFERENCES assets_groups (id);"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
@@ -55,7 +54,6 @@ def main():
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
 	sql_cmd = f"""ALTER TABLE referenced_groups_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
-	'''
 
 def fix_stages_duration():
 	stage_rows = project.get_all_stages()
