@@ -9,6 +9,9 @@
   - !!python/tuple
     - new
     - You can now deactivate a reference or a referenced group
+  - !!python/tuple
+    - new
+    - Resizeable outliner and wall widget
   time: 1703670899.5258627
 '3.5.7.299':
   update_list:

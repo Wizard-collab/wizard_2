@@ -377,6 +377,8 @@ class refresh_thread(QtCore.QThread):
     def run(self):
         while self.running:
             refresh_ui = 0
+            if artefacts.check_keeped_artefacts_expiration():
+                refresh_ui = 1
             if artefacts.check_artefacts_expiration():
                 refresh_ui = 1
             if refresh_ui:

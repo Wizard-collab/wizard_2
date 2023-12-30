@@ -141,7 +141,7 @@ def check_immunity(destination_user):
 		logger.warning(f"Your attack just failed, {destination_user} has an immunity artefact !")
 		return 1
 
-def check_artefacts_expiration():
+def check_keeped_artefacts_expiration():
 	user_row = repository.get_user_row_by_name(environment.get_user())
 	user_keeped_artefacts = json.loads(user_row['keeped_artefacts'])
 	time_ids = list(user_keeped_artefacts.keys())
