@@ -45,7 +45,7 @@ class tree_widget(QtWidgets.QFrame):
         self.assignment_visibility = 1
         self.state_visibility = 1
         self.priority_visibility = 1
-        self.color_visibility = 1
+        self.color_visibility = 0
 
         self.domain_ids=dict()
         self.category_ids=dict()
@@ -95,7 +95,8 @@ class tree_widget(QtWidgets.QFrame):
         for priority in assets_vars._priority_list_:
             self.icons_dic['priority'][priority] = QtGui.QIcon(ressources._priority_icons_list_[priority])
 
-        self.setFixedWidth(330)
+        self.setMinimumWidth(330)
+        self.resize(330, self.height())
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(2)
@@ -130,11 +131,12 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setDragEnabled(True)
-        #self.tree.setDropIndicatorShown(True)
         self.tree.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.tree.setAlternatingRowColors(True)
         self.tree.setHeaderHidden(True)
         self.tree.setIndentation(16)
+        self.tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.tree.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.main_layout.addWidget(self.tree)
 
         self.refresh_label = QtWidgets.QLabel()

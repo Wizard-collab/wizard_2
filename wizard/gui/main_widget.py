@@ -14,6 +14,7 @@ import webbrowser
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.vars import user_vars
 from wizard.core import application
 from wizard.core import user
 from wizard.core import project
@@ -176,6 +177,7 @@ class main_widget(QtWidgets.QWidget):
 
     def init_contexts(self):
         logger.info("Loading user context")
+        self.get_context()
         self.tree_widget.get_context()
         self.tabs_widget.get_context()
         self.versions_widget.get_context()
@@ -200,6 +202,7 @@ class main_widget(QtWidgets.QWidget):
 
     def save_contexts(self):
         logger.info("Saving user context")
+        self.set_context()
         self.tree_widget.set_context()
         self.tabs_widget.set_context()
         self.versions_widget.set_context()
@@ -461,15 +464,12 @@ class main_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_widget)
         self.main_layout.addWidget(self.shelf_widget)
 
-        self.contents_widget = QtWidgets.QWidget()
+        self.contents_widget = gui_utils.QSplitter()
+        self.contents_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.contents_widget.setObjectName('main_widget')
-        self.contents_layout = QtWidgets.QHBoxLayout()
-        self.contents_layout.setSpacing(1)
-        self.contents_layout.setContentsMargins(0,0,0,0)
-        self.contents_widget.setLayout(self.contents_layout)
         self.main_layout.addWidget(self.contents_widget)
 
-        self.contents_layout.addWidget(self.tree_widget)
+        self.contents_widget.addWidget(self.tree_widget)
 
         self.contents_1_widget = QtWidgets.QWidget()
         self.contents_1_widget.setObjectName('main_widget')
@@ -477,7 +477,8 @@ class main_widget(QtWidgets.QWidget):
         self.contents_1_layout.setSpacing(1)
         self.contents_1_layout.setContentsMargins(0,0,0,0)
         self.contents_1_widget.setLayout(self.contents_1_layout)
-        self.contents_layout.addWidget(self.contents_1_widget)
+        self.contents_widget.addWidget(self.contents_1_widget)
+        self.contents_widget.setCollapsible(1, False)
 
         self.contents_2_widget = QtWidgets.QWidget()
         self.contents_2_widget.setObjectName('main_widget')
@@ -505,7 +506,24 @@ class main_widget(QtWidgets.QWidget):
         self.contents_3_layout.addWidget(self.asset_tracking_widget)
         self.contents_3_layout.addWidget(self.launcher_widget)
         
-        self.contents_layout.addWidget(self.wall_widget)
+        self.contents_widget.addWidget(self.wall_widget)
+        self.contents_widget.setCollapsible(2, False)
         self.wall_widget.setVisible(0)
 
         self.main_layout.addWidget(self.footer_widget)
+
+        self.contents_widget.setSizes([300, 10000, 0])
+
+    def showEvent(self, event):
+        logger.info( self.contents_widget.sizes())
+
+    def set_context(self):
+        section_sizes = self.contents_widget.sizes()
+        context_dic = dict()
+        context_dic['sizes'] = section_sizes
+        user.user().add_context(user_vars._main_layout_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._main_layout_context_)
+        if context_dic is not None and context_dic != dict():
+            self.contents_widget.setSizes(context_dic['sizes'])

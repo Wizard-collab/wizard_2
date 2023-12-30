@@ -62,7 +62,6 @@ class wall_widget(QtWidgets.QWidget):
         self.search_thread.hide_id_signal.connect(self.hide_search_event)
 
     def build_ui(self):
-        self.setMaximumWidth(300)
         self.setMinimumWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(0)

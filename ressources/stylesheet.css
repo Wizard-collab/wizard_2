@@ -24,6 +24,14 @@ QPushButton, QToolButton, #classic_button{
 	border-radius: 5px;
 }
 
+QSplitter::handle {
+	background-color: #292930;
+}
+
+QSplitter:hover{
+	background-color: rgba(255,255,255,255);
+}
+
 QPushButton::hover, QToolButton::hover, #classic_button::hover{
 	border: 2px solid #4b4b57;
 	background-color: #4b4b57;

@@ -615,3 +615,44 @@ class minimum_height_textEdit(QtWidgets.QTextEdit):
             doc_height = self.max_height
         self.setMinimumHeight(int(doc_height))
         self.setMaximumHeight(int(doc_height))
+
+class QSplitter(QtWidgets.QSplitter):
+    def __init__(self, parent=None):
+        super(QSplitter, self).__init__(parent)
+
+    def createHandle(self):
+        return QSplitterHandle(self.orientation(), self)
+
+class QSplitterHandle(QtWidgets.QSplitterHandle):
+
+    def __init__(self, orientation, parent):
+        super(QSplitterHandle, self).__init__(orientation, parent)
+        self.hovered = False
+        self.pressed = False
+
+    def enterEvent(self, event):
+        self.hovered = True
+        self.update()
+
+    def leaveEvent(self, event):
+        self.hovered = False
+        self.pressed = False
+        self.update()
+
+    def mousePressEvent(self, event):
+        self.pressed = True
+        self.update()
+
+    def mouseReleaseEvent(self, event):
+        self.pressed = False
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        if self.hovered and not self.pressed:
+            painter.fillRect(self.rect(), QtGui.QColor(245,245,255,30))
+        elif self.pressed:
+            painter.fillRect(self.rect(), QtGui.QColor(0,0,10,30))
+        else:
+            painter.fillRect(self.rect(), QtGui.QColor("#292930"))
+

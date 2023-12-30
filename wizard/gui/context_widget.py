@@ -165,7 +165,6 @@ class context_widget(QtWidgets.QFrame):
             else:
                 self.work_env_changed_signal.emit(0)
                 self.hide_init_work_env_button()
-            self.refresh_string_asset_label()
             self.refresh_extension_hard()
 
     def refresh_extension_hard(self):
@@ -213,13 +212,6 @@ class context_widget(QtWidgets.QFrame):
                 subtasks_library.archive_variant(self.variant_row['id'])        
         else:
             logger.warning("No variant found")
-
-    def refresh_string_asset_label(self):
-        if self.work_env_row is not None and self.variant_row is not None:
-            string_asset = assets.instance_to_string(('work_env', self.work_env_row['id']))
-            self.string_asset_label.setText(string_asset)
-        else:
-            self.string_asset_label.setText('')
 
     def open_work_env_folder(self):
         if self.work_env_row is not None and self.variant_row is not None:
@@ -317,12 +309,6 @@ class context_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.export_extension_comboBox)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.string_asset_label = QtWidgets.QLabel()
-        self.string_asset_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self.main_layout.addWidget(self.string_asset_label)
-
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(8,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open work environment folder")
