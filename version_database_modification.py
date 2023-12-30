@@ -48,6 +48,13 @@ def main():
 	sql_cmd = f"""ALTER TABLE stages ADD COLUMN IF NOT EXISTS start_date real NOT NULL DEFAULT {start_date};"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
 
+	sql_cmd = f"""ALTER TABLE references_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+	sql_cmd = f"""ALTER TABLE grouped_references_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+	sql_cmd = f"""ALTER TABLE referenced_groups_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+
 def fix_stages_duration():
 	stage_rows = project.get_all_stages()
 	for stage in stage_rows:

@@ -260,7 +260,7 @@ class references_widget(QtWidgets.QWidget):
                                                             self.group_item)
                 self.referenced_group_ids[referenced_group_row['id']] = referenced_group_item
             else:
-                self.referenced_group_ids[referenced_group_row['id']].update(group_row)
+                self.referenced_group_ids[referenced_group_row['id']].update(group_row, referenced_group_row)
 
         referenced_group_list_ids = list(self.referenced_group_ids.keys())
         for referenced_group_id in referenced_group_list_ids:
@@ -620,7 +620,17 @@ class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.type = 'group'
         self.referenced_group_row = referenced_group_row
         self.group_row = group_row
+        self.build_ui()
+        self.connect_functions()
         self.fill_ui()
+
+    def connect_functions(self):
+        self.activated_checkbox.stateChanged.connect(self.modify_activation)
+
+    def build_ui(self):
+        self.activated_checkbox = QtWidgets.QCheckBox()
+        self.activated_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 7, self.activated_checkbox)
 
     def fill_ui(self):
         self.setText(0, self.referenced_group_row['group_name'])
@@ -630,12 +640,21 @@ class custom_referenced_group_tree_item(QtWidgets.QTreeWidgetItem):
         self.setFont(1, bold_font)
         self.setIcon(0, gui_utils.QIcon_from_svg(ressources._group_icon_,
                                                     self.group_row['color']))
-        self.on_off_checkbox = QtWidgets.QCheckBox()
-        self.on_off_checkbox.setStyleSheet('background-color:transparent;')
-        self.treeWidget().setItemWidget(self, 7, self.on_off_checkbox)
+        self.set_activated(self.referenced_group_row['activated'])
 
-    def update(self, group_row):
+    def set_activated(self, activated):
+        self.apply_activation_change = False
+        self.activated_checkbox.setChecked(activated)
+        self.apply_activation_change = True
+
+    def modify_activation(self, activated):
+        if self.apply_activation_change:
+            project.modify_referenced_group_activation(self.referenced_group_row['id'], activated)
+            gui_server.refresh_team_ui()
+
+    def update(self, group_row, referenced_group_row):
         self.group_row = group_row
+        self.referenced_group_row = referenced_group_row
         self.fill_ui()
 
 class signal_handler(QtCore.QObject):
@@ -678,9 +697,9 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.state_widget = state_widget()
         self.treeWidget().setItemWidget(self, 6, self.state_widget)
 
-        self.on_off_checkbox = QtWidgets.QCheckBox()
-        self.on_off_checkbox.setStyleSheet('background-color:transparent;')
-        self.treeWidget().setItemWidget(self, 7, self.on_off_checkbox)
+        self.activated_checkbox = QtWidgets.QCheckBox()
+        self.activated_checkbox.setStyleSheet('background-color:transparent;')
+        self.treeWidget().setItemWidget(self, 7, self.activated_checkbox)
 
         self.setText(8, str(self.reference_row['id']))
         self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
@@ -689,6 +708,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.export_widget.setText(infos_list[1])
         self.version_widget.setText(infos_list[2])
         self.set_auto_update(infos_list[4])
+        self.set_activated(infos_list[8])
         self.setText(0, infos_list[5])
         self.stage_row = infos_list[6]
         self.state_widget.set_state(self.stage_row['state'])
@@ -712,6 +732,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_widget.button_clicked.connect(self.version_modification_requested)
         self.export_widget.button_clicked.connect(self.export_modification_requested)
         self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
+        self.activated_checkbox.stateChanged.connect(self.modify_activation)
         self.state_widget.enter.connect(self.show_comment)
         self.state_widget.leave.connect(self.signal_handler.leave.emit)
         self.state_widget.move_event.connect(self.signal_handler.move_event.emit)
@@ -753,12 +774,25 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             self.version_widget.unhide_button()
         self.apply_auto_update_change = True
 
+    def set_activated(self, activated):
+        self.apply_activation_change = False
+        self.activated_checkbox.setChecked(activated)
+        self.apply_activation_change = True
+
     def modify_auto_update(self, auto_update):
         if self.apply_auto_update_change:
             if self.context == 'work_env':
                 project.modify_reference_auto_update(self.reference_row['id'], auto_update)
             else:
                 project.modify_grouped_reference_auto_update(self.reference_row['id'], auto_update)
+            gui_server.refresh_team_ui()
+
+    def modify_activation(self, activated):
+        if self.apply_activation_change:
+            if self.context == 'work_env':
+                project.modify_reference_activation(self.reference_row['id'], activated)
+            else:
+                project.modify_grouped_reference_activation(self.reference_row['id'], activated)
             gui_server.refresh_team_ui()
 
     def modify_version(self, export_version_id):
@@ -870,7 +904,8 @@ class reference_infos_thread(QtCore.QThread):
                                                         reference_row['auto_update'],
                                                         asset_name,
                                                         stage_row,
-                                                        extension])
+                                                        extension,
+                                                        reference_row['activated']])
         except:
             logger.error(str(traceback.format_exc()))
 

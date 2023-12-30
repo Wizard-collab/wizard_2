@@ -1126,7 +1126,7 @@ def get_work_env_data_by_string(string, column='*'):
         return
     return work_env_rows[0]
 
-def create_reference(work_env_id, export_version_id, namespace, count=None, auto_update=0):
+def create_reference(work_env_id, export_version_id, namespace, count=None, auto_update=0, activated=1):
     export_id = get_export_version_data(export_version_id, 'export_id')
     stage_name = get_stage_data(get_export_data(export_id, 'stage_id'),
                                     'name')
@@ -1146,7 +1146,8 @@ def create_reference(work_env_id, export_version_id, namespace, count=None, auto
                                 'work_env_id',
                                 'export_id',
                                 'export_version_id',
-                                'auto_update'),
+                                'auto_update',
+                                'activated'),
                             (time.time(),
                                 environment.get_user(),
                                 namespace,
@@ -1155,7 +1156,8 @@ def create_reference(work_env_id, export_version_id, namespace, count=None, auto
                                 work_env_id,
                                 export_id,
                                 export_version_id,
-                                auto_update))
+                                auto_update,
+                                activated))
     if not reference_id:
         return
     logger.info(f"Reference created")
@@ -1217,20 +1219,6 @@ def get_reference_by_namespace(work_env_id, namespace, column='*'):
         return
     return reference_rows[0]
 
-'''
-def modify_reference_variant(reference_id, variant_id):
-    exports_list = get_variant_export_childs(variant_id, 'id')
-    if exports_list is None or exports_list == []:
-        logger.warning("No export found")
-        return
-    export_id = exports_list[0]
-    export_version_id = get_default_export_version(export_id, 'id')
-    if export_version_id:
-        update_reference_data(reference_id, ('export_id', export_id))
-        update_reference_data(reference_id, ('export_version_id', export_version_id))
-    return 1
-'''
-
 def modify_reference_export(reference_id, export_id):
     export_version_id = get_default_export_version(export_id, 'id')
     if export_version_id:
@@ -1250,6 +1238,11 @@ def modify_reference_auto_update(reference_id, auto_update):
         update_reference_data(reference_id, ('export_version_id', export_version_id))
     return 1
 
+def modify_reference_activation(reference_id, activated):
+    if activated:
+        activated = 1
+    return update_reference_data(reference_id, ('activated', activated))
+
 def update_reference_data(reference_id, data_tuple):
     if not db_utils.update_data('project',
                         'references_data',
@@ -1257,6 +1250,15 @@ def update_reference_data(reference_id, data_tuple):
                         ('id', reference_id)):
         return
     logger.info('Reference modified')
+    return 1
+
+def update_referenced_group_data(referenced_group_id, data_tuple):
+    if not db_utils.update_data('project',
+                        'referenced_groups_data',
+                        data_tuple,
+                        ('id', referenced_group_id)):
+        return
+    logger.info('Referenced group modified')
     return 1
 
 def update_reference(reference_id, export_version_id):
@@ -2198,7 +2200,7 @@ def remove_group(group_id):
     logger.info(f"Group removed from project")
     return 1
 
-def create_referenced_group(work_env_id, group_id, namespace, count=None):
+def create_referenced_group(work_env_id, group_id, namespace, count=None, activated=1):
     group_name = get_group_data(group_id, 'name')
     if (db_utils.check_existence_by_multiple_data('project', 
                                     'referenced_groups_data',
@@ -2214,14 +2216,16 @@ def create_referenced_group(work_env_id, group_id, namespace, count=None):
                                 'count',
                                 'group_id',
                                 'group_name',
-                                'work_env_id'),
+                                'work_env_id',
+                                'activated'),
                             (time.time(),
                                 environment.get_user(),
                                 namespace,
                                 count,
                                 group_id,
                                 group_name,
-                                work_env_id))
+                                work_env_id,
+                                activated))
     if not referenced_group_id:
         return
     logger.info(f"Referenced group created")
@@ -2283,7 +2287,7 @@ def get_referenced_group_by_namespace(work_env_id, namespace, column='*'):
         return
     return referenced_groups_rows[0]
 
-def create_grouped_reference(group_id, export_version_id, namespace, count=None, auto_update=0):
+def create_grouped_reference(group_id, export_version_id, namespace, count=None, auto_update=0, activated=1):
     export_id = get_export_version_data(export_version_id, 'export_id')
     stage_name = get_stage_data(get_export_data(export_id, 'stage_id'),
                                                     'name')
@@ -2303,7 +2307,8 @@ def create_grouped_reference(group_id, export_version_id, namespace, count=None,
                                 'group_id',
                                 'export_id',
                                 'export_version_id',
-                                'auto_update'),
+                                'auto_update',
+                                'activated'),
                             (time.time(),
                                 environment.get_user(),
                                 namespace,
@@ -2312,7 +2317,8 @@ def create_grouped_reference(group_id, export_version_id, namespace, count=None,
                                 group_id,
                                 export_id,
                                 export_version_id,
-                                auto_update))
+                                auto_update,
+                                activated))
     if not reference_id:
         return
     logger.info(f"Grouped reference created")
@@ -2393,6 +2399,16 @@ def modify_grouped_reference_auto_update(grouped_reference_id, auto_update):
         return
     update_grouped_reference_data(grouped_reference_id, ('export_version_id', export_version_id))
     return 1
+
+def modify_grouped_reference_activation(grouped_reference_id, activated):
+    if activated:
+        activated = 1
+    return update_grouped_reference_data(grouped_reference_id, ('activated', activated))
+
+def modify_referenced_group_activation(referenced_group_id, activated):
+    if activated:
+        activated = 1
+    return update_referenced_group_data(referenced_group_id, ('activated', activated))
 
 def search_group(name, column='*'):
     groups_rows = db_utils.get_row_by_column_part_data('project',
@@ -2796,6 +2812,7 @@ def create_references_table(database):
                                         export_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         auto_update integer NOT NULL,
+                                        activated integer NOT NULL,
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id),
                                         FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)
@@ -2815,6 +2832,7 @@ def create_referenced_groups_table(database):
                                         group_id integer NOT NULL,
                                         group_name text NOT NULL,
                                         work_env_id integer NOT NULL,
+                                        activated integer NOT NULL,
                                         FOREIGN KEY (group_id) REFERENCES groups (id),
                                         FOREIGN KEY (work_env_id) REFERENCES work_envs (id)
                                     );"""
@@ -2835,6 +2853,7 @@ def create_grouped_references_table(database):
                                         export_id integer NOT NULL,
                                         export_version_id integer NOT NULL,
                                         auto_update integer NOT NULL,
+                                        activated integer NOT NULL,
                                         FOREIGN KEY (group_id) REFERENCES groups (id),
                                         FOREIGN KEY (export_id) REFERENCES exports (id),
                                         FOREIGN KEY (export_version_id) REFERENCES export_versions (id)

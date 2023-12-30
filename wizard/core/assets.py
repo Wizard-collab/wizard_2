@@ -490,7 +490,8 @@ def create_references_from_stage_id(work_env_id, stage_id):
 def create_reference(work_env_id,
                         export_version_id,
                         namespace_and_count=None,
-                        auto_update=None):
+                        auto_update=None,
+                        activated=1):
     if auto_update is None:
         auto_update = user.user().get_reference_auto_update_default()
     if not namespace_and_count:
@@ -502,7 +503,8 @@ def create_reference(work_env_id,
                                 export_version_id,
                                 namespace,
                                 count,
-                                int(auto_update))
+                                int(auto_update),
+                                activated)
     work_env_row = project.get_work_env_data(work_env_id)
     variant_row = project.get_variant_data(work_env_row['variant_id'])
     stage_name = project.get_stage_data(variant_row['stage_id'], 'name')
@@ -549,29 +551,6 @@ def numbered_namespace(work_env_id, export_version_id, namespace_to_update=None)
         namespace = f"{namespace_raw}_{str(count)}"
     return namespace, count
 
-'''
-def modify_reference_variant(reference_id, variant_id):
-    reference_row = project.get_reference_data(reference_id)
-    old_variant_id = project.get_export_data(reference_row['export_id'], 'variant_id')
-    if old_variant_id == variant_id:
-        return
-    exports_list = project.get_variant_export_childs(variant_id, 'id')
-    if exports_list is None or exports_list == []:
-        logger.warning("No export found")
-        return
-    export_id = exports_list[0]
-    export_version_id = project.get_default_export_version(export_id, 'id')
-    new_namespace, new_count = numbered_namespace(reference_row['work_env_id'], export_version_id, namespace_to_update=reference_row['namespace'])
-    if export_version_id:
-        project.update_reference_data(reference_id, ('export_id', export_id))
-        project.update_reference_data(reference_id, ('export_version_id', export_version_id))
-        if new_namespace != reference_row['namespace']:
-            project.update_reference_data(reference_id, ('namespace', new_namespace))
-        if new_count != reference_row['count']:
-            project.update_reference_data(reference_id, ('count', new_count))
-    return 1
-'''
-
 def remove_reference(reference_id):
     return project.remove_reference(reference_id)
 
@@ -607,6 +586,8 @@ def get_references_files(work_env_id):
     references_rows = project.get_references(work_env_id)
     references_dic = dict()
     for reference_row in references_rows:
+        if not reference_row['activated']:
+            continue
         reference_files_list = json.loads(project.get_export_version_data(reference_row['export_version_id'],
                                                                             'files'))
         if reference_files_list == []:
@@ -632,8 +613,12 @@ def get_references_files(work_env_id):
         references_dic[reference_row['stage']].append(reference_dic)
     referenced_groups_rows = project.get_referenced_groups(work_env_id)
     for referenced_group_row in referenced_groups_rows:
+        if not referenced_group_row['activated']:
+            continue
         grouped_references_rows = project.get_grouped_references(referenced_group_row['group_id'])
         for grouped_reference_row in grouped_references_rows:
+            if not grouped_reference_row['activated']:
+                continue
             reference_files_list = json.loads(project.get_export_version_data(grouped_reference_row['export_version_id'],
                                                                                 'files'))
             if reference_files_list == []:
@@ -993,24 +978,28 @@ def mirror_references(work_env_id, destination_work_env_id):
         create_reference(destination_work_env_id,
                                 reference_row['export_version_id'],
                                 namespace_and_count=[reference_row['namespace'], reference_row['count']],
-                                auto_update=reference_row['auto_update'])
+                                auto_update=reference_row['auto_update'],
+                                activated=reference_row['activated'])
 
 def duplicate_reference(reference_id):
     reference_row = project.get_reference_data(reference_id)
     create_reference(reference_row['work_env_id'],
                             reference_row['export_version_id'],
-                            auto_update=reference_row['auto_update'])
+                            auto_update=reference_row['auto_update'],
+                            activated=reference_row['activated'])
 
 def duplicate_grouped_reference(grouped_reference_id):
     grouped_reference_row = project.get_grouped_reference_data(grouped_reference_id)
     create_grouped_reference(grouped_reference_row['group_id'],
                             grouped_reference_row['export_version_id'],
-                            auto_update=grouped_reference_row['auto_update'])
+                            auto_update=grouped_reference_row['auto_update'],
+                            activated=grouped_reference_row['activated'])
 
 def duplicate_referenced_group(referenced_group_id):
     referenced_group_row = project.get_referenced_group_data(referenced_group_id)
     create_referenced_group(referenced_group_row['work_env_id'],
-                            referenced_group_row['group_id'])
+                            referenced_group_row['group_id'],
+                            activated=referenced_group_row['activated'])
 
 def modify_version_comment(version_id, comment=''):
     if not project.modify_version_comment(version_id, comment):
@@ -1119,7 +1108,7 @@ def create_group(name, color='#798fe8'):
 def remove_group(group_id):
     return project.remove_group(group_id)
 
-def create_referenced_group(work_env_id, group_id):
+def create_referenced_group(work_env_id, group_id, activated=1):
     namespaces_list = project.get_referenced_groups(work_env_id, 'namespace')
     count = 0
     namespace_raw = project.get_group_data(group_id, 'name')
@@ -1130,7 +1119,8 @@ def create_referenced_group(work_env_id, group_id):
     return project.create_referenced_group(work_env_id,
                                             group_id,
                                             namespace,
-                                            count)
+                                            count, 
+                                            activated)
 
 def remove_referenced_group(referenced_group_id):
     return project.remove_referenced_group(referenced_group_id)
@@ -1148,7 +1138,7 @@ def create_grouped_references_from_stage_id(group_id, stage_id):
             create_grouped_reference(group_id, export_version_id)
     return 1
 
-def create_grouped_reference(group_id, export_version_id, auto_update=0):
+def create_grouped_reference(group_id, export_version_id, auto_update=0, activated=1):
     namespaces_list = project.get_grouped_references(group_id, 'namespace')
     count = 0
     namespace_raw = build_namespace(export_version_id)
@@ -1160,7 +1150,8 @@ def create_grouped_reference(group_id, export_version_id, auto_update=0):
                                             export_version_id,
                                             namespace,
                                             count,
-                                            auto_update)
+                                            auto_update,
+                                            activated)
 
 def remove_grouped_reference(grouped_reference_id):
     return project.remove_grouped_reference(grouped_reference_id)
