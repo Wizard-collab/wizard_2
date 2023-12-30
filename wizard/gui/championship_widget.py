@@ -5,6 +5,7 @@
 # Python modules
 import json
 import time
+import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 
@@ -23,6 +24,8 @@ from wizard.core import artefacts
 from wizard.core import tools
 from wizard.vars import ressources
 from wizard.vars import game_vars
+
+logger = logging.getLogger(__name__)
 
 class championship_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -130,6 +133,7 @@ class championship_widget(QtWidgets.QWidget):
         self.level_amount.setObjectName('title_label_2')
         self.level_layout.addWidget(self.level_amount)
 
+
         self.purse_frame = QtWidgets.QFrame()
         self.purse_frame.setObjectName('dark_round_frame')
         self.purse_layout = QtWidgets.QHBoxLayout()
@@ -165,6 +169,8 @@ class championship_widget(QtWidgets.QWidget):
         self.users_championship_widget = users_championship_widget.users_championship_widget()
         self.tabs_widget.addTab(self.users_championship_widget, QtGui.QIcon(ressources._gold_icon_), 'Kingdom')
 
+
+
         self.inventory_widget = inventory_widget.inventory_widget()
         self.tabs_widget.addTab(self.inventory_widget, QtGui.QIcon(ressources._purse_icon_), 'Inventory')
         self.market_widget = market_widget.market_widget()
@@ -181,6 +187,8 @@ class championship_widget(QtWidgets.QWidget):
         self.participation_info_label = QtWidgets.QLabel()
         self.participation_info_label.setObjectName('orange_label')
         self.footer_layout.addWidget(self.participation_info_label)
+
+
 
         self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 

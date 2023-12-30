@@ -514,9 +514,6 @@ class main_widget(QtWidgets.QWidget):
 
         self.contents_widget.setSizes([300, 10000, 0])
 
-    def showEvent(self, event):
-        logger.info( self.contents_widget.sizes())
-
     def set_context(self):
         section_sizes = self.contents_widget.sizes()
         context_dic = dict()
