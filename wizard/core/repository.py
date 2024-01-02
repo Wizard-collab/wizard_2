@@ -887,7 +887,7 @@ def create_projects_table():
                                         project_password text NOT NULL,
                                         project_image text,
                                         creation_user text NOT NULL,
-                                        creation_time real NOT NULL
+                                        creation_time double precision NOT NULL
                                     );"""
     if not db_utils.create_table(environment.get_repository(), sql_cmd):
         return

@@ -66,8 +66,19 @@ class exports_widget(QtWidgets.QWidget):
         self.check_existence_thread = check_existence_thread()
         self.destination_manager = None
         self.build_ui()
+        self.start_timer()
         self.connect_functions()
         self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+
+    def start_timer(self):
+        self.timer = QtCore.QTimer(self)
+        self.timer.start(10000)
+
+    def update_times_ago(self):
+        for export_version_id in self.export_versions_ids.keys():
+            self.export_versions_ids[export_version_id].update_time_ago()
+        for export_id in self.export_ids.keys():
+            self.export_ids[export_id].update_time_ago()
 
     def dragEnterEvent(self, event):
         self.drop_widget.setVisible(1)
@@ -328,6 +339,8 @@ class exports_widget(QtWidgets.QWidget):
         self.manual_publish_button.clicked.connect(lambda:self.merge_files())
         self.folder_button.clicked.connect(self.open_folder)
         self.launch_button.clicked.connect(self.launch_work_version)
+
+        self.timer.timeout.connect(self.update_times_ago)
 
     def refresh_infos(self):
         self.versions_count_label.setText(f"{len(self.export_ids)} exports / {len(self.export_versions_ids)} export versions -")
@@ -591,6 +604,10 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         self.stage_icon = stage_icon
         self.type = 'export'
         self.fill_ui()
+        self.update_time_ago()
+
+    def update_time_ago(self):
+        self.setText(3, tools.time_ago_from_timestamp(self.export_row['creation_time']))
 
     def fill_ui(self):
         self.setText(0, self.export_row['name'])
@@ -599,7 +616,6 @@ class custom_export_tree_item(QtWidgets.QTreeWidgetItem):
         bold_font.setBold(True)
         self.setFont(0, bold_font)
         self.setText(2, self.export_row['creation_user'])
-        self.setText(3, tools.time_ago_from_timestamp(self.export_row['creation_time']))
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
         self.setText(9, str(self.export_row['id']))
@@ -625,6 +641,7 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
+        self.update_time_ago()
         self.signal_handler = signal_handler()
         self.connect_functions()
 
@@ -637,15 +654,16 @@ class custom_export_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.leave.connect(self.signal_handler.leave.emit)
         self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
+    def update_time_ago(self):
+        self.setText(3, tools.time_ago_from_timestamp(self.export_version_row['creation_time']))
+
     def fill_ui(self):
         self.setText(1, self.export_version_row['name'])
         bold_font=QtGui.QFont()
         bold_font.setBold(True)
         self.setIcon(0, QtGui.QIcon(ressources._exports_icon_))
-
         self.setFont(1, bold_font)
         self.setText(2, self.export_version_row['creation_user'])
-        self.setText(3, tools.time_ago_from_timestamp(self.export_version_row['creation_time']))
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.comment_label.setText(self.export_version_row['comment'])
         if self.export_version_row['software'] is not None:

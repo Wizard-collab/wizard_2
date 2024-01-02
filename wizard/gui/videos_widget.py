@@ -53,8 +53,19 @@ class videos_widget(QtWidgets.QWidget):
         self.list_mode = 1
 
         self.build_ui()
+        self.start_timer()
         self.connect_functions()
         self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+
+    def start_timer(self):
+        self.timer = QtCore.QTimer(self)
+        self.timer.start(10000)
+
+    def update_times_ago(self):
+        if self.icon_mode:
+            return
+        for video_id in self.video_list_ids.keys():
+            self.video_list_ids[video_id].update_time_ago()
 
     def dragEnterEvent(self, event):
         self.drop_widget.setVisible(1)
@@ -255,6 +266,8 @@ class videos_widget(QtWidgets.QWidget):
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.show_id_signal.connect(self.show_search_version)
         self.search_thread.hide_id_signal.connect(self.hide_search_version)
+
+        self.timer.timeout.connect(self.update_times_ago)
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -539,6 +552,7 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 3, self.comment_label)
         self.fill_ui()
+        self.update_time_ago()
         self.signal_handler = signal_handler()
         self.connect_functions()
 
@@ -551,6 +565,9 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.leave.connect(self.signal_handler.leave.emit)
         self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
+    def update_time_ago(self):
+        self.setText(2, tools.time_ago_from_timestamp(self.video_row['creation_time']))
+
     def fill_ui(self):
         self.setText(0, self.video_row['name'])
         bold_font=QtGui.QFont()
@@ -558,7 +575,6 @@ class custom_video_tree_item(QtWidgets.QTreeWidgetItem):
         self.setFont(0, bold_font)
         self.setIcon(0, QtGui.QIcon(ressources._file_icon_))
         self.setText(1, self.video_row['creation_user'])
-        self.setText(2, tools.time_ago_from_timestamp(self.video_row['creation_time']))
         self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
         self.comment_label.setText( self.video_row['comment'])
         self.setText(4, os.path.basename(self.video_row['file_path']))

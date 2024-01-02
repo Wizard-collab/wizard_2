@@ -2662,7 +2662,7 @@ def create_domains_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS domains_data (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL UNIQUE,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         string text NOT NULL
                                     );"""
@@ -2675,7 +2675,7 @@ def create_categories_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS categories (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         string text NOT NULL,
                                         domain_id integer NOT NULL,
@@ -2690,7 +2690,7 @@ def create_assets_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS assets (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         inframe integer NOT NULL,
                                         outframe integer NOT NULL,
@@ -2724,7 +2724,7 @@ def create_stages_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS stages (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         state text NOT NULL,
                                         assignment text,
@@ -2751,7 +2751,7 @@ def create_variants_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS variants (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
                                         default_work_env_id integer,
@@ -2767,7 +2767,7 @@ def create_variants_table(database):
 def create_asset_tracking_events_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS asset_tracking_events (
                                         id serial PRIMARY KEY,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         event_type text NOT NULL,
                                         data text NOT NULL,
@@ -2784,7 +2784,7 @@ def create_work_envs_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS work_envs (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         variant_id integer NOT NULL,
                                         lock_id integer,
@@ -2803,7 +2803,7 @@ def create_work_envs_table(database):
 def create_references_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS references_data (
                                         id serial PRIMARY KEY,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
                                         count text,
@@ -2825,7 +2825,7 @@ def create_references_table(database):
 def create_referenced_groups_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS referenced_groups_data (
                                         id serial PRIMARY KEY,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
                                         count text,
@@ -2844,7 +2844,7 @@ def create_referenced_groups_table(database):
 def create_grouped_references_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS grouped_references_data (
                                         id serial PRIMARY KEY,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         namespace text NOT NULL,
                                         count text,
@@ -2867,7 +2867,7 @@ def create_groups_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS groups (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         color text
                                     );"""
@@ -2880,7 +2880,7 @@ def create_exports_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS exports (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         stage_id integer NOT NULL,
                                         string text NOT NULL,
@@ -2896,7 +2896,7 @@ def create_versions_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS versions (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
                                         file_path text NOT NULL,
@@ -2915,7 +2915,7 @@ def create_videos_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS videos (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
                                         file_path text NOT NULL,
@@ -2932,7 +2932,7 @@ def create_export_versions_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS export_versions (
                                         id serial PRIMARY KEY,
                                         name text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         creation_user text NOT NULL,
                                         comment text,
                                         files text NOT NULL,
@@ -2999,7 +2999,7 @@ def create_events_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS events (
                                         id serial PRIMARY KEY,
                                         creation_user text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         type text NOT NULL,
                                         title text NOT NULL,
                                         message text NOT NULL,
@@ -3015,7 +3015,7 @@ def create_events_table(database):
 def create_progress_events_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS progress_events (
                                         id serial PRIMARY KEY,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         day text NOT NULL,
                                         type text NOT NULL,
                                         name text NOT NULL,
@@ -3030,7 +3030,7 @@ def create_tag_groups_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS tag_groups (
                                         id serial PRIMARY KEY,
                                         creation_user text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         name text NOT NULL,
                                         user_ids text NOT NULL
                                     );"""
@@ -3043,7 +3043,7 @@ def create_assets_groups_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS assets_groups (
                                         id serial PRIMARY KEY,
                                         creation_user text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         name text NOT NULL,
                                         color text NOT NULL,
                                         category_id integer NOT NULL,
@@ -3058,7 +3058,7 @@ def create_shelf_scripts_table(database):
     sql_cmd = """ CREATE TABLE IF NOT EXISTS shelf_scripts (
                                         id serial PRIMARY KEY,
                                         creation_user text NOT NULL,
-                                        creation_time real NOT NULL,
+                                        creation_time double precision NOT NULL,
                                         name text NOT NULL,
                                         py_file text,
                                         help text,

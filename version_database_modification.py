@@ -43,6 +43,7 @@ from wizard.core import db_utils
 
 def main():
 	fix_artefacts()
+	fix_time_stamps()
 	project.create_assets_groups_table(environment.get_project_name())
 	sql_cmd = """ALTER TABLE assets ADD COLUMN IF NOT EXISTS assets_group_id integer REFERENCES assets_groups (id);"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
@@ -74,3 +75,17 @@ def fix_artefacts():
 		for artefact in artefacts_list:
 			artefacts_dic[time.time()] = artefact
 		repository.modify_user_artefacts(user, artefacts_dic)
+
+def fix_time_stamps():
+	for table in ['domains_data', 'categories', 'assets',
+				'stages', 'variants', 'asset_tracking_events',
+				'work_envs', 'references_data', 'referenced_groups_data',
+				'grouped_references_data', 'groups', 'exports',
+				'versions', 'videos', 'export_versions', 'events',
+				'progress_events', 'tag_groups', 'assets_groups',
+				'shelf_scripts']:
+		sql_cmd = f"ALTER TABLE {table} ALTER COLUMN creation_time TYPE double precision;"
+		db_utils.create_table(environment.get_project_name(), sql_cmd)
+	for table in ['projects']:
+		sql_cmd = f"ALTER TABLE {table} ALTER COLUMN creation_time TYPE double precision;"
+		db_utils.create_table(environment.get_repository(), sql_cmd)

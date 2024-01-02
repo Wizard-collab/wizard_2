@@ -652,7 +652,7 @@ def get_export_files_list(export_version_id):
     return files_list
 
 def merge_file_as_export_version(export_name, files, stage_id, comment='', analyse_comment=True):
-    return add_export_version(export_name, files, stage_id, comment, analyse_comment, skip_temp_purge=True)
+    return add_export_version(export_name, files, stage_id, version_id=None, comment=comment, analyse_comment=analyse_comment, skip_temp_purge=True)
 
 def add_export_version_from_version_id(export_name, files, version_id, comment='', analyse_comment=True):
     work_env_row = project.get_work_env_data(project.get_version_data(version_id, 'work_env_id'))

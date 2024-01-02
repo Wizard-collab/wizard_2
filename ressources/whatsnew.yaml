@@ -12,6 +12,12 @@
   - !!python/tuple
     - new
     - Resizeable outliner and wall widget
+  - !!python/tuple
+    - new
+    - User artefacts now expires in 5 days
+  - !!python/tuple
+    - debug
+    - Fixed timestamps storing for versions, exports and videos
   time: 1703670899.5258627
 '3.5.7.299':
   update_list:

@@ -56,8 +56,19 @@ class versions_widget(QtWidgets.QWidget):
         self.list_mode = 1
 
         self.build_ui()
+        self.start_timer()
         self.connect_functions()
         self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+
+    def start_timer(self):
+        self.timer = QtCore.QTimer(self)
+        self.timer.start(10000)
+
+    def update_times_ago(self):
+        if self.icon_mode:
+            return
+        for version_id in self.version_list_ids.keys():
+            self.version_list_ids[version_id].update_time_ago()
 
     def dragEnterEvent(self, event):
         self.drop_widget.setVisible(1)
@@ -295,6 +306,8 @@ class versions_widget(QtWidgets.QWidget):
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.show_id_signal.connect(self.show_search_version)
         self.search_thread.hide_id_signal.connect(self.hide_search_version)
+
+        self.timer.timeout.connect(self.update_times_ago)
 
     def batch_export(self):
         selection = self.get_selection()
@@ -787,6 +800,7 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.setNoMultipleLines()
         self.treeWidget().setItemWidget(self, 4, self.comment_label)
         self.fill_ui()
+        self.update_time_ago()
         self.signal_handler = signal_handler()
         self.connect_functions()
 
@@ -799,6 +813,9 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.comment_label.leave.connect(self.signal_handler.leave.emit)
         self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
 
+    def update_time_ago(self):
+        self.setText(3, tools.time_ago_from_timestamp(self.version_row['creation_time']))
+
     def fill_ui(self):
         self.setText(0, self.version_row['name'])
         bold_font=QtGui.QFont()
@@ -807,7 +824,6 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.setIcon(0, QtGui.QIcon(ressources._file_icon_))
         self.setIcon(1, self.software_icon)
         self.setText(2, self.version_row['creation_user'])
-        self.setText(3, tools.time_ago_from_timestamp(self.version_row['creation_time']))
         self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
         self.comment_label.setText(self.version_row['comment'])
         self.setText(5, os.path.basename(self.version_row['file_path']))
