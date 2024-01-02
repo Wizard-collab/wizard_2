@@ -28,17 +28,21 @@
 
 # Python modules
 import traceback
+import json
+import time
 import logging
 
 logger = logging.getLogger(__name__)
 
 # Wizard modules
 from wizard.core import environment
+from wizard.core import repository
 from wizard.core import project
 from wizard.core import assets
 from wizard.core import db_utils
 
 def main():
+	fix_artefacts()
 	project.create_assets_groups_table(environment.get_project_name())
 	sql_cmd = """ALTER TABLE assets ADD COLUMN IF NOT EXISTS assets_group_id integer REFERENCES assets_groups (id);"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
@@ -59,3 +63,14 @@ def fix_stages_duration():
 	stage_rows = project.get_all_stages()
 	for stage in stage_rows:
 		assets.modify_stage_estimation(stage['id'], 3)
+
+def fix_artefacts():
+	for user in repository.get_user_names_list():
+		user_row = repository.get_user_row_by_name(user)
+		artefacts_list = json.loads(user_row['artefacts'])
+		if type(artefacts_list) == dict:
+			return
+		artefacts_dic = dict()
+		for artefact in artefacts_list:
+			artefacts_dic[time.time()] = artefact
+		repository.modify_user_artefacts(user, artefacts_dic)

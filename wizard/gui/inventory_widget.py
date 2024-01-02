@@ -4,6 +4,7 @@
 
 # Python modules
 import json
+import time
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 
@@ -16,6 +17,7 @@ from wizard.gui import artefact_interaction_widget
 from wizard.core import repository
 from wizard.core import environment
 from wizard.core import artefacts
+from wizard.core import tools
 from wizard.vars import ressources
 from wizard.vars import game_vars
 
@@ -25,10 +27,20 @@ class inventory_widget(QtWidgets.QWidget):
         self.artefacts = dict()
         self.artefact_interaction_widget = artefact_interaction_widget.artefact_interaction_widget()
         self.build_ui()
+        self.start_timer()
         self.connect_functions()
+
+    def start_timer(self):
+        self.timer = QtCore.QTimer(self)
+        self.timer.start(1000)
 
     def connect_functions(self):
         self.coins_widget.give_coins_signal.connect(self.give_coins)
+        self.timer.timeout.connect(self.update_times_left)
+
+    def update_times_left(self):
+        for time_id in self.artefacts.keys():
+            self.artefacts[time_id]['widget'].update_time_left()
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -61,25 +73,24 @@ class inventory_widget(QtWidgets.QWidget):
         self.coins_widget.refresh()
         self.artefact_interaction_widget.refresh()
         user_row = repository.get_user_row_by_name(environment.get_user())
-        artefacts_list = json.loads(user_row['artefacts'])
-        artefacts_set = list(set(artefacts_list))
-        for artefact in artefacts_set:
-            if artefact not in self.artefacts.keys():
+        artefacts_dic = json.loads(user_row['artefacts'])
+        for time_id, artefact in artefacts_dic.items():
+            if time_id not in self.artefacts.keys():
                 artefact_list_item = QtWidgets.QListWidgetItem('')
-                artefact_widget = artefact_item(artefact)
+                artefact_widget = artefact_item(artefact, time_id)
                 artefact_widget.use_artefact_signal.connect(self.use_artefact)
                 artefact_widget.give_artefact_signal.connect(self.give_artefact)
                 self.artefacts_view.addItem(artefact_list_item)
                 artefact_list_item.setSizeHint(artefact_widget.size())
                 self.artefacts_view.setItemWidget(artefact_list_item, artefact_widget)
-                self.artefacts[artefact] = dict()
-                self.artefacts[artefact]['item'] = artefact_list_item
-                self.artefacts[artefact]['widget'] = artefact_widget
-            self.artefacts[artefact]['widget'].update_number(artefacts_list.count(artefact))
-        existing_artefact_list = list(self.artefacts)
-        for artefact in existing_artefact_list:
-            if artefact not in artefacts_list:
-                self.remove_item(artefact)
+                self.artefacts[time_id] = dict()
+                self.artefacts[time_id]['artefact'] = artefact
+                self.artefacts[time_id]['item'] = artefact_list_item
+                self.artefacts[time_id]['widget'] = artefact_widget
+        existing_artefact_list = list(self.artefacts.keys())
+        for time_id in existing_artefact_list:
+            if time_id not in artefacts_dic.keys():
+                self.remove_item(time_id)
 
     def use_artefact(self, artefact):
         if game_vars.artefacts_dic[artefact]['type'] == 'attack':
@@ -114,15 +125,15 @@ class inventory_widget(QtWidgets.QWidget):
         gui_server.refresh_team_ui()
         gui_server.custom_popup(f"Inventory", f"You just gived {amount} coins to {user}", ressources._purse_icon_)
 
-    def remove_item(self, artefact):
-        if artefact not in self.artefacts.keys():
+    def remove_item(self, time_id):
+        if time_id not in self.artefacts.keys():
             return
-        item = self.artefacts[artefact]['item']
-        widget = self.artefacts[artefact]['widget']
+        item = self.artefacts[time_id]['item']
+        widget = self.artefacts[time_id]['widget']
         widget.setParent(None)
         widget.deleteLater()
         self.artefacts_view.takeItem(self.artefacts_view.row(item))
-        del self.artefacts[artefact]
+        del self.artefacts[time_id]
 
 class coins_item(QtWidgets.QFrame):
 
@@ -199,20 +210,18 @@ class artefact_item(QtWidgets.QFrame):
     use_artefact_signal = pyqtSignal(str)
     give_artefact_signal = pyqtSignal(str)
 
-    def __init__(self, artefact, parent=None):
+    def __init__(self, artefact, time_id, parent=None):
         super(artefact_item, self).__init__(parent)
         self.artefact = artefact
+        self.time_id = time_id
         self.artefact_dic = game_vars.artefacts_dic[artefact]
-        self.number = 0
         self.build_ui()
         self.connect_functions()
+        self.update_time_left()
 
-    def update_number(self, number):
-        self.number = number
-        self.fill_ui()
-
-    def fill_ui(self):
-        self.number_label.setText(f"x{self.number}")
+    def update_time_left(self):
+        seconds_left = tools.time_left_from_timestamp(float(self.time_id)+game_vars._artefact_expiration_)
+        self.time_left_label.setText(seconds_left)
 
     def build_ui(self):
         icon = QtGui.QIcon(self.artefact_dic['icon'])
@@ -250,17 +259,16 @@ class artefact_item(QtWidgets.QFrame):
         self.type_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.content_layout.addWidget(self.type_label)
 
+        self.time_left_label = QtWidgets.QLabel()
+        self.time_left_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.content_layout.addWidget(self.time_left_label)
+
         self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setContentsMargins(0,0,0,0)
         self.button_layout.setSpacing(2)
         self.content_layout.addLayout(self.button_layout)
-
-        self.number_label = QtWidgets.QLabel()
-        self.number_label.setObjectName('title_label_2')
-        self.number_label.setStyleSheet('color:#f2c96b')
-        self.button_layout.addWidget(self.number_label)
 
         self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
@@ -351,3 +359,31 @@ class give_coins_widget(QtWidgets.QDialog):
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
         self.close_pushButton.clicked.connect(self.reject)
+
+class refresh_thread(QtCore.QThread):
+
+    refresh_signal = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(refresh_thread, self).__init__(parent)
+        self.running = True
+
+    def run(self):
+        try:
+            while self.running:
+                refresh_ui = 0
+                if artefacts.check_keeped_artefacts_expiration():
+                    refresh_ui = 1
+                if artefacts.check_artefacts_expiration():
+                    refresh_ui = 1
+                if refresh_ui:
+                    self.refresh_signal.emit(1)
+                for a in range(5):
+                    if not self.running:
+                        break
+                    time.sleep(1)
+        except:
+            logger.error(str(traceback.format_exc()))
+
+    def stop(self):
+        self.running = False

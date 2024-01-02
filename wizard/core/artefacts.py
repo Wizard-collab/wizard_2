@@ -34,18 +34,30 @@ def buy_artefact(artefact_name):
 	if game_vars.artefacts_dic[artefact_name]['price'] > user_row['coins']:
 		logger.warning(f'Not enough coins to buy this artefact : {artefact_name}')
 		return
-	current_artefacts = json.loads(user_row['artefacts'])
-	if (current_artefacts.count(artefact_name) + stock == game_vars.artefacts_dic[artefact_name]['stock'])\
+	current_artefacts_dic = json.loads(user_row['artefacts'])
+	count = list(current_artefacts_dic.values()).count(artefact_name)
+	if count + stock == game_vars.artefacts_dic[artefact_name]['stock']\
 			and (stock == 1)\
 			and (game_vars.artefacts_dic[artefact_name]['stock'] > 1):
 		logger.warning(f"You can't buy all the artefacts.")
 		return
-	current_artefacts.append(artefact_name)
-	if not repository.modify_user_artefacts(environment.get_user(), current_artefacts):
+	current_artefacts_dic[time.time()] = artefact_name
+	if not repository.modify_user_artefacts(environment.get_user(), current_artefacts_dic):
 		return
 	repository.remove_artefact_stock(artefact_name)
 	repository.modify_user_coins(environment.get_user(), user_row['coins']-game_vars.artefacts_dic[artefact_name]['price'])
 	return 1
+
+def remove_artefact_from_dic(artefact_name, artefacts_dic):
+	for key in artefacts_dic.keys():
+		if artefacts_dic[key] == artefact_name:
+			del artefacts_dic[key]
+			return artefacts_dic
+
+def get_artefact_key(artefact_name, artefacts_dic):
+	for key in artefacts_dic.keys():
+		if artefacts_dic[key] == artefact_name:
+			return key
 
 def give_artefact(artefact_name, destination_user):
 	user_row = repository.get_user_row_by_name(environment.get_user())
@@ -55,16 +67,17 @@ def give_artefact(artefact_name, destination_user):
 		return
 	if artefact_name not in game_vars.artefacts_dic.keys():
 		return
-	artefacts_list = json.loads(user_row['artefacts'])
-	if artefact_name not in artefacts_list:
+	artefacts_dic = json.loads(user_row['artefacts'])
+	if artefact_name not in artefacts_dic.values():
 		logger.warning(f"You don't have this artefact : {artefact_name}")
 		return
-	artefacts_list.remove(artefact_name)
-	if not repository.modify_user_artefacts(environment.get_user(), artefacts_list):
+	artefact_time_id = get_artefact_key(artefact_name, artefacts_dic)
+	artefacts_dic = remove_artefact_from_dic(artefact_name, artefacts_dic)
+	if not repository.modify_user_artefacts(environment.get_user(), artefacts_dic):
 		return
-	destination_user_artefacts_list = json.loads(repository.get_user_row_by_name(destination_user, 'artefacts'))
-	destination_user_artefacts_list.append(artefact_name)
-	if not repository.modify_user_artefacts(destination_user, destination_user_artefacts_list):
+	destination_user_artefacts_dic = json.loads(repository.get_user_row_by_name(destination_user, 'artefacts'))
+	destination_user_artefacts_dic[artefact_time_id] = artefact_name
+	if not repository.modify_user_artefacts(destination_user, destination_user_artefacts_dic):
 		return
 	logger.info(f"{artefact_name} given to {destination_user}")
 
@@ -100,11 +113,11 @@ def use_artefact(artefact_name, destination_user=None):
 		keeped_artefacts_dic[str(time.time())] = artefact_name
 		repository.modify_keeped_artefacts(environment.get_user(), keeped_artefacts_dic)
 	user_row = repository.get_user_row_by_name(environment.get_user())
-	artefacts_list = json.loads(user_row['artefacts'])
-	if artefact_name not in artefacts_list:
+	artefacts_dic = json.loads(user_row['artefacts'])
+	if artefact_name not in artefacts_dic.values():
 		logger.warning(f"You don't have this artefact : {artefact_name}")
 		return
-	artefact_index = artefacts_list.index(artefact_name)
+	artefact_time_id = get_artefact_key(artefact_name, artefacts_dic)
 	if game_vars.artefacts_dic[artefact_name]['type'] == 'attack':
 		
 		user_participation = repository.get_user_row_by_name(destination_user, 'championship_participation')
@@ -124,8 +137,8 @@ def use_artefact(artefact_name, destination_user=None):
 		
 	if 'heal' in artefact_name:
 		heal(game_vars.artefacts_dic[artefact_name]['amount'])
-	artefacts_list.pop(artefact_index)
-	if not repository.modify_user_artefacts(environment.get_user(), artefacts_list):
+	artefacts_dic = remove_artefact_from_dic(artefact_name, artefacts_dic)
+	if not repository.modify_user_artefacts(environment.get_user(), artefacts_dic):
 		return
 	repository.add_artefact_stock(artefact_name)
 	return 1
@@ -155,6 +168,23 @@ def check_keeped_artefacts_expiration():
 	if not update:
 		return
 	repository.modify_keeped_artefacts(environment.get_user(), user_keeped_artefacts)
+	return 1
+
+def check_artefacts_expiration():
+	user_row = repository.get_user_row_by_name(environment.get_user())
+	user_artefacts = json.loads(user_row['artefacts'])
+	time_ids = list(user_artefacts.keys())
+	update = 0
+	for time_id in time_ids:
+		artefact = user_artefacts[time_id]
+		if time.time() > float(time_id) + game_vars._artefact_expiration_:
+			logger.info(f"{game_vars.artefacts_dic[artefact]['name']} is expired")
+			del user_artefacts[time_id]
+			update = 1
+	if not update:
+		return
+	logger.info(user_artefacts)
+	repository.modify_user_artefacts(environment.get_user(), user_artefacts)
 	return 1
 
 def heal(amount):

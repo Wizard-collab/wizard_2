@@ -35,8 +35,7 @@ import traceback
 import shutil
 import tempfile
 import time
-#import datetime
-from datetime import datetime, timezone
+import datetime
 import logging
 import psutil
 
@@ -60,7 +59,7 @@ def convert_time(time_float):
     return day, hour
 
 def get_month(time_float):
-    return datetime.fromtimestamp(time_float).strftime('%b')
+    return datetime.datetime.fromtimestamp(time_float).strftime('%b')
 
 def get_day(time_float):
     return time.strftime('%d', time.localtime(time_float))
@@ -71,7 +70,7 @@ def get_time_float_from_string_date(date_string):
         day = int(time_tokens[0])
         month = int(time_tokens[1])
         year = int(time_tokens[2])
-        dt = datetime(year=year, month=month, day=day)
+        dt = datetime.datetime(year=year, month=month, day=day)
         time_float = time.mktime(dt.timetuple())
         return time_float
     except:
@@ -79,12 +78,15 @@ def get_time_float_from_string_date(date_string):
         return
 
 def time_ago_from_timestamp(timestamp):
-    now = datetime.utcfromtimestamp(time.time())
-    timestamp_datetime = datetime.utcfromtimestamp(timestamp)
+    now = datetime.datetime.utcfromtimestamp(time.time())
+    timestamp_datetime = datetime.datetime.utcfromtimestamp(timestamp)
 
     time_diff = now - timestamp_datetime
     days = time_diff.days
     seconds = time_diff.seconds
+
+    if time_diff < datetime.timedelta(0):
+        return "Now"
 
     if days > 6:
         weeks = days // 7
@@ -99,6 +101,31 @@ def time_ago_from_timestamp(timestamp):
         return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
     else:
         return f"{seconds} second{'s' if seconds > 1 else ''} ago"
+
+def time_left_from_timestamp(timestamp):
+    now = datetime.datetime.utcfromtimestamp(time.time())
+    timestamp_datetime = datetime.datetime.utcfromtimestamp(timestamp)
+
+    time_diff = timestamp_datetime - now 
+    days = time_diff.days
+    seconds = time_diff.seconds
+
+    if time_diff < datetime.timedelta(0):
+        return "0 seconds left"
+
+    if days > 6:
+        weeks = days // 7
+        return f"{weeks} week{'s' if weeks > 1 else ''} left"
+    elif days > 0:
+        return f"{days} day{'s' if days > 1 else ''} left"
+    elif seconds >= 3600:
+        hours = seconds // 3600
+        return f"{hours} hour{'s' if hours > 1 else ''} left"
+    elif seconds >= 60:
+        minutes = seconds // 60
+        return f"{minutes} minute{'s' if minutes > 1 else ''} left"
+    else:
+        return f"{seconds} second{'s' if seconds > 1 else ''} left"
 
 def convert_seconds(time_float):
     hours = int(time_float/3600)

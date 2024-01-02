@@ -5,6 +5,7 @@
 # Python modules
 import json
 import time
+import traceback
 import logging
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
@@ -383,16 +384,21 @@ class refresh_thread(QtCore.QThread):
         self.running = True
 
     def run(self):
-        while self.running:
-            refresh_ui = 0
-            if artefacts.check_keeped_artefacts_expiration():
-                refresh_ui = 1
-            if refresh_ui:
-                self.refresh_signal.emit(1)
-            for a in range(5):
-                if not self.running:
-                    break
-                time.sleep(1)
+        try:
+            while self.running:
+                refresh_ui = 0
+                if artefacts.check_keeped_artefacts_expiration():
+                    refresh_ui = 1
+                if artefacts.check_artefacts_expiration():
+                    refresh_ui = 1
+                if refresh_ui:
+                    self.refresh_signal.emit(1)
+                for a in range(5):
+                    if not self.running:
+                        break
+                    time.sleep(1)
+        except:
+            logger.error(str(traceback.format_exc()))
 
     def stop(self):
         self.running = False

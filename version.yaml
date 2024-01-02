@@ -1,7 +1,7 @@
-BUILDS: 300
+BUILDS: 302
 MAJOR: 3
 MINOR: 6
 PATCH: 0
-builds: 300
-date: 1703926399.4671848
-setup_name: 3.6.0.0300-setup.exe
+builds: 302
+date: 1704188581.6986582
+setup_name: 3.6.0.0302-setup.exe
