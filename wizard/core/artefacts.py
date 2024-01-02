@@ -180,10 +180,10 @@ def check_artefacts_expiration():
 		if time.time() > float(time_id) + game_vars._artefact_expiration_:
 			logger.info(f"{game_vars.artefacts_dic[artefact]['name']} is expired")
 			del user_artefacts[time_id]
+			repository.add_artefact_stock(artefact)
 			update = 1
 	if not update:
 		return
-	logger.info(user_artefacts)
 	repository.modify_user_artefacts(environment.get_user(), user_artefacts)
 	return 1
 
