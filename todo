@@ -3,7 +3,7 @@ On off sur les refs - ok
 Resizeable tree - ok
 Artefacts expiration - ok
 Change state / priority / assignment sur le calendar - ok 
-Set date a la mano aussi
+Set date a la mano aussi - ok
 Asset tracking > Ajouter start date et due date, et maybe time left ? - ok
 
 
@@ -16,5 +16,5 @@ keep selection on refresh - ok
 asset tracking empty it when none - ok
 context on production calendar widget
 context for asset tracking widget on production table widget
-fix frames names width
-
+fix frames names width - ok
+items pos and scale not updated when refresh ui - ok

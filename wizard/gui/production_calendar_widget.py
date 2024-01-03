@@ -575,6 +575,11 @@ class stage_item(calendar_utils.calendar_item):
 
     def update_row(self, stage_row):
         self.stage_row = stage_row
+        new_date = datetime.datetime.fromtimestamp(float(self.stage_row['start_date']))
+        if (new_date != self.date) or (self.stage_row['estimated_time'] != self.duration) :
+            self.date = datetime.datetime.fromtimestamp(float(self.stage_row['start_date']))
+            self.duration = self.stage_row['estimated_time']
+            self.init_pos_and_size()
         self.cache_stage_item_painting()
 
     def connect_functions(self):
