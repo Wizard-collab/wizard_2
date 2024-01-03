@@ -1211,12 +1211,12 @@ class edit_dates_widget(QtWidgets.QDialog):
         self.datas_layout.setContentsMargins(0,0,0,0)
         self.main_layout.addLayout(self.datas_layout)
 
-        self.start_date_label = QtWidgets.QLabel("Start_date")
+        self.start_date_label = QtWidgets.QLabel("Start date")
         self.start_date_label.setObjectName("gray_label")
         self.start_date_lineEdit = QtWidgets.QLineEdit()
         self.datas_layout.addRow(self.start_date_label, self.start_date_lineEdit)
 
-        self.due_date_label = QtWidgets.QLabel("Due_date")
+        self.due_date_label = QtWidgets.QLabel("Due date")
         self.due_date_label.setObjectName("gray_label")
         self.due_date_lineEdit = QtWidgets.QLineEdit()
         self.datas_layout.addRow(self.due_date_label, self.due_date_lineEdit)

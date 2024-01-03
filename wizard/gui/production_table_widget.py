@@ -73,6 +73,7 @@ class production_table_widget(QtWidgets.QWidget):
         context_dic['domain'] = self.domain 
         context_dic['search_text'] = self.search_bar.text() 
         user.user().add_context(user_vars._production_table_context_, context_dic)
+        self.asset_tracking_widget.set_context()
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._production_table_context_)
@@ -86,6 +87,7 @@ class production_table_widget(QtWidgets.QWidget):
             self.update_layout()
             self.domain_comboBox.setCurrentText(context_dic['domain'])
             self.asset_tracking_widget.get_context()
+        self.asset_tracking_widget.get_context()
 
     def context_menu_requested(self, point):
         menu = gui_utils.QMenu(self)

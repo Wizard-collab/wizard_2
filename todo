@@ -5,16 +5,11 @@ Artefacts expiration - ok
 Change state / priority / assignment sur le calendar - ok 
 Set date a la mano aussi - ok
 Asset tracking > Ajouter start date et due date, et maybe time left ? - ok
-
-
-
-
-
-calendar
 stop refresh only when click - ok
 keep selection on refresh - ok
 asset tracking empty it when none - ok
-context on production calendar widget
-context for asset tracking widget on production table widget
+context on production calendar widget - ok
+context for asset tracking widget on production table widget - ok
 fix frames names width - ok
 items pos and scale not updated when refresh ui - ok
+add start date modif event ( asset tracking widget )

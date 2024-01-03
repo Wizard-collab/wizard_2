@@ -48,6 +48,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.group_method = 'stage'
         self.group_methods_list = ['stage', 'domain', 'category', 'asset', 'state', 'assignment', 'priority']
         self.update_group_method = True
+        self.update_filter_set = True
         self.stage_ids = dict()
         self.grouped_dic['frames'] = dict()
         self.filter_dic = dict()
@@ -76,14 +77,32 @@ class calendar_widget(QtWidgets.QWidget):
         context_dic = dict()
         context_dic['group_method'] = self.group_method 
         context_dic['search_text'] = self.search_bar.text() 
+        context_dic['use_filter_set'] = self.filter_sets_checkBox.isChecked()
+        context_dic['current_filter_set'] = self.filter_sets_comboBox.currentText()
+        context_dic['sections_sizes'] = self.content_widget.sizes()
         user.user().add_context(user_vars._production_calendar_context_, context_dic)
+        self.asset_tracking_widget.set_context()
 
     def get_context(self):
         context_dic = user.user().get_context(user_vars._production_calendar_context_)
         if context_dic is not None and context_dic != dict():
-            self.group_method  = context_dic['group_method']
-            self.search_bar.setText(context_dic['search_text'])
+            if 'group_method' in context_dic.keys():
+                self.group_method  = context_dic['group_method']
+            if 'search_text' in context_dic.keys():
+                self.search_bar.setText(context_dic['search_text'])
+            if 'use_filter_set' in context_dic.keys():
+                self.filter_sets_checkBox.setChecked(context_dic['use_filter_set'])
+            if 'current_filter_set' in context_dic.keys():
+                total_sets = self.filter_sets_comboBox.count()
+                existing_sets = []
+                for i in range(total_sets):
+                    existing_sets.append(self.filter_sets_comboBox.itemText(i))
+                if context_dic['current_filter_set'] in existing_sets:
+                    self.filter_sets_comboBox.setCurrentText(context_dic['current_filter_set'])
+            if 'sections_sizes' in context_dic.keys():
+                self.content_widget.setSizes(context_dic['sections_sizes'])
             self.refresh()
+        self.asset_tracking_widget.get_context()
 
     def init_users_images(self):
         self.users_images_dic = dict()
@@ -374,8 +393,8 @@ class calendar_widget(QtWidgets.QWidget):
         total_sets = self.filter_sets_comboBox.count()
         existing_sets = []
         for i in range(total_sets):
-                set_text = self.filter_sets_comboBox.itemText(i)
-                existing_sets.append(set_text)
+            set_text = self.filter_sets_comboBox.itemText(i)
+            existing_sets.append(set_text)
         for filter_set in filter_sets.keys():
             if filter_set in existing_sets:
                 continue
