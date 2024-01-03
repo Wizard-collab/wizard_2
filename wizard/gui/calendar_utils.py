@@ -492,6 +492,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
     row_height_update = pyqtSignal(object)
     current_selection_changed = pyqtSignal(object)
     movement_stopped = pyqtSignal(object)
+    context_menu_requested = pyqtSignal(object)
 
     def __init__(self):
         super(calendar_viewport, self).__init__()
@@ -708,6 +709,9 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         elif event.button() == QtCore.Qt.LeftButton:
             if self.itemAt(event.pos()) not in self.items:
                 self.start_selection_drag = event.pos()
+        elif event.button() == QtCore.Qt.RightButton:
+            if self.itemAt(event.pos()) in self.items:
+                self.context_menu_requested.emit(int)
 
     def mouseMoveEvent(self, event):
         if self.pan:
@@ -913,13 +917,15 @@ class calendar_item(custom_graphic_item):
         self.setPos(QtCore.QPointF(pos_x, 0))
 
     def mousePressEvent(self, event):
-        if not self.selected and event.button() == QtCore.Qt.LeftButton:
+        if (not self.selected and event.button() == QtCore.Qt.LeftButton)\
+                or (not self.selected and event.button() == QtCore.Qt.RightButton):
             self.signal_manager.select.emit([self])
         self.start_move_pos = event.pos()
-        if event.pos().x() < self.width - self.handle_size:
-            self.signal_manager.start_move.emit(1)
-        else:
-            self.signal_manager.start_scale.emit(1)
+        if event.button() == QtCore.Qt.LeftButton:
+            if event.pos().x() < self.width - self.handle_size:
+                self.signal_manager.start_move.emit(1)
+            else:
+                self.signal_manager.start_scale.emit(1)
 
     def start_move(self):
         self.move = True
@@ -942,9 +948,9 @@ class calendar_item(custom_graphic_item):
 
     def mouseReleaseEvent(self, event):
         self.signal_manager.stop_movement.emit(1)
-        if event.button() == QtCore.Qt.LeftButton:
-            if not self.moved and not self.scaled:
-                self.signal_manager.select.emit([self])
+        #if event.button() == QtCore.Qt.LeftButton:
+        #    if not self.moved and not self.scaled:
+        #        self.signal_manager.select.emit([self])
 
     def mouseMoveEvent(self, event):
         delta = int((event.pos().x() - self.start_move_pos.x())/self.column_width)*self.column_width

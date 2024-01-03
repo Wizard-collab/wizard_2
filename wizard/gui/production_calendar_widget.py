@@ -125,12 +125,64 @@ class calendar_widget(QtWidgets.QWidget):
         self.view.row_height_update.connect(self.update_row_height)
         self.view.current_selection_changed.connect(self.change_stage_asset_tracking_widget)
         self.view.movement_stopped.connect(gui_server.refresh_team_ui)
+        self.view.context_menu_requested.connect(self.show_context_menu)
 
         self.group_methods_comboBox.currentTextChanged.connect(self.change_group_method)
         self.search_bar.textChanged.connect(self.update_search)
         self.filter_sets_comboBox.currentTextChanged.connect(self.filter_set_changed)
         self.filter_sets_checkBox.stateChanged.connect(self.filter_set_changed)
         self.filter_set_editor_button.clicked.connect(self.open_filter_set_editor)
+
+    def show_context_menu(self):
+        selection = self.view.get_selected_items()
+        menu = gui_utils.QMenu(self)
+        states_submenu = menu.addMenu("Modify state ")
+        states_actions = dict()
+        for state in assets_vars._asset_states_list_:
+            states_actions[state] = states_submenu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
+        assignments_submenu = menu.addMenu("Modify assignment ")
+        assignments_actions = dict()
+        users_ids = project.get_users_ids_list()
+        for user_id in users_ids:
+            user_row = repository.get_user_data(user_id)
+            icon = QtGui.QIcon()
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
+            icon.addPixmap(pm)
+            assignments_actions[user_id] = assignments_submenu.addAction(icon, user_row['user_name'])
+        priorities_submenu = menu.addMenu("Modify priority ")
+        priorities_actions = dict()
+        for priority in assets_vars._priority_list_:
+            priorities_actions[priority] = priorities_submenu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action in states_actions.values():
+                self.modify_state_on_selected(action.text())
+            elif action in assignments_actions.values():
+                self.modify_assignment_on_selected(action.text())
+            elif action in priorities_actions.values():
+                self.modify_priority_on_selected(action.text())
+
+    def modify_state_on_selected(self, state):
+        selected_items = self.view.get_selected_items()
+        for item in selected_items:
+            stage_id = item.stage_row['id']
+            assets.modify_stage_state(stage_id, state)
+        gui_server.refresh_team_ui()
+
+    def modify_assignment_on_selected(self, user_name):
+        selected_items = self.view.get_selected_items()
+        for item in selected_items:
+            stage_id = item.stage_row['id']
+            assets.modify_stage_assignment(stage_id, user_name)
+        gui_server.refresh_team_ui()
+
+    def modify_priority_on_selected(self, priority):
+        selected_items = self.view.get_selected_items()
+        for item in selected_items:
+            stage_id = item.stage_row['id']
+            assets.modify_stage_priority(stage_id, priority)
+        gui_server.refresh_team_ui()
 
     def change_stage_asset_tracking_widget(self):
         selected_items = self.view.get_selected_items()
