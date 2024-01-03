@@ -136,6 +136,9 @@ class calendar_widget(QtWidgets.QWidget):
     def show_context_menu(self):
         selection = self.view.get_selected_items()
         menu = gui_utils.QMenu(self)
+
+        edit_dates_action = menu.addAction(QtGui.QIcon(ressources._edit_icon_), "Edit dates")
+
         states_submenu = menu.addMenu("Modify state ")
         states_actions = dict()
         for state in assets_vars._asset_states_list_:
@@ -162,6 +165,24 @@ class calendar_widget(QtWidgets.QWidget):
                 self.modify_assignment_on_selected(action.text())
             elif action in priorities_actions.values():
                 self.modify_priority_on_selected(action.text())
+            elif action == edit_dates_action:
+                self.edit_dates()
+
+    def edit_dates(self):
+        selected_items = self.view.get_selected_items()
+        if len(selected_items) < 1:
+            return
+        current_estimation = selected_items[0].stage_row['estimated_time']
+        current_start_date = selected_items[0].stage_row['start_date']
+
+        self.edit_dates_widget = calendar_utils.edit_dates_widget(current_start_date, current_estimation)
+        if self.edit_dates_widget.exec_() == QtWidgets.QDialog.Accepted:
+            duration = self.edit_dates_widget.duration
+            start_time = self.edit_dates_widget.start_time
+            for item in selected_items:
+                assets.modify_stage_estimation(item.stage_row['id'], int(duration))
+                assets.modify_stage_start_date(item.stage_row['id'], start_time)
+            gui_server.refresh_team_ui()
 
     def modify_state_on_selected(self, state):
         selected_items = self.view.get_selected_items()

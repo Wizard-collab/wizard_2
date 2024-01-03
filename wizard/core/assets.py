@@ -413,8 +413,8 @@ def modify_stage_estimation(stage_id, days):
     return 1
 
 def modify_stage_start_date(stage_id, start_date_in_seconds):
-    if type(start_date_in_seconds) != int:
-        logger.warning(f'{start_date_in_seconds} is not a int')
+    if type(start_date_in_seconds) not in [float, int]:
+        logger.warning(f'{start_date_in_seconds} is not a number')
         return
     project.set_stage_data(stage_id, 'start_date', start_date_in_seconds)
     #asset_tracking.add_estimation_event(stage_id, days)

@@ -14,6 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
+from wizard.core import tools
 from wizard.vars import ressources
 
 class signal_manager(QtCore.QObject):
@@ -1152,3 +1153,145 @@ def draw_rect(painter, rectangle, bg_color, outline=QtGui.QColor('transparent'),
     painter.setPen(QtGui.QPen(outline, outline_width))
     painter.setBrush(QtGui.QBrush(bg_color))
     painter.drawRoundedRect(rectangle, radius, radius)
+
+class edit_dates_widget(QtWidgets.QDialog):
+    def __init__(self, start_time=None, duration=None, parent=None):
+        super(edit_dates_widget, self).__init__(parent)
+
+        self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
+        self.setWindowTitle(f"Edit stage dates")
+
+        self.valid = True
+        self.update_dates = True
+        self.update_estimated_time = True
+        self.start_time = None
+        self.due_time = None
+        self.build_ui()
+        self.connect_functions()
+        self.fill_ui(start_time, duration)
+
+    def fill_ui(self, start_time, duration):
+        if start_time is None:
+            self.start_time = time.time()
+        else:
+            self.start_time = float(start_time)
+        start_time_string = datetime.datetime.fromtimestamp(self.start_time).strftime("%d/%m/%Y")
+        self.start_date_lineEdit.setText(start_time_string)
+
+        if duration is None:
+            duration = 6
+        self.days_spinBox.setValue(int(duration))
+
+        self.due_time = self.start_time + duration * 3600 * 24
+        due_time_string = datetime.datetime.fromtimestamp(self.due_time).strftime("%d/%m/%Y")
+        self.due_date_lineEdit.setText(due_time_string)
+
+    def apply(self):
+        if not self.valid:
+            return
+        self.duration = self.days_spinBox.value()
+        self.accept()
+
+    def connect_functions(self):
+        self.start_date_lineEdit.textChanged.connect(self.dates_updated)
+        self.due_date_lineEdit.textChanged.connect(self.dates_updated)
+        self.days_spinBox.valueChanged.connect(self.estimated_time_updated)
+        self.apply_button.clicked.connect(self.apply)
+
+    def build_ui(self):
+        self.resize(300, 300)
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(self.main_layout)
+
+        self.infos_label = QtWidgets.QLabel("Modify here the start date, due date and duration")
+        self.infos_label.setObjectName("gray_label")
+        self.main_layout.addWidget(self.infos_label)
+
+        self.datas_layout = QtWidgets.QFormLayout()
+        self.datas_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.datas_layout)
+
+        self.start_date_label = QtWidgets.QLabel("Start_date")
+        self.start_date_label.setObjectName("gray_label")
+        self.start_date_lineEdit = QtWidgets.QLineEdit()
+        self.datas_layout.addRow(self.start_date_label, self.start_date_lineEdit)
+
+        self.due_date_label = QtWidgets.QLabel("Due_date")
+        self.due_date_label.setObjectName("gray_label")
+        self.due_date_lineEdit = QtWidgets.QLineEdit()
+        self.datas_layout.addRow(self.due_date_label, self.due_date_lineEdit)
+
+        self.duration_label = QtWidgets.QLabel("Estimated time ( Days )")
+        self.duration_label.setObjectName("gray_label")
+        self.days_spinBox = QtWidgets.QSpinBox()
+        self.days_spinBox.setRange(1, 365)
+        self.days_spinBox.setButtonSymbols(2)
+        self.datas_layout.addRow(self.duration_label, self.days_spinBox)
+
+        self.errors_label = QtWidgets.QLabel()
+        self.errors_label.setStyleSheet("color:#d16666")
+        self.main_layout.addWidget(self.errors_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+
+        self.button_layout = QtWidgets.QHBoxLayout()
+        self.button_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.button_layout)
+
+        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.apply_button = QtWidgets.QPushButton("Apply")
+        self.apply_button.setObjectName("blue_button")
+        self.button_layout.addWidget(self.apply_button)
+
+    def check_dates(self):
+        start_date = self.start_date_lineEdit.text()
+        due_date = self.due_date_lineEdit.text()
+        duration = self.days_spinBox.value()
+        self.valid = True
+        self.start_time = tools.get_time_float_from_string_date(start_date, no_warning = True)
+        self.due_time = tools.get_time_float_from_string_date(due_date, no_warning = True)
+        if not self.start_time:
+            start_date_error = f"Start date not a valid date format\nPlease enter a date like following 'day/month/year'\n"
+            self.valid = False
+        else:
+            start_date_error = ''
+
+        if not self.due_time:
+            due_date_error = f"Due date not a valid date format\nPlease enter a date like following 'day/month/year'\n"
+            self.valid = False
+        else:
+            due_date_error = ''
+        match_error = ''
+        if self.start_time != None and self.due_time !=None:
+            if self.start_time >= self.due_time:
+                match_error = f"Start date is after due date"
+                self.valid = False
+        self.errors_label.setText(f"{start_date_error}{due_date_error}{match_error}")
+
+    def dates_updated(self):
+        if not self.update_dates:
+            return
+        self.update_estimated_time = False
+        self.check_dates()
+        if self.valid:
+            start_datetime = datetime.datetime.utcfromtimestamp(self.start_time)
+            due_datetime = datetime.datetime.utcfromtimestamp(self.due_time)
+            diff = due_datetime - start_datetime
+            self.days_spinBox.setValue(diff.days)
+
+        self.update_estimated_time = True
+
+    def estimated_time_updated(self):
+        if not self.update_estimated_time:
+            return
+        self.update_dates = False
+        self.check_dates()
+        if self.valid:
+            self.due_time = self.start_time + self.days_spinBox.value()*3600*24
+            self.due_date_lineEdit.setText(datetime.datetime.fromtimestamp(self.due_time).strftime("%d/%m/%Y"))
+        self.update_dates = True
+
+
+
+

@@ -23,6 +23,7 @@ from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import comment_widget
 from wizard.gui import tag_label
+from wizard.gui import calendar_utils
 
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -53,10 +54,16 @@ class asset_tracking_widget(QtWidgets.QFrame):
                 self.assignment_comboBox.addItem(icon, self.users_ids[user_id])
 
     def edit_estimation(self):
-        self.estimation_widget = estimation_widget()
-        if self.estimation_widget.exec_() == QtWidgets.QDialog.Accepted:
-            days = self.estimation_widget.days
-            assets.modify_stage_estimation(self.stage_id, days)
+        if self.stage_row is None:
+            return
+        current_estimation = self.stage_row['estimated_time']
+        current_start_date = self.stage_row['start_date']
+        self.edit_dates_widget = calendar_utils.edit_dates_widget(current_start_date, current_estimation)
+        if self.edit_dates_widget.exec_() == QtWidgets.QDialog.Accepted:
+            duration = self.edit_dates_widget.duration
+            start_time = self.edit_dates_widget.start_time
+            assets.modify_stage_estimation(self.stage_id, int(duration))
+            assets.modify_stage_start_date(self.stage_id, start_time)
             gui_server.refresh_team_ui()
 
     def build_ui(self):
@@ -247,7 +254,6 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh()
 
     def refresh(self):
-        #QtWidgets.QApplication.processEvents()
         start_time = time.perf_counter()
         if self.stage_id is not None:
             self.stage_row = project.get_stage_data(self.stage_id)
@@ -638,63 +644,3 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.priority_icon)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-class estimation_widget(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super(estimation_widget, self).__init__(parent)
-        self.hours = 6
-        self.build_ui()
-        self.connect_functions()
-        
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-    def showEvent(self, event):
-        corner = gui_utils.move_ui(self)
-
-    def connect_functions(self):
-        self.close_pushButton.clicked.connect(self.reject)
-        self.enter_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self)
-        self.enter_sc.activated.connect(self.apply)
-
-    def apply(self):
-        self.days = self.days_spinBox.value()
-        self.accept()
-
-    def build_ui(self):
-        self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
-        self.setLayout(self.main_layout)
-        self.main_frame = QtWidgets.QFrame()
-        self.main_frame.setObjectName('instance_creation_frame')
-        self.frame_layout = QtWidgets.QHBoxLayout()
-        self.frame_layout.setSpacing(6)
-        self.main_frame.setLayout(self.frame_layout)
-        self.main_layout.addWidget(self.main_frame)
-
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(70)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
-        self.shadow.setXOffset(2)
-        self.shadow.setYOffset(2)
-        self.main_frame.setGraphicsEffect(self.shadow)
-
-        self.days_spinBox = QtWidgets.QSpinBox()
-        self.days_spinBox.setRange(1, 200)
-        self.days_spinBox.setValue(6)
-        self.days_spinBox.setButtonSymbols(2)
-        self.frame_layout.addWidget(self.days_spinBox)
-
-        self.days_label = QtWidgets.QLabel('days')
-        self.frame_layout.addWidget(self.days_label)
-
-        self.close_frame = QtWidgets.QFrame()
-        self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
-        self.close_layout.setSpacing(2)
-        self.close_frame.setLayout(self.close_layout)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
-        self.close_layout.addWidget(self.close_pushButton)
-        self.frame_layout.addWidget(self.close_frame)

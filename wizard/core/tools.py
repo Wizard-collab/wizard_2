@@ -64,7 +64,7 @@ def get_month(time_float):
 def get_day(time_float):
     return time.strftime('%d', time.localtime(time_float))
 
-def get_time_float_from_string_date(date_string):
+def get_time_float_from_string_date(date_string, no_warning = False):
     try:
         time_tokens = date_string.split('/')
         day = int(time_tokens[0])
@@ -74,6 +74,8 @@ def get_time_float_from_string_date(date_string):
         time_float = time.mktime(dt.timetuple())
         return time_float
     except:
+        if no_warning:
+            return
         logger.warning(f"{date_string} not a valid date format\nPlease enter a date like following 'day/month/year'")
         return
 
