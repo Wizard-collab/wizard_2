@@ -162,10 +162,10 @@ class production_table_widget(QtWidgets.QWidget):
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        self.content_layout = QtWidgets.QHBoxLayout()
-        self.content_layout.setContentsMargins(0,0,0,0)
-        self.content_layout.setSpacing(1)
-        self.main_layout.addLayout(self.content_layout)
+        self.content_widget = gui_utils.QSplitter()
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setObjectName('main_widget')
+        self.main_layout.addWidget(self.content_widget)
 
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setObjectName('dark_widget')
@@ -175,10 +175,13 @@ class production_table_widget(QtWidgets.QWidget):
         self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
         self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
         self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.content_layout.addWidget(self.table_widget)
+        self.content_widget.addWidget(self.table_widget)
+        self.content_widget.setCollapsible(0, False)
 
         self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget()
-        self.content_layout.addWidget(self.asset_tracking_widget)
+        self.asset_tracking_widget.setFixedWidth(350)
+        self.content_widget.addWidget(self.asset_tracking_widget)
+        self.content_widget.setCollapsible(1, True)
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_layout = QtWidgets.QHBoxLayout()

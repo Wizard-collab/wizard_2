@@ -9,6 +9,9 @@ import sys
 import datetime
 import time
 import random
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Wizard modules
 from wizard.vars import ressources
@@ -55,7 +58,8 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
         self.update()
 
     def setVisible(self, visible):
-        self.selected = False
+        if not visible:
+            self.selected = False
         super().setVisible(visible)
 
     def boundingRect(self):
@@ -486,6 +490,8 @@ class calendar_viewport(QtWidgets.QGraphicsView):
     zoom_factor_update = pyqtSignal(object)
     column_width_update = pyqtSignal(object)
     row_height_update = pyqtSignal(object)
+    current_selection_changed = pyqtSignal(object)
+    movement_stopped = pyqtSignal(object)
 
     def __init__(self):
         super(calendar_viewport, self).__init__()
@@ -511,6 +517,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.frames = []
         self.scene.zoom_factor = self.zoom_factor
         self.start_selection_drag = None
+        self.movement = False
         self.selection_item = selection_item()
 
         empty_item = custom_graphic_item()
@@ -541,6 +548,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.set_column_width(100)
         self.set_row_height(40)
         self.deselect_all()
+        self.selection_changed()
         self.focus_on_selection()
 
     def goto_today(self):
@@ -573,6 +581,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.update()
 
     def movement_on_selection(self, delta):
+        self.movement = True
         for item in self.items:
             if item.selected:
                 item.movement(delta)
@@ -591,6 +600,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         for item in self.items:
             if item.selected:
                 item.stop_movement()
+        if not self.movement:
+            return
+        self.movement_stopped.emit(1)
+        self.movement = False
 
     def add_item(self, graphic_item):
         self.items.append(graphic_item)
@@ -640,7 +653,18 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             if not item.isVisible():
                 continue
             item.set_selected(True)
+        self.selection_changed()
         self.update_infos()
+
+    def get_selected_items(self):
+        selected_items = []
+        for item in self.items:
+            if item.selected:
+                selected_items.append(item)
+        return selected_items
+
+    def selection_changed(self):
+        self.current_selection_changed.emit(1)
 
     def update_frames_selection(self, frames):
         items = []

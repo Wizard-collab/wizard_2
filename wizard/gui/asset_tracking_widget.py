@@ -141,7 +141,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout_2.setSpacing(6)
         self.time_infos_layout.addLayout(self.time_infos_layout_2)
 
-        self.start_date_label = QtWidgets.QLabel()
+        self.start_date_label = QtWidgets.QLabel("...")
         self.time_infos_layout_2.addWidget(self.start_date_label)
 
         self.date_arrow_label = QtWidgets.QLabel(">")
@@ -149,7 +149,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.date_arrow_label.setObjectName('gray_label')
         self.time_infos_layout_2.addWidget(self.date_arrow_label)
 
-        self.due_date_label = QtWidgets.QLabel()
+        self.due_date_label = QtWidgets.QLabel("...")
         self.time_infos_layout_2.addWidget(self.due_date_label)
 
         self.time_infos_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
@@ -285,6 +285,10 @@ class asset_tracking_widget(QtWidgets.QFrame):
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')
+            self.start_date_label.setText("...")
+            self.start_date_label.setStyleSheet("")
+            self.due_date_label.setText("...")
+            self.due_date_label.setStyleSheet("")
 
     def remove_tracking_event(self, event_id):
         if event_id in self.tracking_event_ids.keys():

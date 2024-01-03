@@ -12,8 +12,10 @@ import logging
 
 # Wizard gui modules
 from wizard.gui import calendar_utils
+from wizard.gui import gui_server
 from wizard.gui import gui_utils
 from wizard.gui import filter_sets_editor_widget
+from wizard.gui import asset_tracking_widget
 
 # Wizard core modules
 from wizard.core import user
@@ -121,11 +123,23 @@ class calendar_widget(QtWidgets.QWidget):
         self.view.zoom_factor_update.connect(self.header_view.update_zoom_factor)
         self.view.column_width_update.connect(self.update_column_width)
         self.view.row_height_update.connect(self.update_row_height)
+        self.view.current_selection_changed.connect(self.change_stage_asset_tracking_widget)
+        self.view.movement_stopped.connect(gui_server.refresh_team_ui)
+
         self.group_methods_comboBox.currentTextChanged.connect(self.change_group_method)
         self.search_bar.textChanged.connect(self.update_search)
         self.filter_sets_comboBox.currentTextChanged.connect(self.filter_set_changed)
         self.filter_sets_checkBox.stateChanged.connect(self.filter_set_changed)
         self.filter_set_editor_button.clicked.connect(self.open_filter_set_editor)
+
+    def change_stage_asset_tracking_widget(self):
+        selected_items = self.view.get_selected_items()
+        if len(selected_items) != 1:
+            self.asset_tracking_widget.change_stage(None)
+            return
+        item = selected_items[0]
+        stage_id = item.stage_row['id']
+        self.asset_tracking_widget.change_stage(stage_id)
 
     def open_filter_set_editor(self):
         self.filter_sets_editor_widget = filter_sets_editor_widget.filter_sets_editor_widget('production_calendar_widget')
@@ -171,8 +185,26 @@ class calendar_widget(QtWidgets.QWidget):
         self.filter_set_editor_button.setFixedSize(30,30)
         self.header_layout.addWidget(self.filter_set_editor_button)
 
-        self.main_layout.addWidget(self.header_view)
-        self.main_layout.addWidget(self.view)
+        self.content_widget = gui_utils.QSplitter()
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setObjectName('main_widget')
+        self.main_layout.addWidget(self.content_widget)
+
+        self.calendar_content_widget = QtWidgets.QWidget()
+        self.calendar_content_layout = QtWidgets.QVBoxLayout()
+        self.calendar_content_layout.setContentsMargins(0,0,0,0)
+        self.calendar_content_layout.setSpacing(1)
+        self.calendar_content_widget.setLayout(self.calendar_content_layout)
+        self.content_widget.addWidget(self.calendar_content_widget)
+        self.content_widget.setCollapsible(0, False)
+
+        self.calendar_content_layout.addWidget(self.header_view)
+        self.calendar_content_layout.addWidget(self.view)
+
+        self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget()
+        self.asset_tracking_widget.setFixedWidth(350)
+        self.content_widget.addWidget(self.asset_tracking_widget)
+        self.content_widget.setCollapsible(1, True)
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_layout = QtWidgets.QHBoxLayout()
@@ -367,6 +399,7 @@ class calendar_widget(QtWidgets.QWidget):
 
         self.update_search()
         self.view.update()
+        self.asset_tracking_widget.refresh()
         self.update_refresh_time(start_time)
 
     def clear_frames(self):
