@@ -5,6 +5,7 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 import time
+import datetime
 
 # Wizard modules
 from wizard.core import tools
@@ -100,35 +101,58 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
         self.time_infos_widget = QtWidgets.QWidget()
         self.time_infos_widget.setObjectName('transparent_widget')
-        self.time_infos_layout = QtWidgets.QHBoxLayout()
+        self.time_infos_layout = QtWidgets.QVBoxLayout()
         self.time_infos_layout.setContentsMargins(0,0,0,0)
         self.time_infos_layout.setSpacing(6)
         self.time_infos_widget.setLayout(self.time_infos_layout)
         self.progress_layout.addWidget(self.time_infos_widget)
 
+        self.time_infos_layout_1 = QtWidgets.QHBoxLayout()
+        self.time_infos_layout_1.setContentsMargins(0,0,0,0)
+        self.time_infos_layout_1.setSpacing(6)
+        self.time_infos_layout.addLayout(self.time_infos_layout_1)
+
         self.work_time_icon_label = QtWidgets.QLabel()
         self.work_time_icon_label.setFixedSize(QtCore.QSize(22,22))
         self.work_time_icon_label.setPixmap(QtGui.QIcon(ressources._work_time_icon_).pixmap(22))
-        self.time_infos_layout.addWidget(self.work_time_icon_label)
+        self.time_infos_layout_1.addWidget(self.work_time_icon_label)
 
         self.work_time_label = QtWidgets.QLabel()
         self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.time_infos_layout.addWidget(self.work_time_label)
+        self.time_infos_layout_1.addWidget(self.work_time_label)
 
-        self.time_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.time_infos_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.estimated_time_icon_label = QtWidgets.QLabel()
         self.estimated_time_icon_label.setFixedSize(QtCore.QSize(22,22))
         self.estimated_time_icon_label.setPixmap(QtGui.QIcon(ressources._estimated_time_icon_).pixmap(22))
-        self.time_infos_layout.addWidget(self.estimated_time_icon_label)
+        self.time_infos_layout_1.addWidget(self.estimated_time_icon_label)
 
         self.estimated_time_label = QtWidgets.QLabel()
         self.estimated_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.time_infos_layout.addWidget(self.estimated_time_label)
+        self.time_infos_layout_1.addWidget(self.estimated_time_label)
 
         self.edit_estimation_button = gui_utils.transparent_button(ressources._edit_transparent_icon_, ressources._edit_icon_)
         self.edit_estimation_button.setFixedSize(16,16)
-        self.time_infos_layout.addWidget(self.edit_estimation_button)
+        self.time_infos_layout_1.addWidget(self.edit_estimation_button)
+
+        self.time_infos_layout_2 = QtWidgets.QHBoxLayout()
+        self.time_infos_layout_2.setContentsMargins(0,0,0,0)
+        self.time_infos_layout_2.setSpacing(6)
+        self.time_infos_layout.addLayout(self.time_infos_layout_2)
+
+        self.start_date_label = QtWidgets.QLabel()
+        self.time_infos_layout_2.addWidget(self.start_date_label)
+
+        self.date_arrow_label = QtWidgets.QLabel(">")
+        self.date_arrow_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.date_arrow_label.setObjectName('gray_label')
+        self.time_infos_layout_2.addWidget(self.date_arrow_label)
+
+        self.due_date_label = QtWidgets.QLabel()
+        self.time_infos_layout_2.addWidget(self.due_date_label)
+
+        self.time_infos_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.separation_widget_1 = QtWidgets.QWidget()
         self.separation_layout_1 = QtWidgets.QHBoxLayout()
@@ -248,6 +272,16 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.work_time_label.setText(string_time)
             if self.stage_row['estimated_time'] is not None:
                 self.estimated_time_label.setText(f"{int(self.stage_row['estimated_time'])} days")
+            start_date = datetime.datetime.fromtimestamp(float(self.stage_row['start_date'])).strftime("%d/%m/%Y")
+            self.start_date_label.setText(start_date)
+            due_time = float(self.stage_row['start_date'])+ int(self.stage_row['estimated_time'])*3600*24
+            due_date = datetime.datetime.fromtimestamp(due_time).strftime("%d/%m/%Y")
+            self.due_date_label.setText(f"{due_date}{" - " + tools.time_left_from_timestamp(due_time) if due_time > time.time() else ''}")
+            if due_time > time.time():
+                self.due_date_label.setStyleSheet("color:#7ca657")
+            else:
+                self.due_date_label.setStyleSheet("color:#d16666")
+
         else:
             self.work_time_label.setText('Work time')
             self.estimated_time_label.setText('Estimation time')
