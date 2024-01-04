@@ -266,4 +266,4 @@ _task_done_coins_ = 1
 _work_coins_ = 1
 _default_ban_time_ = 3600*24*14
 _transaction_tax_ = 0.05
-_artefact_expiration_ = 10#3600*24*5
+_artefact_expiration_ = 3600*24*5
