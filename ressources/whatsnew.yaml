@@ -2,9 +2,6 @@
   update_list:
   - !!python/tuple
     - new
-    - Production Gantt diagram
-  - !!python/tuple
-    - new
     - You can now duplicate references
   - !!python/tuple
     - new
@@ -18,6 +15,9 @@
   - !!python/tuple
     - debug
     - Fixed timestamps storing for versions, exports and videos
+  - !!python/tuple
+    - new
+    - Production Gantt diagram
   time: 1704214201.1367652
 '3.5.7.299':
   update_list:

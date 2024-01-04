@@ -158,11 +158,13 @@ class calendar_widget(QtWidgets.QWidget):
 
         edit_dates_action = menu.addAction(QtGui.QIcon(ressources._edit_icon_), "Edit dates")
 
-        states_submenu = menu.addMenu("Modify state ")
+        menu.addSeparator()
+
+        states_submenu = menu.addMenu("State ")
         states_actions = dict()
         for state in assets_vars._asset_states_list_:
             states_actions[state] = states_submenu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
-        assignments_submenu = menu.addMenu("Modify assignment ")
+        assignments_submenu = menu.addMenu("Assignment ")
         assignments_actions = dict()
         users_ids = project.get_users_ids_list()
         for user_id in users_ids:
@@ -171,7 +173,7 @@ class calendar_widget(QtWidgets.QWidget):
             pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
             icon.addPixmap(pm)
             assignments_actions[user_id] = assignments_submenu.addAction(icon, user_row['user_name'])
-        priorities_submenu = menu.addMenu("Modify priority ")
+        priorities_submenu = menu.addMenu("Priority ")
         priorities_actions = dict()
         for priority in assets_vars._priority_list_:
             priorities_actions[priority] = priorities_submenu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
@@ -199,14 +201,18 @@ class calendar_widget(QtWidgets.QWidget):
             duration = self.edit_dates_widget.duration
             start_time = self.edit_dates_widget.start_time
             for item in selected_items:
-                assets.modify_stage_estimation(item.stage_row['id'], int(duration))
-                assets.modify_stage_start_date(item.stage_row['id'], start_time)
+                if int(duration) != int(item.stage_row['estimated_time']):
+                    assets.modify_stage_estimation(item.stage_row['id'], int(duration))
+                if float(start_time) != float(item.stage_row['start_date']):
+                    assets.modify_stage_start_date(item.stage_row['id'], start_time)
             gui_server.refresh_team_ui()
 
     def modify_state_on_selected(self, state):
         selected_items = self.view.get_selected_items()
         for item in selected_items:
             stage_id = item.stage_row['id']
+            if item.stage_row['state'] == state:
+                continue
             assets.modify_stage_state(stage_id, state)
         gui_server.refresh_team_ui()
 
@@ -214,6 +220,8 @@ class calendar_widget(QtWidgets.QWidget):
         selected_items = self.view.get_selected_items()
         for item in selected_items:
             stage_id = item.stage_row['id']
+            if item.stage_row['assignment'] == user_name:
+                continue
             assets.modify_stage_assignment(stage_id, user_name)
         gui_server.refresh_team_ui()
 
@@ -221,6 +229,8 @@ class calendar_widget(QtWidgets.QWidget):
         selected_items = self.view.get_selected_items()
         for item in selected_items:
             stage_id = item.stage_row['id']
+            if item.stage_row['priority'] == priority:
+                continue
             assets.modify_stage_priority(stage_id, priority)
         gui_server.refresh_team_ui()
 

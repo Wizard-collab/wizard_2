@@ -485,6 +485,8 @@ class tracking_event_widget(QtWidgets.QFrame):
             self.build_work_session_ui()
         elif self.tracking_event_row['event_type'] == 'estimation':
             self.build_estimation_ui()
+        elif self.tracking_event_row['event_type'] == 'start_date':
+            self.build_start_date_ui()
         elif self.tracking_event_row['event_type'] == 'comment':
             self.build_comment_event_ui()
 
@@ -558,6 +560,23 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.estimation_label = QtWidgets.QLabel(f"{self.tracking_event_row['data']} days")
         self.estimation_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.main_layout.addWidget(self.estimation_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+    def build_start_date_ui(self):
+        self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.user_label)
+
+        self.info_label = QtWidgets.QLabel('set start date to')
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setObjectName('gray_label')
+        self.main_layout.addWidget(self.info_label)
+
+        start_date = datetime.datetime.fromtimestamp(float(self.tracking_event_row['data'])).strftime("%d/%m/%Y")
+        self.start_date_label = QtWidgets.QLabel(start_date)
+        self.start_date_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.main_layout.addWidget(self.start_date_label)
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 

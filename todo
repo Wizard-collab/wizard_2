@@ -12,4 +12,4 @@ context on production calendar widget - ok
 context for asset tracking widget on production table widget - ok
 fix frames names width - ok
 items pos and scale not updated when refresh ui - ok
-add start date modif event ( asset tracking widget )
+add start date modif event ( asset tracking widget ) - ok

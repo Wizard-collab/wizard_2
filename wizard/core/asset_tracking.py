@@ -51,6 +51,11 @@ def add_estimation_event(stage_id, estimation_time, comment=''):
 	data = str(estimation_time)
 	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
 
+def add_start_date_event(stage_id, start_date, comment=''):
+	event_type = 'start_date'
+	data = str(start_date)
+	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 def add_state_switch_event(stage_id, new_state, comment=''):
 	event_type = 'state_switch'
 	data = new_state

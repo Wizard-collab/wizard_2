@@ -417,7 +417,7 @@ def modify_stage_start_date(stage_id, start_date_in_seconds):
         logger.warning(f'{start_date_in_seconds} is not a number')
         return
     project.set_stage_data(stage_id, 'start_date', start_date_in_seconds)
-    #asset_tracking.add_estimation_event(stage_id, days)
+    asset_tracking.add_start_date_event(stage_id, start_date_in_seconds)
     return 1
 
 def add_work_time(work_env_id, work_time):
