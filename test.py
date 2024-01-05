@@ -18,8 +18,13 @@ class VideoPlayer(QtWidgets.QWidget):
         self.infos_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.infos_label)
 
-        self.video_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.video_label)
+        self.video_widget = QtWidgets.QWidget()
+        self.video_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.video_widget.setStyleSheet("background-color:black;")
+        self.video_label = QtWidgets.QLabel(self.video_widget)
+        self.video_label.setAlignment(QtCore.Qt.AlignHCenter)
+        self.video_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.main_layout.addWidget(self.video_widget)
 
         self.fps_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.fps_label)
@@ -30,15 +35,26 @@ class VideoPlayer(QtWidgets.QWidget):
         self.video_stream = video_stream()
         self.connect_functions()
 
+    def resizeEvent(self, event):
+        self.video_label.resize(self.video_widget.size())
+
     def connect_functions(self):
-        self.video_stream.pixmap_signal.connect(self.video_label.setPixmap)
+        self.video_stream.pixmap_signal.connect(self.show_frame)
         self.video_stream.buffered_signal.connect(self.infos_label.setText)
-        self.video_stream.fps_signal.connect(self.fps_label.setText)
+        self.video_stream.fps_signal.connect(self.update_fps)
         self.play_button.clicked.connect(self.play)
 
     def load_video(self, video_path):
         logger.critical(video_path)
         self.video_stream.open_video(video_path)
+
+    def show_frame(self, pixmap):
+        pixmap = pixmap.scaled(self.video_label.size(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        self.video_label.setPixmap(pixmap)
+        self.video_stream.set_frame_displayed()
+
+    def update_fps(self, fps):
+        self.fps_label.setText(f"FPS:{round(fps, 1)}")
 
     def play(self):
         self.video_stream.play()
@@ -56,6 +72,9 @@ class buffer_thread(QtCore.QThread):
 
     def get_fps(self):
         return self.cap.get(cv2.CAP_PROP_FPS)
+
+    def get_total_frame_number(self):
+        return int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     def load_video(self):
         self.cap.open(self.video_path)
@@ -84,11 +103,12 @@ class buffer_thread(QtCore.QThread):
 
         # Resize the frame while maintaining aspect ratio
         frame = resize_frame(frame, max_width=1920, max_height=1080)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # Convert the OpenCV frame to a Qt image
         height, width, channel = frame.shape
         bytes_per_line = 3 * width
-        q_image = QtGui.QImage(frame.data, width, height, bytes_per_line, QtGui.QImage.Format_RGB888)
+        q_image = QtGui.QImage(frame_rgb.data, width, height, bytes_per_line, QtGui.QImage.Format_RGB888)
 
         # Convert the Qt image to a QPixmap
         pixmap = QtGui.QPixmap.fromImage(q_image)
@@ -113,7 +133,7 @@ class video_stream(QtCore.QThread):
 
     pixmap_signal = pyqtSignal(object)
     buffered_signal = pyqtSignal(object)
-    fps_signal = pyqtSignal(str)
+    fps_signal = pyqtSignal(float)
     
     def __init__(self, parent=None):
         super(video_stream, self).__init__(parent)
@@ -124,10 +144,13 @@ class video_stream(QtCore.QThread):
         self.videos[video_path]['pixmaps'] = []
         self.videos[video_path]['buffer_thread'] = buffer_thread(video_path)
         self.videos[video_path]['fps'] = self.videos[video_path]['buffer_thread'].get_fps()
+        self.videos[video_path]['total_frame_number'] = self.videos[video_path]['buffer_thread'].get_total_frame_number()
         self.videos[video_path]['buffer_thread'].pixmap_signal.connect(self.add_frame_to_buffer)
         self.videos[video_path]['buffer_thread'].start()
         logger.critical(video_path)
         logger.critical(self.videos[video_path]['fps'])
+        logger.critical(self.videos[video_path]['total_frame_number'])
+        logger.critical(self.videos[video_path]['total_frame_number']/self.videos[video_path]['fps'])
 
     def add_frame_to_buffer(self, data_tuple):
         video_path = data_tuple[0]
@@ -139,26 +162,39 @@ class video_stream(QtCore.QThread):
         print('play')
         self.start()
 
+    def set_frame_displayed(self):
+        self.frame_displayed = True
+
     def run(self):
-        start_time = time.perf_counter()
         try:
             while True:
                 for video in self.videos.keys():
-                    start_time = time.perf_counter()
+                    target_frame_time = 1 / self.videos[video]['fps']
+                    start_time = time.monotonic()
+                    f_time = start_time
                     for pixmap in self.videos[video]['pixmaps']:
 
-                        f_time = time.perf_counter()
-                        self.pixmap_signal.emit(pixmap)
-                        time_to_wait = max(0, ((1 / self.videos[video]['fps']) - (time.perf_counter() - f_time)))
-                        elapsed_time = time.perf_counter() - f_time + time_to_wait
-                        current_fps = 1 / elapsed_time if elapsed_time > 0 else 0
-                        self.fps_signal.emit(str(round(current_fps,3)))
-                        time_to_wait = max(0, ((1 / self.videos[video]['fps']) - (time.perf_counter() - f_time)))
-                        time.sleep(time_to_wait)
+                        elapsed_time = time.monotonic() - f_time
+                        f_time += target_frame_time
 
-                    logger.critical(len(self.videos[video]['pixmaps']))
-                    total_time = time.perf_counter()-start_time - time_to_wait
-                    logger.critical(total_time)
+                        time_to_wait = max(0, target_frame_time - elapsed_time)
+                        current_fps = 1 / (elapsed_time + time_to_wait) if (elapsed_time + time_to_wait) > 0 else 0
+                        self.fps_signal.emit(current_fps)
+                        
+                        if target_frame_time - elapsed_time < 0:
+                            continue
+                        
+                        time_to_wait = max(0, target_frame_time - elapsed_time)
+                        time.sleep(time_to_wait)
+                        
+                        self.frame_displayed = False
+                        self.pixmap_signal.emit(pixmap)
+
+                        while not self.frame_displayed:
+                            pass
+
+                    total_time = time.monotonic() - start_time
+                    logger.critical(f"Total time: {total_time}")
         except:
             logger.critical(str(traceback.format_exc()))
         
@@ -167,6 +203,8 @@ if __name__ == '__main__':
     player = VideoPlayer()
     player.show()
     player.load_video('video_1.mp4')  # Replace with your video file path
-    player.load_video('video_2.mp4')  # Replace with your video file path
-    player.load_video('video_3.mp4')  # Replace with your video file path
+    #player.load_video('video_2.mp4')  # Replace with your video file path
+    #player.load_video('video_3.mp4')  # Replace with your video file path
+    #player.load_video('video_4.mp4')  # Replace with your video file path
+    #player.load_video('video_5.mp4')  # Replace with your video file path
     sys.exit(app.exec_())
