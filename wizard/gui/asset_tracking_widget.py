@@ -282,7 +282,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             self.start_date_label.setText(start_date)
             due_time = float(self.stage_row['start_date'])+ int(self.stage_row['estimated_time'])*3600*24
             due_date = datetime.datetime.fromtimestamp(due_time).strftime("%d/%m/%Y")
-            self.due_date_label.setText(f"{due_date}{" - " + tools.time_left_from_timestamp(due_time) if due_time > time.time() else ''}")
+            self.due_date_label.setText(f"{due_date}{' - ' + tools.time_left_from_timestamp(due_time) if due_time > time.time() else ''}")
             if due_time > time.time():
                 self.due_date_label.setStyleSheet("color:#7ca657")
             else:

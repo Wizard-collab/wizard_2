@@ -222,6 +222,13 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
         else:
             env[key] = additionnal_env[key]
 
+    if 'PYTHONPATH' in env.keys():
+        python_path_list = env['PYTHONPATH'].split(';')
+        for path in python_path_list:
+            if 'Wizard/_internal' in path:
+                python_path_list.remove(path)
+        env['PYTHONPATH'] = (';').join(python_path_list)
+
     # Clean QT from env
     if 'QT_PLUGIN_PATH' in env.keys():
         del env['QT_PLUGIN_PATH']
