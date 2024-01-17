@@ -30,6 +30,7 @@
 import threading
 import subprocess
 import cv2
+import time
 import os
 import logging
 
@@ -39,9 +40,10 @@ from wizard.core import path_utils
 logger = logging.getLogger(__name__)
 
 class create_proxy():
-    def __init__(self, temp_dir, input_video, fps=24):
+    def __init__(self, temp_dir, input_video, resolution=[1920,1080], fps=24):
         self.temp_dir = temp_dir
         self.input_video = input_video
+        self.resolution = resolution
         self.fps = fps
         self.process = self.create_proxy()
 
@@ -51,7 +53,8 @@ class create_proxy():
         if path_utils.isfile(self.proxy_file):
             return
 
-        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB" -codec:v libx264 -preset ultrafast -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
+        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -codec:v copy -preset ultrafast -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
+        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -preset ultrafast -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
         process = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         return process
 
@@ -59,9 +62,10 @@ class create_proxy():
         if self.process is None:
             return
         self.process.communicate()
-        self.process_finished()
 
     def kill(self):
+        if self.process is None:
+            return
         self.process.kill()
 
     def process_finished(self):
@@ -84,7 +88,7 @@ def concatenate_videos(temp_dir, videos_dic, fps=24):
             proxy_video_file = path_utils.join(temp_dir, videos_dic[video]['name'])
             if not path_utils.isfile(proxy_video_file):
                 logger.debug(f"{proxy_video_file} not found, replacing by black.")
-                proxy_video_file = get_black_file(proxy_video_file, videos_dic[video]['frames_count'], fps)
+                continue
 
             file.write(f"file '{path_utils.abspath(proxy_video_file)}'\n")
 
@@ -101,10 +105,7 @@ def get_frames_count(video_file):
 def get_black_file(proxy_video_file, frames_count, fps):
     black_proxy_video_file = path_utils.join(path_utils.dirname(proxy_video_file), f"black_{path_utils.basename(proxy_video_file)}")
     if path_utils.isfile(black_proxy_video_file):
-        if get_frames_count(black_proxy_video_file) == frames_count:
-            return black_proxy_video_file
-        else:
-            path_utils.remove(black_proxy_video_file)
-    command = f"ffmpeg -f lavfi -i color=c=black:s=19.10:r={fps} -preset ultrafast -an -t {frames_count/fps} {black_proxy_video_file}"
+        path_utils.remove(black_proxy_video_file)
+    command = f"ffmpeg -f lavfi -i color=c=black:s=19.10:r={fps} -preset ultrafast -c libx264 -an -t {frames_count/fps} {black_proxy_video_file}"
     subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     return black_proxy_video_file

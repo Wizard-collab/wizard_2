@@ -532,6 +532,7 @@ class videos_widget(QtWidgets.QWidget):
                 if not self.video_manager_widget:
                     #self.video_manager_widget.quit()
                     self.video_manager_widget = video_manager_widget.video_manager_widget()
+                self.video_manager_widget.need_player()
                 self.video_manager_widget.add_video(items[0].video_row['file_path'])
                 self.video_manager_widget.show()
                 #path_utils.startfile(items[0].video_row['file_path'])
