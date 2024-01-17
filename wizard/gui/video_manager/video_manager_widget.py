@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import traceback
 import sys
+import uuid
 import time
 import os
 os.environ["PATH"] = os.path.abspath('') + os.pathsep + os.environ["PATH"]
@@ -25,7 +26,6 @@ logger = logging.getLogger(__name__)
 class video_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(video_manager_widget, self).__init__(parent)
-        self.concat_video_thread = None
         self.load_video_threads = []
         self.temp_dir = 'temp'
         self.videos_dic = dict()
@@ -49,21 +49,20 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def set_fps(self, fps=24):
         self.fps=fps
+        self.video_player.set_fps(fps)
         self.playing_infos_widget.update_fps(self.fps)
 
-    def add_video(self, video_file, force_proxy=False):
-        if video_file in self.videos_dic.keys():
-            if (force_proxy and self.videos_dic[video_file]['proxy']) or not self.videos_dic[video_file]['proxy']:
-                del self.videos_dic[video_file]
-            else :
-                logger.info("Video already loaded")
-                return
-        self.videos_dic[video_file] = dict()
-        self.videos_dic[video_file]['original_file'] = video_file
-        self.videos_dic[video_file]['name'] = path_utils.basename(video_file)
-        self.videos_dic[video_file]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
-        self.videos_dic[video_file]['proxy'] = False
-        thread = load_video_thread(self.temp_dir, video_file, self.fps, force_proxy, self)
+    def clear_proxys(self):
+        ffmpeg_utils.clear_proxys(self.temp_dir)
+
+    def add_video(self, video_file):
+        video_id = str(uuid.uuid4())
+        self.videos_dic[video_id] = dict()
+        self.videos_dic[video_id]['original_file'] = video_file
+        self.videos_dic[video_id]['name'] = path_utils.basename(video_file)
+        self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
+        self.videos_dic[video_id]['proxy'] = False
+        thread = create_proxy_thread(video_id, self.temp_dir, video_file, self.fps, self)
         thread.on_video_ready.connect(self.video_loaded)
         thread.start()
         self.load_video_threads.append(thread)
@@ -73,8 +72,10 @@ class video_manager_widget(QtWidgets.QWidget):
         self.concat_videos()
 
     def concat_videos(self):
+        start_time = time.monotonic()
         concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.videos_dic, self.fps)
         self.update_concat(concat_video_file)
+        print(f"concat creation and update : {time.monotonic()-start_time}")
 
     def update_concat(self, concat_video_file):
         self.video_player.load_video(concat_video_file, self.first_load)
@@ -112,42 +113,30 @@ class video_manager_widget(QtWidgets.QWidget):
         if event.key() == QtCore.Qt.Key_Right:
             self.video_player.next_frame()
 
-class load_video_thread(QtCore.QThread):
+class create_proxy_thread(QtCore.QThread):
 
     on_video_ready = pyqtSignal(str)
 
-    def __init__(self, temp_dir, video_file, output_frame_rate=24, force_proxy=False, parent=None):
-        super(load_video_thread, self).__init__(parent)
+    def __init__(self, video_id, temp_dir, video_file, output_frame_rate=24, parent=None):
+        super(create_proxy_thread, self).__init__(parent)
+        self.video_id = video_id
         self.temp_dir = temp_dir
         self.video_file = video_file
         self.output_frame_rate = output_frame_rate
-        self.force_proxy = force_proxy
         self.create_proxy_object = None
 
     def run(self):
-        self.create_proxy_object = ffmpeg_utils.create_proxy(self.temp_dir, self.video_file, self.output_frame_rate, self.force_proxy)
+        start_time = time.monotonic()
+        self.create_proxy_object = ffmpeg_utils.create_proxy(self.temp_dir, self.video_file, self.output_frame_rate)
         self.create_proxy_object.wait_for_process()
-        self.on_video_ready.emit(self.video_file)
+        self.on_video_ready.emit(self.video_id)
+        print(f"proxy creation {self.video_file} : {time.monotonic()-start_time}")
 
     def kill(self):
         if not self.create_proxy_object:
             return
         self.create_proxy_object.kill()
         self.quit()
-
-class concat_video_thread(QtCore.QThread):
-
-    on_video_ready = pyqtSignal(str)
-
-    def __init__(self, temp_dir, loaded_videos, output_frame_rate=24, parent=None):
-        super(concat_video_thread, self).__init__(parent)
-        self.temp_dir = temp_dir
-        self.loaded_videos = loaded_videos
-        self.output_frame_rate = output_frame_rate
-
-    def run(self):
-        concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.loaded_videos, self.output_frame_rate)
-        self.on_video_ready.emit(concat_video_file)
 
 class playing_infos_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -284,27 +273,31 @@ class video_player(QtWidgets.QWidget):
         self.update_ui_progress = True
 
     def next_frame(self):
-        t = (1/self.fps)
-        self.player.seek(t, reference="relative", precision="exact")
+        self.player.frame_step()
 
     def previous_frame(self):
-        t = -(1/self.fps)
-        self.player.seek(t, reference="relative", precision="exact")
+        self.player.frame_back_step()
+'''
 
 app = app_utils.get_app()
 player = video_manager_widget()
+#player.clear_proxys()
 player.set_fps(24)
 player.show()
 QtWidgets.QApplication.processEvents()
 
 temp_dir = 'temp'
 videos = ["video_1.mp4",
-            "video_5.mp4",
-            "video_4.mp4"]
+            "video_5.mp4"]
+            #"video_4.mp4",
+            #"video_2.mp4",
+            #"video_3.mp4"]
             #"video_4.mp4",
             #"video_5.mp4"]
 
+
 for video in videos:
-    player.add_video(video, force_proxy=True)
+    player.add_video(video)
 
 sys.exit(app.exec_())
+'''

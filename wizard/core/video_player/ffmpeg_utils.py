@@ -39,29 +39,25 @@ from wizard.core import path_utils
 logger = logging.getLogger(__name__)
 
 class create_proxy():
-    def __init__(self, temp_dir, input_video, output_framerate=24, force=False):
+    def __init__(self, temp_dir, input_video, fps=24):
         self.temp_dir = temp_dir
         self.input_video = input_video
-        self.output_framerate = output_framerate
-        self.force = force
+        self.fps = fps
         self.process = self.create_proxy()
 
     def create_proxy(self):
         self.proxy_file = path_utils.join(self.temp_dir, f"{path_utils.basename(self.input_video)}")
         self.temp_proxy_file = path_utils.join(self.temp_dir, f"temp_{path_utils.basename(self.input_video)}")
-        if path_utils.isfile(self.proxy_file) and not self.force:
+        if path_utils.isfile(self.proxy_file):
             return
 
-        if path_utils.isfile(self.proxy_file) and self.force:
-            path_utils.remove(self.proxy_file)
-        if path_utils.isfile(self.temp_proxy_file) and self.force:
-            path_utils.remove(self.temp_proxy_file)
-
-        command = f"ffmpeg -i {self.input_video} -codec:v libx264 -preset medium -an -crf 24 -r {self.output_framerate} {self.temp_proxy_file}"
+        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB" -codec:v libx264 -preset ultrafast -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
         process = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         return process
 
     def wait_for_process(self):
+        if self.process is None:
+            return
         self.process.communicate()
         self.process_finished()
 
@@ -69,21 +65,32 @@ class create_proxy():
         self.process.kill()
 
     def process_finished(self):
+        if self.temp_proxy_file is None:
+            return
+        if self.proxy_file is None:
+            return
+        if not path_utils.isfile(self.temp_proxy_file):
+            return
         os.rename(self.temp_proxy_file, self.proxy_file)
 
-def concatenate_videos(temp_dir, videos_dic, output_framerate=24):
+def clear_proxys(temp_dir):
+    for file in path_utils.listdir(temp_dir):
+        path_utils.remove(path_utils.join(temp_dir, file))
+
+def concatenate_videos(temp_dir, videos_dic, fps=24):
     concat_txt_file = path_utils.join(temp_dir, 'concat.txt')
     with open(concat_txt_file, 'w') as file:
         for video in videos_dic.keys():
             proxy_video_file = path_utils.join(temp_dir, videos_dic[video]['name'])
             if not path_utils.isfile(proxy_video_file):
                 logger.debug(f"{proxy_video_file} not found, replacing by black.")
-                proxy_video_file = get_black_file(proxy_video_file, videos_dic[video]['frames_count'], output_framerate)
+                proxy_video_file = get_black_file(proxy_video_file, videos_dic[video]['frames_count'], fps)
+
             file.write(f"file '{path_utils.abspath(proxy_video_file)}'\n")
 
     output_video_file = path_utils.join(temp_dir, 'concatened.mp4')
 
-    command = f"ffmpeg -y -f concat -safe 0 -i {concat_txt_file} -c copy -an -fflags +genpts -r {output_framerate} {output_video_file}"
+    command = f"ffmpeg -y -f concat -safe 0 -i {concat_txt_file} -preset ultrafast -c copy -an -r {fps} {output_video_file}"
     subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     return output_video_file
 
@@ -98,6 +105,6 @@ def get_black_file(proxy_video_file, frames_count, fps):
             return black_proxy_video_file
         else:
             path_utils.remove(black_proxy_video_file)
-    command = f"ffmpeg -f lavfi -i color=c=black:s=192.108:r={fps} -an -t {frames_count/fps} {black_proxy_video_file}"
+    command = f"ffmpeg -f lavfi -i color=c=black:s=19.10:r={fps} -preset ultrafast -an -t {frames_count/fps} {black_proxy_video_file}"
     subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     return black_proxy_video_file
