@@ -575,18 +575,40 @@ class info_widget(QtWidgets.QFrame):
         self.text.setText(text)
 
 class transparent_button(QtWidgets.QPushButton):
-    def __init__(self, icon, hover_icon, parent=None):
+    def __init__(self, icon, hover_icon, checked_icon=None, parent=None):
         super(transparent_button, self).__init__(parent)
+        self.is_hover = False
         self.icon = icon
         self.hover_icon = hover_icon
+        self.checked_icon = checked_icon
+        self.non_checked_icon = icon
         self.setIcon(QtGui.QIcon(self.icon))
         self.reset_stylesheet()
+        self.toggled.connect(self.check_update)
+
+    def update_icon(self):
+        if self.isCheckable():
+            self.setIcon(QtGui.QIcon(self.icon))
+            return
+        if self.is_hover:
+            self.setIcon(QtGui.QIcon(self.hover_icon))
+        else:
+            self.setIcon(QtGui.QIcon(self.icon))
+
+    def check_update(self):
+        if self.isChecked() and self.checked_icon is not None:
+            self.icon = self.checked_icon
+        else:
+            self.icon = self.non_checked_icon
+        self.update_icon()
 
     def enterEvent(self, event):
-        self.setIcon(QtGui.QIcon(self.hover_icon))
+        self.is_hover = True
+        self.update_icon()
 
     def leaveEvent(self, event):
-        self.setIcon(QtGui.QIcon(self.icon))
+        self.is_hover = False
+        self.update_icon()
 
     def reset_stylesheet(self):
         self.setStyleSheet('background-color: transparent;border: none;')

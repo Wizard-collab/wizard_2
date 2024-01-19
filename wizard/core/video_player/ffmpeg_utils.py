@@ -88,7 +88,8 @@ def concatenate_videos(temp_dir, videos_dic, fps=24):
             proxy_video_file = path_utils.join(temp_dir, videos_dic[video]['name'])
             if not path_utils.isfile(proxy_video_file):
                 logger.debug(f"{proxy_video_file} not found, replacing by black.")
-                continue
+                proxy_video_file = get_black_file(proxy_video_file, videos_dic[video]['frames_count'], fps)
+                #continue
 
             file.write(f"file '{path_utils.abspath(proxy_video_file)}'\n")
 
@@ -106,6 +107,6 @@ def get_black_file(proxy_video_file, frames_count, fps):
     black_proxy_video_file = path_utils.join(path_utils.dirname(proxy_video_file), f"black_{path_utils.basename(proxy_video_file)}")
     if path_utils.isfile(black_proxy_video_file):
         path_utils.remove(black_proxy_video_file)
-    command = f"ffmpeg -f lavfi -i color=c=black:s=19.10:r={fps} -preset ultrafast -c libx264 -an -t {frames_count/fps} {black_proxy_video_file}"
+    command = f"ffmpeg -f lavfi -i color=c=black:s=19.10:r=1 -preset ultrafast -an -t {frames_count/fps} {black_proxy_video_file}"
     subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     return black_proxy_video_file

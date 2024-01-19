@@ -137,6 +137,16 @@ def convert_seconds(time_float):
     seconds = int(time_float)
     return hours, minutes, seconds
 
+def convert_seconds_with_miliseconds(time_float):
+    hours = int(time_float/3600)
+    time_float = time_float - (hours*3600)
+    minutes = int(time_float/60)
+    time_float = time_float - (minutes*60)
+    seconds = int(time_float)
+    time_float = time_float - (seconds)
+    miliseconds = int(time_float*100)
+    return hours, minutes, seconds, miliseconds
+
 def convert_seconds_with_days(time_float):
     days = int(time_float/(3600*24))
     time_float = time_float - (days*3600*24)

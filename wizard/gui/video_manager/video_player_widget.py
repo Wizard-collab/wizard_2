@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 class video_player_widget(QtWidgets.QWidget):
 
     on_progress = pyqtSignal(int)
+    on_frame_range_modified = pyqtSignal(list)
     on_play_toggle = pyqtSignal(int)
 
     def __init__(self, parent=None):
@@ -29,6 +30,7 @@ class video_player_widget(QtWidgets.QWidget):
         self.playing = False
         self.loop = False
         self.mouse_pos = None
+        self.bounds_range = [0,1000]
 
         self.setAttribute(QtCore.Qt.WA_DontCreateNativeAncestors)
         self.setAttribute(QtCore.Qt.WA_NativeWindow)
@@ -36,8 +38,11 @@ class video_player_widget(QtWidgets.QWidget):
         self.create_mpv_player()
 
         self.timer = QtCore.QTimer(self)
-        self.timer.start(int(1/self.fps*1000))
+        self.timer.start(int(1/self.fps*500))
         self.timer.timeout.connect(self.listen_progress)
+
+    def set_bounds_range(self, bounds_range):
+        self.bounds_range = bounds_range
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
@@ -49,6 +54,9 @@ class video_player_widget(QtWidgets.QWidget):
             percent = x_delta/self.width()
             self.seek_relative_percent(percent)
             self.mouse_pos = event.pos()
+
+    def toggle_loop(self, loop):
+        self.loop = loop
 
     def mouseReleaseEvent(self, event):
         self.mouse_pos = None
@@ -73,6 +81,10 @@ class video_player_widget(QtWidgets.QWidget):
             self.seek(pos)
         if self.player.pause != pause:
             self.player.command('cycle', 'pause')
+        self.update_frame_range()
+
+    def update_frame_range(self):
+        self.on_frame_range_modified.emit([0, self.player.duration*self.fps])
 
     def force_pause(self):
         if not self.player.pause:
@@ -101,9 +113,11 @@ class video_player_widget(QtWidgets.QWidget):
             current_position = time_pos / duration
             frame = round(current_position*self.get_total_frames())
 
-            if frame == self.get_total_frames()-1:
+            if frame >= self.bounds_range[1] and not self.player.pause:
                 if self.loop:
-                    self.seek(0)
+                    self.seek_frame(self.bounds_range[0])
+                else:
+                    self.play_pause_toggle()
 
             if frame == self.frame:
                 return
@@ -119,18 +133,24 @@ class video_player_widget(QtWidgets.QWidget):
         total_frames = self.get_total_frames()
         if not total_frames:
             return
-        if self.frame == self.get_total_frames()-1 and self.player.pause:
-            self.seek(0)
+        if self.frame >= self.bounds_range[1] and self.player.pause:
+            self.seek_frame(self.bounds_range[0])
 
         self.player.command('cycle', 'pause')
-        self.playing = self.player.pause
-        self.on_play_toggle.emit(self.playing)
+        self.pause = self.player.pause
+        self.on_play_toggle.emit(not self.pause)
 
     def seek(self, value):
         if not self.apply_seek:
             return
 
         frame = round(value * self.get_total_frames())
+        if frame > self.bounds_range[1]:
+            self.seek_frame(self.bounds_range[0])
+            return
+        if frame < self.bounds_range[0]:
+            self.seek_frame(self.bounds_range[1])
+            return
         if frame == self.frame:
             return
 
@@ -138,8 +158,33 @@ class video_player_widget(QtWidgets.QWidget):
         self.player.seek(value, reference="absolute", precision="exact")
         self.update_ui_progress = True
 
+    def seek_frame(self, frame):
+        if not self.apply_seek:
+            return
+
+        t_value = frame/self.fps
+        if frame > self.bounds_range[1]:
+            self.seek_frame(self.bounds_range[0])
+            return
+        if frame < self.bounds_range[0]:
+            self.seek_frame(self.bounds_range[1])
+            return
+
+        self.update_ui_progress = False
+        self.player.seek(t_value, reference="absolute", precision="exact")
+        self.update_ui_progress = True
+
     def seek_relative(self, value):
         if not self.apply_seek:
+            return
+
+        t_value = self.player.time_pos + value
+        frame = t_value*self.fps
+        if frame > self.bounds_range[1]:
+            self.seek_frame(self.bounds_range[0])
+            return
+        if frame < self.bounds_range[0]:
+            self.seek_frame(self.bounds_range[1])
             return
 
         self.update_ui_progress = False
@@ -157,15 +202,31 @@ class video_player_widget(QtWidgets.QWidget):
             return
         if frame < 0:
             return
-        if frame > self.get_total_frames():
+        if frame >= self.bounds_range[1]:
+            self.seek_frame(self.bounds_range[0])
+            return
+        if frame < self.bounds_range[0]:
+            self.seek_frame(self.bounds_range[1])
             return
 
         self.update_ui_progress = False
         self.player.seek(t_value, reference="relative", precision="exact")
         self.update_ui_progress = True
 
+    def seek_end(self):
+        self.seek_frame(self.bounds_range[1])
+
+    def seek_beginning(self):
+        self.seek_frame(self.bounds_range[0])
+
     def next_frame(self):
+        if self.frame + 1 >= self.bounds_range[1]:
+            self.seek_frame(self.bounds_range[0])
+            return
         self.player.frame_step()
 
     def previous_frame(self):
+        if self.frame - 1 <= self.bounds_range[0]:
+            self.seek_frame(self.bounds_range[1])
+            return
         self.player.frame_back_step()
