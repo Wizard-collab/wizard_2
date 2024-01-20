@@ -5,6 +5,7 @@
 # Python modules
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
+import math
 
 # Wizard modules
 from wizard.core import tools
@@ -69,7 +70,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.playing_infos_widget.set_fps(fps)
 
     def set_frame_range(self, frame_range):
-        self.frame_range = frame_range
+        self.frame_range = [int(frame_range[0]), int(frame_range[1])]
         self.timeline_viewport.set_frame_range(self.frame_range)
         self.playing_infos_widget.set_frame_range(self.frame_range)
         self.update_bound_range()
@@ -192,7 +193,7 @@ class playing_infos_widget(QtWidgets.QWidget):
 
     def set_frame_range(self, frame_range):
         self.frame_range = frame_range
-        total_time = (frame_range[1]-frame_range[0])/self.fps
+        total_time = (frame_range[1]-frame_range[0]+1)/self.fps
         hours, minutes, seconds, miliseconds = tools.convert_seconds_with_miliseconds(total_time)
         self.total_time_label.setText(f"| {str(hours).zfill(2)}:{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(miliseconds).zfill(2)}")
 
@@ -286,10 +287,10 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.bounds_range = bounds_range
         self.in_bound_item.set_frame(self.bounds_range[0])
         self.out_bound_item.set_frame(self.bounds_range[1])
-        self.timeline_scene.set_bounds_range(bounds_range)
-        self.cursor_item.set_bounds_range(bounds_range)
-        self.in_bound_item.set_bounds_range(bounds_range)
-        self.out_bound_item.set_bounds_range(bounds_range)
+        self.timeline_scene.set_bounds_range(self.bounds_range)
+        self.cursor_item.set_bounds_range(self.bounds_range)
+        self.in_bound_item.set_bounds_range(self.bounds_range)
+        self.out_bound_item.set_bounds_range(self.bounds_range)
 
     def set_frame_width(self, frame_width=2):
         self.frame_width = frame_width
@@ -427,39 +428,49 @@ class timeline_scene(QtWidgets.QGraphicsScene):
         bounds_zone = QtCore.QRectF(rect.left(),0,rect.width(),10)
         painter.fillRect(bounds_zone, QtGui.QColor(0,0,10,10))
 
+
         bounds_rect = QtCore.QRectF(self.bounds_range[0]*self.frame_width,2,(self.bounds_range[1]-self.bounds_range[0])*self.frame_width,6)
         painter.fillRect(bounds_rect, QtGui.QColor(245,245,255,20))
 
         time_rect = QtCore.QRectF(rect.left(),10,rect.width(),20)
         painter.fillRect(time_rect, QtGui.QColor(0,0,10,10))
 
-        frame_range_rect = QtCore.QRectF(self.frame_range[0]*self.frame_width,10,(self.frame_range[1]-self.frame_range[0])*self.frame_width,20)
+        frame_range_rect = QtCore.QRectF(self.frame_range[0]*self.frame_width,10,(self.frame_range[1]-self.frame_range[0]+1)*self.frame_width,20)
         painter.fillRect(frame_range_rect, QtGui.QColor(245,245,255,10))
 
         in_rect = QtCore.QRectF((self.frame_range[0]*self.frame_width),10,1,20)
         painter.fillRect(in_rect, QtGui.QColor(100,100,110,150))
 
-        out_rect = QtCore.QRectF((self.frame_range[1])*self.frame_width,10,1,20)
+        out_rect = QtCore.QRectF((self.frame_range[1]+1)*self.frame_width,10,1,20)
         painter.fillRect(out_rect, QtGui.QColor(100,100,110,150))
 
+
         start_x = 0
-        end_x = int(rect.right()) // self.frame_width
-        step = self.fps
-        if self.frame_width < 2:
-            step *= 2
-        if self.frame_width > 5:
-            step = int(step/2)
-        if self.frame_width < 2:
-            step *= 2
-        if self.frame_width > 10:
-            step = int(step/2)
-        if self.frame_width > 15:
-            step = int(step/2)
-        if self.frame_width > 20:
+        end_x = int(rect.right() // self.frame_width)
+
+        # Adjust frames display
+        step = int(self.fps)
+        if self.frame_width >= 4:
+            step = int(self.fps/2)
+        if self.frame_width >= 10:
+            step = int(self.fps/4)
+        if self.frame_width >= 15:
+            step = int(self.fps/6)
+        if self.frame_width >= 20:
             step = 1
-        '''
+        if self.frame_width <= 1:
+            step = self.fps*2
+        if self.frame_width <= 0.5:
+            step = self.fps*6
+        if self.frame_width <= 0.2:
+            step = self.fps*8
+        if self.frame_width <= 0.15:
+            step = self.fps*12
+        if self.frame_width <= 0.1:
+            step = self.fps*18
+        
         for x in range(start_x, end_x + 1, step):
-            x_pos = x * self.frame_width
+            x_pos = int(x * self.frame_width)
             rect = QtCore.QRectF(x_pos-25+int(self.frame_width/2), 10, 50, 20)
             pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.2)), 1, QtCore.Qt.SolidLine)
             painter.setPen(pen)
@@ -467,7 +478,6 @@ class timeline_scene(QtWidgets.QGraphicsScene):
             pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.05)), 1, QtCore.Qt.SolidLine)
             painter.setPen(pen)
             painter.drawLine(x_pos, 30, x_pos, 80)
-        '''
 
 class custom_graphic_item(QtWidgets.QGraphicsItem):
     def __init__(self):
@@ -724,7 +734,7 @@ class bound_item(custom_graphic_item):
                 return
 
         if self.type == 'out':
-            if self.get_pos() + delta <= (self.bounds_range[0])*self.frame_width:
+            if self.get_pos() + delta <= (self.bounds_range[0]+1)*self.frame_width:
                 self.set_frame(self.bounds_range[0]+1)
                 self.signal_manager.on_bounds_change.emit(1)
                 return

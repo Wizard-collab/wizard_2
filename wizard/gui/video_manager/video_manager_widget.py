@@ -76,6 +76,9 @@ class video_manager_widget(QtWidgets.QWidget):
     def video_loaded(self, video_id):
         self.videos_dic[video_id]['proxy'] = True
         self.timeline_widget.update_videos_dic(self.videos_dic)
+        for video_id in self.videos_dic.keys():
+            if self.videos_dic[video_id]['proxy'] is False:
+                return
         self.concat_videos()
 
     def concat_videos(self):
@@ -130,20 +133,21 @@ class video_manager_widget(QtWidgets.QWidget):
 
 app = app_utils.get_app()
 player = video_manager_widget()
-#player.clear_proxys()
-player.set_fps(24)
+player.clear_proxys()
+player.set_fps(1)
 player.show()
 QtWidgets.QApplication.processEvents()
 
 temp_dir = 'temp'
-videos = ["video_1.mp4",
-            "video_2.mp4",
-            "video_3.mp4",
-            "video_4.mp4",
-            "video_5.mp4"]
+videos = ["video_1.mp4"]
+            #"video_1.mp4"]
+            #"video_3.mp4",
+            #"video_4.mp4",
+            #"video_5.mp4"]
             #"video_3.mp4"]
             #"video_4.mp4",
             #"video_5.mp4"]
+
 
 for video in videos:
     player.add_video(video)
