@@ -74,11 +74,11 @@ class video_player_widget(QtWidgets.QWidget):
         if first_load:
             pos = 0
             pause = True
-        self.player.loadfile(video_file)
+        self.player.play(video_file)
         MPV_EVENT_FILE_LOADED = 8
         self.player.wait_for_event(MPV_EVENT_FILE_LOADED)
         if pos is not None:
-            self.seek(pos)
+            self.seek(pos, force=True)
         if self.player.pause != pause:
             self.player.command('cycle', 'pause')
         self.update_frame_range()
@@ -108,19 +108,15 @@ class video_player_widget(QtWidgets.QWidget):
         return round(duration*self.fps)
 
     def listen_progress(self):
-
         try:
             if not self.update_ui_progress:
                 return
 
-            duration = self.player.duration
             time_pos = self.player.time_pos
-
-            if (duration is None) or (time_pos is None):
+            if time_pos is None:
                 return
 
-            current_position = time_pos / duration
-            frame = round(current_position*self.get_total_frames())
+            frame = round(time_pos*self.fps)
 
             if frame == self.frame:
                 return
@@ -131,22 +127,18 @@ class video_player_widget(QtWidgets.QWidget):
             self.apply_seek = True
 
             if frame >= self.bounds_range[1] and not self.player.pause:
+                self.force_pause()
                 QtWidgets.QApplication.processEvents()
                 time.sleep(1/self.fps)
                 QtWidgets.QApplication.processEvents()
                 if self.loop:
                     self.seek_frame(self.bounds_range[0])
                     self.force_play()
-                else:
-                    self.force_pause()
 
         except mpv.ShutdownError:
             self.timer.stop()
 
     def play_pause_toggle(self):
-        total_frames = self.get_total_frames()
-        if not total_frames:
-            return
         if self.frame >= self.bounds_range[1] and self.player.pause:
             self.seek_frame(self.bounds_range[0])
 
@@ -154,18 +146,18 @@ class video_player_widget(QtWidgets.QWidget):
         self.pause = self.player.pause
         self.on_play_toggle.emit(not self.pause)
 
-    def seek(self, value):
+    def seek(self, value, force=False):
         if not self.apply_seek:
             return
 
-        frame = round(value * self.get_total_frames())
+        frame = round(value * self.fps)
         if frame > self.bounds_range[1]:
             self.seek_frame(self.bounds_range[0])
             return
         if frame < self.bounds_range[0]:
             self.seek_frame(self.bounds_range[1])
             return
-        if frame == self.frame:
+        if frame == self.frame and not force:
             return
 
         self.update_ui_progress = False

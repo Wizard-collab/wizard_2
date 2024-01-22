@@ -86,27 +86,32 @@ def concatenate_videos(temp_dir, videos_dic, fps=24):
     with open(concat_txt_file, 'w') as file:
         for video in videos_dic.keys():
             proxy_video_file = path_utils.join(temp_dir, videos_dic[video]['name'])
-            if not path_utils.isfile(proxy_video_file):
-                logger.debug(f"{proxy_video_file} not found, replacing by black.")
-                proxy_video_file = get_black_file(proxy_video_file, videos_dic[video]['frames_count'], fps)
-                #continue
-
+            if (not path_utils.isfile(proxy_video_file)) or (not videos_dic[video]['proxy']):
+                break
             file.write(f"file '{path_utils.abspath(proxy_video_file)}'\n")
-
     output_video_file = path_utils.join(temp_dir, 'concatened.mp4')
-
     command = f"ffmpeg -y -f concat -safe 0 -i {concat_txt_file} -preset ultrafast -c copy -an -r {fps} {output_video_file}"
-    subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    process = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    process.communicate()
+    process.kill()
     return output_video_file
-
-def get_frames_count(video_file):
-    cap = cv2.VideoCapture(video_file)
-    return cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
 def get_black_file(proxy_video_file, frames_count, fps):
     black_proxy_video_file = path_utils.join(path_utils.dirname(proxy_video_file), f"black_{path_utils.basename(proxy_video_file)}")
     if path_utils.isfile(black_proxy_video_file):
         path_utils.remove(black_proxy_video_file)
-    command = f"ffmpeg -f lavfi -i color=c=black:s=19.10:r=1 -preset ultrafast -an -t {frames_count/fps} {black_proxy_video_file}"
+    command = f"ffmpeg -f lavfi -i color=c=black:s=1920.1080:r={fps} -c libx264 -preset ultrafast -an -t {frames_count/fps} {black_proxy_video_file}"
     subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     return black_proxy_video_file
+
+def get_one_frame_black_file(proxy_video_file, fps):
+    black_proxy_video_file = path_utils.join(path_utils.dirname(proxy_video_file), f"black_{path_utils.basename(proxy_video_file)}")
+    if path_utils.isfile(black_proxy_video_file):
+        path_utils.remove(black_proxy_video_file)
+    command = f"ffmpeg -f lavfi -i color=c=black:s=1920.1080:r={fps} -c libx264 -preset ultrafast -an -t {120/fps} {black_proxy_video_file}"
+    subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    return black_proxy_video_file
+
+def get_frames_count(video_file):
+    cap = cv2.VideoCapture(video_file)
+    return cap.get(cv2.CAP_PROP_FRAME_COUNT)

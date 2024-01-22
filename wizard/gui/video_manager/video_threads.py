@@ -41,3 +41,33 @@ class create_proxy_thread(QtCore.QThread):
             return
         self.create_proxy_object.kill()
         self.quit()
+
+class concat_thread(QtCore.QThread):
+
+    on_concat_ready = pyqtSignal(str)
+
+    def __init__(self, temp_dir, parent=None):
+        super(concat_thread, self).__init__(parent)
+        self.temp_dir = temp_dir
+        self.fps = 24
+        self.to_concat = []
+        self.running = False
+
+    def set_fps(self, fps):
+        self.fps = fps
+
+    def set_temp_dir(self, temp_dir):
+        self.temp_dir = temp_dir
+
+    def give_job(self, videos_dic):
+        self.to_concat.append(videos_dic)
+        if not self.running:
+            self.start()
+
+    def run(self):
+        self.running = True
+        while self.to_concat != []:
+            concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.to_concat[0], self.fps)
+            self.on_concat_ready.emit(concat_video_file)
+            self.to_concat.pop(0)
+        self.running = False

@@ -13,6 +13,7 @@ import logging
 
 # Wizard core modules
 from wizard.core import path_utils
+from wizard.core import project
 from wizard.core.video_player import ffmpeg_utils
 
 # Wizard gui modules
@@ -31,12 +32,17 @@ class video_manager_widget(QtWidgets.QWidget):
         self.videos_dic = dict()
         self.load_threads = []
         self.frame_range = [0,1000]
+        self.resolution = [1920,1080]
+        self.concat_thread = video_threads.concat_thread(self.temp_dir, self)
         self.video_player = video_player_widget.video_player_widget(self)
         self.timeline_widget = timeline_widget.timeline_widget(self)
         self.first_load = True
         self.build_ui()
         self.connect_functions()
-        self.set_fps()
+        #self.set_fps(project.get_frame_rate())
+        #self.set_resolution(project.get_image_format())
+        self.set_fps(24)
+        self.set_resolution([2048,858])
 
     def need_player(self):
         self.video_player.create_mpv_player()
@@ -56,6 +62,11 @@ class video_manager_widget(QtWidgets.QWidget):
         self.fps=fps
         self.video_player.set_fps(fps)
         self.timeline_widget.set_fps(fps)
+        self.concat_thread.set_fps(fps)
+
+    def set_resolution(self, resolution=[1920,1080]):
+        self.resolution = resolution
+
 
     def clear_proxys(self):
         ffmpeg_utils.clear_proxys(self.temp_dir)
@@ -63,29 +74,33 @@ class video_manager_widget(QtWidgets.QWidget):
     def add_video(self, video_file):
         video_id = str(uuid.uuid4())
         self.videos_dic[video_id] = dict()
-        self.videos_dic[video_id]['original_file'] = video_file
+        self.videos_dic[video_id]['original_file'] = path_utils.abspath(video_file)
         self.videos_dic[video_id]['name'] = path_utils.basename(video_file)
         self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
         self.videos_dic[video_id]['proxy'] = False
-        thread = video_threads.create_proxy_thread(video_id, self.temp_dir, video_file, [1920,1080], self.fps, self)
-        thread.on_video_ready.connect(self.video_loaded)
-        thread.start()
-        self.load_video_threads.append(thread)
         self.timeline_widget.update_videos_dic(self.videos_dic)
+
+    def load_next(self):
+        for video_id in self.videos_dic.keys():
+            if self.videos_dic[video_id]['proxy']:
+                continue
+            thread = video_threads.create_proxy_thread(video_id,
+                                                        self.temp_dir,
+                                                        self.videos_dic[video_id]['original_file'],
+                                                        self.resolution,
+                                                        self.fps,
+                                                        self)
+            thread.on_video_ready.connect(self.video_loaded)
+            thread.start()
+            self.load_video_threads.append(thread)
+            break
 
     def video_loaded(self, video_id):
-        self.videos_dic[video_id]['proxy'] = True
+        for other_video_id in self.videos_dic.keys():
+            if self.videos_dic[other_video_id]['original_file'] == self.videos_dic[video_id]['original_file']:
+                self.videos_dic[other_video_id]['proxy'] = True
         self.timeline_widget.update_videos_dic(self.videos_dic)
-        for video_id in self.videos_dic.keys():
-            if self.videos_dic[video_id]['proxy'] is False:
-                return
-        self.concat_videos()
-
-    def concat_videos(self):
-        start_time = time.monotonic()
-        concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.videos_dic, self.fps)
-        self.update_concat(concat_video_file)
-        print(f"concat creation and update : {time.monotonic()-start_time}")
+        self.concat_thread.give_job(self.videos_dic)
 
     def update_frame_range(self, frame_range):
         self.frame_range = frame_range
@@ -95,6 +110,7 @@ class video_manager_widget(QtWidgets.QWidget):
         self.video_player.load_video(concat_video_file, self.first_load)
         if self.first_load:
             self.first_load = False
+        self.load_next()
 
     def build_ui(self):
         self.resize(1280,720)
@@ -116,6 +132,7 @@ class video_manager_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.timeline_widget)
 
     def connect_functions(self):
+        self.concat_thread.on_concat_ready.connect(self.update_concat)
         self.video_player.on_progress.connect(self.update_frame)
         self.video_player.on_frame_range_modified.connect(self.update_frame_range)
         self.video_player.on_play_toggle.connect(self.timeline_widget.set_play_pause)
@@ -130,26 +147,36 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
-
 app = app_utils.get_app()
 player = video_manager_widget()
-player.clear_proxys()
-player.set_fps(1)
+#player.clear_proxys()
+player.set_fps(24)
 player.show()
 QtWidgets.QApplication.processEvents()
 
 temp_dir = 'temp'
-videos = ["video_1.mp4"]
-            #"video_1.mp4"]
-            #"video_3.mp4",
-            #"video_4.mp4",
-            #"video_5.mp4"]
-            #"video_3.mp4"]
-            #"video_4.mp4",
-            #"video_5.mp4"]
-
+videos = ["video_1.mp4",
+            "video_6.mp4",
+            "video_1.mp4",
+            "video_6.mp4",
+            "video_1.mp4",
+            "video_6.mp4",
+            "video_1.mp4",
+            "video_6.mp4",
+            "video_1.mp4",
+            "video_6.mp4",
+            "video_3.mp4",
+            "video_4.mp4",
+            "video_5.mp4",
+            "video_3.mp4",
+            "video_4.mp4",
+            "video_5.mp4"]
+videos=[]
+for a in range(0,100):
+    videos.append(f"videos/{a}.mp4")
 
 for video in videos:
     player.add_video(video)
+player.load_next()
 
 sys.exit(app.exec_())

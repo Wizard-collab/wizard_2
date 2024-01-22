@@ -70,10 +70,14 @@ class timeline_widget(QtWidgets.QWidget):
         self.playing_infos_widget.set_fps(fps)
 
     def set_frame_range(self, frame_range):
+        old_frame_range = self.frame_range
         self.frame_range = [int(frame_range[0]), int(frame_range[1])]
         self.timeline_viewport.set_frame_range(self.frame_range)
         self.playing_infos_widget.set_frame_range(self.frame_range)
-        self.update_bound_range()
+        if old_frame_range == self.bounds_range:
+            self.set_bounds_range(self.frame_range)
+        else:
+            self.update_bound_range()
 
     def update_bound_range(self):
         if self.bounds_range[0] < self.frame_range[0]:
@@ -285,12 +289,12 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def set_bounds_range(self, bounds_range):
         self.bounds_range = bounds_range
-        self.in_bound_item.set_frame(self.bounds_range[0])
-        self.out_bound_item.set_frame(self.bounds_range[1])
         self.timeline_scene.set_bounds_range(self.bounds_range)
-        self.cursor_item.set_bounds_range(self.bounds_range)
         self.in_bound_item.set_bounds_range(self.bounds_range)
         self.out_bound_item.set_bounds_range(self.bounds_range)
+        self.in_bound_item.set_frame(self.bounds_range[0])
+        self.out_bound_item.set_frame(self.bounds_range[1])
+        self.cursor_item.set_bounds_range(self.bounds_range)
 
     def set_frame_width(self, frame_width=2):
         self.frame_width = frame_width
@@ -534,7 +538,7 @@ class video_item(custom_graphic_item):
         self.width = 0
         self.frame_width = 2
         self.loaded = False
-        self.margin = 4
+        self.margin = 1
         self.start_frame = 0
         self.setPos(self.pos().x(), 30)
 
@@ -580,9 +584,9 @@ class video_item(custom_graphic_item):
         pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
         rect = QtCore.QRect(int(self.x),
-                            int(self.y+self.margin),
+                            int(self.y+self.margin*4),
                             int(self.width-self.margin),
-                            int(self.height-self.margin*2))
+                            int(self.height-self.margin*8))
         painter.drawRoundedRect(rect, 2,2)
         #painter.fillRect(QtCore.QRectF(self.x, self.y, self.width, self.height), QtGui.QColor(255,255,255,5))
 
