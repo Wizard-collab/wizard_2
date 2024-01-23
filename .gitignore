@@ -1,3 +1,4 @@
 *.pyc
 compile/
 python3_wizard_venv
+ffmpeg.exe

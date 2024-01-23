@@ -576,10 +576,10 @@ class video_item(custom_graphic_item):
         self.update()
 
     def paint(self, painter, option, widget):
-        if self.loaded:
-            brush = QtGui.QBrush(QtGui.QColor(100,100,110,255))
-        else:
-            brush = QtGui.QBrush(QtGui.QColor(20,20,30,255))
+        color = QtGui.QColor(100,100,110,255)
+        if not self.loaded:
+            color.setAlpha(100)
+        brush = QtGui.QBrush(color)
         painter.setBrush(brush)
         pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)

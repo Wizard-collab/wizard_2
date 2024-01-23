@@ -155,7 +155,6 @@ class video_manager_widget(QtWidgets.QWidget):
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
 
-'''
 app = app_utils.get_app()
 player = video_manager_widget()
 player.set_fps(24)
@@ -188,4 +187,3 @@ player.clear_all_proxys()
 player.load_next()
 
 sys.exit(app.exec_())
-'''
