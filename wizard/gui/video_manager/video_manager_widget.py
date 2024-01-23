@@ -43,7 +43,7 @@ class video_manager_widget(QtWidgets.QWidget):
         #self.set_fps(project.get_frame_rate())
         #self.set_resolution(project.get_image_format())
         self.set_fps(24)
-        self.set_resolution([2048,858])
+        self.set_resolution([1920,1080])
 
     def need_player(self):
         self.video_player.create_mpv_player()
@@ -78,6 +78,9 @@ class video_manager_widget(QtWidgets.QWidget):
     def clear_proxy(self, original_file):
         ffmpeg_utils.delete_proxy(self.temp_dir, original_file)
 
+    def hard_clear_proxys(self):
+        ffmpeg_utils.hard_clear_proxys(self.temp_dir)
+
     def add_video(self, video_file):
         video_id = str(uuid.uuid4())
         self.videos_dic[video_id] = dict()
@@ -85,7 +88,7 @@ class video_manager_widget(QtWidgets.QWidget):
         self.videos_dic[video_id]['name'] = path_utils.basename(video_file)
         self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
         self.videos_dic[video_id]['proxy'] = False
-        self.timeline_widget.update_videos_dic(self.videos_dic)
+        #self.timeline_widget.update_videos_dic(self.videos_dic)
 
     def load_next(self):
         for video_id in self.videos_dic.keys():
@@ -114,6 +117,7 @@ class video_manager_widget(QtWidgets.QWidget):
         self.timeline_widget.set_frame_range(frame_range)
 
     def update_concat(self, concat_video_file):
+        self.timeline_widget.update_videos_dic(self.videos_dic)
         self.video_player.load_video(concat_video_file, self.first_load)
         if self.first_load:
             self.first_load = False
@@ -151,10 +155,17 @@ class video_manager_widget(QtWidgets.QWidget):
         self.timeline_widget.on_bounds_change.connect(self.video_player.set_bounds_range)
         self.timeline_widget.on_end_requested.connect(self.video_player.seek_end)
         self.timeline_widget.on_beginning_requested.connect(self.video_player.seek_beginning)
+        self.timeline_widget.on_order_changed.connect(self.order_changed)
+
+    def order_changed(self, new_order):
+        self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))
+        self.concat_thread.give_job(self.videos_dic)
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
 
+
+'''
 app = app_utils.get_app()
 player = video_manager_widget()
 player.set_fps(24)
@@ -184,6 +195,8 @@ videos = ["D:/SBOX/video_1.mp4",
 for video in videos:
     player.add_video(video)
 player.clear_all_proxys()
+#player.hard_clear_proxys()
 player.load_next()
 
 sys.exit(app.exec_())
+'''
