@@ -35,6 +35,7 @@ class video_player_widget(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_DontCreateNativeAncestors)
         self.setAttribute(QtCore.Qt.WA_NativeWindow)
 
+        self.player = None
         self.create_mpv_player()
 
         self.timer = QtCore.QTimer(self)
@@ -62,11 +63,13 @@ class video_player_widget(QtWidgets.QWidget):
         self.mouse_pos = None
 
     def create_mpv_player(self):
+        if self.player:
+            del self.player
         self.player = mpv.MPV(wid=str(int(self.winId())), keep_open='always')
 
     def quit(self):
-        self.player.terminate()
         self.timer.stop()
+        self.player.terminate()
 
     def load_video(self, video_file, first_load=False):
         pos = self.player.time_pos

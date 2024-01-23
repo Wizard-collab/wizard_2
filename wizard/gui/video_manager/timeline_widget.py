@@ -588,7 +588,6 @@ class video_item(custom_graphic_item):
                             int(self.width-self.margin),
                             int(self.height-self.margin*8))
         painter.drawRoundedRect(rect, 2,2)
-        #painter.fillRect(QtCore.QRectF(self.x, self.y, self.width, self.height), QtGui.QColor(255,255,255,5))
 
 class cursor_item(custom_graphic_item):
     def __init__(self):

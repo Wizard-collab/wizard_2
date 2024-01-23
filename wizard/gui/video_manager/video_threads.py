@@ -15,6 +15,8 @@ import logging
 from wizard.core import path_utils
 from wizard.core.video_player import ffmpeg_utils
 
+logger = logging.getLogger(__name__)
+
 class create_proxy_thread(QtCore.QThread):
 
     on_video_ready = pyqtSignal(str)
@@ -34,7 +36,7 @@ class create_proxy_thread(QtCore.QThread):
         self.create_proxy_object.wait_for_process()
         self.create_proxy_object.process_finished()
         self.on_video_ready.emit(self.video_id)
-        print(f"proxy creation {self.video_file} : {time.monotonic()-start_time}")
+        logger.debug(f"proxy creation {self.video_file} : {time.monotonic()-start_time}")
 
     def kill(self):
         if not self.create_proxy_object:
@@ -46,9 +48,10 @@ class concat_thread(QtCore.QThread):
 
     on_concat_ready = pyqtSignal(str)
 
-    def __init__(self, temp_dir, parent=None):
+    def __init__(self, temp_dir, player_id, parent=None):
         super(concat_thread, self).__init__(parent)
         self.temp_dir = temp_dir
+        self.player_id = player_id
         self.fps = 24
         self.to_concat = []
         self.running = False
@@ -67,7 +70,7 @@ class concat_thread(QtCore.QThread):
     def run(self):
         self.running = True
         while self.to_concat != []:
-            concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.to_concat[0], self.fps)
+            concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.player_id, self.to_concat[0], self.fps)
             self.on_concat_ready.emit(concat_video_file)
             self.to_concat.pop(0)
         self.running = False

@@ -33,11 +33,43 @@ import cv2
 import time
 import os
 import logging
+import tempfile
+import base64
 
 # Wizard core modules
 from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
+
+def get_temp_dir():
+    tmp_dir = path_utils.join(tempfile.gettempdir(), 'wizard', 'video_manager')
+    if not path_utils.isdir(tmp_dir):
+        path_utils.makedirs(tmp_dir)
+    return tmp_dir
+
+def encode_path_to_name(input_path):
+    encoded_bytes = base64.b64encode(input_path.encode('utf-8'))
+    encoded_string = f"{encoded_bytes.decode('utf-8')}.mp4"
+    return encoded_string
+
+def decode_name_to_path(encoded_path):
+    encoded_string = os.path.splitext(path_utils.basename(encoded_path))[0]
+    decoded_bytes = base64.b64decode(encoded_string.encode('utf-8'))
+    decoded_string = decoded_bytes.decode('utf-8')
+    return decoded_string
+
+def delete_proxy(temp_dir, original_file_name):
+    proxy_file = path_utils.join(temp_dir, encode_path_to_name(original_file_name))
+    if path_utils.isfile(proxy_file):
+        path_utils.remove(proxy_file)
+
+def clear_player_files(temp_dir, player_id):
+    concat_txt_file = path_utils.join(temp_dir, f'{player_id}.txt')
+    output_video_file = path_utils.join(temp_dir, f'{player_id}.mp4')
+    if path_utils.isfile(concat_txt_file):
+        path_utils.remove(concat_txt_file)
+    if path_utils.isfile(output_video_file):
+        path_utils.remove(output_video_file)
 
 class create_proxy():
     def __init__(self, temp_dir, input_video, resolution=[1920,1080], fps=24):
@@ -48,13 +80,12 @@ class create_proxy():
         self.process = self.create_proxy()
 
     def create_proxy(self):
-        self.proxy_file = path_utils.join(self.temp_dir, f"{path_utils.basename(self.input_video)}")
-        self.temp_proxy_file = path_utils.join(self.temp_dir, f"temp_{path_utils.basename(self.input_video)}")
+        self.proxy_file = path_utils.join(self.temp_dir, encode_path_to_name(self.input_video))
+        self.temp_proxy_file = path_utils.join(self.temp_dir, f"temp_{path_utils.basename(self.proxy_file)}")
         if path_utils.isfile(self.proxy_file):
             return
 
-        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -codec:v copy -preset ultrafast -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
-        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -preset ultrafast -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
+        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -preset ultrafast -c:v libx264 -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
         process = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         return process
 
@@ -77,19 +108,24 @@ class create_proxy():
             return
         os.rename(self.temp_proxy_file, self.proxy_file)
 
-def clear_proxys(temp_dir):
+def hard_clear_proxys(temp_dir):
     for file in path_utils.listdir(temp_dir):
         path_utils.remove(path_utils.join(temp_dir, file))
 
-def concatenate_videos(temp_dir, videos_dic, fps=24):
-    concat_txt_file = path_utils.join(temp_dir, 'concat.txt')
+def concatenate_videos(temp_dir, player_id, videos_dic, fps=24):
+    concat_txt_file = path_utils.join(temp_dir, f'{player_id}.txt')
+    files = []
     with open(concat_txt_file, 'w') as file:
         for video in videos_dic.keys():
-            proxy_video_file = path_utils.join(temp_dir, videos_dic[video]['name'])
+            proxy_video_file = path_utils.join(temp_dir, encode_path_to_name(videos_dic[video]['original_file']))
             if (not path_utils.isfile(proxy_video_file)) or (not videos_dic[video]['proxy']):
                 break
             file.write(f"file '{path_utils.abspath(proxy_video_file)}'\n")
-    output_video_file = path_utils.join(temp_dir, 'concatened.mp4')
+            files.append(path_utils.abspath(proxy_video_file))
+    if len(files) == 0:
+        logger.debug("No files to concat.")
+        return
+    output_video_file = path_utils.join(temp_dir, f'{player_id}.mp4')
     command = f"ffmpeg -y -f concat -safe 0 -i {concat_txt_file} -preset ultrafast -c copy -an -r {fps} {output_video_file}"
     process = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     process.communicate()

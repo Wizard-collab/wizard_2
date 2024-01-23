@@ -28,12 +28,13 @@ class video_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(video_manager_widget, self).__init__(parent)
         self.load_video_threads = []
-        self.temp_dir = 'temp'
+        self.player_id = str(uuid.uuid4())
+        self.temp_dir = ffmpeg_utils.get_temp_dir()
         self.videos_dic = dict()
         self.load_threads = []
         self.frame_range = [0,1000]
         self.resolution = [1920,1080]
-        self.concat_thread = video_threads.concat_thread(self.temp_dir, self)
+        self.concat_thread = video_threads.concat_thread(self.temp_dir, self.player_id, self)
         self.video_player = video_player_widget.video_player_widget(self)
         self.timeline_widget = timeline_widget.timeline_widget(self)
         self.first_load = True
@@ -52,6 +53,7 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def quit(self):
         self.video_player.quit()
+        ffmpeg_utils.clear_player_files(self.temp_dir, self.player_id)
         for thread in self.load_video_threads:
             thread.on_video_ready.disconnect()
             thread.kill()
@@ -67,9 +69,14 @@ class video_manager_widget(QtWidgets.QWidget):
     def set_resolution(self, resolution=[1920,1080]):
         self.resolution = resolution
 
+    def clear_all_proxys(self):
+        for video_id in self.videos_dic.keys():
+            self.clear_proxy(self.videos_dic[video_id]['original_file'])
+            self.videos_dic[video_id]['proxy'] = False
+            self.timeline_widget.update_videos_dic(self.videos_dic)
 
-    def clear_proxys(self):
-        ffmpeg_utils.clear_proxys(self.temp_dir)
+    def clear_proxy(self, original_file):
+        ffmpeg_utils.delete_proxy(self.temp_dir, original_file)
 
     def add_video(self, video_file):
         video_id = str(uuid.uuid4())
@@ -147,36 +154,38 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
+
+'''
 app = app_utils.get_app()
 player = video_manager_widget()
-#player.clear_proxys()
 player.set_fps(24)
 player.show()
 QtWidgets.QApplication.processEvents()
 
-temp_dir = 'temp'
-videos = ["video_1.mp4",
-            "video_6.mp4",
-            "video_1.mp4",
-            "video_6.mp4",
-            "video_1.mp4",
-            "video_6.mp4",
-            "video_1.mp4",
-            "video_6.mp4",
-            "video_1.mp4",
-            "video_6.mp4",
-            "video_3.mp4",
-            "video_4.mp4",
-            "video_5.mp4",
-            "video_3.mp4",
-            "video_4.mp4",
-            "video_5.mp4"]
-videos=[]
-for a in range(0,100):
-    videos.append(f"videos/{a}.mp4")
+videos = ["D:/SBOX/video_1.mp4",
+            "D:/SBOX/video_6.mp4",
+            "D:/SBOX/video_1.mp4",
+            "D:/SBOX/video_6.mp4",
+            "D:/SBOX/video_1.mp4",
+            "D:/SBOX/video_6.mp4",
+            "D:/SBOX/video_1.mp4",
+            "D:/SBOX/video_6.mp4",
+            "D:/SBOX/video_1.mp4",
+            "D:/SBOX/video_6.mp4",
+            "D:/SBOX/video_3.mp4",
+            "D:/SBOX/video_4.mp4",
+            "D:/SBOX/video_5.mp4",
+            "D:/SBOX/video_3.mp4",
+            "D:/SBOX/video_4.mp4",
+            "D:/SBOX/video_5.mp4"]
+#videos=[]
+#for a in range(0,100):
+#    videos.append(f"videos/{a}.mp4")
 
 for video in videos:
     player.add_video(video)
+player.clear_all_proxys()
 player.load_next()
 
 sys.exit(app.exec_())
+'''
