@@ -13,4 +13,4 @@ pip uninstall rotate-screen
 pip uninstall pywin32
 pip uninstall PyInstaller
 pip uninstall winshell
-pip uninstall python-mpv
+pip uninstall mpv

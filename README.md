@@ -30,7 +30,7 @@ http://54.39.96.76/
 	* PyInstaller
 	* winshell
 	* rotate-screen
-	* python-mpv
+	* mpv
 
 * Other dependecies
 	* ffmpeg.exe
