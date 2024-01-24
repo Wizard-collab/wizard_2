@@ -13,7 +13,7 @@ http://54.39.96.76/
 		* Launch `install_python3_modules.bat`
 		* Launch `app.bat` or `python app.py`
 
-* Developed with _python 3.11.1_
+* Developed with _python 3.12.1_
 
 * Modules dependencies:
 	* PyQt5
