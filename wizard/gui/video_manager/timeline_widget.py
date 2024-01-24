@@ -23,7 +23,9 @@ class signal_manager(QtCore.QObject):
     on_bounds_change = pyqtSignal(object)
     on_video_item_move = pyqtSignal(object)
     on_video_item_moved = pyqtSignal(object)
+    on_video_item_scale = pyqtSignal(object)
     current_video_name = pyqtSignal(str)
+    on_video_item_in_out_modified = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -39,6 +41,7 @@ class timeline_widget(QtWidgets.QWidget):
     on_end_requested = pyqtSignal(int)
     on_beginning_requested = pyqtSignal(int)
     on_order_changed = pyqtSignal(list)
+    on_video_in_out_modified = pyqtSignal(dict)
 
     def __init__(self, parent=None):
         super(timeline_widget, self).__init__(parent)
@@ -112,7 +115,9 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_prev_frame.connect(self.on_prev_frame.emit)
         self.timeline_viewport.signal_manager.on_bounds_change.connect(self.bounds_changed)
         self.timeline_viewport.signal_manager.on_video_item_moved.connect(self.on_order_changed.emit)
+        self.timeline_viewport.signal_manager.on_video_item_in_out_modified.connect(self.on_video_in_out_modified.emit)
         self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
+        
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
         self.playing_infos_widget.on_end_requested.connect(self.on_end_requested.emit)
@@ -323,11 +328,18 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 self.timeline_scene.addItem(self.videos_dic[video_id])
                 self.videos_dic[video_id].signal_manager.on_video_item_moved.connect(self.video_item_moved)
                 self.videos_dic[video_id].signal_manager.on_video_item_move.connect(self.video_item_is_moving)
+                self.videos_dic[video_id].signal_manager.on_video_item_scale.connect(self.video_item_is_scaling)
+                self.videos_dic[video_id].signal_manager.on_video_item_in_out_modified.connect(self.video_item_in_out_modified)
             self.videos_dic[video_id].set_frames_count(videos_dic[video_id]['frames_count'])
+            self.videos_dic[video_id].set_in_frame(int((videos_dic[video_id]['inpoint'])*self.fps))
+            self.videos_dic[video_id].set_out_frame(int((videos_dic[video_id]['outpoint'])*self.fps))
             self.videos_dic[video_id].set_thumbnail(videos_dic[video_id]['thumbnail'])
             self.videos_dic[video_id].set_loaded(videos_dic[video_id]['proxy'])
             self.videos_dic[video_id].name = videos_dic[video_id]['name']
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: list(videos_dic.keys()).index(x[0])))
+        self.reorganise_items()
+
+    def reorganise_items(self):
         start_frame = 0
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id].set_start_frame(start_frame)
@@ -360,6 +372,19 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         closest_frame = min(start_frames, key=lambda x: abs(x - int(video_item.pos().x()/self.frame_width)))
         self.insert_item.setVisible(True)
         self.insert_item.setPos(closest_frame*self.frame_width, self.insert_item.pos().y())
+
+    def video_item_is_scaling(self, video_item):
+        self.reorganise_items()
+
+    def video_item_in_out_modified(self, video_item):
+        inpoint = video_item.in_frame/self.fps
+        outpoint = video_item.out_frame/self.fps
+        video_id = video_item.video_id
+        modification_dic = dict()
+        modification_dic['id'] = video_id
+        modification_dic['inpoint'] = inpoint
+        modification_dic['outpoint'] = outpoint
+        self.signal_manager.on_video_item_in_out_modified.emit(modification_dic)
 
     def bounds_changed(self):
         in_frame = self.in_bound_item.get_frame()
@@ -640,52 +665,92 @@ class video_item(custom_graphic_item):
         self.thumbnail_path = None
         self.thumbnail_pixmap = None
         self.video_id = video_id
-        self.start_move_pos = None
+        self.start_crop_in = False
+        self.start_crop_out = False
+        self.start_move_pos = False
         self.frames_count = frames_count
+        self.in_frame = 0
+        self.out_frame = 1
         self.signal_manager = signal_manager()
         self.height = 50
         self.width = 0
         self.frame_width = 2
         self.loaded = False
         self.moved = False
+        self.in_or_out_modified = False
         self.margin = 1
         self.frame = 0
         self.start_frame = 0
-        self.video_frame_range = [0,100]
+        self.video_frame_range = [0,1]
         self.setPos(self.pos().x(), 30)
 
     def mousePressEvent(self, event):
         self.moved = False
+        self.start_crop_in = False
+        self.start_crop_out = False
+        self.start_move_pos = False
+        self.in_or_out_modified = False
+
         if event.button() == QtCore.Qt.LeftButton:
-            self.start_move_pos = event.pos()
+            if event.pos().x() < 4:
+                self.start_crop_in = event.pos()
+            elif event.pos().x() > self.width - 4:
+                self.start_crop_out = event.pos()
+            else:
+                self.start_move_pos = event.pos()
 
     def mouseReleaseEvent(self, event):
         self.start_move_pos = None
         self.setZValue(0)
-        if event.button() == QtCore.Qt.LeftButton and self.moved:
-            self.signal_manager.on_video_item_moved.emit(self)
-            self.moved=False
+
+        if event.button() == QtCore.Qt.LeftButton:
+            if self.moved:
+                self.signal_manager.on_video_item_moved.emit(self)
+                self.moved=False
+            if self.in_or_out_modified:
+                self.signal_manager.on_video_item_in_out_modified.emit(self)
+                self.start_crop_in = False
+                self.start_crop_out = False
 
     def get_pos(self):
         return int(self.pos().x())
 
     def mouseMoveEvent(self, event):
-        if not self.start_move_pos:
-            return
-        self.setZValue(500)
-        delta = (event.pos().x() - self.start_move_pos.x())
-        self.moveBy(delta, 0)
-        self.moved = True
-        self.signal_manager.on_video_item_move.emit(self)
+        if self.start_move_pos:
+            self.setZValue(500)
+            delta = (event.pos().x() - self.start_move_pos.x())
+            self.moveBy(delta, 0)
+            self.moved = True
+            self.signal_manager.on_video_item_move.emit(self)
+        if self.start_crop_in:
+            abs_frame = self.mapToScene(event.pos()).x()/self.frame_width
+            self.set_in_frame(int((abs_frame+self.in_frame) - self.start_frame))
+            self.in_or_out_modified = True
+            self.signal_manager.on_video_item_scale.emit(self)
+        if self.start_crop_out:
+            abs_frame = self.mapToScene(event.pos()).x()/self.frame_width
+            self.set_out_frame(int((abs_frame+self.in_frame) - self.start_frame))
+            self.in_or_out_modified = True
+            self.signal_manager.on_video_item_scale.emit(self)
 
     def contains(self, pos):
         return self.boundingRect().contains(self.mapFromScene(pos))
 
     def is_current(self):
-        return self.frame in range(int(self.start_frame), int(self.start_frame+self.frames_count))
+        return self.frame in range(int(self.start_frame), int(self.start_frame+(self.out_frame-self.in_frame)))
 
     def set_frame(self, frame):
         self.frame = frame
+
+    def set_in_frame(self, in_frame):
+        self.in_frame = min(max(0, in_frame), self.out_frame-1)
+        self.update_video_frame_range()
+        self.update_width()
+
+    def set_out_frame(self, out_frame):
+        self.out_frame = max(self.in_frame+1, min(self.frames_count, out_frame))
+        self.update_video_frame_range()
+        self.update_width()
 
     def set_thumbnail(self, thumbnail_path):
         self.thumbnail_path = thumbnail_path
@@ -706,7 +771,7 @@ class video_item(custom_graphic_item):
         self.update()
 
     def update_video_frame_range(self):
-        self.video_frame_range = [int(self.start_frame), int(self.start_frame+self.frames_count)]
+        self.video_frame_range = [int(self.start_frame), int(self.out_frame-self.in_frame)]
 
     def set_frame_width(self, frame_width):
         self.frame_width = frame_width
@@ -715,16 +780,14 @@ class video_item(custom_graphic_item):
 
     def set_frames_count(self, frames_count):
         self.frames_count = frames_count
-        self.update_video_frame_range()
-        self.update_width()
 
     def update_width(self):
         self.prepareGeometryChange()
-        self.width = self.frames_count*self.frame_width
+        self.width = int(self.out_frame-self.in_frame)*self.frame_width
         self.update()
 
     def get_frames_count(self):
-        return self.frames_count
+        return int(self.out_frame-self.in_frame)
 
     def set_frame_range(self, frame_range):
         self.frame_range = frame_range

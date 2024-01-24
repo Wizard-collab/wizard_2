@@ -87,6 +87,8 @@ class video_manager_widget(QtWidgets.QWidget):
         self.videos_dic[video_id]['original_file'] = path_utils.abspath(video_file)
         self.videos_dic[video_id]['name'] = path_utils.basename(video_file)
         self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
+        self.videos_dic[video_id]['inpoint'] = 0
+        self.videos_dic[video_id]['outpoint'] = self.videos_dic[video_id]['frames_count']/24
         self.videos_dic[video_id]['proxy'] = False
         self.videos_dic[video_id]['thumbnail'] = None
 
@@ -157,9 +159,15 @@ class video_manager_widget(QtWidgets.QWidget):
         self.timeline_widget.on_end_requested.connect(self.video_player.seek_end)
         self.timeline_widget.on_beginning_requested.connect(self.video_player.seek_beginning)
         self.timeline_widget.on_order_changed.connect(self.order_changed)
+        self.timeline_widget.on_video_in_out_modified.connect(self.in_out_modified)
 
     def order_changed(self, new_order):
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))
+        self.concat_thread.give_job(self.videos_dic)
+
+    def in_out_modified(self, modification_dic):
+        self.videos_dic[modification_dic['id']]['inpoint'] = modification_dic['inpoint']
+        self.videos_dic[modification_dic['id']]['outpoint'] = modification_dic['outpoint']
         self.concat_thread.give_job(self.videos_dic)
 
     def update_frame(self, frame):

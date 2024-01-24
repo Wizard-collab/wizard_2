@@ -126,6 +126,8 @@ def concatenate_videos(temp_dir, player_id, videos_dic, fps=24):
             if (not path_utils.isfile(proxy_video_file)) or (not videos_dic[video]['proxy']):
                 break
             file.write(f"file '{path_utils.abspath(proxy_video_file)}'\n")
+            file.write(f"inpoint {videos_dic[video]['inpoint']}\n")
+            file.write(f"outpoint {videos_dic[video]['outpoint']}\n")
             files.append(path_utils.abspath(proxy_video_file))
     if len(files) == 0:
         logger.debug("No files to concat.")
