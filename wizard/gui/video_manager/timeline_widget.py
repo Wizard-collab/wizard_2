@@ -117,7 +117,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_video_item_moved.connect(self.on_order_changed.emit)
         self.timeline_viewport.signal_manager.on_video_item_in_out_modified.connect(self.on_video_in_out_modified.emit)
         self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
-        
+
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
         self.playing_infos_widget.on_end_requested.connect(self.on_end_requested.emit)
@@ -364,6 +364,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             order.pop(old_index)
             order.insert(new_index, video_id)
         self.signal_manager.on_video_item_moved.emit(order)
+        self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: order.index(x[0])))
+        self.reorganise_items()
 
     def video_item_is_moving(self, video_item):
         start_frames = []
@@ -377,6 +379,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.reorganise_items()
 
     def video_item_in_out_modified(self, video_item):
+        self.reorganise_items()
         inpoint = video_item.in_frame/self.fps
         outpoint = video_item.out_frame/self.fps
         video_id = video_item.video_id
@@ -665,8 +668,8 @@ class video_item(custom_graphic_item):
         self.thumbnail_path = None
         self.thumbnail_pixmap = None
         self.video_id = video_id
-        self.start_crop_in = False
-        self.start_crop_out = False
+        self.start_crop_in = None
+        self.start_crop_out = None
         self.start_move_pos = False
         self.frames_count = frames_count
         self.in_frame = 0
@@ -682,22 +685,29 @@ class video_item(custom_graphic_item):
         self.frame = 0
         self.start_frame = 0
         self.video_frame_range = [0,1]
+        self.scale_handle_width = 8
+        self.hover_in_frame_handle = False
+        self.hover_out_frame_handle = False
         self.setPos(self.pos().x(), 30)
 
     def mousePressEvent(self, event):
         self.moved = False
-        self.start_crop_in = False
-        self.start_crop_out = False
+        self.start_crop_in = None
+        self.start_crop_out = None
         self.start_move_pos = False
         self.in_or_out_modified = False
 
         if event.button() == QtCore.Qt.LeftButton:
-            if event.pos().x() < 4:
-                self.start_crop_in = event.pos()
-            elif event.pos().x() > self.width - 4:
-                self.start_crop_out = event.pos()
-            else:
+            if self.width < 20:
                 self.start_move_pos = event.pos()
+                return
+            if event.pos().x() < self.scale_handle_width:
+                self.start_crop_in = self.in_frame
+                return
+            if event.pos().x() > self.width - self.scale_handle_width:
+                self.start_crop_out = event.pos()
+                return
+            self.start_move_pos = event.pos()
 
     def mouseReleaseEvent(self, event):
         self.start_move_pos = None
@@ -706,32 +716,56 @@ class video_item(custom_graphic_item):
         if event.button() == QtCore.Qt.LeftButton:
             if self.moved:
                 self.signal_manager.on_video_item_moved.emit(self)
-                self.moved=False
             if self.in_or_out_modified:
                 self.signal_manager.on_video_item_in_out_modified.emit(self)
-                self.start_crop_in = False
-                self.start_crop_out = False
+            self.moved=False
+            self.start_crop_in = None
+            self.start_crop_out = None
+            self.update()
 
     def get_pos(self):
         return int(self.pos().x())
 
     def mouseMoveEvent(self, event):
+        self.setZValue(500)
         if self.start_move_pos:
-            self.setZValue(500)
             delta = (event.pos().x() - self.start_move_pos.x())
             self.moveBy(delta, 0)
             self.moved = True
             self.signal_manager.on_video_item_move.emit(self)
-        if self.start_crop_in:
-            abs_frame = self.mapToScene(event.pos()).x()/self.frame_width
-            self.set_in_frame(int((abs_frame+self.in_frame) - self.start_frame))
+        if self.start_crop_in is not None:
+            abs_frame = int(self.mapToScene(event.pos()).x()/self.frame_width)
+            in_frame = int((abs_frame+(self.start_crop_in)) - self.start_frame)
+            in_frame = min(max(0, in_frame), self.out_frame-1)
+            self.setPos(int((in_frame-self.start_crop_in+self.start_frame)*self.frame_width), self.pos().y())
+            self.set_in_frame(in_frame)
+
             self.in_or_out_modified = True
-            self.signal_manager.on_video_item_scale.emit(self)
         if self.start_crop_out:
             abs_frame = self.mapToScene(event.pos()).x()/self.frame_width
             self.set_out_frame(int((abs_frame+self.in_frame) - self.start_frame))
             self.in_or_out_modified = True
-            self.signal_manager.on_video_item_scale.emit(self)
+
+    def hoverLeaveEvent(self, event):
+        self.hover_in_frame_handle = False
+        self.hover_out_frame_handle = False
+        self.update()
+
+    def hoverMoveEvent(self, event):
+        if self.width < 20:
+            self.hover_in_frame_handle = False
+            self.hover_out_frame_handle = False
+            self.update()
+            return
+        if event.pos().x() < self.scale_handle_width:
+            self.hover_in_frame_handle = True
+        else:
+            self.hover_in_frame_handle = False
+        if event.pos().x() > self.width - self.scale_handle_width:
+            self.hover_out_frame_handle = True
+        else:
+            self.hover_out_frame_handle = False
+        self.update()
 
     def contains(self, pos):
         return self.boundingRect().contains(self.mapFromScene(pos))
@@ -784,7 +818,7 @@ class video_item(custom_graphic_item):
     def update_width(self):
         self.prepareGeometryChange()
         self.width = int(self.out_frame-self.in_frame)*self.frame_width
-        self.update()
+        self.scene().update()
 
     def get_frames_count(self):
         return int(self.out_frame-self.in_frame)
@@ -795,13 +829,26 @@ class video_item(custom_graphic_item):
     def update_pos(self):
         self.setPos((self.start_frame*self.frame_width), self.pos().y())
         self.update()
+        self.scene().update()
 
     def paint(self, painter, option, widget):
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.SolidLine)
+        painter.setPen(pen)
         color = QtGui.QColor(100,100,110,190)
         if not self.loaded:
             color.setAlpha(70)
         if self.is_current():
             color.setAlpha(255)
+        if self.start_crop_in is not None or self.start_crop_out is not None:
+            rect = QtCore.QRectF(self.x-(self.in_frame*self.frame_width),
+                                self.y+self.margin*4,
+                                self.frames_count*self.frame_width,
+                                self.height-self.margin*8)
+            brush = QtGui.QBrush(QtGui.QColor(30,30,40,100))
+            painter.setBrush(brush)
+            painter.drawRoundedRect(rect, 2,2)
+            color.setAlpha(255)
+        
         brush = QtGui.QBrush(color)
         painter.setBrush(brush)
         pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
@@ -812,12 +859,26 @@ class video_item(custom_graphic_item):
                             int(self.height-self.margin*8))
         painter.drawRoundedRect(rect, 2,2)
 
+        if rect.width()-self.margin*4 < 1:
+            return
         display_thumbnail_rect = QtCore.QRect(rect.x()+self.margin*2,
                             int(rect.y()+self.margin*2),
                             min(rect.width()-self.margin*4, self.thumbnail_pixmap.width()),
                             self.thumbnail_pixmap.height())
         pixmap = self.thumbnail_pixmap.copy(display_thumbnail_rect)
         painter.drawPixmap(display_thumbnail_rect, pixmap)
+
+        if self.hover_in_frame_handle:
+            handle_rect = QtCore.QRectF(rect.x(), rect.y(), int(self.scale_handle_width/2), rect.height())
+            brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
+            painter.setBrush(brush)
+            painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
+        if self.hover_out_frame_handle:
+            handle_rect = QtCore.QRectF(rect.width()-int(self.scale_handle_width/2), rect.y(), int(self.scale_handle_width/2), rect.height())
+            brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
+            painter.setBrush(brush)
+            painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
+
         '''
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
