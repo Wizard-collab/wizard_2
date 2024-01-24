@@ -23,6 +23,7 @@ class signal_manager(QtCore.QObject):
     on_bounds_change = pyqtSignal(object)
     on_video_item_move = pyqtSignal(object)
     on_video_item_moved = pyqtSignal(object)
+    current_video_name = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -111,6 +112,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_prev_frame.connect(self.on_prev_frame.emit)
         self.timeline_viewport.signal_manager.on_bounds_change.connect(self.bounds_changed)
         self.timeline_viewport.signal_manager.on_video_item_moved.connect(self.on_order_changed.emit)
+        self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
         self.playing_infos_widget.on_end_requested.connect(self.on_end_requested.emit)
@@ -186,6 +188,11 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.fps_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.fps_label)
 
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+
+        self.video_name_label = QtWidgets.QLabel('')
+        self.main_layout.addWidget(self.video_name_label)
+
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
     def connect_functions(self):
@@ -223,6 +230,9 @@ class playing_infos_widget(QtWidgets.QWidget):
     def set_fps(self, fps):
         self.fps = fps
         self.fps_label.setText(f"{fps} fps")
+
+    def update_current_video_name(self, video_name):
+        self.video_name_label.setText(video_name)
 
 class timeline_viewport(QtWidgets.QGraphicsView):
 
@@ -314,6 +324,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 self.videos_dic[video_id].signal_manager.on_video_item_moved.connect(self.video_item_moved)
                 self.videos_dic[video_id].signal_manager.on_video_item_move.connect(self.video_item_is_moving)
             self.videos_dic[video_id].set_frames_count(videos_dic[video_id]['frames_count'])
+            self.videos_dic[video_id].set_thumbnail(videos_dic[video_id]['thumbnail'])
             self.videos_dic[video_id].set_loaded(videos_dic[video_id]['proxy'])
             self.videos_dic[video_id].name = videos_dic[video_id]['name']
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: list(videos_dic.keys()).index(x[0])))
@@ -398,6 +409,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.update()
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id].set_frame(frame)
+            if self.videos_dic[video_id].is_current():
+                self.signal_manager.current_video_name.emit(self.videos_dic[video_id].video_name)
 
     def move_scene_center_to_left(self, force=False):
         delta_x = self.mapToScene(QtCore.QPoint(0,0)).x() + 20
@@ -624,6 +637,8 @@ class video_item(custom_graphic_item):
         self.setAcceptHoverEvents(True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.video_name = video_name
+        self.thumbnail_path = None
+        self.thumbnail_pixmap = None
         self.video_id = video_id
         self.start_move_pos = None
         self.frames_count = frames_count
@@ -632,6 +647,7 @@ class video_item(custom_graphic_item):
         self.width = 0
         self.frame_width = 2
         self.loaded = False
+        self.moved = False
         self.margin = 1
         self.frame = 0
         self.start_frame = 0
@@ -639,13 +655,16 @@ class video_item(custom_graphic_item):
         self.setPos(self.pos().x(), 30)
 
     def mousePressEvent(self, event):
+        self.moved = False
         if event.button() == QtCore.Qt.LeftButton:
             self.start_move_pos = event.pos()
 
     def mouseReleaseEvent(self, event):
         self.start_move_pos = None
-        if event.button() == QtCore.Qt.LeftButton:
+        self.setZValue(0)
+        if event.button() == QtCore.Qt.LeftButton and self.moved:
             self.signal_manager.on_video_item_moved.emit(self)
+            self.moved=False
 
     def get_pos(self):
         return int(self.pos().x())
@@ -653,8 +672,10 @@ class video_item(custom_graphic_item):
     def mouseMoveEvent(self, event):
         if not self.start_move_pos:
             return
+        self.setZValue(500)
         delta = (event.pos().x() - self.start_move_pos.x())
         self.moveBy(delta, 0)
+        self.moved = True
         self.signal_manager.on_video_item_move.emit(self)
 
     def contains(self, pos):
@@ -665,6 +686,14 @@ class video_item(custom_graphic_item):
 
     def set_frame(self, frame):
         self.frame = frame
+
+    def set_thumbnail(self, thumbnail_path):
+        self.thumbnail_path = thumbnail_path
+        self.thumbnail_pixmap = QtGui.QIcon(thumbnail_path).pixmap(120)
+        if self.thumbnail_pixmap.height() > 0:
+            height_ratio = 38 / self.thumbnail_pixmap.height()
+            self.thumbnail_pixmap = self.thumbnail_pixmap.scaled(int(self.thumbnail_pixmap.width()*height_ratio), 38)
+        self.update()
 
     def set_loaded(self, loaded):
         self.loaded = loaded
@@ -719,6 +748,14 @@ class video_item(custom_graphic_item):
                             int(self.width-self.margin),
                             int(self.height-self.margin*8))
         painter.drawRoundedRect(rect, 2,2)
+
+        display_thumbnail_rect = QtCore.QRect(rect.x()+self.margin*2,
+                            int(rect.y()+self.margin*2),
+                            min(rect.width()-self.margin*4, self.thumbnail_pixmap.width()),
+                            self.thumbnail_pixmap.height())
+        pixmap = self.thumbnail_pixmap.copy(display_thumbnail_rect)
+        painter.drawPixmap(display_thumbnail_rect, pixmap)
+        '''
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
         text_rect = QtCore.QRect(rect.x()+self.margin*4,
@@ -726,11 +763,11 @@ class video_item(custom_graphic_item):
                             int(rect.width()-self.margin*8),
                             int(rect.height()-self.margin*8))
         painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, self.video_name)
+        '''
 
 class cursor_item(custom_graphic_item):
     def __init__(self):
         super(cursor_item, self).__init__()
-        #self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
         self.signal_manager = signal_manager()
         self.height = 70
         self.width = 40

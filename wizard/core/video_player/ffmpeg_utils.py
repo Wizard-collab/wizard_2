@@ -71,6 +71,9 @@ def clear_player_files(temp_dir, player_id):
     if path_utils.isfile(output_video_file):
         path_utils.remove(output_video_file)
 
+def get_thumbnail_path(temp_dir, original_video_file):
+    return path_utils.join(temp_dir, encode_path_to_name(original_video_file).replace('.mp4', '.jpg'))
+
 class create_proxy():
     def __init__(self, temp_dir, input_video, resolution=[1920,1080], fps=24):
         self.temp_dir = temp_dir
@@ -81,11 +84,12 @@ class create_proxy():
 
     def create_proxy(self):
         self.proxy_file = path_utils.join(self.temp_dir, encode_path_to_name(self.input_video))
+        self.thumbnail_file = path_utils.join(self.temp_dir, encode_path_to_name(self.input_video).replace('.mp4', '.jpg'))
         self.temp_proxy_file = path_utils.join(self.temp_dir, f"temp_{path_utils.basename(self.proxy_file)}")
         if path_utils.isfile(self.proxy_file):
             return
 
-        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -preset ultrafast -c:v libx264 -an -crf 24 -r {self.fps} {self.temp_proxy_file}"""
+        command = f"""ffmpeg -i {self.input_video} -vf "setpts=N/{self.fps}/TB,scale={self.resolution[0]}:{self.resolution[1]}:force_original_aspect_ratio=decrease,pad={self.resolution[0]}:{self.resolution[1]}:-1:-1,setsar=1" -preset ultrafast -c:v libx264 -an -crf 24 -g 1 -r {self.fps} {self.temp_proxy_file}"""
         process = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         return process
 
@@ -107,6 +111,7 @@ class create_proxy():
         if not path_utils.isfile(self.temp_proxy_file):
             return
         os.rename(self.temp_proxy_file, self.proxy_file)
+        extract_first_frame(self.proxy_file, self.thumbnail_file)
 
 def hard_clear_proxys(temp_dir):
     for file in path_utils.listdir(temp_dir):
@@ -151,3 +156,9 @@ def get_one_frame_black_file(proxy_video_file, fps):
 def get_frames_count(video_file):
     cap = cv2.VideoCapture(video_file)
     return cap.get(cv2.CAP_PROP_FRAME_COUNT)
+
+def extract_first_frame(video_file, destination_file):
+    cap = cv2.VideoCapture(video_file)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, int(cap.get(cv2.CAP_PROP_FRAME_COUNT)/2))
+    ret, frame = cap.read()
+    cv2.imwrite(destination_file, frame)

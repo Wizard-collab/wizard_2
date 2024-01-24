@@ -88,7 +88,7 @@ class video_manager_widget(QtWidgets.QWidget):
         self.videos_dic[video_id]['name'] = path_utils.basename(video_file)
         self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
         self.videos_dic[video_id]['proxy'] = False
-        #self.timeline_widget.update_videos_dic(self.videos_dic)
+        self.videos_dic[video_id]['thumbnail'] = None
 
     def load_next(self):
         for video_id in self.videos_dic.keys():
@@ -109,6 +109,7 @@ class video_manager_widget(QtWidgets.QWidget):
         for other_video_id in self.videos_dic.keys():
             if self.videos_dic[other_video_id]['original_file'] == self.videos_dic[video_id]['original_file']:
                 self.videos_dic[other_video_id]['proxy'] = True
+                self.videos_dic[other_video_id]['thumbnail'] = ffmpeg_utils.get_thumbnail_path(self.temp_dir, self.videos_dic[video_id]['original_file'])
         self.timeline_widget.update_videos_dic(self.videos_dic)
         self.concat_thread.give_job(self.videos_dic)
 
@@ -165,7 +166,6 @@ class video_manager_widget(QtWidgets.QWidget):
         self.timeline_widget.set_frame(frame)
 
 
-'''
 app = app_utils.get_app()
 player = video_manager_widget()
 player.set_fps(24)
@@ -194,9 +194,8 @@ videos = ["D:/SBOX/video_1.mp4",
 
 for video in videos:
     player.add_video(video)
-player.clear_all_proxys()
+#player.clear_all_proxys()
 #player.hard_clear_proxys()
 player.load_next()
 
 sys.exit(app.exec_())
-'''
