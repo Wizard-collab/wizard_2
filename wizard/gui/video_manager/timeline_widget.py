@@ -26,6 +26,7 @@ class signal_manager(QtCore.QObject):
     on_video_item_scale = pyqtSignal(object)
     current_video_name = pyqtSignal(str)
     on_video_item_in_out_modified = pyqtSignal(object)
+    on_video_item_double_clicked = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -330,6 +331,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 self.videos_dic[video_id].signal_manager.on_video_item_move.connect(self.video_item_is_moving)
                 self.videos_dic[video_id].signal_manager.on_video_item_scale.connect(self.video_item_is_scaling)
                 self.videos_dic[video_id].signal_manager.on_video_item_in_out_modified.connect(self.video_item_in_out_modified)
+                self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(self.video_item_double_clicked)
             self.videos_dic[video_id].set_frames_count(videos_dic[video_id]['frames_count'])
             self.videos_dic[video_id].set_in_frame(int((videos_dic[video_id]['inpoint'])*self.fps))
             self.videos_dic[video_id].set_out_frame(int((videos_dic[video_id]['outpoint'])*self.fps))
@@ -345,6 +347,12 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.videos_dic[video_id].set_start_frame(start_frame)
             self.videos_dic[video_id].update()
             start_frame += self.videos_dic[video_id].get_frames_count()
+
+    def video_item_double_clicked(self, video_item):
+        in_bound = video_item.start_frame
+        out_bound = video_item.start_frame + video_item.get_frames_count() - 1
+        self.signal_manager.on_bounds_change.emit([in_bound, out_bound])
+        self.signal_manager.on_seek.emit(in_bound)
 
     def video_item_moved(self, video_item):
         self.insert_item.setVisible(False)
@@ -766,6 +774,9 @@ class video_item(custom_graphic_item):
         else:
             self.hover_out_frame_handle = False
         self.update()
+
+    def mouseDoubleClickEvent(self, event):
+        self.signal_manager.on_video_item_double_clicked.emit(self)
 
     def contains(self, pos):
         return self.boundingRect().contains(self.mapFromScene(pos))

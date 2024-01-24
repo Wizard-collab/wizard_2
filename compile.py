@@ -140,7 +140,10 @@ class compile():
 							'dist/server/server.exe',
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
-							'dist/error_handler/error_handler.exe'
+							'dist/error_handler/error_handler.exe',
+							'ffmpeg.exe',
+							'libmpv.dll.a',
+							'libmpv-2.dll'
 							]
 							
 			for file in files_list:

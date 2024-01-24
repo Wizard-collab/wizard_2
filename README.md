@@ -9,11 +9,11 @@ http://54.39.96.76/
 	* Install PostgreSQL on your computer or any server
 	* This repository :
 		* Clone the repository
-		* Install `python 3.10.7`
+		* Install `python 3.12.1`
 		* Launch `install_python3_modules.bat`
 		* Launch `app.bat` or `python app.py`
 
-* Developed with _python 3.10.7_
+* Developed with _python 3.11.1_
 
 * Modules dependencies:
 	* PyQt5
@@ -25,6 +25,12 @@ http://54.39.96.76/
 	* requests
 	* pywin32
 	* rotate-screen
+	* python-mpv
+
+* Other dependecies
+	* ffmpeg.exe
+	* libmpv-2.dll
+	* libmpv.dll.a
 
 * Database dependency:
 	* PostgreSQL

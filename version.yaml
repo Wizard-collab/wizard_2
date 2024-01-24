@@ -1,7 +1,7 @@
-BUILDS: 311
+BUILDS: 313
 MAJOR: 3
-MINOR: 6
+MINOR: 7
 PATCH: 0
-builds: 311
-date: 1704969993.7825
-setup_name: 3.6.0.0311-setup.exe
+builds: 313
+date: 1706121039.055869
+setup_name: 3.7.0.0313-setup.exe
