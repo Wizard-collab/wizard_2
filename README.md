@@ -19,11 +19,16 @@ http://54.39.96.76/
 	* PyQt5
 	* PyYaml
 	* pillow
+	* pyautogui
 	* psycopg2
 	* psutil
 	* QScintilla
 	* requests
+	* clipboard
+	* opencv-python
 	* pywin32
+	* PyInstaller
+	* winshell
 	* rotate-screen
 	* python-mpv
 
