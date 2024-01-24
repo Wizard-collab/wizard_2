@@ -1,1 +1,0 @@
-from wizard.gui.video_manager import video_manager_widget
