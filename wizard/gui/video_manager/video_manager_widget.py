@@ -145,6 +145,12 @@ class video_manager_widget(QtWidgets.QWidget):
         self.container_layout.addWidget(self.video_player)
         self.main_layout.addWidget(self.timeline_widget)
 
+    def videos_dropped(self, videos_list):
+        for video_path in videos_list:
+            self.add_video(video_path)
+        self.timeline_widget.update_videos_dic(self.videos_dic)
+        self.load_next()
+
     def connect_functions(self):
         self.concat_thread.on_concat_ready.connect(self.update_concat)
         self.video_player.on_progress.connect(self.update_frame)
@@ -160,6 +166,7 @@ class video_manager_widget(QtWidgets.QWidget):
         self.timeline_widget.on_beginning_requested.connect(self.video_player.seek_beginning)
         self.timeline_widget.on_order_changed.connect(self.order_changed)
         self.timeline_widget.on_video_in_out_modified.connect(self.in_out_modified)
+        self.timeline_widget.on_videos_dropped.connect(self.videos_dropped)
 
     def order_changed(self, new_order):
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))
@@ -172,7 +179,6 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
-'''
 
 app = app_utils.get_app()
 player = video_manager_widget()
@@ -207,4 +213,3 @@ for video in videos:
 player.load_next()
 
 sys.exit(app.exec_())
-'''
