@@ -63,6 +63,13 @@ class concat_thread(QtCore.QThread):
         self.temp_dir = temp_dir
 
     def give_job(self, videos_dic):
+        is_at_least_on_proxy = False
+        for video_id in videos_dic.keys():
+            if videos_dic[video_id]['proxy']:
+                is_at_least_on_proxy = True
+                break
+        if not is_at_least_on_proxy:
+            return
         self.to_concat.append(videos_dic)
         if not self.running:
             self.start()

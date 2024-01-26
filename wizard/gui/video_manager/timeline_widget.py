@@ -305,10 +305,12 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         data = event.mimeData()
         urls = data.urls()
 
+        paths = []
         for url in urls:
             if url and url.scheme() == 'file':
                 path = str(url.path())[1:]
-                self.signal_manager.on_videos_dropped.emit([path])
+                paths.append(path)
+        self.signal_manager.on_videos_dropped.emit(paths)
 
     def update_selection(self, video_items):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
@@ -331,6 +333,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
     def deselect_all(self):
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id].set_selected(False)
+        self.update()
 
     def jump_to_previous_video(self):
         videos_list = list(self.videos_dic.keys())
@@ -441,7 +444,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.reorganise_items()
         posx = selected_items[0].pos().x()
         for video_item in self.get_selected_items():
-            video_item.setPos(posx, video_item.pos().y())
+            video_item.setPos(posx, 50)
             posx += video_item.get_frames_count() * self.frame_width
             video_item.move_item(delta)
         start_frames = []
@@ -558,6 +561,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         if event.button() == QtCore.Qt.LeftButton:
             self.move_cursor = None
             self.move_video_item = None
+            
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
@@ -791,7 +795,7 @@ class video_item(custom_graphic_item):
 
     def mouseReleaseEvent(self, event):
         self.start_move_pos = None
-        self.setZValue(0)
+        self.setZValue(1)
 
         if event.button() == QtCore.Qt.LeftButton:
             if self.moved:
@@ -815,7 +819,8 @@ class video_item(custom_graphic_item):
     def stop_moving(self):
         self.start_move_pos = None
         self.moved=False
-        self.setZValue(0)
+        self.setPos(self.pos().x(), 30)
+        self.setZValue(1)
 
     def mouseMoveEvent(self, event):
         if self.start_move_pos:
@@ -932,7 +937,7 @@ class video_item(custom_graphic_item):
         color = QtGui.QColor(100,100,110,190)
         if not self.loaded:
             color.setAlpha(70)
-        if self.is_current():
+        if self.is_current() and self.loaded:
             color.setAlpha(255)
         if self.start_crop_in is not None or self.start_crop_out is not None:
             rect = QtCore.QRectF(self.x-(self.in_frame*self.frame_width),
@@ -977,7 +982,6 @@ class video_item(custom_graphic_item):
             painter.setBrush(brush)
             painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
 
-        '''
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
         text_rect = QtCore.QRect(rect.x()+self.margin*4,
@@ -985,7 +989,6 @@ class video_item(custom_graphic_item):
                             int(rect.width()-self.margin*8),
                             int(rect.height()-self.margin*8))
         painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, self.video_name)
-        '''
 
 class cursor_item(custom_graphic_item):
     def __init__(self):

@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class video_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(video_manager_widget, self).__init__(parent)
-        self.load_video_threads = []
+        self.load_video_threads = dict()
         self.player_id = str(uuid.uuid4())
         self.temp_dir = ffmpeg_utils.get_temp_dir()
         self.videos_dic = dict()
@@ -54,11 +54,17 @@ class video_manager_widget(QtWidgets.QWidget):
     def quit(self):
         self.video_player.quit()
         ffmpeg_utils.clear_player_files(self.temp_dir, self.player_id)
-        for thread in self.load_video_threads:
-            thread.on_video_ready.disconnect()
-            thread.kill()
-            thread.wait()
-            self.load_video_threads.remove(thread)
+        for video_id in self.load_video_threads.keys():
+            self.kill_and_delete_proxy_thread(video_id)
+        self.concat_thread.quit()
+
+    def kill_and_delete_proxy_thread(self, video_id):
+        if video_id not in self.load_video_threads.keys():
+            return
+        self.load_video_threads[video_id].on_video_ready.disconnect()
+        self.load_video_threads[video_id].kill()
+        self.load_video_threads[video_id].wait()
+        del self.load_video_threads[video_id]
 
     def set_fps(self, fps=24):
         self.fps=fps
@@ -92,6 +98,18 @@ class video_manager_widget(QtWidgets.QWidget):
         self.videos_dic[video_id]['proxy'] = False
         self.videos_dic[video_id]['thumbnail'] = None
 
+    def check_proxys_soft(self):
+        for video_id in self.videos_dic.keys():
+            self.videos_dic[video_id]['proxy'] = ffmpeg_utils.check_if_proxy_exists(self.temp_dir, self.videos_dic[video_id]['original_file'])
+            self.videos_dic[video_id]['thumbnail'] = ffmpeg_utils.check_if_thumbnail_exists(self.temp_dir, self.videos_dic[video_id]['original_file'])
+
+    def videos_dropped(self, videos_list):
+        for video_path in videos_list:
+            self.add_video(video_path)
+        self.check_proxys_soft()
+        self.concat_thread.give_job(self.videos_dic)
+        self.load_next()
+
     def load_next(self):
         for video_id in self.videos_dic.keys():
             if self.videos_dic[video_id]['proxy']:
@@ -104,7 +122,7 @@ class video_manager_widget(QtWidgets.QWidget):
                                                         self)
             thread.on_video_ready.connect(self.video_loaded)
             thread.start()
-            self.load_video_threads.append(thread)
+            self.load_video_threads[video_id] = thread
             break
 
     def video_loaded(self, video_id):
@@ -112,6 +130,7 @@ class video_manager_widget(QtWidgets.QWidget):
             if self.videos_dic[other_video_id]['original_file'] == self.videos_dic[video_id]['original_file']:
                 self.videos_dic[other_video_id]['proxy'] = True
                 self.videos_dic[other_video_id]['thumbnail'] = ffmpeg_utils.get_thumbnail_path(self.temp_dir, self.videos_dic[video_id]['original_file'])
+        self.kill_and_delete_proxy_thread(video_id)
         self.timeline_widget.update_videos_dic(self.videos_dic)
         self.concat_thread.give_job(self.videos_dic)
 
@@ -145,12 +164,6 @@ class video_manager_widget(QtWidgets.QWidget):
         self.container_layout.addWidget(self.video_player)
         self.main_layout.addWidget(self.timeline_widget)
 
-    def videos_dropped(self, videos_list):
-        for video_path in videos_list:
-            self.add_video(video_path)
-        self.timeline_widget.update_videos_dic(self.videos_dic)
-        self.load_next()
-
     def connect_functions(self):
         self.concat_thread.on_concat_ready.connect(self.update_concat)
         self.video_player.on_progress.connect(self.update_frame)
@@ -179,6 +192,7 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
+'''
 
 app = app_utils.get_app()
 player = video_manager_widget()
@@ -206,10 +220,12 @@ videos = ["D:/SBOX/video_1.mp4",
 #for a in range(0,100):
 #    videos.append(f"videos/{a}.mp4")
 
-for video in videos:
-    player.add_video(video)
+#for video in videos:
+#    player.add_video(video)
 #player.clear_all_proxys()
-#player.hard_clear_proxys()
+player.hard_clear_proxys()
+player.check_proxys_soft()
 player.load_next()
 
 sys.exit(app.exec_())
+'''
