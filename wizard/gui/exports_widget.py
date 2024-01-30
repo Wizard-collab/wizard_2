@@ -568,7 +568,11 @@ class exports_widget(QtWidgets.QWidget):
                 files = self.manual_export_widget.files
                 export_name = self.manual_export_widget.export_name
                 comment = self.manual_export_widget.comment
-                if assets.merge_file_as_export_version(export_name, files, self.stage_id, comment):
+                if comment != None and comment != '':
+                    analyse_comment = True
+                else:
+                    analyse_comment = False
+                if assets.merge_file_as_export_version(export_name, files, self.stage_id, comment, analyse_comment=analyse_comment):
                     gui_server.refresh_ui()
 
     def focus_export_version(self, export_version_id):

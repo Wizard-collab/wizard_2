@@ -58,7 +58,6 @@ def playblast(directory, frange):
     bpy.context.scene.render.image_settings.color_mode = 'RGB'
     temp_dir = os.path.join(directory, 'tmp_playblast').replace('\\', '/')
     bpy.context.scene.render.filepath = temp_dir
-    # Set the resolution and frame range
     resolution = wizard_communicate.get_image_format()
     bpy.context.scene.render.resolution_x = resolution[0]
     bpy.context.scene.render.resolution_y = resolution[1]

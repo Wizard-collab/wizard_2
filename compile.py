@@ -141,9 +141,7 @@ class compile():
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
 							'dist/error_handler/error_handler.exe',
-							'ffmpeg.exe',
-							'libmpv.dll.a',
-							'libmpv-2.dll'
+							'ffmpeg.exe'
 							]
 							
 			for file in files_list:

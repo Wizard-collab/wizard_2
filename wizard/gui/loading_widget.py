@@ -88,7 +88,6 @@ class loading_widget(QtWidgets.QWidget):
         self.content_layout.setSpacing(4)
         self.content_widget.setLayout(self.content_layout)
         self.overlap_content_layout.addWidget(self.content_widget)
-        
 
         self.wizard_logo = QtWidgets.QLabel()
         self.wizard_logo.setPixmap(QtGui.QIcon(ressources._wizard_ico_).pixmap(50))
@@ -104,9 +103,21 @@ class loading_widget(QtWidgets.QWidget):
 
         self.datas_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
 
+        self.project_and_user_layout = QtWidgets.QHBoxLayout()
+        self.project_and_user_layout.setSpacing(10)
+        self.project_and_user_layout.setContentsMargins(0,0,0,0)
+        self.datas_layout.addLayout(self.project_and_user_layout)
+
+        self.project_name_label = QtWidgets.QLabel()
+        self.project_name_label.setObjectName("title_label")
+        self.project_and_user_layout.addWidget(self.project_name_label)
+
+        self.project_and_user_layout.addWidget(QtWidgets.QLabel('-'))
+
         self.user_label = QtWidgets.QLabel()
-        #self.user_label.setObjectName('gray_label')
-        self.datas_layout.addWidget(self.user_label)
+        self.project_and_user_layout.addWidget(self.user_label)
+
+        self.project_and_user_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('transparent_widget')
@@ -129,6 +140,7 @@ class loading_widget(QtWidgets.QWidget):
         self.infos_layout.addWidget(self.build_label)
 
     def fill_ui(self):
+        self.project_name_label.setText(environment.get_project_name().capitalize())
         self.user_label.setText(environment.get_user())
         #self.info_label.setText(f'Loading {environment.get_project_name()}...')
         version_dic = application.get_version()

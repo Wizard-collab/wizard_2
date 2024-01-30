@@ -1,6 +1,24 @@
 'last':
   update_list:
   - !!python/tuple
+    - debug
+    - Comment checking at export manual merge fixed
+  - !!python/tuple
+    - debug
+    - Update substance painter templates when openning export dialog
+  - !!python/tuple
+    - new
+    - Project name now displayed on loading screen
+  - !!python/tuple
+    - new
+    - Added JPG and JPEG extension rule for texturing stage
+  - !!python/tuple
+    - new
+    - New video viewer - ALPHA
+  time: 1706608839.4537444
+'3.6.0.310':
+  update_list:
+  - !!python/tuple
     - new
     - You can now duplicate references
   - !!python/tuple

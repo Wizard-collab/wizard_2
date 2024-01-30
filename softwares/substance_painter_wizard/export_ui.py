@@ -53,6 +53,9 @@ class export_ui(QtWidgets.QDialog):
         self.load_settings()
         self.connect_functions()
 
+    def showEvent(self, event):
+        self.fill_presets()
+
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -84,6 +87,7 @@ class export_ui(QtWidgets.QDialog):
         self.export_button.setAutoDefault(True)
 
     def fill_presets(self):
+        self.presets_comboBox.clear()
         self.presets_list = wizard_tools.get_export_presets_list()
         for preset in self.presets_list:
             self.presets_comboBox.addItem(preset)
