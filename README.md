@@ -14,6 +14,7 @@ Wizard is an autonomous software for managing CGI productions.
 		* Clone the repository
 		* Install `python 3.12.#`
 		* Download FFmpeg (https://ffmpeg.org/download.html) and move `ffmpeg.exe` inside the repository
+		* Get mpv binaries here : https://sourceforge.net/projects/mpv-player-windows/files/libmpv/ and move `libmpv-2.dll` inside the repository
 		* Launch `pip install -r requirement.txt`
 		* Launch `app.bat` or `python app.py`
 
@@ -38,6 +39,7 @@ Wizard is an autonomous software for managing CGI productions.
 
 * Other dependecies
 	* ffmpeg.exe
+	* libmpv-2.dll
 
 * Database dependency:
 	* PostgreSQL

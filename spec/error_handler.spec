@@ -3,7 +3,7 @@
 block_cipher = None
 import os
 
-a = Analysis(['PyWizard.py'],
+a = Analysis([os.path.abspath('error_handler.py')],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -21,14 +21,14 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='PyWizard',
+          name='error_handler',
           debug=False,
           bootloader_ignore_signals=True,
           strip=False,
           upx=True,
-          console=True,
-          version = 'compile\\version.rc',
-          icon=os.path.abspath("ressources\\icons\\pywizard.ico"))
+          console=False,
+          version = os.path.abspath('compile\\version.rc'),
+          icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -36,4 +36,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='PyWizard')
+               name='error_handler')

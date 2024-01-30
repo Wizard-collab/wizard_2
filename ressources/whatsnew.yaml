@@ -7,6 +7,9 @@
     - debug
     - Update substance painter templates when openning export dialog
   - !!python/tuple
+    - debug
+    - Uninstaller does work now
+  - !!python/tuple
     - new
     - Project name now displayed on loading screen
   - !!python/tuple

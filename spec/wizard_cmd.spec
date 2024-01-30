@@ -3,7 +3,7 @@
 block_cipher = None
 import os
 
-a = Analysis(['wizard_cmd.py'],
+a = Analysis([os.path.abspath('wizard_cmd.py')],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -27,7 +27,7 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=True,
-          version = 'compile\\version.rc',
+          version = os.path.abspath('compile\\version.rc'),
           icon=os.path.abspath("ressources\\icons\\pywizard.ico"))
 coll = COLLECT(exe,
                a.binaries,

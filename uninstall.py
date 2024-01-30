@@ -92,8 +92,9 @@ def delete_reg_keys():
 def delete_shortcuts():
     delete_shortcut('Wizard')
     delete_shortcut('PyWizard')
-    delete_shortcut('Wizard Console')
-    delete_shortcut('Wizard Server')
+    delete_shortcut('server')
+    delete_shortcut('Create Repository')
+    delete_shortcut('Change Repository')
 
 def delete_shortcut(name):
     desktop = winshell.desktop()
@@ -138,9 +139,6 @@ class uninstaller(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.png')))
         self.setWindowTitle(f"Wizard uninstaller")
 
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
         self.build_ui()
         self.fill_ui()
         self.connect_functions()
@@ -150,7 +148,7 @@ class uninstaller(QtWidgets.QWidget):
         screenRect = desktop.screenGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
-        self.move((screen_maxX-self.width())/2, (screen_maxY-self.height())/2)
+        self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))
         print(os.path.abspath(''))
 
     def fill_ui(self):
@@ -190,34 +188,16 @@ class uninstaller(QtWidgets.QWidget):
         self.uninstall_button.clicked.connect(self.process)
 
     def build_ui(self):
-        self.setStyleSheet('QWidget{background-color:#2c2c33;color:white;}')
         self.setFixedWidth(600)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(18,18,18,18)
         self.setLayout(self.main_layout)
-
-        self.main_frame = QtWidgets.QFrame()
-        self.main_frame.setStyleSheet('QFrame{border-radius:10px;}')
-
-        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
-        self.shadow.setBlurRadius(70)
-        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
-        self.shadow.setXOffset(2)
-        self.shadow.setYOffset(2)
-        self.main_frame.setGraphicsEffect(self.shadow)
-
-        self.frame_layout = QtWidgets.QVBoxLayout()
-        self.frame_layout.setContentsMargins(20,20,20,20)
-        self.frame_layout.setSpacing(6)
-        self.main_frame.setLayout(self.frame_layout)
-        self.main_layout.addWidget(self.main_frame)
 
         self.datas_widget = QtWidgets.QWidget()
         self.datas_layout = QtWidgets.QHBoxLayout()
         self.datas_layout.setContentsMargins(0,0,0,0)
         self.datas_layout.setSpacing(12)
         self.datas_widget.setLayout(self.datas_layout)
-        self.frame_layout.addWidget(self.datas_widget)
+        self.main_layout.addWidget(self.datas_widget)
 
         self.image_label = QtWidgets.QLabel()
         self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -241,48 +221,53 @@ class uninstaller(QtWidgets.QWidget):
         self.progress_bar = QtWidgets.QProgressBar()
         self.progress_bar.setStyleSheet('QProgressBar{height:6px;background-color: rgba(0,0,0,50);border-radius:3px;color: transparent;}QProgressBar::chunk {background-color: #7785de;border-radius:3px;}')
         self.progress_bar.setMaximumHeight(6)
-        self.frame_layout.addWidget(self.progress_bar)
+        self.main_layout.addWidget(self.progress_bar)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
-        self.frame_layout.addWidget(self.buttons_widget)
+        self.main_layout.addWidget(self.buttons_widget)
 
         self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
-        button_style = '''
-                        QPushButton, QToolButton, #classic_button{
-                            border: 2px solid #42424d;
-                            background-color: #42424d;
-                            padding: 12px;
-                            border-radius: 5px;
-                        }
-
-                        QPushButton::hover, QToolButton::hover, #classic_button::hover{
-                            border: 2px solid #4b4b57;
-                            background-color: #4b4b57;
-                        }
-
-                        QPushButton::pressed, QToolButton::pressed, #classic_button::pressed{
-                            border: 2px solid #1d1d21;
-                            background-color: #1d1d21;
-                        }
-                        '''
-
         self.cancel_button = QtWidgets.QPushButton('Cancel')
-        self.cancel_button.setStyleSheet(button_style)
         self.buttons_layout.addWidget(self.cancel_button)
 
         self.uninstall_button = QtWidgets.QPushButton('Uninstall')
-        self.uninstall_button.setStyleSheet(button_style)
+        self.uninstall_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.uninstall_button)
 
         self.close_button = QtWidgets.QPushButton('Close')
-        self.close_button.setStyleSheet(button_style)
+        self.close_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.close_button)
         self.close_button.setVisible(0)
+
+stylesheet = """
+#title_label_2{
+    font: bold large;
+    font-size: 14px;}
+QWidget{background-color:#2c2c33;color:white;}
+QPushButton, QToolButton, #classic_button{
+    border: 2px solid #42424d;
+    background-color: #42424d;
+    padding: 12px;
+    border-radius: 5px;}
+#blue_button{
+    background-color: transparent;
+    border: 2px solid #7785de;}
+#blue_button::hover{
+    background-color: #8e9dfa;
+    border: 2px solid #8e9dfa;}
+#blue_button::pressed{
+    background-color: #6772b5;
+    border: 2px solid #6772b5;}
+QProgressBar{height:6px;background-color: rgba(0,0,0,50);
+    border-radius:3px;color: transparent;}
+QProgressBar::chunk {background-color:
+    #7785de;border-radius:3px;}
+"""
 
 def main():
     if is_bootsrap():
@@ -291,6 +276,7 @@ def main():
             QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
             QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
             app = QtWidgets.QApplication(sys.argv)
+            app.setStyleSheet(stylesheet)
             uninstaller_widget = uninstaller()
             uninstaller_widget.show()
             QtWidgets.QApplication.processEvents()
@@ -299,7 +285,6 @@ def main():
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     else:
         create_bootstrap()
-
 
 if __name__ == '__main__':
     main()

@@ -3,7 +3,9 @@
 block_cipher = None
 import os
 
-a = Analysis(['app.py'],
+print(os.path.abspath(''))
+
+a = Analysis([os.path.abspath('app.py')],
              binaries=[],
              datas=[],
              hiddenimports=['PyQt5.QtPrintSupport', 'server'],
@@ -27,7 +29,7 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=True,
-          version = 'compile\\version.rc',
+          version = os.path.abspath('compile\\version.rc'),
           icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
 coll = COLLECT(exe,
                a.binaries,

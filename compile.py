@@ -83,43 +83,43 @@ class compile():
 			if os.path.isdir('build'):
 				shutil.rmtree('build')
 				
-			command_line = "PyInstaller wizard.spec"
+			command_line = "PyInstaller spec/wizard.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller create_repository.spec"
+			command_line = "PyInstaller spec/create_repository.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller change_repository.spec"
+			command_line = "PyInstaller spec/change_repository.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller change_db_server.spec"
+			command_line = "PyInstaller spec/change_db_server.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller PyWizard.spec"
+			command_line = "PyInstaller spec/PyWizard.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller wizard_cmd.spec"
+			command_line = "PyInstaller spec/wizard_cmd.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller server.spec"
+			command_line = "PyInstaller spec/server.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller uninstall.spec"
+			command_line = "PyInstaller spec/uninstall.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller error_handler.spec"
+			command_line = "PyInstaller spec/error_handler.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			command_line = "PyInstaller project_manager.spec"
+			command_line = "PyInstaller spec/project_manager.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 
@@ -141,6 +141,7 @@ class compile():
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
 							'dist/error_handler/error_handler.exe',
+							'libmpv-2.dll',
 							'ffmpeg.exe'
 							]
 							
@@ -168,7 +169,7 @@ class compile():
 			zip_file = self.build_folder+'.zip'
 			shutil.copyfile(zip_file, '__wizard__.zip')
 
-			command_line = "PyInstaller installer.spec"
+			command_line = "PyInstaller spec/installer.spec"
 			p = subprocess.Popen(command_line)
 			p.wait()
 

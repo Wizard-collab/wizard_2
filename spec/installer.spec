@@ -3,7 +3,7 @@
 block_cipher = None
 import os
 
-a = Analysis(['change_repository.py'],
+a = Analysis([os.path.abspath('installer.py')],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -15,25 +15,24 @@ a = Analysis(['change_repository.py'],
              cipher=block_cipher,
              noarchive=False)
 
+a.datas += [ ('__wizard__.zip', '.\\__wizard__.zip', 'DATA')]
+a.datas += [ ('version.yaml', '.\\version.yaml', 'DATA')]
+a.datas += [ ('ressources\\icons\\wizard_setup.png', '.\\ressources\\icons\\wizard_setup.png', 'DATA')]
+
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
           [],
-          exclude_binaries=True,
-          name='Change Repository',
+          name='__installer_temp__',
           debug=False,
-          bootloader_ignore_signals=True,
+          bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=True,
-          version = 'compile\\version.rc',
-          icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=False,
-               upx=True,
-               upx_exclude=[],
-               name='Change Repository')
+          upx_exclude=[],
+          runtime_tmpdir=None,
+          console=False,
+          icon=os.path.abspath('ressources\\icons\\wizard_setup.ico'))

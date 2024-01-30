@@ -3,7 +3,7 @@
 block_cipher = None
 import os
 
-a = Analysis(['uninstall.py'],
+a = Analysis([os.path.abspath('uninstall.py')],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -32,5 +32,5 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False,
+          console=True,
           icon=os.path.abspath('ressources\\icons\\wizard_setup.ico'))

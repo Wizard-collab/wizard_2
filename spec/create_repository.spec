@@ -3,7 +3,7 @@
 block_cipher = None
 import os
 
-a = Analysis(['error_handler.py'],
+a = Analysis([os.path.abspath('create_repository.py')],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -21,13 +21,13 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='error_handler',
+          name='Create Repository',
           debug=False,
           bootloader_ignore_signals=True,
           strip=False,
           upx=True,
-          console=False,
-          version = 'compile\\version.rc',
+          console=True,
+          version = os.path.abspath('compile\\version.rc'),
           icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
 coll = COLLECT(exe,
                a.binaries,
@@ -36,4 +36,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='error_handler')
+               name='Create Repository')

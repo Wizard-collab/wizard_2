@@ -3,7 +3,7 @@
 block_cipher = None
 import os
 
-a = Analysis(['server.py'],
+a = Analysis([os.path.abspath('project_manager.py')],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -21,13 +21,13 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='server',
+          name='Project Manager',
           debug=False,
           bootloader_ignore_signals=True,
           strip=False,
           upx=True,
           console=True,
-          version = 'compile\\version.rc',
+          version = os.path.abspath('compile\\version.rc'),
           icon=os.path.abspath("ressources\\icons\\wizard_icon.ico"))
 coll = COLLECT(exe,
                a.binaries,
@@ -36,4 +36,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='server')
+               name='Project Manager')
