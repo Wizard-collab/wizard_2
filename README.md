@@ -3,9 +3,10 @@
 # Wizard
 
 Wizard is an autonomous software for managing CGI productions.
-http://54.39.96.76/
 
-For now it only works on Windows OS.
+🌏 http://54.39.96.76/
+
+⚠️ For now it only works on Windows OS.
 
 * Installation:
 	* Install PostgreSQL on your computer or any server
