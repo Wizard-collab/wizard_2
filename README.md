@@ -9,11 +9,12 @@ http://54.39.96.76/
 	* Install PostgreSQL on your computer or any server
 	* This repository :
 		* Clone the repository
-		* Install `python 3.12.1`
-		* Launch `install_python3_modules.bat`
+		* Install `python 3.12.#`
+		* Download FFmpeg `https://ffmpeg.org/download.html` and move ffmpeg.exe inside the repository
+		* Launch `pip install -r requirement.txt`
 		* Launch `app.bat` or `python app.py`
 
-* Developed with _python 3.12.1_
+* Developed with _python 3.12.#_
 
 * Modules dependencies:
 	* PyQt5
@@ -34,8 +35,6 @@ http://54.39.96.76/
 
 * Other dependecies
 	* ffmpeg.exe
-	* libmpv-2.dll
-	* libmpv.dll.a
 
 * Database dependency:
 	* PostgreSQL
