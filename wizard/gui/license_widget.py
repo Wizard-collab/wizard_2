@@ -31,7 +31,7 @@ class license_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.main_textEdit)
 
     def fill_ui(self):
-        with open('LICENSE', 'r') as f:
+        with open('ressources/LICENSE', 'r') as f:
             self.main_textEdit.setText(f.read())
 
     def toggle(self):

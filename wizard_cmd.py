@@ -2,8 +2,7 @@ import argparse
 import traceback
 import json
 import logging
-from wizard.gui import gui_utils
-from wizard.gui import app_utils
+
 from wizard.core import application
 from wizard.core import environment
 from wizard.core import repository
@@ -16,6 +15,8 @@ from wizard.core import communicate
 from wizard.core import launch
 from wizard.core import hooks
 from wizard.core import launch_batch
+from wizard.gui import gui_utils
+from wizard.gui import app_utils
 
 custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)

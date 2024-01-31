@@ -77,7 +77,7 @@ def remove_install_dir():
         print(f"{install_dir} not found")
 
 def get_version():
-    version_file = ressources_path('version.yaml')
+    version_file = ressources_path('ressources/version.yaml')
     if os.path.isfile(version_file):
         with open(version_file, 'r') as f:
             version_dic = yaml.load(f, Loader=yaml.Loader)

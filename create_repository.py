@@ -35,15 +35,6 @@ import subprocess
 from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
-# Wizard gui modules
-from wizard.gui import app_utils
-from wizard.gui import gui_server
-from wizard.gui import message_widget
-from wizard.gui import create_repository_widget
-from wizard.gui import warning_tooltip
-from wizard.gui import logging_widget
-import error_handler
-
 # Wizard modules
 from wizard.core import application
 from wizard.core import user
@@ -53,8 +44,17 @@ from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
-
 logger = logging.getLogger('wizard')
+
+# Wizard gui modules
+from wizard.gui import app_utils
+from wizard.gui import gui_server
+from wizard.gui import message_widget
+from wizard.gui import create_repository_widget
+from wizard.gui import warning_tooltip
+from wizard.gui import logging_widget
+import error_handler
+
 
 class app():
     def __init__(self):

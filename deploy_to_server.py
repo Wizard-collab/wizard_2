@@ -17,7 +17,7 @@ def deploy_to_server():
 		print(f"{COMPIL_PATH} not found.")
 		return
 
-	with open("version.yaml", 'r') as f:
+	with open("ressources/version.yaml", 'r') as f:
 		build_dic = yaml.load(f, Loader=yaml.Loader)
 	build_file = os.path.join(COMPIL_PATH, build_dic['setup_name'])
 	if not os.path.isfile(build_file):
@@ -34,7 +34,7 @@ def deploy_to_server():
 
 	yaml_dest_file = os.path.join(SERVER_CGI_BIN_PATH, "version.yaml")
 	print(f"Copying version.yaml to {yaml_dest_file}")
-	shutil.copyfile("version.yaml", yaml_dest_file)
+	shutil.copyfile("ressources/version.yaml", yaml_dest_file)
 
 	if not os.path.isfile(yaml_dest_file):
 		print(f"{yaml_dest_file} not copied")

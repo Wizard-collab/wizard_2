@@ -16,7 +16,7 @@ a = Analysis([os.path.abspath('installer.py')],
              noarchive=False)
 
 a.datas += [ ('__wizard__.zip', '.\\__wizard__.zip', 'DATA')]
-a.datas += [ ('version.yaml', '.\\version.yaml', 'DATA')]
+a.datas += [ ('ressources\\version.yaml', '.\\ressources\\version.yaml', 'DATA')]
 a.datas += [ ('ressources\\icons\\wizard_setup.png', '.\\ressources\\icons\\wizard_setup.png', 'DATA')]
 
 pyz = PYZ(a.pure, a.zipped_data,

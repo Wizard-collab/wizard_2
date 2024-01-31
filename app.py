@@ -32,19 +32,18 @@ import time
 from PyQt5 import QtWidgets, QtCore, QtGui
 import logging
 
+# Wizard modules
+from wizard.core import application
+from wizard.core import custom_logger
+from wizard.core import version_database_modification
+custom_logger.get_root_logger()
+logger = logging.getLogger('wizard')
+
 # Wizard gui modules
 from wizard.gui import app_utils
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
 import error_handler
-
-# Wizard modules
-from wizard.core import application
-from wizard.core import custom_logger
-import version_database_modification
-custom_logger.get_root_logger()
-
-logger = logging.getLogger('wizard')
 
 class app():
     def __init__(self, project_manager,

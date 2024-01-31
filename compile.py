@@ -24,7 +24,7 @@ class compile():
 			compil_dir = 'compile'
 			if not os.path.isdir(compil_dir):
 				os.mkdir(compil_dir)
-			compil_data_file = 'version.yaml'
+			compil_data_file = 'ressources/version.yaml'
 			if not os.path.isfile(compil_data_file):
 				compil_data_dic = dict()
 				compil_data_dic['builds'] = 0
@@ -123,15 +123,13 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			folders_list = ['ressources', 'softwares']
+			folders_list = ['binaries', 'ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
 				destination = os.path.join(dist_folder, folder)
 				shutil.copytree(folder, destination)
 
-			files_list = [  'version.yaml',
-							'LICENSE',
-							'wapi.py',
+			files_list = [  'wapi.py',
 							'dist/PyWizard/PyWizard.exe',
 							'dist/Create Repository/Create Repository.exe',
 							'dist/Change Repository/Change Repository.exe',
@@ -140,18 +138,12 @@ class compile():
 							'dist/server/server.exe',
 							'dist/uninstall.exe',
 							'dist/Project Manager/Project Manager.exe',
-							'dist/error_handler/error_handler.exe',
-							'libmpv-2.dll',
-							'ffmpeg.exe'
+							'dist/error_handler/error_handler.exe'
 							]
 							
 			for file in files_list:
 				destination = os.path.join(dist_folder, os.path.basename(file))
 				shutil.copyfile(file, destination)
-
-			#import PyQt5
-			#qt5_dir = os.path.dirname(PyQt5.__file__)
-			#shutil.copytree(qt5_dir, f"{dist_folder}/PyQt5")
 
 			shutil.copytree(dist_folder, self.build_folder)
 

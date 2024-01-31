@@ -31,12 +31,12 @@ StringFileInfo(
     u'040904B0',
     [StringStruct(u'CompanyName', u'Wizard - Pipeline manager'),
     StringStruct(u'FileDescription', u'Wizard Application'),
-    StringStruct(u'FileVersion', u'2.0.0'),
+    StringStruct(u'FileVersion', u'3.0.0'),
     StringStruct(u'InternalName', u'Wizard'),
     StringStruct(u'LegalCopyright', u'Copyright (c) Wizard - Pipeline manager'),
     StringStruct(u'OriginalFilename', u'wizard.exe'),
     StringStruct(u'ProductName', u'Release'),
-    StringStruct(u'ProductVersion', u'2.0.0')])
+    StringStruct(u'ProductVersion', u'3.0.0')])
   ]), 
 VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]

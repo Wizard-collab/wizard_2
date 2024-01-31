@@ -41,9 +41,6 @@ import logging
 # Append current dir to sys.path
 sys.path.append(os.path.abspath(''))
 
-# Wizard gui modules
-from wizard.gui import app_utils
-from wizard.gui import gui_server
 
 # Wizard modules
 from wizard.core import application
@@ -63,6 +60,10 @@ from wizard.core import hooks
 from wizard.core import custom_logger
 custom_logger.get_root_logger()
 logger = logging.getLogger(__name__)
+
+# Wizard gui modules
+from wizard.gui import app_utils
+from wizard.gui import gui_server
 
 class app():
     def __init__(self):
