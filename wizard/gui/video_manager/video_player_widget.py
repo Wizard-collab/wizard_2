@@ -72,18 +72,18 @@ class video_player_widget(QtWidgets.QWidget):
         self.player.terminate()
 
     def load_video(self, video_file, first_load=False):
+        self.force_pause()
         pos = self.player.time_pos
-        pause = self.player.pause
         if first_load:
             pos = 0
             pause = True
         self.player.play(video_file)
         MPV_EVENT_FILE_LOADED = 8
         self.player.wait_for_event(MPV_EVENT_FILE_LOADED)
+        
         if pos is not None:
             self.seek(pos, force=True)
-        if self.player.pause != pause:
-            self.player.command('cycle', 'pause')
+        
         self.update_frame_range()
 
     def update_frame_range(self):

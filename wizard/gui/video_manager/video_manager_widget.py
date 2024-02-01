@@ -18,6 +18,7 @@ from wizard.core.video_player import ffmpeg_utils
 
 # Wizard gui modules
 from wizard.gui import app_utils
+from wizard.gui import gui_utils
 from wizard.gui.video_manager import video_player_widget
 from wizard.gui.video_manager import video_threads
 from wizard.gui.video_manager import timeline_widget
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 class video_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(video_manager_widget, self).__init__(parent)
-        self.load_video_threads = dict()
+        self.load_video_threads = []
         self.player_id = str(uuid.uuid4())
         self.temp_dir = ffmpeg_utils.get_temp_dir()
         self.videos_dic = dict()
@@ -54,23 +55,28 @@ class video_manager_widget(QtWidgets.QWidget):
     def quit(self):
         self.video_player.quit()
         ffmpeg_utils.clear_player_files(self.temp_dir, self.player_id)
-        for video_id in self.load_video_threads.keys():
-            self.kill_and_delete_proxy_thread(video_id)
+        for thread in self.load_video_threads:
+            thread.on_videos_ready.disconnect()
+            thread.kill()
+            thread.wait()
+            del thread
         self.concat_thread.quit()
-
-    def kill_and_delete_proxy_thread(self, video_id):
-        if video_id not in self.load_video_threads.keys():
-            return
-        self.load_video_threads[video_id].on_video_ready.disconnect()
-        self.load_video_threads[video_id].kill()
-        self.load_video_threads[video_id].wait()
-        del self.load_video_threads[video_id]
 
     def set_fps(self, fps=24):
         self.fps=fps
         self.video_player.set_fps(fps)
         self.timeline_widget.set_fps(fps)
         self.concat_thread.set_fps(fps)
+
+    def modify_fps_and_reload(self, fps=12):
+        # TODO
+        self.set_fps(24)
+        self.clear_cache_and_reload()
+
+    def modify_resolution_and_reload(self, resolution=[1920,1080]):
+        # TODO
+        self.set_resolution([1000,1000])
+        self.clear_cache_and_reload()
 
     def set_resolution(self, resolution=[1920,1080]):
         self.resolution = resolution
@@ -86,6 +92,18 @@ class video_manager_widget(QtWidgets.QWidget):
 
     def hard_clear_proxys(self):
         ffmpeg_utils.hard_clear_proxys(self.temp_dir)
+
+    def clear_cache_and_reload(self):
+        self.set_info("Clearing cache", 2)
+        self.clear_all_proxys()
+        self.check_proxys_soft()
+        self.load_nexts()
+
+    def clear_all_cache_and_reload(self):
+        self.set_info("Clearing all cache", 2)
+        self.hard_clear_proxys()
+        self.check_proxys_soft()
+        self.load_nexts()
 
     def add_video(self, video_file):
         video_id = str(uuid.uuid4())
@@ -107,43 +125,49 @@ class video_manager_widget(QtWidgets.QWidget):
         for video_path in videos_list:
             self.add_video(video_path)
         self.check_proxys_soft()
-        self.concat_thread.give_job(self.videos_dic)
-        self.load_next()
+        self.give_concat_job()
+        self.load_nexts()
 
-    def load_next(self):
+    def give_concat_job(self):
+        self.set_info("Creating concat stream", 2)
+        self.concat_thread.give_job(self.videos_dic)
+
+    def load_nexts(self, number=3):
+        need_proxies = False
         for video_id in self.videos_dic.keys():
-            if self.videos_dic[video_id]['proxy']:
-                continue
-            thread = video_threads.create_proxy_thread(video_id,
+            if not self.videos_dic[video_id]['proxy']:
+                need_proxies = True
+        if not need_proxies:
+            return
+        self.set_info("Loading videos", 2)
+        thread = video_threads.create_multiple_proxies(self.videos_dic,
                                                         self.temp_dir,
-                                                        self.videos_dic[video_id]['original_file'],
+                                                        number,
                                                         self.resolution,
-                                                        self.fps,
-                                                        self)
-            thread.on_video_ready.connect(self.video_loaded)
-            thread.start()
-            self.load_video_threads[video_id] = thread
-            break
+                                                        self.fps)
+        thread.on_videos_ready.connect(self.videos_loaded)
+        thread.start()
+        self.load_video_threads.append(thread)
 
-    def video_loaded(self, video_id):
-        for other_video_id in self.videos_dic.keys():
-            if self.videos_dic[other_video_id]['original_file'] == self.videos_dic[video_id]['original_file']:
-                self.videos_dic[other_video_id]['proxy'] = True
-                self.videos_dic[other_video_id]['thumbnail'] = ffmpeg_utils.get_thumbnail_path(self.temp_dir, self.videos_dic[video_id]['original_file'])
-        self.kill_and_delete_proxy_thread(video_id)
+    def videos_loaded(self):
+        self.set_info("New videos loaded")
+        self.check_proxys_soft()
         self.timeline_widget.update_videos_dic(self.videos_dic)
-        self.concat_thread.give_job(self.videos_dic)
+        self.give_concat_job()
 
     def update_frame_range(self, frame_range):
         self.frame_range = frame_range
         self.timeline_widget.set_frame_range(frame_range)
 
     def update_concat(self, concat_video_file):
+        logger.debug("Updating player content")
+        self.set_info("Updating player content", 2)
         self.timeline_widget.update_videos_dic(self.videos_dic)
         self.video_player.load_video(concat_video_file, self.first_load)
         if self.first_load:
             self.first_load = False
-        self.load_next()
+        self.set_info("Player updated")
+        self.load_nexts()
 
     def build_ui(self):
         self.resize(1280,720)
@@ -152,6 +176,17 @@ class video_manager_widget(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
+
+        self.menu_bar = QtWidgets.QMenuBar()
+        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+
+        self.main_layout.addWidget(self.menu_bar)
+        
+        self.tools_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Tools')
+        self.clear_cache_and_reload_action = self.tools_action.addAction(QtGui.QIcon(''), "Clear cache and reload")
+        self.clear_all_cache_and_reload_action = self.tools_action.addAction(QtGui.QIcon(''), "Clear all cache and reload")
+        self.modify_fps_action = self.tools_action.addAction(QtGui.QIcon(''), "Modify fps")
+        self.modify_resolution_action = self.tools_action.addAction(QtGui.QIcon(''), "Modify resolution")
 
         self.container = QtWidgets.QFrame()
         self.container.setStyleSheet("background-color:black;")
@@ -163,6 +198,27 @@ class video_manager_widget(QtWidgets.QWidget):
 
         self.container_layout.addWidget(self.video_player)
         self.main_layout.addWidget(self.timeline_widget)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setSpacing(6)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.infos_label_1 = QtWidgets.QLabel()
+        self.infos_label_1.setObjectName('gray_label')
+        self.infos_layout.addWidget(self.infos_label_1)
+
+    def set_info(self, info, color=1):
+        if color == 1:
+            color = '#90d1f0'
+        elif color == 2:
+            color = '#f79360'
+        elif color == 3:
+            color = '#f0605b'
+        self.infos_label_1.setText(info)
+        self.infos_label_1.setStyleSheet(f"color:{color}")
+        QtWidgets.QApplication.processEvents()
 
     def connect_functions(self):
         self.concat_thread.on_concat_ready.connect(self.update_concat)
@@ -180,19 +236,22 @@ class video_manager_widget(QtWidgets.QWidget):
         self.timeline_widget.on_order_changed.connect(self.order_changed)
         self.timeline_widget.on_video_in_out_modified.connect(self.in_out_modified)
         self.timeline_widget.on_videos_dropped.connect(self.videos_dropped)
+        self.clear_cache_and_reload_action.triggered.connect(self.clear_cache_and_reload)
+        self.clear_all_cache_and_reload_action.triggered.connect(self.clear_all_cache_and_reload)
+        self.modify_fps_action.triggered.connect(self.modify_fps_and_reload)
+        self.modify_resolution_action.triggered.connect(self.modify_resolution_and_reload)
 
     def order_changed(self, new_order):
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))
-        self.concat_thread.give_job(self.videos_dic)
+        self.give_concat_job()
 
     def in_out_modified(self, modification_dic):
         self.videos_dic[modification_dic['id']]['inpoint'] = modification_dic['inpoint']
         self.videos_dic[modification_dic['id']]['outpoint'] = modification_dic['outpoint']
-        self.concat_thread.give_job(self.videos_dic)
+        self.give_concat_job()
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
-'''
 
 app = app_utils.get_app()
 player = video_manager_widget()
@@ -223,9 +282,9 @@ videos = ["D:/SBOX/video_1.mp4",
 #for video in videos:
 #    player.add_video(video)
 #player.clear_all_proxys()
-player.hard_clear_proxys()
+#player.hard_clear_proxys()
 player.check_proxys_soft()
-player.load_next()
+player.give_concat_job()
+player.load_nexts()
 
 sys.exit(app.exec_())
-'''

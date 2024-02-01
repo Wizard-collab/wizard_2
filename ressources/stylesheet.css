@@ -866,6 +866,10 @@ QTableCornerButton::section {
 	color: #f79360;
 }
 
+#blue_label{
+	color: #90d1f0;
+}
+
 #bold_label{
 	font: bold;
 }

@@ -32,6 +32,7 @@ class create_proxy_thread(QtCore.QThread):
 
     def run(self):
         start_time = time.monotonic()
+        logger.debug(f"Creating proxy for {self.video_file}")
         self.create_proxy_object = ffmpeg_utils.create_proxy(self.temp_dir, self.video_file, self.resolution, self.fps)
         self.create_proxy_object.wait_for_process()
         self.create_proxy_object.process_finished()
@@ -42,6 +43,38 @@ class create_proxy_thread(QtCore.QThread):
         if not self.create_proxy_object:
             return
         self.create_proxy_object.kill()
+        self.quit()
+
+class create_multiple_proxies(QtCore.QThread):
+
+    on_videos_ready = pyqtSignal(object)
+
+    def __init__(self, videos_dic, temp_dir, number, resolution=[1920,1080], fps=24, parent=None):
+        super(create_multiple_proxies, self).__init__(parent)
+        self.videos_dic = videos_dic
+        self.temp_dir = temp_dir
+        self.resolution = resolution
+        self.fps = fps
+        self.number = number
+        self.proxy_thread = None
+
+    def run(self):
+        count = 0
+        for video_id in self.videos_dic.keys():
+            if self.videos_dic[video_id]['proxy']:
+                continue
+            self.proxy_thread = create_proxy_thread(video_id, self.temp_dir, self.videos_dic[video_id]['original_file'], self.resolution, self.fps)
+            self.proxy_thread.start()
+            self.proxy_thread.wait()
+            count += 1
+            if count == self.number:
+                break
+        self.on_videos_ready.emit(1)
+
+    def kill(self):
+        if not self.proxy_thread:
+            return
+        self.proxy_thread.kill()
         self.quit()
 
 class concat_thread(QtCore.QThread):
@@ -77,6 +110,7 @@ class concat_thread(QtCore.QThread):
     def run(self):
         self.running = True
         while self.to_concat != []:
+            logger.debug(f"Creating concat file")
             concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.player_id, self.to_concat[0], self.fps)
             self.on_concat_ready.emit(concat_video_file)
             self.to_concat.pop(0)
