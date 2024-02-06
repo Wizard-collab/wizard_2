@@ -29,6 +29,7 @@ class signal_manager(QtCore.QObject):
     on_video_item_double_clicked = pyqtSignal(object)
     on_videos_dropped = pyqtSignal(list)
     on_select = pyqtSignal(list)
+    on_delete = pyqtSignal(list)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -46,6 +47,7 @@ class timeline_widget(QtWidgets.QWidget):
     on_order_changed = pyqtSignal(list)
     on_video_in_out_modified = pyqtSignal(dict)
     on_videos_dropped = pyqtSignal(list)
+    on_delete = pyqtSignal(list)
 
     def __init__(self, parent=None):
         super(timeline_widget, self).__init__(parent)
@@ -80,6 +82,9 @@ class timeline_widget(QtWidgets.QWidget):
         self.fps = fps
         self.timeline_viewport.set_fps(fps)
         self.playing_infos_widget.set_fps(fps)
+
+    def set_resolution(self, resolution=[1920, 1080]):
+        self.playing_infos_widget.set_resolution(resolution)
 
     def set_frame_range(self, frame_range):
         old_frame_range = self.frame_range
@@ -122,6 +127,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_video_item_in_out_modified.connect(self.on_video_in_out_modified.emit)
         self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
         self.timeline_viewport.signal_manager.on_videos_dropped.connect(self.on_videos_dropped.emit)
+        self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
 
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
@@ -200,6 +206,11 @@ class playing_infos_widget(QtWidgets.QWidget):
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
+        self.resolution_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.resolution_label)
+
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+
         self.video_name_label = QtWidgets.QLabel('')
         self.main_layout.addWidget(self.video_name_label)
 
@@ -240,6 +251,9 @@ class playing_infos_widget(QtWidgets.QWidget):
     def set_fps(self, fps):
         self.fps = fps
         self.fps_label.setText(f"{fps} fps")
+
+    def set_resolution(self, resolution):
+        self.resolution_label.setText(f"{resolution[0]}x{resolution[1]}")
 
     def update_current_video_name(self, video_name):
         self.video_name_label.setText(video_name)
@@ -394,6 +408,9 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.videos_dic[video_id].set_thumbnail(videos_dic[video_id]['thumbnail'])
             self.videos_dic[video_id].set_loaded(videos_dic[video_id]['proxy'])
             self.videos_dic[video_id].name = videos_dic[video_id]['name']
+        existing_video_ids = list(self.videos_dic.keys())
+        for video_id in existing_video_ids:
+            pass
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: list(videos_dic.keys()).index(x[0])))
         self.reorganise_items()
         self.update()
@@ -533,6 +550,13 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.setSceneRect(rect)
         self.update()
 
+    def delete_selection(self):
+        selected_items = self.get_selected_items()
+        selected_ids = []
+        for selected_item in selected_items:
+            selected_ids.append(selected_item.video_id)
+        self.signal_manager.on_delete.emit(selected_ids)
+
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
         if event.key() == QtCore.Qt.Key_Space:
@@ -541,6 +565,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.signal_manager.on_prev_frame.emit(1)
         if event.key() == QtCore.Qt.Key_Right:
             self.signal_manager.on_next_frame.emit(1)
+        if event.key() == QtCore.Qt.Key_Delete:
+            self.delete_selection()
 
     def mousePressEvent(self, event):
         self.move_cursor = None

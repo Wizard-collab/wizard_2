@@ -86,6 +86,7 @@ class video_player_widget(QtWidgets.QWidget):
 
     def set_resolution(self, resolution=[1920,1080]):
         self.resolution = resolution
+        self.timeline_widget.set_resolution(resolution)
 
     def clear_all_proxys(self):
         for video_id in self.videos_dic.keys():
@@ -188,10 +189,10 @@ class video_player_widget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.menu_bar)
         
-        self.tools_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Tools')
-        self.clear_cache_and_reload_action = self.tools_action.addAction(QtGui.QIcon(''), "Clear cache and reload")
-        self.clear_all_cache_and_reload_action = self.tools_action.addAction(QtGui.QIcon(''), "Clear all cache and reload")
-        self.show_preferences_action = self.tools_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
+        self.player_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Player')
+        self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear cache")
+        self.clear_all_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear all cache")
+        self.show_preferences_action = self.player_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
 
         self.container = QtWidgets.QFrame()
         self.container.setStyleSheet("background-color:black;")
@@ -241,6 +242,7 @@ class video_player_widget(QtWidgets.QWidget):
         self.timeline_widget.on_order_changed.connect(self.order_changed)
         self.timeline_widget.on_video_in_out_modified.connect(self.in_out_modified)
         self.timeline_widget.on_videos_dropped.connect(self.videos_dropped)
+        self.timeline_widget.on_delete.connect(self.delete_videos)
         self.clear_cache_and_reload_action.triggered.connect(self.clear_cache_and_reload)
         self.clear_all_cache_and_reload_action.triggered.connect(self.clear_all_cache_and_reload)
         self.show_preferences_action.triggered.connect(self.show_preferences)
@@ -252,6 +254,12 @@ class video_player_widget(QtWidgets.QWidget):
     def in_out_modified(self, modification_dic):
         self.videos_dic[modification_dic['id']]['inpoint'] = modification_dic['inpoint']
         self.videos_dic[modification_dic['id']]['outpoint'] = modification_dic['outpoint']
+        self.give_concat_job()
+
+    def delete_videos(self, video_ids):
+        for video_id in video_ids:
+            if video_id in self.videos_dic.keys():
+                del self.videos_dic[video_id]
         self.give_concat_job()
 
     def update_frame(self, frame):
