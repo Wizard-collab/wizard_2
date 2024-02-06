@@ -389,8 +389,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 self.videos_dic[video_id].signal_manager.on_select.connect(self.update_selection)
             self.videos_dic[video_id].set_frame_width(self.frame_width)
             self.videos_dic[video_id].set_frames_count(videos_dic[video_id]['frames_count'])
-            self.videos_dic[video_id].set_in_frame(int((videos_dic[video_id]['inpoint'])*self.fps))
-            self.videos_dic[video_id].set_out_frame(int((videos_dic[video_id]['outpoint'])*self.fps))
+            self.videos_dic[video_id].set_in_frame((videos_dic[video_id]['inpoint']))
+            self.videos_dic[video_id].set_out_frame((videos_dic[video_id]['outpoint']))
             self.videos_dic[video_id].set_thumbnail(videos_dic[video_id]['thumbnail'])
             self.videos_dic[video_id].set_loaded(videos_dic[video_id]['proxy'])
             self.videos_dic[video_id].name = videos_dic[video_id]['name']
@@ -460,8 +460,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def video_item_in_out_modified(self, video_item):
         self.reorganise_items()
-        inpoint = video_item.in_frame/self.fps
-        outpoint = video_item.out_frame/self.fps
+        inpoint = video_item.in_frame
+        outpoint = video_item.out_frame
         video_id = video_item.video_id
         modification_dic = dict()
         modification_dic['id'] = video_id

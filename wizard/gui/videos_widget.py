@@ -32,7 +32,7 @@ from wizard.gui import comment_widget
 from wizard.gui import batch_settings_widget
 from wizard.gui import tag_label
 from wizard.gui import current_asset_viewer
-from wizard.gui.video_manager import video_manager_widget
+from wizard.gui.video_manager import video_manager
 
 logger = logging.getLogger(__name__)
 
@@ -529,12 +529,10 @@ class videos_widget(QtWidgets.QWidget):
         items = self.get_selection()
         if items is not None:
             if len(items) == 1:
-                if self.video_manager_widget:
-                    self.video_manager_widget.close()
-                self.video_manager_widget = video_manager_widget.video_manager_widget()
-                self.video_manager_widget.add_video(items[0].video_row['file_path'])
-                self.video_manager_widget.load_nexts()
-                self.video_manager_widget.show()
+                instance = video_manager.video_manager().get_instance()
+                instance.add_video(items[0].video_row['file_path'])
+                instance.load_nexts()
+                instance.show()
 
     def open_folder(self):
         if self.variant_id is not None:
