@@ -141,16 +141,17 @@ def merge(namespace, files_list):
 def reference_abc_camera(namespace, files_list):
     if len(files_list) == 1:
         cam_main_node = wizard_tools.create_node_without_duplicate("alembicarchive", namespace)
-        abc_xform_node = wizard_tools.create_node_without_duplicate("alembicxform", namespace+'_xform', cam_main_node)
-        abc_xform_node.parm("fileName").set(files_list[0])
-        wizard_tools.connect_to_input_item(abc_xform_node, cam_main_node, 1)
-        arg = abc_xform_node.parm("objectPath").menuLabels()[1]
-        abc_xform_node.parm("objectPath").set(arg)
-        abc_xform_node.parm("frame").setExpression("$F")
-        hou_camera_node = wizard_tools.create_node_without_duplicate("cam", namespace+'_hou_cam', abc_xform_node)
-        wizard_tools.connect_to_input_item(hou_camera_node, abc_xform_node, 1)
+        parameter = cam_main_node.parm('fileName')
+        parameter.set(files_list[0])
+
+        cam_main_node.parm('buildHierarchy').pressButton()
         cam_main_node.layoutChildren()
-        abc_xform_node.layoutChildren()
+
+        image_format = wizard_communicate.get_image_format()
+        hou_camera_node = wizard_tools.look_for_nodetype('cam', parent=cam_main_node)
+        if hou_camera_node is not None:
+            hou_camera_node.parm("resx").set(image_format[0])
+            hou_camera_node.parm("resy").set(image_format[1])
     else:
         logger.warning("Can't merge multiple files")
 
@@ -158,11 +159,13 @@ def update_abc_camera(namespace, files_list):
     if len(files_list) == 1:
         cam_main_node = wizard_tools.node_exists(namespace, parent=None)
         if cam_main_node:
-            abc_xform_node = wizard_tools.node_exists(namespace+'_xform', parent=cam_main_node)
-            if abc_xform_node:
-                abc_xform_node.parm("fileName").set(files_list[0])
-            else:
-                logger.warning(f"{namespace+'_xform'} not found")
+            cam_main_node.parm("fileName").set(files_list[0])
+            cam_main_node.parm('buildHierarchy').pressButton()
+            image_format = wizard_communicate.get_image_format()
+            hou_camera_node = wizard_tools.look_for_nodetype('cam', parent=cam_main_node)
+            if hou_camera_node is not None:
+                hou_camera_node.parm("resx").set(image_format[0])
+                hou_camera_node.parm("resy").set(image_format[1])
         else:
             logger.warning(f"{namespace} not found")
     else:

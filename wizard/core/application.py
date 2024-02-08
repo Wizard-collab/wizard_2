@@ -66,4 +66,5 @@ def log_license():
     with open('ressources/LICENSE', 'r') as f:
         print(f.read())
 
+sys.path.append(os.path.abspath(''))
 add_binaries_to_path()

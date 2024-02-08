@@ -57,7 +57,7 @@ _extensions_dic_[_guerilla_render_] = 'gproject'
 _extensions_dic_[_substance_painter_] = 'spp'
 _extensions_dic_[_substance_designer_] = 'sbs'
 _extensions_dic_[_nuke_] = 'nk'
-_extensions_dic_[_houdini_] = 'hip'
+_extensions_dic_[_houdini_] = 'hipnc'
 _extensions_dic_[_blender_] = 'blend'
 
 # Launch commands

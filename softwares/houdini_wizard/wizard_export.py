@@ -72,6 +72,9 @@ def export_hip(export_file, frange):
 
 def export_abc(export_file, frange, out_node, parent):
     wizard_abc_output = wizard_tools.look_for_node(out_node, parent)
+    if wizard_abc_output.type().name() == 'rop_geometry':
+        export_file = export_file.replace('.abc', '.vdb')
+        return export_vdb(export_file, frange, out_node, parent)
     if wizard_abc_output:
         abc_command = wizard_hooks.get_abc_command("houdini")
         if abc_command is None:
@@ -84,6 +87,9 @@ def export_abc(export_file, frange, out_node, parent):
 def export_vdb(export_file, frange, out_node, parent):
     export_dir = os.path.dirname(export_file)
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
+    if wizard_vdb_output.type().name() == 'rop_alembic':
+        export_file = export_file.replace('.vdb', '.abc')
+        return export_vdb(export_file, frange, out_node, parent)
     if wizard_vdb_output:
         vdb_command = wizard_hooks.get_vdb_command("houdini")
         if vdb_command is None:

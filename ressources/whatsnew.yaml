@@ -5,6 +5,27 @@
     - Comment checking at export manual merge fixed
   - !!python/tuple
     - debug
+    - Wizard command fixed
+  - !!python/tuple
+    - debug
+    - Switched Houdini save to hipnc
+  - !!python/tuple
+    - debug
+    - Houdini wizard tags fixed
+  - !!python/tuple
+    - debug
+    - Houdini camera import fixed
+  - !!python/tuple
+    - debug
+    - Houdini image resolution comes with camera
+  - !!python/tuple
+    - New
+    - Houdini / Rop geometry is automatically detected to export vdb
+  - !!python/tuple
+    - update
+    - Removed auto increment at substance painter export
+  - !!python/tuple
+    - debug
     - Update substance painter templates when openning export dialog
   - !!python/tuple
     - debug

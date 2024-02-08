@@ -333,7 +333,7 @@ class preferences_widget(QtWidgets.QDialog):
         self.accept_button = QtWidgets.QPushButton('Accept')
         self.accept_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.accept_button)
-
+'''
 app = app_utils.get_app()
 player = video_player_widget()
 player.set_fps(24)
@@ -369,3 +369,4 @@ player.give_concat_job()
 player.load_nexts()
 
 sys.exit(app.exec_())
+'''

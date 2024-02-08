@@ -87,6 +87,21 @@ def look_for_node(name, parent=None):
             break
     return found
 
+def look_for_nodetype(node_type, parent=None):
+    if parent is not None:
+        for node in hou.node('/').allSubChildren():
+            if node.name() == parent:
+                parent = node
+                break
+    else:
+        parent = hou.node('/')
+    found = None
+    for node in parent.allSubChildren():
+        if node.type().name() == node_type:
+            found = node
+            break
+    return found
+
 def check_out_node_existence(out_node, parent=None):
     if look_for_node(out_node, parent):
         return True
@@ -103,8 +118,11 @@ def get_new_objects(old_objects):
     all_objects = get_all_nodes()
     new_objects = []
     for object in all_objects:
-        if object not in old_objects:
-            new_objects.append(object)
+        try:
+            if object not in old_objects:
+                new_objects.append(object)
+        except hou.ObjectWasDeleted:
+            pass
     return new_objects
 
 def get_wizard_ref_node():
@@ -127,7 +145,7 @@ def apply_tags(out_node):
     name = f"wizardTags_{out_node.name()}"
 
     tags_node = create_node_without_duplicate('attribcreate', name, out_node_parent)
-    tags_node.parm('name1').set(name)
+    tags_node.parm('name1').set('wizardTags')
     tags_node.parm('class1').set('detail')
     tags_node.parm('type1').set('index')
 
@@ -155,7 +173,7 @@ def get_export_nodes(base_name, parent=hou.node('/')):
     for node in get_all_nodes(parent=parent):
         node_name = node.name()
         short_node_name = node_name.split('|')[-1]
-        if base_name in short_node_name:
+        if short_node_name.startswith(base_name):
             node_name_tokens = node_name.split('_')
             if len(node_name_tokens) == tokens_len:
                 export_name = 'main'

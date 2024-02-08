@@ -199,3 +199,6 @@ def set_frame_range(rolls=0):
 def set_frame_rate():
     frame_rate = wizard_communicate.get_frame_rate()
     hou.setFps(frame_rate)
+
+def set_image_size():
+    image_format = wizard_communicate.get_image_format()
