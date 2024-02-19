@@ -291,6 +291,8 @@ class tree_widget(QtWidgets.QFrame):
             self.sort_domain_children(domain_id)
         for category_id in self.category_ids.keys():
             self.sort_category_children(category_id)
+        for asset_group_id in self.assets_groups_ids.keys():
+            self.sort_asset_group_children(asset_group_id)
         for asset_id in self.asset_ids.keys():
             self.sort_asset_children(asset_id)
 
@@ -343,6 +345,19 @@ class tree_widget(QtWidgets.QFrame):
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
         self.category_ids[category_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+
+    def sort_asset_group_children(self, asset_group_id):
+        names_dic = dict()
+        names = []
+        creation_item = None
+        for child_index in range(self.assets_groups_ids[asset_group_id].childCount()):
+            item = self.assets_groups_ids[asset_group_id].child(child_index)
+            names_dic[item.instance_name] = item
+            names.append(item.instance_name)
+        names = tools.natural_sort(names)
+        for name in names:
+            names_dic[name].setText(50, str(names.index(name)).zfill(10))
+        self.assets_groups_ids[asset_group_id].sortChildren(50, QtCore.Qt.AscendingOrder)
 
     def sort_asset_children(self, asset_id):
         names_dic = dict()

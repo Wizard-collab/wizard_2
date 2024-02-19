@@ -3,6 +3,9 @@
   - !!python/tuple
     - debug
     - Substance Painter keep settings
+  - !!python/tuple
+    - debug
+    - Assets inside asset groups now alphabetically sorted
   time: 1708334566.4214418
 '3.7.2.341':
   update_list:
