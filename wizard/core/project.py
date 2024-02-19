@@ -2259,6 +2259,14 @@ def get_videos(variant_id, column='*'):
                                                         column)
     return videos_rows
 
+def get_all_videos(column='*', order='creation_time'):
+    videos_rows = db_utils.get_rows('project',
+                                        'videos',
+                                        column,
+                                        order,
+                                        'DESC')
+    return videos_rows
+
 def get_referenced_groups_by_group_id(group_id, column='*'):
     referenced_groups_rows = db_utils.get_row_by_column_data('project',
                                                         'referenced_groups_data',

@@ -26,6 +26,9 @@ from wizard.gui.video_manager import timeline_widget
 logger = logging.getLogger(__name__)
 
 class video_player_widget(QtWidgets.QWidget):
+
+    current_stage = pyqtSignal(int)
+
     def __init__(self, parent=None):
         super(video_player_widget, self).__init__(parent)
 
@@ -112,7 +115,7 @@ class video_player_widget(QtWidgets.QWidget):
         self.check_proxys_soft()
         self.load_nexts()
 
-    def add_video(self, video_file):
+    def add_video(self, video_file, project_video_id=None):
         video_id = str(uuid.uuid4())
         self.videos_dic[video_id] = dict()
         self.videos_dic[video_id]['original_file'] = path_utils.abspath(video_file)
@@ -122,13 +125,14 @@ class video_player_widget(QtWidgets.QWidget):
         self.videos_dic[video_id]['outpoint'] = self.videos_dic[video_id]['frames_count']
         self.videos_dic[video_id]['proxy'] = False
         self.videos_dic[video_id]['thumbnail'] = None
+        self.videos_dic[video_id]['project_video_id'] = project_video_id
 
     def check_proxys_soft(self):
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id]['proxy'] = ffmpeg_utils.check_if_proxy_exists(self.temp_dir, self.videos_dic[video_id]['original_file'])
             self.videos_dic[video_id]['thumbnail'] = ffmpeg_utils.check_if_thumbnail_exists(self.temp_dir, self.videos_dic[video_id]['original_file'])
 
-    def videos_dropped(self, videos_list):
+    def add_videos(self, videos_list):
         for video_path in videos_list:
             self.add_video(video_path)
         self.check_proxys_soft()
@@ -169,6 +173,7 @@ class video_player_widget(QtWidgets.QWidget):
     def update_concat(self, concat_video_file):
         logger.debug("Updating player content")
         self.set_info("Updating player content", 2)
+        logger.info(self.videos_dic)
         self.timeline_widget.update_videos_dic(self.videos_dic)
         self.video_player.load_video(concat_video_file, self.first_load)
         if self.first_load:
@@ -193,6 +198,8 @@ class video_player_widget(QtWidgets.QWidget):
         self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear cache")
         self.clear_all_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear all cache")
         self.show_preferences_action = self.player_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
+        self.playlist_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Playlist')
+        self.clear_playlist_action = self.playlist_action.addAction(QtGui.QIcon(''), "Clear playlist")
 
         self.container = QtWidgets.QFrame()
         self.container.setStyleSheet("background-color:black;")
@@ -241,11 +248,13 @@ class video_player_widget(QtWidgets.QWidget):
         self.timeline_widget.on_beginning_requested.connect(self.video_player.seek_beginning)
         self.timeline_widget.on_order_changed.connect(self.order_changed)
         self.timeline_widget.on_video_in_out_modified.connect(self.in_out_modified)
-        self.timeline_widget.on_videos_dropped.connect(self.videos_dropped)
+        self.timeline_widget.on_videos_dropped.connect(self.add_videos)
         self.timeline_widget.on_delete.connect(self.delete_videos)
+        self.timeline_widget.current_stage.connect(self.current_stage.emit)
         self.clear_cache_and_reload_action.triggered.connect(self.clear_cache_and_reload)
         self.clear_all_cache_and_reload_action.triggered.connect(self.clear_all_cache_and_reload)
         self.show_preferences_action.triggered.connect(self.show_preferences)
+        self.clear_playlist_action.triggered.connect(self.clear)
 
     def order_changed(self, new_order):
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))
@@ -255,6 +264,9 @@ class video_player_widget(QtWidgets.QWidget):
         self.videos_dic[modification_dic['id']]['inpoint'] = modification_dic['inpoint']
         self.videos_dic[modification_dic['id']]['outpoint'] = modification_dic['outpoint']
         self.give_concat_job()
+
+    def clear(self):
+        self.delete_videos(list(self.videos_dic.keys()))
 
     def delete_videos(self, video_ids):
         for video_id in video_ids:

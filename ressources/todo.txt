@@ -1,9 +1,5 @@
+VIDEOS - 
 
-
-- add jpg option for texturing stage - OK
-- check what's happenning with the comments and manual exports - OK
-- update substance painter presets when openning export ui - OK
-- add project to loading window - OK
-- fix blender import and update textures
-- fix blender Qt - not possible for now - need to create a ui in blender
-- faire un peu de doc c'est une catastrophe la
+Video browser
+Asset infos in video player
+Ingest image sequence

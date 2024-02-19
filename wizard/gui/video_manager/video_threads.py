@@ -102,6 +102,7 @@ class concat_thread(QtCore.QThread):
                 is_at_least_on_proxy = True
                 break
         if not is_at_least_on_proxy:
+            self.on_concat_ready.emit(None)
             return
         self.to_concat.append(videos_dic)
         if not self.running:
@@ -112,6 +113,7 @@ class concat_thread(QtCore.QThread):
         while self.to_concat != []:
             logger.debug(f"Creating concat file")
             concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.player_id, self.to_concat[0], self.fps)
+            print(concat_video_file)
             self.on_concat_ready.emit(concat_video_file)
             self.to_concat.pop(0)
         self.running = False

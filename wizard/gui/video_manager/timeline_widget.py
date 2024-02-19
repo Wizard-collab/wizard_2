@@ -6,13 +6,17 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import math
+import logging
 
 # Wizard modules
 from wizard.core import tools
+from wizard.core import project
 from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+
+logger = logging.getLogger(__name__)
 
 class signal_manager(QtCore.QObject):
 
@@ -30,6 +34,7 @@ class signal_manager(QtCore.QObject):
     on_videos_dropped = pyqtSignal(list)
     on_select = pyqtSignal(list)
     on_delete = pyqtSignal(list)
+    current_stage = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -48,6 +53,7 @@ class timeline_widget(QtWidgets.QWidget):
     on_video_in_out_modified = pyqtSignal(dict)
     on_videos_dropped = pyqtSignal(list)
     on_delete = pyqtSignal(list)
+    current_stage = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(timeline_widget, self).__init__(parent)
@@ -128,6 +134,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
         self.timeline_viewport.signal_manager.on_videos_dropped.connect(self.on_videos_dropped.emit)
         self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
+        self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
 
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
@@ -298,6 +305,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.timeline_scene.addItem(self.insert_item)
         self.insert_item.setVisible(False)
 
+        self.last_stage_id = None
+
         self.connect_functions()
 
     def dragEnterEvent(self, event):
@@ -408,12 +417,43 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.videos_dic[video_id].set_thumbnail(videos_dic[video_id]['thumbnail'])
             self.videos_dic[video_id].set_loaded(videos_dic[video_id]['proxy'])
             self.videos_dic[video_id].name = videos_dic[video_id]['name']
+            self.videos_dic[video_id].project_video_id = videos_dic[video_id]['project_video_id']
         existing_video_ids = list(self.videos_dic.keys())
         for video_id in existing_video_ids:
-            pass
+            if video_id not in videos_dic.keys():
+                self.remove_video(video_id)
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: list(videos_dic.keys()).index(x[0])))
         self.reorganise_items()
+        self.refresh()
+
+    def refresh(self):
+        stage_rows = project.get_all_stages()
+        stages = dict()
+        for stage_row in stage_rows:
+            stages[stage_row['id']] = stage_row
+        variant_rows = project.get_all_variants()
+        variants = dict()
+        for variant_row in variant_rows:
+            variants[variant_row['id']] = variant_row
+        video_rows = project.get_all_videos()
+        videos = dict()
+        for video_row in video_rows:
+            videos[video_row['id']] = video_row
+        for video_id in self.videos_dic.keys():
+            video_item = self.videos_dic[video_id]
+            if video_item.project_video_id:
+                video_row = videos[video_item.project_video_id]
+                video_item.set_video_row(video_row)
+                variant_row = variants[video_row['variant_id']]
+                video_item.set_variant_row(variant_row)
+                stage_row = stages[variant_row['stage_id']]
+                video_item.set_stage_row(stage_row)
         self.update()
+
+    def remove_video(self, video_id):
+        if video_id in self.videos_dic.keys():
+            self.timeline_scene.removeItem(self.videos_dic[video_id])
+            del self.videos_dic[video_id]
 
     def reorganise_items(self):
         start_frame = 0
@@ -534,8 +574,16 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.update()
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id].set_frame(frame)
-            if self.videos_dic[video_id].is_current():
-                self.signal_manager.current_video_name.emit(self.videos_dic[video_id].video_name)
+            if not self.videos_dic[video_id].is_current():
+                continue
+            self.signal_manager.current_video_name.emit(self.videos_dic[video_id].video_name)
+            if self.videos_dic[video_id].stage_row:
+                stage_id = self.videos_dic[video_id].stage_row['id']
+            else:
+                stage_id = None
+            if self.last_stage_id != stage_id:
+                self.signal_manager.current_stage.emit(stage_id)
+                self.last_stage_id = stage_id
 
     def move_scene_center_to_left(self, force=False):
         delta_x = self.mapToScene(QtCore.QPoint(0,0)).x() + 20
@@ -796,6 +844,18 @@ class video_item(custom_graphic_item):
         self.hover_in_frame_handle = False
         self.hover_out_frame_handle = False
         self.setPos(self.pos().x(), 30)
+        self.video_row = None
+        self.variant_row = None
+        self.stage_row = None
+
+    def set_video_row(self, video_row):
+        self.video_row = video_row
+
+    def set_variant_row(self, variant_row):
+        self.variant_row = variant_row
+
+    def set_stage_row(self, stage_row):
+        self.stage_row = stage_row
 
     def mousePressEvent(self, event):
         self.moved = False
@@ -960,7 +1020,11 @@ class video_item(custom_graphic_item):
     def paint(self, painter, option, widget):
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
-        color = QtGui.QColor(100,100,110,190)
+        if not self.stage_row:
+            color = QtGui.QColor(100,100,110,190)
+        else:
+            color = QtGui.QColor(ressources._stages_colors_[self.stage_row['name']])
+            color.setAlpha(150)
         if not self.loaded:
             color.setAlpha(70)
         if self.is_current() and self.loaded:
@@ -1010,11 +1074,29 @@ class video_item(custom_graphic_item):
 
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
-        text_rect = QtCore.QRect(rect.x()+self.margin*4,
-                            int(rect.y()+self.margin*4),
-                            int(rect.width()-self.margin*8),
-                            int(rect.height()-self.margin*8))
-        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, self.video_name)
+        text_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
+                            int(rect.y()+self.margin*2)),
+                            QtCore.QPoint(int(rect.width()-self.margin*8),
+                            int(rect.height()-self.margin*8)))
+        if self.variant_row:
+            text = f"{self.variant_row['string']}/{self.video_row['name']}"
+        else:
+            text = self.video_name
+        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, text)
+
+        if self.stage_row is not None:
+            state_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
+                            display_thumbnail_rect.y()+15),
+                            QtCore.QPoint(max(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,min(display_thumbnail_rect.x()+display_thumbnail_rect.width()+50+self.margin*4, int(rect.width()-self.margin*8))), 40))
+            brush = QtGui.QBrush(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
+            painter.setBrush(brush)
+            pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+            painter.setPen(pen)
+            painter.drawRoundedRect(state_rect, 4, 4)
+            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
+            painter.setPen(pen)
+            painter.drawText(state_rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter, self.stage_row['state'])
+
 
 class cursor_item(custom_graphic_item):
     def __init__(self):

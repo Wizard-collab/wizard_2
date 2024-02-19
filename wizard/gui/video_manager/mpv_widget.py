@@ -73,6 +73,9 @@ class mpv_widget(QtWidgets.QWidget):
         self.player.terminate()
 
     def load_video(self, video_file, first_load=False):
+        if video_file is None or not os.path.isfile(video_file):
+            self.player.stop()
+            return
         self.force_pause()
         pos = self.player.time_pos
         if first_load:

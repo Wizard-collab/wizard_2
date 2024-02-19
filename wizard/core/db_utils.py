@@ -61,8 +61,8 @@ def create_row(level, table, columns, datas):
     sql_cmd += ') RETURNING id;'
     return execute_sql(sql_cmd, level, 0, datas, 1)
 
-def get_rows(level, table, column='*', order='id'):
-    sql_cmd = f''' SELECT {column} FROM {table} ORDER BY {order}'''
+def get_rows(level, table, column='*', order='id', sort=''):
+    sql_cmd = f''' SELECT {column} FROM {table} ORDER BY {order} {sort}'''
     if column != '*':
         as_dict=0
     else:

@@ -404,7 +404,7 @@ QToolTip
 
 QMenuBar {
 	background-color: transparent;
-    padding: 0px;
+    padding: 4px;
     margin: 0px;
 }
 
