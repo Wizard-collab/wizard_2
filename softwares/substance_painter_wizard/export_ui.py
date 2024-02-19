@@ -55,6 +55,7 @@ class export_ui(QtWidgets.QDialog):
 
     def showEvent(self, event):
         self.fill_presets()
+        self.load_settings()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()

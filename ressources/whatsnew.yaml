@@ -2,6 +2,12 @@
   update_list:
   - !!python/tuple
     - debug
+    - Substance Painter keep settings
+  time: 1708334566.4214418
+'3.7.2.341':
+  update_list:
+  - !!python/tuple
+    - debug
     - Comment checking at export manual merge fixed
   - !!python/tuple
     - debug
