@@ -35,6 +35,7 @@ class header_widget(QtWidgets.QFrame):
     show_splash_screen = pyqtSignal(object)
     show_latest_build = pyqtSignal(object)
     show_documentation = pyqtSignal(object)
+    show_video_manager = pyqtSignal(object)
     close_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -67,6 +68,7 @@ class header_widget(QtWidgets.QFrame):
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
         self.production_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._production_manager_icon_), "Production manager")
+        self.video_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._production_manager_icon_), "Videos manager")
         self.groups_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._group_icon_), "Groups manager")
         self.batcher_action = self.window_action.addAction(QtGui.QIcon(ressources._batcher_icon_), "Batcher")
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")
@@ -111,6 +113,7 @@ class header_widget(QtWidgets.QFrame):
         self.project_create_action.triggered.connect(self.create_project)
         self.project_preferences_action.triggered.connect(self.show_project_preferences.emit)
         self.production_manager_action.triggered.connect(self.show_production_manager.emit)
+        self.video_manager_action.triggered.connect(self.show_video_manager.emit)
         self.table_viewer_action.triggered.connect(self.show_tables_viewer.emit)
         self.groups_manager_action.triggered.connect(self.show_groups_manager.emit)
         self.batcher_action.triggered.connect(self.show_batcher.emit)

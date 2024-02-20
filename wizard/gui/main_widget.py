@@ -64,6 +64,7 @@ from wizard.gui import table_viewer_widget
 from wizard.gui import floating_widgets_layout
 from wizard.gui import batcher_widget
 from wizard.gui import pranks
+from wizard.gui.video_manager import video_manager
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,7 @@ class main_widget(QtWidgets.QWidget):
         self.quotes_manager = quotes_manager.quotes_manager()
         self.table_viewer_widget = table_viewer_widget.table_viewer_widget()
         self.batcher_widget = batcher_widget.batcher_widget()
+        self.video_manager = video_manager.video_manager()
         self.pranks = pranks.pranks()
 
         self.build_ui()
@@ -229,6 +231,7 @@ class main_widget(QtWidgets.QWidget):
         self.header_widget.show_splash_screen.connect(self.splash_screen_widget.show)
         self.header_widget.show_latest_build.connect(lambda:self.is_latest_build(force=1))
         self.header_widget.show_documentation.connect(self.show_documentation)
+        self.header_widget.show_video_manager.connect(self.video_manager.toggle)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
         self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
@@ -445,6 +448,7 @@ class main_widget(QtWidgets.QWidget):
         self.championship_widget.refresh()
         self.splash_screen_widget.refresh()
         self.subtask_manager.refresh()
+        self.video_manager.refresh()
         self.footer_widget.update_refresh_time(start_time)
 
     def build_ui(self):

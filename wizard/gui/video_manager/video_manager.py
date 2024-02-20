@@ -63,7 +63,24 @@ class video_manager(QtWidgets.QWidget):
         self.video_player.load_nexts()
 
     def closeEvent(self, event):
-        self.video_player.quit()
+        self.hide()
+        event.ignore()
+
+    def refresh(self):
+        self.video_browser.refresh()
+        self.asset_tracking_widget.refresh()
+        self.video_player.refresh()
+
+    def toggle(self):
+        if self.isVisible():
+            if not self.isActiveWindow():
+                self.show()
+                self.raise_()
+            else:
+                self.hide()
+        else:
+            self.show()
+            self.raise_()
 
     def build_ui(self):
         self.resize(1280,720)

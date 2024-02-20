@@ -37,6 +37,7 @@ class signal_manager(QtCore.QObject):
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
     current_video_row = pyqtSignal(object)
+    is_last = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -78,6 +79,9 @@ class timeline_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.playing_infos_widget)
         self.main_layout.addWidget(self.timeline_viewport)
         self.setLayout(self.main_layout)
+
+    def refresh(self):
+        self.timeline_viewport.refresh()
 
     def update_videos_dic(self, videos_dic):
         self.videos_dic = videos_dic
@@ -138,6 +142,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
         self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
         self.timeline_viewport.signal_manager.current_video_row.connect(self.playing_infos_widget.update_current_video_row)
+        self.timeline_viewport.signal_manager.is_last.connect(self.playing_infos_widget.update_is_last)
 
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
@@ -312,6 +317,12 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.video_date_label.setText(tools.time_ago_from_timestamp(video_row['creation_time']))
         self.comment_label.setText(video_row['comment'])
 
+    def update_is_last(self, is_last):
+        if is_last:
+            self.video_version_label.setStyleSheet("color:#b3f07d")
+        else:
+            self.video_version_label.setStyleSheet("color:#ffae4f")
+
 class timeline_viewport(QtWidgets.QGraphicsView):
 
     def __init__(self):
@@ -485,8 +496,14 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             variants[variant_row['id']] = variant_row
         video_rows = project.get_all_videos()
         videos = dict()
+        variant_videos = dict()
         for video_row in video_rows:
             videos[video_row['id']] = video_row
+            if video_row['variant_id'] not in variant_videos.keys():
+                variant_videos[video_row['variant_id']] = video_row['id']
+            if video_row['id'] > variant_videos[video_row['variant_id']]:
+                variant_videos[video_row['variant_id']] = video_row['id']
+
         for video_id in self.videos_dic.keys():
             video_item = self.videos_dic[video_id]
             if video_item.project_video_id:
@@ -496,6 +513,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 video_item.set_variant_row(variant_row)
                 stage_row = stages[variant_row['stage_id']]
                 video_item.set_stage_row(stage_row)
+                last_variant_video_id = variant_videos[video_row['variant_id']]
+                video_item.set_is_last(video_row['id'] == last_variant_video_id)
             if video_item.is_current():
                 self.current_playing_item(video_item)
         self.update()
@@ -508,6 +527,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.signal_manager.current_video_name.emit(item.video_name)
             stage_id = None
         if self.last_stage_id != stage_id:
+            self.signal_manager.is_last.emit(item.is_last)
             self.signal_manager.current_stage.emit(stage_id)
             self.signal_manager.current_video_row.emit(item.video_row)
             self.last_stage_id = stage_id
@@ -635,7 +655,6 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.cursor_item.set_frame(frame)
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id].set_frame(frame)
-            
         self.update()
 
     def move_scene_center_to_left(self, force=False):
@@ -900,6 +919,10 @@ class video_item(custom_graphic_item):
         self.video_row = None
         self.variant_row = None
         self.stage_row = None
+        self.is_last = True
+
+    def set_is_last(self, is_last):
+        self.is_last = is_last
 
     def set_video_row(self, video_row):
         self.video_row = video_row
@@ -1073,66 +1096,89 @@ class video_item(custom_graphic_item):
         self.scene().update()
 
     def paint(self, painter, option, widget):
+        # Set up background color
+        bg_color = QtGui.QColor(100,100,110,190)
+        if not self.loaded:
+            bg_color.setAlpha(70)
+        if self.is_current() and self.loaded:
+            bg_color.setAlpha(255)
+
+        # Paint cropping effect
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
-        if not self.stage_row:
-            color = QtGui.QColor(100,100,110,190)
-        else:
-            color = QtGui.QColor(ressources._stages_colors_[self.stage_row['name']])
-            color.setAlpha(150)
-        if not self.loaded:
-            color.setAlpha(70)
-        if self.is_current() and self.loaded:
-            color.setAlpha(255)
         if self.start_crop_in is not None or self.start_crop_out is not None:
-            rect = QtCore.QRectF(self.x-(self.in_frame*self.frame_width),
+            shadow_rect = QtCore.QRectF(self.x-(self.in_frame*self.frame_width),
                                 self.y+self.margin*4,
                                 self.frames_count*self.frame_width,
                                 self.height-self.margin*8)
             brush = QtGui.QBrush(QtGui.QColor(30,30,40,100))
             painter.setBrush(brush)
-            painter.drawRoundedRect(rect, 2,2)
-            color.setAlpha(255)
+            painter.drawRoundedRect(shadow_rect, 2,2)
+            bg_color.setAlpha(255)
         
-        brush = QtGui.QBrush(color)
+        # Paint background
+        brush = QtGui.QBrush(bg_color)
         painter.setBrush(brush)
         if not self.selected:
             pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
         else:
             pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
-        rect = QtCore.QRect(int(self.x),
+        bg_rect = QtCore.QRect(int(self.x),
                             int(self.y+self.margin*4),
                             int(self.width-self.margin),
                             int(self.height-self.margin*8))
-        painter.drawRoundedRect(rect, 2,2)
+        painter.drawRoundedRect(bg_rect, 2,2)
 
-        if rect.width()-self.margin*4 < 1:
+        if self.stage_row:
+            stage_outline_color = QtGui.QColor(ressources._stages_colors_[self.stage_row['name']])
+            pen = QtGui.QPen(QtGui.QColor(stage_outline_color), 2, QtCore.Qt.SolidLine)
+            painter.setPen(pen)
+            stage_outline_rect = QtCore.QRect(bg_rect.x()+1, bg_rect.y()+1, bg_rect.width()-2, bg_rect.height()-2)
+            painter.drawRoundedRect(stage_outline_rect, 2,2)
+
+
+        if bg_rect.width()-self.margin*4 < 1:
             return
-        display_thumbnail_rect = QtCore.QRect(rect.x()+self.margin*2,
-                            int(rect.y()+self.margin*2),
-                            min(rect.width()-self.margin*4, self.thumbnail_pixmap.width()),
+
+        display_thumbnail_rect = QtCore.QRect(bg_rect.x()+self.margin*2,
+                            int(bg_rect.y()+self.margin*2),
+                            min(bg_rect.width()-self.margin*4, self.thumbnail_pixmap.width()),
                             self.thumbnail_pixmap.height())
         pixmap = self.thumbnail_pixmap.copy(display_thumbnail_rect)
         painter.drawPixmap(display_thumbnail_rect, pixmap)
 
+        # Draw crop handles
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+        painter.setPen(pen)
         if self.hover_in_frame_handle:
-            handle_rect = QtCore.QRectF(rect.x(), rect.y(), int(self.scale_handle_width/2), rect.height())
+            handle_rect = QtCore.QRectF(bg_rect.x(),
+                                        bg_rect.y(),
+                                        int(self.scale_handle_width/2),
+                                        bg_rect.height())
             brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
             painter.setBrush(brush)
-            painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
+            painter.drawRoundedRect(handle_rect,
+                                    int(self.scale_handle_width/4),
+                                    int(self.scale_handle_width/4))
         if self.hover_out_frame_handle:
-            handle_rect = QtCore.QRectF(rect.width()-int(self.scale_handle_width/2), rect.y(), int(self.scale_handle_width/2), rect.height())
+            handle_rect = QtCore.QRectF(bg_rect.width()-int(self.scale_handle_width/2),
+                                        bg_rect.y(),
+                                        int(self.scale_handle_width/2),
+                                        bg_rect.height())
             brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
             painter.setBrush(brush)
             painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
 
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
+        pen_color = '#ffffff'
+        if not self.is_last:
+            pen_color = '#ffae4f'
+        pen = QtGui.QPen(QtGui.QColor(pen_color), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
         text_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
-                            int(rect.y()+self.margin*2)),
-                            QtCore.QPoint(int(rect.width()-self.margin*8),
-                            int(rect.height()-self.margin*8)))
+                            int(bg_rect.y()+self.margin*3)),
+                            QtCore.QPoint(int(bg_rect.width()-self.margin*4),
+                            int(bg_rect.height()-self.margin*8)))
         if self.variant_row:
             text = f"{self.variant_row['string']}/{self.video_row['name']}"
         else:
@@ -1140,18 +1186,23 @@ class video_item(custom_graphic_item):
         painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, text)
 
         if self.stage_row is not None:
-            state_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
-                            display_thumbnail_rect.y()+15),
-                            QtCore.QPoint(max(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,min(display_thumbnail_rect.x()+display_thumbnail_rect.width()+50+self.margin*4, int(rect.width()-self.margin*8))), 40))
-            brush = QtGui.QBrush(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
-            painter.setBrush(brush)
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
-            painter.setPen(pen)
-            painter.drawRoundedRect(state_rect, 4, 4)
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
-            painter.setPen(pen)
-            painter.drawText(state_rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter, self.stage_row['state'])
-
+            x_orig = display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4
+            y_orig = display_thumbnail_rect.y()+15
+            state_rect = QtCore.QRect(QtCore.QPoint(x_orig,
+                            y_orig),
+                            QtCore.QPoint(max(x_orig,
+                                            min(x_orig+50,
+                                                int(bg_rect.width()-self.margin*4))),
+                                            40))
+            if state_rect.width() > 1:
+                brush = QtGui.QBrush(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
+                painter.setBrush(brush)
+                pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+                painter.setPen(pen)
+                painter.drawRoundedRect(state_rect, 4, 4)
+                pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
+                painter.setPen(pen)
+                painter.drawText(state_rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter, self.stage_row['state'])
 
 class cursor_item(custom_graphic_item):
     def __init__(self):

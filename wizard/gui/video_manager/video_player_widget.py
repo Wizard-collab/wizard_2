@@ -57,6 +57,9 @@ class video_player_widget(QtWidgets.QWidget):
     def closeEvent(self, event):
         self.quit()
 
+    def refresh(self):
+        self.timeline_widget.refresh()
+
     def quit(self):
         self.video_player.quit()
         ffmpeg_utils.clear_player_files(self.temp_dir, self.player_id)
@@ -173,7 +176,6 @@ class video_player_widget(QtWidgets.QWidget):
     def update_concat(self, concat_video_file):
         logger.debug("Updating player content")
         self.set_info("Updating player content", 2)
-        logger.info(self.videos_dic)
         self.timeline_widget.update_videos_dic(self.videos_dic)
         self.video_player.load_video(concat_video_file, self.first_load)
         if self.first_load:

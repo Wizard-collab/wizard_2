@@ -168,7 +168,6 @@ class custom_video_icon_item(QtWidgets.QListWidgetItem):
         self.widget.stage_label.setText(f"{self.stage_row['name']}")
         self.widget.asset_name_label.setText(f"{self.asset_name}")
         self.widget.infos_label.setText(f"{self.video_row['name']} - {self.video_row['creation_user']} - {tools.time_ago_from_timestamp(self.video_row['creation_time'])}")
-        self.widget.comment_label.setText(f"{self.video_row['comment']}")
         self.widget.set_background(ressources._stages_colors_[self.stage_row['name']])
         self.widget.set_state(self.stage_row['state'])
         self.setSizeHint(self.widget.sizeHint())
@@ -191,13 +190,21 @@ class video_item_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 
-        self.stage_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.stage_label)
-
         self.asset_name_label = QtWidgets.QLabel()
         self.asset_name_label.setObjectName('bold_label')
         self.asset_name_label.setWordWrap(True)
         self.main_layout.addWidget(self.asset_name_label)
+
+        self.infos_layout = QtWidgets.QHBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.addLayout(self.infos_layout)
+        
+        self.stage_label = QtWidgets.QLabel()
+        self.infos_layout.addWidget(self.stage_label)
+
+        self.state_label = QtWidgets.QLabel()
+        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.infos_layout.addWidget(self.state_label)
 
         self.image_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.image_label)
@@ -206,11 +213,4 @@ class video_item_widget(QtWidgets.QWidget):
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.comment_label = QtWidgets.QLabel()
-        self.comment_label.setFixedHeight(50)
-        self.comment_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.comment_label)
-
-        self.state_label = QtWidgets.QLabel()
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        self.main_layout.addWidget(self.state_label)
+        
