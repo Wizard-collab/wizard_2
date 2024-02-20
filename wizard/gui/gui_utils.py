@@ -449,6 +449,23 @@ class search_bar(QtWidgets.QFrame):
 
     color = pyqtProperty(QtGui.QColor, fset=_set_color)
 
+class ScrollLabel(QtWidgets.QScrollArea):
+ 
+    def __init__(self, *args, **kwargs):
+        QtWidgets.QScrollArea.__init__(self, *args, **kwargs)
+        self.setWidgetResizable(True)
+        content = QtWidgets.QWidget(self)
+        self.setWidget(content)
+        lay = QtWidgets.QVBoxLayout(content)
+        lay.setContentsMargins(0,0,0,0)
+        self.label = QtWidgets.QLabel(content)
+        self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.label.setWordWrap(True)
+        lay.addWidget(self.label)
+ 
+    def setText(self, text):
+        self.label.setText(text)
+
 class close_button(QtWidgets.QPushButton):
     def __init__(self, parent=None):
         super(close_button, self).__init__(parent)

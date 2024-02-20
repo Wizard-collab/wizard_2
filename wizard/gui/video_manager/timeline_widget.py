@@ -28,6 +28,7 @@ class signal_manager(QtCore.QObject):
     on_video_item_move = pyqtSignal(object)
     on_video_item_moved = pyqtSignal(object)
     on_video_item_scale = pyqtSignal(object)
+    on_current = pyqtSignal(object)
     current_video_name = pyqtSignal(str)
     on_video_item_in_out_modified = pyqtSignal(object)
     on_video_item_double_clicked = pyqtSignal(object)
@@ -35,6 +36,7 @@ class signal_manager(QtCore.QObject):
     on_select = pyqtSignal(list)
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
+    current_video_row = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -135,6 +137,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_videos_dropped.connect(self.on_videos_dropped.emit)
         self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
         self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
+        self.timeline_viewport.signal_manager.current_video_row.connect(self.playing_infos_widget.update_current_video_row)
 
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
@@ -160,34 +163,71 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.connect_functions()
 
     def build_ui(self):
-        self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
+
+        self.video_infos_widget = QtWidgets.QWidget()
+        self.video_infos_widget.setFixedHeight(100)
+        self.video_infos_layout = QtWidgets.QVBoxLayout()
+        self.video_infos_layout.setContentsMargins(6,6,6,6)
+        self.video_infos_widget.setLayout(self.video_infos_layout)
+        self.main_layout.addWidget(self.video_infos_widget)
+
+        self.video_infos_header_layout = QtWidgets.QHBoxLayout()
+        self.video_infos_header_layout.setContentsMargins(0,0,0,0)
+        self.video_infos_layout.addLayout(self.video_infos_header_layout)
+
+        self.video_name_label = QtWidgets.QLabel('')
+        self.video_name_label.setObjectName('bold_label')
+        self.video_infos_header_layout.addWidget(self.video_name_label)
+
+        self.video_version_label = QtWidgets.QLabel()
+        self.video_infos_header_layout.addWidget(self.video_version_label)
+
+        self.video_user_label = QtWidgets.QLabel()
+        self.video_user_label.setObjectName('gray_label')
+        self.video_infos_header_layout.addWidget(self.video_user_label)
+
+        self.video_date_label = QtWidgets.QLabel()
+        self.video_date_label.setObjectName('gray_label')
+        self.video_infos_header_layout.addWidget(self.video_date_label)
+
+        self.video_infos_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.comment_label = gui_utils.ScrollLabel()
+        self.comment_label.label.setObjectName('gray_label')
+        self.video_infos_layout.addWidget(self.comment_label)
+
+        self.content_1_layout = QtWidgets.QHBoxLayout()
+        self.content_1_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.addLayout(self.content_1_layout)
 
         self.beginning_button = gui_utils.transparent_button(ressources._player_beginning_icon_, ressources._player_beginning_icon_hover_)
         self.beginning_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.beginning_button.setFixedSize(QtCore.QSize(20,20))
-        self.main_layout.addWidget(self.beginning_button)
+        self.content_1_layout.addWidget(self.beginning_button)
 
         self.previous_button = gui_utils.transparent_button(ressources._player_previous_icon_, ressources._player_previous_icon_hover_)
         self.previous_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.previous_button.setFixedSize(QtCore.QSize(20,20))
-        self.main_layout.addWidget(self.previous_button)
+        self.content_1_layout.addWidget(self.previous_button)
 
         self.play_pause_button = gui_utils.transparent_button(ressources._player_play_icon_, ressources._player_play_icon_hover_)
         self.play_pause_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.play_pause_button.setFixedSize(QtCore.QSize(20,20))
-        self.main_layout.addWidget(self.play_pause_button)
+        self.content_1_layout.addWidget(self.play_pause_button)
 
         self.next_button = gui_utils.transparent_button(ressources._player_next_icon_, ressources._player_next_icon_hover_)
         self.next_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.next_button.setFixedSize(QtCore.QSize(20,20))
-        self.main_layout.addWidget(self.next_button)
+        self.content_1_layout.addWidget(self.next_button)
 
         self.end_button = gui_utils.transparent_button(ressources._player_end_icon_, ressources._player_end_icon_hover_)
         self.end_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.end_button.setFixedSize(QtCore.QSize(20,20))
-        self.main_layout.addWidget(self.end_button)
+        self.content_1_layout.addWidget(self.end_button)
 
         self.loop_button = gui_utils.transparent_button(ressources._player_loop_icon_,
                                                         ressources._player_loop_icon_hover_,
@@ -195,33 +235,28 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.loop_button.setCheckable(True)
         self.loop_button.setFocusPolicy(QtCore.Qt.NoFocus)
         self.loop_button.setFixedSize(QtCore.QSize(20,20))
-        self.main_layout.addWidget(self.loop_button)
+        self.content_1_layout.addWidget(self.loop_button)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.time_label = QtWidgets.QLabel('00:00:00:00')
-        self.main_layout.addWidget(self.time_label)
+        self.content_1_layout.addWidget(self.time_label)
 
         self.total_time_label = QtWidgets.QLabel('| 00:00:00:00')
         self.total_time_label.setObjectName('gray_label')
-        self.main_layout.addWidget(self.total_time_label)
+        self.content_1_layout.addWidget(self.total_time_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.fps_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.fps_label)
+        self.content_1_layout.addWidget(self.fps_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
 
         self.resolution_label = QtWidgets.QLabel()
-        self.main_layout.addWidget(self.resolution_label)
+        self.content_1_layout.addWidget(self.resolution_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
-
-        self.video_name_label = QtWidgets.QLabel('')
-        self.main_layout.addWidget(self.video_name_label)
-
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
     def connect_functions(self):
         self.play_pause_button.clicked.connect(self.on_play_pause.emit)
@@ -264,6 +299,18 @@ class playing_infos_widget(QtWidgets.QWidget):
 
     def update_current_video_name(self, video_name):
         self.video_name_label.setText(video_name)
+
+    def update_current_video_row(self, video_row):
+        if video_row is None:
+            self.video_version_label.setText('')
+            self.video_user_label.setText('')
+            self.video_date_label.setText('')
+            self.comment_label.setText('')
+            return
+        self.video_version_label.setText(video_row['name'])
+        self.video_user_label.setText(video_row['creation_user'])
+        self.video_date_label.setText(tools.time_ago_from_timestamp(video_row['creation_time']))
+        self.comment_label.setText(video_row['comment'])
 
 class timeline_viewport(QtWidgets.QGraphicsView):
 
@@ -410,6 +457,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(self.video_item_double_clicked)
                 self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(self.video_item_double_clicked)
                 self.videos_dic[video_id].signal_manager.on_select.connect(self.update_selection)
+                self.videos_dic[video_id].signal_manager.on_current.connect(self.current_playing_item)
             self.videos_dic[video_id].set_frame_width(self.frame_width)
             self.videos_dic[video_id].set_frames_count(videos_dic[video_id]['frames_count'])
             self.videos_dic[video_id].set_in_frame((videos_dic[video_id]['inpoint']))
@@ -448,7 +496,21 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 video_item.set_variant_row(variant_row)
                 stage_row = stages[variant_row['stage_id']]
                 video_item.set_stage_row(stage_row)
+            if video_item.is_current():
+                self.current_playing_item(video_item)
         self.update()
+
+    def current_playing_item(self, item):
+        if item.stage_row:
+            self.signal_manager.current_video_name.emit(item.variant_row['string'])
+            stage_id = item.stage_row['id']
+        else:
+            self.signal_manager.current_video_name.emit(item.video_name)
+            stage_id = None
+        if self.last_stage_id != stage_id:
+            self.signal_manager.current_stage.emit(stage_id)
+            self.signal_manager.current_video_row.emit(item.video_row)
+            self.last_stage_id = stage_id
 
     def remove_video(self, video_id):
         if video_id in self.videos_dic.keys():
@@ -571,19 +633,10 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def set_frame(self, frame):
         self.cursor_item.set_frame(frame)
-        self.update()
         for video_id in self.videos_dic.keys():
             self.videos_dic[video_id].set_frame(frame)
-            if not self.videos_dic[video_id].is_current():
-                continue
-            self.signal_manager.current_video_name.emit(self.videos_dic[video_id].video_name)
-            if self.videos_dic[video_id].stage_row:
-                stage_id = self.videos_dic[video_id].stage_row['id']
-            else:
-                stage_id = None
-            if self.last_stage_id != stage_id:
-                self.signal_manager.current_stage.emit(stage_id)
-                self.last_stage_id = stage_id
+            
+        self.update()
 
     def move_scene_center_to_left(self, force=False):
         delta_x = self.mapToScene(QtCore.QPoint(0,0)).x() + 20
@@ -961,6 +1014,8 @@ class video_item(custom_graphic_item):
 
     def set_frame(self, frame):
         self.frame = frame
+        if self.is_current():
+            self.signal_manager.on_current.emit(self)
 
     def set_in_frame(self, in_frame):
         self.in_frame = min(max(0, in_frame), self.out_frame-1)

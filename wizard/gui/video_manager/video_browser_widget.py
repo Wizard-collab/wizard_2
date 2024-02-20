@@ -207,6 +207,7 @@ class video_item_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.infos_label)
 
         self.comment_label = QtWidgets.QLabel()
+        self.comment_label.setFixedHeight(50)
         self.comment_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.comment_label)
 
