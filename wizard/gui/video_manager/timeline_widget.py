@@ -36,6 +36,7 @@ class signal_manager(QtCore.QObject):
     on_select = pyqtSignal(list)
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
+    current_variant = pyqtSignal(int)
     current_video_row = pyqtSignal(object)
     is_last = pyqtSignal(object)
 
@@ -57,6 +58,7 @@ class timeline_widget(QtWidgets.QWidget):
     on_videos_dropped = pyqtSignal(list)
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
+    current_variant = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(timeline_widget, self).__init__(parent)
@@ -141,6 +143,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_videos_dropped.connect(self.on_videos_dropped.emit)
         self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
         self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
+        self.timeline_viewport.signal_manager.current_variant.connect(self.current_variant.emit)
         self.timeline_viewport.signal_manager.current_video_row.connect(self.playing_infos_widget.update_current_video_row)
         self.timeline_viewport.signal_manager.is_last.connect(self.playing_infos_widget.update_is_last)
 
@@ -529,6 +532,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         if self.last_stage_id != stage_id:
             self.signal_manager.is_last.emit(item.is_last)
             self.signal_manager.current_stage.emit(stage_id)
+            self.signal_manager.current_variant.emit(item.variant_row['id'])
             self.signal_manager.current_video_row.emit(item.video_row)
             self.last_stage_id = stage_id
 

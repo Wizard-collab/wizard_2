@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 class video_player_widget(QtWidgets.QWidget):
 
     current_stage = pyqtSignal(int)
+    current_variant = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(video_player_widget, self).__init__(parent)
@@ -253,6 +254,7 @@ class video_player_widget(QtWidgets.QWidget):
         self.timeline_widget.on_videos_dropped.connect(self.add_videos)
         self.timeline_widget.on_delete.connect(self.delete_videos)
         self.timeline_widget.current_stage.connect(self.current_stage.emit)
+        self.timeline_widget.current_variant.connect(self.current_variant.emit)
         self.clear_cache_and_reload_action.triggered.connect(self.clear_cache_and_reload)
         self.clear_all_cache_and_reload_action.triggered.connect(self.clear_all_cache_and_reload)
         self.show_preferences_action.triggered.connect(self.show_preferences)
