@@ -29,6 +29,7 @@ class video_player_widget(QtWidgets.QWidget):
 
     current_stage = pyqtSignal(int)
     current_variant = pyqtSignal(int)
+    current_video_row = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(video_player_widget, self).__init__(parent)
@@ -255,10 +256,38 @@ class video_player_widget(QtWidgets.QWidget):
         self.timeline_widget.on_delete.connect(self.delete_videos)
         self.timeline_widget.current_stage.connect(self.current_stage.emit)
         self.timeline_widget.current_variant.connect(self.current_variant.emit)
+        self.timeline_widget.current_video_row.connect(self.current_video_row.emit)
+        self.timeline_widget.replace_videos.connect(self.replace_videos)
+        self.timeline_widget.clear_playlist.connect(self.clear)
         self.clear_cache_and_reload_action.triggered.connect(self.clear_cache_and_reload)
         self.clear_all_cache_and_reload_action.triggered.connect(self.clear_all_cache_and_reload)
         self.show_preferences_action.triggered.connect(self.show_preferences)
         self.clear_playlist_action.triggered.connect(self.clear)
+
+    def replace_current_video(self, project_video_id):
+        self.timeline_widget.replace_current_video(project_video_id)
+
+    def replace_videos(self, data_tuples_list):
+        for data_tuple in data_tuples_list:
+            video_id = data_tuple[0]
+            video_file = data_tuple[1]
+            project_video_id = data_tuple[2]
+            if video_id not in self.videos_dic.keys():
+                logger.error("Video not found")
+                return
+            self.videos_dic[video_id]['original_file'] = path_utils.abspath(video_file)
+            self.videos_dic[video_id]['name'] = path_utils.basename(video_file)
+            self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
+
+            if self.videos_dic[video_id]['inpoint'] >= self.videos_dic[video_id]['frames_count']:
+                self.videos_dic[video_id]['inpoint'] = self.videos_dic[video_id]['frames_count']-1
+            if self.videos_dic[video_id]['outpoint'] > self.videos_dic[video_id]['frames_count']:
+                self.videos_dic[video_id]['outpoint'] = self.videos_dic[video_id]['frames_count']
+
+            self.videos_dic[video_id]['proxy'] = False
+            self.videos_dic[video_id]['thumbnail'] = None
+            self.videos_dic[video_id]['project_video_id'] = project_video_id
+        self.load_nexts()
 
     def order_changed(self, new_order):
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))

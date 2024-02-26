@@ -11,10 +11,15 @@ import logging
 # Wizard modules
 from wizard.core import tools
 from wizard.core import project
+from wizard.core import repository
+from wizard.core import assets
+from wizard.core import image
 from wizard.vars import ressources
+from wizard.vars import assets_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +44,8 @@ class signal_manager(QtCore.QObject):
     current_variant = pyqtSignal(int)
     current_video_row = pyqtSignal(object)
     is_last = pyqtSignal(object)
+    replace_videos = pyqtSignal(object)
+    clear_playlist = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
@@ -59,6 +66,9 @@ class timeline_widget(QtWidgets.QWidget):
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
     current_variant = pyqtSignal(int)
+    current_video_row = pyqtSignal(object)
+    replace_videos = pyqtSignal(object)
+    clear_playlist = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(timeline_widget, self).__init__(parent)
@@ -120,6 +130,9 @@ class timeline_widget(QtWidgets.QWidget):
         self.on_bounds_change.emit(self.bounds_range)
         self.update()
 
+    def replace_current_video(self, project_video_id):
+        self.timeline_viewport.replace_current_video(project_video_id)
+
     def set_bounds_range(self, bounds_range):
         self.bounds_range = bounds_range
         self.update_bound_range()
@@ -144,8 +157,11 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
         self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
         self.timeline_viewport.signal_manager.current_variant.connect(self.current_variant.emit)
+        self.timeline_viewport.signal_manager.current_video_row.connect(self.current_video_row.emit)
         self.timeline_viewport.signal_manager.current_video_row.connect(self.playing_infos_widget.update_current_video_row)
         self.timeline_viewport.signal_manager.is_last.connect(self.playing_infos_widget.update_is_last)
+        self.timeline_viewport.signal_manager.replace_videos.connect(self.replace_videos.emit)
+        self.timeline_viewport.signal_manager.clear_playlist.connect(self.clear_playlist.emit)
 
         self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
         self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
@@ -177,36 +193,28 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.video_infos_widget = QtWidgets.QWidget()
-        self.video_infos_widget.setFixedHeight(100)
-        self.video_infos_layout = QtWidgets.QVBoxLayout()
+        self.video_infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.video_infos_layout = QtWidgets.QHBoxLayout()
         self.video_infos_layout.setContentsMargins(6,6,6,6)
         self.video_infos_widget.setLayout(self.video_infos_layout)
         self.main_layout.addWidget(self.video_infos_widget)
 
-        self.video_infos_header_layout = QtWidgets.QHBoxLayout()
-        self.video_infos_header_layout.setContentsMargins(0,0,0,0)
-        self.video_infos_layout.addLayout(self.video_infos_header_layout)
-
         self.video_name_label = QtWidgets.QLabel('')
         self.video_name_label.setObjectName('bold_label')
-        self.video_infos_header_layout.addWidget(self.video_name_label)
+        self.video_infos_layout.addWidget(self.video_name_label)
 
         self.video_version_label = QtWidgets.QLabel()
-        self.video_infos_header_layout.addWidget(self.video_version_label)
+        self.video_infos_layout.addWidget(self.video_version_label)
 
         self.video_user_label = QtWidgets.QLabel()
         self.video_user_label.setObjectName('gray_label')
-        self.video_infos_header_layout.addWidget(self.video_user_label)
+        self.video_infos_layout.addWidget(self.video_user_label)
 
         self.video_date_label = QtWidgets.QLabel()
         self.video_date_label.setObjectName('gray_label')
-        self.video_infos_header_layout.addWidget(self.video_date_label)
+        self.video_infos_layout.addWidget(self.video_date_label)
 
-        self.video_infos_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.comment_label = gui_utils.ScrollLabel()
-        self.comment_label.label.setObjectName('gray_label')
-        self.video_infos_layout.addWidget(self.comment_label)
+        self.video_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
 
         self.content_1_layout = QtWidgets.QHBoxLayout()
         self.content_1_layout.setContentsMargins(6,6,6,6)
@@ -313,12 +321,10 @@ class playing_infos_widget(QtWidgets.QWidget):
             self.video_version_label.setText('')
             self.video_user_label.setText('')
             self.video_date_label.setText('')
-            self.comment_label.setText('')
             return
         self.video_version_label.setText(video_row['name'])
         self.video_user_label.setText(video_row['creation_user'])
         self.video_date_label.setText(tools.time_ago_from_timestamp(video_row['creation_time']))
-        self.comment_label.setText(video_row['comment'])
 
     def update_is_last(self, is_last):
         if is_last:
@@ -366,9 +372,18 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.timeline_scene.addItem(self.insert_item)
         self.insert_item.setVisible(False)
 
-        self.last_stage_id = None
+        self.last_video_id = None
+
+        self.init_users_images()
 
         self.connect_functions()
+
+    def init_users_images(self):
+        self.users_images_dic = dict()
+        for user_row in repository.get_users_list():
+            user_image =  user_row['profile_picture']
+            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 20, 8)
+            self.users_images_dic[user_row['user_name']] = pixmap
 
     def dragEnterEvent(self, event):
         data = event.mimeData()
@@ -463,7 +478,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
     def update_videos_dic(self, videos_dic):
         for video_id in videos_dic.keys():
             if video_id not in self.videos_dic.keys():
-                self.videos_dic[video_id] = video_item(videos_dic[video_id]['name'], video_id, videos_dic[video_id]['frames_count'])
+                self.videos_dic[video_id] = video_item(videos_dic[video_id]['name'], video_id, videos_dic[video_id]['frames_count'], self.users_images_dic)
                 self.timeline_scene.addItem(self.videos_dic[video_id])
                 self.videos_dic[video_id].signal_manager.on_video_item_moved.connect(self.video_items_moved)
                 self.videos_dic[video_id].signal_manager.on_video_item_move.connect(self.video_item_is_moving)
@@ -519,22 +534,141 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 last_variant_video_id = variant_videos[video_row['variant_id']]
                 video_item.set_is_last(video_row['id'] == last_variant_video_id)
             if video_item.is_current():
-                self.current_playing_item(video_item)
+                self.current_playing_item(video_item, force=True)
         self.update()
 
-    def current_playing_item(self, item):
+    def show_context_menu(self):
+        selection = self.get_selected_items()
+        menu = gui_utils.QMenu(self)
+        
+        update_selection_action = None
+        remove_selection_action = None
+
+        if len(selection) > 0:
+            update_selection_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected')
+            remove_selection_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected')
+
+        update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all')
+        clear_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Clear playlist')
+
+        states_submenu = menu.addMenu("State ")
+        states_actions = dict()
+
+        for state in assets_vars._asset_states_list_:
+            states_actions[state] = states_submenu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
+        assignments_submenu = menu.addMenu("Assignment ")
+        assignments_actions = dict()
+        users_ids = project.get_users_ids_list()
+        for user_id in users_ids:
+            user_row = repository.get_user_data(user_id)
+            icon = QtGui.QIcon()
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
+            icon.addPixmap(pm)
+            assignments_actions[user_id] = assignments_submenu.addAction(icon, user_row['user_name'])
+        priorities_submenu = menu.addMenu("Priority ")
+        priorities_actions = dict()
+        for priority in assets_vars._priority_list_:
+            priorities_actions[priority] = priorities_submenu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
+
+        action = menu.exec_(QtGui.QCursor().pos())
+        if action is not None:
+            if action in states_actions.values():
+                self.modify_state_on_selected(action.text())
+            elif action in assignments_actions.values():
+                self.modify_assignment_on_selected(action.text())
+            elif action in priorities_actions.values():
+                self.modify_priority_on_selected(action.text())
+            elif action == update_selection_action:
+                self.update_selected_items_versions()
+            elif action == remove_selection_action:
+                self.delete_selection()
+            elif action == update_all_action:
+                self.update_all()
+            elif action == clear_playlist_action:
+                self.clear_playlist()
+
+    def update_selected_items_versions(self):
+        selected_items = self.get_selected_items()
+        video_ids = []
+        for item in selected_items:
+            video_ids.append(item.video_id)
+        self.update_videos_version(video_ids)
+
+    def update_all(self):
+        video_ids = []
+        for video_id in self.videos_dic.keys():
+            video_ids.append(video_id)
+        self.update_videos_version(video_ids)
+
+    def clear_playlist(self):
+        self.signal_manager.clear_playlist.emit(1)
+
+    def update_videos_version(self, video_ids):
+        tuples_list = []
+        for video_id in video_ids:
+            variant_id = self.videos_dic[video_id].video_row['variant_id']
+            last_video_row = project.get_videos(variant_id)
+            if not last_video_row:
+                continue
+            last_video_row = last_video_row[-1]
+            tuples_list.append((video_id, last_video_row['file_path'], last_video_row['id']))
+        self.signal_manager.replace_videos.emit(tuples_list)
+
+    def modify_state_on_selected(self, state):
+        selected_items = self.get_selected_items()
+        for item in selected_items:
+            stage_id = item.stage_row['id']
+            if item.stage_row['state'] == state:
+                continue
+            assets.modify_stage_state(stage_id, state)
+        gui_server.refresh_team_ui()
+
+    def modify_assignment_on_selected(self, user_name):
+        selected_items = self.get_selected_items()
+        for item in selected_items:
+            stage_id = item.stage_row['id']
+            if item.stage_row['assignment'] == user_name:
+                continue
+            assets.modify_stage_assignment(stage_id, user_name)
+        gui_server.refresh_team_ui()
+
+    def modify_priority_on_selected(self, priority):
+        selected_items = self.get_selected_items()
+        for item in selected_items:
+            stage_id = item.stage_row['id']
+            if item.stage_row['priority'] == priority:
+                continue
+            assets.modify_stage_priority(stage_id, priority)
+        gui_server.refresh_team_ui()
+
+    def current_playing_item(self, item, force=False):
         if item.stage_row:
             self.signal_manager.current_video_name.emit(item.variant_row['string'])
-            stage_id = item.stage_row['id']
+            video_id = item.video_row['id']
         else:
             self.signal_manager.current_video_name.emit(item.video_name)
-            stage_id = None
-        if self.last_stage_id != stage_id:
+            video_id = None
+            return
+        if self.last_video_id != video_id or force:
             self.signal_manager.is_last.emit(item.is_last)
-            self.signal_manager.current_stage.emit(stage_id)
+            self.signal_manager.current_stage.emit(item.stage_row['id'])
             self.signal_manager.current_variant.emit(item.variant_row['id'])
             self.signal_manager.current_video_row.emit(item.video_row)
-            self.last_stage_id = stage_id
+            self.last_video_id = video_id
+
+    def get_current_video_id(self):
+        for video_id in self.videos_dic.keys():
+            if self.videos_dic[video_id].is_current():
+                return video_id
+        return None
+
+    def replace_current_video(self, project_video_id):
+        current_video_id = self.get_current_video_id()
+        if not current_video_id:
+            logger.error("No current video found")
+            return
+        video_path = project.get_video_data(project_video_id, 'file_path')
+        self.signal_manager.replace_videos.emit([(current_video_id, video_path, project_video_id)])
 
     def remove_video(self, video_id):
         if video_id in self.videos_dic.keys():
@@ -711,7 +845,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         if event.button() == QtCore.Qt.LeftButton:
             self.move_cursor = None
             self.move_video_item = None
-            
+        elif event.button() == QtCore.Qt.RightButton:
+            self.show_context_menu()
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
@@ -891,7 +1026,7 @@ class insert_item(custom_graphic_item):
         painter.drawRoundedRect(option.rect, 1, 1)
 
 class video_item(custom_graphic_item):
-    def __init__(self, video_name, video_id, frames_count):
+    def __init__(self, video_name, video_id, frames_count, users_images_dic):
         super(video_item, self).__init__()
         self.setAcceptHoverEvents(True)
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
@@ -925,16 +1060,24 @@ class video_item(custom_graphic_item):
         self.stage_row = None
         self.is_last = True
 
+        self.widget = video_item_widget(users_images_dic)
+        self.widget.set_video_name(self.video_name)
+        self.proxy_widget = QtWidgets.QGraphicsProxyWidget(self)
+        self.proxy_widget.setWidget(self.widget)
+
     def set_is_last(self, is_last):
         self.is_last = is_last
+        self.widget.set_is_last(is_last)
 
     def set_video_row(self, video_row):
         self.video_row = video_row
 
     def set_variant_row(self, variant_row):
+        self.widget.set_video_name(variant_row['string'])
         self.variant_row = variant_row
 
     def set_stage_row(self, stage_row):
+        self.widget.set_stage_row(stage_row)
         self.stage_row = stage_row
 
     def mousePressEvent(self, event):
@@ -1055,12 +1198,7 @@ class video_item(custom_graphic_item):
         self.update_width()
 
     def set_thumbnail(self, thumbnail_path):
-        self.thumbnail_path = thumbnail_path
-        self.thumbnail_pixmap = QtGui.QIcon(thumbnail_path).pixmap(120)
-        if self.thumbnail_pixmap.height() > 0:
-            height_ratio = 38 / self.thumbnail_pixmap.height()
-            self.thumbnail_pixmap = self.thumbnail_pixmap.scaled(int(self.thumbnail_pixmap.width()*height_ratio), 38)
-        self.update()
+        self.widget.set_thumbnail(thumbnail_path)
 
     def set_loaded(self, loaded):
         self.loaded = loaded
@@ -1106,7 +1244,6 @@ class video_item(custom_graphic_item):
             bg_color.setAlpha(70)
         if self.is_current() and self.loaded:
             bg_color.setAlpha(255)
-
         # Paint cropping effect
         pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
@@ -1119,7 +1256,6 @@ class video_item(custom_graphic_item):
             painter.setBrush(brush)
             painter.drawRoundedRect(shadow_rect, 2,2)
             bg_color.setAlpha(255)
-        
         # Paint background
         brush = QtGui.QBrush(bg_color)
         painter.setBrush(brush)
@@ -1133,25 +1269,6 @@ class video_item(custom_graphic_item):
                             int(self.width-self.margin),
                             int(self.height-self.margin*8))
         painter.drawRoundedRect(bg_rect, 2,2)
-
-        if self.stage_row:
-            stage_outline_color = QtGui.QColor(ressources._stages_colors_[self.stage_row['name']])
-            pen = QtGui.QPen(QtGui.QColor(stage_outline_color), 2, QtCore.Qt.SolidLine)
-            painter.setPen(pen)
-            stage_outline_rect = QtCore.QRect(bg_rect.x()+1, bg_rect.y()+1, bg_rect.width()-2, bg_rect.height()-2)
-            painter.drawRoundedRect(stage_outline_rect, 2,2)
-
-
-        if bg_rect.width()-self.margin*4 < 1:
-            return
-
-        display_thumbnail_rect = QtCore.QRect(bg_rect.x()+self.margin*2,
-                            int(bg_rect.y()+self.margin*2),
-                            min(bg_rect.width()-self.margin*4, self.thumbnail_pixmap.width()),
-                            self.thumbnail_pixmap.height())
-        pixmap = self.thumbnail_pixmap.copy(display_thumbnail_rect)
-        painter.drawPixmap(display_thumbnail_rect, pixmap)
-
         # Draw crop handles
         pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
         painter.setPen(pen)
@@ -1173,40 +1290,79 @@ class video_item(custom_graphic_item):
             brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
             painter.setBrush(brush)
             painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
+        self.widget.set_size(int(self.width), int(self.height))
 
-        pen_color = '#ffffff'
-        if not self.is_last:
-            pen_color = '#ffae4f'
-        pen = QtGui.QPen(QtGui.QColor(pen_color), 1, QtCore.Qt.SolidLine)
-        painter.setPen(pen)
-        text_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
-                            int(bg_rect.y()+self.margin*3)),
-                            QtCore.QPoint(int(bg_rect.width()-self.margin*4),
-                            int(bg_rect.height()-self.margin*8)))
-        if self.variant_row:
-            text = f"{self.variant_row['string']}/{self.video_row['name']}"
+class video_item_widget(QtWidgets.QWidget):
+    def __init__(self, users_images_dic, parent=None):
+        super(video_item_widget, self).__init__(parent)
+        self.setObjectName('transparent_widget')
+        self.users_images_dic = users_images_dic
+        self.build_ui()
+
+    def set_video_name(self, video_name):
+        self.video_name_label.setText(video_name)
+
+    def set_size(self, width, height):
+        self.resize(int(width), int(height))
+
+    def set_is_last(self, is_last):
+        if is_last:
+            self.thumbnail_label.setStyleSheet("")
         else:
-            text = self.video_name
-        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, text)
+            self.thumbnail_label.setStyleSheet("border:2px solid #f79360;border-radius:2px;")
 
-        if self.stage_row is not None:
-            x_orig = display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4
-            y_orig = display_thumbnail_rect.y()+15
-            state_rect = QtCore.QRect(QtCore.QPoint(x_orig,
-                            y_orig),
-                            QtCore.QPoint(max(x_orig,
-                                            min(x_orig+50,
-                                                int(bg_rect.width()-self.margin*4))),
-                                            40))
-            if state_rect.width() > 1:
-                brush = QtGui.QBrush(QtGui.QColor(ressources._states_colors_[self.stage_row['state']]))
-                painter.setBrush(brush)
-                pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
-                painter.setPen(pen)
-                painter.drawRoundedRect(state_rect, 4, 4)
-                pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.8)), 1, QtCore.Qt.SolidLine)
-                painter.setPen(pen)
-                painter.drawText(state_rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignCenter, self.stage_row['state'])
+    def set_stage_row(self, stage_row):
+        self.state_label.setText(stage_row['state'])
+        self.state_label.setStyleSheet("background-color:%s; padding:2px; border-radius:2px"%ressources._states_colors_[stage_row['state']])
+        self.assignment_label.setPixmap(self.users_images_dic[stage_row['assignment']])
+        self.priority_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[stage_row['priority']]).pixmap(20))
+
+    def set_thumbnail(self, thumbnail_path):
+        thumbnail_pixmap = QtGui.QIcon(thumbnail_path).pixmap(120)
+        #height = self.height()-16
+        #width = int(thumbnail_pixmap.width() * (height / thumbnail_pixmap.height()))
+        #thumbnail_pixmap = thumbnail_pixmap.scaled(width, height)
+        self.thumbnail_label.setPixmap(thumbnail_pixmap)
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(3,6,3,6)
+        self.main_layout.setSpacing(3)
+        self.setLayout(self.main_layout)
+
+        self.thumbnail_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.thumbnail_label)
+
+        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget.setObjectName('transparent_widget')
+        self.infos_layout = QtWidgets.QVBoxLayout()
+        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setSpacing(2)
+        self.infos_widget.setLayout(self.infos_layout)
+        self.main_layout.addWidget(self.infos_widget)
+
+        self.video_name_label = QtWidgets.QLabel()
+        self.video_name_label.setObjectName('bold_label')
+        self.infos_layout.addWidget(self.video_name_label)
+
+        self.tracking_layout = QtWidgets.QHBoxLayout()
+        self.tracking_layout.setContentsMargins(0,0,0,0)
+        self.tracking_layout.setSpacing(2)
+        self.infos_layout.addLayout(self.tracking_layout)
+
+        self.assignment_label = QtWidgets.QLabel()
+        self.tracking_layout.addWidget(self.assignment_label)
+
+        self.state_label = QtWidgets.QLabel()
+        self.state_label.setObjectName('bold_label')
+        self.tracking_layout.addWidget(self.state_label)
+
+        self.priority_label = QtWidgets.QLabel()
+        self.tracking_layout.addWidget(self.priority_label)
+
+        self.tracking_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
 class cursor_item(custom_graphic_item):
     def __init__(self):

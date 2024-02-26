@@ -6,6 +6,9 @@
   - !!python/tuple
     - debug
     - Assets inside asset groups now alphabetically sorted
+  - !!python/tuple
+    - debug
+    - Skip __pycache__ and .idea when looking for hooks
   time: 1708334566.4214418
 '3.7.2.341':
   update_list:

@@ -4,6 +4,9 @@
 
 # Python modules
 import logging
+import time
+import traceback
+import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import pyqtSignal
 
@@ -30,6 +33,10 @@ class video_browser_widget(QtWidgets.QWidget):
         self.setWindowTitle(f"Wizard - Video browser")
 
         self.variants_ids = dict()
+        self.comb_rows_for_search = []
+
+        self.old_thread_id = None
+        self.search_threads = dict()
 
         self.build_ui()
         self.connect_functions()
@@ -38,6 +45,46 @@ class video_browser_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.icon_view.itemDoubleClicked.connect(lambda:self.create_playlist(add=False))
         self.icon_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.search_bar.textChanged.connect(self.update_search)
+
+    def update_search(self):
+        search_data = self.search_bar.text()
+        self.search_start_time = time.perf_counter()
+        self.accept_item_from_thread = False
+        if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
+            self.search_threads[self.old_thread_id].show_variant_signal.disconnect()
+            self.search_threads[self.old_thread_id].hide_variant_signal.disconnect()
+        thread_id = time.time()
+        self.search_threads[thread_id] = search_thread()
+        self.search_threads[thread_id].show_variant_signal.connect(self.show_variant)
+        self.search_threads[thread_id].hide_variant_signal.connect(self.hide_variant)
+        self.old_thread_id = thread_id
+        if len(search_data) > 0:
+            self.accept_item_from_thread = True
+            self.search_threads[thread_id].update_search(self.comb_rows_for_search, search_data)
+        else:
+            self.search_threads[thread_id].running=False
+            self.show_all_variants()
+        self.clean_threads()
+
+    def clean_threads(self):
+        ids = list(self.search_threads.keys())
+        for thread_id in ids:
+            if not self.search_threads[thread_id].running:
+                self.search_threads[thread_id].terminate()
+                del self.search_threads[thread_id]
+
+    def show_variant(self, variant_id):
+        if variant_id in self.variants_ids.keys():
+            self.variants_ids[variant_id]['video_item'].setHidden(False)
+
+    def hide_variant(self, variant_id):
+        if variant_id in self.variants_ids.keys():
+            self.variants_ids[variant_id]['video_item'].setHidden(True)
+
+    def show_all_variants(self):
+        for variant_id in self.variants_ids.keys():
+            self.show_variant(variant_id)
 
     def context_menu_requested(self):
         selection = self.icon_view.selectedItems()
@@ -94,7 +141,7 @@ class video_browser_widget(QtWidgets.QWidget):
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
-        self.search_bar = gui_utils.search_bar()
+        self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43)
         self.header_layout.addWidget(self.search_bar)
 
         self.content_widget = QtWidgets.QWidget()
@@ -121,6 +168,7 @@ class video_browser_widget(QtWidgets.QWidget):
 
     def refresh(self):
         stage_rows = project.get_all_stages()
+        self.comb_rows_for_search = []
         stages = dict()
         for stage_row in stage_rows:
             stages[stage_row['id']] = stage_row
@@ -135,6 +183,10 @@ class video_browser_widget(QtWidgets.QWidget):
                 self.variants_ids[video_row['variant_id']]['asset_name'] = variants[video_row['variant_id']]['string']
                 self.variants_ids[video_row['variant_id']]['variant_row'] = variants[video_row['variant_id']]
                 self.variants_ids[video_row['variant_id']]['stage_row'] = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
+                comb_row = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
+                comb_row['variant'] = variants[video_row['variant_id']]['name']
+                comb_row['variant_id'] = variants[video_row['variant_id']]['id']
+                self.comb_rows_for_search.append(comb_row)
                 video_item = custom_video_icon_item(video_row,
                                                 self.variants_ids[video_row['variant_id']]['asset_name'],
                                                 self.variants_ids[video_row['variant_id']]['stage_row'],
@@ -213,4 +265,58 @@ class video_item_widget(QtWidgets.QWidget):
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        
+class search_thread(QtCore.QThread):
+
+    show_variant_signal = pyqtSignal(int)
+    hide_variant_signal = pyqtSignal(int)
+    search_ended = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def update_search(self, comb_rows, search_data):
+        self.search_data = search_data
+        self.comb_rows = copy.deepcopy(comb_rows)
+        self.start()
+
+    def run(self):
+        try:
+            variants_to_show = []
+            variants_to_hide = []
+
+            keywords_sets = self.search_data.split('+')
+            
+            for comb_row in self.comb_rows:
+
+                variant_id = comb_row['variant_id']
+                values = []
+                for key in comb_row:
+                    if key in ['variant_id', 'id', 'creation_time', 'creation_user']:
+                        continue
+                    values.append(comb_row[key])
+
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
+
+                for keywords_set in keywords_sets:
+                    if keywords_set == '':
+                        continue
+                    keywords = keywords_set.split('&')
+                    if all(keyword.upper() in data.upper() for keyword in keywords):
+                        variants_to_show.append(variant_id)
+
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.01)
+            for comb_row in self.comb_rows:
+                if comb_row['id'] in variants_to_show:
+                    self.show_variant_signal.emit(comb_row['id'])
+                else:
+                    self.hide_variant_signal.emit(comb_row['id'])
+            self.search_ended.emit(1)
+
+        except:
+            logger.info(str(traceback.format_exc()))
+        self.running = False

@@ -67,6 +67,10 @@ def get_hooks_modules():
     # Load plugins hooks
     if os.path.isdir(plugins_path):
         for folder in os.listdir(plugins_path):
+            if "pycache" in folder:
+                continue
+            if ".idea" in folder:
+                continue
             plugin_path = os.path.join(plugins_path, folder)
             module_name, module_path = load_module(plugin_path, hook_type="plugin_{0}".format(folder))
             if module_name and module_path:

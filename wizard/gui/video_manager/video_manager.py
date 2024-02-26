@@ -56,7 +56,8 @@ class video_manager(QtWidgets.QWidget):
         self.video_browser.add_videos.connect(self.add_videos)
         self.video_browser.clear_playlist.connect(self.video_player.clear)
         self.video_player.current_stage.connect(self.asset_tracking_widget.change_stage)
-        self.video_player.current_variant.connect(self.video_history_widget.change_variant)
+        self.video_player.current_video_row.connect(self.video_history_widget.change_video_row)
+        self.video_history_widget.replace_current_video.connect(self.video_player.replace_current_video)
 
     def add_videos(self, video_tuples):
         for video_tuple in video_tuples:
@@ -65,14 +66,15 @@ class video_manager(QtWidgets.QWidget):
         self.video_player.give_concat_job()
         self.video_player.load_nexts()
 
-    #def closeEvent(self, event):
-    #    self.hide()
-    #    event.ignore()
+    def closeEvent(self, event):
+        self.hide()
+        event.ignore()
 
     def refresh(self):
         self.video_browser.refresh()
         self.asset_tracking_widget.refresh()
         self.video_player.refresh()
+        self.video_history_widget.refresh()
 
     def toggle(self):
         if self.isVisible():
