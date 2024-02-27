@@ -1,5 +1,12 @@
 VIDEOS - 
 
-Video browser
-Asset infos in video player
+Video browser - wip
+Asset infos in video player - ok
 Ingest image sequence
+Playlist
+Playlist browser
+Current stage in asset tracking widget - ok
+Fix video items handles
+Init contexts on video manager
+Copy references -
+Init param in softwares hook -

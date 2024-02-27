@@ -42,50 +42,7 @@ from wizard.core import assets
 from wizard.core import db_utils
 
 def main():
-	fix_artefacts()
-	fix_time_stamps()
-	project.create_assets_groups_table(environment.get_project_name())
-	sql_cmd = """ALTER TABLE assets ADD COLUMN IF NOT EXISTS assets_group_id integer REFERENCES assets_groups (id);"""
+	project.create_playlists_table(environment.get_project_name())
+	sql_cmd = """ALTER TABLE playlists ADD COLUMN IF NOT EXISTS last_save_time double precision NOT NULL;ALTER TABLE playlists ADD COLUMN IF NOT EXISTS last_save_user text NOT NULL;"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
 
-	import time
-	start_date = time.time()
-	sql_cmd = f"""ALTER TABLE stages ADD COLUMN IF NOT EXISTS start_date real NOT NULL DEFAULT {start_date};"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
-
-	sql_cmd = f"""ALTER TABLE references_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
-	sql_cmd = f"""ALTER TABLE grouped_references_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
-	sql_cmd = f"""ALTER TABLE referenced_groups_data ADD COLUMN IF NOT EXISTS activated integer NOT NULL DEFAULT 1;"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
-
-def fix_stages_duration():
-	stage_rows = project.get_all_stages()
-	for stage in stage_rows:
-		assets.modify_stage_estimation(stage['id'], 3)
-
-def fix_artefacts():
-	for user in repository.get_user_names_list():
-		user_row = repository.get_user_row_by_name(user)
-		artefacts_list = json.loads(user_row['artefacts'])
-		if type(artefacts_list) == dict:
-			return
-		artefacts_dic = dict()
-		for artefact in artefacts_list:
-			artefacts_dic[time.time()] = artefact
-		repository.modify_user_artefacts(user, artefacts_dic)
-
-def fix_time_stamps():
-	for table in ['domains_data', 'categories', 'assets',
-				'stages', 'variants', 'asset_tracking_events',
-				'work_envs', 'references_data', 'referenced_groups_data',
-				'grouped_references_data', 'groups', 'exports',
-				'versions', 'videos', 'export_versions', 'events',
-				'progress_events', 'tag_groups', 'assets_groups',
-				'shelf_scripts']:
-		sql_cmd = f"ALTER TABLE {table} ALTER COLUMN creation_time TYPE double precision;"
-		db_utils.create_table(environment.get_project_name(), sql_cmd)
-	for table in ['projects']:
-		sql_cmd = f"ALTER TABLE {table} ALTER COLUMN creation_time TYPE double precision;"
-		db_utils.create_table(environment.get_repository(), sql_cmd)

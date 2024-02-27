@@ -121,6 +121,14 @@ def abspath(path):
 	path = clean_path(path)
 	return path
 
+def splitext(path):
+	if path is None:
+		logger.info("No path given")
+		return
+	path = os.path.abspath(path)
+	path = clean_path(path)
+	return os.path.splitext(path)
+
 def dirname(path):
 	if path is None:
 		logger.info("No path given")

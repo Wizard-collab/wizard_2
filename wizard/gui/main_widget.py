@@ -187,6 +187,7 @@ class main_widget(QtWidgets.QWidget):
         self.asset_tracking_widget.get_context()
         self.console_widget.get_context()
         self.production_manager_widget.get_context()
+        self.video_manager.get_context()
         self.subtask_manager.load_old_tasks()
 
     def save_widgets_pos(self):
@@ -212,6 +213,7 @@ class main_widget(QtWidgets.QWidget):
         self.wall_widget.set_context()
         self.asset_tracking_widget.set_context()
         self.console_widget.set_context()
+        self.video_manager.set_context()
         self.production_manager_widget.set_context()
 
     def connect_functions(self):

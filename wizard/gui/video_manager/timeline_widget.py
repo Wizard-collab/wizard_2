@@ -1303,6 +1303,9 @@ class video_item_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def set_video_name(self, video_name):
+        video_name = video_name.replace("sequences/", "")
+        video_name = video_name.replace("assets/", "")
+        video_name = video_name.replace("library/", "")
         self.video_name_label.setText(video_name)
 
     def set_size(self, width, height):
@@ -1328,7 +1331,9 @@ class video_item_widget(QtWidgets.QWidget):
     def set_thumbnail(self, thumbnail_path):
         thumbnail_pixmap = QtGui.QIcon(thumbnail_path).pixmap(120)
         height = 80
-        self.thumbnail_width = int(thumbnail_pixmap.width() * (height / thumbnail_pixmap.height()))
+        self.thumbnail_width = 136
+        if thumbnail_pixmap.height() > 0:
+            self.thumbnail_width = int(thumbnail_pixmap.width() * (height / thumbnail_pixmap.height()))
         thumbnail_pixmap = thumbnail_pixmap.scaled(self.thumbnail_width, height)
         self.thumbnail_label.setPixmap(thumbnail_pixmap)
 

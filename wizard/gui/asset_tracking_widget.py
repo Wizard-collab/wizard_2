@@ -24,6 +24,7 @@ from wizard.gui import gui_utils
 from wizard.gui import comment_widget
 from wizard.gui import tag_label
 from wizard.gui import calendar_utils
+from wizard.gui import current_asset_viewer
 
 class asset_tracking_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -71,6 +72,11 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
+
+        self.current_asset_viewer = current_asset_viewer.current_asset_viewer()
+        self.current_asset_viewer.set_contents_margins(0,0,0,0)
+        self.current_asset_viewer.setObjectName('transparent_widget')
+        self.main_layout.addWidget(self.current_asset_viewer)
 
         self.setup_widget = QtWidgets.QFrame()
         self.setup_widget.setObjectName('asset_tracking_event_frame')
@@ -251,6 +257,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
 
     def change_stage(self, stage_id):
         self.stage_id = stage_id
+        self.current_asset_viewer.refresh('stage', stage_id)
         self.refresh()
 
     def refresh(self):

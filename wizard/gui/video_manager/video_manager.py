@@ -15,6 +15,7 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui.video_manager import video_player_widget
 from wizard.gui.video_manager import video_browser_widget
+from wizard.gui.video_manager import playlist_browser_widget
 from wizard.gui.video_manager import video_history_widget
 from wizard.gui import asset_tracking_widget
 
@@ -47,6 +48,7 @@ class video_manager(QtWidgets.QWidget):
         self.setWindowTitle(f"Wizard - Video manager")
 
         self.video_browser = video_browser_widget.video_browser_widget()
+        self.playlist_browser = playlist_browser_widget.playlist_browser_widget()
         self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget()
         self.video_history_widget = video_history_widget.video_history_widget()
         self.build_ui()
@@ -54,10 +56,11 @@ class video_manager(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.video_browser.add_videos.connect(self.add_videos)
-        self.video_browser.clear_playlist.connect(self.video_player.clear)
+        self.video_browser.create_playlist_and_add_videos.connect(self.clear_and_add_videos)
         self.video_player.current_stage.connect(self.asset_tracking_widget.change_stage)
         self.video_player.current_video_row.connect(self.video_history_widget.change_video_row)
         self.video_history_widget.replace_current_video.connect(self.video_player.replace_current_video)
+        self.playlist_browser.load_playlist.connect(self.video_player.load_playlist)
 
     def add_videos(self, video_tuples):
         for video_tuple in video_tuples:
@@ -66,13 +69,25 @@ class video_manager(QtWidgets.QWidget):
         self.video_player.give_concat_job()
         self.video_player.load_nexts()
 
+    def clear_and_add_videos(self, video_tuples):
+        if not self.video_player.clear():
+            return
+        self.add_videos(video_tuples)
+
     def closeEvent(self, event):
-        #self.video_player.quit()
-        self.hide()
-        event.ignore()
+        self.video_player.quit()
+        #self.hide()
+        #event.ignore()
+
+    def get_context(self):
+        self.asset_tracking_widget.get_context()
+
+    def set_context(self):
+        self.asset_tracking_widget.set_context()
 
     def refresh(self):
         self.video_browser.refresh()
+        self.playlist_browser.refresh()
         self.asset_tracking_widget.refresh()
         self.video_player.refresh()
         self.video_history_widget.refresh()
@@ -98,10 +113,16 @@ class video_manager(QtWidgets.QWidget):
 
         self.content_widget = gui_utils.QSplitter()
         self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.content_widget.setObjectName('main_widget')
+        #self.content_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.content_widget)
 
-        self.content_widget.addWidget(self.video_browser)
+        self.tabs_widget = QtWidgets.QTabWidget()
+        self.tabs_widget.setIconSize(QtCore.QSize(16,16))
+        self.content_widget.addWidget(self.tabs_widget)
+
+        self.tabs_widget.addTab(self.video_browser, QtGui.QIcon(ressources._videos_icon_), "Videos")
+        self.tabs_widget.addTab(self.playlist_browser, QtGui.QIcon(ressources._videos_icon_), "Playlists")
+
         self.video_player = video_player_instances().get_instance(self)
         self.content_widget.addWidget(self.video_player)
 

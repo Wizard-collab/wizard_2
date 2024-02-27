@@ -28,6 +28,7 @@
 
 _project_database_file_ = 'project.db'
 _shared_files_folder_ = 'shared_files'
+_thumbnails_folder_ = f'{_shared_files_folder_}/thumbnails'
 _scripts_folder_ = 'scripts'
 _hooks_folder_ = 'hooks'
 _plugins_folder_ = 'plugins'

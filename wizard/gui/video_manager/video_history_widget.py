@@ -104,6 +104,7 @@ class video_history_widget(QtWidgets.QFrame):
         self.list_view.setHeaderHidden(True)
         self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
+        self.list_view.setStyleSheet("#tree_as_list_widget::item{padding:0px;}")
         self.list_view.setColumnCount(1)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)

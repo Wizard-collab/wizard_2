@@ -58,6 +58,7 @@ import json
 import logging
 import clipboard
 import traceback
+import uuid
 
 # Wizard modules
 from wizard.core import environment
@@ -79,6 +80,7 @@ from wizard.vars import assets_vars
 from wizard.vars import env_vars
 from wizard.vars import softwares_vars
 from wizard.vars import game_vars
+from wizard.vars import project_vars
 
 logger = logging.getLogger(__name__)
 
@@ -944,6 +946,21 @@ def add_video(variant_id, comment="", analyse_comment=None):
     if analyse_comment:
         game.analyse_comment(comment, game_vars._video_penalty_)
     return video_id
+
+def save_playlist(playlist_id, data, thumbnail_temp_path=None):
+    project.update_playlist_data(playlist_id, ('data', json.dumps(data)))
+    project.update_playlist_data(playlist_id, ('last_save_user', environment.get_user()))
+    project.update_playlist_data(playlist_id, ('last_save_time', time.time()))
+    if thumbnail_temp_path is not None:
+        ext = path_utils.splitext(thumbnail_temp_path)[-1]
+        thumbnail_path = path_utils.join(environment.get_project_path(), project_vars._thumbnails_folder_)
+        if not path_utils.isdir(thumbnail_path):
+            path_utils.makedirs(thumbnail_path)
+        thumbnail_path = path_utils.join(thumbnail_path, f"{str(uuid.uuid4())}{ext}")
+        logger.info(thumbnail_path)
+        path_utils.copyfile(thumbnail_temp_path, thumbnail_path)
+        project.update_playlist_data(playlist_id, ('thumbnail_path', thumbnail_path))
+    return 1
 
 def copy_work_version(work_version_id):
     clipboard_dic = dict()

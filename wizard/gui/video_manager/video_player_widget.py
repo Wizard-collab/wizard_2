@@ -10,18 +10,23 @@ import sys
 import uuid
 import time
 import logging
+import json
 
 # Wizard core modules
 from wizard.core import path_utils
+from wizard.core import project
+from wizard.core import assets
 from wizard.core.video_player import ffmpeg_utils
 from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import app_utils
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui.video_manager import mpv_widget
 from wizard.gui.video_manager import video_threads
 from wizard.gui.video_manager import timeline_widget
+from wizard.gui import confirm_widget
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +53,9 @@ class video_player_widget(QtWidgets.QWidget):
         self.video_player = mpv_widget.mpv_widget(self)
         self.timeline_widget = timeline_widget.timeline_widget(self)
         self.first_load = True
+        self.modified = False
+        self.current_playlist = None
+        self.current_playlist_name = ''
         self.build_ui()
         self.connect_functions()
         self.set_fps(24)
@@ -131,6 +139,7 @@ class video_player_widget(QtWidgets.QWidget):
         self.videos_dic[video_id]['proxy'] = False
         self.videos_dic[video_id]['thumbnail'] = None
         self.videos_dic[video_id]['project_video_id'] = project_video_id
+        self.set_modified(True)
 
     def check_proxys_soft(self):
         for video_id in self.videos_dic.keys():
@@ -198,11 +207,27 @@ class video_player_widget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.menu_bar)
         
+        self.playlist_layout = QtWidgets.QHBoxLayout()
+        self.playlist_layout.setContentsMargins(10,10,10,10)
+        self.playlist_layout.setSpacing(6)
+        self.main_layout.addLayout(self.playlist_layout)
+
+        self.playlist_info_label = QtWidgets.QLabel("Current playlist : ")
+        self.playlist_info_label.setObjectName('gray_label')
+        self.playlist_layout.addWidget(self.playlist_info_label)
+
+        self.current_playlist_label = QtWidgets.QLabel()
+        self.current_playlist_label.setObjectName('bold_label')
+        self.playlist_layout.addWidget(self.current_playlist_label)
+
+        self.playlist_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
         self.player_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Player')
         self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear cache")
         self.clear_all_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear all cache")
         self.show_preferences_action = self.player_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
         self.playlist_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Playlist')
+        self.save_playlist_action = self.playlist_action.addAction(QtGui.QIcon(''), "Save playlist")
         self.clear_playlist_action = self.playlist_action.addAction(QtGui.QIcon(''), "Clear playlist")
 
         self.container = QtWidgets.QFrame()
@@ -263,9 +288,11 @@ class video_player_widget(QtWidgets.QWidget):
         self.clear_all_cache_and_reload_action.triggered.connect(self.clear_all_cache_and_reload)
         self.show_preferences_action.triggered.connect(self.show_preferences)
         self.clear_playlist_action.triggered.connect(self.clear)
+        self.save_playlist_action.triggered.connect(self.save_playlist)
 
     def replace_current_video(self, project_video_id):
         self.timeline_widget.replace_current_video(project_video_id)
+        self.set_modified(True)
 
     def replace_videos(self, data_tuples_list):
         for data_tuple in data_tuples_list:
@@ -288,27 +315,102 @@ class video_player_widget(QtWidgets.QWidget):
             self.videos_dic[video_id]['thumbnail'] = None
             self.videos_dic[video_id]['project_video_id'] = project_video_id
         self.load_nexts()
+        self.set_modified(True)
 
     def order_changed(self, new_order):
         self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: new_order.index(x[0])))
         self.give_concat_job()
+        self.set_modified(True)
 
     def in_out_modified(self, modification_dic):
         self.videos_dic[modification_dic['id']]['inpoint'] = modification_dic['inpoint']
         self.videos_dic[modification_dic['id']]['outpoint'] = modification_dic['outpoint']
         self.give_concat_job()
+        self.set_modified(True)
+
+    def set_modified(self, is_modified):
+        self.modified = is_modified
+        if self.modified:
+            self.current_playlist_label.setText(f'{self.current_playlist_name} *')
+        else:
+            self.current_playlist_label.setText(self.current_playlist_name)
 
     def clear(self):
+        if self.videos_dic != {} and self.modified:
+            self.confirm_widget = confirm_widget.confirm_widget(f"Create a new playlist without saving ?", parent=self)
+            if self.confirm_widget.exec_() != QtWidgets.QDialog.Accepted:
+                return
         self.delete_videos(list(self.videos_dic.keys()))
+        self.current_playlist = None
+        self.current_playlist_name = ''
+        self.current_playlist_label.setText(self.current_playlist_name)
+        self.update()
+        self.set_modified(False)
+        return 1
 
     def delete_videos(self, video_ids):
         for video_id in video_ids:
             if video_id in self.videos_dic.keys():
                 del self.videos_dic[video_id]
         self.give_concat_job()
+        self.set_modified(True)
 
     def update_frame(self, frame):
         self.timeline_widget.set_frame(frame)
+
+    def get_playlist_dic(self):
+        return self.videos_dic
+
+    def save_playlist(self):
+        if self.current_playlist is not None:
+            assets.save_playlist(self.current_playlist, self.videos_dic, thumbnail_temp_path=self.get_first_thumbnail())
+            self.set_modified(False)
+            gui_server.refresh_team_ui()
+
+    def get_first_thumbnail(self):
+        video_ids = list(self.videos_dic.keys())
+        if len(video_ids) == 0:
+            return
+        thumbnail_path = ffmpeg_utils.check_if_thumbnail_exists(self.temp_dir, self.videos_dic[video_ids[0]]['original_file'])
+        return thumbnail_path
+
+    def export_playlist_as_file(self):
+        options = QtWidgets.QFileDialog.Options()
+        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Playlist File", "", "JSON Files (*.json)", options=options)
+        if file_name:
+            with open(file_name, 'w') as f:
+                json.dump(self.get_playlist_dic(), f, indent=4)
+            logger.info("Playlist saved successfully")
+            self.set_info("Playlist saved successfully")
+
+    def load_playlist_file(self):
+        options = QtWidgets.QFileDialog.Options()
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Load Playlist File", "", "JSON Files (*.json)", options=options)
+        if file_name:
+            with open(file_name, 'r') as f:
+                videos_dic = json.load(f)
+                self.load_playlist_dic(videos_dic)
+        self.set_modified(False)
+
+    def load_playlist(self, playlist_id):
+        if not self.clear():
+            return
+        self.current_playlist = playlist_id
+        playlist_row = project.get_playlist_data(playlist_id)
+        self.current_playlist_name = playlist_row['name']
+        self.current_playlist_label.setText(self.current_playlist_name)
+        playlist_data = json.loads(playlist_row['data'])
+        self.load_playlist_dic(playlist_data)
+        self.set_modified(False)
+
+    def load_playlist_dic(self, videos_dic):
+        for video_id in videos_dic:
+            videos_dic[video_id]['proxy'] = False
+            videos_dic[video_id]['thumbnail'] = None
+        self.videos_dic = videos_dic
+        self.load_nexts()
+        logger.info("Loading playlist")
+        self.set_info("Loading playlist")
 
 class preferences_widget(QtWidgets.QDialog):
     def __init__(self, fps, resolution, parent=None):
@@ -378,40 +480,3 @@ class preferences_widget(QtWidgets.QDialog):
         self.accept_button = QtWidgets.QPushButton('Accept')
         self.accept_button.setObjectName('blue_button')
         self.buttons_layout.addWidget(self.accept_button)
-'''
-app = app_utils.get_app()
-player = video_player_widget()
-player.set_fps(24)
-player.show()
-QtWidgets.QApplication.processEvents()
-
-videos = ["D:/SBOX/video_1.mp4",
-            "D:/SBOX/video_6.mp4",
-            "D:/SBOX/video_1.mp4",
-            "D:/SBOX/video_6.mp4",
-            "D:/SBOX/video_1.mp4",
-            "D:/SBOX/video_6.mp4",
-            "D:/SBOX/video_1.mp4",
-            "D:/SBOX/video_6.mp4",
-            "D:/SBOX/video_1.mp4",
-            "D:/SBOX/video_6.mp4",
-            "D:/SBOX/video_3.mp4",
-            "D:/SBOX/video_4.mp4",
-            "D:/SBOX/video_5.mp4",
-            "D:/SBOX/video_3.mp4",
-            "D:/SBOX/video_4.mp4",
-            "D:/SBOX/video_5.mp4"]
-#videos=[]
-#for a in range(0,100):
-#    videos.append(f"videos/{a}.mp4")
-
-#for video in videos:
-#    player.add_video(video)
-#player.clear_all_proxys()
-#player.hard_clear_proxys()
-player.check_proxys_soft()
-player.give_concat_job()
-player.load_nexts()
-
-sys.exit(app.exec_())
-'''

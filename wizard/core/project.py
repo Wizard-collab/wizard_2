@@ -1652,6 +1652,75 @@ def search_version(data_to_search, work_env_id=None, column_to_search='name', co
                                                             column)
     return versions_rows
 
+def add_playlist(name, data, thumbnail_path=None):
+    if not tools.is_safe(name):
+        return
+    if db_utils.check_existence('project', 
+                                    'playlists',
+                                    'name',
+                                    name):
+        logger.warning(f"Playlist {name} already exists")
+        return
+    playlist_id = db_utils.create_row('project',
+                        'playlists', 
+                        ('name',
+                            'creation_time',
+                            'creation_user',
+                            'data',
+                            'thumbnail_path',
+                            'last_save_user',
+                            'last_Save_time'),
+                        (name,
+                            time.time(),
+                            environment.get_user(),
+                            data,
+                            thumbnail_path,
+                            environment.get_user(),
+                            time.time()))
+    if not playlist_id:
+        return
+    logger.info(f"Playlist {name} added to project")
+    return playlist_id
+
+def get_all_playlists(column='*'):
+    playlist_rows = db_utils.get_rows('project',
+                                        'playlists',
+                                        column)
+    return playlist_rows
+
+def remove_playlist(playlist_id):
+    if not db_utils.check_existence('project', 
+                                    'playlists',
+                                    'id',
+                                    playlist_id):
+        logger.warning(f"Playlist not found")
+        return
+    if not db_utils.delete_row('project', 'playlists', playlist_id):
+        logger.warning(f"Playlist NOT removed from project")
+        return
+    logger.info(f"PLaylist removed from project")
+    return 1
+
+def get_playlist_data(playlist_id, column='*'):
+    playlists_rows = db_utils.get_row_by_column_data('project',
+                                                        'playlists',
+                                                        ('id', playlist_id),
+                                                        column)
+    if playlists_rows is None or len(playlists_rows) < 1:
+        logger.error("Playlist not found")
+        return
+    return playlists_rows[0]
+
+def update_playlist_data(playlist_id, data_tuple):
+    if not db_utils.update_data('project',
+                        'playlists',
+                        data_tuple,
+                        ('id', playlist_id)):
+        logger.warning('Playlist NOT modified')
+        return
+    logger.info('Playlist modified')
+    return 1
+
 def add_software(name, extension, file_command, no_file_command, batch_file_command='', batch_no_file_command=''):
     if name not in softwares_vars._softwares_list_:
         logger.warning("Unregistered software")
@@ -2664,6 +2733,7 @@ def init_project(project_path, project_name):
     create_progress_events_table(project_name)
     create_videos_table(project_name)
     create_tag_groups_table(project_name)
+    create_playlists_table(project_name)
     return project_name
 
 def create_domains_table(database):
@@ -3045,6 +3115,22 @@ def create_tag_groups_table(database):
     if not db_utils.create_table(database, sql_cmd):
         return
     logger.info("Tag groups table created")
+    return 1
+
+def create_playlists_table(database):
+    sql_cmd = """ CREATE TABLE IF NOT EXISTS playlists (
+                                        id serial PRIMARY KEY,
+                                        creation_user text NOT NULL,
+                                        creation_time double precision NOT NULL,
+                                        name text NOT NULL,
+                                        data text NOT NULL,
+                                        thumbnail_path text,
+                                        last_save_user text NOT NULL,
+                                        last_save_time double precision NOT NULL
+                                    );"""
+    if not db_utils.create_table(database, sql_cmd):
+        return
+    logger.info("Playlists table created")
     return 1
 
 def create_assets_groups_table(database):

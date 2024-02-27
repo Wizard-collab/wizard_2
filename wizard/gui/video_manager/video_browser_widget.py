@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class video_browser_widget(QtWidgets.QWidget):
 
     add_videos = pyqtSignal(object)
-    clear_playlist = pyqtSignal(object)
+    create_playlist_and_add_videos = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(video_browser_widget, self).__init__(parent)
@@ -122,25 +122,28 @@ class video_browser_widget(QtWidgets.QWidget):
         for item in items:
             videos.append((item.video_row['file_path'], item.video_row['id']))
         if not add:
-            self.clear_playlist.emit(True)
-        self.add_videos.emit(videos)
+            self.create_playlist_and_add_videos.emit(videos)
+        else:
+            self.add_videos.emit(videos)
 
     def add_to_playlist(self):
         self.create_playlist(add=True)
 
     def build_ui(self):
-        self.setMinimumWidth(450)
+        self.setObjectName('dark_widget')
+        self.setMinimumWidth(380)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
+        self.header_widget.setObjectName('dark_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
-        self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43)
+        self.search_bar = gui_utils.search_bar()
         self.header_layout.addWidget(self.search_bar)
 
         self.content_widget = QtWidgets.QWidget()
@@ -258,6 +261,8 @@ class video_item_widget(QtWidgets.QWidget):
         self.infos_layout.addWidget(self.state_label)
 
         self.image_label = QtWidgets.QLabel()
+        self.image_label.setFixedWidth(160)
+        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
         self.main_layout.addWidget(self.image_label)
 
         self.infos_label = QtWidgets.QLabel()

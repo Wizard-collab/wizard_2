@@ -70,6 +70,9 @@ class current_asset_viewer(QtWidgets.QFrame):
         self.asset_label.setText(asset_row['name'])
         self.stage_label.setText(stage_row['name'])
 
+    def set_contents_margins(self, *arg, **args):
+        self.main_layout.setContentsMargins(*arg, **args)
+
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(8,8,8,8)
