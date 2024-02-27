@@ -40,7 +40,6 @@ class video_browser_widget(QtWidgets.QWidget):
 
         self.build_ui()
         self.connect_functions()
-        self.refresh()
 
     def connect_functions(self):
         self.icon_view.itemDoubleClicked.connect(lambda:self.create_playlist(add=False))
@@ -286,7 +285,6 @@ class search_thread(QtCore.QThread):
             variants_to_hide = []
 
             keywords_sets = self.search_data.split('+')
-            
             for comb_row in self.comb_rows:
 
                 variant_id = comb_row['variant_id']

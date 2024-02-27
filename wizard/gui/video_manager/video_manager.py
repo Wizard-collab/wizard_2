@@ -67,6 +67,7 @@ class video_manager(QtWidgets.QWidget):
         self.video_player.load_nexts()
 
     def closeEvent(self, event):
+        #self.video_player.quit()
         self.hide()
         event.ignore()
 

@@ -717,6 +717,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def video_item_is_moving(self, delta):
         selected_items = self.get_selected_items()
+        if len(selected_items) == 0:
+            return
         self.moving_items = selected_items
         self.reorganise_items()
         posx = selected_items[0].pos().x()
@@ -1297,13 +1299,19 @@ class video_item_widget(QtWidgets.QWidget):
         super(video_item_widget, self).__init__(parent)
         self.setObjectName('transparent_widget')
         self.users_images_dic = users_images_dic
+        self.thumbnail_width = 1
         self.build_ui()
 
     def set_video_name(self, video_name):
         self.video_name_label.setText(video_name)
 
     def set_size(self, width, height):
-        self.resize(int(width), int(height))
+        width_with_padding = width-6
+        thumbnail_width = min(int(self.thumbnail_width/2), width_with_padding)
+        self.setFixedSize(int(width), int(height))
+        self.thumbnail_label.setFixedWidth(thumbnail_width)
+        self.infos_widget.move(thumbnail_width+3, 0)
+        self.infos_widget.setFixedSize((width-thumbnail_width-3), self.height())
 
     def set_is_last(self, is_last):
         if is_last:
@@ -1319,9 +1327,9 @@ class video_item_widget(QtWidgets.QWidget):
 
     def set_thumbnail(self, thumbnail_path):
         thumbnail_pixmap = QtGui.QIcon(thumbnail_path).pixmap(120)
-        #height = self.height()-16
-        #width = int(thumbnail_pixmap.width() * (height / thumbnail_pixmap.height()))
-        #thumbnail_pixmap = thumbnail_pixmap.scaled(width, height)
+        height = 80
+        self.thumbnail_width = int(thumbnail_pixmap.width() * (height / thumbnail_pixmap.height()))
+        thumbnail_pixmap = thumbnail_pixmap.scaled(self.thumbnail_width, height)
         self.thumbnail_label.setPixmap(thumbnail_pixmap)
 
     def build_ui(self):
@@ -1331,15 +1339,16 @@ class video_item_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.thumbnail_label = QtWidgets.QLabel()
+        self.thumbnail_label.setAlignment(QtCore.Qt.AlignCenter)
         self.main_layout.addWidget(self.thumbnail_label)
 
-        self.infos_widget = QtWidgets.QWidget()
+        self.infos_widget = QtWidgets.QWidget(self)
         self.infos_widget.setObjectName('transparent_widget')
         self.infos_layout = QtWidgets.QVBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setContentsMargins(3,3,3,3)
         self.infos_layout.setSpacing(2)
         self.infos_widget.setLayout(self.infos_layout)
-        self.main_layout.addWidget(self.infos_widget)
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         self.video_name_label = QtWidgets.QLabel()
         self.video_name_label.setObjectName('bold_label')
