@@ -12,6 +12,9 @@ from PyQt5.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
+from wizard.gui import confirm_widget
+from wizard.gui.video_manager import create_playlist_widget
 
 # Wizard core modules
 from wizard.core import path_utils
@@ -43,9 +46,15 @@ class playlist_browser_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.update_search)
         self.list_view.itemDoubleClicked.connect(self.open_selected_playlist)
+        self.create_playlist_button.clicked.connect(self.create_playlist)
+        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
 
     def open_selected_playlist(self, item):
         self.load_playlist.emit(item.playlist_row['id'])
+
+    def create_playlist(self):
+        self.create_playlist_widget = create_playlist_widget.create_playlist_widget()
+        self.create_playlist_widget.exec_()
 
     def update_search(self):
         search_data = self.search_bar.text()
@@ -87,31 +96,30 @@ class playlist_browser_widget(QtWidgets.QWidget):
             self.show_playlist(playlist_id)
 
     def context_menu_requested(self):
-        selection = self.icon_view.selectedItems()
+        selection = self.list_view.selectedItems()
         menu = gui_utils.QMenu(self)
-        folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
-        archive_action = None
-        comment_action = None
-        create_playlist_action = None
         if len(selection)>=1:
-            archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive video(s)')
-            comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
-            create_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Create playlist')
-            add_to_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Add to playlist')
+            delete_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete selected playlist(s)')
+        else:
+            return
 
         pos = QtGui.QCursor().pos()
         action = menu.exec_(pos)
         if action is not None:
-            if action == folder_action:
-                self.open_folder()
-            elif action == archive_action:
-                self.archive()
-            elif action == comment_action:
-                self.modify_comment(pos)
-            elif action == create_playlist_action:
-                self.create_playlist()
-            elif action == add_to_playlist_action:
-                self.add_to_playlist()
+            if action == delete_playlist_action:
+                self.delete_selected_playlists()
+
+    def delete_selected_playlists(self):
+        selection = self.list_view.selectedItems()
+        if len(selection) == 0:
+            return
+        self.confirm_widget = confirm_widget.confirm_widget(f"Delete selected playlist(s) ?", parent=self)
+        if not self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            return
+        for item in selection:
+            playlist_id = item.playlist_row['id']
+            project.remove_playlist(playlist_id)
+        gui_server.refresh_team_ui()
 
     def build_ui(self):
         self.setObjectName('dark_widget')
@@ -129,6 +137,11 @@ class playlist_browser_widget(QtWidgets.QWidget):
 
         self.search_bar = gui_utils.search_bar()
         self.header_layout.addWidget(self.search_bar)
+
+        self.create_playlist_button = QtWidgets.QPushButton()
+        self.create_playlist_button.setFixedSize(32,32)
+        self.create_playlist_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.header_layout.addWidget(self.create_playlist_button)
 
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -155,7 +168,6 @@ class playlist_browser_widget(QtWidgets.QWidget):
         project_playlists_ids = []
         self.playlist_rows = playlist_rows
         for playlist_row in playlist_rows:
-            print(playlist_row)
             project_playlists_ids.append(playlist_row['id'])
             if playlist_row['id'] not in self.playlist_ids.keys():
                 item = playlist_item(playlist_row, self.list_view.invisibleRootItem())
@@ -165,6 +177,7 @@ class playlist_browser_widget(QtWidgets.QWidget):
         for playlist_id in existing_playlists_ids:
             if playlist_id not in project_playlists_ids:
                 self.remove_playlist(playlist_id)
+        self.list_view.updateGeometry()
 
     def remove_playlist(self, playlist_id):
         if playlist_id in self.playlist_ids.keys():
@@ -189,6 +202,7 @@ class playlist_item(QtWidgets.QTreeWidgetItem):
         self.widget.time_label.setText(tools.time_ago_from_timestamp(self.playlist_row['last_save_time']))
         thumbnail_pixmap = QtGui.QIcon(self.playlist_row['thumbnail_path']).pixmap(100)
         self.widget.thumbnail_label.setPixmap(thumbnail_pixmap)
+        self.widget.adjustSize()
         self.setSizeHint(0, self.widget.sizeHint())
 
 class playlist_item_widget(QtWidgets.QWidget):

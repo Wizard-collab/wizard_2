@@ -68,7 +68,7 @@ class header_widget(QtWidgets.QFrame):
 
         self.window_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Window')
         self.production_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._production_manager_icon_), "Production manager")
-        self.video_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._production_manager_icon_), "Videos manager")
+        self.video_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._videos_manager_icon_), "Videos manager")
         self.groups_manager_action = self.window_action.addAction(QtGui.QIcon(ressources._group_icon_), "Groups manager")
         self.batcher_action = self.window_action.addAction(QtGui.QIcon(ressources._batcher_icon_), "Batcher")
         self.console_action = self.window_action.addAction(QtGui.QIcon(ressources._console_icon_), "Console")

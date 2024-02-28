@@ -26,11 +26,12 @@ from wizard.gui import gui_server
 from wizard.gui.video_manager import mpv_widget
 from wizard.gui.video_manager import video_threads
 from wizard.gui.video_manager import timeline_widget
+from wizard.gui.video_manager import create_playlist_widget
 from wizard.gui import confirm_widget
 
 logger = logging.getLogger(__name__)
 
-class video_player_widget(QtWidgets.QWidget):
+class video_player_widget(QtWidgets.QFrame):
 
     current_stage = pyqtSignal(int)
     current_variant = pyqtSignal(int)
@@ -202,15 +203,39 @@ class video_player_widget(QtWidgets.QWidget):
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
+        self.menu_widget = QtWidgets.QFrame()
+        self.menu_layout = QtWidgets.QHBoxLayout()
+        self.menu_layout.setContentsMargins(6,6,6,6)
+        self.menu_layout.setSpacing(6)
+        self.menu_widget.setLayout(self.menu_layout)
+        self.main_layout.addWidget(self.menu_widget)
+
         self.menu_bar = QtWidgets.QMenuBar()
         self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-
-        self.main_layout.addWidget(self.menu_bar)
+        self.menu_layout.addWidget(self.menu_bar)
         
+        self.menu_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+
+        self.player_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Player')
+        self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(ressources._tool_clear_cache_), "Clear cache")
+        self.clear_all_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(ressources._tool_clear_cache_), "Clear all cache")
+        self.show_preferences_action = self.player_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
+        self.playlist_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Playlist')
+        self.save_playlist_action = self.playlist_action.addAction(QtGui.QIcon(ressources._tool_save_), "Save playlist")
+        self.save_as_new_playlist_action = self.playlist_action.addAction(QtGui.QIcon(ressources._tool_save_), "Save as new playlist")
+        self.clear_playlist_action = self.playlist_action.addAction(QtGui.QIcon(ressources._tool_add_), "New playlist")
+        self.export_video_file_action = self.playlist_action.addAction(QtGui.QIcon(ressources._tool_batch_publish_), "Export video")
+
+        self.playlist_widget = QtWidgets.QFrame()
         self.playlist_layout = QtWidgets.QHBoxLayout()
         self.playlist_layout.setContentsMargins(10,10,10,10)
         self.playlist_layout.setSpacing(6)
-        self.main_layout.addLayout(self.playlist_layout)
+        self.playlist_widget.setLayout(self.playlist_layout)
+        self.main_layout.addWidget(self.playlist_widget)
+
+        self.playlist_icon_label = QtWidgets.QLabel()
+        self.playlist_icon_label.setPixmap(QtGui.QIcon(ressources._playlist_icon_).pixmap(22))
+        self.playlist_layout.addWidget(self.playlist_icon_label)
 
         self.playlist_info_label = QtWidgets.QLabel("Current playlist : ")
         self.playlist_info_label.setObjectName('gray_label')
@@ -221,14 +246,6 @@ class video_player_widget(QtWidgets.QWidget):
         self.playlist_layout.addWidget(self.current_playlist_label)
 
         self.playlist_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
-
-        self.player_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Player')
-        self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear cache")
-        self.clear_all_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(''), "Clear all cache")
-        self.show_preferences_action = self.player_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
-        self.playlist_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Playlist')
-        self.save_playlist_action = self.playlist_action.addAction(QtGui.QIcon(''), "Save playlist")
-        self.clear_playlist_action = self.playlist_action.addAction(QtGui.QIcon(''), "Clear playlist")
 
         self.container = QtWidgets.QFrame()
         self.container.setStyleSheet("background-color:black;")
@@ -289,6 +306,8 @@ class video_player_widget(QtWidgets.QWidget):
         self.show_preferences_action.triggered.connect(self.show_preferences)
         self.clear_playlist_action.triggered.connect(self.clear)
         self.save_playlist_action.triggered.connect(self.save_playlist)
+        self.save_as_new_playlist_action.triggered.connect(self.save_as_new_playlist)
+        self.export_video_file_action.triggered.connect(self.export_video_file)
 
     def replace_current_video(self, project_video_id):
         self.timeline_widget.replace_current_video(project_video_id)
@@ -366,6 +385,16 @@ class video_player_widget(QtWidgets.QWidget):
             assets.save_playlist(self.current_playlist, self.videos_dic, thumbnail_temp_path=self.get_first_thumbnail())
             self.set_modified(False)
             gui_server.refresh_team_ui()
+        else:
+            self.save_as_new_playlist()
+
+    def save_as_new_playlist(self):
+        self.create_playlist_widget = create_playlist_widget.create_playlist_widget(data=json.dumps(self.videos_dic), thumbnail_temp_path=self.get_first_thumbnail())
+        if self.create_playlist_widget.exec_() == QtWidgets.QDialog.Accepted:
+            self.current_playlist = self.create_playlist_widget.playlist_id
+            self.current_playlist_name = self.create_playlist_widget.playlist_name
+            self.set_modified(False)
+            gui_server.refresh_team_ui()
 
     def get_first_thumbnail(self):
         video_ids = list(self.videos_dic.keys())
@@ -382,6 +411,19 @@ class video_player_widget(QtWidgets.QWidget):
                 json.dump(self.get_playlist_dic(), f, indent=4)
             logger.info("Playlist saved successfully")
             self.set_info("Playlist saved successfully")
+
+    def export_video_file(self):
+        options = QtWidgets.QFileDialog.Options()
+        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save video file", "", "Mp4 Files (*.mp4)", options=options)
+        if file_name:
+            concat_file = ffmpeg_utils.get_concat_video_file(self.temp_dir, self.player_id)
+            if not path_utils.isfile(concat_file):
+                logger.warning("Nothing to export")
+                self.set_info("Nothing to export", 2)
+                return
+            path_utils.copyfile(concat_file, file_name)
+            logger.info("Video exported successfully")
+            self.set_info("Video exported successfully")
 
     def load_playlist_file(self):
         options = QtWidgets.QFileDialog.Options()

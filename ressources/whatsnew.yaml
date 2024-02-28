@@ -2,10 +2,13 @@
   update_list:
   - !!python/tuple
     - debug
-    - Substance Painter keep settings
+    - Substance Painter keeps settings
   - !!python/tuple
     - debug
     - Assets inside asset groups now alphabetically sorted
+  - !!python/tuple
+    - debug
+    - Reduce all now reducing assets groups
   - !!python/tuple
     - debug
     - Skip __pycache__ and .idea when looking for hooks

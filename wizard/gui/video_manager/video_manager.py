@@ -75,9 +75,9 @@ class video_manager(QtWidgets.QWidget):
         self.add_videos(video_tuples)
 
     def closeEvent(self, event):
-        self.video_player.quit()
-        #self.hide()
-        #event.ignore()
+        #self.video_player.quit()
+        self.hide()
+        event.ignore()
 
     def get_context(self):
         self.asset_tracking_widget.get_context()
@@ -121,7 +121,7 @@ class video_manager(QtWidgets.QWidget):
         self.content_widget.addWidget(self.tabs_widget)
 
         self.tabs_widget.addTab(self.video_browser, QtGui.QIcon(ressources._videos_icon_), "Videos")
-        self.tabs_widget.addTab(self.playlist_browser, QtGui.QIcon(ressources._videos_icon_), "Playlists")
+        self.tabs_widget.addTab(self.playlist_browser, QtGui.QIcon(ressources._playlist_icon_), "Playlists")
 
         self.video_player = video_player_instances().get_instance(self)
         self.content_widget.addWidget(self.video_player)

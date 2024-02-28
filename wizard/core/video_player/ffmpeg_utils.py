@@ -142,10 +142,13 @@ def concatenate_videos(temp_dir, player_id, videos_dic, fps=24):
     if len(files) == 0:
         logger.debug("No files to concat.")
         return
-    output_video_file = path_utils.join(temp_dir, f'{player_id}.mp4')
+    output_video_file = get_concat_video_file(temp_dir, player_id)
     command = f"ffmpeg -y -f concat -safe 0 -i {concat_txt_file} -preset ultrafast -c copy -an -r {fps} {output_video_file}"
     res = subprocess.run(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     return output_video_file
+
+def get_concat_video_file(temp_dir, player_id):
+    return path_utils.join(temp_dir, f'{player_id}.mp4')
 
 def get_frames_count(video_file):
     cap = cv2.VideoCapture(video_file)

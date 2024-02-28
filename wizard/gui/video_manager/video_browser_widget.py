@@ -88,26 +88,16 @@ class video_browser_widget(QtWidgets.QWidget):
     def context_menu_requested(self):
         selection = self.icon_view.selectedItems()
         menu = gui_utils.QMenu(self)
-        folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
-        archive_action = None
-        comment_action = None
-        create_playlist_action = None
         if len(selection)>=1:
-            archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive video(s)')
-            comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
-            create_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Create playlist')
-            add_to_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Add to playlist')
+            create_playlist_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), 'Create playlist')
+            add_to_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add to playlist')
+        else:
+            return
 
         pos = QtGui.QCursor().pos()
         action = menu.exec_(pos)
         if action is not None:
-            if action == folder_action:
-                self.open_folder()
-            elif action == archive_action:
-                self.archive()
-            elif action == comment_action:
-                self.modify_comment(pos)
-            elif action == create_playlist_action:
+            if action == create_playlist_action:
                 self.create_playlist()
             elif action == add_to_playlist_action:
                 self.add_to_playlist()

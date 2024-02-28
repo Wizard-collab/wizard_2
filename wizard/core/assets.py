@@ -957,9 +957,20 @@ def save_playlist(playlist_id, data, thumbnail_temp_path=None):
         if not path_utils.isdir(thumbnail_path):
             path_utils.makedirs(thumbnail_path)
         thumbnail_path = path_utils.join(thumbnail_path, f"{str(uuid.uuid4())}{ext}")
-        logger.info(thumbnail_path)
         path_utils.copyfile(thumbnail_temp_path, thumbnail_path)
         project.update_playlist_data(playlist_id, ('thumbnail_path', thumbnail_path))
+    return 1
+
+def create_playlist(name, data='{}', thumbnail_temp_path=None):
+    thumbnail_path = None
+    if thumbnail_temp_path is not None:
+        ext = path_utils.splitext(thumbnail_temp_path)[-1]
+        thumbnail_path = path_utils.join(environment.get_project_path(), project_vars._thumbnails_folder_)
+        if not path_utils.isdir(thumbnail_path):
+            path_utils.makedirs(thumbnail_path)
+        thumbnail_path = path_utils.join(thumbnail_path, f"{str(uuid.uuid4())}{ext}")
+        path_utils.copyfile(thumbnail_temp_path, thumbnail_path)
+    project.add_playlist(name=name, data=data, thumbnail_path=thumbnail_path)
     return 1
 
 def copy_work_version(work_version_id):

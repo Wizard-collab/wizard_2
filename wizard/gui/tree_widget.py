@@ -634,6 +634,8 @@ class tree_widget(QtWidgets.QFrame):
             self.category_ids[id].setExpanded(0)
         for id in self.asset_ids.keys():
             self.asset_ids[id].setExpanded(0)
+        for id in self.assets_groups_ids.keys():
+            self.assets_groups_ids[id].setExpanded(0)
 
     def toggle_all_visibility(self, visibility):
         for id in self.domain_ids.keys():
@@ -1053,6 +1055,7 @@ class state_indicator(QtWidgets.QWidget):
         for current_state in current_states:
             if current_state not in self.states:
                 self.indicators[current_state].setParent(None)
+                self.indicators[current_state].setVisible(False)
                 self.indicators[current_state].deleteLater()
                 del self.indicators[current_state]
 
@@ -1093,6 +1096,7 @@ class priority_indicator(QtWidgets.QWidget):
         for current_priority in current_priorities:
             if current_priority not in self.priorities:
                 self.indicators[current_priority].setParent(None)
+                self.indicators[current_priority].setVisible(False)
                 self.indicators[current_priority].deleteLater()
                 del self.indicators[current_priority]
 
