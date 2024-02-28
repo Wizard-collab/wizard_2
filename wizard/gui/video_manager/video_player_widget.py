@@ -15,9 +15,11 @@ import json
 # Wizard core modules
 from wizard.core import path_utils
 from wizard.core import project
+from wizard.core import user
 from wizard.core import assets
 from wizard.core.video_player import ffmpeg_utils
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import app_utils
@@ -64,6 +66,18 @@ class video_player_widget(QtWidgets.QFrame):
 
     def need_player(self):
         self.video_player.create_mpv_player()
+
+    def set_context(self):
+        context_dic = dict()
+        context_dic['current_playlist'] = self.current_playlist
+        user.user().add_context(user_vars._video_player_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._video_player_context_)
+        if context_dic is None:
+            return
+        if 'current_playlist' in context_dic.keys():
+            self.load_playlist(context_dic['current_playlist'])
 
     def closeEvent(self, event):
         self.quit()
@@ -437,8 +451,12 @@ class video_player_widget(QtWidgets.QFrame):
     def load_playlist(self, playlist_id):
         if not self.clear():
             return
-        self.current_playlist = playlist_id
+        if playlist_id is None:
+            return
         playlist_row = project.get_playlist_data(playlist_id)
+        if playlist_row is None:
+            return
+        self.current_playlist = playlist_id
         self.current_playlist_name = playlist_row['name']
         self.current_playlist_label.setText(self.current_playlist_name)
         playlist_data = json.loads(playlist_row['data'])

@@ -176,6 +176,7 @@ class main_widget(QtWidgets.QWidget):
         floating_widgets_layout.init_widget_pos(self.groups_manager_widget, 'groups_manager_widget')
         floating_widgets_layout.init_widget_pos(self.quotes_manager, 'quotes_manager')
         floating_widgets_layout.init_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
+        floating_widgets_layout.init_widget_pos(self.video_manager, 'video_manager')
 
     def init_contexts(self):
         logger.info("Loading user context")
@@ -202,6 +203,7 @@ class main_widget(QtWidgets.QWidget):
         floating_widgets_layout.save_widget_pos(self.groups_manager_widget, 'groups_manager_widget')
         floating_widgets_layout.save_widget_pos(self.quotes_manager, 'quotes_manager')
         floating_widgets_layout.save_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
+        floating_widgets_layout.save_widget_pos(self.video_manager, 'video_manager')
 
     def save_contexts(self):
         logger.info("Saving user context")
@@ -277,6 +279,7 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
         self.gui_server.popup_signal.connect(self.popup_wall_widget.add_custom_popup)
+        self.gui_server.create_playlist_from_stages_signal.connect(self.video_manager.create_playlist_from_stages)
 
     def show_documentation(self):
         webbrowser.open_new_tab(ressources._documentation_url_)

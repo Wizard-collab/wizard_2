@@ -52,6 +52,7 @@ class gui_server(QThread):
     save_popup_signal = pyqtSignal(int)
     raise_ui_signal = pyqtSignal(int)
     popup_signal = pyqtSignal(object)
+    create_playlist_from_stages_signal = pyqtSignal(list)
 
     def __init__(self):
         super(gui_server, self).__init__()
@@ -117,6 +118,8 @@ class gui_server(QThread):
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'popup':
             self.popup_signal.emit(signal_dic['data'])
+        elif signal_dic['function'] == 'create_playlist_from_stages':
+            self.create_playlist_from_stages_signal.emit(signal_dic['stages_ids_list'])
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
@@ -172,6 +175,12 @@ def focus_instance(instance_tuple):
     signal_dic = dict()
     signal_dic['function'] = 'focus_instance'
     signal_dic['instance_tuple'] = instance_tuple
+    send_signal(signal_dic)
+
+def create_playlist_from_stages(stages_ids_list):
+    signal_dic = dict()
+    signal_dic['function'] = 'create_playlist_from_stages'
+    signal_dic['stages_ids_list'] = stages_ids_list
     send_signal(signal_dic)
 
 def focus_export_version(export_version_id):

@@ -1,6 +1,6 @@
 VIDEOS - 
 
-Video browser - wip
+Video browser - ok
 Asset infos in video player - ok
 Playlist - ok
 Playlist browser - ok
@@ -8,10 +8,15 @@ Current stage in asset tracking widget - ok
 Reduce all > groups aussi - ok
 Playlist save as - ok
 Playlist creation - ok
+Video file export - ok
+Create pllist from prod table - ok
+Create pllist from calendar - ok
+Init contexts on video manager - 
+Fix video items handles - 
+
+ELSE -
+
 Nuke import - 
 Ingest image sequence - 
-Video file export - 
-Fix video items handles - 
-Init contexts on video manager - 
 Copy references - 
 Init param in softwares hook - 

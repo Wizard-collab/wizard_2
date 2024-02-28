@@ -157,6 +157,7 @@ class calendar_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu(self)
 
         edit_dates_action = menu.addAction(QtGui.QIcon(ressources._edit_icon_), "Edit dates")
+        create_playlist_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), "Create playlist from selection")
 
         menu.addSeparator()
 
@@ -178,6 +179,7 @@ class calendar_widget(QtWidgets.QWidget):
         for priority in assets_vars._priority_list_:
             priorities_actions[priority] = priorities_submenu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
 
+
         action = menu.exec_(QtGui.QCursor().pos())
         if action is not None:
             if action in states_actions.values():
@@ -188,6 +190,17 @@ class calendar_widget(QtWidgets.QWidget):
                 self.modify_priority_on_selected(action.text())
             elif action == edit_dates_action:
                 self.edit_dates()
+            elif action == create_playlist_action:
+                self.create_playlist_from_selection()
+
+    def create_playlist_from_selection(self):
+        selected_items = self.view.get_selected_items()
+        if len(selected_items) < 1:
+            return
+        stages_ids = []
+        for item in selected_items:
+            stages_ids.append(item.stage_row['id'])
+        gui_server.create_playlist_from_stages(stages_ids)
 
     def edit_dates(self):
         selected_items = self.view.get_selected_items()

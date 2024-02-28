@@ -18,9 +18,11 @@ from wizard.gui.video_manager import create_playlist_widget
 
 # Wizard core modules
 from wizard.core import path_utils
+from wizard.core import user
 from wizard.core import project
 from wizard.core import tools
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +44,18 @@ class playlist_browser_widget(QtWidgets.QWidget):
 
         self.build_ui()
         self.connect_functions()
+
+    def set_context(self):
+        context_dic = dict()
+        context_dic['search_text'] = self.search_bar.text()
+        user.user().add_context(user_vars._playlist_browser_context_, context_dic)
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._playlist_browser_context_)
+        if context_dic is None:
+            return
+        if 'search_text' in context_dic.keys():
+            self.search_bar.setText(context_dic['search_text'])
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.update_search)

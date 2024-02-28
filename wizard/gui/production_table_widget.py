@@ -91,6 +91,9 @@ class production_table_widget(QtWidgets.QWidget):
 
     def context_menu_requested(self, point):
         menu = gui_utils.QMenu(self)
+
+        create_playlist_from_selection_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), "Create playist from selection")
+
         menu.addSeparator()
         show_notes_icon = ressources._uncheck_icon_
         if self.show_notes:
@@ -128,6 +131,22 @@ class production_table_widget(QtWidgets.QWidget):
                 self.show_priorities = 1-self.show_priorities
                 self.update_stage_datas_visibility()
                 self.update_layout()
+            if action == create_playlist_from_selection_action:
+                self.create_playlist_from_selection()
+
+    def create_playlist_from_selection(self):
+        stages_ids = []
+        for modelIndex in self.table_widget.selectedIndexes():
+            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            if widget and widget.type == 'stage':
+                if not widget.isVisible():
+                    continue
+                stage_row = widget.stage_row
+                stage_id = stage_row['id']
+                stages_ids.append(stage_id)
+        if len(stages_ids) < 1:
+            return
+        gui_server.create_playlist_from_stages(stages_ids)
 
     def update_stage_datas_visibility(self):
         for stage_id in self.stage_ids.keys():
