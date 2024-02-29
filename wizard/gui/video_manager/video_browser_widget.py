@@ -162,6 +162,7 @@ class video_browser_widget(QtWidgets.QWidget):
         self.icon_view = QtWidgets.QListWidget()
         self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.icon_view.setObjectName('icon_view')
+        self.icon_view.setStyleSheet("#icon_view::item{padding:0px;}")
         self.icon_view.setSpacing(4)
         self.icon_view.setContentsMargins(4,4,4,4)
         self.icon_view.setIconSize(QtCore.QSize(200,200))
@@ -228,7 +229,8 @@ class custom_video_icon_item(QtWidgets.QListWidgetItem):
         self.widget.infos_label.setText(f"{self.video_row['name']} - {self.video_row['creation_user']} - {tools.time_ago_from_timestamp(self.video_row['creation_time'])}")
         self.widget.set_background(ressources._stages_colors_[self.stage_row['name']])
         self.widget.set_state(self.stage_row['state'])
-        self.setSizeHint(self.widget.sizeHint())
+        self.setSizeHint(self.widget.size())
+        print(self.widget.size())
 
 class video_item_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -243,8 +245,9 @@ class video_item_widget(QtWidgets.QWidget):
         self.state_label.setStyleSheet("background-color:%s;font: bold;border-radius:4px;padding:3px"%ressources._states_colors_[state])
 
     def build_ui(self):
+        self.setFixedSize(172,140)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(3,3,3,3)
+        self.main_layout.setContentsMargins(6,6,6,6)
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 

@@ -12,11 +12,11 @@ Video file export - ok
 Create pllist from prod table - ok
 Create pllist from calendar - ok
 Init contexts on video manager - ok
-Fix video items handles - 
+Fix video items handles - ok
 
 ELSE -
 
 Nuke import - ok
-Ingest image sequence - 
 Copy references - ok
 Init param in softwares hook - ok
+Ingest image sequence - 
