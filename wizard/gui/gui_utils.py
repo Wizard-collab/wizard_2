@@ -557,6 +557,9 @@ def add_menu_to_menu_bar(menu_bar, title, icon=None):
     return menu
 
 class info_widget(QtWidgets.QFrame):
+
+    customContextMenuRequested = pyqtSignal(int)
+
     def __init__(self, parent=None, transparent = None):
         super(info_widget, self).__init__(parent)
         self.transparent = transparent
@@ -590,6 +593,11 @@ class info_widget(QtWidgets.QFrame):
 
     def setText(self, text):
         self.text.setText(text)
+
+    def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+        if event.button() == QtCore.Qt.RightButton:
+            self.customContextMenuRequested.emit(1)
 
 class transparent_button(QtWidgets.QPushButton):
     def __init__(self, icon, hover_icon, checked_icon=None, parent=None):

@@ -17,6 +17,9 @@
     - Nuke import should now work for more cases
   - !!python/tuple
     - new
+    - You can now copy and paste references
+  - !!python/tuple
+    - new
     - Video manager ( beta )
   time: 1708334566.4214418
 '3.7.2.341':

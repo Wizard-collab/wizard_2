@@ -70,6 +70,7 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
         self.list_view.itemDoubleClicked.connect(self.item_double_clicked)
         self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.info_widget.customContextMenuRequested.connect(self.context_menu_requested)
 
         self.remove_selection_button.clicked.connect(self.remove_selection)
         self.duplicate_selection_button.clicked.connect(self.duplicate_selection)
@@ -398,6 +399,7 @@ class references_widget(QtWidgets.QWidget):
         selection = self.list_view.selectedItems()
         menu = gui_utils.QMenu(self)
         remove_action = None
+        copy_references_action = None
         update_action = None
         launch_action = None
         focus_action = None
@@ -405,10 +407,12 @@ class references_widget(QtWidgets.QWidget):
         open_folder_action = None
         duplicate_action = None
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
+        paste_references_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste references')
         if len(selection)>=1:
             update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected references')
             remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected references')
             duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate selected references')
+            copy_references_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Copy selected references')
             if len(selection) == 1:
                 if selection[0].type == 'reference':
                     launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
@@ -437,6 +441,34 @@ class references_widget(QtWidgets.QWidget):
                 self.open_folder()
             elif action == duplicate_action:
                 self.duplicate_selection()
+            elif action == copy_references_action:
+                self.copy_references()
+            elif action == paste_references_action:
+                self.paste_references()
+
+    def copy_references(self):
+        selected_items = self.list_view.selectedItems()
+        references_dic = dict()
+        references_dic['references'] = []
+        references_dic['grouped_references'] = []
+        references_dic['referenced_groups'] = []
+        if len(selected_items) == 0:
+            logger.warning("No references selected")
+        for selected_item in selected_items:
+            if selected_item.type == 'reference':
+                reference_id = selected_item.reference_row['id']
+                if self.context == 'work_env':
+                    references_dic['references'].append(reference_id)
+                else:
+                    references_dic['grouped_references'].append(reference_id)
+            elif selected_item.type == 'group':
+                referenced_group_id = selected_item.referenced_group_row['id']
+                references_dic['referenced_groups'].append(referenced_group_id)
+        assets.copy_references(references_dic)
+
+    def paste_references(self):
+        assets.paste_references(self.context, self.parent_instance_id)
+        gui_server.refresh_team_ui()
 
     def item_double_clicked(self, item):
         if item.type == 'group':

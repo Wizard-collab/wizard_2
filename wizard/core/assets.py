@@ -980,6 +980,13 @@ def copy_work_version(work_version_id):
     logger.info("Version ID copied to clipboard")
     return 1
 
+def copy_references(references_dic):
+    clipboard_dic = dict()
+    clipboard_dic['references_dic'] = references_dic
+    clipboard.copy(json.dumps(clipboard_dic))
+    logger.info("References copied to clipboard")
+    return 1
+
 def paste_work_version(destination_work_env_id, mirror_work_env_references=False):
     clipboard_json = clipboard.paste()
     try:
@@ -997,6 +1004,56 @@ def paste_work_version(destination_work_env_id, mirror_work_env_references=False
         work_version_row = project.get_version_data(work_version_id)
         work_env_id = work_version_row['work_env_id']
         mirror_references(work_env_id, destination_work_env_id)
+    return 1
+
+def paste_references(context, destination_instance_id):
+    clipboard_json = clipboard.paste()
+    try:
+        clipboard_dic = json.loads(clipboard_json)
+    except json.decoder.JSONDecodeError:
+        logger.warning("No valid references found in clipboard")
+        return
+    if 'references_dic' not in clipboard_dic.keys():
+        logger.warning("No valid references found in clipboard")
+        return
+    references_dic = clipboard_dic['references_dic']
+    references_rows = []
+    referenced_groups_rows = []
+    grouped_references_rows = []
+    for reference_id in references_dic['references']:
+        references_rows.append(project.get_reference_data(reference_id))
+    for grouped_reference_id in references_dic['grouped_references']:
+        grouped_references_rows.append(project.get_grouped_reference_data(grouped_reference_id))
+    for referenced_group_id in references_dic['referenced_groups']:
+        referenced_groups_rows.append(project.get_referenced_group_data(referenced_group_id))
+    for reference_row in references_rows:
+        if context == 'work_env':
+            create_reference(destination_instance_id,
+                                    reference_row['export_version_id'],
+                                    auto_update=reference_row['auto_update'],
+                                    activated=reference_row['activated'])
+        else:
+            create_grouped_reference(destination_instance_id,
+                                    reference_row['export_version_id'],
+                                    auto_update=reference_row['auto_update'],
+                                    activated=reference_row['activated'])
+    for grouped_reference_row in grouped_references_rows:
+        if context == 'work_env':
+            create_reference(destination_instance_id,
+                                    grouped_reference_row['export_version_id'],
+                                    auto_update=grouped_reference_row['auto_update'],
+                                    activated=grouped_reference_row['activated'])
+        else:
+            create_grouped_reference(destination_instance_id,
+                                    grouped_reference_row['export_version_id'],
+                                    auto_update=grouped_reference_row['auto_update'],
+                                    activated=grouped_reference_row['activated'])
+    for referenced_group_row in referenced_groups_rows:
+        if context != 'work_env':
+            continue
+        create_referenced_group(destination_instance_id,
+                                referenced_group_row['group_id'],
+                                activated=referenced_group_row['activated'])
     return 1
 
 def mirror_references(work_env_id, destination_work_env_id):

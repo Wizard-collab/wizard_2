@@ -111,7 +111,6 @@ def reference_exr(namespace, files_list, local=True ):
             if len(local_files_list) == len(files_list):
                 files_list = local_files_list
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
-        logger.info(paths_dic)
         reads_list = []
         for path in paths_dic.keys():
             read_name = os.path.basename(path).split('.')[0]
