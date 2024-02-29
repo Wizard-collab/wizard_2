@@ -5,6 +5,7 @@
 # Python modules
 import os
 import sys
+import re
 import shutil
 import traceback
 import logging
@@ -60,47 +61,19 @@ def exr_list_to_paths_list(exr_list):
     paths_list = []
     paths_dic = dict()
     for file in exr_list:
-        directory = os.path.dirname(file)
-        full_file_name = os.path.basename(file)
-        extension = os.path.splitext(full_file_name)[-1].replace('.', '')
-        file_name_without_extension = os.path.splitext(full_file_name)[0]
-        digits = ''.join(filter(str.isdigit, file_name_without_extension))
+        file_name_with_hashtags = re.sub(r'(_|\.)[0-9]+(.exr)', r'\1#####\2', file)
+        digits = re.search(r'(_|\.)([0-9]+)(.exr)', file).group(2)
         if digits != '':
-            file_name_without_extension = file_name_without_extension.replace(digits, replace_digits(digits))
             digits = int(digits)
-        file = f"{directory}/{file_name_without_extension}.{extension}"
-        logger.info(file)
-        '''
+        if file_name_with_hashtags not in paths_dic.keys():
+            paths_dic[file_name_with_hashtags] = []
+        paths_dic[file_name_with_hashtags].append(digits)
+        paths_list.append(file_name_with_hashtags)
 
-        logger.info(directory)
-        logger.info(full_file_name)
-        logger.info(extension)
-        logger.info(file_name_without_extension)
-        logger.info(filter(str.isdigit, file_name_without_extension))
-
-
-
-
-
-        file_tokens = os.path.basename(file).split('.')
-        logger.info(file_tokens)
-        file_name = os.path.basename(file_tokens[-2])
-        file_tokens.insert(0, os.path.dirname(file_tokens[-2]))
-        file_tokens[-2] = file_name
-        frame_number = file_tokens[-2]
-        digits_string = replace_digits(frame_number)
-        file_tokens[-2] = digits_string
-        filename = ('.').join([file_tokens[-2], file_tokens[-1]])
-        file = ('/').join([file_tokens[0], filename])
-        '''
-        if file not in paths_dic.keys():
-            paths_dic[file] = []
-        paths_dic[file].append(digits)
-        paths_list.append(file)
-    for path in paths_dic.keys():
-        paths_dic[path].sort()
-        frange = [paths_dic[path][0], paths_dic[path][-1]]
-        paths_dic[path] = frange
+    for file_name_with_hashtags in paths_dic.keys():
+        paths_dic[file_name_with_hashtags].sort()
+        frange = [paths_dic[file_name_with_hashtags][0], paths_dic[file_name_with_hashtags][-1]]
+        paths_dic[file_name_with_hashtags] = frange
     return paths_dic
 
 def replace_digits(digits):

@@ -12,6 +12,12 @@
   - !!python/tuple
     - debug
     - Skip __pycache__ and .idea when looking for hooks
+  - !!python/tuple
+    - debug
+    - Nuke import should now work for more cases
+  - !!python/tuple
+    - new
+    - Video manager ( beta )
   time: 1708334566.4214418
 '3.7.2.341':
   update_list:
