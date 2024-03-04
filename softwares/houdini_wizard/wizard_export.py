@@ -24,23 +24,25 @@ def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0
             work_env_id = int(os.environ['wizard_work_env_id'])
         export_file = wizard_communicate.request_export(work_env_id,
                                                                 export_name)
-        export_files = export_by_extension(export_file, frange, out_node, parent, export_name, work_env_id)
+        export_files = export_by_extension(export_file, frange, out_node, parent, export_name)
+        '''
         export_dir = wizard_communicate.add_export_version(export_name,
                                                 export_files,
                                                 work_env_id,
                                                 int(os.environ['wizard_version_id']),
                                                 comment=comment)
+        '''
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
-def export_by_extension(export_file, frange, out_node, parent, export_name, work_env_id):
+def export_by_extension(export_file, frange, out_node, parent, export_name):
     if export_file.endswith('.hip'):
         export_files = export_hip(export_file, frange)
         return export_files
     elif export_file.endswith('.abc'):
-        export_files = export_abc(export_file, frange, out_node, parent, export_name, work_env_id)
+        export_files = export_abc(export_file, frange, out_node, parent, export_name)
         return export_files
     elif export_file.endswith('.vdb'):
-        export_files = export_vdb(export_file, frange, out_node, parent, export_name, work_env_id)
+        export_files = export_vdb(export_file, frange, out_node, parent, export_name)
         return export_files
     else:
         logger.info("{} extension is unkown".format(export_file))
@@ -70,8 +72,10 @@ def export_hip(export_file, frange):
     hip_command(export_file)
     return [export_file]
 
-def export_abc(export_file, frange, out_node, parent, export_name, work_env_id):
-    export_dir = wizard_communicate.request_render(export_name, work_env_id)
+def export_abc(export_file, frange, out_node, parent, export_name):
+    export_dir = wizard_communicate.request_render(export_name,
+                                                int(os.environ['wizard_version_id']))
+    print(export_dir)
     export_file = os.path.join(export_dir, os.path.basename(export_file))
     wizard_abc_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_abc_output.type().name() == 'rop_geometry':
@@ -87,7 +91,8 @@ def export_abc(export_file, frange, out_node, parent, export_name, work_env_id):
         logger.warning(f'"{out_node}" node not found')
 
 def export_vdb(export_file, frange, out_node, parent, export_name):
-    export_dir = wizard_communicate.request_render(export_name, work_env_id)
+    export_dir = wizard_communicate.request_render(export_name,
+                                                int(os.environ['wizard_version_id']))
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_vdb_output.type().name() == 'rop_alembic':
         export_file = export_file.replace('.vdb', '.abc')
