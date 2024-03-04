@@ -62,9 +62,11 @@ def exr_list_to_paths_list(exr_list):
     paths_dic = dict()
     for file in exr_list:
         file_name_with_hashtags = re.sub(r'(_|\.)[0-9]+(.exr)', r'\1#####\2', file)
-        digits = re.search(r'(_|\.)([0-9]+)(.exr)', file).group(2)
-        if digits != '':
-            digits = int(digits)
+        digits = re.search(r'(_|\.)([0-9]+)(.exr)', file)
+        if digits is not None:
+            digits = int(digits.group(2))
+        else:
+            digits = ''
         if file_name_with_hashtags not in paths_dic.keys():
             paths_dic[file_name_with_hashtags] = []
         paths_dic[file_name_with_hashtags].append(digits)
