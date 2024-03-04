@@ -24,7 +24,7 @@ def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0
             work_env_id = int(os.environ['wizard_work_env_id'])
         export_file = wizard_communicate.request_export(work_env_id,
                                                                 export_name)
-        export_files = export_by_extension(export_file, frange, out_node, parent)
+        export_files = export_by_extension(export_file, frange, out_node, parent, export_name)
         export_dir = wizard_communicate.add_export_version(export_name,
                                                 export_files,
                                                 work_env_id,
