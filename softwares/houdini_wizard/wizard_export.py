@@ -75,7 +75,7 @@ def export_hip(export_file, frange):
 def export_abc(export_file, frange, out_node, parent, export_name):
     export_dir = wizard_communicate.request_render(export_name,
                                                 int(os.environ['wizard_version_id']))
-    print(export_dir)
+    logger.info(export_dir)
     export_file = os.path.join(export_dir, os.path.basename(export_file))
     wizard_abc_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_abc_output.type().name() == 'rop_geometry':
@@ -93,6 +93,7 @@ def export_abc(export_file, frange, out_node, parent, export_name):
 def export_vdb(export_file, frange, out_node, parent, export_name):
     export_dir = wizard_communicate.request_render(export_name,
                                                 int(os.environ['wizard_version_id']))
+    logger.info(export_dir)
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_vdb_output.type().name() == 'rop_alembic':
         export_file = export_file.replace('.vdb', '.abc')
