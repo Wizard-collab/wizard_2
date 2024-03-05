@@ -22,31 +22,21 @@ def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0
             work_env_id = custom_work_env_id
         else:
             work_env_id = int(os.environ['wizard_work_env_id'])
-        export_file = wizard_communicate.request_export(work_env_id,
-                                                                export_name)
-        export_files = export_by_extension(export_file, frange, out_node, parent, export_name)
-        '''
-        export_dir = wizard_communicate.add_export_version(export_name,
-                                                export_files,
-                                                work_env_id,
-                                                int(os.environ['wizard_version_id']),
-                                                comment=comment)
-        '''
+        export_file = wizard_communicate.request_export(work_env_id, export_name)
+        export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']), export_name)
+        export_file = os.path.join(export_dir, os.path.basename(export_file))
+        export_by_extension(export_file, frange, out_node, parent)
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
-def export_by_extension(export_file, frange, out_node, parent, export_name):
+def export_by_extension(export_file, frange, out_node, parent):
     if export_file.endswith('.hip'):
-        export_files = export_hip(export_file, frange)
-        return export_files
+        export_hip(export_file, frange)
     elif export_file.endswith('.abc'):
-        export_files = export_abc(export_file, frange, out_node, parent, export_name)
-        return export_files
+        export_abc(export_file, frange, out_node, parent)
     elif export_file.endswith('.vdb'):
-        export_files = export_vdb(export_file, frange, out_node, parent, export_name)
-        return export_files
+        export_vdb(export_file, frange, out_node, parent)
     else:
         logger.info("{} extension is unkown".format(export_file))
-        return
 
 def reopen(scene):
     hou.hipFile.load(scene, suppress_save_prompt=True)
@@ -72,11 +62,7 @@ def export_hip(export_file, frange):
     hip_command(export_file)
     return [export_file]
 
-def export_abc(export_file, frange, out_node, parent, export_name):
-    export_dir = wizard_communicate.request_render(export_name,
-                                                int(os.environ['wizard_version_id']))
-    logger.info(export_dir)
-    export_file = os.path.join(export_dir, os.path.basename(export_file))
+def export_abc(export_file, frange, out_node, parent):
     wizard_abc_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_abc_output.type().name() == 'rop_geometry':
         export_file = export_file.replace('.abc', '.vdb')
@@ -90,14 +76,12 @@ def export_abc(export_file, frange, out_node, parent, export_name):
     else:
         logger.warning(f'"{out_node}" node not found')
 
-def export_vdb(export_file, frange, out_node, parent, export_name):
-    export_dir = wizard_communicate.request_render(export_name,
-                                                int(os.environ['wizard_version_id']))
-    logger.info(export_dir)
+def export_vdb(export_file, frange, out_node, parent):
+    export_dir =os.path.dirname(export_file)
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_vdb_output.type().name() == 'rop_alembic':
         export_file = export_file.replace('.vdb', '.abc')
-        return export_vdb(export_file, frange, out_node, parent)
+        return export_abc(export_file, frange, out_node, parent)
     if wizard_vdb_output:
         vdb_command = wizard_hooks.get_vdb_command("houdini")
         if vdb_command is None:
