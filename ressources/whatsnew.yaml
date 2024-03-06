@@ -2,6 +2,12 @@
   update_list:
   - !!python/tuple
     - debug
+    - Houdini export changed to request render
+  time: 1709632447.2574043
+'3.8.0.342':
+  update_list:
+  - !!python/tuple
+    - debug
     - Substance Painter keeps settings
   - !!python/tuple
     - debug

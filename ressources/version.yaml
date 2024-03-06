@@ -1,7 +1,7 @@
-BUILDS: 342
+BUILDS: 344
 MAJOR: 3
 MINOR: 8
-PATCH: 0
-builds: 342
-date: 1709225629.9453783
-setup_name: 3.8.0.0342-setup.exe
+PATCH: 1
+builds: 344
+date: 1709632512.5946999
+setup_name: 3.8.1.0344-setup.exe
