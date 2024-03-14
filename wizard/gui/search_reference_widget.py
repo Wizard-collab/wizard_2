@@ -74,17 +74,17 @@ class search_reference_widget(QtWidgets.QWidget):
             win_width = self.frameSize().width()
             win_heigth = self.frameSize().height()
 
-            if (cursor.y() - 30 - win_heigth) <= screen_minY:
-                posy = cursor.y() - 15
+            if (cursor.y() - 120 - win_heigth) <= screen_minY:
+                posy = cursor.y() - 60
                 angley = 'top'
             else:
-                posy = cursor.y() - win_heigth + 15
+                posy = cursor.y() - win_heigth + 60
                 angley = 'bottom'
-            if (cursor.x() + 30 + win_width) >= screen_maxX:
-                posx = cursor.x() - win_width + 15
+            if (cursor.x() + 120 + win_width) >= screen_maxX:
+                posx = cursor.x() - win_width + 60
                 anglex = 'right'
             else:
-                posx = cursor.x() - 15
+                posx = cursor.x() - 30
                 anglex = 'left'
 
             self.move(posx, posy)

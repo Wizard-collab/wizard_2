@@ -16,7 +16,7 @@ import wizard_hooks
 import wizard_communicate
 from houdini_wizard import wizard_tools
 
-def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0], custom_work_env_id = None, parent=None, comment=''):
+def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0], custom_work_env_id = None, parent=None, comment='', prepare_only=False):
     if trigger_sanity_hook(stage_name, exported_string_asset):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
@@ -25,16 +25,18 @@ def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0
         export_file = wizard_communicate.request_export(work_env_id, export_name)
         export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']), export_name)
         export_file = os.path.join(export_dir, os.path.basename(export_file))
-        export_by_extension(export_file, frange, out_node, parent)
+        export_by_extension(export_file, frange, out_node, parent, prepare_only=prepare_only)
+        if prepare_only:
+            return
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
-def export_by_extension(export_file, frange, out_node, parent):
+def export_by_extension(export_file, frange, out_node, parent, prepare_only=False):
     if export_file.endswith('.hip'):
         export_hip(export_file, frange)
     elif export_file.endswith('.abc'):
-        export_abc(export_file, frange, out_node, parent)
+        export_abc(export_file, frange, out_node, parent, prepare_only=prepare_only)
     elif export_file.endswith('.vdb'):
-        export_vdb(export_file, frange, out_node, parent)
+        export_vdb(export_file, frange, out_node, parent, prepare_only=prepare_only)
     else:
         logger.info("{} extension is unkown".format(export_file))
 
@@ -62,31 +64,31 @@ def export_hip(export_file, frange):
     hip_command(export_file)
     return [export_file]
 
-def export_abc(export_file, frange, out_node, parent):
+def export_abc(export_file, frange, out_node, parent, prepare_only=False):
     wizard_abc_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_abc_output.type().name() == 'rop_geometry':
         export_file = export_file.replace('.abc', '.vdb')
-        return export_vdb(export_file, frange, out_node, parent)
+        return export_vdb(export_file, frange, out_node, parent, prepare_only=prepare_only)
     if wizard_abc_output:
         abc_command = wizard_hooks.get_abc_command("houdini")
         if abc_command is None:
             abc_command = default_abc_command
-        abc_command(wizard_abc_output, frange, export_file)
+        abc_command(wizard_abc_output, frange, export_file, prepare_only=prepare_only)
         return [export_file]
     else:
         logger.warning(f'"{out_node}" node not found')
 
-def export_vdb(export_file, frange, out_node, parent):
+def export_vdb(export_file, frange, out_node, parent, prepare_only=False):
     export_dir =os.path.dirname(export_file)
     wizard_vdb_output = wizard_tools.look_for_node(out_node, parent)
     if wizard_vdb_output.type().name() == 'rop_alembic':
         export_file = export_file.replace('.vdb', '.abc')
-        return export_abc(export_file, frange, out_node, parent)
+        return export_abc(export_file, frange, out_node, parent, prepare_only=prepare_only)
     if wizard_vdb_output:
         vdb_command = wizard_hooks.get_vdb_command("houdini")
         if vdb_command is None:
             vdb_command = default_vdb_command
-        vdb_command(wizard_vdb_output, frange, export_dir)
+        vdb_command(wizard_vdb_output, frange, export_dir, prepare_only=prepare_only)
         files = []
         for file in os.listdir(export_dir):
             files.append(os.path.join(export_dir, file))
@@ -110,7 +112,7 @@ def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
 def default_hip_command(export_file):
     hou.hipFile.save(file_name=export_file)
 
-def default_abc_command(wizard_abc_output, frange, export_file):
+def default_abc_command(wizard_abc_output, frange, export_file, prepare_only=False):
     wizard_tools.apply_tags(wizard_abc_output)
     wizard_abc_output.parm("trange").set('normal')
     hou.playbar.setFrameRange(frange[0], frange[1])
@@ -120,9 +122,11 @@ def default_abc_command(wizard_abc_output, frange, export_file):
     wizard_abc_output.parm("shutter1").set(-0.2)
     wizard_abc_output.parm("shutter2").set(0.2)
     wizard_abc_output.parm("filename").set(export_file)
+    if prepare_only:
+        return
     wizard_abc_output.parm("execute").pressButton()
 
-def default_vdb_command(wizard_vdb_output, frange, export_dir):
+def default_vdb_command(wizard_vdb_output, frange, export_dir, prepare_only=False):
     file = f"{export_dir}/fx_export.$F4.vdb"
     wizard_vdb_output.parm('sopoutput').set(file)
     wizard_vdb_output.parm("trange").set('normal')
@@ -131,4 +135,6 @@ def default_vdb_command(wizard_vdb_output, frange, export_dir):
     wizard_vdb_output.parm("f2").setExpression('$FEND')
     wizard_vdb_output.parm('lpostframe').set("python")
     wizard_vdb_output.parm('postframe').set(wizard_tools.by_frame_progress_script())
+    if prepare_only:
+        return
     wizard_vdb_output.parm("execute").pressButton()

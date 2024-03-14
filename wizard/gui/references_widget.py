@@ -406,6 +406,10 @@ class references_widget(QtWidgets.QWidget):
         declare_error_action = None
         open_folder_action = None
         duplicate_action = None
+        activate_auto_update_action = None
+        deactivate_auto_update_action = None
+        activate_action = None
+        deactivate_action = None
         update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all references')
         paste_references_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste references')
         if len(selection)>=1:
@@ -413,6 +417,10 @@ class references_widget(QtWidgets.QWidget):
             remove_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected references')
             duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate selected references')
             copy_references_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Copy selected references')
+            activate_auto_update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Activate auto update for selection')
+            deactivate_auto_update_action = menu.addAction(QtGui.QIcon(''), 'Dectivate auto update for selection')
+            activate_action = menu.addAction(QtGui.QIcon(ressources._check_icon_), 'Activate selection')
+            deactivate_action = menu.addAction(QtGui.QIcon(''), 'Dectivate selection')
             if len(selection) == 1:
                 if selection[0].type == 'reference':
                     launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
@@ -445,6 +453,14 @@ class references_widget(QtWidgets.QWidget):
                 self.copy_references()
             elif action == paste_references_action:
                 self.paste_references()
+            elif action == activate_auto_update_action:
+                self.set_auto_update_on_selection(True)
+            elif action == deactivate_auto_update_action:
+                self.set_auto_update_on_selection(False)
+            elif action == activate_action:
+                self.set_activation_on_selection(True)
+            elif action == deactivate_action:
+                self.set_activation_on_selection(False)
 
     def copy_references(self):
         selected_items = self.list_view.selectedItems()
@@ -465,6 +481,42 @@ class references_widget(QtWidgets.QWidget):
                 referenced_group_id = selected_item.referenced_group_row['id']
                 references_dic['referenced_groups'].append(referenced_group_id)
         assets.copy_references(references_dic)
+
+    def set_auto_update_on_selection(self, auto_update):
+        selected_items = self.list_view.selectedItems()
+        for item in selected_items:
+            if item.type != 'reference':
+                continue
+            reference_id = item.reference_row['id']
+            if auto_update:
+                auto_update = 1
+            else:
+                auto_update = 0
+            if self.context == 'work_env':
+                project.modify_reference_auto_update(reference_id, auto_update)
+            else:
+                project.modify_grouped_reference_auto_update(reference_id, auto_update)
+        gui_server.refresh_team_ui()
+
+    def set_activation_on_selection(self, activation):
+        selected_items = self.list_view.selectedItems()
+        for item in selected_items:
+            if activation:
+                activation = 1
+            else:
+                activation = 0
+            if item.type == 'reference':
+                reference_id = item.reference_row['id']
+                if self.context == 'work_env':
+                    project.modify_reference_activation(reference_id, activation)
+                else:
+                    project.modify_grouped_reference_activation(reference_id, activation)
+            elif item.type == 'referenced_group':
+                referenced_group_id = item.referenced_group_row['id']
+                project.modify_referenced_group_activation(referenced_group_id, activation)
+            else:
+                continue
+        gui_server.refresh_team_ui()
 
     def paste_references(self):
         assets.paste_references(self.context, self.parent_instance_id)

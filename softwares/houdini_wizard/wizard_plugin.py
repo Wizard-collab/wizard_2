@@ -26,22 +26,22 @@ from houdini_wizard.export import fx
 def save_increment(comment=''):
     wizard_tools.save_increment(comment=comment)
 
-def export():
+def export(prepare_only=False):
     stage_name = os.environ['wizard_stage_name']
     if stage_name == 'custom':
-        custom.main()
+        custom.main(prepare_only=prepare_only)
     elif stage_name == 'modeling':
-        modeling.main()
+        modeling.main(prepare_only=prepare_only)
     elif stage_name == 'rigging':
-        rigging.main()
+        rigging.main(prepare_only=prepare_only)
     elif stage_name == 'grooming':
-        grooming.main()
+        grooming.main(prepare_only=prepare_only)
     elif stage_name == 'layout':
-        layout.main()
+        layout.main(prepare_only=prepare_only)
     elif stage_name == 'cfx':
-        cfx.invoke_settings_widget()
+        cfx.invoke_settings_widget(prepare_only=prepare_only)
     elif stage_name == 'fx':
-        fx.invoke_settings_widget()
+        fx.invoke_settings_widget(prepare_only=prepare_only)
     else:
         logger.warning(f"Unplugged stage : {stage_name}")
 

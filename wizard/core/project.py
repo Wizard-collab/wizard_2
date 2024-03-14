@@ -1491,6 +1491,11 @@ def update_progress_event(progress_event_id, data_tuple):
                         data_tuple,
                         ('id', progress_event_id))
 
+def update_progress_events(set_values):
+    return db_utils.update_multiple_data('project',
+                        'progress_events',
+                        set_values)
+
 def add_version(name, file_path, work_env_id, comment='', screenshot_path=None, thumbnail_path=None):
     if (db_utils.check_existence_by_multiple_data('project', 
                                     'versions',

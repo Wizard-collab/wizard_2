@@ -1,6 +1,27 @@
 'last':
   update_list:
   - !!python/tuple
+    - new
+    - Added "prepare export" to houdini wizard menu
+  - !!python/tuple
+    - new
+    - Added activate auto update and deactivate auto update on multiple references
+  - !!python/tuple
+    - new
+    - Added activate and deactivate on multiple references
+  - !!python/tuple
+    - new
+    - Added an expand children option on the outliner
+  - !!python/tuple
+    - debug
+    - Fixed search reference menu disparition problem
+  - !!python/tuple
+    - debug
+    - Stage creation time reduced by almost 90%
+  time: 1710413358.5147898
+'3.8.1.344':
+  update_list:
+  - !!python/tuple
     - debug
     - Houdini export changed to request render
   time: 1709632447.2574043

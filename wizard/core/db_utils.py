@@ -158,7 +158,18 @@ def update_data(level,
     sql_cmd += f''' SET {set_tuple[0]} = %s'''
     sql_cmd += f''' WHERE {where_tuple[0]} = %s'''
     return execute_sql(sql_cmd, level, 0, (set_tuple[1], where_tuple[1]), 0)
-    
+
+def update_multiple_data(level,
+                    table,
+                    set_values):
+    sql_cmd = ''
+    all_params = tuple()
+    for value in set_values:
+        sql_cmd += f'''UPDATE {table} SET {value[1]} = %s WHERE id = %s;'''
+        all_params = all_params+(value[2],)
+        all_params = all_params+(value[0],)
+    return execute_sql(sql_cmd, level, 0, all_params, 0)
+
 def delete_row(level, table, id, column='id'):
     sql_cmd = f'DELETE FROM {table} WHERE {column}=%s'
     return execute_sql(sql_cmd, level, 0, (id,), 0)

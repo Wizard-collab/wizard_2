@@ -18,6 +18,13 @@ wizard_plugin.export()]]>
         </scriptCode>
       </scriptItem>
 
+      <scriptItem>
+        <label>Prepare export</label>
+        <scriptCode><![CDATA[from houdini_wizard import wizard_plugin
+wizard_plugin.export(prepare_only=True)]]>
+        </scriptCode>
+      </scriptItem>
+
       <separatorItem/>
 
       <scriptItem>

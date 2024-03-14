@@ -51,10 +51,17 @@ def add_progress_event(new_stage=None, removed_stage=None):
         all_stages = project.get_all_stages('name')
         total_len = len(all_stages)
         stage_len = all_stages.count(stage_name)
+        all_assets = project.get_all_assets()
+        assets = dict()
+        for asset_row in all_assets:
+            assets[asset_row['id']] = asset_row
 
         progress_rows = project.get_all_progress_events()
+        ids_to_update = []
+        datas_to_update = []
         for progress_row in progress_rows:
             datas_dic = json.loads(progress_row['datas_dic'])
+            original_datas_dic = datas_dic.copy()
             if stage_name not in datas_dic:
                 continue
             if stage_name in assets_vars._assets_stages_list_:
@@ -62,14 +69,15 @@ def add_progress_event(new_stage=None, removed_stage=None):
                 if 'total' in datas_dic:
                     datas_dic['total'] = datas_dic['total'] * ((total_len-1) / total_len)
             elif stage_name in assets_vars._sequences_stages_list_:
-                asset_row = project.get_asset_data(new_stage_row['asset_id'])
+                asset_row = assets[new_stage_row['asset_id']]
                 frames_number = asset_row['outframe'] - asset_row['inframe']
                 datas_dic[stage_name] = datas_dic[stage_name] * (all_frames-frames_number) / (all_frames)
                 if 'total' in datas_dic:
                     datas_dic['total'] = datas_dic['total'] * (all_frames-frames_number) / (all_frames)
-            if datas_dic == json.loads(progress_row['datas_dic']):
+            if datas_dic == original_datas_dic:
                 continue
-            project.update_progress_event(progress_row['id'], ('datas_dic', json.dumps(datas_dic)))
+            datas_to_update.append((progress_row['id'], 'datas_dic', json.dumps(datas_dic)))
+        project.update_progress_events(datas_to_update)
 
     if removed_stage:
         all_stages = project.get_all_stages('name')
@@ -190,7 +198,7 @@ def add_progress_event(new_stage=None, removed_stage=None):
             categories_progresses_dic[category][stage] = get_mean(categories_progresses_dic[category][stage])
         project.add_progress_event('category', category, json.dumps(categories_progresses_dic[category]))
 
-    logger.debug(f"Progress event calculation duration : {time.time()-start_time}s")
+    logger.info(f"Progress event calculation duration : {time.time()-start_time}s")
 
 def get_mean(data_list):
     if data_list == []:

@@ -13,7 +13,7 @@ import wizard_communicate
 from houdini_wizard import wizard_tools
 from houdini_wizard import wizard_export
 
-def main(nspace_list, frange, comment=''):
+def main(nspace_list, frange, comment='', prepare_only=False):
     scene = wizard_export.save_or_save_increment()
     try:
         at_least_one = False
@@ -22,7 +22,7 @@ def main(nspace_list, frange, comment=''):
             for rigging_reference in rigging_references:
                 if rigging_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_cfx(rigging_reference, frange, comment=comment)
+                    export_cfx(rigging_reference, frange, comment=comment, prepare_only=prepare_only)
             if not at_least_one:
                 logger.warning(f"Nothing to export from namespace list : {nspace_list}")
         else:
@@ -32,15 +32,15 @@ def main(nspace_list, frange, comment=''):
     finally:
         wizard_export.reopen(scene)
 
-def invoke_settings_widget():
+def invoke_settings_widget(prepare_only=False):
     from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('cfx')
     if export_settings_widget_win.exec_() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
-        main(nspace_list, frange)
+        main(nspace_list, frange, prepare_only=prepare_only)
 
-def export_cfx(rigging_reference, frange, comment=''):
+def export_cfx(rigging_reference, frange, comment='', prepare_only=False):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
     variant_name = rigging_reference['variant_name']
@@ -55,7 +55,7 @@ def export_cfx(rigging_reference, frange, comment=''):
         logger.info(f"Exporting {rig_nspace} | {out_node_name}")
         wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
         export_name = buid_export_name(asset_name, variant_name, count, out_nodes_dic[out_node_name])
-        wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name, exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace, comment=comment)
+        wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name, exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace, comment=comment, prepare_only=prepare_only)
 
 def buid_export_name(asset_name, variant_name, count, additionnal_name):
     if variant_name == 'main':

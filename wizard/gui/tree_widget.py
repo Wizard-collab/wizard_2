@@ -803,6 +803,7 @@ class tree_widget(QtWidgets.QFrame):
         open_sandbox_folder_action = None
         create_assets_group_action = None
         edit_frame_range_action = None
+        expand_all_children_action = None
         if item:
             if 'creation' not in item.instance_type:
                 open_folder_action = menu.addAction(QtGui.QIcon(ressources._folder_icon_), 'Open folder')
@@ -817,6 +818,9 @@ class tree_widget(QtWidgets.QFrame):
                 launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type} (Double click)')
             if 'creation' not in item.instance_type and item.instance_type == 'category':
                 create_assets_group_action = menu.addAction(QtGui.QIcon(ressources._assets_group_icon_), f'Create assets group')
+            if 'creation' not in item.instance_type and item.instance_type in ['category', 'domain', 'assets_group']:
+                expand_all_children_action = menu.addAction(QtGui.QIcon(ressources._expand_icon_), f'Expand all children')
+
 
         menu.addSeparator()
 
@@ -874,6 +878,14 @@ class tree_widget(QtWidgets.QFrame):
                 self.edit_frame_range(item)
             elif action == create_assets_group_action:
                 self.create_assets_group(item)
+            elif action == expand_all_children_action:
+                self.expand_all_children(item)
+
+    def expand_all_children(self, item):
+        item.setExpanded(True)
+        for i in range(item.childCount()):
+            child = item.child(i)
+            self.expand_all_children(child)
 
     def open_folder(self, item):
         if item.instance_type == 'domain':
