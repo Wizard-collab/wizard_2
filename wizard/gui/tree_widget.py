@@ -1448,50 +1448,52 @@ class search_thread(QtCore.QThread):
         self.start()
 
     def run(self):
-        keywords = self.string.split('&') 
         all_stages = project.get_all_stages()
-        for stage_row in all_stages:
+        keywords_sets = self.string.split('+') 
+        for keywords_set in keywords_sets:
+            keywords = keywords_set.split('&') 
+            for stage_row in all_stages:
 
-            stage_row_cp = copy.deepcopy(stage_row)
+                stage_row_cp = copy.deepcopy(stage_row)
 
-            del stage_row_cp['id']
-            del stage_row_cp['creation_time']
-            del stage_row_cp['creation_user']
-            del stage_row_cp['work_time']
-            del stage_row_cp['progress']
-            del stage_row_cp['estimated_time']
-            del stage_row_cp['default_variant_id']
-            del stage_row_cp['asset_id']
-            del stage_row_cp['domain_id']
+                del stage_row_cp['id']
+                del stage_row_cp['creation_time']
+                del stage_row_cp['creation_user']
+                del stage_row_cp['work_time']
+                del stage_row_cp['progress']
+                del stage_row_cp['estimated_time']
+                del stage_row_cp['default_variant_id']
+                del stage_row_cp['asset_id']
+                del stage_row_cp['domain_id']
 
-            values = list(stage_row_cp.values())
-            data_list = []
-            for data_block in values:
-                data_list.append(str(data_block))
-            data = (' ').join(data_list)
+                values = list(stage_row_cp.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
 
-            if all(keyword.upper() in data.upper() for keyword in keywords):
-                self.item_signal.emit(('stage', stage_row['id']))
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.item_signal.emit(('stage', stage_row['id']))
 
-        all_assets_groups = project.get_all_assets_groups()
-        for assets_group_row in all_assets_groups:
+            all_assets_groups = project.get_all_assets_groups()
+            for assets_group_row in all_assets_groups:
 
-            assets_group_row_cp = copy.deepcopy(assets_group_row)
+                assets_group_row_cp = copy.deepcopy(assets_group_row)
 
-            del assets_group_row_cp['id']
-            del assets_group_row_cp['creation_time']
-            del assets_group_row_cp['creation_user']
-            del assets_group_row_cp['color']
-            del assets_group_row_cp['category_id']
+                del assets_group_row_cp['id']
+                del assets_group_row_cp['creation_time']
+                del assets_group_row_cp['creation_user']
+                del assets_group_row_cp['color']
+                del assets_group_row_cp['category_id']
 
-            values = list(assets_group_row_cp.values())
-            data_list = []
-            for data_block in values:
-                data_list.append(str(data_block))
-            data = (' ').join(data_list)
+                values = list(assets_group_row_cp.values())
+                data_list = []
+                for data_block in values:
+                    data_list.append(str(data_block))
+                data = (' ').join(data_list)
 
-            if all(keyword.upper() in data.upper() for keyword in keywords):
-                self.item_signal.emit(('assets_group', assets_group_row['id']))
+                if all(keyword.upper() in data.upper() for keyword in keywords):
+                    self.item_signal.emit(('assets_group', assets_group_row['id']))
 
 class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
