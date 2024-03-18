@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - debug
+    - Added the + separator in outliner search for OR function.
+  time: 1710751333.847594
+'3.8.4.347':
+  update_list:
+  - !!python/tuple
     - new
     - Added "prepare export" to houdini wizard menu
   - !!python/tuple
