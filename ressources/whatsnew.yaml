@@ -2,6 +2,12 @@
   update_list:
   - !!python/tuple
     - update
+    - Fixed no logged files reference bug when grouped
+  time: 1711120471.299477
+'3.8.4.351':
+  update_list:
+  - !!python/tuple
+    - update
     - Removed reopen scene after Houdini exports
   time: 1711118025.5711613
 '3.8.4.349':
