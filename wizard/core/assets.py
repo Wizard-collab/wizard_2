@@ -624,7 +624,7 @@ def get_references_files(work_env_id):
             reference_files_list = json.loads(project.get_export_version_data(grouped_reference_row['export_version_id'],
                                                                                 'files'))
             if reference_files_list == []:
-                reference_files_list = get_export_files_list(reference_row['export_version_id'])
+                reference_files_list = get_export_files_list(grouped_reference_row['export_version_id'])
             stage_id = project.get_export_data(grouped_reference_row['export_id'], 'stage_id')
             stage_row = project.get_stage_data(stage_id)
             stage_name = stage_row['name']
