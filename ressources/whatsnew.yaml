@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - update
+    - Removed reopen scene after Houdini exports
+  time: 1711118025.5711613
+'3.8.4.349':
+  update_list:
+  - !!python/tuple
     - debug
     - Added the + separator in outliner search for OR function.
   time: 1710751333.847594
