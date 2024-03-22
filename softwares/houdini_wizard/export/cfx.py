@@ -30,7 +30,8 @@ def main(nspace_list, frange, comment='', prepare_only=False):
     except:
         logger.error(str(traceback.format_exc()))
     finally:
-        wizard_export.reopen(scene)
+        pass
+        #wizard_export.reopen(scene)
 
 def invoke_settings_widget(prepare_only=False):
     from wizard_widgets import export_settings_widget

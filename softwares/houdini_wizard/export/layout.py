@@ -30,4 +30,5 @@ def main(comment='', prepare_only=False):
     except:
         logger.error(str(traceback.format_exc()))
     finally:
-        wizard_export.reopen(scene)
+        pass
+        #wizard_export.reopen(scene)
