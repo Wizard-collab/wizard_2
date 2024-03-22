@@ -91,6 +91,7 @@ def is_referenced(camrig_nspace):
 
 def select_default_cam():
     default_camera = bpy.data.objects.get("Camera")
+    logger.info(default_camera)
     if not default_camera:
         return
     logger.info(f"No namespace given, creating video trough {default_camera}")
