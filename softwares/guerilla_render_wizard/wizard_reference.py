@@ -106,6 +106,8 @@ def import_file(namespace, files_list, parent_GRP_name, stage_name, referenced_s
 def update_file(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_objects = wizard_tools.get_all_nodes()
     if namespace in wizard_tools.get_all_nodes():
+        if len(files_list) == 0:
+            return
         GRP = wizard_tools.add_GRP(parent_GRP_name)
         extension = files_list[0].split('.')[-1]
         if extension == 'abc' or  extension == 'gproject':

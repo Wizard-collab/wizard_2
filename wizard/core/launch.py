@@ -42,6 +42,7 @@ import subprocess
 import shlex
 import json
 import traceback
+import copy
 import time
 from threading import Thread
 import logging
@@ -223,6 +224,16 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
                 python_path_list.remove(path)
         env['PYTHONPATH'] = (';').join(python_path_list)
 
+    if 'PATH' in env.keys():
+        paths_list = env['PATH'].split(';')
+        temp_path_list = copy.deepcopy(paths_list)
+        for path in temp_path_list:
+            if 'Wizard/_internal' in path_utils.clean_path(path):
+                paths_list.remove(path)
+            if path_utils.clean_path(path) == path_utils.abspath(''):
+                paths_list.remove(path)
+        env['PATH'] = (';').join(paths_list)
+    
     #if software_row['name'] == 'blender':
     #    import PyQt5
     #    pyqt5_path = path_utils.dirname(path_utils.dirname(PyQt5.__file__))
@@ -251,9 +262,10 @@ class software_thread(Thread):
         self.work_env_id = work_env_id
         self.killed = False
         self.start_time = time.perf_counter()
- 
+        print(self.command)
+
     def run(self):
-        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=path_utils.abspath('softwares'))
+        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=path_utils.dirname(shlex.split(self.command)[0]))
         self.process.wait()
         died(self.work_env_id)
         if not self.killed:

@@ -50,6 +50,6 @@ def main(nspace_list, frange):
 
             logger.info("Exporting .fur")
             node_name = node.split(':')[-1]
-            file = os.path.join(export_dir, '{}.%04d.fur'.format(node_name))
+            file = os.path.join(export_dir, 'yeti_cache__{}.%04d.fur'.format(node_name))
             pm.select(yeti_node, r=True)
             cmds.pgYetiCommand(writeCache=file, range=(frange[0], frange[1]), samples=3, sampleTimes= "-0.2 0.0 0.2")
