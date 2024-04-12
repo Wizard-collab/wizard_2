@@ -1492,6 +1492,8 @@ def update_progress_event(progress_event_id, data_tuple):
                         ('id', progress_event_id))
 
 def update_progress_events(set_values):
+    if len(set_values) == 0:
+        return
     return db_utils.update_multiple_data('project',
                         'progress_events',
                         set_values)

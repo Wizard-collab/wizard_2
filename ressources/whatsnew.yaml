@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - debug
+    - Added "yeti_cache__" to .fur cfx file names
+  time: 1712952284.016511
+'3.8.8.363':
+  update_list:
+  - !!python/tuple
     - update
     - Fixed no logged files reference bug when grouped
   time: 1711120471.299477
