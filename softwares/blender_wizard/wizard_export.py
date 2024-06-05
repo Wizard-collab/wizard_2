@@ -68,7 +68,7 @@ def export_blend(export_GRP_list, export_file):
         data_to.collections = [collection_name]
     for collection in data_to.collections:
         bpy.context.collection.children.link(collection)
-    bpy.ops.wm.save_as_mainfile(filepath=export_file, relative_remap=False)
+    bpy.ops.wm.save_as_mainfile(filepath=export_file, relative_remap=True)
 
 def reopen(scene):
     bpy.ops.wm.open_mainfile(filepath=scene)
