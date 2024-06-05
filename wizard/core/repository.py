@@ -257,7 +257,7 @@ def create_user(user_name,
                     0,
                     int(championship_participation),
                     None,
-                    json.dumps([]),
+                    json.dumps({}),
                     json.dumps({}))):
         return
     info = f"User {user_name} created"
