@@ -67,9 +67,9 @@ def import_and_update_all():
     update_modeling(references)
     update_rigging(references)
     update_shading(references)
-    refupdate_layout(references)
-    refupdate_animation(references)
-    refupdate_camera(references)
+    update_layout(references)
+    update_animation(references)
+    update_camera(references)
     update_custom(references)
     update_camrig(references)
 
@@ -79,9 +79,9 @@ def update_all():
     update_modeling(references)
     update_rigging(references)
     update_shading(references)
-    refupdate_layout(references)
-    refupdate_animation(references)
-    refupdate_camera(references)
+    update_layout(references)
+    update_animation(references)
+    update_camera(references)
     update_custom(references)
     update_camrig(references)
 
@@ -181,7 +181,7 @@ def reference_layout(references=None):
         for reference in references['layout']:
             wizard_reference.import_layout(reference)
 
-def refupdate_layout(references=None):
+def update_layout(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'layout' in references.keys():
@@ -195,7 +195,7 @@ def reference_animation(references=None):
         for reference in references['animation']:
             wizard_reference.import_animation(reference)
 
-def refupdate_animation(references=None):
+def update_animation(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'animation' in references.keys():
@@ -209,7 +209,7 @@ def reference_camera(references=None):
         for reference in references['camera']:
             wizard_reference.import_camera(reference)
 
-def refupdate_camera(references=None):
+def update_camera(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'camera' in references.keys():

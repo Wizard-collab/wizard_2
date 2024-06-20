@@ -1,4 +1,14 @@
+
 'last':
+  update_list:
+  - !!python/tuple
+    - debug
+    - Fixed artefacts as list in db at user creation
+  - !!python/tuple
+    - debug
+    - Fixed blender layout update
+  time: 1712952284.016511 
+'3.8.9.365':
   update_list:
   - !!python/tuple
     - debug

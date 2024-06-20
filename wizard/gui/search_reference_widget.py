@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import pyqtSignal
 import logging
 import time
+import traceback
 
 # Wizard modules
 from wizard.core import assets
@@ -101,6 +102,14 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def leaveEvent(self, event):
         self.close()
+
+    #def focusOutEvent(self, event):
+    #    logger.info(self.focusWidget())
+    #    if not self.focusWidget().isAncestorOf(self):
+    #        self.setFocus()
+    #        return
+    #    logger.info('focusout')
+    #    self.close()
 
     def search_ended(self):
         search_time = str(round((time.perf_counter()-self.search_start_time), 3))
@@ -275,34 +284,37 @@ class search_thread(QtCore.QThread):
         self.start()
 
     def run(self):
-        keywords = self.string.split('&') 
-        all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
-        #all_variants = project.get_all_variants()
-        all_stages = project.get_all_stages()
-        all_assets = project.get_all_assets()
-        all_categories = project.get_all_categories()
-        stages = dict()
-        for stage_row in all_stages:
-            stages[stage_row['id']] = stage_row
-        assets = dict()
-        for asset_row in all_assets:
-            assets[asset_row['id']] = asset_row    
-        categories = dict()
-        for category_row in all_categories:
-            categories[category_row['id']] = category_row
-        for stage_row in all_stages:
-            if stage_row['id'] in all_export_versions_stage_ids:
-                if all(keyword.upper() in stage_row['string'].upper() for keyword in keywords):
-                    asset_row = assets[stage_row['asset_id']]
-                    category_row = categories[asset_row['category_id']]
-                    self.item_signal.emit([category_row, asset_row, stage_row])
-        if (self.context == 'work_env'):
-                groups_rows = project.get_groups()
-                for group_row in groups_rows:
-                    if all(keyword.upper() in group_row['name'].upper()+'GROUPS' for keyword in keywords):
-                        self.group_signal.emit(group_row)
-        self.search_ended.emit(1)
-        self.running = False
+        try:
+            keywords = self.string.split('&') 
+            all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
+            #all_variants = project.get_all_variants()
+            all_stages = project.get_all_stages()
+            all_assets = project.get_all_assets()
+            all_categories = project.get_all_categories()
+            stages = dict()
+            for stage_row in all_stages:
+                stages[stage_row['id']] = stage_row
+            assets = dict()
+            for asset_row in all_assets:
+                assets[asset_row['id']] = asset_row    
+            categories = dict()
+            for category_row in all_categories:
+                categories[category_row['id']] = category_row
+            for stage_row in all_stages:
+                if stage_row['id'] in all_export_versions_stage_ids:
+                    if all(keyword.upper() in stage_row['string'].upper() for keyword in keywords):
+                        asset_row = assets[stage_row['asset_id']]
+                        category_row = categories[asset_row['category_id']]
+                        self.item_signal.emit([category_row, asset_row, stage_row])
+            if (self.context == 'work_env'):
+                    groups_rows = project.get_groups()
+                    for group_row in groups_rows:
+                        if all(keyword.upper() in group_row['name'].upper()+'GROUPS' for keyword in keywords):
+                            self.group_signal.emit(group_row)
+            self.search_ended.emit(1)
+            self.running = False
+        except:
+            logger.critical(str(traceback.format_exc()))
 
 class custom_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, category_row, asset_row, stage_row, icons_dic, parent=None):
