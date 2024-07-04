@@ -716,12 +716,12 @@ class assets:
         exports = None
 
         if type(parent) == str:
-            instance_type, variant_id = core.assets.string_to_instance(parent)
+            instance_type, stage_id = core.assets.string_to_instance(parent)
         else:
-            variant_id = parent
+            stage_id = parent
 
-        if variant_id:
-            exports = core.project.get_variant_export_childs(variant_id, column)
+        if stage_id:
+            exports = core.project.get_stage_export_childs(stage_id, column)
         return exports
 
     def list_export_versions(self, parent, column='*'):
