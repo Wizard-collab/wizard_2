@@ -65,7 +65,13 @@ def import_shading(reference_dic):
     create_reference(reference_dic, 'SHADING') 
 
 def update_shading(reference_dic):
-    update_reference(reference_dic, 'SHADING')   
+    update_reference(reference_dic, 'SHADING')  
+
+def import_grooming(reference_dic):
+    create_reference(reference_dic, 'GROOMING') 
+
+def update_grooming(reference_dic):
+    update_reference(reference_dic, 'GROOMING')    
 
 def import_layout(reference_dic):
     create_reference(reference_dic, 'LAYOUT')  
@@ -155,8 +161,10 @@ def link_blend(file_path, reference_dic, parent_collection=None):
         data_to.collections = [c for c in data_from.collections]
     for coll in data_to.collections:
         if coll is not None:
-            if coll.name != reference_dic['asset_name']:
+            if "main_collection_tag" not in coll.keys():
                 continue
+            #if coll.name != reference_dic['asset_name']:
+            #    continue
             override_collection = coll.override_hierarchy_create(bpy.context.scene, bpy.context.view_layer, do_fully_editable=True)
             bpy.context.scene.collection.children.unlink(override_collection)
             parent_collection.children.link(override_collection)

@@ -68,7 +68,19 @@ def export_blend(export_GRP_list, export_file):
         data_to.collections = [collection_name]
     for collection in data_to.collections:
         bpy.context.collection.children.link(collection)
-    bpy.ops.wm.save_as_mainfile(filepath=export_file, relative_remap=True)
+
+    # Make everything local
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.make_local(type='ALL')
+    
+    for col in bpy.data.collections:
+        if "main_collection_tag" in col.keys():
+            del col["main_collection_tag"]
+
+    logger.info(bpy.data.collections[collection_name])
+    bpy.data.collections[collection_name]["main_collection_tag"] = 1
+
+    bpy.ops.wm.save_as_mainfile(filepath=export_file, relative_remap=False)
 
 def reopen(scene):
     bpy.ops.wm.open_mainfile(filepath=scene)

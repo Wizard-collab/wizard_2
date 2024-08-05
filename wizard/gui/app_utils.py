@@ -34,9 +34,10 @@ from wizard.gui import project_manager_widget
 logger = logging.getLogger(__name__)
 
 def get_app():
-    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    os.environ["QT_SCALE_FACTOR"] = "0.75"
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+
     app = QtWidgets.QApplication(sys.argv)
 
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")

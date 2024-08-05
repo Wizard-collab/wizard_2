@@ -31,12 +31,12 @@ def main(comment=''):
 
             asset_name = os.environ['wizard_asset_name']
             collection_obj.name = asset_name
+            collection_obj["main_collection_tag"] = 1
 
             export_name = collections_dic[collection_name]
 
             object_list = wizard_tools.get_all_children(collection_obj, meshes=1)
             objects_dic = wizard_tools.remove_export_name_from_names(object_list, export_name)
-
 
             exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
 

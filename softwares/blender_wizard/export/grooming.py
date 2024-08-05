@@ -20,7 +20,7 @@ def main(comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
 
-        collections_dic = wizard_tools.get_export_grps('shading_GRP')
+        collections_dic = wizard_tools.get_export_grps('grooming_GRP')
         if collections_dic == dict():
             logger.warning("No group to export...")
             return
@@ -31,7 +31,6 @@ def main(comment=''):
 
             asset_name = os.environ['wizard_asset_name']
             collection_obj.name = asset_name
-            collection_obj["main_collection_tag"] = 1
 
             export_name = collections_dic[collection_name]
 
@@ -42,11 +41,11 @@ def main(comment=''):
             exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
 
             export_GRP_list = [collection_obj]
-            additionnal_objects = wizard_export.trigger_before_export_hook('shading', exported_string_asset)
+            additionnal_objects = wizard_export.trigger_before_export_hook('grooming', exported_string_asset)
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
 
-            wizard_export.export('shading', export_name, exported_string_asset, export_GRP_list, comment=comment)
+            wizard_export.export('grooming', export_name, exported_string_asset, export_GRP_list, comment=comment)
     except:
         logger.error(str(traceback.format_exc()))
     finally:

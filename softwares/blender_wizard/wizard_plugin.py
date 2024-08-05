@@ -21,6 +21,7 @@ from blender_wizard.export import shading
 from blender_wizard.export import rigging
 from blender_wizard.export import layout
 from blender_wizard.export import custom
+from blender_wizard.export import grooming
 from blender_wizard.export import animation
 from blender_wizard.export import camrig
 from blender_wizard.export import camera
@@ -36,6 +37,8 @@ def export():
         shading.main()
     elif stage_name == 'rigging':
         rigging.main()
+    elif stage_name == 'grooming':
+        grooming.main()
     elif stage_name == 'camrig':
         camrig.main()
     elif stage_name == 'layout':
@@ -57,6 +60,7 @@ def import_and_update_all():
     reference_texturing(references)
     reference_modeling(references)
     reference_rigging(references)
+    reference_grooming(references)
     reference_shading(references)
     reference_layout(references)
     reference_animation(references)
@@ -66,6 +70,7 @@ def import_and_update_all():
     update_texturing(references)
     update_modeling(references)
     update_rigging(references)
+    update_grooming(references)
     update_shading(references)
     update_layout(references)
     update_animation(references)
@@ -78,6 +83,7 @@ def update_all():
     update_texturing(references)
     update_modeling(references)
     update_rigging(references)
+    update_grooming(references)
     update_shading(references)
     update_layout(references)
     update_animation(references)
@@ -145,6 +151,20 @@ def update_rigging(references=None):
     if 'rigging' in references.keys():
         for reference in references['rigging']:
             wizard_reference.update_rigging(reference)
+
+def reference_grooming(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.import_grooming(reference)
+
+def update_grooming(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'grooming' in references.keys():
+        for reference in references['grooming']:
+            wizard_reference.update_grooming(reference)
 
 def reference_camrig(references=None):
     if not references:

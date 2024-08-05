@@ -91,6 +91,17 @@ class import_rigging(bpy.types.Operator):
         wizard_plugin.reference_rigging()
         return {'FINISHED'}
 
+class import_grooming(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_grooming"
+    bl_label = "Import grooming"
+    bl_description = "Import grooming"
+    
+    def execute(self, context):
+        wizard_plugin.reference_grooming()
+        return {'FINISHED'}
+
 class import_camrig(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
@@ -188,6 +199,17 @@ class update_rigging(bpy.types.Operator):
     
     def execute(self, context):
         wizard_plugin.update_rigging()
+        return {'FINISHED'}
+
+class update_grooming(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_grooming"
+    bl_label = "Update grooming"
+    bl_description = "Update existing grooming"
+    
+    def execute(self, context):
+        wizard_plugin.update_grooming()
         return {'FINISHED'}
 
 class update_camrig(bpy.types.Operator):
@@ -315,6 +337,7 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
         layout.operator("wizard.import_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.import_shading", icon_value=wizard_icons["shading"].icon_id)
         layout.operator("wizard.import_rigging", icon_value=wizard_icons["rigging"].icon_id)
+        layout.operator("wizard.import_grooming", icon_value=wizard_icons["grooming"].icon_id)
         layout.operator("wizard.import_texturing", icon_value=wizard_icons["texturing"].icon_id)
         layout.operator("wizard.import_layout", icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.import_animation", icon_value=wizard_icons["animation"].icon_id)
@@ -330,6 +353,7 @@ class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
         layout.operator("wizard.update_modeling", icon_value=wizard_icons["modeling"].icon_id)
         layout.operator("wizard.update_shading", icon_value=wizard_icons["shading"].icon_id)
         layout.operator("wizard.update_rigging", icon_value=wizard_icons["rigging"].icon_id)
+        layout.operator("wizard.update_grooming", icon_value=wizard_icons["grooming"].icon_id)
         layout.operator("wizard.update_texturing", icon_value=wizard_icons["texturing"].icon_id)
         layout.operator("wizard.update_layout", icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.update_animation", icon_value=wizard_icons["animation"].icon_id)
@@ -376,6 +400,7 @@ classes = (save_increment,
                 import_modeling,
                 import_shading,
                 import_rigging,
+                import_grooming,
                 import_layout,
                 import_animation,
                 import_camera,
@@ -386,6 +411,7 @@ classes = (save_increment,
                 update_modeling,
                 update_shading,
                 update_rigging,
+                update_grooming,
                 update_layout,
                 update_animation,
                 update_camera,
@@ -417,6 +443,7 @@ def register():
     wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
     wizard_icons.load("shading", 'icons/shading.png', 'IMAGE')
     wizard_icons.load("rigging", 'icons/rigging.png', 'IMAGE')
+    wizard_icons.load("grooming", 'icons/grooming.png', 'IMAGE')
     wizard_icons.load("layout", 'icons/wlayout.png', 'IMAGE')
     wizard_icons.load("animation", 'icons/animation.png', 'IMAGE')
     wizard_icons.load("camera", 'icons/camera.png', 'IMAGE')
