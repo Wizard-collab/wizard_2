@@ -1,5 +1,16 @@
-
 'last':
+  update_list:
+  - !!python/tuple
+    - update
+    - References are no longer deleted when you remove an export version
+  time: 1722963126.4927104 
+'3.8.10.369':
+  update_list:
+  - !!python/tuple
+    - debug
+    - Fixed blender .blend link
+  time: 1722874478.954636 
+'3.8.9.367':
   update_list:
   - !!python/tuple
     - debug

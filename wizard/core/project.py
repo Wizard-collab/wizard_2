@@ -1015,7 +1015,8 @@ def remove_export_version(export_version_id, force = 0):
     if export_row['default_export_version'] == export_version_id:
         set_default_export_version(export_row['id'], None)
     for reference_id in get_export_version_destinations(export_version_id, 'id'):
-        remove_reference(reference_id)
+        #remove_reference(reference_id)
+        lower_or_remove_reference(reference_id)
     for grouped_reference_id in get_grouped_export_version_destination(export_version_id, 'id'):
         remove_grouped_reference(grouped_reference_id)
     if not db_utils.delete_row('project', 'export_versions', export_version_id):
@@ -1162,6 +1163,21 @@ def create_reference(work_env_id, export_version_id, namespace, count=None, auto
         return
     logger.info(f"Reference created")
     return reference_id
+
+def lower_or_remove_reference(reference_id):
+    reference_row = get_reference_data(reference_id)
+    if not reference_row:
+        return
+    export_version_row = get_export_version_data(reference_row['export_version_id'])
+    export_versions = get_export_childs(reference_row['export_id'])
+    index = export_versions.index(export_version_row)
+    if index - 1 in range(0,len(export_versions)-1):
+        update_reference_data(reference_id, ('export_version_id', export_versions[index-1]['id']))
+    elif index + 1 in range(0,len(export_versions)-1):
+        update_reference_data(reference_id, ('export_version_id', export_versions[index+1]['id']))
+    else:
+        remove_reference(reference_id)
+    return 1
 
 def remove_reference(reference_id):
     if not db_utils.delete_row('project', 'references_data', reference_id):
