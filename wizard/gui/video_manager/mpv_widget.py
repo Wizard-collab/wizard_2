@@ -10,7 +10,10 @@ import traceback
 import time
 import os
 os.environ["PATH"] = os.path.abspath('') + os.pathsep + os.environ["PATH"]
-import mpv
+try:
+    import mpv
+except:
+    pass
 import logging
 
 logger = logging.getLogger(__name__)
