@@ -49,6 +49,10 @@ class search_reference_widget(QtWidgets.QWidget):
 
         self.build_ui()
         self.load_context()
+
+        self.click_detector = gui_utils.GlobalClickDetector(self)
+        QtWidgets.QApplication.instance().installEventFilter(self.click_detector)
+
         self.connect_functions()
 
     def load_context(self):
@@ -76,16 +80,16 @@ class search_reference_widget(QtWidgets.QWidget):
             win_heigth = self.frameSize().height()
 
             if (cursor.y() - 120 - win_heigth) <= screen_minY:
-                posy = cursor.y() - 60
+                posy = cursor.y() - 12
                 angley = 'top'
             else:
-                posy = cursor.y() - win_heigth + 60
+                posy = cursor.y() - win_heigth + 12
                 angley = 'bottom'
             if (cursor.x() + 120 + win_width) >= screen_maxX:
-                posx = cursor.x() - win_width + 60
+                posx = cursor.x() - win_width + 12
                 anglex = 'right'
             else:
-                posx = cursor.x() - 30
+                posx = cursor.x() - 12
                 anglex = 'left'
 
             self.move(posx, posy)
@@ -100,16 +104,9 @@ class search_reference_widget(QtWidgets.QWidget):
     def clear(self):
         self.search_bar.setText('')
 
-    def leaveEvent(self, event):
+    def focus_out(self):
+        QtWidgets.QApplication.instance().removeEventFilter(self.click_detector)
         self.close()
-
-    #def focusOutEvent(self, event):
-    #    logger.info(self.focusWidget())
-    #    if not self.focusWidget().isAncestorOf(self):
-    #        self.setFocus()
-    #        return
-    #    logger.info('focusout')
-    #    self.close()
 
     def search_ended(self):
         search_time = str(round((time.perf_counter()-self.search_start_time), 3))
@@ -166,6 +163,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.search_bar.textChanged.connect(self.search_asset)
         self.list_view.itemDoubleClicked.connect(self.return_references)
         self.reference_with_auto_update_checkBox.stateChanged.connect(self.set_context)
+        self.click_detector.clicked_outside.connect(self.focus_out)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Down:

@@ -8,12 +8,15 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtCore import pyqtProperty
 import sys
 import os
+import logging
 
 # Wizard modules
 from wizard.vars import ressources
 
 # Wizard gui modules
 from wizard.gui import gui_server
+
+logger = logging.getLogger(__name__)
 
 class QFlowLayout(QtWidgets.QLayout):
     def __init__(self, parent=None):
@@ -703,3 +706,23 @@ class QSplitterHandle(QtWidgets.QSplitterHandle):
         else:
             painter.fillRect(self.rect(), QtGui.QColor("#292930"))
 
+class GlobalClickDetector(QtCore.QObject):
+
+    clicked_outside = pyqtSignal(int)
+    clicked_inside = pyqtSignal(int)
+
+    def __init__(self, target_widget, parent=None):
+        super().__init__(parent)
+        self.target_widget = target_widget
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.MouseButtonPress:
+            global_pos = event.globalPos()
+            target_global_geometry = self.target_widget.mapToGlobal(self.target_widget.rect().topLeft())
+            target_global_rect = self.target_widget.rect().translated(target_global_geometry)
+
+            if not target_global_rect.contains(global_pos):
+                self.clicked_outside.emit(1)
+            else:
+                self.clicked_inside.emit(1)
+        return super().eventFilter(obj, event)

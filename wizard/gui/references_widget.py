@@ -519,8 +519,9 @@ class references_widget(QtWidgets.QWidget):
         gui_server.refresh_team_ui()
 
     def paste_references(self):
-        assets.paste_references(self.context, self.parent_instance_id)
-        gui_server.refresh_team_ui()
+        if self.parent_instance_id is not None and self.parent_instance_id != 0:
+            assets.paste_references(self.context, self.parent_instance_id)
+            gui_server.refresh_team_ui()
 
     def item_double_clicked(self, item):
         if item.type == 'group':

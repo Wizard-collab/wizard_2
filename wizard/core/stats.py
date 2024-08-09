@@ -40,6 +40,48 @@ from wizard.core import project
 from wizard.core import environment
 from wizard.vars import assets_vars
 
+def get_all_progresses(to_round=1):
+    stages_rows = project.get_all_stages()
+    all_frames = get_all_frames()
+
+    assets_progresses_lists = dict()
+    assets_progresses = dict()
+    categories_progresses_lists = dict()
+    categories_progresses = dict()
+    domains_progresses_lists = dict()
+    domains_progresses = dict()
+
+    for stage_row in stages_rows:
+        asset_id = stage_row['asset_id']
+        if asset_id not in assets_progresses_lists.keys():
+            assets_progresses_lists[asset_id] = []
+        asset_row = project.get_asset_data(asset_id)
+        frames_number = asset_row['outframe'] - asset_row['inframe']
+        assets_progresses_lists[asset_id].append((stage_row['progress'],1))
+        domain_row = project.get_domain_data(stage_row['domain_id'])
+        if asset_row['category_id'] not in categories_progresses_lists.keys():
+            categories_progresses_lists[asset_row['category_id']] = []
+        if domain_row['name'] == assets_vars._sequences_:
+            categories_progresses_lists[asset_row['category_id']].append((stage_row['progress'], frames_number / all_frames))
+        else:
+            categories_progresses_lists[asset_row['category_id']].append((stage_row['progress'], 1))
+        if domain_row['id'] not in domains_progresses_lists.keys():
+            domains_progresses_lists[domain_row['id']] = []
+        if domain_row['name'] == assets_vars._sequences_:
+            domains_progresses_lists[domain_row['id']].append((stage_row['progress'], frames_number / all_frames))
+        else:
+            domains_progresses_lists[domain_row['id']].append((stage_row['progress'], 1))
+
+    for asset_id in assets_progresses_lists.keys():
+        assets_progresses[asset_id] = round(get_mean(assets_progresses_lists[asset_id]), to_round)
+    for category_id in categories_progresses_lists.keys():
+        categories_progresses[category_id] = round(get_mean(categories_progresses_lists[category_id]), to_round)
+    for domain_id in domains_progresses_lists.keys():
+        domains_progresses[domain_id] = round(get_mean(domains_progresses_lists[domain_id]), to_round)
+
+
+    return assets_progresses, categories_progresses, domains_progresses
+
 def add_progress_event(new_stage=None, removed_stage=None):
     start_time = time.time()
 
@@ -214,6 +256,8 @@ def get_all_frames():
     for asset_row in assets_rows:
         all_frames += asset_row['outframe'] - asset_row['inframe']
     return all_frames
+
+
 
 class schedule(threading.Thread):
     def __init__(self, parent=None):

@@ -21,6 +21,7 @@ from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.core import repository
 from wizard.core import tools
+from wizard.core import stats
 from wizard.core import image
 from wizard.vars import user_vars
 from wizard.vars import assets_vars
@@ -46,6 +47,7 @@ class tree_widget(QtWidgets.QFrame):
         self.state_visibility = 1
         self.priority_visibility = 1
         self.color_visibility = 0
+        self.progress_visibility = 1
 
         self.domain_ids=dict()
         self.category_ids=dict()
@@ -123,7 +125,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setObjectName('delegate_tree')
 
         self.tree.setAnimated(0)
-        self.tree.setColumnCount(4)
+        self.tree.setColumnCount(5)
         self.tree.header().setStretchLastSection(False)
         self.tree.header().resizeSection(0, 190)
         self.tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -133,6 +135,8 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.header().resizeSection(3, 32)
         self.tree.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.tree.header().resizeSection(4, 52)
+        self.tree.header().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.setIconSize(QtCore.QSize(16, 16))
         self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tree.setDragEnabled(True)
@@ -183,6 +187,7 @@ class tree_widget(QtWidgets.QFrame):
         context_dic['state_visibility'] = self.state_visibility
         context_dic['priority_visibility'] = self.priority_visibility
         context_dic['color_visibility'] = self.color_visibility
+        context_dic['progress_visibility'] = self.progress_visibility
         context_dic['expanded_domains'] = []
         context_dic['expanded_categories'] = []
         context_dic['expanded_assets'] = []
@@ -239,6 +244,8 @@ class tree_widget(QtWidgets.QFrame):
                 self.priority_visibility = context_dic['priority_visibility']
             if 'color_visibility' in context_dic.keys():
                 self.color_visibility = context_dic['color_visibility']
+            if 'progress_visibility' in context_dic.keys():
+                self.color_visibility = context_dic['progress_visibility']
             self.update_creation_items_visibility()
             self.update_columns_visibility()
             self.update_color_visibility()
@@ -295,6 +302,14 @@ class tree_widget(QtWidgets.QFrame):
             self.sort_asset_group_children(asset_group_id)
         for asset_id in self.asset_ids.keys():
             self.sort_asset_children(asset_id)
+
+        assets_progresses, categories_progresses, domains_progresses = stats.get_all_progresses()
+        for asset_id in assets_progresses.keys():
+            self.asset_ids[asset_id].progress_indicator.set_progress(assets_progresses[asset_id])
+        for category_id in categories_progresses.keys():
+            self.category_ids[category_id].progress_indicator.set_progress(categories_progresses[category_id])
+        for domain_id in domains_progresses.keys():
+            self.domain_ids[domain_id].progress_indicator.set_progress(domains_progresses[domain_id])
 
         self.apply_search()
         self.refresh_datas()
@@ -380,6 +395,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setColumnHidden(1, not self.assignment_visibility)
         self.tree.setColumnHidden(2, not self.state_visibility)
         self.tree.setColumnHidden(3, not self.priority_visibility)
+        self.tree.setColumnHidden(4, not self.progress_visibility)
 
     def toggle_assignment_visibility(self):
         self.assignment_visibility = not self.assignment_visibility
@@ -391,6 +407,10 @@ class tree_widget(QtWidgets.QFrame):
 
     def toggle_priority_visibility(self):
         self.priority_visibility = not self.priority_visibility
+        self.update_columns_visibility()
+
+    def toggle_progress_visibility(self):
+        self.progress_visibility = not self.progress_visibility
         self.update_columns_visibility()
 
     def toggle_color_visibility(self):
@@ -422,6 +442,7 @@ class tree_widget(QtWidgets.QFrame):
             
             domain_item.setIcon(0, self.icons_dic['domain'][f"{row['name']}"])
             domain_item.setText(0, row['name'])
+            domain_item.add_progress_indicator()
             self.domain_ids[row['id']] = domain_item
             self.tree.addTopLevelItem(domain_item)
             if row['id'] != 1:
@@ -492,6 +513,7 @@ class tree_widget(QtWidgets.QFrame):
 
                 if parent_widget != self.asset_ids[row['id']].parent():
                     self.move_asset(self.asset_ids[row['id']], parent_widget)
+            #self.asset_ids[row['id']].progress_indicator.set_progress()
 
     def update_color_visibility(self):
         for domain_id in self.domain_ids.keys():
@@ -501,11 +523,13 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[domain_item.instance_name], opacity=110)
                 self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[domain_item.instance_name], opacity=110)
                 self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 4, ressources._domains_colors_[domain_item.instance_name], opacity=110)
             else:
                 self.tree.set_background_color(domain_item, 0, None)
                 self.tree.set_background_color(domain_item, 1, None)
                 self.tree.set_background_color(domain_item, 2, None)
                 self.tree.set_background_color(domain_item, 3, None)
+                self.tree.set_background_color(domain_item, 4, None)
         for category_id in self.category_ids.keys():
             category_item = self.category_ids[category_id]
             parent_widget = category_item.parent()
@@ -514,11 +538,13 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(category_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
                 self.tree.set_background_color(category_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
                 self.tree.set_background_color(category_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 4, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
             else:
                 self.tree.set_background_color(category_item, 0, None)
                 self.tree.set_background_color(category_item, 1, None)
                 self.tree.set_background_color(category_item, 2, None)
                 self.tree.set_background_color(category_item, 3, None)
+                self.tree.set_background_color(category_item, 4, None)
         for asset_id in self.asset_ids.keys():
             asset_item = self.asset_ids[asset_id]
             parent_widget = asset_item.parent()
@@ -530,11 +556,13 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(asset_item, 1, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
                 self.tree.set_background_color(asset_item, 2, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
                 self.tree.set_background_color(asset_item, 3, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 4, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
             else:
                 self.tree.set_background_color(asset_item, 0, None)
                 self.tree.set_background_color(asset_item, 1, None)
                 self.tree.set_background_color(asset_item, 2, None)
                 self.tree.set_background_color(asset_item, 3, None)
+                self.tree.set_background_color(asset_item, 4, None)
         for assets_group_id in self.assets_groups_ids.keys():
             assets_group_item = self.assets_groups_ids[assets_group_id]
             category_item = assets_group_item.parent()
@@ -544,11 +572,13 @@ class tree_widget(QtWidgets.QFrame):
                 self.tree.set_background_color(assets_group_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
                 self.tree.set_background_color(assets_group_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
                 self.tree.set_background_color(assets_group_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 4, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
             else:
                 self.tree.set_background_color(assets_group_item, 0, None)
                 self.tree.set_background_color(assets_group_item, 1, None)
                 self.tree.set_background_color(assets_group_item, 2, None)
                 self.tree.set_background_color(assets_group_item, 3, None)
+                self.tree.set_background_color(assets_group_item, 4, None)
 
     def move_asset(self, item, new_parent):
         item.parent().takeChild(item.parent().indexOfChild(item))
@@ -576,6 +606,7 @@ class tree_widget(QtWidgets.QFrame):
             self.stage_ids[row['id']].state_indicator.set_state(row['state'])
             self.stage_ids[row['id']].priority_indicator.set_priority(row['priority'])
             self.stage_ids[row['id']].setIcon(1, self.users_icons_dic[row['assignment']])
+            self.stage_ids[row['id']].progress_indicator.set_progress(row['progress'])
             if row['state'] in ['error', 'rtk']:
                 self.stage_ids[row['id']].parent().state_indicator.add_state(row['state'])
                 self.stage_ids[row['id']].parent().parent().state_indicator.add_state(row['state'])
@@ -840,6 +871,10 @@ class tree_widget(QtWidgets.QFrame):
         if self.priority_visibility:
             priority_visibility_icon = ressources._check_icon_
 
+        progress_visibility_icon = ressources._uncheck_icon_
+        if self.progress_visibility:
+            progress_visibility_icon = ressources._check_icon_
+
         color_visibility_icon = ressources._uncheck_icon_
         if self.color_visibility:
             color_visibility_icon = ressources._check_icon_
@@ -848,6 +883,7 @@ class tree_widget(QtWidgets.QFrame):
         hide_assignment = menu.addAction(QtGui.QIcon(assignment_visibility_icon), f'Assignment')
         hide_state = menu.addAction(QtGui.QIcon(state_visibility_icon), f'State')
         hide_priority = menu.addAction(QtGui.QIcon(priority_visibility_icon), f'Priority')
+        hide_progress = menu.addAction(QtGui.QIcon(progress_visibility_icon), f'Progress')
         hide_colors = menu.addAction(QtGui.QIcon(color_visibility_icon), f'Color')
 
         action = menu.exec_(QtGui.QCursor().pos())
@@ -872,6 +908,8 @@ class tree_widget(QtWidgets.QFrame):
                 self.toggle_state_visibility()
             elif action == hide_priority:
                 self.toggle_priority_visibility()
+            elif action == hide_progress:
+                self.toggle_progress_visibility()
             elif action == hide_colors:
                 self.toggle_color_visibility()
             elif action == edit_frame_range_action:
@@ -1042,6 +1080,25 @@ class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
         self.treeWidget().setItemWidget(self, 2, self.state_indicator)
         self.priority_indicator = priority_indicator()
         self.treeWidget().setItemWidget(self, 3, self.priority_indicator)
+        self.add_progress_indicator()
+
+    def add_progress_indicator(self):
+        self.progress_indicator = progress_indicator()
+        self.treeWidget().setItemWidget(self, 4, self.progress_indicator)
+
+class progress_indicator(QtWidgets.QWidget):
+    def __init__(self):
+        super(progress_indicator, self).__init__()
+        self.setFixedWidth(35)
+        self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setSpacing(2)
+        self.main_layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.main_layout)
+        self.progress_label = QtWidgets.QLabel()
+        self.main_layout.addWidget(self.progress_label)
+
+    def set_progress(self, progress):
+        self.progress_label.setText(f"{progress}%")
 
 class state_indicator(QtWidgets.QWidget):
     def __init__(self):

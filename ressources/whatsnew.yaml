@@ -3,6 +3,12 @@
   - !!python/tuple
     - update
     - References are no longer deleted when you remove an export version
+  - !!python/tuple
+    - update
+    - Search reference behavior modified ( focus out behavior )
+  - !!python/tuple
+    - debug
+    - No more crashes when pasting in non existing work environment
   time: 1722963126.4927104 
 '3.8.10.369':
   update_list:
