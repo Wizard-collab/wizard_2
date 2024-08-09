@@ -141,7 +141,9 @@ def main(stages_ids_list, comment=''):
                 referenced_group_rows = project.get_referenced_groups_by_group_id(destination_grouped_reference_row['group_id'])
                 for referenced_group_row in referenced_group_rows:
                     work_env_ids_list.append(referenced_group_row['work_env_id'])
-
+    if len(work_env_ids_list) == 0:
+        logger.warning("Stage is not referenced")
+        return
     export_work_envs(list(set(work_env_ids_list)), comment)
 
 def export_work_envs(work_env_ids_list, comment=''):
