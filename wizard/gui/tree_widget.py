@@ -513,7 +513,6 @@ class tree_widget(QtWidgets.QFrame):
 
                 if parent_widget != self.asset_ids[row['id']].parent():
                     self.move_asset(self.asset_ids[row['id']], parent_widget)
-            #self.asset_ids[row['id']].progress_indicator.set_progress()
 
     def update_color_visibility(self):
         for domain_id in self.domain_ids.keys():
@@ -1095,6 +1094,8 @@ class progress_indicator(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
         self.progress_label = QtWidgets.QLabel()
+        self.progress_label.setObjectName('bold_label')
+        self.progress_label.setAlignment(QtCore.Qt.AlignCenter)
         self.main_layout.addWidget(self.progress_label)
 
     def set_progress(self, progress):
@@ -1147,7 +1148,7 @@ class priority_indicator(QtWidgets.QWidget):
         super(priority_indicator, self).__init__()
         self.setFixedWidth(32)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setSpacing(2)
+        self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
         self.priorities = []

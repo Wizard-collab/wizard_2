@@ -438,14 +438,14 @@ def get_user():
     return 1
 
 def log_project(project_name, password, wait_for_restart=False):
-    #if project_name not in repository.get_projects_names_list():
-    #    logger.error(f"{project_name} doesn't exists")
-    #    return
+    if project_name not in repository.get_projects_names_list():
+        logger.error(f"{project_name} doesn't exists")
+        return
     project_row = repository.get_project_row_by_name(project_name)
-    #if not tools.decrypt_string(project_row['project_password'],
-    #                        password):
-    #    logger.warning(f'Wrong password for {project_name}')
-    #    return
+    if not tools.decrypt_string(project_row['project_password'],
+                            password):
+        logger.warning(f'Wrong password for {project_name}')
+        return
     repository.update_current_ip_data('project_id', project_row['id'])
     logger.info(f'Successfully signed in {project_name} project')
     if not wait_for_restart:
