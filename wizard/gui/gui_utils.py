@@ -214,14 +214,14 @@ class no_return_textEdit(QtWidgets.QTextEdit):
         super(no_return_textEdit, self).__init__(parent)
 
     def keyPressEvent(self, event):
-        if event.modifiers() & QtCore.Qt.ControlModifier:
-            if event.key() == QtCore.Qt.Key_Return:
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if event.key() == QtCore.Qt.Key.Key_Return:
                 self.insertPlainText('\n')
-                self.moveCursor(QtGui.QTextCursor.End)
+                self.moveCursor(QtGui.QTextCursor.MoveOperation.End)
             else:
                 super().keyPressEvent(event)
         else:
-            if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+            if event.key() == QtCore.Qt.Key.Key_Return or event.key() == QtCore.Qt.Key.Key_Enter:
                 self.apply_signal.emit(1)
             else:
                 super().keyPressEvent(event)

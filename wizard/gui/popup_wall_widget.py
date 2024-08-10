@@ -227,7 +227,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.warning_text.setStyleSheet('color: %s' %color)
 
     def move_cursor_to_end(self):
-        self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
+        self.comment_textEdit.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -419,7 +419,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.tags_widget.exec()
 
     def move_cursor_to_end(self):
-        self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
+        self.comment_textEdit.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def update_comment_validity(self):
         text = self.comment_textEdit.toPlainText()

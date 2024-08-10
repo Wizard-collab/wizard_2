@@ -32,16 +32,16 @@ class tags_widget(gui_utils.QMenu):
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == QtCore.Qt.Key_Up or key == QtCore.Qt.Key_Down or key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter:
+        if key == QtCore.Qt.Key.Key_Up or key == QtCore.Qt.Key.Key_Down or key == QtCore.Qt.Key.Key_Return or key == QtCore.Qt.Key.Key_Enter:
             super().keyPressEvent(event)
         else:
             self.close() 
             self.other_key_pressed.emit(event)
 
-    def exec(self):
+    def execute(self):
         if len(self.actions) == 0:
             return
-        action = self.exec()
+        action = self.execute()
         if action is not None:
             token = self.text.split('@')[-1]
             text = self.text[:-(len(token)+1)] + f"@{action.text()} "

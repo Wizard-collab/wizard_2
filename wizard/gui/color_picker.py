@@ -58,8 +58,8 @@ class color_picker(QtWidgets.QWidget):
         self.black_overlay.mousePressEvent = self.moveSVSelector
 
     def moveSVSelector(self, event):
-        if event.buttons() == QtCore.Qt.LeftButton:
-            pos = event.pos()
+        if event.buttons() == QtCore.Qt.MouseButton.LeftButton:
+            pos = event.position()
             if pos.x() < 0: pos.setX(0)
             if pos.y() < 0: pos.setY(0)
             if pos.x() > 200: pos.setX(200)
@@ -68,8 +68,8 @@ class color_picker(QtWidgets.QWidget):
             self.hsvChanged()
 
     def moveHueSelector(self, event):
-        if event.buttons() == QtCore.Qt.LeftButton:
-            pos = event.pos().y()
+        if event.buttons() == QtCore.Qt.MouseButton.LeftButton:
+            pos = event.position().y()
             if pos < 0: pos = 0
             if pos > 185: pos = 185
             self.hue_selector.move(QtCore.QPoint(0,pos))

@@ -65,7 +65,7 @@ class comment_widget(QtWidgets.QDialog):
 
         self.comment_field = gui_utils.no_return_textEdit()
         self.comment_field.setText(self.old_comment)
-        self.comment_field.moveCursor(QtGui.QTextCursor.End)
+        self.comment_field.moveCursor(QtGui.QTextCursor.MoveOperation.End)
         self.frame_layout.addWidget(self.comment_field)
 
         self.accept_button = QtWidgets.QPushButton(self.button_text)
@@ -89,7 +89,7 @@ class comment_widget(QtWidgets.QDialog):
         self.tags_widget.exec()
 
     def move_cursor_to_end(self):
-        self.comment_field.moveCursor(QtGui.QTextCursor.End)
+        self.comment_field.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def connect_functions(self):
         self.accept_button.clicked.connect(self.confirm)

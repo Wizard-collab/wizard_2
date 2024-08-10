@@ -166,8 +166,8 @@ class curves_chart(QtWidgets.QFrame):
                 color =  QtGui.QColor(line_dic['color'])
                 pen.setBrush(color)
                 pen.setStyle(line_dic['style'])
-                pen.setCapStyle(QtCore.Qt.RoundCap)
-                pen.setJoinStyle(QtCore.Qt.RoundJoin)
+                pen.setCapStyle(QtCore.Qt.PenCapStyle.RoundCap)
+                pen.setJoinStyle(QtCore.Qt.PenJoinStyle.RoundJoin)
                 path = QtGui.QPainterPath()
                 first_point = line_dic['data'][0]
                 for point in line_dic['data']:
@@ -236,8 +236,8 @@ class curves_chart(QtWidgets.QFrame):
         pen = QtGui.QPen()
         color = QtGui.QColor(line_dic['color'])
         pen.setBrush(color)
-        pen.setCapStyle(QtCore.Qt.RoundCap)
-        pen.setJoinStyle(QtCore.Qt.RoundJoin)
+        pen.setCapStyle(QtCore.Qt.PenCapStyle.RoundCap)
+        pen.setJoinStyle(QtCore.Qt.PenJoinStyle.RoundJoin)
         pen.setWidth(pen_width)
         painter.setPen(pen)
         painter.setBrush(QtGui.QBrush(color))
@@ -286,7 +286,7 @@ class curves_chart(QtWidgets.QFrame):
         painter.drawLine(int(point.x()), int(point.y()), int(point.x()), int(self.height()-self.margin))
 
         pen = QtGui.QPen()
-        pen.setCapStyle(QtCore.Qt.RoundCap)
+        pen.setCapStyle(QtCore.Qt.PenCapStyle.RoundCap)
         pen.setWidth(12)
         pen.setBrush(QtGui.QColor(line_dic['color']))
         painter.setPen(pen)

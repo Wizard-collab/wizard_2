@@ -1649,7 +1649,7 @@ class tree(QtWidgets.QTreeWidget):
     def _drag_event(self, event, enter=True):
         items = []
         disable = False
-        item = self.itemAt(event.pos())
+        item = self.itemAt(event.position().toPoint())
         asset_item = self.currentItem()
         if item is not None:
             if item.instance_type not in ['assets_group', 'category']:
@@ -1680,7 +1680,7 @@ class tree(QtWidgets.QTreeWidget):
             for item in item, parent:
                 if item is not None:
                     flags = item.flags()
-                    item.setFlags(flags & ~QtCore.Qt.ItemIsDropEnabled)
+                    item.setFlags(flags & ~QtCore.Qt.ItemFlag.ItemIsDropEnabled)
                     items.append((item, flags))
         else:
             self.setDropIndicatorShown(False)
@@ -1694,7 +1694,7 @@ class tree(QtWidgets.QTreeWidget):
 
     def dropEvent(self, event):
         if isinstance(event.source(), tree):
-            destination_assets_group_item = self.itemAt(event.pos())
+            destination_assets_group_item = self.itemAt(event.position().toPoint())
             asset_item = self.currentItem()
             if not asset_item:
                 return

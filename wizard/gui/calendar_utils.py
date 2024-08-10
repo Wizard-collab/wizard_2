@@ -649,7 +649,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
 
     def update_selection(self, items):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
-        if not modifiers & QtCore.Qt.ShiftModifier:
+        if not modifiers & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.deselect_all()
         for item in items:
             if not item.isVisible():
@@ -695,35 +695,35 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.scene_rect_update.emit(rect)
 
     def wheelEvent(self, event):
-        if event.modifiers() & QtCore.Qt.ShiftModifier:
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.zoom_column_width(event)
-        elif event.modifiers() & QtCore.Qt.ControlModifier:
+        elif event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
             self.zoom_row_height(event)
         else:
             self.zoom(event)
 
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
-        if event.button() == QtCore.Qt.MiddleButton:
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
             self.pan = True
-            self.last_mouse_pos = event.pos()
-        elif event.button() == QtCore.Qt.LeftButton:
-            if self.itemAt(event.pos()) not in self.items:
-                self.start_selection_drag = event.pos()
+            self.last_mouse_pos = event.position()
+        elif event.button() == QtCore.Qt.MouseButton.LeftButton:
+            if self.itemAt(event.position().toPoint()) not in self.items:
+                self.start_selection_drag = event.position()
         elif event.button() == QtCore.Qt.MouseButton.RightButton:
-            if self.itemAt(event.pos()) in self.items:
+            if self.itemAt(event.position().toPoint()) in self.items:
                 self.context_menu_requested.emit(int)
 
     def mouseMoveEvent(self, event):
         if self.pan:
-            delta = event.pos() - self.last_mouse_pos
-            self.last_mouse_pos = event.pos()
+            delta = event.position() - self.last_mouse_pos
+            self.last_mouse_pos = event.position()
             dx = -delta.x() / self.zoom_factor
             dy = -delta.y() / self.zoom_factor
             point = self.mapToScene(QtCore.QPoint(0,0))
             self.update_scene_rect(self.sceneRect().translated(dx, dy))
         if self.start_selection_drag:
-            rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
+            rect = self.mapToScene(QtCore.QRect(self.start_selection_drag.toPoint(), event.position().toPoint()).normalized()).boundingRect()
             if not self.selection_item.scene():
                 self.scene.addItem(self.selection_item)
             self.selection_item.setPos(rect.x(), rect.y())
@@ -731,11 +731,11 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.MiddleButton:
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
             self.pan = False
-        elif event.button() == QtCore.Qt.LeftButton:
+        elif event.button() == QtCore.Qt.MouseButton.LeftButton:
             if self.start_selection_drag:
-                rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
+                rect = self.mapToScene(QtCore.QRect(self.start_selection_drag.toPoint(), event.position().toPoint()).normalized()).boundingRect()
                 items_intersected = []
                 frames_intersected = []
                 for item in self.items:
@@ -756,7 +756,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_F:
+        if event.key() == QtCore.Qt.Key.Key_F:
             self.focus_on_selection()
         else:
             super().keyPressEvent(event)
@@ -784,10 +784,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         delta = event.angleDelta().y() / 60.0
         column_width = int(self.column_width+delta*3)
         column_width = min(max(column_width, 20), 500)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.column_width
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.column_width
         self.set_column_width(column_width)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.column_width
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.column_width
         diff = (new_mouse_scene_pos - mouse_scene_pos) * self.column_width
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff,
                                         self.sceneRect().y(),
@@ -798,10 +798,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         delta = event.angleDelta().y() / 60.0
         row_height = int(self.row_height+delta*2)
         row_height = min(max(row_height, 40), 200)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos).y() / self.row_height
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).y() / self.row_height
         self.set_row_height(row_height)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).y() / self.row_height
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).y() / self.row_height
         diff = (new_mouse_scene_pos - mouse_scene_pos) * self.row_height
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x(),
                                         self.sceneRect().y()- diff,
@@ -822,10 +822,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         scale_factor = new_zoom / current_zoom
         self.scale_factor_update.emit(scale_factor)
         self.zoom_factor_update.emit(new_zoom)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos)
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint())
         self.scale(scale_factor, scale_factor)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos)
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint())
         diff = new_mouse_scene_pos - mouse_scene_pos
         self.zoom_factor = new_zoom
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff.x(),
@@ -918,11 +918,11 @@ class calendar_item(custom_graphic_item):
         self.setPos(QtCore.QPointF(pos_x, 0))
 
     def mousePressEvent(self, event):
-        if (not self.selected and event.button() == QtCore.Qt.LeftButton)\
+        if (not self.selected and event.button() == QtCore.Qt.MouseButton.LeftButton)\
                 or (not self.selected and event.button() == QtCore.Qt.MouseButton.RightButton):
             self.signal_manager.select.emit([self])
         self.start_move_pos = event.pos()
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             if event.pos().x() < self.width - self.handle_size:
                 self.signal_manager.start_move.emit(1)
             else:
@@ -949,7 +949,7 @@ class calendar_item(custom_graphic_item):
 
     def mouseReleaseEvent(self, event):
         self.signal_manager.stop_movement.emit(1)
-        #if event.button() == QtCore.Qt.LeftButton:
+        #if event.button() == QtCore.Qt.MouseButton.LeftButton:
         #    if not self.moved and not self.scaled:
         #        self.signal_manager.select.emit([self])
 
@@ -1059,7 +1059,7 @@ class frame_item(custom_graphic_item):
         painter.setPen(self.pen)
         painter.setBrush(self.brush)
         painter.drawRoundedRect(rect, 10, 10)
-        text_rect = QtCore.QRect(rect.x(), rect.y()-self.text_height-10, self.font_metrics.width(self.frame_label), self.text_height)
+        text_rect = QtCore.QRect(rect.x(), rect.y()-self.text_height-10, self.font_metrics.horizontalAdvance(self.frame_label), self.text_height)
         painter.setPen(self.text_pen)
         painter.setFont(self.font)
         painter.drawText(text_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter, self.frame_label)

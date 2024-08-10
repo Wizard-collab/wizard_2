@@ -349,7 +349,7 @@ class production_table_widget(QtWidgets.QWidget):
             if asset_row['id'] not in self.asset_ids.keys():
                 index = self.asset_rows.index(asset_row)
                 item = QtWidgets.QTableWidgetItem()
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsSelectable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsSelectable)
                 self.table_widget.setItem(index, 0, item)
                 widget = asset_widget(asset_row, self.category_rows[asset_row['category_id']], assets_preview[asset_row['id']])
                 self.table_widget.setCellWidget(index, 0, widget)
@@ -360,7 +360,7 @@ class production_table_widget(QtWidgets.QWidget):
                 self.asset_ids[asset_row['id']]['widget'] = widget
                 if self.domain == assets_vars._sequences_:
                     item = QtWidgets.QTableWidgetItem()
-                    item.setFlags(item.flags() ^ QtCore.Qt.ItemIsSelectable)
+                    item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsSelectable)
                     self.table_widget.setItem(index, 1, item)
                     frange_widget = frame_range_widget(asset_row)
                     self.table_widget.setCellWidget(index, 1, frange_widget)
@@ -709,8 +709,8 @@ class stage_widget(QtWidgets.QWidget):
         self.note_content = gui_utils.minimum_height_textEdit(77)
         self.note_content.setFixedWidth(150)
         self.note_content.setReadOnly(True)
-        self.note_content.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
-        self.note_content.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
+        self.note_content.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.NoTextInteraction)
+        self.note_content.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.NoContextMenu)
         self.note_content.setObjectName('gray_label')
         self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
         self.data_layout.addWidget(self.note_content)

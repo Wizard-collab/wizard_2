@@ -429,7 +429,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def update_selection(self, video_items):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
-        if not modifiers & QtCore.Qt.ShiftModifier:
+        if not modifiers & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.deselect_all()
         for video_item in video_items:
             video_item.set_selected(True)
@@ -812,32 +812,32 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
-        if event.key() == QtCore.Qt.Key_Space:
+        if event.key() == QtCore.Qt.Key.Key_Space:
             self.signal_manager.on_play_pause.emit(1)
-        if event.key() == QtCore.Qt.Key_Left:
+        if event.key() == QtCore.Qt.Key.Key_Left:
             self.signal_manager.on_prev_frame.emit(1)
-        if event.key() == QtCore.Qt.Key_Right:
+        if event.key() == QtCore.Qt.Key.Key_Right:
             self.signal_manager.on_next_frame.emit(1)
-        if event.key() == QtCore.Qt.Key_Delete:
+        if event.key() == QtCore.Qt.Key.Key_Delete:
             self.delete_selection()
 
     def mousePressEvent(self, event):
         self.move_cursor = None
         super().mousePressEvent(event)
-        if event.button() == QtCore.Qt.MiddleButton:
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
             self.pan = True
-            self.last_mouse_pos = event.pos()
+            self.last_mouse_pos = event.position()
 
-        if event.button() == QtCore.Qt.LeftButton:
-            if self.timeline_scene.is_in_cursor_zone(self.mapToScene(event.pos())):
-                self.cursor_item.move_item(self.mapToScene(event.pos()).x())
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            if self.timeline_scene.is_in_cursor_zone(self.mapToScene(event.position())):
+                self.cursor_item.move_item(self.mapToScene(event.position()).x())
                 self.move_cursor = True
 
     def mouseReleaseEvent(self, event):
         super().mouseReleaseEvent(event)
-        if event.button() == QtCore.Qt.MiddleButton:
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
             self.pan = False
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.move_cursor = None
             self.move_video_item = None
         elif event.button() == QtCore.Qt.MouseButton.RightButton:
@@ -846,17 +846,17 @@ class timeline_viewport(QtWidgets.QGraphicsView):
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
         if self.pan:
-            delta = event.pos() - self.last_mouse_pos
-            self.last_mouse_pos = event.pos()
+            delta = event.position() - self.last_mouse_pos
+            self.last_mouse_pos = event.position()
             dx = -delta.x()
             point = self.mapToScene(QtCore.QPoint(0,0))
             self.update_scene_rect(self.sceneRect().translated(dx, 0))
             self.move_scene_center_to_left()
         if self.move_cursor:
-            self.cursor_item.move_item(self.mapToScene(event.pos()).x())
+            self.cursor_item.move_item(self.mapToScene(event.position()).x())
 
     def wheelEvent(self, event):
-        if event.modifiers() & QtCore.Qt.ShiftModifier:
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.zoom_frame_width(event)
 
     def zoom_frame_width(self, event):
@@ -866,10 +866,10 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         else:
             frame_width = self.frame_width/-delta
         frame_width = min(max(frame_width, 0.1), 30)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.frame_width
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.frame_width
         self.set_frame_width(frame_width)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.frame_width
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.frame_width
         diff = (new_mouse_scene_pos - mouse_scene_pos) * self.frame_width
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff,
                                         self.sceneRect().y(),
@@ -1074,18 +1074,18 @@ class video_item(custom_graphic_item):
         self.start_move_pos = False
         self.in_or_out_modified = False
 
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             if self.width < 20:
-                self.start_move_pos = event.pos()
+                self.start_move_pos = event.position()
                 return
-            if event.pos().x() < self.scale_handle_width:
+            if event.position().x() < self.scale_handle_width:
                 self.start_crop_in = self.in_frame
                 return
-            if event.pos().x() > self.width - self.scale_handle_width:
-                self.start_crop_out = event.pos()
+            if event.position().x() > self.width - self.scale_handle_width:
+                self.start_crop_out = event.position()
                 return
-            self.start_move_pos = event.pos()
-        if (not self.selected and event.button() == QtCore.Qt.LeftButton)\
+            self.start_move_pos = event.position()
+        if (not self.selected and event.button() == QtCore.Qt.MouseButton.LeftButton)\
                 or (not self.selected and event.button() == QtCore.Qt.MouseButton.RightButton):
             self.signal_manager.on_select.emit([self])
 
@@ -1093,7 +1093,7 @@ class video_item(custom_graphic_item):
         self.start_move_pos = None
         self.setZValue(1)
 
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             if self.moved:
                 self.signal_manager.on_video_item_moved.emit(self)
             else:
@@ -1120,11 +1120,11 @@ class video_item(custom_graphic_item):
 
     def mouseMoveEvent(self, event):
         if self.start_move_pos:
-            delta = (event.pos().x() - self.start_move_pos.x())
+            delta = (event.position().x() - self.start_move_pos.x())
             self.signal_manager.on_video_item_move.emit(delta)
         if self.start_crop_in is not None:
             self.setZValue(500)
-            abs_frame = int(self.mapToScene(event.pos()).x()/self.frame_width)
+            abs_frame = int(self.mapToScene(event.position()).x()/self.frame_width)
             in_frame = int((abs_frame+(self.start_crop_in)) - self.start_frame)
             in_frame = min(max(0, in_frame), self.out_frame-1)
             self.setPos(int((in_frame-self.start_crop_in+self.start_frame)*self.frame_width), self.pos().y())
@@ -1134,7 +1134,7 @@ class video_item(custom_graphic_item):
 
         if self.start_crop_out:
             self.setZValue(500)
-            abs_frame = self.mapToScene(event.pos()).x()/self.frame_width
+            abs_frame = self.mapToScene(event.position()).x()/self.frame_width
             self.set_out_frame(int((abs_frame+self.in_frame) - self.start_frame))
             self.in_or_out_modified = True
             self.signal_manager.on_select.emit([self])
@@ -1150,11 +1150,11 @@ class video_item(custom_graphic_item):
             self.hover_out_frame_handle = False
             self.update()
             return
-        if event.pos().x() < self.scale_handle_width:
+        if event.position().x() < self.scale_handle_width:
             self.hover_in_frame_handle = True
         else:
             self.hover_in_frame_handle = False
-        if event.pos().x() > self.width - self.scale_handle_width:
+        if event.position().x() > self.width - self.scale_handle_width:
             self.hover_out_frame_handle = True
         else:
             self.hover_out_frame_handle = False
@@ -1443,8 +1443,8 @@ class bound_item(custom_graphic_item):
         self.update_pos()
 
     def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.start_move_pos = event.pos()
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.start_move_pos = event.position()
 
     def mouseReleaseEvent(self, event):
         self.start_move_pos = None
@@ -1455,7 +1455,7 @@ class bound_item(custom_graphic_item):
     def mouseMoveEvent(self, event):
         if not self.start_move_pos:
             return
-        delta = int((event.pos().x() - self.start_move_pos.x())/self.frame_width)*self.frame_width
+        delta = int((event.position().x() - self.start_move_pos.x())/self.frame_width)*self.frame_width
         if self.type == 'in':
             if self.get_pos() + delta >= (self.bounds_range[1])*self.frame_width:
                 self.set_frame(self.bounds_range[1]-1)

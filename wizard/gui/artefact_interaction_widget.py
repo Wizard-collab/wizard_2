@@ -98,11 +98,11 @@ class artefact_interaction_widget(QtWidgets.QDialog):
         self.list_view.itemDoubleClicked.connect(self.return_user)
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Down:
+        if event.key() == QtCore.Qt.Key.Key_Down:
             self.list_view.keyPressEvent(event)
-        if event.key() == QtCore.Qt.Key_Up:
+        if event.key() == QtCore.Qt.Key.Key_Up:
             self.list_view.keyPressEvent(event)
-        if event.key() == QtCore.Qt.Key_Return:
+        if event.key() == QtCore.Qt.Key.Key_Return:
             self.return_user()
         event.accept()
 

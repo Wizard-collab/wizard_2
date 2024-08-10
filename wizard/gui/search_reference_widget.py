@@ -166,11 +166,11 @@ class search_reference_widget(QtWidgets.QWidget):
         self.click_detector.clicked_outside.connect(self.focus_out)
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Down:
+        if event.key() == QtCore.Qt.Key.Key_Down:
             self.list_view.keyPressEvent(event)
-        if event.key() == QtCore.Qt.Key_Up:
+        if event.key() == QtCore.Qt.Key.Key_Up:
             self.list_view.keyPressEvent(event)
-        if event.key() == QtCore.Qt.Key_Return:
+        if event.key() == QtCore.Qt.Key.Key_Return:
             self.return_references()
         event.accept()
 

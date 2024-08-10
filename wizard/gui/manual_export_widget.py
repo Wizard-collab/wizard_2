@@ -52,7 +52,7 @@ class manual_export_widget(QtWidgets.QDialog):
             self.files.append(self.files_list.item(item_index).text())
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Delete:
+        if event.key() == QtCore.Qt.Key.Key_Delete:
             self.remove_selection()
 
     def add_file(self, file):

@@ -302,13 +302,13 @@ class shelf_separator(QtWidgets.QFrame):
 
     def mousePressEvent(self, event):
         if self.edit_mode:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.setStyleSheet('#shelf_seperator_container{background-color:#1d1d21;}')
 
     def mouseReleaseEvent(self, event):
         event.accept()
         if self.edit_mode:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 if self.isChecked():
                     self.setStyleSheet('')
                     self.setChecked(False)
@@ -396,11 +396,11 @@ class shelf_script_button(QtWidgets.QPushButton):
         event.accept()
         if not self.edit_mode:
             self.hide_help_signal.emit(self.shelf_script_row['id'])
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.setStyleSheet('background-color:#1d1d21;')
             self.timer.stop()
         else:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.setStyleSheet('background-color:#1d1d21;')
 
     def mouseReleaseEvent(self, event):
@@ -409,10 +409,10 @@ class shelf_script_button(QtWidgets.QPushButton):
             self.setStyleSheet('')
             if event.button() == QtCore.Qt.MouseButton.RightButton:
                 self.custom_menu()
-            elif event.button() == QtCore.Qt.LeftButton:
+            elif event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.execute()
         else:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 if self.isChecked():
                     self.setStyleSheet('')
                     self.setChecked(False)

@@ -47,15 +47,15 @@ class mpv_widget(QtWidgets.QWidget):
         self.bounds_range = bounds_range
 
     def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.mouse_pos = event.pos()
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.mouse_pos = event.position()
 
     def mouseMoveEvent(self, event):
         if self.mouse_pos is not None:
-            x_delta = event.pos().x() - self.mouse_pos.x()
+            x_delta = event.position().x() - self.mouse_pos.x()
             percent = x_delta/self.width()
             self.seek_relative_percent(percent)
-            self.mouse_pos = event.pos()
+            self.mouse_pos = event.position()
 
     def toggle_loop(self, loop):
         self.loop = loop
