@@ -7,8 +7,8 @@ import time
 import os
 import copy
 import sys
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 import traceback
 
@@ -138,14 +138,14 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.header().resizeSection(4, 52)
         self.tree.header().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.setIconSize(QtCore.QSize(16, 16))
-        self.tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.tree.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.tree.setDragEnabled(True)
-        self.tree.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.tree.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.tree.setAlternatingRowColors(True)
         self.tree.setHeaderHidden(True)
         self.tree.setIndentation(16)
-        self.tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.tree.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.tree.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.main_layout.addWidget(self.tree)
 
         self.refresh_label = QtWidgets.QLabel()
@@ -343,7 +343,7 @@ class tree_widget(QtWidgets.QFrame):
         names = tools.natural_sort(names)
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.domain_ids[domain_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+        self.domain_ids[domain_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_category_children(self, category_id):
         names_dic = dict()
@@ -359,7 +359,7 @@ class tree_widget(QtWidgets.QFrame):
         names = tools.natural_sort(names)
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.category_ids[category_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+        self.category_ids[category_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_asset_group_children(self, asset_group_id):
         names_dic = dict()
@@ -372,7 +372,7 @@ class tree_widget(QtWidgets.QFrame):
         names = tools.natural_sort(names)
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.assets_groups_ids[asset_group_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+        self.assets_groups_ids[asset_group_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_asset_children(self, asset_id):
         names_dic = dict()
@@ -389,7 +389,7 @@ class tree_widget(QtWidgets.QFrame):
         names = sorted(names, key=lambda x: order_list.index(x))
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.asset_ids[asset_id].sortChildren(50, QtCore.Qt.AscendingOrder)
+        self.asset_ids[asset_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def update_columns_visibility(self):
         self.tree.setColumnHidden(1, not self.assignment_visibility)
@@ -770,7 +770,7 @@ class tree_widget(QtWidgets.QFrame):
                     action.name = stage
             action = menu.addAction(QtGui.QIcon(ressources._guess_icon_), 'Create all stages')
             action.name = 'create_all'
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action is not None:
                 parent_id = item.instance_parent_id
                 if action.name in assets_vars._stages_list_[domain_name]:
@@ -788,7 +788,7 @@ class tree_widget(QtWidgets.QFrame):
 
         elif item.instance_type == 'asset_creation':
             self.instance_creation_widget = instance_creation_widget(self, title='Create asset')
-            if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.instance_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 asset_name = self.instance_creation_widget.name_field.text()
                 inframe = self.instance_creation_widget.inframe
                 outframe = self.instance_creation_widget.outframe
@@ -801,7 +801,7 @@ class tree_widget(QtWidgets.QFrame):
                     gui_server.refresh_team_ui()
         elif item.instance_type == 'category_creation':
             self.instance_creation_widget = instance_creation_widget(self, request_frames=None, title='Create category')
-            if self.instance_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.instance_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.instance_parent_id
                 new_category_id = assets.create_category(category_name, parent_id)
@@ -885,7 +885,7 @@ class tree_widget(QtWidgets.QFrame):
         hide_progress = menu.addAction(QtGui.QIcon(progress_visibility_icon), f'Progress')
         hide_colors = menu.addAction(QtGui.QIcon(color_visibility_icon), f'Color')
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == archive_action:
                 self.archive_instance(item)
@@ -943,7 +943,7 @@ class tree_widget(QtWidgets.QFrame):
             return
         category_id = item.instance_id
         self.assets_group_creation_widget = assets_group_creation_widget(title='Create assets group')
-        if self.assets_group_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.assets_group_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             assets_group_name = self.assets_group_creation_widget.name_field.text()
             if project.create_assets_group(assets_group_name, category_id):
                 gui_server.refresh_team_ui()
@@ -964,7 +964,7 @@ class tree_widget(QtWidgets.QFrame):
             security_sentence = f"{environment.get_project_name()}/{item.instance_name}"
 
         self.confirm_widget.set_security_sentence(security_sentence)
-        if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             success = None
             if item.instance_type == 'category':
                 subtasks_library.archive_category(item.instance_id)
@@ -979,7 +979,7 @@ class tree_widget(QtWidgets.QFrame):
     def edit_frame_range(self, item):
         if item.instance_type == 'asset':
             self.edit_frame_range_widget = edit_frame_range_widget(asset_id=item.instance_id)
-            self.edit_frame_range_widget.exec_()
+            self.edit_frame_range_widget.exec()
 
     def remove_category(self, id):
         item = self.category_ids[id]
@@ -1095,7 +1095,7 @@ class progress_indicator(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
         self.progress_label = QtWidgets.QLabel()
         self.progress_label.setObjectName('bold_label')
-        self.progress_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.progress_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.progress_label)
 
     def set_progress(self, progress):
@@ -1196,8 +1196,8 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.build_ui()
         self.connect_functions()
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -1233,7 +1233,7 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.close_frame.setLayout(self.close_layout)
         self.title_label = QtWidgets.QLabel(self.title)
         self.close_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)
@@ -1258,26 +1258,26 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.preroll_spinBox.setObjectName('gray_label')
         self.preroll_spinBox.setRange(0, 1000000)
         self.preroll_spinBox.setValue(100)
-        self.preroll_spinBox.setButtonSymbols(2)
+        self.preroll_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.preroll_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-100000, 219)
         self.inframe_spinBox.setValue(100)
-        self.inframe_spinBox.setButtonSymbols(2)
+        self.inframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(101, 100000)
         self.outframe_spinBox.setValue(220)
-        self.outframe_spinBox.setButtonSymbols(2)
+        self.outframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.outframe_spinBox)
 
         self.postroll_spinBox = QtWidgets.QSpinBox()
         self.postroll_spinBox.setObjectName('gray_label')
         self.postroll_spinBox.setRange(0, 1000000)
         self.postroll_spinBox.setValue(0)
-        self.postroll_spinBox.setButtonSymbols(2)
+        self.postroll_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.postroll_spinBox)
 
         self.frame_layout.addWidget(self.frange_frame)
@@ -1314,8 +1314,8 @@ class assets_group_creation_widget(QtWidgets.QDialog):
         self.build_ui()
         self.connect_functions()
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -1351,7 +1351,7 @@ class assets_group_creation_widget(QtWidgets.QDialog):
         self.close_frame.setLayout(self.close_layout)
         self.title_label = QtWidgets.QLabel(self.title)
         self.close_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)
@@ -1379,8 +1379,8 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.load_old_range()
         self.connect_functions()
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def load_old_range(self):
         asset_row = project.get_asset_data(self.asset_id)
@@ -1437,7 +1437,7 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.close_frame.setLayout(self.close_layout)
         self.title_label = QtWidgets.QLabel("Edit frame range")
         self.close_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)
@@ -1459,26 +1459,26 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.preroll_spinBox.setObjectName('gray_label')
         self.preroll_spinBox.setRange(0, 1000000)
         self.preroll_spinBox.setValue(100)
-        self.preroll_spinBox.setButtonSymbols(2)
+        self.preroll_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.preroll_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-100000, 100000)
         self.inframe_spinBox.setValue(100)
-        self.inframe_spinBox.setButtonSymbols(2)
+        self.inframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 100000)
         self.outframe_spinBox.setValue(220)
-        self.outframe_spinBox.setButtonSymbols(2)
+        self.outframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.outframe_spinBox)
 
         self.postroll_spinBox = QtWidgets.QSpinBox()
         self.postroll_spinBox.setObjectName('gray_label')
         self.postroll_spinBox.setRange(0, 1000000)
         self.postroll_spinBox.setValue(0)
-        self.postroll_spinBox.setButtonSymbols(2)
+        self.postroll_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frange_layout.addWidget(self.postroll_spinBox)
 
         self.frame_layout.addWidget(self.frange_frame)
@@ -1558,8 +1558,8 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
         super(ColoredItemDelegate, self).__init__(parent)
 
     def paint(self, painter, option, index):
-        color_data = index.data(QtCore.Qt.UserRole + 1)
-        opacity = index.data(QtCore.Qt.UserRole + 2)
+        color_data = index.data(QtCore.Qt.ItemDataRole.UserRole + 1)
+        opacity = index.data(QtCore.Qt.ItemDataRole.UserRole + 2)
         if color_data:
             selected_color = QtGui.QColor(color_data)
             selected_color.setAlpha(int(opacity*2))
@@ -1571,13 +1571,13 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
             selected_color = QtGui.QColor(255, 255, 255, 30)
             hover_color = QtGui.QColor(255, 255, 255, 10)
             color = QtGui.QColor(255, 255, 255, 0)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setPen(QtGui.QPen(QtCore.Qt.NoPen))
-        if option.state & QtWidgets.QStyle.State_Selected and option.state & QtWidgets.QStyle.State_MouseOver:
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        painter.setPen(QtGui.QPen(QtCore.Qt.PenStyle.NoPen))
+        if option.state & QtWidgets.QStyle.StateFlag.State_Selected and option.state & QtWidgets.QStyle.StateFlag.State_MouseOver:
             painter.setBrush(QtGui.QBrush(selected_color))
-        elif option.state & QtWidgets.QStyle.State_MouseOver:
+        elif option.state & QtWidgets.QStyle.StateFlag.State_MouseOver:
             painter.setBrush(QtGui.QBrush(hover_color))
-        elif option.state & QtWidgets.QStyle.State_Selected:
+        elif option.state & QtWidgets.QStyle.StateFlag.State_Selected:
             painter.setBrush(QtGui.QBrush(selected_color))
         else:
             painter.setBrush(QtGui.QBrush(color))
@@ -1621,8 +1621,8 @@ class tree(QtWidgets.QTreeWidget):
 
     def set_background_color(self, item, column, color, opacity=255):
         # Set the background color for the specified column using a custom role
-        item.setData(column, QtCore.Qt.UserRole + 1, color)
-        item.setData(column, QtCore.Qt.UserRole + 2, opacity)
+        item.setData(column, QtCore.Qt.ItemDataRole.UserRole + 1, color)
+        item.setData(column, QtCore.Qt.ItemDataRole.UserRole + 2, opacity)
 
     def itemRootIndex(self, item=None):
         root = self.invisibleRootItem()
@@ -1713,7 +1713,7 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     widget = tree_widget()
     widget.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()

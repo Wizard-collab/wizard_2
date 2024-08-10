@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import os
 import time
 
@@ -180,14 +180,14 @@ class launcher_widget(QtWidgets.QFrame):
     def unlock_context_menu(self):
         menu = gui_utils.QMenu(self)
         force_unlock_action = menu.addAction(QtGui.QIcon(ressources._lock_icons_[0]), 'Force unlock')
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == force_unlock_action:
                 self.force_unlock()
 
     def force_unlock(self):
         self.confirm_widget = confirm_widget.confirm_widget("Do you want to continue ?\nPlease make sure this work environment is not used by someone.", parent=self)
-        if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             assets.force_unlock(self.work_env_id)
             gui_server.refresh_team_ui()
 
@@ -226,7 +226,7 @@ class launcher_widget(QtWidgets.QFrame):
             self.anim.start()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
@@ -263,7 +263,7 @@ class launcher_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.user_label, "Version user")
         self.version_infos_layout.addWidget(self.user_label)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.version_infos_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()

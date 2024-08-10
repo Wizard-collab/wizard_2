@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import statistics
 import time
 import datetime
@@ -48,7 +48,7 @@ class overview_widget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.horizontal_layout)
 
         self.vertical_widget_1 = QtWidgets.QWidget()
-        self.vertical_widget_1.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.vertical_widget_1.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.vertical_widget_1.setObjectName('transparent_widget')
         self.vertical_layout_1 = QtWidgets.QVBoxLayout()
         self.vertical_layout_1.setContentsMargins(0,0,0,0)
@@ -62,7 +62,7 @@ class overview_widget(QtWidgets.QWidget):
         self.project_quickstats_widget = project_quickstats_widget()
         self.vertical_layout_1.addWidget(self.project_quickstats_widget)
 
-        self.vertical_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.vertical_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.vertical_layout_2 = QtWidgets.QVBoxLayout()
         self.vertical_layout_2.setContentsMargins(0,0,0,0)
@@ -75,7 +75,7 @@ class overview_widget(QtWidgets.QWidget):
         self.footer_layout.setContentsMargins(0,0,0,0)
         self.main_layout.addLayout(self.footer_layout)
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
@@ -181,7 +181,7 @@ class main_progress_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.setObjectName('round_frame')
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(6)
         self.main_layout.setContentsMargins(20,20,20,20)
@@ -211,7 +211,7 @@ class main_progress_widget(QtWidgets.QFrame):
         self.progress_label.setObjectName('title_label_gray')
         self.text_widget_layout.addWidget(self.progress_label)
 
-        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         stage_rows = project.get_all_stages()
@@ -248,7 +248,7 @@ class user_progress_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_widget_layout = QtWidgets.QHBoxLayout()
         self.header_widget_layout.setContentsMargins(0,0,0,0)
         self.header_widget_layout.setSpacing(6)
@@ -288,7 +288,7 @@ class user_progress_widget(QtWidgets.QFrame):
         self.main_progress_label.setObjectName('title_label_gray')
         self.main_progress_widget_layout.addWidget(self.main_progress_label)
 
-        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(gui_utils.separator())
 
@@ -335,14 +335,14 @@ class user_progress_widget(QtWidgets.QFrame):
 
         self.assets_stats_content_widget = QtWidgets.QWidget()
         self.assets_stats_content_layout = QtWidgets.QHBoxLayout()
-        self.assets_stats_content_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.assets_stats_content_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.assets_stats_content_layout.setSpacing(6)
         self.assets_stats_content_layout.setContentsMargins(0,0,0,0)
         self.assets_stats_content_widget.setLayout(self.assets_stats_content_layout)
         self.main_layout.addWidget(self.assets_stats_content_widget)
 
         self.stages_piechart_widget_layout = QtWidgets.QVBoxLayout()
-        self.stages_piechart_widget_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.stages_piechart_widget_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.stages_piechart_widget = stages_piechart()
         self.stages_piechart_widget_layout.addWidget(self.stages_piechart_widget)
         self.assets_stats_content_layout.addLayout(self.stages_piechart_widget_layout)
@@ -359,7 +359,7 @@ class user_progress_widget(QtWidgets.QFrame):
             self.stages_widgets_dic[stage] = stage_widget
             stage_widget.setVisible(0)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         self.stages_piechart_widget.pie_chart.clear()
@@ -462,12 +462,12 @@ class quickstats_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.stat_label = QtWidgets.QLabel()
-        self.stat_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.stat_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.stat_label.setObjectName("title_label")
         self.main_layout.addWidget(self.stat_label)
 
         self.description_label = QtWidgets.QLabel()
-        self.description_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.description_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.description_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.description_label)
 
@@ -514,13 +514,13 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.title_label.setObjectName("title_label")
         self.header_widget_layout.addWidget(self.title_label)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(30,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(30,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.context_comboBox = gui_utils.QComboBox()
         self.context_comboBox.setFixedWidth(140)
         self.header_widget_layout.addWidget(self.context_comboBox)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.chart_layout = QtWidgets.QHBoxLayout()
         self.chart_layout.setContentsMargins(0,0,0,0)
@@ -531,7 +531,7 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.set_margin(40)
         self.chart.set_points_thickness(0)
-        self.chart.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.chart.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.chart_layout.addWidget(self.chart)
 
         self.settings_layout = QtWidgets.QVBoxLayout()
@@ -549,9 +549,9 @@ class progress_curves_widget(QtWidgets.QFrame):
 
         self.stages_selection_list = QtWidgets.QListWidget()
         self.stages_selection_list.setObjectName('transparent_widget')
-        self.stages_selection_list.setSelectionMode(QtWidgets.QListWidget.ExtendedSelection)
+        self.stages_selection_list.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
         self.stages_selection_list.setFixedWidth(120)
-        self.stages_selection_list.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.stages_selection_list.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.settings_content_layout.addWidget(self.stages_selection_list)
 
     def connect_functions(self):
@@ -722,7 +722,7 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.stage_name_label.setObjectName('title_label_2')
         self.header_widget_layout.addWidget(self.stage_name_label)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.progress_label = QtWidgets.QLabel()
         #self.progress_label.setObjectName('title_label_gray')
@@ -766,7 +766,7 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.tasks_count_label.setObjectName('gray_label')
         self.additionnal_infos_widget_layout.addWidget(self.tasks_count_label)
 
-        self.additionnal_infos_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.additionnal_infos_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def fill_ui(self):
         self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(18))
@@ -859,7 +859,7 @@ class progress_overview_widget(QtWidgets.QFrame):
             domain_title_label.setFixedWidth(80)
             domain_header_layout.addWidget(domain_title_label)
 
-            domain_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+            domain_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
             domain_progress_label = QtWidgets.QLabel()
             domain_header_layout.addWidget(domain_progress_label)
@@ -900,7 +900,7 @@ class progress_overview_widget(QtWidgets.QFrame):
                 title_label.setFixedWidth(80)
                 main_widget_layout.addWidget(title_label)
 
-                main_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+                main_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
                 progress_label = QtWidgets.QLabel()
                 main_widget_layout.addWidget(progress_label)
@@ -917,7 +917,7 @@ class progress_overview_widget(QtWidgets.QFrame):
                 color_frame.setStyleSheet(f"background-color:{ressources._stages_colors_[stage]};border-radius:4px;")
                 main_widget_layout.addWidget(color_frame)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         stages_rows = project.get_all_stages()

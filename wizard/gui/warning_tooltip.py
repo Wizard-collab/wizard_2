@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import time
 import logging
 
@@ -20,8 +20,8 @@ class warning_tooltip(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(warning_tooltip, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.additional_labels = []
 
@@ -60,7 +60,7 @@ class warning_tooltip(QtWidgets.QWidget):
         self.log_level.setObjectName('bold_label')
         self.header_layout.addWidget(self.log_level)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.line_frame = QtWidgets.QFrame()
         self.line_frame.setFixedHeight(1)
@@ -71,7 +71,7 @@ class warning_tooltip(QtWidgets.QWidget):
         self.log_msg.setWordWrap(True)
         self.main_layout.addWidget(self.log_msg)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.open_console_label = QtWidgets.QLabel('Open console for more informations')
         self.open_console_label.setObjectName('gray_label')

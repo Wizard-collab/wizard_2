@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import time
 import logging
 
@@ -22,8 +22,8 @@ class loading_widget(QtWidgets.QWidget):
     def __init__(self, parent = None):
         super(loading_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint |  QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |  QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Loading - {environment.get_project_name()}")
@@ -37,7 +37,7 @@ class loading_widget(QtWidgets.QWidget):
     def showEvent(self, event):
         screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
         if not screen:
-            screen = QtWidgets.QApplication.desktop()
+            screen = QtWidgets.QGuiApplication.primaryScreen()
         screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
@@ -76,10 +76,10 @@ class loading_widget(QtWidgets.QWidget):
         self.overlap_content_layout.setContentsMargins(0,0,0,0)
         self.overlap_widget.setLayout(self.overlap_content_layout)
         
-        self.overlap_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.overlap_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.content_widget.setObjectName('content_widget')
         self.content_widget.setStyleSheet("#content_widget{background: qlineargradient(spread:pad, x1:1 y1:0, x2:1 y2:1, stop:0 rgba(0, 0, 0, 0), stop:1 #24242b);border-bottom-left-radius:8px;border-bottom-right-radius:8px}")
 
@@ -101,7 +101,7 @@ class loading_widget(QtWidgets.QWidget):
         self.datas_widget.setLayout(self.datas_layout)
         self.content_layout.addWidget(self.datas_widget)
 
-        self.datas_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.datas_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.project_and_user_layout = QtWidgets.QHBoxLayout()
         self.project_and_user_layout.setSpacing(10)
@@ -117,7 +117,7 @@ class loading_widget(QtWidgets.QWidget):
         self.user_label = QtWidgets.QLabel()
         self.project_and_user_layout.addWidget(self.user_label)
 
-        self.project_and_user_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.project_and_user_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('transparent_widget')
@@ -130,7 +130,7 @@ class loading_widget(QtWidgets.QWidget):
         self.info_label.setObjectName('bold_label')
         self.infos_layout.addWidget(self.info_label)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.version_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.version_label)

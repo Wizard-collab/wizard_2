@@ -7,8 +7,8 @@ import logging
 import time
 import traceback
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -109,7 +109,7 @@ class video_browser_widget(QtWidgets.QWidget):
             return
 
         pos = QtGui.QCursor().pos()
-        action = menu.exec_(pos)
+        action = menu.exec(pos)
         if action is not None:
             if action == create_playlist_action:
                 self.create_playlist()
@@ -151,7 +151,7 @@ class video_browser_widget(QtWidgets.QWidget):
         self.header_layout.addWidget(self.search_bar)
 
         self.content_widget = QtWidgets.QWidget()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_widget.setObjectName('dark_widget')
         self.content_layout = QtWidgets.QHBoxLayout()
         self.content_layout.setContentsMargins(0,0,0,0)
@@ -160,16 +160,16 @@ class video_browser_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.content_widget)
 
         self.icon_view = QtWidgets.QListWidget()
-        self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.icon_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.icon_view.setObjectName('icon_view')
         self.icon_view.setStyleSheet("#icon_view::item{padding:0px;}")
         self.icon_view.setSpacing(4)
         self.icon_view.setContentsMargins(4,4,4,4)
         self.icon_view.setIconSize(QtCore.QSize(200,200))
-        self.icon_view.setMovement(QtWidgets.QListView.Static)
-        self.icon_view.setResizeMode(QtWidgets.QListView.Adjust)
-        self.icon_view.setViewMode(QtWidgets.QListView.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
+        self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
+        self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
+        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.content_layout.addWidget(self.icon_view)
 
@@ -264,12 +264,12 @@ class video_item_widget(QtWidgets.QWidget):
         self.infos_layout.addWidget(self.stage_label)
 
         self.state_label = QtWidgets.QLabel()
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.infos_layout.addWidget(self.state_label)
 
         self.image_label = QtWidgets.QLabel()
         self.image_label.setFixedWidth(160)
-        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.image_label)
 
         self.infos_label = QtWidgets.QLabel()

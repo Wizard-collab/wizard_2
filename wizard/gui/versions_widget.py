@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import os
 import time
 import logging
@@ -322,7 +322,7 @@ class versions_widget(QtWidgets.QWidget):
             domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
             stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
             self.batch_settings_widget = batch_settings_widget.batch_settings_widget(self.work_env_id, stage)
-            if self.batch_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.batch_settings_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'export'
@@ -357,7 +357,7 @@ class versions_widget(QtWidgets.QWidget):
             domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
             stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
             self.batch_settings_widget = batch_settings_widget.batch_settings_widget(self.work_env_id, 'camera')
-            if self.batch_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.batch_settings_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'export'
                 settings_dic['frange'] = self.batch_settings_widget.frange
@@ -384,7 +384,7 @@ class versions_widget(QtWidgets.QWidget):
             domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
             stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
             self.video_settings_widget = video_settings_widget.video_settings_widget(self.work_env_id)
-            if self.video_settings_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.video_settings_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'video'
@@ -417,12 +417,12 @@ class versions_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.views_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(7)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
 
         self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File', 'ID'])
         self.list_view.header().resizeSection(3, 150)
@@ -433,14 +433,14 @@ class versions_widget(QtWidgets.QWidget):
         self.views_layout.addWidget(self.list_view)
 
         self.icon_view = QtWidgets.QListWidget()
-        self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.icon_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.icon_view.setObjectName('icon_view')
         self.icon_view.setSpacing(4)
         self.icon_view.setIconSize(QtCore.QSize(200,200))
-        self.icon_view.setMovement(QtWidgets.QListView.Static)
-        self.icon_view.setResizeMode(QtWidgets.QListView.Adjust)
-        self.icon_view.setViewMode(QtWidgets.QListView.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
+        self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
+        self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
+        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.views_layout.addWidget(self.icon_view)
         self.icon_view.setVisible(0)
@@ -453,7 +453,7 @@ class versions_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.versions_count_label = QtWidgets.QLabel()
         self.versions_count_label.setObjectName('gray_label')
@@ -474,7 +474,7 @@ class versions_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
@@ -592,7 +592,7 @@ class versions_widget(QtWidgets.QWidget):
         paste_and_mirror_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard and mirror references')
 
         pos = QtGui.QCursor().pos()
-        action = menu.exec_(pos)
+        action = menu.exec(pos)
         if action is not None:
             if action == folder_action:
                 self.open_folder()
@@ -629,7 +629,7 @@ class versions_widget(QtWidgets.QWidget):
                 if len(items) == 1:
                     old_comment = items[0].version_row['comment']
                 self.comment_widget = comment_widget.comment_widget(old_comment=old_comment, pos=pos)
-                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     comment = self.comment_widget.comment
                     for item in items:
                         assets.modify_version_comment(item.version_row['id'], comment)
@@ -755,7 +755,7 @@ class versions_widget(QtWidgets.QWidget):
         if items is not None:
             if items!=[]:
                 self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
-                if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     version_ids = []
                     for item in items:
                         version_ids.append(item.version_row['id'])
@@ -859,16 +859,16 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
         icon = QtGui.QIcon()
         
         pixmap = QtGui.QPixmap(self.version_row['thumbnail_path'])
-        icon.addPixmap(pixmap, QtGui.QIcon.Normal)
-        icon.addPixmap(pixmap, QtGui.QIcon.Selected)
+        icon.addPixmap(pixmap, QtGui.QIcon.Mode.Normal)
+        icon.addPixmap(pixmap, QtGui.QIcon.Mode.Selected)
         if not path_utils.isfile(self.version_row['thumbnail_path']):
             default_icon = QtGui.QIcon(ressources._no_screenshot_small_)
-            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Normal)
-            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Selected)
+            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Mode.Normal)
+            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Mode.Selected)
 
         self.setIcon(icon)
         self.setText(f"{self.version_row['name']} - {self.version_row['creation_user']}")
-        self.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
     def set_missing(self):
         self.setForeground(QtGui.QColor('#f79360'))

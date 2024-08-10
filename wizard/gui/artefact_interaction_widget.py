@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import time
 import copy
 import logging
@@ -26,8 +26,8 @@ class artefact_interaction_widget(QtWidgets.QDialog):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Choose target")
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)    
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)    
 
         self.parent = parent
         self.search_thread = search_thread()
@@ -116,7 +116,7 @@ class artefact_interaction_widget(QtWidgets.QDialog):
     def build_ui(self):
         self.setMinimumWidth(550)
         self.setMinimumHeight(500)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(12,12,12,12)
@@ -153,7 +153,7 @@ class artefact_interaction_widget(QtWidgets.QDialog):
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().resizeSection(0, 30)
         self.list_view.header().resizeSection(1, 150)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.main_widget_layout.addWidget(self.list_view)
 
 class custom_item(QtWidgets.QTreeWidgetItem):

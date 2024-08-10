@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 import webbrowser
 
@@ -30,7 +30,7 @@ class new_build_widget(QtWidgets.QWidget):
     def showEvent(self, event):
         screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
         if not screen:
-            screen = QtWidgets.QApplication.desktop()
+            screen = QtWidgets.QGuiApplication.primaryScreen()
         screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
@@ -43,12 +43,12 @@ class new_build_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.title_label = QtWidgets.QLabel("A new build is available !")
-        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.title_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.title_label.setObjectName('title_label')
         self.main_layout.addWidget(self.title_label)
 
         self.build_label = QtWidgets.QLabel()
-        self.build_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.build_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.build_label)
 
         self.download_button = QtWidgets.QPushButton('Download')
@@ -66,7 +66,7 @@ class new_build_widget(QtWidgets.QWidget):
         self.ignore_layout.setSpacing(0)
         self.main_layout.addLayout(self.ignore_layout)
 
-        self.ignore_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.ignore_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.ignore_checkbox = QtWidgets.QCheckBox('Ignore this alert')
         self.ignore_layout.addWidget(self.ignore_checkbox)

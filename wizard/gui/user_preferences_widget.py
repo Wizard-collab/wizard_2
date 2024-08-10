@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import logging
 
@@ -184,7 +184,7 @@ class general_widget(QtWidgets.QWidget):
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollArea_widget)
 
@@ -197,7 +197,7 @@ class general_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.popups_frame = QtWidgets.QFrame()
-        self.popups_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.popups_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.popups_layout = QtWidgets.QVBoxLayout()
         self.popups_layout.setContentsMargins(0,0,0,0)
         self.popups_layout.setSpacing(6)
@@ -228,13 +228,13 @@ class general_widget(QtWidgets.QWidget):
         self.popups_sublayout.addRow(QtWidgets.QLabel('Keep popups until comment'), self.keep_until_comment_checkbox)
 
         self.popups_duration_spinBox = QtWidgets.QSpinBox()
-        self.popups_duration_spinBox.setButtonSymbols(2)
+        self.popups_duration_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.popups_sublayout.addRow(QtWidgets.QLabel('Duration ( seconds )'), self.popups_duration_spinBox)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.local_path_frame = QtWidgets.QFrame()
-        self.local_path_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.local_path_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.local_path_layout = QtWidgets.QVBoxLayout()
         self.local_path_layout.setContentsMargins(0,0,0,0)
         self.local_path_layout.setSpacing(6)
@@ -269,7 +269,7 @@ class general_widget(QtWidgets.QWidget):
         self.local_path_buttons_widget.setLayout(self.local_path_buttons_layout)
         self.local_path_layout.addWidget(self.local_path_buttons_widget)
 
-        self.local_path_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.local_path_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.local_path_accept_button = QtWidgets.QPushButton('Apply')
         self.local_path_accept_button.setObjectName('blue_button')
@@ -278,7 +278,7 @@ class general_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.team_ip_frame = QtWidgets.QFrame()
-        self.team_ip_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.team_ip_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.team_ip_layout = QtWidgets.QVBoxLayout()
         self.team_ip_layout.setContentsMargins(0,0,0,0)
         self.team_ip_layout.setSpacing(6)
@@ -308,7 +308,7 @@ class general_widget(QtWidgets.QWidget):
         self.team_ip_buttons_widget.setLayout(self.team_ip_buttons_layout)
         self.team_ip_layout.addWidget(self.team_ip_buttons_widget)
 
-        self.team_ip_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.team_ip_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.team_ip_accept_button = QtWidgets.QPushButton('Apply')
         self.team_ip_accept_button.setObjectName('blue_button')
@@ -317,7 +317,7 @@ class general_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.about_frame = QtWidgets.QFrame()
-        self.about_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.about_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.about_layout = QtWidgets.QVBoxLayout()
         self.about_layout.setContentsMargins(0,0,0,0)
         self.about_layout.setSpacing(6)
@@ -338,25 +338,25 @@ class general_widget(QtWidgets.QWidget):
         self.install_dir_label = QtWidgets.QLabel('Install directory')
         self.install_dir_label.setObjectName('gray_label')
         self.install_dir_data = QtWidgets.QLabel()
-        self.install_dir_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.install_dir_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.about_sublayout.addRow(self.install_dir_label, self.install_dir_data)
 
         self.version_label = QtWidgets.QLabel('Version')
         self.version_label.setObjectName('gray_label')
         self.version_data = QtWidgets.QLabel()
-        self.version_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.version_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.about_sublayout.addRow(self.version_label, self.version_data)
 
         self.build_label = QtWidgets.QLabel('Build')
         self.build_label.setObjectName('gray_label')
         self.build_data = QtWidgets.QLabel()
-        self.build_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.build_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.about_sublayout.addRow(self.build_label, self.build_data)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.psql_frame = QtWidgets.QFrame()
-        self.psql_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.psql_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.psql_layout = QtWidgets.QVBoxLayout()
         self.psql_layout.setContentsMargins(0,0,0,0)
         self.psql_layout.setSpacing(6)
@@ -377,25 +377,25 @@ class general_widget(QtWidgets.QWidget):
         self.psql_host_label = QtWidgets.QLabel('Host')
         self.psql_host_label.setObjectName('gray_label')
         self.psql_host_data = QtWidgets.QLabel()
-        self.psql_host_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.psql_host_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.psql_sublayout.addRow(self.psql_host_label, self.psql_host_data)
 
         self.psql_port_label = QtWidgets.QLabel('Port')
         self.psql_port_label.setObjectName('gray_label')
         self.psql_port_data = QtWidgets.QLabel()
-        self.psql_port_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.psql_port_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.psql_sublayout.addRow(self.psql_port_label, self.psql_port_data)
 
         self.psql_user_label = QtWidgets.QLabel('User')
         self.psql_user_label.setObjectName('gray_label')
         self.psql_user_data = QtWidgets.QLabel()
-        self.psql_user_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.psql_user_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.psql_sublayout.addRow(self.psql_user_label, self.psql_user_data)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.repository_frame = QtWidgets.QFrame()
-        self.repository_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.repository_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.repository_layout = QtWidgets.QVBoxLayout()
         self.repository_layout.setContentsMargins(0,0,0,0)
         self.repository_layout.setSpacing(6)
@@ -416,10 +416,10 @@ class general_widget(QtWidgets.QWidget):
         self.repository_label = QtWidgets.QLabel('repository')
         self.repository_label.setObjectName('gray_label')
         self.repository_data = QtWidgets.QLabel()
-        self.repository_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.repository_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.repository_sublayout.addRow(self.repository_label, self.repository_data)
 
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
 class user_account_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -436,7 +436,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.user_name_label.setText(user_name)
         self.user_email_label.setText(user_row['email'])
 
-        self.admin_checkBox.setCheckState(user_row['administrator'])
+        #self.admin_checkBox.setCheckState(user_row['administrator'])
         self.admin_checkBox.setChecked(user_row['administrator'])
 
         profile_image = image.convert_str_data_to_image_bytes(user_row['profile_picture'])
@@ -516,7 +516,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollArea_widget)
 
@@ -529,7 +529,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.profile_frame = QtWidgets.QFrame()
-        self.profile_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.profile_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.profile_layout = QtWidgets.QVBoxLayout()
         self.profile_layout.setContentsMargins(0,0,0,0)
         self.profile_layout.setSpacing(6)
@@ -566,12 +566,12 @@ class user_account_widget(QtWidgets.QWidget):
         self.user_email_label.setObjectName('gray_label')
         self.profile_sub_subwidget_layout.addWidget(self.user_email_label)
 
-        self.profile_sub_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.profile_sub_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.email_frame = QtWidgets.QFrame()
-        self.email_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.email_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.email_layout = QtWidgets.QVBoxLayout()
         self.email_layout.setContentsMargins(0,0,0,0)
         self.email_layout.setSpacing(6)
@@ -593,7 +593,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.email_buttons_widget.setLayout(self.email_buttons_layout)
         self.email_layout.addWidget(self.email_buttons_widget)
 
-        self.email_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.email_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.email_accept_button = QtWidgets.QPushButton('Apply')
         self.email_accept_button.setObjectName('blue_button')
@@ -602,7 +602,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.pwd_frame = QtWidgets.QFrame()
-        self.pwd_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.pwd_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.pwd_layout = QtWidgets.QVBoxLayout()
         self.pwd_layout.setContentsMargins(0,0,0,0)
         self.pwd_layout.setSpacing(6)
@@ -632,7 +632,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.pwd_buttons_widget.setLayout(self.pwd_buttons_layout)
         self.pwd_layout.addWidget(self.pwd_buttons_widget)
 
-        self.pwd_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.pwd_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.pwd_accept_button = QtWidgets.QPushButton('Apply')
         self.pwd_accept_button.setObjectName('blue_button')
@@ -641,7 +641,7 @@ class user_account_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.admin_frame = QtWidgets.QFrame()
-        self.admin_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.admin_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.admin_layout = QtWidgets.QVBoxLayout()
         self.admin_layout.setContentsMargins(0,0,0,0)
         self.admin_layout.setSpacing(6)
@@ -668,4 +668,4 @@ class user_account_widget(QtWidgets.QWidget):
         self.admin_subwidget_layout.addWidget(self.admin_checkBox)
 
 
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))

@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6.QtCore import pyqtSignal
 import logging
 
 # Wizard core modules
@@ -150,7 +150,7 @@ class video_manager(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.content_widget = gui_utils.QSplitter()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout.addWidget(self.content_widget)
 
         self.tabs_widget = QtWidgets.QTabWidget()
@@ -164,7 +164,7 @@ class video_manager(QtWidgets.QWidget):
         self.content_widget.addWidget(self.video_player)
 
         self.content_2_widget = gui_utils.QSplitter()
-        self.content_2_widget.setOrientation(QtCore.Qt.Vertical)
+        self.content_2_widget.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.content_widget.addWidget(self.content_2_widget)
 
         self.content_2_widget.addWidget(self.asset_tracking_widget)

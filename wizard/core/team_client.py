@@ -27,7 +27,7 @@
 # SOFTWARE.
 
 # Python modules
-from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt6.QtCore import pyqtSignal, QThread
 import json
 import logging
 

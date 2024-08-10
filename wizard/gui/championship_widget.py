@@ -7,8 +7,8 @@ import json
 import time
 import traceback
 import logging
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_server
@@ -85,7 +85,7 @@ class championship_widget(QtWidgets.QWidget):
         self.title.setObjectName('title_label')
         self.user_header_layout.addWidget(self.title)
 
-        self.user_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.user_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.keeped_artefacts_frame = QtWidgets.QFrame()
         self.keeped_artefacts_frame.setObjectName('dark_round_frame')
@@ -191,7 +191,7 @@ class championship_widget(QtWidgets.QWidget):
 
 
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.participation_checkbox = QtWidgets.QCheckBox("Participation")
         self.participation_checkbox.setObjectName('android_checkbox')
@@ -265,7 +265,7 @@ class championship_widget(QtWidgets.QWidget):
         current_participation = user_row['championship_participation']
         if current_participation:
             self.confirm_widget = confirm_widget.confirm_widget(f"If you turn off your participation to the game, you won't be able to participate again within {tools.convert_seconds_to_string_time_with_days(game_vars._default_ban_time_)}.\nDo you want to continue ?", parent=self)
-            if self.confirm_widget.exec_() != QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
                 return
         repository.modify_user_championship_participation(environment.get_user(), 1-current_participation)
         gui_server.refresh_ui()

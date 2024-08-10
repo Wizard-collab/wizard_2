@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 
 # Wizard modules
@@ -23,11 +23,11 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
         self.photo = QtWidgets.QGraphicsPixmapItem()
         self.scene.addItem(self.photo)
         self.setScene(self.scene)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
 
         self.setPhoto(QtGui.QPixmap(image))
         rect = QtCore.QRectF(self.photo.pixmap().rect())
@@ -54,7 +54,7 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
         self.zoom = 0
         if pixmap and not pixmap.isNull():
             self.empty = False
-            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+            self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
             self.photo.setPixmap(pixmap)
         else:
             self.empty = True

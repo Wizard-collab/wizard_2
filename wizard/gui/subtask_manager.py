@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import QThread, pyqtSignal
 import time
 import json
 import os
@@ -96,8 +96,8 @@ class subtask_manager(QtWidgets.QWidget):
         self.list_view.header().resizeSection(1, 200)
         self.list_view.header().resizeSection(5, 550)
         self.list_view.header().resizeSection(6, 400)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
@@ -295,7 +295,7 @@ class subtask_manager(QtWidgets.QWidget):
         if len(selection) == 1:
             submit_log_action = menu.addAction(QtGui.QIcon(ressources._send_icon_), 'Submit to support')
         pos = QtGui.QCursor().pos()
-        action = menu.exec_(pos)
+        action = menu.exec(pos)
         if action is None:
             return
         if action == kill_action:

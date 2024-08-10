@@ -4,8 +4,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import traceback
 import time
 import os
@@ -33,8 +33,8 @@ class mpv_widget(QtWidgets.QWidget):
         self.mouse_pos = None
         self.bounds_range = [0,1000]
 
-        self.setAttribute(QtCore.Qt.WA_DontCreateNativeAncestors)
-        self.setAttribute(QtCore.Qt.WA_NativeWindow)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_NativeWindow)
 
         self.player = None
         self.create_mpv_player()

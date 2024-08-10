@@ -32,7 +32,7 @@ def main(frange, comment='', prepare_only=False):
 def invoke_settings_widget(prepare_only=False):
     from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('fx')
-    if export_settings_widget_win.exec_() == export_settings_widget.dialog_accepted:
+    if export_settings_widget_win.exec() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(frange, prepare_only=prepare_only)

@@ -29,7 +29,7 @@
 # This module is used to manage images in wizard
 
 # Python modules
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from PIL import Image, ImageCms, ImageFont, ImageDraw
 import io
 import base64
@@ -51,7 +51,7 @@ def screenshot(file, thumbnail_file):
     width = rect.width()
     height = rect.height()
     pixmap = screen.grabWindow(
-        QtWidgets.QApplication.desktop().winId(), x=x, y=y, width=width, height=height
+        QtWidgets.QGuiApplication.primaryScreen().winId(), x=x, y=y, width=width, height=height
     )
     base_image = pixmap_to_PIL(pixmap)
 

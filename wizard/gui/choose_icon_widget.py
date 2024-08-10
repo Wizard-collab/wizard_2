@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -18,8 +18,8 @@ class choose_icon_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(choose_icon_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.icon_path = None
 
@@ -57,10 +57,10 @@ class choose_icon_widget(QtWidgets.QDialog):
         self.icon_view.setStyleSheet('#icon_view{background-color:transparent}')
         self.icon_view.setSpacing(4)
         self.icon_view.setIconSize(QtCore.QSize(20,20))
-        self.icon_view.setMovement(QtWidgets.QListView.Static)
-        self.icon_view.setResizeMode(QtWidgets.QListView.Adjust)
-        self.icon_view.setViewMode(QtWidgets.QListView.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
+        self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
+        self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
+        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.main_layout.addWidget(self.icon_view)
 

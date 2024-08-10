@@ -1,7 +1,7 @@
 # Update and export multiple stages
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class widget(QtWidgets.QWidget):
         self.deadline_checkbox = QtWidgets.QCheckBox("Deadline")
         self.footer_layout.addWidget(self.deadline_checkbox)
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.execute_button = QtWidgets.QPushButton("Execute")
         self.execute_button.setObjectName("blue_button")

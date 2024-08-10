@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import json
 import logging
 
@@ -100,7 +100,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.apply_button = QtWidgets.QPushButton('Apply')
         self.apply_button.setObjectName('blue_button')
@@ -124,7 +124,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
             for version in versions_dic.keys():
                 action = menu.addAction(version)
                 action.name = version
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action is not None:
                 self.path_lineEdit.setText(versions_dic[action.name])
 

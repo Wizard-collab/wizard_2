@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import time
 import logging
 import traceback
@@ -113,7 +113,7 @@ class production_table_widget(QtWidgets.QWidget):
         show_notes_item = menu.addAction(QtGui.QIcon(show_notes_icon), f'Show notes')
         show_priorities_item = menu.addAction(QtGui.QIcon(show_priorities_icon), f'Show priorities')
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == show_notes_item:
                 self.show_notes = 1-self.show_notes
@@ -181,21 +181,21 @@ class production_table_widget(QtWidgets.QWidget):
         self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43)
         self.header_layout.addWidget(self.search_bar)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.content_widget = gui_utils.QSplitter()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.content_widget)
 
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setObjectName('dark_widget')
-        self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_widget.setAlternatingRowColors(True)
-        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
         self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
-        self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.content_widget.addWidget(self.table_widget)
         self.content_widget.setCollapsible(0, False)
 
@@ -211,7 +211,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
@@ -220,7 +220,7 @@ class production_table_widget(QtWidgets.QWidget):
     def update_state(self, state):
         comment = ''
         self.comment_widget = comment_widget.comment_widget()
-        if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             comment = self.comment_widget.comment
         for modelIndex in self.table_widget.selectedIndexes():
             widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
@@ -534,26 +534,26 @@ class asset_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,8,0)
         self.setLayout(self.main_layout)
 
         self.image_label = QtWidgets.QLabel()
         self.image_label.setFixedWidth(self.thumbnail_width)
-        self.image_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.image_label.setObjectName('production_manager_variant_frame')
         self.main_layout.addWidget(self.image_label)
 
         self.name_layout = QtWidgets.QVBoxLayout()
         self.name_layout.setSpacing(2)
-        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
         self.asset_name_label = QtWidgets.QLabel()
         self.name_layout.addWidget(self.asset_name_label)
         self.category_name_label = QtWidgets.QLabel()
         self.category_name_label.setObjectName('gray_label')
         self.name_layout.addWidget(self.category_name_label)
-        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
         self.main_layout.addLayout(self.name_layout)
 
 
@@ -573,7 +573,7 @@ class asset_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu(self)
         custom_preview_action = menu.addAction(QtGui.QIcon(ressources._add_icon_), 'Add custom preview')
         default_preview_action = menu.addAction(QtGui.QIcon(ressources._refresh_icon_), 'Set preview to auto')
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == default_preview_action:
                 assets.set_asset_preview(self.preview_row['asset_id'], None)
@@ -595,7 +595,7 @@ class asset_widget(QtWidgets.QWidget):
                 logger.warning('{} is not a valid image file...'.format(image_file))
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.show_context_menu()
 
     def refresh(self, asset_row, preview_row):
@@ -611,24 +611,24 @@ class frame_range_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(2)
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.frame_range_label = QtWidgets.QLabel()
-        self.frame_range_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.frame_range_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.frame_range_label)
 
         self.details_label = QtWidgets.QLabel()
-        self.details_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.details_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.details_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.details_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def fill_ui(self):
         self.frame_range_label.setText(f"{self.asset_row['inframe']} - {self.asset_row['outframe']}")
@@ -677,7 +677,7 @@ class stage_widget(QtWidgets.QWidget):
         self.priority_label.priority_signal.connect(self.priority_signal.emit)
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
@@ -693,12 +693,12 @@ class stage_widget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.data_layout)
 
         self.priority_label = priority_widget()
-        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.priority_label.setFixedSize(30, 30)
         self.data_layout.addWidget(self.priority_label)
 
         self.state_label = state_widget()
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.state_label.setFixedHeight(30)
         self.data_layout.addWidget(self.state_label)
 
@@ -748,20 +748,20 @@ class priority_widget(QtWidgets.QLabel):
     def __init__(self, parent=None):
         super(priority_widget, self).__init__(parent)
         self.setFixedWidth(60)
-        self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.setObjectName('priority_label')
         self.setStyleSheet('#priority_label{border-radius:4px;background-color:rgba(0,0,0,40);}')
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.states_menu_requested()
 
     def states_menu_requested(self):
         menu = gui_utils.QMenu(self)
         for priority in assets_vars._priority_list_:
             menu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             self.priority_signal.emit(action.text())
 
@@ -780,18 +780,18 @@ class state_widget(QtWidgets.QLabel):
         self.setMouseTracking(True)
         self.setFixedWidth(60)
         self.setObjectName('bold_label')
-        self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.states_menu_requested()
 
     def states_menu_requested(self):
         menu = gui_utils.QMenu(self)
         for state in assets_vars._asset_states_list_:
             menu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             self.state_signal.emit(action.text())
 
@@ -814,10 +814,10 @@ class assignment_widget(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(assignment_widget, self).__init__(parent)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.users_menu_requested()
 
     def users_menu_requested(self):
@@ -830,7 +830,7 @@ class assignment_widget(QtWidgets.QLabel):
             pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
             icon.addPixmap(pm)
             menu.addAction(icon, user_row['user_name'])
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             self.assignment_signal.emit(action.text())
 

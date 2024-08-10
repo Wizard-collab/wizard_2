@@ -8,7 +8,7 @@ print(os.path.abspath(''))
 a = Analysis([os.path.abspath('app.py')],
              binaries=[],
              datas=[],
-             hiddenimports=['PyQt5.QtPrintSupport', 'server'],
+             hiddenimports=['PyQt6.QtPrintSupport', 'server'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

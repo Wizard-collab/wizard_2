@@ -1,3 +1,4 @@
+
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
@@ -6,7 +7,7 @@
 import os
 import sys
 try:
-    from PyQt5 import QtWidgets, QtCore, QtGui
+    from PyQt6 import QtWidgets, QtCore, QtGui
 except ModuleNotFoundError:
     from PySide2 import QtWidgets, QtCore, QtGui
 import logging
@@ -16,7 +17,7 @@ import wizard_communicate
 
 logger = logging.getLogger(__name__)
 
-dialog_accepted = QtWidgets.QDialog.Accepted
+dialog_accepted = QtWidgets.QDialog.DialogCode.Accepted
 
 if not QtWidgets.QApplication.instance():
     app = QtWidgets.QApplication(sys.argv)
@@ -140,24 +141,24 @@ class export_settings_widget(QtWidgets.QDialog):
         self.inrollframe_spinBox.setEnabled(False)
         self.inrollframe_spinBox.setObjectName('gray_label')
         self.inrollframe_spinBox.setRange(-1000000, 1000000)
-        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inrollframe_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-1000000, 1000000)
-        self.inframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.inframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 1000000)
-        self.outframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.outframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outframe_spinBox)
 
         self.outrollframe_spinBox = QtWidgets.QSpinBox()
         self.outrollframe_spinBox.setEnabled(False)
         self.outrollframe_spinBox.setObjectName('gray_label')
         self.outrollframe_spinBox.setRange(-1000000, 1000000)
-        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outrollframe_spinBox)
 
         self.nspace_list_widget = QtWidgets.QWidget()
@@ -173,7 +174,7 @@ class export_settings_widget(QtWidgets.QDialog):
         self.nspace_list_layout.addWidget(self.infos_label)
 
         self.assets_list = QtWidgets.QListWidget()
-        self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.nspace_list_layout.addWidget(self.assets_list)
 
         self.buttons_widget = QtWidgets.QWidget()
@@ -184,7 +185,7 @@ class export_settings_widget(QtWidgets.QDialog):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

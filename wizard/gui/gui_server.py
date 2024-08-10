@@ -10,8 +10,8 @@
 # It roughly is a lan access to the wizard core functions
 
 # Python modules
-from PyQt5 import QtCore
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6 import QtCore
+from PyQt6.QtCore import QThread, pyqtSignal
 import socket
 import sys
 import time

@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 import os
 import importlib
@@ -57,7 +57,7 @@ class batcher_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.description_label)
 
         self.scripts_widgets_frame = QtWidgets.QFrame()
-        self.scripts_widgets_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.scripts_widgets_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.scripts_widgets_frame.setObjectName("dark_round_frame")
         self.scripts_widgets_frame.setStyleSheet("#dark_round_frame{border:1px solid rgba(255,255,255,10);}")
         self.scripts_widgets_layout = QtWidgets.QHBoxLayout()

@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import time
 import os
 import subprocess
@@ -408,14 +408,14 @@ class main_widget(QtWidgets.QWidget):
         else:
             self.confirm_widget = confirm_widget.confirm_widget('Softwares are running...\nKill all softwares ?',
                                                                 accept_text='Kill softwares')
-            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 launch.kill_all()
                 close = True
         if self.subtask_manager.is_task_running():
             close = False
             self.confirm_widget = confirm_widget.confirm_widget('Subtasks are running...\nDo you want to conitnue ?',
                                                                 accept_text='Kill tasks')
-            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 self.subtask_manager.kill_all()
                 close = True
         if close:
@@ -474,7 +474,7 @@ class main_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.shelf_widget)
 
         self.contents_widget = gui_utils.QSplitter()
-        self.contents_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.contents_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.contents_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.contents_widget)
 

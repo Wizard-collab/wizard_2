@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import time
 
 # Wizard gui modules
@@ -36,13 +36,13 @@ class users_championship_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget_no_hover')
         self.list_view.setColumnCount(9)
         self.list_view.setIconSize(QtCore.QSize(30,30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
 
         self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time', 'Deaths', 'Life', 'Coins', 'Participation'])
         self.main_layout.addWidget(self.list_view)

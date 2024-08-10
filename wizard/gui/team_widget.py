@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import QThread, pyqtSignal
 
 # Wizard modules
 from wizard.core import environment
@@ -20,8 +20,8 @@ class team_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(team_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.user_ids = dict()
         self.build_ui()
@@ -69,7 +69,7 @@ class team_widget(QtWidgets.QWidget):
         self.dns_info_label.setObjectName('gray_label')
         self.header_layout.addWidget(self.dns_info_label)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.main_layout.addWidget(self.header_widget)
 
@@ -88,11 +88,11 @@ class team_widget(QtWidgets.QWidget):
         self.users_scrollArea_layout.setSpacing(3)
         self.users_scrollArea_widget.setLayout(self.users_scrollArea_layout)
 
-        self.users_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.users_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.users_scrollArea.setWidgetResizable(True)
         self.users_scrollArea.setWidget(self.users_scrollArea_widget)
 
-        self.users_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.users_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.users_scrollArea)
 

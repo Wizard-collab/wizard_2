@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 
 # Wizard core modules
@@ -57,14 +57,14 @@ class renamer(QtWidgets.QWidget):
         self.content_layout.addWidget(self.viewer_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(3)
         self.list_view.setHeaderLabels(['Original file', '', 'File renamed'])
         self.list_view.header().resizeSection(1, 20)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.viewer_layout.addWidget(self.list_view)
 
         self.settings_widget = QtWidgets.QWidget()
@@ -83,7 +83,7 @@ class renamer(QtWidgets.QWidget):
         self.replace_lineEdit.setPlaceholderText('String to use as replacement')
         self.replace_layout.addWidget(self.replace_lineEdit)
 
-        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         self.path_lineEdit.setText(self.directory)

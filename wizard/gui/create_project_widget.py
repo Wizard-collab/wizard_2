@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 
 # Wizard gui modules
@@ -43,13 +43,13 @@ class create_project_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.title_label = QtWidgets.QLabel("Create project")
         self.title_label.setObjectName("title_label_2")
         self.main_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Project credentials")
@@ -67,7 +67,7 @@ class create_project_widget(QtWidgets.QDialog):
         self.password_confirm_lineEdit.setPlaceholderText('Confirm project password')
         self.main_layout.addWidget(self.password_confirm_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.project_path_label = QtWidgets.QLabel("The directory of your project")
@@ -91,7 +91,7 @@ class create_project_widget(QtWidgets.QDialog):
         self.folder_button.setFixedSize(28,28)
         self.path_layout.addWidget(self.folder_button)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.project_settings_label = QtWidgets.QLabel("Project settings")
@@ -113,7 +113,7 @@ class create_project_widget(QtWidgets.QDialog):
 
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
         self.frame_rate_spinBox.setRange(1, 300)
-        self.frame_rate_spinBox.setButtonSymbols(2)
+        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.frame_rate_spinBox.setValue(24)
         self.settings_layout.addRow(self.frame_rate_label, self.frame_rate_spinBox)
 
@@ -126,13 +126,13 @@ class create_project_widget(QtWidgets.QDialog):
 
         self.format_width = QtWidgets.QSpinBox()
         self.format_width.setRange(1, 100000)
-        self.format_width.setButtonSymbols(2)
+        self.format_width.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.format_width.setValue(1920)
         self.format_layout.addWidget(self.format_width)
 
         self.format_height = QtWidgets.QSpinBox()
         self.format_height.setRange(1, 100000)
-        self.format_height.setButtonSymbols(2)
+        self.format_height.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
         self.format_height.setValue(1080)
         self.format_layout.addWidget(self.format_height)
 
@@ -143,7 +143,7 @@ class create_project_widget(QtWidgets.QDialog):
         self.deadline_lineedit.setPlaceholderText('day/month/year')
         self.settings_layout.addRow(self.deadline_label, self.deadline_lineedit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.main_layout.addWidget(QtWidgets.QLabel('Project Image'))
@@ -170,9 +170,9 @@ class create_project_widget(QtWidgets.QDialog):
         self.random_image_button.setFixedSize(28,28)
         self.image_buttons_layout.addWidget(self.random_image_button)
 
-        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()

@@ -50,6 +50,6 @@ def invoke_settings_widget():
     from PySide2 import QtWidgets, QtCore, QtGui
     from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('fx')
-    if export_settings_widget_win.exec_() == QtWidgets.QDialog.Accepted:
+    if export_settings_widget_win.exec() == QtWidgets.QDialog.DialogCode.Accepted:
         frange = export_settings_widget_win.frange
         main(frange)

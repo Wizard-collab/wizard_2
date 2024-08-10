@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 import json
 
@@ -62,7 +62,7 @@ class project_users_widget(QtWidgets.QWidget):
 
     def create_tag_group(self):
         self.tag_group_creation_widget = tag_group_creation_widget()
-        if self.tag_group_creation_widget.exec_() != QtWidgets.QDialog.Accepted:
+        if self.tag_group_creation_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         tag_group_name = self.tag_group_creation_widget.name_field.text()
         project.create_tag_group(tag_group_name)
@@ -121,7 +121,7 @@ class project_users_widget(QtWidgets.QWidget):
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollArea_widget)
 
@@ -157,7 +157,7 @@ class project_users_widget(QtWidgets.QWidget):
         self.tag_groups_title.setObjectName('bold_label')
         self.tag_groups_header_layout.addWidget(self.tag_groups_title)
 
-        self.tag_groups_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.tag_groups_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.create_tag_group_button = QtWidgets.QPushButton('Create tag group')
         self.create_tag_group_button.setStyleSheet('padding:2px;')
@@ -173,7 +173,7 @@ class project_users_widget(QtWidgets.QWidget):
         self.tag_groups_container.setSpacing(2)
         self.scrollArea_layout.addLayout(self.tag_groups_container)
 
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
 class tag_group_widget(QtWidgets.QFrame):
     def __init__(self, tag_group_row, users_ids, parent=None):
@@ -204,7 +204,7 @@ class tag_group_widget(QtWidgets.QFrame):
         self.tag_group_name.setObjectName('tag_label')
         self.header_layout.addWidget(self.tag_group_name)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.suscribe_button = QtWidgets.QPushButton('')
         self.suscribe_button.setStyleSheet('padding:2px;')
@@ -223,7 +223,7 @@ class tag_group_widget(QtWidgets.QFrame):
         self.users_layout.setSpacing(6)
         self.group_tag_layout.addLayout(self.users_layout)
 
-        self.users_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.users_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def connect_functions(self):
         self.suscribe_button.clicked.connect(self.suscribe)
@@ -301,7 +301,7 @@ class user_widget(QtWidgets.QFrame):
         self.user_section_name = QtWidgets.QLabel()
         self.header_layout.addWidget(self.user_section_name)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.ignore_user_button = QtWidgets.QPushButton('Remove user')
         self.ignore_user_button.setStyleSheet('padding:2px;')
@@ -313,8 +313,8 @@ class tag_group_creation_widget(QtWidgets.QDialog):
         self.build_ui()
         self.connect_functions()
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -350,7 +350,7 @@ class tag_group_creation_widget(QtWidgets.QDialog):
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel('New tag group'))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)

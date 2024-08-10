@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 import time
 import traceback
@@ -41,8 +41,8 @@ class search_reference_widget(QtWidgets.QWidget):
 
         self.accept_item_from_thread = True      
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)       
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)       
 
         self.stage_ids = dict()
         self.groups_ids = dict()
@@ -203,7 +203,7 @@ class search_reference_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setMinimumWidth(550)
         self.setMinimumHeight(500)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(12,12,12,12)
@@ -252,7 +252,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().resizeSection(0, 100)
         self.list_view.header().resizeSection(1, 150)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.main_widget_layout.addWidget(self.list_view)
         self.show_info_mode('No export found...', ressources._nothing_info_)
 
@@ -261,7 +261,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.settings_widget.setLayout(self.settings_layout)
         self.main_widget_layout.addWidget(self.settings_widget)
 
-        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reference_with_auto_update_checkBox = QtWidgets.QCheckBox("Reference with auto update")
         self.settings_layout.addWidget(self.reference_with_auto_update_checkBox)

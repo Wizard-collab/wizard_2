@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import logging
 
@@ -74,7 +74,7 @@ class project_security_widget(QtWidgets.QWidget):
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollArea_widget)
 
@@ -87,7 +87,7 @@ class project_security_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.pwd_frame = QtWidgets.QFrame()
-        self.pwd_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.pwd_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.pwd_layout = QtWidgets.QVBoxLayout()
         self.pwd_layout.setContentsMargins(0,0,0,0)
         self.pwd_layout.setSpacing(6)
@@ -121,10 +121,10 @@ class project_security_widget(QtWidgets.QWidget):
         self.pwd_buttons_widget.setLayout(self.pwd_buttons_layout)
         self.pwd_layout.addWidget(self.pwd_buttons_widget)
 
-        self.pwd_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.pwd_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.pwd_accept_button = QtWidgets.QPushButton('Apply')
         self.pwd_accept_button.setObjectName('blue_button')
         self.pwd_buttons_layout.addWidget(self.pwd_accept_button)
 
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))

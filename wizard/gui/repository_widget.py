@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -47,7 +47,7 @@ class repository_widget(QtWidgets.QDialog):
         self.button_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.button_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
         self.quit_button = QtWidgets.QPushButton('Quit')

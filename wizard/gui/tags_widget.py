@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 import re
 
@@ -41,7 +41,7 @@ class tags_widget(gui_utils.QMenu):
     def exec(self):
         if len(self.actions) == 0:
             return
-        action = self.exec_()
+        action = self.exec()
         if action is not None:
             token = self.text.split('@')[-1]
             text = self.text[:-(len(token)+1)] + f"@{action.text()} "

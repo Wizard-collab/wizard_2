@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import time
 import psutil
 import logging
@@ -57,7 +57,7 @@ class footer_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.icon_label)
 
         self.main_layout.addWidget(self.logging_widget)
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.icon_label = QtWidgets.QLabel()
         self.icon_label.setFixedSize(QtCore.QSize(22,22))
@@ -75,11 +75,11 @@ class footer_widget(QtWidgets.QFrame):
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setFixedWidth(130)
-        self.refresh_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.refresh_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.refresh_label.setObjectName('gray_label')
         self.buttons_layout.addWidget(self.refresh_label)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.team_connection_button = QtWidgets.QPushButton()
         self.team_connection_button.setFixedSize(QtCore.QSize(30, 30))
@@ -256,7 +256,7 @@ class hardware_infos_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         gui_utils.application_tooltip(self, "Computer hardware informations")
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(6)

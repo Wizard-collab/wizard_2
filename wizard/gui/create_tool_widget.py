@@ -4,7 +4,7 @@
 
 # Python modules
 import os
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard gui modules
@@ -82,7 +82,7 @@ class create_tool_widget(QtWidgets.QWidget):
         menu = gui_utils.QMenu()
         custom_icon_action = menu.addAction('Choose from disk')
         existing_icon_action = menu.addAction('Choose from wizard')
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action == custom_icon_action:
             self.custom_icon()
         elif action == existing_icon_action:
@@ -98,7 +98,7 @@ class create_tool_widget(QtWidgets.QWidget):
             self.icon_button.setIcon(QtGui.QIcon(self.icon))
 
     def existing_icon(self):
-        if self.choose_icon_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.choose_icon_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self.icon = self.choose_icon_widget.icon_path
             self.icon_button.setIcon(QtGui.QIcon(self.icon))
 
@@ -123,7 +123,7 @@ class create_tool_widget(QtWidgets.QWidget):
         self.name_field = QtWidgets.QLineEdit()
         self.name_field.setPlaceholderText('Tool name')
         self.header_layout.addWidget(self.name_field)
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.script_editor_widget = script_editor_widget.script_editor_widget()
         self.main_layout.addWidget(self.script_editor_widget)
@@ -140,7 +140,7 @@ class create_tool_widget(QtWidgets.QWidget):
         self.subtask_widget.setLayout(self.subtask_layout)
         self.main_layout.addWidget(self.subtask_widget)
 
-        self.subtask_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.subtask_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
         self.only_subtask_checkBox = QtWidgets.QCheckBox('Only execute as subtask')
         self.subtask_layout.addWidget(self.only_subtask_checkBox)
 
@@ -152,7 +152,7 @@ class create_tool_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.cancel_button.setDefault(False)

@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import time
 import logging
 import copy
@@ -64,7 +64,7 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.setVisible(1)
 
     def connect_functions(self):
-        self.search_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Tab'), self)
+        self.search_sc = QtGui.QShortcut(QtGui.QKeySequence('Tab'), self)
         self.search_sc.activated.connect(self.search_reference)
         self.reference_infos_thread.reference_infos_signal.connect(self.update_item_infos)
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
@@ -351,7 +351,7 @@ class references_widget(QtWidgets.QWidget):
                 variant_id = project.get_export_data(export_id, 'variant_id')
                 stage_id = project.get_variant_data(variant_id, 'stage_id')
                 self.comment_widget = comment_widget.comment_widget()
-                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     assets.modify_stage_state(variant_id, 'error', self.comment_widget.comment)
                     gui_server.refresh_team_ui()
 
@@ -429,7 +429,7 @@ class references_widget(QtWidgets.QWidget):
                     open_folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
         add_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add references (Tab)')
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == remove_action:
                 self.remove_selection()
@@ -599,8 +599,8 @@ class references_widget(QtWidgets.QWidget):
         self.list_view.header().resizeSection(6, 80)
         self.list_view.header().resizeSection(7, 90)
         self.list_view.header().resizeSection(8, 40)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
@@ -612,7 +612,7 @@ class references_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.references_count_label = QtWidgets.QLabel()
         self.references_count_label.setObjectName('gray_label')
@@ -641,7 +641,7 @@ class references_widget(QtWidgets.QWidget):
         self.quick_import_layout.setSpacing(4)
         self.buttons_layout.addWidget(self.quick_import_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
@@ -680,7 +680,7 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, stage, parent=None):
         super(custom_stage_tree_item, self).__init__(parent)
         self.stage = stage
-        self.setFlags(QtCore.Qt.ItemIsEnabled)
+        self.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
         self.setExpanded(1)
         self.fill_ui()
 
@@ -694,7 +694,7 @@ class custom_stage_tree_item(QtWidgets.QTreeWidgetItem):
 class custom_group_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent=None):
         super(custom_group_tree_item, self).__init__(parent)
-        self.setFlags(QtCore.Qt.ItemIsEnabled)
+        self.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
         self.setExpanded(1)
         self.setText(0, 'Groups')
         self.setIcon(0, QtGui.QIcon(ressources._group_icon_))
@@ -831,7 +831,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
             for export in exports_list:
                 action = menu.addAction(export['name'])
                 action.id = export['id']
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action is not None:
                 self.modify_export(action.id)
 
@@ -846,7 +846,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
                     comment = version['comment']
                 action = menu.addAction(f"{version['name']} - {comment}")
                 action.id = version['id']
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action is not None:
                 self.modify_version(action.id)
 
@@ -897,7 +897,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
     def modify_state(self, state):
         if self.stage_row['state'] != state:
             self.comment_widget = comment_widget.comment_widget()
-            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 comment = self.comment_widget.comment
                 assets.modify_stage_state(self.stage_row['id'], state, comment)
                 gui_server.refresh_team_ui()
@@ -1080,8 +1080,8 @@ class state_widget(QtWidgets.QLabel):
         self.setObjectName('state_widget')
         self.setMouseTracking(True)
         self.setFixedWidth(60)
-        self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.connect_functions()
 
     def connect_functions(self):
@@ -1095,7 +1095,7 @@ class state_widget(QtWidgets.QLabel):
         menu = gui_utils.QMenu(self)
         for state in assets_vars._asset_states_list_:
             menu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             self.modify_state_signal.emit(action.text())
 

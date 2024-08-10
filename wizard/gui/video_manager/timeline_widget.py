@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import math
 import logging
 
@@ -84,7 +84,7 @@ class timeline_widget(QtWidgets.QWidget):
         self.set_frame(0)
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.setObjectName("main_widget")
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -203,7 +203,7 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.video_infos_widget = QtWidgets.QWidget()
-        self.video_infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.video_infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.video_infos_layout = QtWidgets.QHBoxLayout()
         self.video_infos_layout.setContentsMargins(6,6,6,6)
         self.video_infos_widget.setLayout(self.video_infos_layout)
@@ -224,7 +224,7 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.video_date_label.setObjectName('gray_label')
         self.video_infos_layout.addWidget(self.video_date_label)
 
-        self.video_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.video_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.assignment_label = QtWidgets.QLabel()
         self.video_infos_layout.addWidget(self.assignment_label)
@@ -241,27 +241,27 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.main_layout.addLayout(self.content_1_layout)
 
         self.beginning_button = gui_utils.transparent_button(ressources._player_beginning_icon_, ressources._player_beginning_icon_hover_)
-        self.beginning_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.beginning_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.beginning_button.setFixedSize(QtCore.QSize(20,20))
         self.content_1_layout.addWidget(self.beginning_button)
 
         self.previous_button = gui_utils.transparent_button(ressources._player_previous_icon_, ressources._player_previous_icon_hover_)
-        self.previous_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.previous_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.previous_button.setFixedSize(QtCore.QSize(20,20))
         self.content_1_layout.addWidget(self.previous_button)
 
         self.play_pause_button = gui_utils.transparent_button(ressources._player_play_icon_, ressources._player_play_icon_hover_)
-        self.play_pause_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.play_pause_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.play_pause_button.setFixedSize(QtCore.QSize(20,20))
         self.content_1_layout.addWidget(self.play_pause_button)
 
         self.next_button = gui_utils.transparent_button(ressources._player_next_icon_, ressources._player_next_icon_hover_)
-        self.next_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.next_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.next_button.setFixedSize(QtCore.QSize(20,20))
         self.content_1_layout.addWidget(self.next_button)
 
         self.end_button = gui_utils.transparent_button(ressources._player_end_icon_, ressources._player_end_icon_hover_)
-        self.end_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.end_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.end_button.setFixedSize(QtCore.QSize(20,20))
         self.content_1_layout.addWidget(self.end_button)
 
@@ -269,11 +269,11 @@ class playing_infos_widget(QtWidgets.QWidget):
                                                         ressources._player_loop_icon_hover_,
                                                         checked_icon=ressources._player_loop_icon_checked_)
         self.loop_button.setCheckable(True)
-        self.loop_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.loop_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.loop_button.setFixedSize(QtCore.QSize(20,20))
         self.content_1_layout.addWidget(self.loop_button)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.time_label = QtWidgets.QLabel('00:00:00:00')
         self.content_1_layout.addWidget(self.time_label)
@@ -282,17 +282,17 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.total_time_label.setObjectName('gray_label')
         self.content_1_layout.addWidget(self.total_time_label)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.fps_label = QtWidgets.QLabel()
         self.content_1_layout.addWidget(self.fps_label)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.resolution_label = QtWidgets.QLabel()
         self.content_1_layout.addWidget(self.resolution_label)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def connect_functions(self):
         self.play_pause_button.clicked.connect(self.on_play_pause.emit)
@@ -367,13 +367,13 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.timeline_scene = timeline_scene()
         self.signal_manager = signal_manager()
         self.setScene(self.timeline_scene)
-        self.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        self.setRenderHint(QtGui.QPainter.TextAntialiasing, True)
-        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
+        self.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing, True)
+        self.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform, True)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.pan = False
         self.move_cursor = False
         self.last_mouse_pos = None
@@ -568,7 +568,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         
         clear_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Clear playlist')
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == update_selection_action:
                 self.update_selected_items_versions()
@@ -840,7 +840,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         if event.button() == QtCore.Qt.LeftButton:
             self.move_cursor = None
             self.move_video_item = None
-        elif event.button() == QtCore.Qt.RightButton:
+        elif event.button() == QtCore.Qt.MouseButton.RightButton:
             self.show_context_menu()
 
     def mouseMoveEvent(self, event):
@@ -958,10 +958,10 @@ class timeline_scene(QtWidgets.QGraphicsScene):
         for x in range(start_x, end_x + 1, step):
             x_pos = int(x * self.frame_width)
             rect = QtCore.QRectF(x_pos-25+int(self.frame_width/2), 10, 50, 20)
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.2)), 1, QtCore.Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.2)), 1, QtCore.Qt.PenStyle.SolidLine)
             painter.setPen(pen)
-            painter.drawText(rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter, str(x))
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.05)), 1, QtCore.Qt.SolidLine)
+            painter.drawText(rect, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter, str(x))
+            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.05)), 1, QtCore.Qt.PenStyle.SolidLine)
             painter.setPen(pen)
             painter.drawLine(x_pos, 30, x_pos, 80)
 
@@ -1003,7 +1003,7 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         color = QtGui.QColor('transparent')
-        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.PenStyle.SolidLine)
         brush = QtGui.QBrush(color)
         painter.setPen(pen)
         painter.setBrush(brush)
@@ -1024,7 +1024,7 @@ class video_item(custom_graphic_item):
     def __init__(self, video_name, video_id, frames_count):
         super(video_item, self).__init__()
         self.setAcceptHoverEvents(True)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.video_name = video_name
         self.thumbnail_path = None
         self.thumbnail_pixmap = None
@@ -1086,7 +1086,7 @@ class video_item(custom_graphic_item):
                 return
             self.start_move_pos = event.pos()
         if (not self.selected and event.button() == QtCore.Qt.LeftButton)\
-                or (not self.selected and event.button() == QtCore.Qt.RightButton):
+                or (not self.selected and event.button() == QtCore.Qt.MouseButton.RightButton):
             self.signal_manager.on_select.emit([self])
 
     def mouseReleaseEvent(self, event):
@@ -1235,7 +1235,7 @@ class video_item(custom_graphic_item):
         if self.is_current() and self.loaded:
             bg_color.setAlpha(255)
         # Paint cropping effect
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         if self.start_crop_in is not None or self.start_crop_out is not None:
             shadow_rect = QtCore.QRectF(self.x-(self.in_frame*self.frame_width),
@@ -1250,9 +1250,9 @@ class video_item(custom_graphic_item):
         brush = QtGui.QBrush(bg_color)
         painter.setBrush(brush)
         if not self.selected:
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
         else:
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         bg_rect = QtCore.QRect(int(self.x),
                             int(self.y+self.margin*4),
@@ -1268,10 +1268,10 @@ class video_item(custom_graphic_item):
         painter.drawPixmap(display_thumbnail_rect, pixmap)
         if not self.is_last:
             painter.setBrush(QtGui.QBrush())
-            painter.setPen(QtGui.QPen(QtGui.QColor('#f79360'), 2, QtCore.Qt.SolidLine))
+            painter.setPen(QtGui.QPen(QtGui.QColor('#f79360'), 2, QtCore.Qt.PenStyle.SolidLine))
             painter.drawRect(display_thumbnail_rect)
 
-        pen = QtGui.QPen(QtGui.QColor("#ffffff"), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor("#ffffff"), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         text_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
                             int(bg_rect.y()+self.margin*3)),
@@ -1285,20 +1285,20 @@ class video_item(custom_graphic_item):
             text = f"{category} / {asset} / {variant}"
         else:
             text = self.video_name
-        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, text)
+        painter.drawText(text_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop, text)
         
         if self.stage_row:
             stage_name = self.stage_row['name']
-            pen = QtGui.QPen(QtGui.QColor(ressources._stages_colors_[self.stage_row['name']]), 1, QtCore.Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(ressources._stages_colors_[self.stage_row['name']]), 1, QtCore.Qt.PenStyle.SolidLine)
             painter.setPen(pen)
             stage_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
                             int(bg_rect.y()+self.margin*3+12)),
                             QtCore.QPoint(int(bg_rect.width()-self.margin*4),
                             int(bg_rect.height()-self.margin*8)))
-            painter.drawText(stage_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop, stage_name)
+            painter.drawText(stage_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop, stage_name)
 
         # Draw crop handles
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         if self.hover_in_frame_handle:
             handle_rect = QtCore.QRectF(bg_rect.x(),
@@ -1379,26 +1379,26 @@ class cursor_item(custom_graphic_item):
         self.signal_manager.on_seek.emit(self.frame)
 
     def paint(self, painter, option, widget):
-        pen = QtGui.QPen(QtGui.QColor(255,100,100,200), max(self.frame_width, 2), QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,100,100,200), max(self.frame_width, 2), QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         painter.drawLine(self.x+int(self.width/2), 20, self.x+int(self.width/2), self.height)
         frame_rect = QtCore.QRectF(self.x, 0, self.width, 20)
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
         brush = QtGui.QBrush(QtGui.QColor(255,100,100,255))
         painter.setBrush(brush)
         painter.setPen(pen)
         painter.drawRoundedRect(frame_rect, 4, 4)
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         font = QtGui.QFont()
         font.setBold(True)
         painter.setFont(font)
-        painter.drawText(frame_rect, QtCore.Qt.AlignCenter | QtCore.Qt.AlignHCenter, str(self.frame))
+        painter.drawText(frame_rect, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter, str(self.frame))
 
 class bound_item(custom_graphic_item):
     def __init__(self):
         super(bound_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.setZValue(999)
         self.signal_manager = signal_manager()
         self.height = 8
@@ -1484,7 +1484,7 @@ class bound_item(custom_graphic_item):
 
     def paint(self, painter, option, widget):
         brush = QtGui.QBrush(QtGui.QColor(255,100,100,255))
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setBrush(brush)
         painter.setPen(pen)
         painter.drawRoundedRect(QtCore.QRectF(0,0, self.width, self.height), 4, 4)

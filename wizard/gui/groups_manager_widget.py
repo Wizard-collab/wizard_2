@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 
 # Wizard modules
@@ -62,7 +62,7 @@ class groups_manager_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.header = QtWidgets.QWidget()
-        self.header.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.header.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(6)
         self.header.setLayout(self.header_layout)
@@ -78,7 +78,7 @@ class groups_manager_widget(QtWidgets.QWidget):
         self.groups_comboBox.setFixedWidth(300)
         self.header_layout.addWidget(self.groups_comboBox)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.color_button = QtWidgets.QPushButton()
         self.color_button.setFixedSize(26,26)
@@ -143,7 +143,7 @@ class groups_manager_widget(QtWidgets.QWidget):
 
     def create_group(self):
         self.group_creation_widget = group_creation_widget(self)
-        if self.group_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.group_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             group_name = self.group_creation_widget.name_field.text()
             new_group_id = assets.create_group(group_name)
             gui_server.refresh_team_ui()
@@ -154,7 +154,7 @@ class groups_manager_widget(QtWidgets.QWidget):
         if current_group != '':
             self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
             security_sentence = f"{current_group}"
-            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 group_id = self.groups[current_group]['id']
                 assets.remove_group(group_id)
                 gui_server.refresh_team_ui()
@@ -189,7 +189,7 @@ class groups_manager_widget(QtWidgets.QWidget):
             self.get_current_group_id()
 
             #comboBox->model()->sort(0, Qt::DescendingOrder)
-            self.groups_comboBox.model().sort(0, QtCore.Qt.AscendingOrder)
+            self.groups_comboBox.model().sort(0, QtCore.Qt.SortOrder.AscendingOrder)
 
             if self.group_id != self.old_group_id:
                 self.current_group_changed()
@@ -203,8 +203,8 @@ class group_creation_widget(QtWidgets.QDialog):
         self.build_ui()
         self.connect_functions()
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -240,7 +240,7 @@ class group_creation_widget(QtWidgets.QDialog):
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel('New group'))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)

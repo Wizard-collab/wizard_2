@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 import os
 import sys
@@ -34,9 +34,9 @@ from wizard.gui import project_manager_widget
 logger = logging.getLogger(__name__)
 
 def get_app():
-    os.environ["QT_SCALE_FACTOR"] = "0.75"
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+    #os.environ["QT_SCALE_FACTOR"] = "0.75"
+    #QtWidgets.QApplication.setAttribute(QtCore.Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
+    #QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
 
     app = QtWidgets.QApplication(sys.argv)
 
@@ -86,7 +86,7 @@ def init_psql_dns(app, change_psql=False):
     if (not user.user().get_psql_dns()) or change_psql:
         if environment.is_gui():
                 _psql_widget = psql_widget.psql_widget()
-                if _psql_widget.exec_() != QtWidgets.QDialog.Accepted:
+                if _psql_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
                     app.quit()
         else:
             while not user.user().get_psql_dns():
@@ -103,7 +103,7 @@ def init_repository(app, change_repo=False):
     if (not user.user().get_repository()) or change_repo:
         if environment.is_gui():
             _repository_widget = repository_widget.repository_widget()
-            if _repository_widget.exec_() != QtWidgets.QDialog.Accepted:
+            if _repository_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
                 app.quit()
                 return None
         else:
@@ -120,7 +120,7 @@ def init_user(app, log_user=False):
     if (not user.get_user()) or log_user:
         if environment.is_gui():
             _user_log_widget = user_log_widget.user_log_widget()
-            if _user_log_widget.exec_() != QtWidgets.QDialog.Accepted:
+            if _user_log_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
                 app.quit()
         else:
             while not user.get_user():
@@ -146,7 +146,7 @@ def init_project(app, project_manager=False):
     if (not user.get_project()) or project_manager:
         if environment.is_gui():
             _project_manager_widget = project_manager_widget.project_manager_widget()
-            if _project_manager_widget.exec_() != QtWidgets.QDialog.Accepted:
+            if _project_manager_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
                 app.quit()
         else:
             while not user.get_project():

@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import traceback
 import sys
 import uuid
@@ -106,7 +106,7 @@ class video_player_widget(QtWidgets.QFrame):
 
     def show_preferences(self):
         self.preferences_dialog = preferences_widget(self.fps, self.resolution, self)
-        if self.preferences_dialog.exec_() == QtWidgets.QDialog.Accepted:
+        if self.preferences_dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             fps = self.preferences_dialog.fps
             resolution = self.preferences_dialog.resolution
             if fps != self.fps or resolution != self.resolution:
@@ -225,10 +225,10 @@ class video_player_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.menu_widget)
 
         self.menu_bar = QtWidgets.QMenuBar()
-        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.menu_layout.addWidget(self.menu_bar)
         
-        self.menu_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.menu_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.player_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Player')
         self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(ressources._tool_clear_cache_), "Clear cache")
@@ -259,11 +259,11 @@ class video_player_widget(QtWidgets.QFrame):
         self.current_playlist_label.setObjectName('bold_label')
         self.playlist_layout.addWidget(self.current_playlist_label)
 
-        self.playlist_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.playlist_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.container = QtWidgets.QFrame()
         self.container.setStyleSheet("background-color:black;")
-        self.container.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.container.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.container_layout = QtWidgets.QHBoxLayout()
         self.container_layout.setContentsMargins(0,0,0,0)
         self.container.setLayout(self.container_layout)
@@ -371,7 +371,7 @@ class video_player_widget(QtWidgets.QFrame):
     def clear(self):
         if self.videos_dic != {} and self.modified:
             self.confirm_widget = confirm_widget.confirm_widget(f"Create a new playlist without saving ?", parent=self)
-            if self.confirm_widget.exec_() != QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
                 return
         self.delete_videos(list(self.videos_dic.keys()))
         self.current_playlist = None
@@ -404,7 +404,7 @@ class video_player_widget(QtWidgets.QFrame):
 
     def save_as_new_playlist(self):
         self.create_playlist_widget = create_playlist_widget.create_playlist_widget(data=json.dumps(self.videos_dic), thumbnail_temp_path=self.get_first_thumbnail())
-        if self.create_playlist_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.create_playlist_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self.current_playlist = self.create_playlist_widget.playlist_id
             self.current_playlist_name = self.create_playlist_widget.playlist_name
             self.set_modified(False)
@@ -514,15 +514,15 @@ class preferences_widget(QtWidgets.QDialog):
 
         self.fps_spinbox = QtWidgets.QSpinBox()
         self.fps_spinbox.setRange(0, 120)
-        self.fps_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.fps_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.settings_layout.addRow(QtWidgets.QLabel('Fps'), self.fps_spinbox)
 
         self.width_spinbox = QtWidgets.QSpinBox()
         self.width_spinbox.setRange(1, 10000)
-        self.width_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.width_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.height_spinbox = QtWidgets.QSpinBox()
         self.height_spinbox.setRange(1, 10000)
-        self.height_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.height_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.resolutions_layout = QtWidgets.QHBoxLayout()
         self.resolutions_layout.addWidget(self.width_spinbox)
         self.resolutions_layout.addWidget(self.height_spinbox)
@@ -533,7 +533,7 @@ class preferences_widget(QtWidgets.QDialog):
         self.buttons_layout.setSpacing(6)
         self.main_layout.addLayout(self.buttons_layout)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.buttons_layout.addWidget(self.cancel_button)
