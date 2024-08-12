@@ -347,7 +347,7 @@ class give_coins_widget(QtWidgets.QDialog):
 
         self.amount_field = QtWidgets.QSpinBox()
         self.amount_field.setRange(1, 2147483647)
-        self.amount_field.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.amount_field.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frame_layout.addWidget(self.amount_field)
 
         self.accept_button = QtWidgets.QPushButton('Give')

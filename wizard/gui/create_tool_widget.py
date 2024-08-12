@@ -89,10 +89,8 @@ class create_tool_widget(QtWidgets.QWidget):
             self.existing_icon()
 
     def custom_icon(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select tool icon", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.svg);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.svg);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             self.icon = image_file
             self.icon_button.setIcon(QtGui.QIcon(self.icon))

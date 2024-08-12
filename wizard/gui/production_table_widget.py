@@ -582,10 +582,8 @@ class asset_widget(QtWidgets.QWidget):
                 self.set_preview()
 
     def set_preview(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select preview image", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):

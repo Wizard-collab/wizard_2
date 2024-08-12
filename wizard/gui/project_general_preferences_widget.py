@@ -80,10 +80,8 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.refresh()
 
     def open_image(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select project image", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
@@ -215,7 +213,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
         self.frame_rate_spinBox.setRange(1, 300)
         self.frame_rate_spinBox.setFixedWidth(60)
-        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frame_rate_layout.addWidget(self.frame_rate_spinBox)
 
         self.frame_rate_buttons_widget = QtWidgets.QWidget()
@@ -254,13 +252,13 @@ class project_general_preferences_widget(QtWidgets.QWidget):
 
         self.format_width = QtWidgets.QSpinBox()
         self.format_width.setRange(1, 100000)
-        self.format_width.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.format_width.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.format_width.setValue(1920)
         self.format_layout.addWidget(self.format_width)
 
         self.format_height = QtWidgets.QSpinBox()
         self.format_height.setRange(1, 100000)
-        self.format_height.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.format_height.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.format_height.setValue(1080)
         self.format_layout.addWidget(self.format_height)
 

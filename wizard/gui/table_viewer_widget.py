@@ -243,5 +243,5 @@ class HighlightTextDelegate(QtWidgets.QStyledItemDelegate):
         super().initStyleOption(option, index)
         foregroundData = index.data(QtCore.Qt.ItemDataRole.ForegroundRole)
         if foregroundData:
-            option.palette.setBrush(QtGui.QPalette.HighlightedText, QtGui.QBrush(foregroundData))
+            option.palette.setBrush(QtGui.QPalette.ColorRole.HighlightedText, QtGui.QBrush(foregroundData))
 

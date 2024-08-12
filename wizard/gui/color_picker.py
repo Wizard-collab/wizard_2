@@ -64,7 +64,7 @@ class color_picker(QtWidgets.QWidget):
             if pos.y() < 0: pos.setY(0)
             if pos.x() > 200: pos.setX(200)
             if pos.y() > 200: pos.setY(200)
-            self.selector.move(pos - QtCore.QPoint(6,6))
+            self.selector.move(pos.toPoint() - QtCore.QPoint(6,6))
             self.hsvChanged()
 
     def moveHueSelector(self, event):
@@ -72,7 +72,7 @@ class color_picker(QtWidgets.QWidget):
             pos = event.position().y()
             if pos < 0: pos = 0
             if pos > 185: pos = 185
-            self.hue_selector.move(QtCore.QPoint(0,pos))
+            self.hue_selector.move(QtCore.QPoint(0,int(pos)))
             self.hsvChanged()
 
     def hsv_to_hex(self, h, s, v):
@@ -109,8 +109,8 @@ class color_picker(QtWidgets.QWidget):
         "background-color: qlineargradient(x1:1, x2:0, stop:0 hsl(0%,100%,50%), stop:1 rgba(255, 255, 255, 255));border-radius:6px;\n"
         "\n"
         "")
-        self.color_view.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.color_view.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.color_view.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.color_view.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.color_view.setObjectName("color_view")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.color_view)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -121,8 +121,8 @@ class color_picker(QtWidgets.QWidget):
         "\n"
         "\n"
         "")
-        self.black_overlay.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.black_overlay.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.black_overlay.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.black_overlay.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.black_overlay.setObjectName("black_overlay")
         self.selector = QtWidgets.QFrame(self.black_overlay)
         self.selector.setGeometry(QtCore.QRect(194, 20, 12, 12))
@@ -131,23 +131,23 @@ class color_picker(QtWidgets.QWidget):
         self.selector.setStyleSheet("background-color:none;\n"
         "border: 2px solid white;\n"
         "border-radius: 6px;")
-        self.selector.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.selector.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.selector.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.selector.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.selector.setObjectName("selector")
         self.verticalLayout_2.addWidget(self.black_overlay)
         self.main_layout.addWidget(self.color_view)
         self.frame_2 = QtWidgets.QFrame(self)
         self.frame_2.setObjectName('transparent_widget')
         self.frame_2.setMinimumSize(QtCore.QSize(12, 0))
-        self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_2.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.frame_2.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.hue_bg = QtWidgets.QFrame(self.frame_2)
         self.hue_bg.setGeometry(QtCore.QRect(0, 0, 12, 200))
         self.hue_bg.setMinimumSize(QtCore.QSize(12, 200))
         self.hue_bg.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(255, 0, 0, 255), stop:0.166 rgba(255, 255, 0, 255), stop:0.333 rgba(0, 255, 0, 255), stop:0.5 rgba(0, 255, 255, 255), stop:0.666 rgba(0, 0, 255, 255), stop:0.833 rgba(255, 0, 255, 255), stop:1 rgba(255, 0, 0, 255));\n"
         "border-radius: 6px;")
-        self.hue_bg.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.hue_bg.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.hue_bg.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.hue_bg.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         #self.hue_bg.setObjectName("hue_bg")
         self.hue_selector = QtWidgets.QLabel(self.frame_2)
         self.hue_selector.setGeometry(QtCore.QRect(0, 185, 0, 12))
@@ -161,7 +161,7 @@ class color_picker(QtWidgets.QWidget):
         self.hue.setGeometry(QtCore.QRect(0, 0, 12, 200))
         self.hue.setMinimumSize(QtCore.QSize(12, 200))
         self.hue.setStyleSheet("background-color: none;")
-        self.hue.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.hue.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.hue.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        self.hue.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.hue.setObjectName("hue")
         self.main_layout.addWidget(self.frame_2)

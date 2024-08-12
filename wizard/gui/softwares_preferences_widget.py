@@ -109,10 +109,8 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.buttons_layout.addWidget(self.apply_button)
 
     def open_folder(self):
-        options = QtWidgets.QFileDialog.Options()
         software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select software executable", "",
-                            "All Files (*);;",
-                            options=options)
+                            "All Files (*);;")
         if software_path:
             self.path_lineEdit.setText(software_path.replace('\\', '/'))
 

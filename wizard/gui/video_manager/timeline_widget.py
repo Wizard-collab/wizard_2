@@ -829,8 +829,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.last_mouse_pos = event.position()
 
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            if self.timeline_scene.is_in_cursor_zone(self.mapToScene(event.position())):
-                self.cursor_item.move_item(self.mapToScene(event.position()).x())
+            if self.timeline_scene.is_in_cursor_zone(self.mapToScene(event.position().toPoint())):
+                self.cursor_item.move_item(self.mapToScene(event.position().toPoint()).x())
                 self.move_cursor = True
 
     def mouseReleaseEvent(self, event):
@@ -853,7 +853,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             self.update_scene_rect(self.sceneRect().translated(dx, 0))
             self.move_scene_center_to_left()
         if self.move_cursor:
-            self.cursor_item.move_item(self.mapToScene(event.position()).x())
+            self.cursor_item.move_item(self.mapToScene(event.position().toPoint()).x())
 
     def wheelEvent(self, event):
         if event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier:
@@ -1124,7 +1124,7 @@ class video_item(custom_graphic_item):
             self.signal_manager.on_video_item_move.emit(delta)
         if self.start_crop_in is not None:
             self.setZValue(500)
-            abs_frame = int(self.mapToScene(event.position()).x()/self.frame_width)
+            abs_frame = int(self.mapToScene(event.position().toPoint()).x()/self.frame_width)
             in_frame = int((abs_frame+(self.start_crop_in)) - self.start_frame)
             in_frame = min(max(0, in_frame), self.out_frame-1)
             self.setPos(int((in_frame-self.start_crop_in+self.start_frame)*self.frame_width), self.pos().y())
@@ -1134,7 +1134,7 @@ class video_item(custom_graphic_item):
 
         if self.start_crop_out:
             self.setZValue(500)
-            abs_frame = self.mapToScene(event.position()).x()/self.frame_width
+            abs_frame = self.mapToScene(event.position().toPoint()).x()/self.frame_width
             self.set_out_frame(int((abs_frame+self.in_frame) - self.start_frame))
             self.in_or_out_modified = True
             self.signal_manager.on_select.emit([self])

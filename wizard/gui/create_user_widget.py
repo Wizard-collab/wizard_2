@@ -160,10 +160,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.profile_picture_button.setIcon(icon)
 
     def update_profile_picture(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select profile picture", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):

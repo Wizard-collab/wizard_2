@@ -228,7 +228,7 @@ class general_widget(QtWidgets.QWidget):
         self.popups_sublayout.addRow(QtWidgets.QLabel('Keep popups until comment'), self.keep_until_comment_checkbox)
 
         self.popups_duration_spinBox = QtWidgets.QSpinBox()
-        self.popups_duration_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.popups_duration_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.popups_sublayout.addRow(QtWidgets.QLabel('Duration ( seconds )'), self.popups_duration_spinBox)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
@@ -488,10 +488,8 @@ class user_account_widget(QtWidgets.QWidget):
             self.refresh()
 
     def update_profile_picture(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select profile picture", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):

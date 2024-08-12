@@ -293,7 +293,7 @@ class QProgressBar(QtWidgets.QProgressBar):
         qp = QtWidgets.QStylePainter(self)
         opt = QtWidgets.QStyleOptionProgressBar()
         self.initStyleOption(opt)
-        rect = self.style().subElementRect(QtWidgets.QStyle.SE_ProgressBarContents, opt, self)
+        rect = self.style().subElementRect(QtWidgets.QStyle.SubElement.SE_ProgressBarContents, opt, self)
         minSize = rect.height()
         grooveSize = rect.width() - minSize - 1
         valueRange = self.maximum() - self.minimum()
@@ -302,7 +302,7 @@ class QProgressBar(QtWidgets.QProgressBar):
         if int(newValue) != newValue:
             newValue = min(self.maximum(), newValue + 1)
         opt.progress = int(newValue)
-        qp.drawControl(QtWidgets.QStyle.CE_ProgressBar, opt)
+        qp.drawControl(QtWidgets.QStyle.ControlElement.CE_ProgressBar, opt)
 
 class QRightClickButton(QtWidgets.QPushButton):
 
@@ -716,12 +716,12 @@ class GlobalClickDetector(QtCore.QObject):
         self.target_widget = target_widget
 
     def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-            global_pos = event.globalPos()
+        if event.type() == QtCore.QEvent.Type.MouseButtonPress:
+            global_pos = event.globalPosition()
             target_global_geometry = self.target_widget.mapToGlobal(self.target_widget.rect().topLeft())
             target_global_rect = self.target_widget.rect().translated(target_global_geometry)
 
-            if not target_global_rect.contains(global_pos):
+            if not target_global_rect.contains(global_pos.toPoint()):
                 self.clicked_outside.emit(1)
             else:
                 self.clicked_inside.emit(1)

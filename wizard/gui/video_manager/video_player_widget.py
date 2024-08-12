@@ -418,8 +418,7 @@ class video_player_widget(QtWidgets.QFrame):
         return thumbnail_path
 
     def export_playlist_as_file(self):
-        options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Playlist File", "", "JSON Files (*.json)", options=options)
+        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Playlist File", "", "JSON Files (*.json)")
         if file_name:
             with open(file_name, 'w') as f:
                 json.dump(self.get_playlist_dic(), f, indent=4)
@@ -427,8 +426,7 @@ class video_player_widget(QtWidgets.QFrame):
             self.set_info("Playlist saved successfully")
 
     def export_video_file(self):
-        options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save video file", "", "Mp4 Files (*.mp4)", options=options)
+        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save video file", "", "Mp4 Files (*.mp4)")
         if file_name:
             concat_file = ffmpeg_utils.get_concat_video_file(self.temp_dir, self.player_id)
             if not path_utils.isfile(concat_file):
@@ -440,8 +438,7 @@ class video_player_widget(QtWidgets.QFrame):
             self.set_info("Video exported successfully")
 
     def load_playlist_file(self):
-        options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Load Playlist File", "", "JSON Files (*.json)", options=options)
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Load Playlist File", "", "JSON Files (*.json)")
         if file_name:
             with open(file_name, 'r') as f:
                 videos_dic = json.load(f)
@@ -514,15 +511,15 @@ class preferences_widget(QtWidgets.QDialog):
 
         self.fps_spinbox = QtWidgets.QSpinBox()
         self.fps_spinbox.setRange(0, 120)
-        self.fps_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.fps_spinbox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.settings_layout.addRow(QtWidgets.QLabel('Fps'), self.fps_spinbox)
 
         self.width_spinbox = QtWidgets.QSpinBox()
         self.width_spinbox.setRange(1, 10000)
-        self.width_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.width_spinbox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.height_spinbox = QtWidgets.QSpinBox()
         self.height_spinbox.setRange(1, 10000)
-        self.height_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.height_spinbox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.resolutions_layout = QtWidgets.QHBoxLayout()
         self.resolutions_layout.addWidget(self.width_spinbox)
         self.resolutions_layout.addWidget(self.height_spinbox)

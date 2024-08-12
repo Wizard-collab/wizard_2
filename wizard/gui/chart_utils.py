@@ -33,7 +33,7 @@ class pie_chart(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         for pie in self.pies_list:
             painter.setPen(QtGui.QPen(QtGui.QColor(pie[1]), 0))
-            painter.setBrush(QtGui.QBrush(QtGui.QColor(pie[1]), QtCore.Qt.SolidPattern))
+            painter.setBrush(QtGui.QBrush(QtGui.QColor(pie[1]), QtCore.Qt.BrushStyle.SolidPattern))
             painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
             painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
             angle = 360*pie[0]/100
@@ -59,7 +59,7 @@ class time_left_chart(QtWidgets.QFrame):
         percent = current_time/time_range*100
         painter = QtGui.QPainter(self)
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 0))
-        painter.setBrush(QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.SolidPattern))
+        painter.setBrush(QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.BrushStyle.SolidPattern))
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         # Draw gradient
@@ -77,7 +77,7 @@ class time_left_chart(QtWidgets.QFrame):
         position_rect = QtCore.QRectF(position_x, position_y, 4, 12)
         path = QtGui.QPainterPath()
         path.addRoundedRect(position_rect, 2, 2);
-        painter.fillPath(path, QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.SolidPattern))
+        painter.fillPath(path, QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.BrushStyle.SolidPattern))
         # Draw percent text
         text = f"{int(percent)} %"
         font = QtGui.QFont()
@@ -204,7 +204,7 @@ class curves_chart(QtWidgets.QFrame):
                         point_x = ((w-self.margin*2)*prevision_time_at_100)/100+self.margin
                         point_y = h-(((h-self.margin*2)*prevision_at_100_time)/100+self.margin)
                         color.setAlpha(100)
-                        pen.setStyle(QtCore.Qt.DotLine)
+                        pen.setStyle(QtCore.Qt.PenStyle.DotLine)
                         pen.setBrush(color)
                         painter.setPen(pen)
                         path = QtGui.QPainterPath()
@@ -282,7 +282,7 @@ class curves_chart(QtWidgets.QFrame):
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
         painter.drawText(int(text_point_x), int(text_point_y), text)
 
-        painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1, QtCore.Qt.DashLine))
+        painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1, QtCore.Qt.PenStyle.DashLine))
         painter.drawLine(int(point.x()), int(point.y()), int(point.x()), int(self.height()-self.margin))
 
         pen = QtGui.QPen()

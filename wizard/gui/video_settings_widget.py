@@ -156,24 +156,24 @@ class video_settings_widget(QtWidgets.QDialog):
         self.inrollframe_spinBox.setEnabled(False)
         self.inrollframe_spinBox.setObjectName('gray_label')
         self.inrollframe_spinBox.setRange(-1000000, 1000000)
-        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inrollframe_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-1000000, 1000000)
-        self.inframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.inframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 1000000)
-        self.outframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.outframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outframe_spinBox)
 
         self.outrollframe_spinBox = QtWidgets.QSpinBox()
         self.outrollframe_spinBox.setEnabled(False)
         self.outrollframe_spinBox.setObjectName('gray_label')
         self.outrollframe_spinBox.setRange(-1000000, 1000000)
-        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outrollframe_spinBox)
 
         # Camera namespaces selection section

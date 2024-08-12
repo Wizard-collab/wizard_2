@@ -856,7 +856,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             zoom_factor = min(zoom_factor_width, zoom_factor_height)
             self.set_zoom(zoom_factor)
             focus_rect_center_scene = focus_rect.center().toPoint()
-            viewport_center_scene = self.mapToScene(self.viewport().rect().center())
+            viewport_center_scene = self.mapToScene(self.viewport().rect().center()).toPoint()
             translation = focus_rect_center_scene - viewport_center_scene
             self.update_scene_rect(self.sceneRect().translated(translation.x(), translation.y()))
 
@@ -1225,7 +1225,7 @@ class edit_dates_widget(QtWidgets.QDialog):
         self.duration_label.setObjectName("gray_label")
         self.days_spinBox = QtWidgets.QSpinBox()
         self.days_spinBox.setRange(1, 365)
-        self.days_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.days_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.datas_layout.addRow(self.duration_label, self.days_spinBox)
 
         self.errors_label = QtWidgets.QLabel()

@@ -104,7 +104,7 @@ class attack_history_widget(QtWidgets.QFrame):
 
         self.infos_layout.addWidget(QtWidgets.QLabel('Show'))
         self.event_count_spinBox = QtWidgets.QSpinBox()
-        self.event_count_spinBox.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.PlusMinus)
+        self.event_count_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.event_count_spinBox.setValue(10)
         self.event_count_spinBox.setRange(1, 10000000)
         self.event_count_spinBox.setFixedWidth(50)
