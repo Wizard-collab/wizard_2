@@ -583,6 +583,8 @@ class references_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.info_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
+        delegate = CustomDelegate()
+        self.list_view.setItemDelegate(delegate)
         self.list_view.setAnimated(1)
         self.list_view.setExpandsOnDoubleClick(1)
         self.list_view.setObjectName('tree_as_list_widget')
@@ -1133,3 +1135,10 @@ class quick_import_button(QtWidgets.QPushButton):
 
     def emit_signal(self):
         self.quick_import_signal.emit(self.stage)
+
+class CustomDelegate(QtWidgets.QStyledItemDelegate):
+    def initStyleOption(self, option, index):
+        super().initStyleOption(option, index)
+        # Ensure the text color remains the same when the item is selected
+        if option.state & QtWidgets.QStyle.StateFlag.State_Selected:
+            option.palette.setColor(QtGui.QPalette.ColorRole.Text, option.palette.color(QtGui.QPalette.ColorRole.WindowText))

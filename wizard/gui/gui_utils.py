@@ -232,7 +232,7 @@ class QComboBox(QtWidgets.QComboBox):
         super(QComboBox, self).__init__(parent)
         self.view().window().setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
         self.view().window().setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.view().window().setStyleSheet("QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
+        self.view().window().setStyleSheet("QListView::item:hover{background:#4b4b57;color:white;}QListView::item:selected{background:#4b4b57;color:white;}")
         self.setItemDelegate(QtWidgets.QStyledItemDelegate())
 
 class QMenu(QtWidgets.QMenu):
@@ -682,19 +682,23 @@ class QSplitterHandle(QtWidgets.QSplitterHandle):
 
     def enterEvent(self, event):
         self.hovered = True
+        super().enterEvent(event)
         self.update()
 
     def leaveEvent(self, event):
         self.hovered = False
         self.pressed = False
+        super().leaveEvent(event)
         self.update()
 
     def mousePressEvent(self, event):
         self.pressed = True
+        super().mousePressEvent(event)
         self.update()
 
     def mouseReleaseEvent(self, event):
         self.pressed = False
+        super().mouseReleaseEvent(event)
         self.update()
 
     def paintEvent(self, event):

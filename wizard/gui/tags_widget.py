@@ -41,7 +41,7 @@ class tags_widget(gui_utils.QMenu):
     def execute(self):
         if len(self.actions) == 0:
             return
-        action = self.execute()
+        action = self.exec()
         if action is not None:
             token = self.text.split('@')[-1]
             text = self.text[:-(len(token)+1)] + f"@{action.text()} "
