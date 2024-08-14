@@ -17,6 +17,8 @@ from wizard.gui import gui_utils
 class timeline_widget(QtWidgets.QFrame):
 
     load_video = pyqtSignal(str)
+    current_video_row = pyqtSignal(object)
+    current_stage = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -60,26 +62,78 @@ class timeline_widget(QtWidgets.QFrame):
         for video_id in video_ids:
             self.add_video(video_id)
 
+    def refresh(self):
+        stage_rows = project.get_all_stages()
+        stages = dict()
+        for stage_row in stage_rows:
+            stages[stage_row['id']] = stage_row
+        variant_rows = project.get_all_variants()
+        variants = dict()
+        for variant_row in variant_rows:
+            variants[variant_row['id']] = variant_row
+        video_rows = project.get_all_videos()
+        videos = dict()
+        variant_videos = dict()
+        for video_row in video_rows:
+            videos[video_row['id']] = video_row
+            if video_row['variant_id'] not in variant_videos.keys():
+                variant_videos[video_row['variant_id']] = video_row['id']
+            if video_row['id'] > variant_videos[video_row['variant_id']]:
+                variant_videos[video_row['variant_id']] = video_row['id']
+
+        for unique_id in self.videos_dic.keys():
+            video_item = self.videos_dic[unique_id]['item']
+            video_row = videos[self.videos_dic[unique_id]['video_id']]
+            video_item.set_video_row(video_row)
+            variant_row = variants[video_row['variant_id']]
+            video_item.set_variant_row(variant_row)
+            stage_row = stages[variant_row['stage_id']]
+            video_item.set_stage_row(stage_row)
+            last_variant_video_id = variant_videos[video_row['variant_id']]
+            video_item.set_is_last(video_row['id'] == last_variant_video_id)
+            video_item.fill_ui()
+
+        self.update_timeline()
+
     def add_video(self, video_id):
         unique_id = uuid.uuid4()
         video_row = project.get_video_data(video_id)
+        variant_row = project.get_variant_data(video_row['variant_id'])
+        stage_row = project.get_stage_data(variant_row['stage_id'])
         self.videos_dic[unique_id] = dict()
         self.videos_dic[unique_id]['video_id'] = video_id
         self.videos_dic[unique_id]['video_row'] = video_row
-        self.videos_dic[unique_id]['item'] = video_item(video_row, unique_id)
+        self.videos_dic[unique_id]['variant_row'] = variant_row
+        self.videos_dic[unique_id]['stage_row'] = stage_row
+        self.videos_dic[unique_id]['item'] = video_item(unique_id)
         self.videos_dic[unique_id]['item'].double_click.connect(self.view_video)
         self.video_items_content_layout.addWidget(self.videos_dic[unique_id]['item'])
 
         if len(self.videos_dic.keys()) == 1:
             self.load_video.emit(self.videos_dic[unique_id]['video_row']['file_path'])
-            self.update_timeline()
+        self.refresh()
+
+    def replace_current_video(self, video_id):
+        video_path = project.get_video_data(video_id, 'file_path')
+
+        current_unique_id = list(self.videos_dic.keys())[self.current_index]
+        video_row = project.get_video_data(video_id)
+        variant_row = project.get_variant_data(video_row['variant_id'])
+        stage_row = project.get_stage_data(variant_row['stage_id'])
+
+        self.videos_dic[current_unique_id]['video_id'] = video_id
+        self.videos_dic[current_unique_id]['video_row'] = video_row
+        self.videos_dic[current_unique_id]['variant_row'] = variant_row
+        self.videos_dic[current_unique_id]['stage_row'] = stage_row
+        self.load_video.emit(self.videos_dic[current_unique_id]['video_row']['file_path'])
+        self.refresh()
 
     def view_video(self, unique_id):
         if unique_id not in self.videos_dic.keys():
             return
         self.load_video.emit(self.videos_dic[unique_id]['video_row']['file_path'])
         self.current_index = list(self.videos_dic.keys()).index(unique_id)
-        self.update_timeline()
+        self.refresh()
 
     def play_next(self):
         if self.current_index+1 > len(self.videos_dic.keys())-1:
@@ -87,13 +141,15 @@ class timeline_widget(QtWidgets.QFrame):
         else:
             self.current_index += 1
         self.load_video.emit(self.videos_dic[list(self.videos_dic.keys())[self.current_index]]['video_row']['file_path'])
-        self.update_timeline()
+        self.refresh()
 
     def update_timeline(self):
         for unique_id in self.videos_dic.keys():
             index = list(self.videos_dic.keys()).index(unique_id)
             if index == self.current_index:
                 self.videos_dic[unique_id]['item'].set_current(True)
+                self.current_video_row.emit(self.videos_dic[unique_id]['video_row'])
+                self.current_stage.emit(self.videos_dic[unique_id]['stage_row']['id'])
             else:
                 self.videos_dic[unique_id]['item'].set_current(False)
 
@@ -101,14 +157,15 @@ class video_item(QtWidgets.QFrame):
 
     double_click = pyqtSignal(object)
 
-    def __init__(self, video_row, unique_id, parent=None):
+    def __init__(self, unique_id, parent=None):
         super().__init__(parent)
         self.unique_id = unique_id
-        self.video_row = video_row
+        self.video_row = None
+        self.stage_row = None
+        self.variant_row = None
         self.hover = False
         self.current = False
         self.build_ui()
-        self.fill_ui()
 
     def build_ui(self):
         self.setObjectName('round_frame')
@@ -118,6 +175,20 @@ class video_item(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
         self.image_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.image_label)
+
+        self.is_last_indicator = QtWidgets.QWidget(self)
+        self.is_last_indicator.setFixedSize(10,10)
+        self.is_last_indicator.move(5,5)
+        self.is_last_indicator.setStyleSheet('background-color:#b6864e;border-radius:5px;')
+
+    def set_video_row(self, video_row):
+        self.video_row = video_row
+
+    def set_variant_row(self, variant_row):
+        self.variant_row = variant_row
+
+    def set_stage_row(self, stage_row):
+        self.stage_row = stage_row
 
     def enterEvent(self, event):
         self.hover = True
@@ -130,9 +201,11 @@ class video_item(QtWidgets.QFrame):
     def update_state(self):
         stylesheet = '#round_frame{'
         if self.current:
-            stylesheet += 'background-color:rgba(255,255,255,160)'
+            stylesheet += 'border:2px solid rgba(160,160,170,255)'
         if self.hover and not self.current:
-            stylesheet += 'background-color:rgba(255,255,255,80)'
+            stylesheet += 'border: 2px solid rgba(80,80,90,255)'
+        if (not self.hover) and (not self.current):
+            stylesheet += 'border: 2px solid rgba(255,255,255,0)'
         stylesheet += '}'
         self.setStyleSheet(stylesheet)
 
@@ -153,3 +226,9 @@ class video_item(QtWidgets.QFrame):
     def mouseDoubleClickEvent(self, event):
         self.double_click.emit(self.unique_id)
 
+
+    def set_is_last(self, is_last):
+        if is_last:
+            self.is_last_indicator.setStyleSheet('background-color:#7ca657;border-radius:5px;')
+        else:
+            self.is_last_indicator.setStyleSheet('background-color:#b6864e;border-radius:5px;')

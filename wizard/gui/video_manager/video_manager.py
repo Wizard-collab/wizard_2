@@ -51,6 +51,9 @@ class video_manager(QtWidgets.QWidget):
         self.video_browser.add_videos.connect(self.timeline_widget.add_videos)
         self.timeline_widget.load_video.connect(self.video_player.load_video)
         self.video_player.end_reached.connect(self.timeline_widget.play_next)
+        self.timeline_widget.current_stage.connect(self.asset_tracking_widget.change_stage)
+        self.timeline_widget.current_video_row.connect(self.video_history_widget.change_video_row)
+        self.video_history_widget.replace_current_video.connect(self.timeline_widget.replace_current_video)
 
     def create_playlist_from_stages(self, stages_ids_list):
         video_tuples = []
@@ -90,6 +93,7 @@ class video_manager(QtWidgets.QWidget):
         self.playlist_browser.refresh()
         self.asset_tracking_widget.refresh()
         self.video_history_widget.refresh()
+        self.timeline_widget.refresh()
 
     def toggle(self):
         if self.isVisible():
