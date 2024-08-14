@@ -51,7 +51,7 @@ def screenshot(file, thumbnail_file):
     width = rect.width()
     height = rect.height()
     pixmap = screen.grabWindow(
-        QtWidgets.QGuiApplication.primaryScreen().winId(), x=x, y=y, width=width, height=height
+        0, x=x, y=y, width=width, height=height
     )
     base_image = pixmap_to_PIL(pixmap)
 
@@ -69,7 +69,7 @@ def screenshot(file, thumbnail_file):
 
 def pixmap_to_PIL(pixmap):
     buffer = QtCore.QBuffer()
-    buffer.open(QtCore.QBuffer.ReadWrite)
+    buffer.open(QtCore.QIODevice.OpenModeFlag.ReadWrite)
     pixmap.save(buffer, "PNG")
     PIL_image = Image.open(io.BytesIO(buffer.data()))
     return PIL_image

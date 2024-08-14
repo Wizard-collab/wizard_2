@@ -1,9 +1,15 @@
+# coding: utf-8
+# Author: Leo BRUNEL
+# Contact: contact@leobrunel.com
+
+# Python modules
+import os
 import sys
-from PyQt6 import QtWidgets, QtMultimedia, QtMultimediaWidgets, QtCore, QtGui
-from PyQt6.QtCore import pyqtSignal
 import uuid
 import ffmpeg
-import os
+from PyQt6 import QtWidgets, QtMultimedia, QtMultimediaWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
+
 os.environ['PATH'] += os.pathsep + "W:/SCRIPT/ffmpeg/bin"
 
 def get_video_length(video_path):
@@ -97,6 +103,9 @@ class video_output(QtWidgets.QWidget):
         self.video_item.setSize(rect.size())
 
 class video_player(QtWidgets.QWidget):
+
+    end_reached = pyqtSignal(int)
+
     def __init__(self):
         super().__init__()
 
@@ -104,10 +113,14 @@ class video_player(QtWidgets.QWidget):
         self.video_output = video_output(self.media_player)
         self.timeline_widget = timeline_widget()
 
-        self.videos_dic = dict()
+        self.video = None
+        self.duration = 0
+        self.fps = 24.0
+        self.total_frames = 0
         self.is_video_loaded = False
         self.next_index = 0
         self.frame = 0
+        self.playing = False
 
         self.build_ui()
         self.connect_functions()
@@ -118,6 +131,7 @@ class video_player(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 
         self.video_surface = QtWidgets.QWidget()
@@ -143,50 +157,40 @@ class video_player(QtWidgets.QWidget):
     def seek(self, frame):
         if self.media_player.duration() == 0:
             return
-        fps = self.videos_dic[list(self.videos_dic.keys())[self.next_index-1]]["fps"]
-        time = int(frame*fps)
+        time = int(frame*self.fps)
         self.media_player.setPosition(time)
 
-    def add_video(self, video):
-        video_id = uuid.uuid4()
-        self.videos_dic[video_id] = dict()
-        self.videos_dic[video_id]["path"] = video
-        self.videos_dic[video_id]["duration"] = get_video_length(video)
-        self.videos_dic[video_id]["fps"] = get_video_fps(video)
-        self.videos_dic[video_id]["total_frames"] = round(self.videos_dic[video_id]["duration"] / self.videos_dic[video_id]["fps"])
+    def load_video(self, video):
+        self.video = video
+        self.duration = get_video_length(video)
+        self.fps = get_video_fps(video)
+        self.total_frames = round(self.duration / self.fps)
+        self.media_player.setSource(QtCore.QUrl.fromLocalFile(video))
+        self.timeline_widget.set_range(0, self.total_frames)
+        self.infos_widget.set_fps(self.fps)
+        self.infos_widget.set_current_video(self.video)
+        self.media_player.play()
+        self.media_player.pause()
+        self.media_player.setPosition(0)
+        if self.playing is True:
+            self.toggle_play_pause()
 
     def toggle_play_pause(self):
         if self.media_player.playbackState() == QtMultimedia.QMediaPlayer.PlaybackState.PlayingState:
             self.media_player.pause()
+            self.playing = False
         else:
-            if not self.is_video_loaded:
-                self.load_next()
+            if not self.video:
+                return
             self.media_player.play()
-
-    def load_next(self):
-        video_to_play = self.videos_dic[list(self.videos_dic.keys())[self.next_index]]["path"]
-        fps = self.videos_dic[list(self.videos_dic.keys())[self.next_index]]["fps"]
-        duration = self.videos_dic[list(self.videos_dic.keys())[self.next_index]]["duration"]
-        total_frames = int(duration / fps)
-        self.media_player.setSource(QtCore.QUrl.fromLocalFile(video_to_play))
-        self.timeline_widget.set_range(0, total_frames)
-        self.infos_widget.set_fps(fps)
-        self.infos_widget.set_current_video(video_to_play)
-        self.next_index += 1
-        if self.next_index >= len(list(self.videos_dic.keys())):
-            self.next_index = 0
-        self.is_video_loaded = True
+            self.playing = True
 
     def position_changed(self, position):
         if position >= self.media_player.duration():
-            self.load_next()
-            self.media_player.play()
+            self.end_reached.emit(1)
         if self.media_player.duration() == 0:
             return
-        fps = self.videos_dic[list(self.videos_dic.keys())[self.next_index-1]]["fps"]
-        duration = self.videos_dic[list(self.videos_dic.keys())[self.next_index-1]]["duration"]
-        total_frames = self.videos_dic[list(self.videos_dic.keys())[self.next_index-1]]["total_frames"]
-        frame = int(position / fps)
+        frame = int(position / self.fps)
         if frame == self.frame:
             return
         self.frame = frame

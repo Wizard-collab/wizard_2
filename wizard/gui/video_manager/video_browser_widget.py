@@ -124,7 +124,7 @@ class video_browser_widget(QtWidgets.QWidget):
             return
         videos = []
         for item in items:
-            videos.append((item.video_row['file_path'], item.video_row['id']))
+            videos.append(item.video_row['id'])
         if not add:
             self.create_playlist_and_add_videos.emit(videos)
         else:
