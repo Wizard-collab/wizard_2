@@ -34,7 +34,7 @@ from wizard.gui import project_manager_widget
 logger = logging.getLogger(__name__)
 
 def get_app():
-    os.environ["QT_SCALE_FACTOR"] = "0.75"
+    #os.environ["QT_SCALE_FACTOR"] = "0.75"
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
 
