@@ -130,6 +130,7 @@ class video_player(QtWidgets.QWidget):
         super().resizeEvent(event)
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
@@ -144,11 +145,10 @@ class video_player(QtWidgets.QWidget):
 
         self.infos_widget = infos_widget(self.video_surface)
 
+        self.main_layout.addWidget(self.timeline_widget)
         self.play_button = QtWidgets.QPushButton('Play')
         self.main_layout.addWidget(self.play_button)
-
-        self.main_layout.addWidget(self.timeline_widget)
-
+        
     def connect_functions(self):
         self.play_button.clicked.connect(self.toggle_play_pause)
         self.media_player.positionChanged.connect(self.position_changed)
@@ -161,19 +161,20 @@ class video_player(QtWidgets.QWidget):
         self.media_player.setPosition(time)
 
     def load_video(self, video):
-        self.video = video
-        self.duration = get_video_length(video)
-        self.fps = get_video_fps(video)
-        self.total_frames = round(self.duration / self.fps)
-        self.media_player.setSource(QtCore.QUrl.fromLocalFile(video))
-        self.timeline_widget.set_range(0, self.total_frames)
-        self.infos_widget.set_fps(self.fps)
-        self.infos_widget.set_current_video(self.video)
-        self.media_player.play()
-        self.media_player.pause()
+        if self.video != video:
+            self.video = video
+            self.duration = get_video_length(video)
+            self.fps = get_video_fps(video)
+            self.total_frames = round(self.duration / self.fps)
+            self.media_player.setSource(QtCore.QUrl.fromLocalFile(video))
+            self.timeline_widget.set_range(0, self.total_frames)
+            self.infos_widget.set_fps(self.fps)
+            self.infos_widget.set_current_video(self.video)
+            self.media_player.play()
+            self.media_player.pause()
         self.media_player.setPosition(0)
         if self.playing is True:
-            self.toggle_play_pause()
+            self.media_player.play()
 
     def toggle_play_pause(self):
         if self.media_player.playbackState() == QtMultimedia.QMediaPlayer.PlaybackState.PlayingState:
@@ -186,7 +187,7 @@ class video_player(QtWidgets.QWidget):
             self.playing = True
 
     def position_changed(self, position):
-        if position >= self.media_player.duration():
+        if position >= self.media_player.duration()-100:
             self.end_reached.emit(1)
         if self.media_player.duration() == 0:
             return

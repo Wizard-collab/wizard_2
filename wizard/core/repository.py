@@ -847,7 +847,7 @@ def create_admin_user(admin_password, admin_email):
                                 0,
                                 1,
                                 None,
-                                json.dumps([]),
+                                json.dumps({}),
                                 json.dumps({}))):
         return
     logger.info('Admin user created')

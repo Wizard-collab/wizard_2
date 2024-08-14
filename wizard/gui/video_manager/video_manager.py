@@ -50,6 +50,7 @@ class video_manager(QtWidgets.QWidget):
     def connect_functions(self):
         self.video_browser.add_videos.connect(self.timeline_widget.add_videos)
         self.timeline_widget.load_video.connect(self.video_player.load_video)
+        self.video_player.end_reached.connect(self.timeline_widget.play_next)
 
     def create_playlist_from_stages(self, stages_ids_list):
         video_tuples = []
@@ -106,7 +107,7 @@ class video_manager(QtWidgets.QWidget):
         self.setObjectName('main_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
-        self.main_layout.setSpacing(1)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.content_widget = gui_utils.QSplitter()
@@ -122,6 +123,8 @@ class video_manager(QtWidgets.QWidget):
 
         self.content_3_widget = QtWidgets.QWidget()
         self.content_3_layout = QtWidgets.QVBoxLayout()
+        self.content_3_layout.setContentsMargins(0,0,0,0)
+        self.content_3_layout.setSpacing(0)
         self.content_3_widget.setLayout(self.content_3_layout)
         self.content_widget.addWidget(self.content_3_widget)
 
