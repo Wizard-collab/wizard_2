@@ -970,8 +970,7 @@ def create_playlist(name, data='{}', thumbnail_temp_path=None):
             path_utils.makedirs(thumbnail_path)
         thumbnail_path = path_utils.join(thumbnail_path, f"{str(uuid.uuid4())}{ext}")
         path_utils.copyfile(thumbnail_temp_path, thumbnail_path)
-    project.add_playlist(name=name, data=data, thumbnail_path=thumbnail_path)
-    return 1
+    return project.add_playlist(name=name, data=data, thumbnail_path=thumbnail_path)
 
 def copy_work_version(work_version_id):
     clipboard_dic = dict()

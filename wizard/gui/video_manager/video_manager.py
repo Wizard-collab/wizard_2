@@ -44,30 +44,51 @@ class video_manager(QtWidgets.QWidget):
         self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget()
         self.video_history_widget = video_history_widget.video_history_widget()
         self.timeline_widget = timeline_widget.timeline_widget()
+        self.buttons_bar_widget = timeline_widget.buttons_bar_widget()
         self.build_ui()
         self.connect_functions()
 
     def connect_functions(self):
         self.video_browser.add_videos.connect(self.timeline_widget.add_videos)
+        self.video_browser.create_playlist_and_add_videos.connect(self.timeline_widget.create_playlist_and_add_videos)
         self.timeline_widget.load_video.connect(self.video_player.load_video)
         self.video_player.end_reached.connect(self.timeline_widget.play_next)
+        self.video_player.playing_signal.connect(self.buttons_bar_widget.set_play_pause)
+        self.buttons_bar_widget.on_play_pause.connect(self.video_player.toggle_play_pause)
+        self.buttons_bar_widget.on_loop_toggle.connect(self.timeline_widget.set_loop)
         self.timeline_widget.current_stage.connect(self.asset_tracking_widget.change_stage)
         self.timeline_widget.current_video_row.connect(self.video_history_widget.change_video_row)
         self.video_history_widget.replace_current_video.connect(self.timeline_widget.replace_current_video)
+        self.playlist_browser.load_playlist.connect(self.timeline_widget.load_playlist)
 
     def create_playlist_from_stages(self, stages_ids_list):
-        video_tuples = []
+        videos = []
         for stage_id in stages_ids_list:
             variants_ids = project.get_stage_childs(stage_id, 'id')
             for variant_id in variants_ids:
                 video_rows = project.get_videos(variant_id)
                 if len(video_rows) == 0:
                     continue
-                video_tuples.append((video_rows[-1]['file_path'], video_rows[-1]['id']))
-        if len(video_tuples) == 0:
+                videos.append(video_rows[-1]['id'])
+        self.timeline_widget.create_playlist_and_add_videos(videos)
+        if len(videos) == 0:
             logger.warning("No videos found")
         self.show()
         self.raise_()
+
+    def show_single_video(self, video_id):
+        self.timeline_widget.create_playlist_and_add_videos([video_id])
+        self.show()
+        self.raise_()
+        
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+        if event.key() == QtCore.Qt.Key.Key_Space:
+            self.video_player.toggle_play_pause()
+        if event.key() == QtCore.Qt.Key.Key_C:
+            self.video_player.previous_frame()
+        if event.key() == QtCore.Qt.Key.Key_V:
+            self.video_player.next_frame()
 
     def get_context(self):
         self.asset_tracking_widget.get_context()
@@ -99,11 +120,13 @@ class video_manager(QtWidgets.QWidget):
         if self.isVisible():
             if not self.isActiveWindow():
                 self.show()
+                self.refresh()
                 self.raise_()
             else:
                 self.hide()
         else:
             self.show()
+            self.refresh()
             self.raise_()
 
     def build_ui(self):
@@ -115,10 +138,10 @@ class video_manager(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.content_widget = gui_utils.QSplitter()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout.addWidget(self.content_widget)
 
         self.tabs_widget = QtWidgets.QTabWidget()
+        self.tabs_widget.setMaximumWidth(380)
         self.tabs_widget.setIconSize(QtCore.QSize(16,16))
         self.content_widget.addWidget(self.tabs_widget)
 
@@ -133,6 +156,7 @@ class video_manager(QtWidgets.QWidget):
         self.content_widget.addWidget(self.content_3_widget)
 
         self.content_3_layout.addWidget(self.video_player)
+        self.content_3_layout.addWidget(self.buttons_bar_widget)
         self.content_3_layout.addWidget(self.timeline_widget)
 
         self.content_2_widget = gui_utils.QSplitter()

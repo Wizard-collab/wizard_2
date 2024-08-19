@@ -529,10 +529,7 @@ class videos_widget(QtWidgets.QWidget):
         items = self.get_selection()
         if items is not None:
             if len(items) == 1:
-                instance = video_manager.video_player_instances().get_instance()
-                instance.add_video(items[0].video_row['file_path'], items[0].video_row['id'])
-                instance.load_nexts()
-                instance.show()
+                gui_server.show_video(items[0].video_row['id'])
 
     def open_folder(self):
         if self.variant_id is not None:

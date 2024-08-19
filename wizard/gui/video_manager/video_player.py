@@ -9,6 +9,13 @@ import uuid
 import ffmpeg
 from PyQt6 import QtWidgets, QtMultimedia, QtMultimediaWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
+import logging
+import time
+
+# Wizard gui modules
+from wizard.gui.video_manager import slider_view
+
+logger = logging.getLogger(__name__)
 
 os.environ['PATH'] += os.pathsep + "W:/SCRIPT/ffmpeg/bin"
 
@@ -105,11 +112,13 @@ class video_output(QtWidgets.QWidget):
 class video_player(QtWidgets.QWidget):
 
     end_reached = pyqtSignal(int)
+    playing_signal = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()
 
         self.media_player = QtMultimedia.QMediaPlayer()
+
         self.video_output = video_output(self.media_player)
         self.timeline_widget = timeline_widget()
 
@@ -133,6 +142,7 @@ class video_player(QtWidgets.QWidget):
         self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.video_surface = QtWidgets.QWidget()
@@ -146,26 +156,33 @@ class video_player(QtWidgets.QWidget):
         self.infos_widget = infos_widget(self.video_surface)
 
         self.main_layout.addWidget(self.timeline_widget)
-        self.play_button = QtWidgets.QPushButton('Play')
-        self.main_layout.addWidget(self.play_button)
         
     def connect_functions(self):
-        self.play_button.clicked.connect(self.toggle_play_pause)
         self.media_player.positionChanged.connect(self.position_changed)
         self.timeline_widget.seek.connect(self.seek)
 
     def seek(self, frame):
         if self.media_player.duration() == 0:
             return
-        time = int(frame*self.fps)
+        if frame > self.total_frames:
+            return
+        if frame < 0:
+            return
+        time = round(((frame+0.2)/self.fps)*1000)
         self.media_player.setPosition(time)
 
     def load_video(self, video):
+        logger.info(video)
+        if video == '':
+            self.video = None
+            self.media_player.setSource(QtCore.QUrl.fromLocalFile(''))
+            self.infos_widget.set_current_video('')
+            return
         if self.video != video:
             self.video = video
             self.duration = get_video_length(video)
             self.fps = get_video_fps(video)
-            self.total_frames = round(self.duration / self.fps)
+            self.total_frames = round(self.fps * (self.duration/1000))-1
             self.media_player.setSource(QtCore.QUrl.fromLocalFile(video))
             self.timeline_widget.set_range(0, self.total_frames)
             self.infos_widget.set_fps(self.fps)
@@ -173,31 +190,47 @@ class video_player(QtWidgets.QWidget):
             self.media_player.play()
             self.media_player.pause()
         self.media_player.setPosition(0)
+        self.position_changed(0)
         if self.playing is True:
             self.media_player.play()
+        else:
+            self.media_player.pause()
+
+    def ensure_frame(self):
+        frame = round(((self.media_player.position() - (0.2*(1/self.fps*1000))) / 1000) * self.fps)
+        self.seek(frame)
 
     def toggle_play_pause(self):
         if self.media_player.playbackState() == QtMultimedia.QMediaPlayer.PlaybackState.PlayingState:
             self.media_player.pause()
+            self.ensure_frame()
             self.playing = False
+            self.playing_signal.emit(self.playing)
         else:
             if not self.video:
                 return
             self.media_player.play()
             self.playing = True
+            self.playing_signal.emit(self.playing)
+
+    def next_frame(self):
+        frame = round(((self.media_player.position() - (0.2*(1/self.fps*1000))) / 1000) * self.fps)
+        self.seek(frame+1)  
+    
+    def previous_frame(self):
+        frame = round(((self.media_player.position() - (0.2*(1/self.fps*1000))) / 1000) * self.fps)
+        self.seek(frame-1)  
 
     def position_changed(self, position):
-        if position >= self.media_player.duration()-100:
+        if (position >= self.duration-100) and self.playing:
+            self.media_player.pause()
             self.end_reached.emit(1)
-        if self.media_player.duration() == 0:
-            return
-        frame = int(position / self.fps)
-        if frame == self.frame:
-            return
+        frame = round(((position - (0.2*(1/self.fps*1000))) / 1000) * self.fps)
         self.frame = frame
         self.timeline_widget.set_frame(frame)
         self.infos_widget.set_frame(frame)
         self.infos_widget.set_time(position)
+
 
 class timeline_widget(QtWidgets.QWidget):
 
@@ -210,37 +243,22 @@ class timeline_widget(QtWidgets.QWidget):
         self.connect_functions()
 
     def build_ui(self):
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
+        self.main_layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.main_layout)
 
-        self.slider = QtWidgets.QSlider()
-        self.slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(100)
-
-        self.main_layout.addWidget(self.slider)
+        self.slider_view = slider_view.timeline_viewport()
+        self.main_layout.addWidget(self.slider_view)
 
     def connect_functions(self):
-        self.slider.valueChanged.connect(self.send_seek)
+        self.slider_view.signal_manager.on_seek.connect(self.send_seek)
 
     def send_seek(self, value):
-        if self.ignore_seek:
-            return
         self.seek.emit(value)
 
     def set_frame(self, frame):
-        self.ignore_seek = True
-        self.slider.setValue(frame)
-        self.ignore_seek = False
+        self.slider_view.set_frame(frame)
 
     def set_range(self, start, end):
-        self.slider.setMinimum(start)
-        self.slider.setMaximum(end)
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    player = video_player()
-    player.show()
-    player.add_video("W:/SCRIPT/video_player/test_4.mp4")
-    player.add_video("W:/SCRIPT/video_player/test_7.mp4")
-    sys.exit(app.exec())
+        self.slider_view.set_frame_range([start, end])

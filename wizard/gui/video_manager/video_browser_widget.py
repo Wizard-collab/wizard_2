@@ -136,6 +136,7 @@ class video_browser_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setObjectName('dark_widget')
         self.setMinimumWidth(380)
+        self.setMaximumWidth(380)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
