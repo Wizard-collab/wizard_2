@@ -222,7 +222,7 @@ class video_player(QtWidgets.QWidget):
         self.seek(frame-1)  
 
     def position_changed(self, position):
-        if (position >= self.duration-100) and self.playing:
+        if (position >= self.duration-int(1/self.fps*1000)) and self.playing:
             self.media_player.pause()
             self.end_reached.emit(1)
         frame = round(((position - (0.2*(1/self.fps*1000))) / 1000) * self.fps)
@@ -230,7 +230,6 @@ class video_player(QtWidgets.QWidget):
         self.timeline_widget.set_frame(frame)
         self.infos_widget.set_frame(frame)
         self.infos_widget.set_time(position)
-
 
 class timeline_widget(QtWidgets.QWidget):
 

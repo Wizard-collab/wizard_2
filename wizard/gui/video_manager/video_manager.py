@@ -58,7 +58,7 @@ class video_manager(QtWidgets.QWidget):
         self.buttons_bar_widget.on_loop_toggle.connect(self.timeline_widget.set_loop)
         self.timeline_widget.current_stage.connect(self.asset_tracking_widget.change_stage)
         self.timeline_widget.current_video_row.connect(self.video_history_widget.change_video_row)
-        self.video_history_widget.replace_current_video.connect(self.timeline_widget.replace_current_video)
+        self.video_history_widget.replace_current_video.connect(self.timeline_widget.replace_video)
         self.playlist_browser.load_playlist.connect(self.timeline_widget.load_playlist)
 
     def create_playlist_from_stages(self, stages_ids_list):
@@ -93,6 +93,7 @@ class video_manager(QtWidgets.QWidget):
     def get_context(self):
         self.asset_tracking_widget.get_context()
         self.playlist_browser.get_context()
+        self.timeline_widget.get_context()
         
         context_dic = user.user().get_context(user_vars._video_manager_context_)
         if context_dic is None:
@@ -103,6 +104,7 @@ class video_manager(QtWidgets.QWidget):
     def set_context(self):
         self.asset_tracking_widget.set_context()
         self.playlist_browser.set_context()
+        self.timeline_widget.set_context()
 
         current_tab = self.tabs_widget.currentIndex()
         context_dic = dict()

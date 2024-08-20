@@ -1,5 +1,4 @@
 *.pyc
 compile/
 python3_wizard_venv
-ffmpeg.exe
-libmpv-2.dll
+binaries/

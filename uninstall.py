@@ -272,9 +272,7 @@ QProgressBar::chunk {background-color:
 def main():
     if is_bootsrap():
         if is_admin():
-            os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-            #QtWidgets.QApplication.setAttribute(QtCore.Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
-            #QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+            os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "0.75"
             app = QtWidgets.QApplication(sys.argv)
             app.setStyleSheet(stylesheet)
             uninstaller_widget = uninstaller()

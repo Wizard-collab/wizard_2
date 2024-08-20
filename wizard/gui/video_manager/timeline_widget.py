@@ -12,7 +12,9 @@ import json
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import image
+from wizard.core import user
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -81,75 +83,27 @@ class timeline_widget(QtWidgets.QFrame):
         self.current_playlist_id = None
         self.modified = False
         self.loop = False
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.build_ui()
         self.connect_functions()
+
+    def get_context(self):
+        context_dic = user.user().get_context(user_vars._video_timeline_context_)
+        if context_dic is None:
+            return
+        if 'current_playlist_id' in context_dic.keys():
+            self.load_playlist(context_dic['current_playlist_id'])
+
+    def set_context(self):
+        context_dic = dict()
+        context_dic['current_playlist_id'] = self.current_playlist_id
+        user.user().add_context(user_vars._video_timeline_context_, context_dic)
 
     def connect_functions(self):
         self.save_as_playlist_button.clicked.connect(self.save_as_playlist)
         self.save_playlist_button.clicked.connect(self.save_playlist)
         self.new_playlist_button.clicked.connect(self.clear_playlist)
-
-    def load_playlist(self, playlist_id):
-        playlist_row = project.get_playlist_data(playlist_id)
-        if not playlist_row:
-            return
-        self.clear_playlist()
-        self.current_playlist = playlist_row['name']
-        self.current_playlist_id = playlist_id
-        playlist_dic = json.loads(playlist_row['data'])
-        for unique_id in playlist_dic.keys():
-            self.add_video(playlist_dic[unique_id], unique_id, modification=False)
-        self.refresh()
-
-    def create_playlist_and_add_videos(self, video_ids):
-        self.clear_playlist()
-        self.add_videos(video_ids)
-
-    def clear_playlist(self):
-        self.current_playlist = None
-        self.current_playlist_id = None
-
-        for unique_id in self.videos_dic.keys():
-            item = self.videos_dic[unique_id]['item']
-            item.setVisible(False)
-            item.setParent(None)
-            item.deleteLater()
-
-        self.videos_dic = dict()
-        self.current_index = 0
-        self.modified = False
-        self.load_video.emit('')
-        self.current_stage.emit(None)
-        self.current_video_row.emit(None)
-        self.refresh()
-
-    def save_as_playlist(self):
-        thumbnail_path = None
-        if self.videos_dic:
-            thumbnail_path = self.videos_dic[list(self.videos_dic.keys())[0]]['video_row']['thumbnail_path']
-        self.create_playlist_widget = create_playlist_widget.create_playlist_widget(data=json.dumps(self.get_playlist_dic()), thumbnail_temp_path=thumbnail_path)
-        if self.create_playlist_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            playlist_id = self.create_playlist_widget.playlist_id
-            self.load_playlist(playlist_id)
-
-    def save_playlist(self):
-        if not self.current_playlist:
-            return self.save_as_playlist()
-        thumbnail_path = None
-        if self.videos_dic:
-            thumbnail_path = self.videos_dic[list(self.videos_dic.keys())[0]]['video_row']['thumbnail_path']
-        assets.save_playlist(self.current_playlist_id, data=self.get_playlist_dic(), thumbnail_temp_path=thumbnail_path)
-        self.modified=False
-        self.refresh()
-
-    def get_playlist_dic(self):
-        playlist_dic = dict()
-        for unique_id in self.videos_dic.keys():
-            playlist_dic[unique_id] = self.videos_dic[unique_id]['video_id']
-        return playlist_dic
-
-    def set_loop(self, loop):
-        self.loop = loop
+        self.customContextMenuRequested.connect(self.show_context_menu)
 
     def build_ui(self):
         self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
@@ -208,6 +162,107 @@ class timeline_widget(QtWidgets.QFrame):
         self.new_playlist_button = QtWidgets.QPushButton('New playlist')
         self.new_playlist_button.setFixedSize(100, 40)
         self.playlist_layout.addWidget(self.new_playlist_button)
+
+    def load_playlist(self, playlist_id):
+        playlist_row = project.get_playlist_data(playlist_id)
+        if not playlist_row:
+            return
+        self.clear_playlist()
+        self.current_playlist = playlist_row['name']
+        self.current_playlist_id = playlist_id
+        playlist_dic = json.loads(playlist_row['data'])
+        for unique_id in playlist_dic.keys():
+            self.add_video(playlist_dic[unique_id], unique_id, modification=False)
+        self.refresh()
+
+    def create_playlist_and_add_videos(self, video_ids):
+        self.clear_playlist()
+        self.add_videos(video_ids)
+
+    def clear_playlist(self):
+        self.current_playlist = None
+        self.current_playlist_id = None
+
+        self.delete_all()
+
+        self.videos_dic = dict()
+        self.current_index = 0
+        self.modified = False
+        self.load_video.emit('')
+        self.current_stage.emit(None)
+        self.current_video_row.emit(None)
+        self.refresh()
+
+    def save_as_playlist(self):
+        thumbnail_path = None
+        if self.videos_dic:
+            thumbnail_path = self.videos_dic[list(self.videos_dic.keys())[0]]['video_row']['thumbnail_path']
+        self.create_playlist_widget = create_playlist_widget.create_playlist_widget(data=json.dumps(self.get_playlist_dic()), thumbnail_temp_path=thumbnail_path)
+        if self.create_playlist_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            playlist_id = self.create_playlist_widget.playlist_id
+            self.load_playlist(playlist_id)
+
+    def save_playlist(self):
+        if not self.current_playlist:
+            return self.save_as_playlist()
+        thumbnail_path = None
+        if self.videos_dic:
+            thumbnail_path = self.videos_dic[list(self.videos_dic.keys())[0]]['video_row']['thumbnail_path']
+        assets.save_playlist(self.current_playlist_id, data=self.get_playlist_dic(), thumbnail_temp_path=thumbnail_path)
+        self.modified=False
+        self.refresh()
+
+    def get_playlist_dic(self):
+        playlist_dic = dict()
+        for unique_id in self.videos_dic.keys():
+            playlist_dic[unique_id] = self.videos_dic[unique_id]['video_id']
+        return playlist_dic
+
+    def set_loop(self, loop):
+        self.loop = loop
+
+    def update_all(self):
+        unique_ids = []
+        for unique_id in self.videos_dic.keys():
+            unique_ids.append(unique_id)
+        self.update_videos_version(unique_ids)
+
+    def delete_all(self):
+        unique_ids = []
+        for unique_id in self.videos_dic.keys():
+            unique_ids.append(unique_id)
+        self.delete_videos(unique_ids)
+
+    def delete_videos(self, unique_ids):
+        for unique_id in unique_ids:
+            if unique_id in self.videos_dic.keys():
+                item = self.videos_dic[unique_id]['item']
+                item.setVisible(False)
+                item.setParent(None)
+                item.deleteLater()
+                del self.videos_dic[unique_id]
+
+    def update_videos_version(self, unique_ids):
+        for unique_id in unique_ids:
+            variant_id = self.videos_dic[unique_id]['variant_row']['id']
+            last_video_row = project.get_videos(variant_id)
+            if not last_video_row:
+                continue
+            last_video_row = last_video_row[-1]
+            self.replace_video(last_video_row['id'], unique_id)
+
+    def show_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        
+        update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all')
+        clear_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Clear playlist')
+
+        action = menu.exec(QtGui.QCursor().pos())
+        if action is not None:
+            if action == update_all_action:
+                self.update_all()
+            elif action == clear_playlist_action:
+                self.delete_all()
 
     def add_videos(self, video_ids):
         for video_id in video_ids:
@@ -281,6 +336,8 @@ class timeline_widget(QtWidgets.QFrame):
         self.videos_dic[unique_id]['video_row'] = video_row
         self.videos_dic[unique_id]['item'] = video_item(unique_id)
         self.videos_dic[unique_id]['item'].double_click.connect(self.view_video)
+        self.videos_dic[unique_id]['item'].update_video_signal.connect(self.update_videos_version)
+        self.videos_dic[unique_id]['item'].delete_video_signal.connect(self.delete_videos)
         self.video_items_content_layout.addWidget(self.videos_dic[unique_id]['item'])
 
         if len(self.videos_dic.keys()) == 1:
@@ -288,18 +345,20 @@ class timeline_widget(QtWidgets.QFrame):
         self.modified = modification
         self.refresh()
 
-    def replace_current_video(self, video_id):
+    def replace_video(self, video_id, unique_id=None):
         video_path = project.get_video_data(video_id, 'file_path')
 
-        try:
-            current_unique_id = list(self.videos_dic.keys())[self.current_index]
-        except IndexError:
-            return
+        if unique_id is None:
+            try:
+                unique_id = list(self.videos_dic.keys())[self.current_index]
+            except IndexError:
+                return
         video_row = project.get_video_data(video_id)
 
-        self.videos_dic[current_unique_id]['video_id'] = video_id
-        self.videos_dic[current_unique_id]['video_row'] = video_row
-        self.load_video.emit(self.videos_dic[current_unique_id]['video_row']['file_path'])
+        self.videos_dic[unique_id]['video_id'] = video_id
+        self.videos_dic[unique_id]['video_row'] = video_row
+        if self.current_index == list(self.videos_dic.keys()).index(unique_id):
+            self.load_video.emit(self.videos_dic[unique_id]['video_row']['file_path'])
         self.modified = 1
         self.refresh()
 
@@ -332,6 +391,8 @@ class timeline_widget(QtWidgets.QFrame):
 class video_item(QtWidgets.QFrame):
 
     double_click = pyqtSignal(object)
+    update_video_signal = pyqtSignal(list)
+    delete_video_signal = pyqtSignal(list)
 
     def __init__(self, unique_id, parent=None):
         super().__init__(parent)
@@ -343,7 +404,9 @@ class video_item(QtWidgets.QFrame):
         self.variant_row = None
         self.hover = False
         self.current = False
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.build_ui()
+        self.connect_functions()
 
     def build_ui(self):
         self.setObjectName('round_frame')
@@ -380,6 +443,28 @@ class video_item(QtWidgets.QFrame):
         self.is_last_indicator.setFixedSize(10,10)
         self.is_last_indicator.move(10,30)
         self.is_last_indicator.setStyleSheet('background-color:#b6864e;border-radius:5px;')
+
+    def update_video(self):
+        self.update_video_signal.emit([self.unique_id])
+
+    def delete_video(self):
+        self.delete_video_signal.emit([self.unique_id])
+
+    def show_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        
+        update_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update')
+        delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
+
+        action = menu.exec(QtGui.QCursor().pos())
+        if action is not None:
+            if action == update_action:
+                self.update_video()
+            elif action == delete_action:
+                self.delete_video()
+
+    def connect_functions(self):
+        self.customContextMenuRequested.connect(self.show_context_menu)
 
     def set_video_row(self, video_row):
         self.video_row = video_row
@@ -433,7 +518,6 @@ class video_item(QtWidgets.QFrame):
 
     def mouseDoubleClickEvent(self, event):
         self.double_click.emit(self.unique_id)
-
 
     def set_is_last(self, is_last):
         if is_last:
