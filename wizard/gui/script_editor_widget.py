@@ -3,10 +3,10 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.Qsci import QsciScintilla
-from PyQt5.Qsci import QsciLexerCustom
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.Qsci import QsciScintilla
+from PyQt6.Qsci import QsciLexerCustom
 import sys
 import re
 import copy
@@ -44,24 +44,24 @@ class script_editor_widget(QsciScintilla):
 
         self.setTabWidth(4)
         self.setAutoIndent(True)
-        self.setWrapMode(QsciScintilla.WrapWord)
-        self.setWrapIndentMode(QsciScintilla.WrapIndentIndented)
+        self.setWrapMode(QsciScintilla.WrapMode.WrapWord)
+        self.setWrapIndentMode(QsciScintilla.WrapIndentMode.WrapIndentIndented)
         self.setSelectionBackgroundColor(QtGui.QColor("#7e7e91"))
 
         fontmetrics = QtGui.QFontMetrics(self.font)
         self.setMarginsFont(self.font)
-        self.setMarginWidth(0, fontmetrics.width("00000"))
+        self.setMarginWidth(0, fontmetrics.horizontalAdvance("00000"))
         self.setMarginLineNumbers(0, True)
         self.setMarginsBackgroundColor(QtGui.QColor("#292930"))
         self.setMarginsForegroundColor(QtGui.QColor("gray"))
 
         self.setMarginSensitivity(1, True)
-        self.markerDefine(QsciScintilla.RightArrow,
+        self.markerDefine(QsciScintilla.MarkerSymbol.RightArrow,
             self.ARROW_MARKER_NUM)
         self.setMarkerBackgroundColor(QtGui.QColor("#ffffff"),
             self.ARROW_MARKER_NUM)
 
-        self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+        self.setBraceMatching(QsciScintilla.BraceMatch.SloppyBraceMatch)
 
         self.setCaretLineVisible(True)
         self.setCaretLineBackgroundColor(QtGui.QColor("#292930"))

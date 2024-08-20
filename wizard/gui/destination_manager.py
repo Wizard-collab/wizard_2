@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 
 # Wizard modules
@@ -57,7 +57,7 @@ class destination_manager(QtWidgets.QWidget):
         self.main_layout.addWidget(self.content_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(4)
         self.list_view.setHeaderLabels(['Destination', 'Reference namespace', 'Referenced version', 'Auto update'])
@@ -65,7 +65,7 @@ class destination_manager(QtWidgets.QWidget):
         self.list_view.header().resizeSection(1, 200)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.content_layout.addWidget(self.list_view)
 
         self.buttons_widget = QtWidgets.QWidget()
@@ -76,7 +76,7 @@ class destination_manager(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.content_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.remove_selection_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.remove_selection_button, "Remove selected references")
@@ -193,7 +193,7 @@ class custom_target_item(QtWidgets.QTreeWidgetItem):
                     comment = version['comment']
                 action = menu.addAction(f"{version['name']} - {comment}")
                 action.id = version['id']
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action is not None:
                 self.modify_version(action.id)
 

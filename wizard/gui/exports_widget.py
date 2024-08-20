@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import json
 import time
 import os
@@ -128,8 +128,8 @@ class exports_widget(QtWidgets.QWidget):
         self.list_view.header().resizeSection(6, 60)
         self.list_view.header().resizeSection(8, 100)
         self.list_view.header().resizeSection(9, 40)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
@@ -141,7 +141,7 @@ class exports_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.versions_count_label = QtWidgets.QLabel()
         self.versions_count_label.setObjectName('gray_label')
@@ -162,7 +162,7 @@ class exports_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
@@ -239,7 +239,7 @@ class exports_widget(QtWidgets.QWidget):
                     self.confirm_widget.set_important_message(message)
                     self.confirm_widget.set_security_sentence('archive anyway')
 
-                if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
 
                     export_ids = []
                     export_version_ids = []
@@ -488,7 +488,7 @@ class exports_widget(QtWidgets.QWidget):
             else:
                 set_default_action = menu.addAction(QtGui.QIcon(ressources._default_export_version_icon_), 'Set default as always last')
         pos = QtGui.QCursor().pos()
-        action = menu.exec_(pos)
+        action = menu.exec(pos)
         if action is not None:
             if action == folder_action:
                 self.open_folder()
@@ -537,7 +537,7 @@ class exports_widget(QtWidgets.QWidget):
                 if len(selection) == 1:
                     old_comment = selection[0].export_version_row['comment']
                 self.comment_widget = comment_widget.comment_widget(old_comment=old_comment, pos=pos)
-                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     comment = self.comment_widget.comment
                     for item in selection:
                         assets.modify_export_version_comment(item.export_version_row['id'], comment)
@@ -564,7 +564,7 @@ class exports_widget(QtWidgets.QWidget):
 
             self.manual_export_widget.set_export_name('main')
 
-            if self.manual_export_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.manual_export_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 files = self.manual_export_widget.files
                 export_name = self.manual_export_widget.export_name
                 comment = self.manual_export_widget.comment

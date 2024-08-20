@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.core import repository
@@ -47,8 +47,8 @@ class create_quote_widget(QtWidgets.QDialog):
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding,
-                                                    QtWidgets.QSizePolicy.MinimumExpanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding,
+                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding))
 
         self.count_label = QtWidgets.QLabel('0/100 characters')
         self.main_layout.addWidget(self.count_label)
@@ -60,16 +60,16 @@ class create_quote_widget(QtWidgets.QDialog):
 
         self.warning_frame = QtWidgets.QFrame()
         self.warning_layout = QtWidgets.QHBoxLayout()
-        self.warning_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.warning_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.warning_layout.setContentsMargins(6,6,6,6)
         self.warning_layout.setSpacing(6)
         self.warning_frame.setLayout(self.warning_layout)
         self.main_layout.addWidget(self.warning_frame)
 
         self.warning_icon = QtWidgets.QLabel()
-        self.warning_icon.setAlignment(QtCore.Qt.AlignTop)
+        self.warning_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.warning_icon.setPixmap(QtGui.QIcon(ressources._agreement_icon_).pixmap(30))
-        self.warning_icon.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.warning_icon.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.warning_layout.addWidget(self.warning_icon)
 
         warning_text = "Please ensure that you're respectful, everybody has access to your publication.\n"
@@ -79,8 +79,8 @@ class create_quote_widget(QtWidgets.QDialog):
         self.warning_label = QtWidgets.QLabel(warning_text)
         self.warning_layout.addWidget(self.warning_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding,
-                                                    QtWidgets.QSizePolicy.MinimumExpanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding,
+                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding))
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -89,7 +89,7 @@ class create_quote_widget(QtWidgets.QDialog):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.cancel_button.setDefault(False)

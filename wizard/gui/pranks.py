@@ -17,7 +17,7 @@ import subprocess
 import time
 import logging
 logger = logging.getLogger(__name__)
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 
 # Wizard core modules
 from wizard.core import game

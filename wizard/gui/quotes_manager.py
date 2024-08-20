@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import json
 import statistics
 
@@ -53,11 +53,11 @@ class quotes_manager(QtWidgets.QWidget):
         self.quotes_scrollArea_layout.setSpacing(6)
         self.quotes_scrollArea_widget.setLayout(self.quotes_scrollArea_layout)
 
-        self.quotes_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.quotes_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.quotes_scrollArea.setWidgetResizable(True)
         self.quotes_scrollArea.setWidget(self.quotes_scrollArea_widget)
 
-        self.quotes_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.quotes_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.quotes_scrollArea)
 
@@ -97,9 +97,9 @@ class quotes_manager(QtWidgets.QWidget):
         self.voters_number.setObjectName('gray_label')
         self.rank_layout.addWidget(self.voters_number)
 
-        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.create_quote_button = QtWidgets.QPushButton()
         self.create_quote_button.setFixedSize(QtCore.QSize(30,30))
@@ -127,7 +127,7 @@ class quotes_manager(QtWidgets.QWidget):
 
     def add_quote(self):
         self.create_quote_widget = create_quote_widget.create_quote_widget(self)
-        self.create_quote_widget.exec_()
+        self.create_quote_widget.exec()
         gui_server.refresh_ui()
 
     def remove_quote(self, quote_id):
@@ -222,7 +222,7 @@ class quote_widget(QtWidgets.QFrame):
         self.voters_number.setObjectName('gray_label')
         self.rank_layout.addWidget(self.voters_number)
 
-        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.delete_button = QtWidgets.QPushButton()
         self.delete_button.setFixedSize(QtCore.QSize(18,18))

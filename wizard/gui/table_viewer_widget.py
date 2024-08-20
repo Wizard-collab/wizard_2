@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import json
 import statistics
 
@@ -43,13 +43,13 @@ class table_viewer_widget(QtWidgets.QWidget):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setFixedWidth(200)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setStyleSheet('#tree_as_list_widget{background:#2c2c33;}')
         self.list_view.setColumnCount(1)
         self.list_view.setHeaderHidden(True)
         self.list_view.setIndentation(0)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.main_layout.addWidget(self.list_view)
 
         self.content_widget = QtWidgets.QWidget()
@@ -75,17 +75,17 @@ class table_viewer_widget(QtWidgets.QWidget):
         self.refresh_button.setIcon(QtGui.QIcon(ressources._refresh_icon_))
         self.toolbar_layout.addWidget(self.refresh_button)
 
-        self.toolbar_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.toolbar_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setItemDelegate(HighlightTextDelegate(self))
         self.table_widget.setAlternatingRowColors(True)
         self.table_widget.verticalHeader().setVisible(False)
-        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
         self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
-        self.table_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.table_widget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table_widget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.content_layout.addWidget(self.table_widget)
 
     def context_menu_requested(self, point):
@@ -94,7 +94,7 @@ class table_viewer_widget(QtWidgets.QWidget):
         item = self.table_widget.itemAt(point)
         delete_row = menu.addAction(QtGui.QIcon(ressources._archive_icon_), 'Delete row')
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == delete_row:
                 self.delete_row(item)
@@ -126,14 +126,14 @@ class table_viewer_widget(QtWidgets.QWidget):
                 item = self.table_widget.item(row_index, column_index)
                 item.deleted = True
                 item.new_data = None
-                item.setData(QtCore.Qt.ForegroundRole, QtGui.QColor(255, 89, 89, 250))
+                item.setData(QtCore.Qt.ItemDataRole.ForegroundRole, QtGui.QColor(255, 89, 89, 250))
         self.apply_change = True
 
     def cell_modified(self, row, column):
         if self.apply_change:
             item = self.table_widget.item(row, column)
             if not item.deleted:
-                item.setData(QtCore.Qt.ForegroundRole, QtGui.QColor(255, 175, 89, 250))
+                item.setData(QtCore.Qt.ItemDataRole.ForegroundRole, QtGui.QColor(255, 175, 89, 250))
                 item.new_data = item.text()
 
     def change_table(self):
@@ -168,7 +168,7 @@ class table_viewer_widget(QtWidgets.QWidget):
     def push_all(self):
         if repository.is_admin():
             self.confirm_widget = confirm_widget.confirm_widget("Do you really want to modify the project database ?")
-            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 all_items = self.get_all_items()
                 for item in all_items:
                     if item.new_data is not None:
@@ -233,7 +233,7 @@ class custom_table_item(QtWidgets.QTableWidgetItem):
     def fill_ui(self):
         self.setText(str(self.data))
         if self.data is None:
-            self.setData(QtCore.Qt.ForegroundRole, QtGui.QColor(255,255,255,40))
+            self.setData(QtCore.Qt.ItemDataRole.ForegroundRole, QtGui.QColor(255,255,255,40))
 
 class HighlightTextDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
@@ -241,7 +241,7 @@ class HighlightTextDelegate(QtWidgets.QStyledItemDelegate):
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
-        foregroundData = index.data(QtCore.Qt.ForegroundRole)
+        foregroundData = index.data(QtCore.Qt.ItemDataRole.ForegroundRole)
         if foregroundData:
-            option.palette.setBrush(QtGui.QPalette.HighlightedText, QtGui.QBrush(foregroundData))
+            option.palette.setBrush(QtGui.QPalette.ColorRole.HighlightedText, QtGui.QBrush(foregroundData))
 

@@ -5,8 +5,8 @@
 # Python modules
 import time
 import logging
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -102,13 +102,13 @@ class video_history_widget(QtWidgets.QFrame):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setHeaderHidden(True)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setStyleSheet("#tree_as_list_widget::item{padding:0px;}")
         self.list_view.setColumnCount(1)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.main_layout.addWidget(self.list_view)
 
         self.infos_layout = QtWidgets.QHBoxLayout()
@@ -173,10 +173,10 @@ class video_item_widget(QtWidgets.QWidget):
         self.time_label.setObjectName("gray_label")
         self.header_infos_layout.addWidget(self.time_label)
 
-        self.header_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.comment_label = QtWidgets.QLabel()
-        self.comment_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.comment_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.infos_layout.addWidget(self.comment_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))

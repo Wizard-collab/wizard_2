@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import sys
 import logging
 
@@ -31,12 +31,17 @@ class custom_stdout(QtCore.QObject):
     def write(self, buf):
         try:
             self.stdout_signal.emit(buf)
+            if not sys.__stdout__:
+                return
+            sys.__stdout__.write(buf)
         except RuntimeError:
-            pass
+            if not sys.__stdout__:
+                return
             sys.__stdout__.write(buf)
 
     def flush(self):
-        sys.__stdout__.flush()
+        if not sys.__stdout__:
+            sys.__stdout__.flush()
 
 class custom_stderr(QtCore.QObject):
 
@@ -47,9 +52,13 @@ class custom_stderr(QtCore.QObject):
 
     def write(self, buf):
         self.stderr_signal.emit(buf)
+        if not sys.__stderr__:
+            return
         sys.__stderr__.write(buf)
 
     def flush(self):
+        if not sys.__stderr__:
+            return
         sys.__stderr__.flush()
 
 class console_widget(QtWidgets.QWidget):
@@ -109,9 +118,9 @@ class console_widget(QtWidgets.QWidget):
         self.header_custom_widget.setLayout(self.header_custom_layout)
 
         self.menu_bar = QtWidgets.QMenuBar()
-        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_custom_layout.addWidget(self.menu_bar)
-        self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
         self.main_layout.addWidget(self.header_custom_widget)
         self.console_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Console")
         self.clear_console_action = self.console_action.addAction(QtGui.QIcon(ressources._archive_icon_), "Clear")
@@ -132,7 +141,7 @@ class console_widget(QtWidgets.QWidget):
     def connect_functions(self):
         self.console_scrollBar.rangeChanged.connect(lambda: self.console_scrollBar.setValue(self.console_scrollBar.maximum()))
         self.custom_handler.log_record.connect(self.handle_record)
-        self.exec_sc = QtWidgets.QShortcut(QtGui.QKeySequence('Ctrl+Return'), self)
+        self.exec_sc = QtGui.QShortcut(QtGui.QKeySequence('Ctrl+Return'), self)
         self.exec_sc.activated.connect(self.execute_script)
 
         self.clear_console_action.triggered.connect(self.console_viewer.clear)

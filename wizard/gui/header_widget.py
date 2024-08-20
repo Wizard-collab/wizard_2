@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard modules
 from wizard.vars import ressources
@@ -55,7 +55,7 @@ class header_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.menu_bar = QtWidgets.QMenuBar()
-        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
 
         self.main_layout.addWidget(self.menu_bar)
         
@@ -121,17 +121,17 @@ class header_widget(QtWidgets.QFrame):
 
     def change_user(self):
         self.user_log_widget = user_log_widget.user_log_widget()
-        self.user_log_widget.exec_()
+        self.user_log_widget.exec()
 
     def change_project(self):
         self.project_manager_widget = project_manager_widget.project_manager_widget(wait_for_restart=True)
-        self.project_manager_widget.exec_()
+        self.project_manager_widget.exec()
 
     def create_user(self):
         self.create_user_widget = create_user_widget.create_user_widget()
-        self.create_user_widget.exec_()
+        self.create_user_widget.exec()
 
     def create_project(self):
         self.create_project_widget = create_project_widget.create_project_widget()
-        self.create_project_widget.exec_()
+        self.create_project_widget.exec()
 

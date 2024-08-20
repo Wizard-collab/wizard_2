@@ -3,9 +3,9 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import pyqtProperty
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtProperty
 import sys
 import os
 

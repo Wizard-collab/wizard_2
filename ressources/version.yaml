@@ -1,7 +1,7 @@
-BUILDS: 370
-MAJOR: 3
-MINOR: 8
-PATCH: 11
-builds: 370
-date: 1723623698.6814883
-setup_name: 3.8.11.0370-setup.exe
+BUILDS: 385
+MAJOR: 4
+MINOR: 0
+PATCH: 0
+builds: 385
+date: 1724145417.957828
+setup_name: 4.0.0.0385-setup.exe

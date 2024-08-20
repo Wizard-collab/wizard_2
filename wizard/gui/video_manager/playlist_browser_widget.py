@@ -7,8 +7,8 @@ import logging
 import time
 import traceback
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -68,7 +68,7 @@ class playlist_browser_widget(QtWidgets.QWidget):
 
     def create_playlist(self):
         self.create_playlist_widget = create_playlist_widget.create_playlist_widget()
-        self.create_playlist_widget.exec_()
+        self.create_playlist_widget.exec()
 
     def update_search(self):
         search_data = self.search_bar.text()
@@ -118,7 +118,7 @@ class playlist_browser_widget(QtWidgets.QWidget):
             return
 
         pos = QtGui.QCursor().pos()
-        action = menu.exec_(pos)
+        action = menu.exec(pos)
         if action is not None:
             if action == delete_playlist_action:
                 self.delete_selected_playlists()
@@ -128,7 +128,7 @@ class playlist_browser_widget(QtWidgets.QWidget):
         if len(selection) == 0:
             return
         self.confirm_widget = confirm_widget.confirm_widget(f"Delete selected playlist(s) ?", parent=self)
-        if not self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if not self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             return
         for item in selection:
             playlist_id = item.playlist_row['id']
@@ -158,7 +158,7 @@ class playlist_browser_widget(QtWidgets.QWidget):
         self.header_layout.addWidget(self.create_playlist_button)
 
         self.content_widget = QtWidgets.QWidget()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_widget.setObjectName('dark_widget')
         self.content_layout = QtWidgets.QHBoxLayout()
         self.content_layout.setContentsMargins(0,0,0,0)
@@ -168,13 +168,13 @@ class playlist_browser_widget(QtWidgets.QWidget):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setHeaderHidden(True)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setStyleSheet("#tree_as_list_widget::item{padding:0px;}")
         self.list_view.setColumnCount(1)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.content_layout.addWidget(self.list_view)
 
     def refresh(self):
@@ -252,9 +252,9 @@ class playlist_item_widget(QtWidgets.QWidget):
         self.time_label.setObjectName("gray_label")
         self.header_infos_layout.addWidget(self.time_label)
 
-        self.header_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
 class search_thread(QtCore.QThread):
 

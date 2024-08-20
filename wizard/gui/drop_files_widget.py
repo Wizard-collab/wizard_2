@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import os
 
 # Wizard modules
@@ -27,7 +27,7 @@ class drop_files_widget(QtWidgets.QWidget):
         self.setLayout(self.main_layout)
 
         self.files_scrollArea = QtWidgets.QScrollArea()
-        self.files_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.files_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.files_scrollArea.setVisible(False)
 
         self.files_scrollArea_widget = QtWidgets.QWidget()
@@ -36,7 +36,7 @@ class drop_files_widget(QtWidgets.QWidget):
         self.files_scrollArea_layout.setContentsMargins(0,0,0,0)
         self.files_scrollArea_widget.setLayout(self.files_scrollArea_layout)
 
-        self.files_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.files_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.files_scrollArea.setWidgetResizable(True)
         self.files_scrollArea.setWidget(self.files_scrollArea_widget)
 
@@ -155,10 +155,8 @@ class drop_files_button(QtWidgets.QPushButton):
                 self.new_file.emit(path)
 
     def open_files(self):
-        options = QtWidgets.QFileDialog.Options()
         software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select software executable", "",
-                            "All Files (*);;",
-                            options=options)
+                            "All Files (*);;")
         if software_path:
             self.path_lineEdit.setText(software_path.replace('\\', '/'))
 
@@ -174,25 +172,25 @@ class drop_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.image = QtWidgets.QLabel()
-        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        self.image.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.image)
         self.text = QtWidgets.QLabel()
-        self.text.setAlignment(QtCore.Qt.AlignCenter)
+        self.text.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.text.setObjectName('title_label')
         self.main_layout.addWidget(self.text)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
         self.setImage(ressources._merge_info_image_)
 
     def setImage(self, image):
         self.image.setPixmap(QtGui.QPixmap(image).scaled(
-            150, 150, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation))
+            150, 150, QtCore.Qt.AspectRatioMode.KeepAspectRatioByExpanding, QtCore.Qt.TransformationMode.SmoothTransformation))
 
     def setText(self, text):
         self.text.setText(text)

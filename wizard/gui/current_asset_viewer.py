@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.core import project
@@ -136,4 +136,4 @@ class current_asset_viewer(QtWidgets.QFrame):
         self.work_env_label.setObjectName('bold_label')
         self.viewer_layout.addWidget(self.work_env_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))

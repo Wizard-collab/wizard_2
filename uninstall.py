@@ -27,7 +27,7 @@
 # SOFTWARE.
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import shutil
 import psutil
@@ -144,8 +144,8 @@ class uninstaller(QtWidgets.QWidget):
         self.connect_functions()
 
     def showEvent(self, event):
-        desktop = QtWidgets.QApplication.desktop()
-        screenRect = desktop.screenGeometry()
+        desktop = QtGui.QGuiApplication.primaryScreen()
+        screenRect = desktop.geometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
         self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))
@@ -200,7 +200,7 @@ class uninstaller(QtWidgets.QWidget):
         self.main_layout.addWidget(self.datas_widget)
 
         self.image_label = QtWidgets.QLabel()
-        self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.png')).pixmap(34))
         self.datas_layout.addWidget(self.image_label)
 
@@ -230,7 +230,7 @@ class uninstaller(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.buttons_layout.addWidget(self.cancel_button)
@@ -272,15 +272,13 @@ QProgressBar::chunk {background-color:
 def main():
     if is_bootsrap():
         if is_admin():
-            os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-            QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-            QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+            os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "0.75"
             app = QtWidgets.QApplication(sys.argv)
             app.setStyleSheet(stylesheet)
             uninstaller_widget = uninstaller()
             uninstaller_widget.show()
             QtWidgets.QApplication.processEvents()
-            sys.exit(app.exec_())
+            sys.exit(app.exec())
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     else:

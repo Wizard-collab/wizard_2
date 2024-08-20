@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import json
 import traceback
 import os
@@ -36,8 +36,8 @@ class popup_wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(popup_wall_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.popup_ids = dict()
         self.popup_save_ids = dict()
@@ -59,24 +59,24 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.popup_scrollBar = self.popups_scrollArea.verticalScrollBar()
 
         self.popups_scrollArea_widget = QtWidgets.QWidget()
-        self.popups_scrollArea_widget.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.popups_scrollArea_widget.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
         self.popups_scrollArea_widget.setObjectName('transparent_widget')
         self.popups_scrollArea_layout = QtWidgets.QVBoxLayout()
         self.popups_scrollArea_layout.setSpacing(6)
         self.popups_scrollArea_widget.setLayout(self.popups_scrollArea_layout)
 
-        self.popups_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.popups_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.popups_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.popups_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.popups_scrollArea.setWidgetResizable(True)
         self.popups_scrollArea.setWidget(self.popups_scrollArea_widget)
 
-        self.popups_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.popups_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.popups_scrollArea)
 
     def move_ui(self):
-        desktop = QtWidgets.QApplication.desktop()
-        screenRect = desktop.screenGeometry()
+        desktop = QtGui.QGuiApplication.screens()[0]
+        screenRect = desktop.geometry()
         screen_minX = screenRect.topLeft().x()
         screen_minY = screenRect.topLeft().y()
         screen_maxX = screenRect.bottomRight().x()
@@ -227,7 +227,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.warning_text.setStyleSheet('color: %s' %color)
 
     def move_cursor_to_end(self):
-        self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
+        self.comment_textEdit.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -250,8 +250,8 @@ class popup_save_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.setMinimumWidth(320)
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(17,17,17,17)
         self.main_layout.setSpacing(6)
@@ -271,7 +271,7 @@ class popup_save_widget(QtWidgets.QFrame):
 
         self.version_name_label = QtWidgets.QLabel()
         self.version_name_label.setWordWrap(True)
-        self.version_name_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.version_name_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_layout.addWidget(self.version_name_label)
 
         self.decoration_content = QtWidgets.QWidget()
@@ -291,7 +291,7 @@ class popup_save_widget(QtWidgets.QFrame):
         self.comment_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.comment_label)
         
-        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.comment_widget = QtWidgets.QWidget()
         self.comment_widget.setObjectName('transparent_widget')
@@ -419,7 +419,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.tags_widget.exec()
 
     def move_cursor_to_end(self):
-        self.comment_textEdit.moveCursor(QtGui.QTextCursor.End)
+        self.comment_textEdit.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def update_comment_validity(self):
         text = self.comment_textEdit.toPlainText()
@@ -488,9 +488,9 @@ class popup_event_widget(QtWidgets.QFrame):
                 gui_server.focus_instance(data['instance'])
 
     def build_ui(self):
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.setMinimumWidth(320)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(6,6,6,6)
         self.main_layout.setSpacing(0)
@@ -533,7 +533,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.user_name_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.user_name_label)
 
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.decoration_content = QtWidgets.QWidget()
         self.decoration_content.setObjectName('transparent_widget')
@@ -563,7 +563,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout_2.addWidget(self.quit_button)
         
-        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setVisible(0)
@@ -666,9 +666,9 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.popup_id))
 
     def build_ui(self):
-        self.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.setMinimumWidth(320)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(6,6,6,6)
         self.main_layout.setSpacing(0)
@@ -703,7 +703,7 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.msg_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.msg_label)
 
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.decoration_content = QtWidgets.QWidget()
         self.decoration_content.setObjectName('transparent_widget')
@@ -719,4 +719,4 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout.addWidget(self.quit_button)
         
-        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))

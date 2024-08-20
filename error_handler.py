@@ -27,7 +27,7 @@
 # SOFTWARE.
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import sys
 
@@ -76,12 +76,12 @@ class error_handler(QtWidgets.QWidget):
         self.main_layout.addWidget(self.header_widget)
 
         self.crash_image = QtWidgets.QLabel()
-        self.crash_image.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.crash_image.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.crash_image.setPixmap(QtGui.QIcon(ressources._crash_icon_).pixmap(60))
         self.header_layout.addWidget(self.crash_image)
 
         self.header_content_widget = QtWidgets.QWidget()
-        self.header_content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.header_content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_content_widget.setObjectName('transparent_widget')
         self.header_content_layout = QtWidgets.QVBoxLayout()
         self.header_content_layout.setContentsMargins(0,0,0,0)
@@ -96,7 +96,7 @@ class error_handler(QtWidgets.QWidget):
         self.info_label = QtWidgets.QLabel('Please send this error to the support,\nThat way wizard will probably be more stable in the future')
         self.header_content_layout.addWidget(self.info_label)
 
-        self.header_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.header_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
         self.content_layout = QtWidgets.QVBoxLayout()
@@ -108,7 +108,7 @@ class error_handler(QtWidgets.QWidget):
 
         self.error_label = QtWidgets.QTextEdit()
         self.error_label.setText(self.error)
-        self.error_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.error_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.content_layout.addWidget(self.error_label)
 
         self.content_layout.addWidget(QtWidgets.QLabel('You can add some details :'))
@@ -116,7 +116,7 @@ class error_handler(QtWidgets.QWidget):
         self.additionnal_message_field = QtWidgets.QTextEdit()
         self.content_layout.addWidget(self.additionnal_message_field)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -124,7 +124,7 @@ class error_handler(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.close_button = QtWidgets.QPushButton('Close')
         self.buttons_layout.addWidget(self.close_button)
@@ -140,8 +140,9 @@ class error_handler(QtWidgets.QWidget):
 
     def center(self):
         frameGm = self.frameGeometry()
-        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
-        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        #screen = QtWidgets.QGuiApplication.primaryScreen().screenNumber(QtWidgets.QGuiApplication.primaryScreen().cursor().pos())
+        screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor.pos())
+        centerPoint = screen.geometry().center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
@@ -150,7 +151,7 @@ def main():
     error = sys.argv[1]
     error_handler_widget = error_handler(error)
     error_handler_widget.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 if __name__ == '__main__':
     main()

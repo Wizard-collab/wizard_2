@@ -118,7 +118,7 @@ class tool_bar(QtWidgets.QMenu):
         self.update_modeling_action.triggered.connect(update_mesh)
 
     def show_export_ui(self):
-        if self.export_dialog.exec_() == QtWidgets.QDialog.Accepted:
+        if self.export_dialog.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             material = self.export_dialog.material
             size = self.export_dialog.size
             file_type = self.export_dialog.type

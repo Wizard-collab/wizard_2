@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard gui modules
@@ -35,14 +35,14 @@ class create_user_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Expanding,
-                                                    QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding,
+                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.title_label = QtWidgets.QLabel("Create user")
         self.title_label.setObjectName("title_label_2")
         self.main_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Credentials")
@@ -64,8 +64,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.email_lineEdit.setPlaceholderText('User Email')
         self.main_layout.addWidget(self.email_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed,
-                                                    QtWidgets.QSizePolicy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Policy.Fixed,
+                                                    QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Profile picture")
@@ -77,8 +77,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.profile_picture_button.setIconSize(QtCore.QSize(54,54))
         self.main_layout.addWidget(self.profile_picture_button)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
-                                                    QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding,
+                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.championship_label = QtWidgets.QLabel("Championship")
@@ -88,8 +88,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.championship_participation.setObjectName('android_checkbox')
         self.main_layout.addWidget(self.championship_participation)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Fixed,
-                                                    QtWidgets.QSizePolicy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Policy.Fixed,
+                                                    QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.admin_label = QtWidgets.QLabel("The section below is optional")
@@ -99,8 +99,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.admin_password_lineEdit.setPlaceholderText('Administrator Password')
         self.main_layout.addWidget(self.admin_password_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding,
-                                                    QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding,
+                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
@@ -160,10 +160,8 @@ class create_user_widget(QtWidgets.QDialog):
         self.profile_picture_button.setIcon(icon)
 
     def update_profile_picture(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select profile picture", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):

@@ -27,29 +27,19 @@
 # SOFTWARE.
 
 # Python modules
-import logging
+import subprocess
 import os
-import sys
 
 # Wizard modules
 from wizard.vars import user_vars
-from wizard.core import path_utils
 
-def get_root_logger():
-    create_prefs_folder()
-    root_logger = logging.getLogger()
-    if 'DEBUG' in sys.argv:
-        root_logger.setLevel(logging.DEBUG)
-    else:
-        root_logger.setLevel(logging.INFO)
+exe = ['python', 'app.py']
 
-    file_handler = logging.FileHandler(user_vars._user_logger_file_)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
-    root_logger.addHandler(file_handler)
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
-    root_logger.addHandler(stream_handler)
+if not os.path.isdir(user_vars._user_path_):
+    os.makedirs(user_vars._user_path_)
 
-def create_prefs_folder():
-    if not path_utils.isdir(user_vars._user_path_):
-        path_utils.makedirs(user_vars._user_path_)
+log_file_path = os.path.join(user_vars._user_path_, 'main.log')
+
+with open(log_file_path, 'a') as log_file:
+    process = subprocess.Popen(exe, stdout=log_file, stderr=subprocess.STDOUT, shell=True)
+    process.wait()

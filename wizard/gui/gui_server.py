@@ -10,8 +10,8 @@
 # It roughly is a lan access to the wizard core functions
 
 # Python modules
-from PyQt5 import QtCore
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6 import QtCore
+from PyQt6.QtCore import QThread, pyqtSignal
 import socket
 import sys
 import time
@@ -53,6 +53,7 @@ class gui_server(QThread):
     raise_ui_signal = pyqtSignal(int)
     popup_signal = pyqtSignal(object)
     create_playlist_from_stages_signal = pyqtSignal(list)
+    show_video_signal = pyqtSignal(int)
 
     def __init__(self):
         super(gui_server, self).__init__()
@@ -120,6 +121,8 @@ class gui_server(QThread):
             self.popup_signal.emit(signal_dic['data'])
         elif signal_dic['function'] == 'create_playlist_from_stages':
             self.create_playlist_from_stages_signal.emit(signal_dic['stages_ids_list'])
+        elif signal_dic['function'] == 'show_video':
+            self.show_video_signal.emit(signal_dic['video_id'])
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
@@ -181,6 +184,12 @@ def create_playlist_from_stages(stages_ids_list):
     signal_dic = dict()
     signal_dic['function'] = 'create_playlist_from_stages'
     signal_dic['stages_ids_list'] = stages_ids_list
+    send_signal(signal_dic)
+
+def show_video(video_id):
+    signal_dic = dict()
+    signal_dic['function'] = 'show_video'
+    signal_dic['video_id'] = video_id
     send_signal(signal_dic)
 
 def focus_export_version(export_version_id):

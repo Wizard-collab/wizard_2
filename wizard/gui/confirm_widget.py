@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -37,7 +37,7 @@ class confirm_widget(QtWidgets.QDialog):
 
     def build_ui(self):
         self.setMinimumWidth(450)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.main_layout)
 
@@ -76,7 +76,7 @@ class confirm_widget(QtWidgets.QDialog):
         self.security_lineEdit.setStyleSheet('color:#f0605b;font:bold;')
         self.security_layout.addWidget(self.security_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
@@ -84,7 +84,7 @@ class confirm_widget(QtWidgets.QDialog):
         self.buttons_layout.setContentsMargins(0,0,0,0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
-        self.spaceItem = QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
         self.reject_button = QtWidgets.QPushButton(self.reject_text)
         self.reject_button.setDefault(False)

@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.core import user
@@ -31,7 +31,7 @@ class psql_widget(QtWidgets.QDialog):
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.host_lineEdit = QtWidgets.QLineEdit()
@@ -50,7 +50,7 @@ class psql_widget(QtWidgets.QDialog):
         self.password_lineEdit.setPlaceholderText('Password')
         self.main_layout.addWidget(self.password_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.button_widget = QtWidgets.QWidget()
@@ -60,7 +60,7 @@ class psql_widget(QtWidgets.QDialog):
         self.button_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.button_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
         self.quit_button = QtWidgets.QPushButton('Quit')
