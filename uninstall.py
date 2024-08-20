@@ -144,8 +144,8 @@ class uninstaller(QtWidgets.QWidget):
         self.connect_functions()
 
     def showEvent(self, event):
-        desktop = QtWidgets.QGuiApplication.primaryScreen()
-        screenRect = desktop.screenGeometry()
+        desktop = QtGui.QGuiApplication.primaryScreen()
+        screenRect = desktop.geometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
         self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))

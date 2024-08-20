@@ -31,12 +31,17 @@ class custom_stdout(QtCore.QObject):
     def write(self, buf):
         try:
             self.stdout_signal.emit(buf)
+            if not sys.__stdout__:
+                return
+            sys.__stdout__.write(buf)
         except RuntimeError:
-            pass
+            if not sys.__stdout__:
+                return
             sys.__stdout__.write(buf)
 
     def flush(self):
-        sys.__stdout__.flush()
+        if not sys.__stdout__:
+            sys.__stdout__.flush()
 
 class custom_stderr(QtCore.QObject):
 
@@ -47,9 +52,13 @@ class custom_stderr(QtCore.QObject):
 
     def write(self, buf):
         self.stderr_signal.emit(buf)
+        if not sys.__stderr__:
+            return
         sys.__stderr__.write(buf)
 
     def flush(self):
+        if not sys.__stderr__:
+            return
         sys.__stderr__.flush()
 
 class console_widget(QtWidgets.QWidget):

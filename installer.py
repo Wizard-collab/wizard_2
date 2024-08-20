@@ -137,6 +137,8 @@ def delete_shortcuts():
     delete_shortcut('Wizard')
     delete_shortcut('PyWizard')
     delete_shortcut('Server')
+    delete_shortcut('Create Repository')
+    delete_shortcut('Change Repository')
 
 def create_shortcut(name, exe):
     install_dir = get_install_dir()
@@ -215,8 +217,8 @@ class installer(QtWidgets.QWidget):
         self.startup()
 
     def showEvent(self, event):
-        desktop = QtWidgets.QGuiApplication.primaryScreen()
-        screenRect = desktop.screenGeometry()
+        desktop = QtGui.QGuiApplication.primaryScreen()
+        screenRect = desktop.geometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
         self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))

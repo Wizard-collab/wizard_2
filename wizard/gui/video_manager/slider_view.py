@@ -82,11 +82,12 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def move_scene_center_to_left(self, force=False):
         delta_x = self.mapToScene(QtCore.QPoint(0,0)).x() + 20
-        if (delta_x >= 0) and not force:
-            return
+        #if (delta_x >= 0) and not force:
+        #    return
         self.update_scene_rect(self.sceneRect().translated(-delta_x, 0))
 
     def resizeEvent(self, event):
+        super().resizeEvent(event)
         self.adapt_frame_width()
         self.move_scene_center_to_left()
 
