@@ -50,7 +50,7 @@ def update_mesh(mesh_file):
 
 def invoke_init_project_widget(mesh_file):
     widget = init_project_widget(mesh_file)
-    widget.exec_()
+    widget.exec()
 
 class init_project_widget(QtWidgets.QDialog):
     def __init__(self, mesh_file):

@@ -4,8 +4,8 @@
 
 # Python modules
 import os
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard modules
 from wizard.vars import ressources
@@ -44,7 +44,7 @@ class shelf_widget(QtWidgets.QFrame):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.edit_mode_widget = QtWidgets.QWidget()
         self.edit_mode_layout = QtWidgets.QHBoxLayout()
@@ -102,7 +102,7 @@ class shelf_widget(QtWidgets.QFrame):
         menu = gui_utils.QMenu()
         tool_action = menu.addAction(QtGui.QIcon(ressources._python_icon_), 'Tool')
         separator_action = menu.addAction(QtGui.QIcon(ressources._separator_icon_), 'Separator')
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action == tool_action:
             self.create_tool_widget = create_tool_widget.create_tool_widget()
             self.create_tool_widget.show()
@@ -218,8 +218,8 @@ class help_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(help_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.build_ui()
 
@@ -302,13 +302,13 @@ class shelf_separator(QtWidgets.QFrame):
 
     def mousePressEvent(self, event):
         if self.edit_mode:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.setStyleSheet('#shelf_seperator_container{background-color:#1d1d21;}')
 
     def mouseReleaseEvent(self, event):
         event.accept()
         if self.edit_mode:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 if self.isChecked():
                     self.setStyleSheet('')
                     self.setChecked(False)
@@ -316,14 +316,14 @@ class shelf_separator(QtWidgets.QFrame):
                     self.setStyleSheet('#shelf_seperator_container{border:1px solid #f79360;}')
                     self.setChecked(True)   
         else:
-            if event.button() == QtCore.Qt.RightButton:
+            if event.button() == QtCore.Qt.MouseButton.RightButton:
                 self.custom_menu()
 
     def custom_menu(self):
         if not self.edit_mode:
             menu = gui_utils.QMenu()
             delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action == delete_action:
                 self.delete_signal.emit(self.shelf_script_row['id'])
 
@@ -396,23 +396,23 @@ class shelf_script_button(QtWidgets.QPushButton):
         event.accept()
         if not self.edit_mode:
             self.hide_help_signal.emit(self.shelf_script_row['id'])
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.setStyleSheet('background-color:#1d1d21;')
             self.timer.stop()
         else:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.setStyleSheet('background-color:#1d1d21;')
 
     def mouseReleaseEvent(self, event):
         event.accept()
         if not self.edit_mode:
             self.setStyleSheet('')
-            if event.button() == QtCore.Qt.RightButton:
+            if event.button() == QtCore.Qt.MouseButton.RightButton:
                 self.custom_menu()
-            elif event.button() == QtCore.Qt.LeftButton:
+            elif event.button() == QtCore.Qt.MouseButton.LeftButton:
                 self.execute()
         else:
-            if event.button() == QtCore.Qt.LeftButton:
+            if event.button() == QtCore.Qt.MouseButton.LeftButton:
                 if self.isChecked():
                     self.setStyleSheet('')
                     self.setChecked(False)
@@ -427,7 +427,7 @@ class shelf_script_button(QtWidgets.QPushButton):
             subtask_action = menu.addAction(QtGui.QIcon(ressources._tasks_icon_), 'Execute as subtask')
             edit_action = menu.addAction(QtGui.QIcon(ressources._tool_edit_), 'Edit')
             delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
-            action = menu.exec_(QtGui.QCursor().pos())
+            action = menu.exec(QtGui.QCursor().pos())
             if action == edit_action:
                 self.edit_signal.emit(self.shelf_script_row['id'])
             elif action == delete_action:

@@ -27,7 +27,7 @@
 # SOFTWARE.
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import sys
 
@@ -72,7 +72,7 @@ class submit_log_widget(QtWidgets.QWidget):
 
         self.log_label = QtWidgets.QTextEdit()
         self.log_label.setText(self.log)
-        self.log_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.log_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.main_layout.addWidget(self.log_label)
 
         self.main_layout.addWidget(QtWidgets.QLabel('Please add some details :'))
@@ -80,7 +80,7 @@ class submit_log_widget(QtWidgets.QWidget):
         self.additionnal_message_field = QtWidgets.QTextEdit()
         self.main_layout.addWidget(self.additionnal_message_field)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -89,7 +89,7 @@ class submit_log_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.close_button = QtWidgets.QPushButton('Close')
         self.buttons_layout.addWidget(self.close_button)
@@ -102,7 +102,7 @@ class submit_log_widget(QtWidgets.QWidget):
 
     def center(self):
         frameGm = self.frameGeometry()
-        screen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
-        centerPoint = QtWidgets.QApplication.desktop().screenGeometry(screen).center()
+        screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor.pos())
+        centerPoint = screen.geometry().center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())

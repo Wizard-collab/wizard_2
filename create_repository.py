@@ -32,7 +32,7 @@ import time
 import os
 import traceback
 import subprocess
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -70,7 +70,7 @@ class app():
         app_utils.init_psql_dns(self)
 
         self.create_repository_widget = create_repository_widget.create_repository_widget()
-        if self.create_repository_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.create_repository_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self.quit()
 
     def quit(self):
@@ -97,7 +97,7 @@ def main():
     sys.excepthook = excepthook
     application.log_app_infos()
     wizard_app = app()
-    ret = wizard_app.app.exec_()
+    ret = wizard_app.app.exec()
 
     sys.exit(ret)
 

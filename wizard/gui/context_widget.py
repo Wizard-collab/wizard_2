@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import os
 import time
 
@@ -208,7 +208,7 @@ class context_widget(QtWidgets.QFrame):
             self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
             security_sentence = f"{self.variant_row['name']}"
             self.confirm_widget.set_security_sentence(security_sentence)
-            if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 subtasks_library.archive_variant(self.variant_row['id'])        
         else:
             logger.warning("No variant found")
@@ -228,7 +228,7 @@ class context_widget(QtWidgets.QFrame):
     def create_variant(self):
         if self.stage_row is not None:
             self.variant_creation_widget = variant_creation_widget(self)
-            if self.variant_creation_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.variant_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 variant_name = self.variant_creation_widget.name_field.text()
                 new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
                 if new_variant_id:
@@ -308,7 +308,7 @@ class context_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.export_extension_comboBox, "Change export extension")
         self.main_layout.addWidget(self.export_extension_comboBox)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.folder_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.folder_button, "Open work environment folder")
@@ -329,8 +329,8 @@ class variant_creation_widget(QtWidgets.QDialog):
         super(variant_creation_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -366,7 +366,7 @@ class variant_creation_widget(QtWidgets.QDialog):
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel('New variant'))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)

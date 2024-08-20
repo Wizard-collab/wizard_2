@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import time
 import datetime
 
@@ -60,7 +60,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         current_estimation = self.stage_row['estimated_time']
         current_start_date = self.stage_row['start_date']
         self.edit_dates_widget = calendar_utils.edit_dates_widget(current_start_date, current_estimation)
-        if self.edit_dates_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.edit_dates_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             duration = self.edit_dates_widget.duration
             start_time = self.edit_dates_widget.start_time
             assets.modify_stage_estimation(self.stage_id, int(duration))
@@ -68,7 +68,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
             gui_server.refresh_team_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
@@ -131,10 +131,10 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout_1.addWidget(self.work_time_icon_label)
 
         self.work_time_label = QtWidgets.QLabel()
-        self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.time_infos_layout_1.addWidget(self.work_time_label)
 
-        self.time_infos_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.time_infos_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.estimated_time_icon_label = QtWidgets.QLabel()
         self.estimated_time_icon_label.setFixedSize(QtCore.QSize(22,22))
@@ -142,7 +142,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout_1.addWidget(self.estimated_time_icon_label)
 
         self.estimated_time_label = QtWidgets.QLabel()
-        self.estimated_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.estimated_time_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.time_infos_layout_1.addWidget(self.estimated_time_label)
 
         self.edit_estimation_button = gui_utils.transparent_button(ressources._edit_transparent_icon_, ressources._edit_icon_)
@@ -158,14 +158,14 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.time_infos_layout_2.addWidget(self.start_date_label)
 
         self.date_arrow_label = QtWidgets.QLabel(">")
-        self.date_arrow_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.date_arrow_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.date_arrow_label.setObjectName('gray_label')
         self.time_infos_layout_2.addWidget(self.date_arrow_label)
 
         self.due_date_label = QtWidgets.QLabel("...")
         self.time_infos_layout_2.addWidget(self.due_date_label)
 
-        self.time_infos_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.time_infos_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.separation_widget_1 = QtWidgets.QWidget()
         self.separation_layout_1 = QtWidgets.QHBoxLayout()
@@ -178,7 +178,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.note_label.setObjectName("bold_label")
         self.separation_layout_1.addWidget(self.note_label)
 
-        self.separation_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.separation_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.edit_note_button = QtWidgets.QPushButton('Edit note')
         self.edit_note_button.setMaximumHeight(24)
@@ -201,7 +201,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.asset_history_label.setObjectName("bold_label")
         self.separation_layout_2.addWidget(self.asset_history_label)
 
-        self.separation_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.separation_layout_2.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.add_comment_button = QtWidgets.QPushButton('Add comment')
         self.add_comment_button.setMaximumHeight(24)
@@ -209,7 +209,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.separation_layout_2.addWidget(self.add_comment_button)
 
         self.events_scrollArea = QtWidgets.QScrollArea()
-        self.events_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.events_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.events_scrollBar = self.events_scrollArea.verticalScrollBar()
 
         self.events_scrollArea_widget = QtWidgets.QWidget()
@@ -226,9 +226,9 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.events_content_widget.setLayout(self.events_content_layout)
         self.events_scrollArea_layout.addWidget(self.events_content_widget)
 
-        self.events_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.events_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
-        self.events_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.events_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.events_scrollArea.setWidgetResizable(True)
         self.events_scrollArea.setWidget(self.events_scrollArea_widget)
         self.main_layout.addWidget(self.events_scrollArea)
@@ -243,17 +243,17 @@ class asset_tracking_widget(QtWidgets.QFrame):
         self.refresh_label.setObjectName('gray_label')
         self.infos_layout.addWidget(self.refresh_label)
         
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.infos_layout.addWidget(QtWidgets.QLabel('Show'))
         self.event_count_spinBox = QtWidgets.QSpinBox()
-        self.event_count_spinBox.setButtonSymbols(2)
+        self.event_count_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.event_count_spinBox.setRange(1, 10000000)
         self.event_count_spinBox.setFixedWidth(50)
         self.infos_layout.addWidget(self.event_count_spinBox)
         self.infos_layout.addWidget(QtWidgets.QLabel('events'))
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(300,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(300,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def change_stage(self, stage_id):
         self.stage_id = stage_id
@@ -400,7 +400,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
         if self.stage_id is not None:
             if self.apply_state_modification:
                 self.comment_widget = comment_widget.comment_widget()
-                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     comment = self.comment_widget.comment
                     assets.modify_stage_state(self.stage_id, state, comment)
                     gui_server.refresh_team_ui()
@@ -420,7 +420,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
     def add_comment(self):
         if self.stage_id is not None:
             self.comment_widget = comment_widget.comment_widget()
-            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 comment = self.comment_widget.comment
                 assets.add_stage_comment(self.stage_id, comment)
                 gui_server.refresh_team_ui()
@@ -431,7 +431,7 @@ class asset_tracking_widget(QtWidgets.QFrame):
                                                                 old_comment=self.stage_row['note'],
                                                                 propose_tags=False,
                                                                 button_text='Edit')
-            if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 note = self.comment_widget.comment
                 assets.edit_stage_note(self.stage_id, note)
                 gui_server.refresh_team_ui()
@@ -457,7 +457,7 @@ class time_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(4,4,4,4)
         self.main_layout.setSpacing(0)
@@ -471,7 +471,7 @@ class time_widget(QtWidgets.QWidget):
         if current_day != day:
             self.main_layout.addWidget(self.day_label)
         self.main_layout.addWidget(self.hour_label)
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
 class tracking_event_widget(QtWidgets.QFrame):
     def __init__(self, tracking_event_row, parent=None):
@@ -506,7 +506,7 @@ class tracking_event_widget(QtWidgets.QFrame):
             self.overall_layout.insertWidget(0, self.time_widget)
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.setObjectName('transparent_widget')
         self.overall_layout = QtWidgets.QVBoxLayout()
         self.overall_layout.setContentsMargins(0,0,0,0)
@@ -544,96 +544,96 @@ class tracking_event_widget(QtWidgets.QFrame):
 
     def build_comment_event_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('added a comment')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def build_estimation_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('estimated task at')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
         self.estimation_label = QtWidgets.QLabel(f"{self.tracking_event_row['data']} days")
-        self.estimation_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.estimation_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.estimation_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def build_start_date_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('set start date to')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
         start_date = datetime.datetime.fromtimestamp(float(self.tracking_event_row['data'])).strftime("%d/%m/%Y")
         self.start_date_label = QtWidgets.QLabel(start_date)
-        self.start_date_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.start_date_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.start_date_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def build_work_session_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('worked')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
         string_time = tools.convert_seconds_to_string_time(float(self.tracking_event_row['data']))
 
         self.work_time_label = QtWidgets.QLabel(string_time)
-        self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.work_time_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.work_time_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def build_assignment_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('assigned task to')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
         self.assignment_label = QtWidgets.QLabel(self.tracking_event_row['data'])
-        self.assignment_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.assignment_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.assignment_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def build_state_switch_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('switched state to')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
 
         self.state_frame = QtWidgets.QFrame()
         self.state_frame.setObjectName('asset_tracking_event_frame')
-        self.state_frame.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.state_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.state_frame_layout = QtWidgets.QHBoxLayout()
         self.state_frame_layout.setContentsMargins(4,4,4,4)
         self.state_frame.setLayout(self.state_frame_layout)
@@ -644,24 +644,24 @@ class tracking_event_widget(QtWidgets.QFrame):
         
         self.state_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())
         self.state_label.setObjectName('bold_label')
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.state_frame_layout.addWidget(self.state_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def build_priority_switch_ui(self):
         self.user_label = QtWidgets.QLabel(self.tracking_event_row['creation_user'])
-        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.user_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.user_label)
 
         self.info_label = QtWidgets.QLabel('switched priority to')
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.info_label)
         
         self.priority_label = QtWidgets.QLabel(self.tracking_event_row['data'].upper())
         self.priority_label.setObjectName('bold_label')
-        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.priority_label)
 
         self.priority_icon = QtWidgets.QLabel()
@@ -669,4 +669,4 @@ class tracking_event_widget(QtWidgets.QFrame):
         self.priority_icon.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[self.tracking_event_row['data']]).pixmap(14))
         self.main_layout.addWidget(self.priority_icon)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))

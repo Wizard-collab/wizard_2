@@ -22,7 +22,7 @@ import maya.cmds as cmds
 def invoke_settings_widget(*args):
     from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('cfx', parent=wizard_tools.maya_main_window())
-    if export_settings_widget_win.exec_() == export_settings_widget.dialog_accepted:
+    if export_settings_widget_win.exec() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)

@@ -29,7 +29,7 @@
 # Python modules
 import sys
 import time
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -107,7 +107,7 @@ def main(project_manager=False,
                         change_repo,
                         change_psql,
                         table_viewer)
-    ret = wizard_app.app.exec_()
+    ret = wizard_app.app.exec()
     sys.exit(ret)
 
 if __name__ == '__main__':

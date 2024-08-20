@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard modules
@@ -142,7 +142,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.header_text = QtWidgets.QLabel()
         self.header_layout.addWidget(self.header_text)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         # Refresh assets section
 
@@ -183,24 +183,24 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.inrollframe_spinBox.setEnabled(False)
         self.inrollframe_spinBox.setObjectName('gray_label')
         self.inrollframe_spinBox.setRange(-1000000, 1000000)
-        self.inrollframe_spinBox.setButtonSymbols(2)
+        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inrollframe_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-1000000, 1000000)
-        self.inframe_spinBox.setButtonSymbols(2)
+        self.inframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 1000000)
-        self.outframe_spinBox.setButtonSymbols(2)
+        self.outframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outframe_spinBox)
 
         self.outrollframe_spinBox = QtWidgets.QSpinBox()
         self.outrollframe_spinBox.setEnabled(False)
         self.outrollframe_spinBox.setObjectName('gray_label')
         self.outrollframe_spinBox.setRange(-1000000, 1000000)
-        self.outrollframe_spinBox.setButtonSymbols(2)
+        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outrollframe_spinBox)
 
         # Render section
@@ -255,7 +255,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.nspace_list_layout.addWidget(self.infos_label)
 
         self.assets_list = QtWidgets.QListWidget()
-        self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.nspace_list_layout.addWidget(self.assets_list)
 
         # Deadline section
@@ -292,7 +292,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

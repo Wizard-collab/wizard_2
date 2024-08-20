@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import os
 import logging
 
@@ -24,7 +24,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 		self.setLayout(self.main_layout)
 
 		self.buttons_widget = QtWidgets.QWidget()
-		self.buttons_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+		self.buttons_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
 		self.buttons_widget.setObjectName('dark_widget')
 		self.buttons_layout = QtWidgets.QVBoxLayout()
 		self.buttons_layout.setSpacing(0)
@@ -33,7 +33,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 		self.main_layout.addWidget(self.buttons_widget)
 
 		self.buttons_content_widget = QtWidgets.QWidget()
-		self.buttons_content_widget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+		self.buttons_content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
 		self.buttons_content_widget.setObjectName('transparent_widget')
 		self.buttons_content_layout = QtWidgets.QVBoxLayout()
 		self.buttons_content_layout.setSpacing(3)
@@ -41,7 +41,7 @@ class custom_tab_widget(QtWidgets.QWidget):
 		self.buttons_content_widget.setLayout(self.buttons_content_layout)
 		self.buttons_layout.addWidget(self.buttons_content_widget)
 
-		self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+		self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
 		self.widgets_area = QtWidgets.QWidget()
 		self.widgets_area.setObjectName('dark_widget')

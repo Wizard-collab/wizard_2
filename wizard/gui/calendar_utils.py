@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import sys
 import datetime
 import time
@@ -68,7 +68,7 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         color = QtGui.QColor('transparent')
-        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.PenStyle.SolidLine)
         brush = QtGui.QBrush(color)
         painter.setPen(pen)
         painter.setBrush(brush)
@@ -81,13 +81,13 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.setFixedHeight(120)
         self.scene = header_scene()
         self.setScene(self.scene)
-        self.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        self.setRenderHint(QtGui.QPainter.TextAntialiasing, False)
-        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, False)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, False)
+        self.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing, False)
+        self.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform, False)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.pan = False
         self.column_width = 100
         self.last_mouse_pos = None
@@ -308,7 +308,7 @@ class calendar_header(QtWidgets.QGraphicsView):
 class day_item(custom_graphic_item):
     def __init__(self):
         super(day_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations)
         self.date = datetime.date.today()
 
     def setDate(self, date):
@@ -334,7 +334,7 @@ class day_item(custom_graphic_item):
 class week_item(custom_graphic_item):
     def __init__(self):
         super(week_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations)
         self.margin = 1
         self.text = ''
 
@@ -356,7 +356,7 @@ class week_item(custom_graphic_item):
 class month_item(custom_graphic_item):
     def __init__(self):
         super(month_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations)
         self.margin = 2
         self.text = ''
 
@@ -378,7 +378,7 @@ class month_item(custom_graphic_item):
 class year_item(custom_graphic_item):
     def __init__(self):
         super(year_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations)
         self.margin = 4
         self.text = ''
 
@@ -390,7 +390,7 @@ class year_item(custom_graphic_item):
                                 self.y + self.margin,
                                 self.width - self.margin*2,
                                 self.height - self.margin*2)
-        draw_text(painter, rect, self.text, size=20, bold=True, align=QtCore.Qt.AlignLeft)
+        draw_text(painter, rect, self.text, size=20, bold=True, align=QtCore.Qt.AlignmentFlag.AlignLeft)
 
 class viewport_helper(QtWidgets.QWidget):
 
@@ -427,7 +427,7 @@ class viewport_helper(QtWidgets.QWidget):
         self.items_number_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.selected_label)
         self.infos_layout.addWidget(self.items_number_label)
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.helper_layout = QtWidgets.QHBoxLayout()
         self.helper_layout.setContentsMargins(0,0,0,0)
@@ -461,19 +461,19 @@ class viewport_helper(QtWidgets.QWidget):
 
         self.helper_layout.addWidget(self.pan_image)
         self.helper_layout.addWidget(self.pan_label)
-        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
         self.helper_layout.addWidget(self.zoom_image)
         self.helper_layout.addWidget(self.zoom_label)
-        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
         self.helper_layout.addWidget(self.horizontal_zoom_image)
         self.helper_layout.addWidget(self.horizontal_zoom_label)
-        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
         self.helper_layout.addWidget(self.vertical_zoom_image)
         self.helper_layout.addWidget(self.vertical_zoom_label)
-        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
         self.helper_layout.addWidget(self.focus_image)
         self.helper_layout.addWidget(self.focus_label)
-        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        self.helper_layout.addSpacerItem(QtWidgets.QSpacerItem(12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
         self.reset_button = QtWidgets.QPushButton("Default")
         self.reset_button.setFixedHeight(30)
         self.reset_button.setStyleSheet("QPushButton{padding:0px;padding-left:5px;padding-right:5px;}")
@@ -500,13 +500,13 @@ class calendar_viewport(QtWidgets.QGraphicsView):
 
         self.scene = scene()
         self.setScene(self.scene)
-        self.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        self.setRenderHint(QtGui.QPainter.TextAntialiasing, False)
-        self.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, False)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, False)
+        self.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing, False)
+        self.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform, False)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.pan = False
         self.column_width = 100
         self.row_height = 40
@@ -649,7 +649,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
 
     def update_selection(self, items):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
-        if not modifiers & QtCore.Qt.ShiftModifier:
+        if not modifiers & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.deselect_all()
         for item in items:
             if not item.isVisible():
@@ -695,35 +695,35 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.scene_rect_update.emit(rect)
 
     def wheelEvent(self, event):
-        if event.modifiers() & QtCore.Qt.ShiftModifier:
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier:
             self.zoom_column_width(event)
-        elif event.modifiers() & QtCore.Qt.ControlModifier:
+        elif event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
             self.zoom_row_height(event)
         else:
             self.zoom(event)
 
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
-        if event.button() == QtCore.Qt.MiddleButton:
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
             self.pan = True
-            self.last_mouse_pos = event.pos()
-        elif event.button() == QtCore.Qt.LeftButton:
-            if self.itemAt(event.pos()) not in self.items:
-                self.start_selection_drag = event.pos()
-        elif event.button() == QtCore.Qt.RightButton:
-            if self.itemAt(event.pos()) in self.items:
+            self.last_mouse_pos = event.position()
+        elif event.button() == QtCore.Qt.MouseButton.LeftButton:
+            if self.itemAt(event.position().toPoint()) not in self.items:
+                self.start_selection_drag = event.position()
+        elif event.button() == QtCore.Qt.MouseButton.RightButton:
+            if self.itemAt(event.position().toPoint()) in self.items:
                 self.context_menu_requested.emit(int)
 
     def mouseMoveEvent(self, event):
         if self.pan:
-            delta = event.pos() - self.last_mouse_pos
-            self.last_mouse_pos = event.pos()
+            delta = event.position() - self.last_mouse_pos
+            self.last_mouse_pos = event.position()
             dx = -delta.x() / self.zoom_factor
             dy = -delta.y() / self.zoom_factor
             point = self.mapToScene(QtCore.QPoint(0,0))
             self.update_scene_rect(self.sceneRect().translated(dx, dy))
         if self.start_selection_drag:
-            rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
+            rect = self.mapToScene(QtCore.QRect(self.start_selection_drag.toPoint(), event.position().toPoint()).normalized()).boundingRect()
             if not self.selection_item.scene():
                 self.scene.addItem(self.selection_item)
             self.selection_item.setPos(rect.x(), rect.y())
@@ -731,11 +731,11 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.MiddleButton:
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
             self.pan = False
-        elif event.button() == QtCore.Qt.LeftButton:
+        elif event.button() == QtCore.Qt.MouseButton.LeftButton:
             if self.start_selection_drag:
-                rect = self.mapToScene(QtCore.QRect(self.start_selection_drag, event.pos()).normalized()).boundingRect()
+                rect = self.mapToScene(QtCore.QRect(self.start_selection_drag.toPoint(), event.position().toPoint()).normalized()).boundingRect()
                 items_intersected = []
                 frames_intersected = []
                 for item in self.items:
@@ -756,7 +756,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         super().mouseReleaseEvent(event)
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_F:
+        if event.key() == QtCore.Qt.Key.Key_F:
             self.focus_on_selection()
         else:
             super().keyPressEvent(event)
@@ -784,10 +784,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         delta = event.angleDelta().y() / 60.0
         column_width = int(self.column_width+delta*3)
         column_width = min(max(column_width, 20), 500)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.column_width
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.column_width
         self.set_column_width(column_width)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).x() / self.column_width
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.column_width
         diff = (new_mouse_scene_pos - mouse_scene_pos) * self.column_width
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff,
                                         self.sceneRect().y(),
@@ -798,10 +798,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         delta = event.angleDelta().y() / 60.0
         row_height = int(self.row_height+delta*2)
         row_height = min(max(row_height, 40), 200)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos).y() / self.row_height
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).y() / self.row_height
         self.set_row_height(row_height)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos).y() / self.row_height
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).y() / self.row_height
         diff = (new_mouse_scene_pos - mouse_scene_pos) * self.row_height
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x(),
                                         self.sceneRect().y()- diff,
@@ -822,10 +822,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         scale_factor = new_zoom / current_zoom
         self.scale_factor_update.emit(scale_factor)
         self.zoom_factor_update.emit(new_zoom)
-        mouse_view_pos = event.pos()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos)
+        mouse_view_pos = event.position()
+        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint())
         self.scale(scale_factor, scale_factor)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos)
+        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint())
         diff = new_mouse_scene_pos - mouse_scene_pos
         self.zoom_factor = new_zoom
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff.x(),
@@ -856,7 +856,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
             zoom_factor = min(zoom_factor_width, zoom_factor_height)
             self.set_zoom(zoom_factor)
             focus_rect_center_scene = focus_rect.center().toPoint()
-            viewport_center_scene = self.mapToScene(self.viewport().rect().center())
+            viewport_center_scene = self.mapToScene(self.viewport().rect().center()).toPoint()
             translation = focus_rect_center_scene - viewport_center_scene
             self.update_scene_rect(self.sceneRect().translated(translation.x(), translation.y()))
 
@@ -864,7 +864,7 @@ class calendar_item(custom_graphic_item):
 
     def __init__(self, date, duration, bg_color):
         super(calendar_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.setAcceptHoverEvents(True)
 
         self.column_width = 100
@@ -918,11 +918,11 @@ class calendar_item(custom_graphic_item):
         self.setPos(QtCore.QPointF(pos_x, 0))
 
     def mousePressEvent(self, event):
-        if (not self.selected and event.button() == QtCore.Qt.LeftButton)\
-                or (not self.selected and event.button() == QtCore.Qt.RightButton):
+        if (not self.selected and event.button() == QtCore.Qt.MouseButton.LeftButton)\
+                or (not self.selected and event.button() == QtCore.Qt.MouseButton.RightButton):
             self.signal_manager.select.emit([self])
         self.start_move_pos = event.pos()
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             if event.pos().x() < self.width - self.handle_size:
                 self.signal_manager.start_move.emit(1)
             else:
@@ -949,7 +949,7 @@ class calendar_item(custom_graphic_item):
 
     def mouseReleaseEvent(self, event):
         self.signal_manager.stop_movement.emit(1)
-        #if event.button() == QtCore.Qt.LeftButton:
+        #if event.button() == QtCore.Qt.MouseButton.LeftButton:
         #    if not self.moved and not self.scaled:
         #        self.signal_manager.select.emit([self])
 
@@ -1059,10 +1059,10 @@ class frame_item(custom_graphic_item):
         painter.setPen(self.pen)
         painter.setBrush(self.brush)
         painter.drawRoundedRect(rect, 10, 10)
-        text_rect = QtCore.QRect(rect.x(), rect.y()-self.text_height-10, self.font_metrics.width(self.frame_label), self.text_height)
+        text_rect = QtCore.QRect(rect.x(), rect.y()-self.text_height-10, self.font_metrics.horizontalAdvance(self.frame_label), self.text_height)
         painter.setPen(self.text_pen)
         painter.setFont(self.font)
-        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, self.frame_label)
+        painter.drawText(text_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter, self.frame_label)
 
 class header_scene(QtWidgets.QGraphicsScene):
     def __init__(self):
@@ -1131,17 +1131,17 @@ class selection_item(custom_graphic_item):
 class today_item(custom_graphic_item):
     def __init__(self):
         super(today_item, self).__init__()
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations)
+        self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations)
 
     def paint(self, painter, option, widget):
         color = QtGui.QColor(QtGui.QColor(255,255,255,20))
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,60), 1, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255,255,255,60), 1, QtCore.Qt.PenStyle.SolidLine)
         brush = QtGui.QBrush(color)
         painter.setPen(pen)
         painter.setBrush(brush)
         painter.drawRect(self.x, self.y, self.width, self.height)
 
-def draw_text(painter, rectangle, text, color=QtGui.QColor(255,255,255,int(255*0.85)), size=12, bold=False, align=QtCore.Qt.AlignCenter):
+def draw_text(painter, rectangle, text, color=QtGui.QColor(255,255,255,int(255*0.85)), size=12, bold=False, align=QtCore.Qt.AlignmentFlag.AlignCenter):
     font = QtGui.QFont()
     font.setBold(bold)
     font.setPixelSize(size)
@@ -1225,20 +1225,20 @@ class edit_dates_widget(QtWidgets.QDialog):
         self.duration_label.setObjectName("gray_label")
         self.days_spinBox = QtWidgets.QSpinBox()
         self.days_spinBox.setRange(1, 365)
-        self.days_spinBox.setButtonSymbols(2)
+        self.days_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.datas_layout.addRow(self.duration_label, self.days_spinBox)
 
         self.errors_label = QtWidgets.QLabel()
         self.errors_label.setStyleSheet("color:#d16666")
         self.main_layout.addWidget(self.errors_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setContentsMargins(0,0,0,0)
         self.main_layout.addLayout(self.button_layout)
 
-        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.apply_button = QtWidgets.QPushButton("Apply")
         self.apply_button.setObjectName("blue_button")

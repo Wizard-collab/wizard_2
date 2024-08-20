@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import datetime
 import time
 import copy
@@ -180,7 +180,7 @@ class calendar_widget(QtWidgets.QWidget):
             priorities_actions[priority] = priorities_submenu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
 
 
-        action = menu.exec_(QtGui.QCursor().pos())
+        action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action in states_actions.values():
                 self.modify_state_on_selected(action.text())
@@ -210,7 +210,7 @@ class calendar_widget(QtWidgets.QWidget):
         current_start_date = selected_items[0].stage_row['start_date']
 
         self.edit_dates_widget = calendar_utils.edit_dates_widget(current_start_date, current_estimation)
-        if self.edit_dates_widget.exec_() == QtWidgets.QDialog.Accepted:
+        if self.edit_dates_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             duration = self.edit_dates_widget.duration
             start_time = self.edit_dates_widget.start_time
             for item in selected_items:
@@ -283,12 +283,12 @@ class calendar_widget(QtWidgets.QWidget):
         self.group_methods_comboBox = gui_utils.QComboBox()
         self.header_layout.addWidget(self.group_methods_comboBox)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43)
         self.header_layout.addWidget(self.search_bar)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.filter_sets_checkBox = QtWidgets.QCheckBox("Use filter set")
         self.header_layout.addWidget(self.filter_sets_checkBox)
@@ -301,7 +301,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.header_layout.addWidget(self.filter_set_editor_button)
 
         self.content_widget = gui_utils.QSplitter()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.content_widget)
 
@@ -328,7 +328,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
@@ -675,7 +675,7 @@ class stage_item(calendar_utils.calendar_item):
         self.stage_font.setPixelSize(self.state_text_font_size)
         painter.setFont(self.stage_font)
         painter.setPen(self.text_pen)
-        painter.drawText(self.state_rect, QtCore.Qt.AlignCenter, self.stage_row['state'])
+        painter.drawText(self.state_rect, QtCore.Qt.AlignmentFlag.AlignCenter, self.stage_row['state'])
         # Draw user pixmap
         painter.drawPixmap(self.user_pixmap_rect, self.users_images_dic[self.stage_row['assignment']])
         # Draw priority pixmap
@@ -685,7 +685,7 @@ class stage_item(calendar_utils.calendar_item):
         self.stage_font.setBold(False)
         self.stage_font.setPixelSize(self.row_height)
         painter.setFont(self.stage_font)
-        painter.drawText(self.text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, self.stage_text)
+        painter.drawText(self.text_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignVCenter, self.stage_text)
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)

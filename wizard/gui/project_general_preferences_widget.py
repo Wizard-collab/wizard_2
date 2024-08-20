@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 import datetime
 import time
@@ -80,10 +80,8 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.refresh()
 
     def open_image(self):
-        options = QtWidgets.QFileDialog.Options()
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select project image", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)",
-                            options=options)
+                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
@@ -117,7 +115,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollArea_widget)
 
@@ -130,7 +128,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.infos_frame = QtWidgets.QFrame()
-        self.infos_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.infos_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.infos_layout = QtWidgets.QVBoxLayout()
         self.infos_layout.setContentsMargins(0,0,0,0)
         self.infos_layout.setSpacing(6)
@@ -151,19 +149,19 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.project_name_label = QtWidgets.QLabel('Project name')
         self.project_name_label.setObjectName('gray_label')
         self.project_name_data = QtWidgets.QLabel()
-        self.project_name_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.project_name_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.infos_sublayout.addRow(self.project_name_label, self.project_name_data)
 
         self.project_path_label = QtWidgets.QLabel('Project path')
         self.project_path_label.setObjectName('gray_label')
         self.project_path_data = QtWidgets.QLabel()
-        self.project_path_data.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.project_path_data.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.infos_sublayout.addRow(self.project_path_label, self.project_path_data)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.image_frame = QtWidgets.QFrame()
-        self.image_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.image_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.image_layout = QtWidgets.QVBoxLayout()
         self.image_layout.setContentsMargins(0,0,0,0)
         self.image_layout.setSpacing(6)
@@ -196,12 +194,12 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.random_image_button.setFixedSize(28,28)
         self.image_buttons_layout.addWidget(self.random_image_button)
 
-        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.frame_rate_frame = QtWidgets.QFrame()
-        self.frame_rate_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.frame_rate_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.frame_rate_layout = QtWidgets.QVBoxLayout()
         self.frame_rate_layout.setContentsMargins(0,0,0,0)
         self.frame_rate_layout.setSpacing(6)
@@ -215,7 +213,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
         self.frame_rate_spinBox.setRange(1, 300)
         self.frame_rate_spinBox.setFixedWidth(60)
-        self.frame_rate_spinBox.setButtonSymbols(2)
+        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frame_rate_layout.addWidget(self.frame_rate_spinBox)
 
         self.frame_rate_buttons_widget = QtWidgets.QWidget()
@@ -225,7 +223,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.frame_rate_buttons_widget.setLayout(self.frame_rate_buttons_layout)
         self.frame_rate_layout.addWidget(self.frame_rate_buttons_widget)
 
-        self.frame_rate_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.frame_rate_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.frame_rate_accept_button = QtWidgets.QPushButton('Apply')
         self.frame_rate_accept_button.setObjectName('blue_button')
@@ -234,7 +232,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.format_frame = QtWidgets.QFrame()
-        self.format_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.format_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.format_layout = QtWidgets.QVBoxLayout()
         self.format_layout.setContentsMargins(0,0,0,0)
         self.format_layout.setSpacing(6)
@@ -254,17 +252,17 @@ class project_general_preferences_widget(QtWidgets.QWidget):
 
         self.format_width = QtWidgets.QSpinBox()
         self.format_width.setRange(1, 100000)
-        self.format_width.setButtonSymbols(2)
+        self.format_width.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.format_width.setValue(1920)
         self.format_layout.addWidget(self.format_width)
 
         self.format_height = QtWidgets.QSpinBox()
         self.format_height.setRange(1, 100000)
-        self.format_height.setButtonSymbols(2)
+        self.format_height.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.format_height.setValue(1080)
         self.format_layout.addWidget(self.format_height)
 
-        self.format_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.format_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.format_buttons_widget = QtWidgets.QWidget()
         self.format_buttons_layout = QtWidgets.QHBoxLayout()
@@ -273,7 +271,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.format_buttons_widget.setLayout(self.format_buttons_layout)
         self.scrollArea_layout.addWidget(self.format_buttons_widget)
 
-        self.format_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.format_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.format_accept_button = QtWidgets.QPushButton('Apply')
         self.format_accept_button.setObjectName('blue_button')
@@ -282,7 +280,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.deadline_frame = QtWidgets.QFrame()
-        self.deadline_frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.deadline_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.deadline_layout = QtWidgets.QVBoxLayout()
         self.deadline_layout.setContentsMargins(0,0,0,0)
         self.deadline_layout.setSpacing(6)
@@ -307,10 +305,10 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.deadline_buttons_widget.setLayout(self.deadline_buttons_layout)
         self.deadline_layout.addWidget(self.deadline_buttons_widget)
 
-        self.deadline_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.deadline_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.deadline_accept_button = QtWidgets.QPushButton('Apply')
         self.deadline_accept_button.setObjectName('blue_button')
         self.deadline_buttons_layout.addWidget(self.deadline_accept_button)
 
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))

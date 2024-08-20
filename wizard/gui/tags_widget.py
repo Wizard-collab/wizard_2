@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import logging
 import re
 
@@ -32,16 +32,16 @@ class tags_widget(gui_utils.QMenu):
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == QtCore.Qt.Key_Up or key == QtCore.Qt.Key_Down or key == QtCore.Qt.Key_Return or key == QtCore.Qt.Key_Enter:
+        if key == QtCore.Qt.Key.Key_Up or key == QtCore.Qt.Key.Key_Down or key == QtCore.Qt.Key.Key_Return or key == QtCore.Qt.Key.Key_Enter:
             super().keyPressEvent(event)
         else:
             self.close() 
             self.other_key_pressed.emit(event)
 
-    def exec(self):
+    def execute(self):
         if len(self.actions) == 0:
             return
-        action = self.exec_()
+        action = self.exec()
         if action is not None:
             token = self.text.split('@')[-1]
             text = self.text[:-(len(token)+1)] + f"@{action.text()} "

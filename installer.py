@@ -27,7 +27,7 @@
 # SOFTWARE.
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import os
 import shutil
 import psutil
@@ -137,6 +137,8 @@ def delete_shortcuts():
     delete_shortcut('Wizard')
     delete_shortcut('PyWizard')
     delete_shortcut('Server')
+    delete_shortcut('Create Repository')
+    delete_shortcut('Change Repository')
 
 def create_shortcut(name, exe):
     install_dir = get_install_dir()
@@ -215,8 +217,8 @@ class installer(QtWidgets.QWidget):
         self.startup()
 
     def showEvent(self, event):
-        desktop = QtWidgets.QApplication.desktop()
-        screenRect = desktop.screenGeometry()
+        desktop = QtGui.QGuiApplication.primaryScreen()
+        screenRect = desktop.geometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
         self.move(int((screen_maxX-self.width())/2), int((screen_maxY-self.height())/2))
@@ -324,7 +326,7 @@ class installer(QtWidgets.QWidget):
         self.main_layout.addWidget(self.datas_widget)
 
         self.image_label = QtWidgets.QLabel()
-        self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.image_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.image_label.setPixmap(QtGui.QIcon(ressources_path('ressources/icons/wizard_setup.png')).pixmap(34))
         self.datas_layout.addWidget(self.image_label)
 
@@ -343,7 +345,7 @@ class installer(QtWidgets.QWidget):
         self.version_label.setStyleSheet('color:gray;')
         self.infos_layout.addWidget(self.version_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.error_label = QtWidgets.QLabel()
         self.error_label.setStyleSheet('color:#f0605b;')
@@ -392,15 +394,13 @@ QProgressBar::chunk {background-color:
 
 def main():
     if is_admin():
-        os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+        os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "0.75"
         app = QtWidgets.QApplication(sys.argv)
         app.setStyleSheet(stylesheet)
         installer_widget = installer()
         installer_widget.show()
         QtWidgets.QApplication.processEvents()
-        sys.exit(app.exec_())
+        sys.exit(app.exec())
     else:
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
 

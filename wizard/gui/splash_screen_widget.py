@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import yaml
 import logging
 
@@ -25,12 +25,12 @@ class splash_screen_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(splash_screen_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint |  QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |  QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Splash screen")
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
         self.build_ui()
         self.fill_ui()
@@ -61,7 +61,7 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.widget_layout.addWidget(self.main_frame)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_widget.setObjectName('splash_screen_header')
         self.header_widget.setStyleSheet('#splash_screen_header{border-top-left-radius:8px;border-top-right-radius:8px;}')
         #self.header_widget.setStyleSheet('#splash_screen_header{background-color:#646ca2;border-top-left-radius:8px;border-top-right-radius:8px;}')
@@ -78,20 +78,20 @@ class splash_screen_widget(QtWidgets.QDialog):
         #self.title_layout = QtWidgets.QHBoxLayout()
         #self.title_layout.setSpacing(2)
         #self.title_layout.setContentsMargins(0,0,0,0)
-        #self.title_layout.setAlignment(QtCore.Qt.AlignTop)
+        #self.title_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         #self.header_layout.addLayout(self.title_layout)
 
         self.title_label = QtWidgets.QLabel("Wizard")
-        self.title_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.title_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.title_label.setObjectName('title_label')
         self.title_label.setStyleSheet('font-size: 38px;')
         self.header_layout.addWidget(self.title_label)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.version_label = QtWidgets.QLabel()
-        self.version_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
-        self.version_label.setAlignment(QtCore.Qt.AlignTop)
+        self.version_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.version_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.version_label.setObjectName('')
         self.header_layout.addWidget(self.version_label)
 
@@ -117,8 +117,8 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.recent_scenes_list.header().resizeSection(1, 250)
         self.recent_scenes_list.setIndentation(0)
         self.recent_scenes_list.setHeaderHidden(True)
-        self.recent_scenes_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.recent_scenes_list.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.recent_scenes_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.recent_scenes_list.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         #self.recent_scenes_list.setFixedHeight(160)
         self.recent_scenes_layout.addWidget(self.recent_scenes_list)
 
@@ -141,19 +141,19 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.updates_scrollArea_layout.setSpacing(6)
         self.updates_scrollArea_widget.setLayout(self.updates_scrollArea_layout)
 
-        self.updates_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.updates_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.updates_scrollArea.setWidgetResizable(True)
         self.updates_scrollArea.setWidget(self.updates_scrollArea_widget)
 
         self.updates_layout.addWidget(self.updates_scrollArea)
 
-        self.updates_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.updates_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.footer_layout = QtWidgets.QHBoxLayout()
         self.footer_layout.setContentsMargins(20,20,20,20)
         self.main_layout.addLayout(self.footer_layout)
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.show_at_startup_checkbox = QtWidgets.QCheckBox('Show at startup')
         self.show_at_startup_checkbox.setObjectName('transparent_widget')
@@ -212,7 +212,7 @@ class splash_screen_widget(QtWidgets.QDialog):
     def showEvent(self, event):
         screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
         if not screen:
-            screen = QtWidgets.QApplication.desktop()
+            screen = QtWidgets.QGuiApplication.primaryScreen()
         screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
@@ -262,7 +262,7 @@ class update_area(QtWidgets.QFrame):
         self.date_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.date_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,12, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.updates_layout = QtWidgets.QVBoxLayout()
         self.updates_layout.setContentsMargins(0,0,0,0)
@@ -290,7 +290,7 @@ class update_frame(QtWidgets.QFrame):
 
         self.setObjectName('transparent_widget')
         self.setStyleSheet('#transparent_widget{border-top:1px solid rgba(255,255,255,6)}')
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.build_ui()
         self.fill_ui()
 
@@ -302,7 +302,7 @@ class update_frame(QtWidgets.QFrame):
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setContentsMargins(0,6,6,6)
         self.main_layout.setSpacing(2)
-        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed))
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed))
         self.setLayout(self.main_layout)
 
         self.header_layout = QtWidgets.QHBoxLayout()
@@ -311,12 +311,12 @@ class update_frame(QtWidgets.QFrame):
 
         self.update_type_label = QtWidgets.QLabel()
         self.update_type_label.setFixedWidth(60)
-        self.update_type_label.setAlignment(QtCore.Qt.AlignTop)
+        self.update_type_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.update_type_label.setObjectName('gray_label')
         self.header_layout.addWidget(self.update_type_label)
 
         self.update_label = QtWidgets.QLabel()
-        self.update_label.setAlignment(QtCore.Qt.AlignLeft)
+        self.update_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.main_layout.addWidget(self.update_label)
 
 class recent_scene_item(QtWidgets.QTreeWidgetItem):

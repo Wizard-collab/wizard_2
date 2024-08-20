@@ -5,8 +5,8 @@
 # Python modules
 import json
 import time
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -51,13 +51,13 @@ class inventory_widget(QtWidgets.QWidget):
 
         self.artefacts_view = QtWidgets.QListView()
         self.artefacts_view = QtWidgets.QListWidget()
-        self.artefacts_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.artefacts_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.artefacts_view.setObjectName('market_icon_view')
         self.artefacts_view.setSpacing(4)
-        self.artefacts_view.setMovement(QtWidgets.QListView.Static)
-        self.artefacts_view.setResizeMode(QtWidgets.QListView.Adjust)
-        self.artefacts_view.setViewMode(QtWidgets.QListView.IconMode)
-        self.artefacts_view.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.artefacts_view.setMovement(QtWidgets.QListView.Movement.Static)
+        self.artefacts_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
+        self.artefacts_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
+        self.artefacts_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
         self.artefacts_view_scrollBar = self.artefacts_view.verticalScrollBar()
         self.main_layout.addWidget(self.artefacts_view)
 
@@ -94,7 +94,7 @@ class inventory_widget(QtWidgets.QWidget):
 
     def use_artefact(self, artefact):
         if game_vars.artefacts_dic[artefact]['type'] == 'attack':
-            if self.artefact_interaction_widget.exec_() == QtWidgets.QDialog.Accepted:
+            if self.artefact_interaction_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 user = self.artefact_interaction_widget.user
             else:
                 return
@@ -106,7 +106,7 @@ class inventory_widget(QtWidgets.QWidget):
         gui_server.custom_popup(f"Inventory", f"You just used {game_vars.artefacts_dic[artefact]['name']} on {user}", ressources._purse_icon_)
 
     def give_artefact(self, artefact):
-        if self.artefact_interaction_widget.exec_() != QtWidgets.QDialog.Accepted:
+        if self.artefact_interaction_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         user = self.artefact_interaction_widget.user
         artefacts.give_artefact(artefact, user)
@@ -114,10 +114,10 @@ class inventory_widget(QtWidgets.QWidget):
         gui_server.custom_popup(f"Inventory", f"You just gived {game_vars.artefacts_dic[artefact]['name']} to {user}", ressources._purse_icon_)
 
     def give_coins(self):
-        if self.artefact_interaction_widget.exec_() != QtWidgets.QDialog.Accepted:
+        if self.artefact_interaction_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         self.give_coins_widget = give_coins_widget()
-        if self.give_coins_widget.exec_() != QtWidgets.QDialog.Accepted:
+        if self.give_coins_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
             return
         amount = self.give_coins_widget.amount_field.value()
         user = self.artefact_interaction_widget.user
@@ -151,19 +151,19 @@ class coins_item(QtWidgets.QFrame):
 
     def build_ui(self):
         self.setFixedSize(250, 130)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.setLayout(self.main_layout)
 
         self.artefact_icon = QtWidgets.QLabel()
-        self.artefact_icon.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        self.artefact_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.artefact_icon.setPixmap(QtGui.QIcon(ressources._coin_icon_).pixmap(70))
         self.main_layout.addWidget(self.artefact_icon)
 
         self.content_widget = QtWidgets.QWidget()
         self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_layout.setContentsMargins(0,0,0,0)
         self.content_layout.setSpacing(2)
         self.content_widget.setLayout(self.content_layout)
@@ -174,12 +174,12 @@ class coins_item(QtWidgets.QFrame):
         self.content_layout.addWidget(self.artefact_name)
 
         self.info_label = QtWidgets.QLabel("Your coins")
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setWordWrap(True)
         self.info_label.setObjectName('gray_label')
         self.content_layout.addWidget(self.info_label)
 
-        self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setContentsMargins(0,0,0,0)
@@ -191,7 +191,7 @@ class coins_item(QtWidgets.QFrame):
         self.number_label.setStyleSheet('color:#f2c96b')
         self.button_layout.addWidget(self.number_label)
 
-        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.give_button = QtWidgets.QPushButton(f"Give")
         self.give_button.setStyleSheet('padding:2px')
@@ -226,19 +226,19 @@ class artefact_item(QtWidgets.QFrame):
     def build_ui(self):
         icon = QtGui.QIcon(self.artefact_dic['icon'])
         self.setFixedSize(250, 130)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.setLayout(self.main_layout)
 
         self.artefact_icon = QtWidgets.QLabel()
-        self.artefact_icon.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
+        self.artefact_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignTop)
         self.artefact_icon.setPixmap(icon.pixmap(70))
         self.main_layout.addWidget(self.artefact_icon)
 
         self.content_widget = QtWidgets.QWidget()
         self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_layout.setContentsMargins(0,0,0,0)
         self.content_layout.setSpacing(2)
         self.content_widget.setLayout(self.content_layout)
@@ -249,28 +249,28 @@ class artefact_item(QtWidgets.QFrame):
         self.content_layout.addWidget(self.artefact_name)
 
         self.info_label = QtWidgets.QLabel(self.artefact_dic['description'])
-        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.info_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.info_label.setWordWrap(True)
         self.info_label.setObjectName('gray_label')
         self.content_layout.addWidget(self.info_label)
 
         self.type_label = QtWidgets.QLabel(self.artefact_dic['type'].capitalize())
         self.type_label.setStyleSheet('color:#f2c96b')
-        self.type_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.type_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.content_layout.addWidget(self.type_label)
 
         self.time_left_label = QtWidgets.QLabel()
-        self.time_left_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.time_left_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.content_layout.addWidget(self.time_left_label)
 
-        self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setContentsMargins(0,0,0,0)
         self.button_layout.setSpacing(2)
         self.content_layout.addLayout(self.button_layout)
 
-        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.button_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.give_button = QtWidgets.QPushButton(f"Give")
         self.give_button.setStyleSheet('padding:2px')
@@ -300,8 +300,8 @@ class give_coins_widget(QtWidgets.QDialog):
         self.build_ui()
         self.connect_functions()
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Dialog)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         corner = gui_utils.move_ui(self)
@@ -337,7 +337,7 @@ class give_coins_widget(QtWidgets.QDialog):
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel('Coin amount to give'))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)
@@ -347,7 +347,7 @@ class give_coins_widget(QtWidgets.QDialog):
 
         self.amount_field = QtWidgets.QSpinBox()
         self.amount_field.setRange(1, 2147483647)
-        self.amount_field.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.amount_field.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frame_layout.addWidget(self.amount_field)
 
         self.accept_button = QtWidgets.QPushButton('Give')

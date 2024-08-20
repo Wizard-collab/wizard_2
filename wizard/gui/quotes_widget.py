@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import random
 import json
 import statistics
@@ -36,17 +36,17 @@ class quotes_widget(QtWidgets.QFrame):
 
         self.animation_handler_widget = QtWidgets.QWidget()
         self.animation_handler_widget.setObjectName('transparent_widget')
-        self.animation_handler_widget.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
+        self.animation_handler_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Maximum, QtWidgets.QSizePolicy.Policy.Fixed)
         self.animation_handler_layout = QtWidgets.QHBoxLayout()
         self.animation_handler_layout.setContentsMargins(0,0,0,0)
         self.animation_handler_layout.setSpacing(6)
         self.animation_handler_widget.setLayout(self.animation_handler_layout)
         self.main_layout.addWidget(self.animation_handler_widget)
 
-        self.animation_handler_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.animation_handler_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.quote_label = gui_utils.ElidedLabel()
-        self.quote_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.quote_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.quote_label.setObjectName('quote_label')
         self.quote_label.setMinimumHeight(0)
         self.animation_handler_layout.addWidget(self.quote_label)
@@ -68,7 +68,7 @@ class quotes_widget(QtWidgets.QFrame):
         self.add_button.setFixedSize(20,20)
         self.animation_handler_layout.addWidget(self.add_button)
 
-        self.animation_handler_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.animation_handler_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def connect_functions(self):
         self.timer.timeout.connect(self.clear_anim)
@@ -79,7 +79,7 @@ class quotes_widget(QtWidgets.QFrame):
 
     def add_quote(self):
         self.create_quote_widget = create_quote_widget.create_quote_widget(self)
-        self.create_quote_widget.exec_()
+        self.create_quote_widget.exec()
 
     def vote(self, score):
         repository.add_quote_score(self.quote_row['id'], score)
@@ -131,7 +131,7 @@ class quotes_widget(QtWidgets.QFrame):
         self.animation.setDuration(400)
         self.animation.setStartValue(QtCore.QRect(self.geometry().x()-250, -50, self.geometry().width(), self.geometry().height()))
         self.animation.setEndValue(QtCore.QRect(self.geometry().x()-250, self.geometry().y()-6, self.geometry().width(), self.geometry().height()))
-        self.animation.setEasingCurve(QtCore.QEasingCurve.OutBounce)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.Type.OutBounce)
         self.animation.start()
 
     def start_timer(self):

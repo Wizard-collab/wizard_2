@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 import os
 import time
 import logging
@@ -293,12 +293,12 @@ class videos_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.views_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(6)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
 
         self.list_view.setHeaderLabels(['Version', 'User', 'Date', 'Comment', 'File', 'ID'])
         self.list_view.header().resizeSection(2, 150)
@@ -309,14 +309,14 @@ class videos_widget(QtWidgets.QWidget):
         self.views_layout.addWidget(self.list_view)
 
         self.icon_view = QtWidgets.QListWidget()
-        self.icon_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.icon_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.icon_view.setObjectName('icon_view')
         self.icon_view.setSpacing(4)
         self.icon_view.setIconSize(QtCore.QSize(200,200))
-        self.icon_view.setMovement(QtWidgets.QListView.Static)
-        self.icon_view.setResizeMode(QtWidgets.QListView.Adjust)
-        self.icon_view.setViewMode(QtWidgets.QListView.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
+        self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
+        self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
+        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.views_layout.addWidget(self.icon_view)
         self.icon_view.setVisible(0)
@@ -329,7 +329,7 @@ class videos_widget(QtWidgets.QWidget):
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.videos_count_label = QtWidgets.QLabel()
         self.videos_count_label.setObjectName('gray_label')
@@ -350,7 +350,7 @@ class videos_widget(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
         
         self.search_bar = gui_utils.search_bar()
         gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
@@ -400,7 +400,7 @@ class videos_widget(QtWidgets.QWidget):
             comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
 
         pos = QtGui.QCursor().pos()
-        action = menu.exec_(pos)
+        action = menu.exec(pos)
         if action is not None:
             if action == folder_action:
                 self.open_folder()
@@ -417,7 +417,7 @@ class videos_widget(QtWidgets.QWidget):
                 if len(items) == 1:
                     old_comment = items[0].video_row['comment']
                 self.comment_widget = comment_widget.comment_widget(old_comment=old_comment, pos=pos)
-                if self.comment_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     comment = self.comment_widget.comment
                     for item in items:
                         assets.modify_video_comment(item.video_row['id'], comment)
@@ -529,10 +529,7 @@ class videos_widget(QtWidgets.QWidget):
         items = self.get_selection()
         if items is not None:
             if len(items) == 1:
-                instance = video_manager.video_player_instances().get_instance()
-                instance.add_video(items[0].video_row['file_path'], items[0].video_row['id'])
-                instance.load_nexts()
-                instance.show()
+                gui_server.show_video(items[0].video_row['id'])
 
     def open_folder(self):
         if self.variant_id is not None:
@@ -543,7 +540,7 @@ class videos_widget(QtWidgets.QWidget):
         if items is not None:
             if items!=[]:
                 self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
-                if self.confirm_widget.exec_() == QtWidgets.QDialog.Accepted:
+                if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     videos_ids = []
                     for item in items:
                         videos_ids.append(item.video_row['id'])
@@ -615,16 +612,16 @@ class custom_video_icon_item(QtWidgets.QListWidgetItem):
         icon = QtGui.QIcon()
         
         pixmap = QtGui.QPixmap(self.video_row['thumbnail_path'])
-        icon.addPixmap(pixmap, QtGui.QIcon.Normal)
-        icon.addPixmap(pixmap, QtGui.QIcon.Selected)
+        icon.addPixmap(pixmap, QtGui.QIcon.Mode.Normal)
+        icon.addPixmap(pixmap, QtGui.QIcon.Mode.Selected)
         if not path_utils.isfile(self.video_row['thumbnail_path']):
             default_icon = QtGui.QIcon(ressources._no_screenshot_small_)
-            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Normal)
-            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Selected)
+            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Mode.Normal)
+            icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Mode.Selected)
 
         self.setIcon(icon)
         self.setText(f"{self.video_row['name']} - {self.video_row['creation_user']}")
-        self.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
     def set_missing(self):
         self.setForeground(QtGui.QColor('#f79360'))

@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
 
 # Wizard gui modules
@@ -52,7 +52,7 @@ class manual_export_widget(QtWidgets.QDialog):
             self.files.append(self.files_list.item(item_index).text())
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Delete:
+        if event.key() == QtCore.Qt.Key.Key_Delete:
             self.remove_selection()
 
     def add_file(self, file):
@@ -101,7 +101,7 @@ class manual_export_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.comment_textEdit)
 
         self.files_list = QtWidgets.QListWidget()
-        self.files_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.files_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.main_layout.addWidget(self.files_list)
 
         self.drop_files_button = drop_files_widget.drop_files_button()
@@ -114,7 +114,7 @@ class manual_export_widget(QtWidgets.QDialog):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

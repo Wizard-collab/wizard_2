@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
 
 # Wizard core modules
 from wizard.core import repository
@@ -27,7 +27,7 @@ class tag_label(QtWidgets.QWidget):
         self.font = QtGui.QFont("Roboto", 8)
         self.font_metric = QtGui.QFontMetrics(self.font)
         self.font_height = self.font_metric.height()
-        self.space_width = self.font_metric.width(' ')
+        self.space_width = self.font_metric.horizontalAdvance(' ')
         self.no_multiple_lines = False
         self.align_right = False
         self.stop_drawing = False
@@ -104,13 +104,13 @@ class tag_label(QtWidgets.QWidget):
     def paintEvent(self, event):
         # Init painter
         painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 0))
         painter.setBrush(QtGui.QBrush(QtGui.QColor('#ffffff')))
         pos = [0, 0]
         pos[1] += self.font_height
-        space_width = self.font_metric.width(' ')
+        space_width = self.font_metric.horizontalAdvance(' ')
         painter.setFont(self.font)
         
         # Draw tokens
@@ -141,7 +141,7 @@ class tag_label(QtWidgets.QWidget):
         return width - self.get_item_width(' ')
 
     def get_item_width(self, item):
-        width = self.font_metric.width(item)
+        width = self.font_metric.horizontalAdvance(item)
         if item.startswith('@'):
             width += self.tag_block_margin*2
         return width
@@ -152,8 +152,8 @@ class tag_label(QtWidgets.QWidget):
             painter.setBrush(QtGui.QBrush(QtGui.QColor(119, 133, 222, 100)))
             pen = QtGui.QPen()
             pen.setBrush(QtGui.QColor('transparent'))
-            pen.setCapStyle(QtCore.Qt.RoundCap)
-            pen.setJoinStyle(QtCore.Qt.RoundJoin)
+            pen.setCapStyle(QtCore.Qt.PenCapStyle.RoundCap)
+            pen.setJoinStyle(QtCore.Qt.PenJoinStyle.RoundJoin)
             pen.setWidth(0)
             painter.setPen(pen)
             bouding_rect = self.font_metric.boundingRect(item)
@@ -173,8 +173,8 @@ class tag_label(QtWidgets.QWidget):
 class view_comment_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(view_comment_widget, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setMaximumWidth(300)
         self.build_ui()
         self.init_users_images()
@@ -187,7 +187,7 @@ class view_comment_widget(QtWidgets.QWidget):
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_widget_layout = QtWidgets.QHBoxLayout()
         self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
         self.setLayout(self.main_widget_layout)

@@ -3,8 +3,8 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import QThread, pyqtSignal
 import time
 
 # Wizard modules
@@ -24,8 +24,8 @@ class locks_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(locks_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.ToolTip)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.work_env_ids = dict()
         self.build_ui()
@@ -71,7 +71,7 @@ class locks_widget(QtWidgets.QWidget):
         self.title = QtWidgets.QLabel('Locked work environments')
         self.header_layout.addWidget(self.title)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.unlock_all_button = QtWidgets.QPushButton('Unlock all')
         self.unlock_all_button.setStyleSheet('padding:3px;')
@@ -95,11 +95,11 @@ class locks_widget(QtWidgets.QWidget):
         self.work_envs_scrollArea_layout.setSpacing(3)
         self.work_envs_scrollArea_widget.setLayout(self.work_envs_scrollArea_layout)
 
-        self.work_envs_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.work_envs_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.work_envs_scrollArea.setWidgetResizable(True)
         self.work_envs_scrollArea.setWidget(self.work_envs_scrollArea_widget)
 
-        self.work_envs_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.work_envs_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.work_envs_scrollArea)
 

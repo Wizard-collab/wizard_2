@@ -3,9 +3,9 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import pyqtProperty
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtProperty
 import sys
 import os
 import logging
@@ -85,10 +85,10 @@ class QFlowLayout(QtWidgets.QLayout):
         for item in self._item_list:
             style = item.widget().style()
             layout_spacing_x = style.layoutSpacing(
-                QtWidgets.QSizePolicy.PushButton, QtWidgets.QSizePolicy.PushButton, QtCore.Qt.Horizontal
+                QtWidgets.QSizePolicy.ControlType.PushButton, QtWidgets.QSizePolicy.ControlType.PushButton, QtCore.Qt.Orientation.Horizontal
             )
             layout_spacing_y = style.layoutSpacing(
-                QtWidgets.QSizePolicy.PushButton, QtWidgets.QSizePolicy.PushButton, QtCore.Qt.Vertical
+                QtWidgets.QSizePolicy.ControlType.PushButton, QtWidgets.QSizePolicy.ControlType.PushButton, QtCore.Qt.Orientation.Vertical
             )
             space_x = spacing + layout_spacing_x
             space_y = spacing + layout_spacing_y
@@ -110,7 +110,7 @@ class QFlowLayout(QtWidgets.QLayout):
 def QIcon_from_svg(svg_filepath, color='black'):
     img = QtGui.QPixmap(svg_filepath)
     qp = QtGui.QPainter(img)
-    qp.setCompositionMode(QtGui.QPainter.CompositionMode_SourceIn)
+    qp.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_SourceIn)
     qp.fillRect( img.rect(), QtGui.QColor(color) )
     qp.end()
     return QtGui.QIcon(img)
@@ -118,7 +118,7 @@ def QIcon_from_svg(svg_filepath, color='black'):
 def move_ui(widget, margin=0, pos=None):
     screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
     if not screen:
-        screen = QtWidgets.QApplication.desktop()
+        screen = QtWidgets.QGuiApplication.primaryScreen()
     screenRect = screen.availableGeometry()
 
     screen_minX = screenRect.topLeft().x()
@@ -155,7 +155,7 @@ def move_ui(widget, margin=0, pos=None):
 
 def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
     image = QtGui.QImage.fromData(imgdata, imgtype)
-    image.convertToFormat(QtGui.QImage.Format_ARGB32)
+    image.convertToFormat(QtGui.QImage.Format.Format_ARGB32)
     imgsize = min(image.width(), image.height())
     rect = QtCore.QRect(
         int((image.width() - imgsize) / 2),
@@ -164,13 +164,13 @@ def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
         imgsize,
     )
     image = image.copy(rect)
-    out_img = QtGui.QImage(imgsize, imgsize, QtGui.QImage.Format_ARGB32)
-    out_img.fill(QtCore.Qt.transparent)
+    out_img = QtGui.QImage(imgsize, imgsize, QtGui.QImage.Format.Format_ARGB32)
+    out_img.fill(QtCore.Qt.GlobalColor.transparent)
     brush = QtGui.QBrush(image)        # Create texture brush
     painter = QtGui.QPainter(out_img)  # Paint the output image
     painter.setBrush(brush)      # Use the image texture brush
-    painter.setPen(QtCore.Qt.NoPen)     # Don't draw an outline
-    painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
+    painter.setPen(QtCore.Qt.PenStyle.NoPen)     # Don't draw an outline
+    painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)  # Use AA
     if custom_radius:
         rect = QtCore.QRect(0,0,imgsize,imgsize)
         painter.drawRoundedRect(rect, custom_radius, custom_radius)
@@ -181,21 +181,21 @@ def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
     pm = QtGui.QPixmap.fromImage(out_img)
     pm.setDevicePixelRatio(pr)
     size *= pr
-    pm = pm.scaled(int(size), int(size), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    pm = pm.scaled(int(size), int(size), QtCore.Qt.AspectRatioMode.KeepAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
     return pm
     
 def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     pr = QtGui.QWindow().devicePixelRatio()
     image = QtGui.QImage.fromData(imgdata, imgtype)
-    image.convertToFormat(QtGui.QImage.Format_ARGB32)
-    image = image.scaled(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-    out_img = QtGui.QImage(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtGui.QImage.Format_ARGB32)
-    out_img.fill(QtCore.Qt.transparent)
+    image.convertToFormat(QtGui.QImage.Format.Format_ARGB32)
+    image = image.scaled(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtCore.Qt.AspectRatioMode.KeepAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
+    out_img = QtGui.QImage(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtGui.QImage.Format.Format_ARGB32)
+    out_img.fill(QtCore.Qt.GlobalColor.transparent)
     brush = QtGui.QBrush(image)        # Create texture brush
     painter = QtGui.QPainter(out_img)  # Paint the output image
     painter.setBrush(brush)      # Use the image texture brush
-    painter.setPen(QtCore.Qt.NoPen)     # Don't draw an outline
-    painter.setRenderHint(QtGui.QPainter.Antialiasing, True)  # Use AA
+    painter.setPen(QtCore.Qt.PenStyle.NoPen)     # Don't draw an outline
+    painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)  # Use AA
     path = QtGui.QPainterPath()
     path.addRoundedRect(
         0, 0, int(size_tuple[0]*pr), int(size_tuple[1]*pr), int(radius*pr), int(radius*pr))
@@ -214,14 +214,14 @@ class no_return_textEdit(QtWidgets.QTextEdit):
         super(no_return_textEdit, self).__init__(parent)
 
     def keyPressEvent(self, event):
-        if event.modifiers() & QtCore.Qt.ControlModifier:
-            if event.key() == QtCore.Qt.Key_Return:
+        if event.modifiers() & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if event.key() == QtCore.Qt.Key.Key_Return:
                 self.insertPlainText('\n')
-                self.moveCursor(QtGui.QTextCursor.End)
+                self.moveCursor(QtGui.QTextCursor.MoveOperation.End)
             else:
                 super().keyPressEvent(event)
         else:
-            if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+            if event.key() == QtCore.Qt.Key.Key_Return or event.key() == QtCore.Qt.Key.Key_Enter:
                 self.apply_signal.emit(1)
             else:
                 super().keyPressEvent(event)
@@ -230,16 +230,16 @@ class no_return_textEdit(QtWidgets.QTextEdit):
 class QComboBox(QtWidgets.QComboBox):
     def __init__(self, parent = None):
         super(QComboBox, self).__init__(parent)
-        self.view().window().setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.NoDropShadowWindowHint | QtCore.Qt.FramelessWindowHint)
-        self.view().window().setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.view().window().setStyleSheet("QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
+        self.view().window().setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
+        self.view().window().setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.view().window().setStyleSheet("QListView::item:hover{background:#4b4b57;color:white;}QListView::item:selected{background:#4b4b57;color:white;}")
         self.setItemDelegate(QtWidgets.QStyledItemDelegate())
 
 class QMenu(QtWidgets.QMenu):
     def __init__(self, parent = None):
         super(QMenu, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.NoDropShadowWindowHint | QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setStyleSheet("QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
 
 class separator(QtWidgets.QFrame):
@@ -278,7 +278,7 @@ class ElidedLabel(QtWidgets.QLabel):
             self._text = text
             self._width = width
             self._elided = self.fontMetrics().elidedText(
-                text, QtCore.Qt.ElideRight, width)
+                text, QtCore.Qt.TextElideMode.ElideRight, width)
         option = QtWidgets.QStyleOption()
         option.initFrom(self)
         self.style().drawItemText(
@@ -293,7 +293,7 @@ class QProgressBar(QtWidgets.QProgressBar):
         qp = QtWidgets.QStylePainter(self)
         opt = QtWidgets.QStyleOptionProgressBar()
         self.initStyleOption(opt)
-        rect = self.style().subElementRect(QtWidgets.QStyle.SE_ProgressBarContents, opt, self)
+        rect = self.style().subElementRect(QtWidgets.QStyle.SubElement.SE_ProgressBarContents, opt, self)
         minSize = rect.height()
         grooveSize = rect.width() - minSize - 1
         valueRange = self.maximum() - self.minimum()
@@ -302,7 +302,7 @@ class QProgressBar(QtWidgets.QProgressBar):
         if int(newValue) != newValue:
             newValue = min(self.maximum(), newValue + 1)
         opt.progress = int(newValue)
-        qp.drawControl(QtWidgets.QStyle.CE_ProgressBar, opt)
+        qp.drawControl(QtWidgets.QStyle.ControlElement.CE_ProgressBar, opt)
 
 class QRightClickButton(QtWidgets.QPushButton):
 
@@ -313,7 +313,7 @@ class QRightClickButton(QtWidgets.QPushButton):
         super(QRightClickButton, self).__init__(parent)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.rightClicked.emit(1)
         else:
             self.leftClicked.emit(1)
@@ -337,7 +337,7 @@ class password_lineEdit(QtWidgets.QFrame):
         self.main_layout.addWidget(self.password_lineEdit)
 
         self.toggle_visibility_button = QtWidgets.QPushButton()
-        self.toggle_visibility_button.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.toggle_visibility_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.toggle_visibility_button.setObjectName('password_visibility_button')
         self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_on_))
         self.toggle_visibility_button.setCheckable(True)
@@ -462,7 +462,7 @@ class ScrollLabel(QtWidgets.QScrollArea):
         lay = QtWidgets.QVBoxLayout(content)
         lay.setContentsMargins(0,0,0,0)
         self.label = QtWidgets.QLabel(content)
-        self.label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.label.setWordWrap(True)
         lay.addWidget(self.label)
  
@@ -507,8 +507,8 @@ class RoundProgress(QtWidgets.QWidget):
                             self.width()-self.line_width,
                             self.height()-self.line_width)
         painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setRenderHint(QtGui.QPainter.HighQualityAntialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         # Draw bg
         self.draw_arc(painter, 0, 360, self.bg_color)
         # Draw chunck
@@ -555,8 +555,8 @@ def add_menu_to_menu_bar(menu_bar, title, icon=None):
         menu = menu_bar.addMenu(icon, title)
     else:
         menu = menu_bar.addMenu(title)
-    menu.setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint)
-    menu.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+    menu.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.NoDropShadowWindowHint)
+    menu.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
     return menu
 
 class info_widget(QtWidgets.QFrame):
@@ -572,24 +572,24 @@ class info_widget(QtWidgets.QFrame):
         self.setObjectName('dark_widget')
         if self.transparent:
             self.setObjectName('transparent_widget')
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(6)
-        self.main_layout.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.image = QtWidgets.QLabel()
-        self.image.setAlignment(QtCore.Qt.AlignCenter)
+        self.image.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.image)
         self.text = QtWidgets.QLabel()
-        self.text.setAlignment(QtCore.Qt.AlignCenter)
+        self.text.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.text.setObjectName('title_label_gray')
         self.main_layout.addWidget(self.text)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def setImage(self, image):
         self.image.setPixmap(QtGui.QIcon(image).pixmap(200))
@@ -599,7 +599,7 @@ class info_widget(QtWidgets.QFrame):
 
     def mouseReleaseEvent(self, event):
         super().mouseReleaseEvent(event)
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.customContextMenuRequested.emit(1)
 
 class transparent_button(QtWidgets.QPushButton):
@@ -645,7 +645,7 @@ class minimum_height_textEdit(QtWidgets.QTextEdit):
     def __init__(self, max_height=100, parent=None):
         super(minimum_height_textEdit, self).__init__(parent)
         self.max_height = max_height
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.connect_functions()
         self.update_height()
 
@@ -682,19 +682,23 @@ class QSplitterHandle(QtWidgets.QSplitterHandle):
 
     def enterEvent(self, event):
         self.hovered = True
+        super().enterEvent(event)
         self.update()
 
     def leaveEvent(self, event):
         self.hovered = False
         self.pressed = False
+        super().leaveEvent(event)
         self.update()
 
     def mousePressEvent(self, event):
         self.pressed = True
+        super().mousePressEvent(event)
         self.update()
 
     def mouseReleaseEvent(self, event):
         self.pressed = False
+        super().mouseReleaseEvent(event)
         self.update()
 
     def paintEvent(self, event):
@@ -716,12 +720,12 @@ class GlobalClickDetector(QtCore.QObject):
         self.target_widget = target_widget
 
     def eventFilter(self, obj, event):
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-            global_pos = event.globalPos()
+        if event.type() == QtCore.QEvent.Type.MouseButtonPress:
+            global_pos = event.globalPosition()
             target_global_geometry = self.target_widget.mapToGlobal(self.target_widget.rect().topLeft())
             target_global_rect = self.target_widget.rect().translated(target_global_geometry)
 
-            if not target_global_rect.contains(global_pos):
+            if not target_global_rect.contains(global_pos.toPoint()):
                 self.clicked_outside.emit(1)
             else:
                 self.clicked_inside.emit(1)

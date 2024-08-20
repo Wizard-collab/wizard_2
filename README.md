@@ -21,7 +21,7 @@ Wizard is an autonomous software for managing CGI productions.
 * Developed with _python 3.12.#_
 
 * Modules dependencies:
-	* PyQt5
+	* PyQt6
 	* PyYaml
 	* pillow
 	* pyautogui

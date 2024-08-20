@@ -40,7 +40,7 @@ def main(nspace_list, frange, comment=''):
 def invoke_settings_widget():
     from wizard_widgets import export_settings_widget
     export_settings_widget_win = export_settings_widget.export_settings_widget('animation', parent=wizard_tools.maya_main_window())
-    if export_settings_widget_win.exec_() == export_settings_widget.dialog_accepted:
+    if export_settings_widget_win.exec() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)

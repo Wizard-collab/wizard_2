@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 
 # Wizard modules
 from wizard.vars import ressources
@@ -24,8 +24,8 @@ class comment_widget(QtWidgets.QDialog):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Comment")
         
-        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
         gui_utils.move_ui(self, pos=self.pos)
@@ -55,7 +55,7 @@ class comment_widget(QtWidgets.QDialog):
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel(title))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
         self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
         self.close_pushButton.setFixedSize(16,16)
@@ -65,7 +65,7 @@ class comment_widget(QtWidgets.QDialog):
 
         self.comment_field = gui_utils.no_return_textEdit()
         self.comment_field.setText(self.old_comment)
-        self.comment_field.moveCursor(QtGui.QTextCursor.End)
+        self.comment_field.moveCursor(QtGui.QTextCursor.MoveOperation.End)
         self.frame_layout.addWidget(self.comment_field)
 
         self.accept_button = QtWidgets.QPushButton(self.button_text)
@@ -86,10 +86,10 @@ class comment_widget(QtWidgets.QDialog):
         self.tags_widget.other_key_pressed.connect(self.comment_field.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_field.setText)
         self.tags_widget.returned_text.connect(self.move_cursor_to_end)
-        self.tags_widget.exec()
+        self.tags_widget.execute()
 
     def move_cursor_to_end(self):
-        self.comment_field.moveCursor(QtGui.QTextCursor.End)
+        self.comment_field.moveCursor(QtGui.QTextCursor.MoveOperation.End)
 
     def connect_functions(self):
         self.accept_button.clicked.connect(self.confirm)

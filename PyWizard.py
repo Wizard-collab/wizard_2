@@ -35,7 +35,7 @@ import sys
 import os
 import traceback
 import code
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 import logging
 
 # Append current dir to sys.path
