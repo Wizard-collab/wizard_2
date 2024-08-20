@@ -40,7 +40,6 @@ def get_app():
         logger.error("FFmpeg not found")
         sys.exit()
     os.environ['PATH'] += os.pathsep + "binaries/ffmpeg/bin"
-
     app = QtWidgets.QApplication(sys.argv)
 
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
