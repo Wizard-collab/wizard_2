@@ -123,7 +123,7 @@ class compile():
 			p = subprocess.Popen(command_line)
 			p.wait()
 
-			folders_list = ['ressources', 'softwares']
+			folders_list = ['binaries', 'ressources', 'softwares']
 			dist_folder = 'dist/Wizard'
 			for folder in folders_list:
 				destination = os.path.join(dist_folder, folder)

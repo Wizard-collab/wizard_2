@@ -7,18 +7,22 @@ from PyQt6 import QtWidgets, QtMultimedia, QtMultimediaWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
 import uuid
 import json
+import logging
 
 # Wizard core modules
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import image
 from wizard.core import user
+from wizard.core import ffmpeg_utils
 from wizard.vars import ressources
 from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui.video_manager import create_playlist_widget
+
+logger = logging.getLogger(__name__)
 
 class buttons_bar_widget(QtWidgets.QWidget):
 
@@ -92,6 +96,8 @@ class timeline_widget(QtWidgets.QFrame):
         if context_dic is None:
             return
         if 'current_playlist_id' in context_dic.keys():
+            if not context_dic['current_playlist_id']:
+                return
             self.load_playlist(context_dic['current_playlist_id'])
 
     def set_context(self):
@@ -103,6 +109,7 @@ class timeline_widget(QtWidgets.QFrame):
         self.save_as_playlist_button.clicked.connect(self.save_as_playlist)
         self.save_playlist_button.clicked.connect(self.save_playlist)
         self.new_playlist_button.clicked.connect(self.clear_playlist)
+        self.export_playlist_button.clicked.connect(self.export_playlist)
         self.customContextMenuRequested.connect(self.show_context_menu)
 
     def build_ui(self):
@@ -162,6 +169,25 @@ class timeline_widget(QtWidgets.QFrame):
         self.new_playlist_button = QtWidgets.QPushButton('New playlist')
         self.new_playlist_button.setFixedSize(100, 40)
         self.playlist_layout.addWidget(self.new_playlist_button)
+
+        self.export_playlist_button = QtWidgets.QPushButton('Export playlist')
+        self.export_playlist_button.setFixedSize(110, 40)
+        self.playlist_layout.addWidget(self.export_playlist_button)
+
+    def export_playlist(self):
+        video_paths = []
+        for unique_id in self.videos_dic.keys():
+            video_paths.append(self.videos_dic[unique_id]['video_row']['file_path'])
+        if len(video_paths) == 0:
+            logger.warning('No videos to export')
+            return
+        output_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save File",
+                                                  f"{self.current_playlist}.mp4",
+                                                  "Videos (*.mp4)")
+        if not output_path:
+            logger.warning('Please choose a file')
+            return
+        ffmpeg_utils.merge_videos(video_paths, output_path)
 
     def load_playlist(self, playlist_id):
         playlist_row = project.get_playlist_data(playlist_id)

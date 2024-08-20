@@ -17,8 +17,6 @@ from wizard.gui.video_manager import slider_view
 
 logger = logging.getLogger(__name__)
 
-os.environ['PATH'] += os.pathsep + "W:/SCRIPT/ffmpeg/bin"
-
 def get_video_length(video_path):
     probe = ffmpeg.probe(video_path)
     duration = round(float(probe['format']['duration'])*1000)

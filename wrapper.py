@@ -33,15 +33,13 @@ import os
 # Wizard modules
 from wizard.vars import user_vars
 
-exe_path = os.path.join(os.path.abspath(''), 'python')
+exe = ['python', 'app.py']
 
 if not os.path.isdir(user_vars._user_path_):
     os.makedirs(user_vars._user_path_)
 
 log_file_path = os.path.join(user_vars._user_path_, 'main.log')
 
-# Open the log file in write mode
 with open(log_file_path, 'a') as log_file:
-    # Launch the executable and redirect stdout and stderr to the log file
-    process = subprocess.Popen(['python', 'app.py'], stdout=log_file, stderr=subprocess.STDOUT)
+    process = subprocess.Popen(exe, stdout=log_file, stderr=subprocess.STDOUT, shell=True)
     process.wait()

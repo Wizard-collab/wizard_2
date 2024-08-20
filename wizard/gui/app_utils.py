@@ -36,6 +36,11 @@ logger = logging.getLogger(__name__)
 def get_app():
     os.environ["QT_SCALE_FACTOR"] = "0.8"
 
+    if not os.path.isdir("binaries/ffmpeg/bin"):
+        logger.error("FFmpeg not found")
+        sys.exit()
+    os.environ['PATH'] += os.pathsep + "binaries/ffmpeg/bin"
+
     app = QtWidgets.QApplication(sys.argv)
 
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
