@@ -1,0 +1,25 @@
+1 ICON "../ressources/icons/wizard_icon.ico"
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "Wizard - Production Manager"
+      VALUE "FileDescription", "Wizard"
+      VALUE "FileVersion", "4.0"
+      VALUE "InternalName", "Wizard"
+      VALUE "LegalCopyright", ""
+      VALUE "OriginalFilename", "Wizard.exe"
+      VALUE "ProductName", "Wizard"
+      VALUE "ProductVersion", "4.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
