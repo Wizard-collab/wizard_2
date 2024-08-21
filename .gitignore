@@ -1,4 +1,5 @@
 *.pyc
 compile/
-python3_wizard_venv
 binaries/
+python/
+

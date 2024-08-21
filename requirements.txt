@@ -4,7 +4,6 @@ pyautogui
 pillow
 psycopg2
 psutil
-QScintilla
 requests
 clipboard
 opencv-python
@@ -13,3 +12,5 @@ pywin32
 PyInstaller
 winshell
 mpv
+ffmpeg-python
+PyQt6-QScintilla

@@ -26,6 +26,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Python modules
+import subprocess
+import os
+
 # Wizard modules
-import app
-app.main(log_user=True)
+from wizard.vars import user_vars
+
+exe = [os.path.abspath('python/python.exe'), 'app.py']
+
+user_path = os.path.expanduser('~/Documents/wizard/')
+if not os.path.isdir(user_path):
+    os.mkdir(user_path)
+
+log_file_path = os.path.join(user_path, 'main.log')
+
+with open(log_file_path, 'a') as log_file:
+    process = subprocess.Popen(exe, stdout=log_file, stderr=subprocess.STDOUT, shell=True)
+    process.wait()

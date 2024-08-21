@@ -31,6 +31,7 @@ import sys
 import time
 from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
+import argparse
 
 # Wizard modules
 from wizard.core import application
@@ -49,8 +50,7 @@ class app():
     def __init__(self, project_manager,
                         log_user,
                         change_repo, 
-                        change_psql,
-                        table_viewer):
+                        change_psql):
         self.stats_schedule = None
 
         # Init
@@ -71,9 +71,6 @@ class app():
         QtWidgets.QApplication.processEvents()
 
         version_database_modification.main()
-
-        if table_viewer:
-            self.table_viewer = table_viewer_widget.table_viewer_widget()
 
         self.main_widget = main_widget.main_widget()
         self.main_widget.stop_threads.connect(self.stats_schedule.stop)
@@ -100,13 +97,24 @@ def main(project_manager=False,
             change_repo=False,
             change_psql=False,
             table_viewer=False):
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-change_db_server", action="store_true", help="Launch the DB server connection interface")
+    parser.add_argument("-change_repository", action="store_true", help="Launch the repository connection interface")
+    parser.add_argument("-log_user", action="store_true", help="Launch the user log interface")
+    parser.add_argument("-project_manager", action="store_true", help="Launch the project manager interface")
+    args = parser.parse_args()
+    change_psql = args.change_db_server
+    project_manager = args.project_manager
+    change_repo = args.change_repository
+    log_user = args.log_user
+
     sys.excepthook = app_utils.excepthook
     application.log_app_infos()
     wizard_app = app(project_manager,
                         log_user,
                         change_repo,
-                        change_psql,
-                        table_viewer)
+                        change_psql)
     ret = wizard_app.app.exec()
     sys.exit(ret)
 
