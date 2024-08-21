@@ -82,70 +82,36 @@ class compile():
 				shutil.rmtree('dist')
 			if os.path.isdir('build'):
 				shutil.rmtree('build')
-				
-			command_line = "PyInstaller spec/wizard.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
 
-			command_line = "PyInstaller spec/create_repository.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/change_repository.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/change_db_server.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/PyWizard.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/wizard_cmd.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/server.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/uninstall.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/error_handler.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			command_line = "PyInstaller spec/project_manager.spec"
-			p = subprocess.Popen(command_line)
-			p.wait()
-
-			folders_list = ['binaries', 'ressources', 'softwares']
-			dist_folder = 'dist/Wizard'
+			folders_list = ['Python', 'binaries', 'ressources', 'softwares', 'wizard']
 			for folder in folders_list:
-				destination = os.path.join(dist_folder, folder)
+				destination = os.path.join(self.build_folder, folder)
 				shutil.copytree(folder, destination)
 
-			files_list = [  'wapi.py',
-							'dist/PyWizard/PyWizard.exe',
-							'dist/Create Repository/Create Repository.exe',
-							'dist/Change Repository/Change Repository.exe',
-							'dist/Connect Server/Connect Server.exe',
-							'dist/wizard_cmd/wizard_cmd.exe',
-							'dist/server/server.exe',
-							'dist/uninstall.exe',
-							'dist/Project Manager/Project Manager.exe',
-							'dist/error_handler/error_handler.exe'
+			files_list = [  
+							
+							'PyWizard.exe',
+							'Create Repository.exe',
+							'Change Repository.exe',
+							'Change DB Server.exe',
+							'Server.exe',
+							'Project Manager.exe',
+							'Log User.exe',
+							'Wizard.exe',
+
+							'app.py',
+							'create_repository.py',
+							'error_handler.py',
+							'PyWizard.py',
+							'server.py',
+							'wapi.py',
+							'wizard_cmd.py'
+
 							]
 							
 			for file in files_list:
-				destination = os.path.join(dist_folder, os.path.basename(file))
+				destination = os.path.join(self.build_folder, os.path.basename(file))
 				shutil.copyfile(file, destination)
-
-			shutil.copytree(dist_folder, self.build_folder)
 
 			if os.path.isdir('dist'):
 				shutil.rmtree('dist')
@@ -154,9 +120,10 @@ class compile():
 
 			shutil.make_archive(f'{self.build_folder}', 'zip', self.build_folder)
 
-			if os.path.isdir(self.build_folder):
-				shutil.rmtree(self.build_folder)
+			#if os.path.isdir(self.build_folder):
+			#	shutil.rmtree(self.build_folder)
 
+			'''
 			# Making installer
 			zip_file = self.build_folder+'.zip'
 			shutil.copyfile(zip_file, '__wizard__.zip')
@@ -175,6 +142,7 @@ class compile():
 
 			self.clean_pycache()
 			os.startfile(os.path.dirname(self.build_folder))
+			'''
 
 	def clean_pycache(self):
 		total_chars = 0

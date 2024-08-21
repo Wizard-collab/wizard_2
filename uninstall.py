@@ -44,6 +44,7 @@ import tempfile
 # CHECK ADMIN
 def is_bootsrap():
     if not sys.argv[0].endswith('.py'):
+        print(os.path.abspath(''))
         if os.path.normpath(os.path.abspath('')) != os.path.normpath(get_current_install()[3]):
             if os.path.normpath(os.path.abspath('')) == os.path.normpath('C:/Windows/ImmersiveControlPanel'):
                 return False

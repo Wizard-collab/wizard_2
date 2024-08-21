@@ -5,7 +5,7 @@
 ::YAwzuBVtJxjWCl3EqQJgSA==
 ::ZR4luwNxJguZRRnk
 ::Yhs/ulQjdF+5
-::cxAkpRVqdFKZSjk=
+::cxAkpRVqdFKZSzk=
 ::cBs/ulQjdF+5
 ::ZR41oxFsdFKZSDk=
 ::eBoioBt6dFKZSDk=
@@ -26,7 +26,7 @@
 ::ZQ0/vhVqMQ3MEVWAtB9wSA==
 ::Zg8zqx1/OA3MEVWAtB9wSA==
 ::dhA7pRFwIByZRRnk
-::Zh4grVQjdDiDJGqnxmsAHCdDRR6DLm+FVIkv7frt6vjJp1UYNA==
+::Zh4grVQjdDiDJGqnxmsAHCdDRR6DLm+FVIk/+u36++/HkEgNW/E2bIDJw/qLOOVz
 ::YB416Ek+ZG8=
 ::
 ::
@@ -39,16 +39,8 @@ if not exist "%user_path%" (
     mkdir "%user_path%"
 )
 
-set "log_file=%user_path%\main.log"
-set "temp_log_file=%user_path%\temp_main_%RANDOM%.log"
+set "log_file=%user_path%\%RANDOM%.log"
 
-python\python.exe >> "%temp_log_file%" 2>&1
-
-if exist "%log_file%" (
-    type "%temp_log_file%" >> "%log_file%"
-    del "%temp_log_file%"
-) else (
-    ren "%temp_log_file%" "%log_file%"
-)
+python\python.exe create_repository.py >> "%log_file%" 2>&1
 
 endlocal

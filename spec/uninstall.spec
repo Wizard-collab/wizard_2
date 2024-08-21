@@ -33,4 +33,5 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=True,
-          icon=os.path.abspath('ressources\\icons\\wizard_setup.ico'))
+          icon=os.path.abspath('ressources\\icons\\wizard_setup.ico'),
+          onefile=True)

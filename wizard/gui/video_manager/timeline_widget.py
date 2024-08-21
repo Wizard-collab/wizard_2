@@ -355,6 +355,8 @@ class timeline_widget(QtWidgets.QFrame):
         if unique_id is None:
             unique_id = str(uuid.uuid4())
         video_row = project.get_video_data(video_id)
+        if video_row is None:
+            return
         variant_row = project.get_variant_data(video_row['variant_id'])
         stage_row = project.get_stage_data(variant_row['stage_id'])
         self.videos_dic[unique_id] = dict()
