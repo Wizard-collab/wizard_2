@@ -238,10 +238,7 @@ class subtask(Thread):
         else:
             py_file = tools.temp_file_from_pycmd(self.pycmd)
         
-        if sys.argv[0].endswith('.py'):
-            executable = 'python wizard_cmd.py'
-        else:
-            executable = 'wizard_cmd'
+        executable = 'python/python wizard_cmd.py'
 
         psql_dns = environment.get_psql_dns()
         repository_name = environment.get_repository()[11:]

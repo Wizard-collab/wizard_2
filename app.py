@@ -44,7 +44,6 @@ logger = logging.getLogger('wizard')
 from wizard.gui import app_utils
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
-import error_handler
 
 class app():
     def __init__(self, project_manager,

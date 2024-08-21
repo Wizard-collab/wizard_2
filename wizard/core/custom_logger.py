@@ -43,9 +43,9 @@ def get_root_logger():
     else:
         root_logger.setLevel(logging.INFO)
 
-    file_handler = logging.FileHandler(user_vars._user_logger_file_)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
-    root_logger.addHandler(file_handler)
+    #file_handler = logging.FileHandler(user_vars._user_logger_file_)
+    #file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
+    #root_logger.addHandler(file_handler)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
     root_logger.addHandler(stream_handler)

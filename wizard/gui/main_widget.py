@@ -286,16 +286,11 @@ class main_widget(QtWidgets.QWidget):
         webbrowser.open_new_tab(ressources._documentation_url_)
 
     def show_pywizard(self):
-        if sys.argv[0].endswith('.py'):
-            subprocess.Popen('python PyWizard.py', creationflags=subprocess.CREATE_NEW_CONSOLE)
-        elif sys.argv[0].endswith('.exe'):
-            path_utils.startfile('PyWizard.exe')
+        path_utils.startfile('PyWizard.exe')
 
     def restart(self):
         self.close()
         command = 'wizard.exe'
-        if sys.argv[0].endswith('.py'):
-            command = 'python app.py'
         subprocess.Popen(command, shell=True)
 
     def raise_window(self):

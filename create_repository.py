@@ -53,8 +53,6 @@ from wizard.gui import message_widget
 from wizard.gui import create_repository_widget
 from wizard.gui import warning_tooltip
 from wizard.gui import logging_widget
-import error_handler
-
 
 class app():
     def __init__(self):
@@ -88,9 +86,7 @@ def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     QtWidgets.QApplication.closeAllWindows()
     logger.critical(tb)
-    command = f'error_handler.exe "{tb}"'
-    if sys.argv[0].endswith('.py'):
-        command = f'python error_handler.py "{tb}"'
+    command = ['python/python.exe', 'error_handler.py', f'"{tb}"']
     subprocess.Popen(command, start_new_session=True)
 
 def main():
