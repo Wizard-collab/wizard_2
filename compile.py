@@ -83,22 +83,12 @@ class compile():
 			if os.path.isdir('build'):
 				shutil.rmtree('build')
 
-			folders_list = ['Python', 'binaries', 'ressources', 'softwares', 'wizard']
+			folders_list = ['Python', 'binaries', 'ressources', 'softwares', 'wizard', 'bin']
 			for folder in folders_list:
 				destination = os.path.join(self.build_folder, folder)
 				shutil.copytree(folder, destination)
 
 			files_list = [  
-							
-							'PyWizard.exe',
-							'Create Repository.exe',
-							'Change Repository.exe',
-							'Change DB Server.exe',
-							'Server.exe',
-							'Project Manager.exe',
-							'Log User.exe',
-							'Wizard.exe',
-
 							'app.py',
 							'create_repository.py',
 							'error_handler.py',
@@ -106,7 +96,6 @@ class compile():
 							'server.py',
 							'wapi.py',
 							'wizard_cmd.py'
-
 							]
 							
 			for file in files_list:
