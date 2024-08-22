@@ -231,7 +231,6 @@ class custom_video_icon_item(QtWidgets.QListWidgetItem):
         self.widget.set_background(ressources._stages_colors_[self.stage_row['name']])
         self.widget.set_state(self.stage_row['state'])
         self.setSizeHint(self.widget.size())
-        print(self.widget.size())
 
 class video_item_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

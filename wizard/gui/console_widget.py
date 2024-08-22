@@ -21,6 +21,9 @@ from wizard.gui import submit_log_widget
 
 logger = logging.getLogger(__name__)
 
+known_errors = ['libpng warning: iCCP: known incorrect sRGB profile',
+                'The requested filter buffer is too big, ignoring']
+
 class custom_stdout(QtCore.QObject):
 
     stdout_signal = pyqtSignal(str)
@@ -30,6 +33,8 @@ class custom_stdout(QtCore.QObject):
 
     def write(self, buf):
         try:
+            if buf in known_errors:
+                return
             self.stdout_signal.emit(buf)
             if not sys.__stdout__:
                 return

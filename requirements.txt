@@ -1,10 +1,11 @@
 PyQt6
+PyQt6-QScintilla
+ffmpeg-python
 PyYaml
 pyautogui
 pillow
 psycopg2
 psutil
-QScintilla
 requests
 clipboard
 opencv-python
@@ -12,4 +13,3 @@ rotate-screen
 pywin32
 PyInstaller
 winshell
-mpv
