@@ -170,7 +170,6 @@ class video_player(QtWidgets.QWidget):
         self.media_player.setPosition(time)
 
     def load_video(self, video):
-        logger.info(video)
         if video == '':
             self.video = None
             self.media_player.setSource(QtCore.QUrl.fromLocalFile(''))

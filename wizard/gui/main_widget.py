@@ -286,12 +286,11 @@ class main_widget(QtWidgets.QWidget):
         webbrowser.open_new_tab(ressources._documentation_url_)
 
     def show_pywizard(self):
-        path_utils.startfile('PyWizard.exe')
+        subprocess.run(["start", "cmd", "/c", path_utils.abspath('PyWizard.exe')], shell=True)
 
     def restart(self):
         self.close()
-        command = 'wizard.exe'
-        subprocess.Popen(command, shell=True)
+        subprocess.run([path_utils.abspath('Wizard.exe')], shell=True)
 
     def raise_window(self):
         self.raise_()

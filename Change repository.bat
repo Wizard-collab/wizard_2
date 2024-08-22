@@ -1,8 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-cd ..\
-
 set "user_path=%USERPROFILE%\Documents\wizard\"
 if not exist "%user_path%" (
     mkdir "%user_path%"
@@ -10,6 +8,6 @@ if not exist "%user_path%" (
 
 set "log_file=%user_path%\%RANDOM%.log"
 
-python\python.exe app.py >> "%log_file%" 2>&1
+python\python.exe app.py -change_repository >> "%log_file%" 2>&1
 
 endlocal
