@@ -201,7 +201,7 @@ class popup_save_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.update_comment_button.clicked.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.version_id))
-        self.comment_textEdit.textChanged.connect(self.propose_tags)
+        #self.comment_textEdit.textChanged.connect(self.propose_tags)
         self.comment_textEdit.textChanged.connect(self.update_comment_validity)
         self.comment_textEdit.apply_signal.connect(self.update_comment)
 
