@@ -206,7 +206,6 @@ class video_browser_widget(QtWidgets.QWidget):
             comb_row['variant'] = variants[video_row['variant_id']]['name']
             comb_row['variant_id'] = variants[video_row['variant_id']]['id']
             self.comb_rows_for_search.append(comb_row)
-        logger.info(self.comb_rows_for_search)
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, video_row, asset_name, stage_row, parent=None):

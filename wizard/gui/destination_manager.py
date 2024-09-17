@@ -142,6 +142,7 @@ class custom_target_item(QtWidgets.QTreeWidgetItem):
         self.reference_row = reference_row
         self.fill_ui()
         self.connect_functions()
+        self.setSizeHint(0, QtCore.QSize(1,30))
 
     def connect_functions(self):
         self.version_widget.button_clicked.connect(self.version_modification_requested)

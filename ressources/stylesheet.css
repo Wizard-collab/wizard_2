@@ -127,6 +127,11 @@ QListView::item {
 QListView::item:hover {
 	background-color:rgba(255,255,255,10);
 }
+
+QListView::item:alternate{
+	background-color: rgba(0,0,0,15);
+}
+
  
 QListView::item:selected {
 	background-color:rgba(255,255,255,30);
@@ -155,6 +160,10 @@ QTreeView::item {
 	margin-right: 1px;
 }
  
+QTreeView::item:alternate{
+	background-color: rgba(0,0,0,15);
+}
+
 QTreeView::item:hover {
 	background-color:rgba(255,255,255,10);
 }
@@ -176,7 +185,6 @@ QTreeView::item:selected:!active {
 
 #tree_widget{
 	background-color: transparent;
-	alternate-background-color: #29292f;
 }
 
 #tree_widget::item {
@@ -189,7 +197,6 @@ QTreeView::item:selected:!active {
 
 #delegate_tree{
 	background-color: transparent;
-	alternate-background-color: #29292f;
 }
 
 #delegate_tree::item {
@@ -508,12 +515,15 @@ QTableWidget{
 	outline: none;
 	background-color:#24242b;
 	gridline-color: rgba(0,0,0,80);
-	alternate-background-color: rgba(0,0,0,50);
 }
 
 QTableWidget::item:focus{
 	outline: none;
 	border: none;
+}
+
+QTableWidget::item:alternate{
+	background-color: rgba(0,0,0,15);
 }
 
 QTableWidget::item:selected{
@@ -804,7 +814,6 @@ QTableCornerButton::section {
 
 #tree_as_list_widget{
 	padding: 0px;
-	alternate-background-color: rgba(0,0,0,30);
 }
 
 #tree_as_list_widget::item{
@@ -814,7 +823,6 @@ QTableCornerButton::section {
 
 #tree_as_list_widget_no_hover{
 	padding: 0px;
-	alternate-background-color: rgba(0,0,0,30);
 }
 
 #tree_as_list_widget_no_hover::item{
@@ -829,7 +837,6 @@ QTableCornerButton::section {
 
 #production_manager_list_widget{
 	margin: 0px;
-	alternate-background-color: rgba(0,0,0,50);
 }
 
 #production_manager_list_widget::item{
