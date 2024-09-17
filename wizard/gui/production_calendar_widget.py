@@ -22,6 +22,7 @@ from wizard.core import user
 from wizard.core import project
 from wizard.core import assets
 from wizard.core import image
+from wizard.core import launch
 from wizard.core import repository
 from wizard.vars import ressources
 from wizard.vars import user_vars
@@ -156,6 +157,9 @@ class calendar_widget(QtWidgets.QWidget):
         selection = self.view.get_selected_items()
         menu = gui_utils.QMenu(self)
 
+        if len(selection) == 1:
+            launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), "Launch")
+
         edit_dates_action = menu.addAction(QtGui.QIcon(ressources._edit_icon_), "Edit dates")
         create_playlist_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), "Create playlist from selection")
 
@@ -192,6 +196,21 @@ class calendar_widget(QtWidgets.QWidget):
                 self.edit_dates()
             elif action == create_playlist_action:
                 self.create_playlist_from_selection()
+            elif action == launch_action:
+                self.launch_work_version()
+
+    def launch_work_version(self):
+        selection = self.view.get_selected_items()
+        if len(selection) != 1:
+            return
+        stage_id = selection[0].stage_row['id']
+        default_variant_id = project.get_stage_data(stage_id, 'default_variant_id')
+        default_work_env_id = project.get_variant_data(default_variant_id, 'default_work_env_id')
+        work_version_id = project.get_last_work_version(default_work_env_id, 'id')
+        if len(work_version_id) != 1:
+            logger.warning("No work version found")
+            return
+        launch.launch_work_version(work_version_id[0])
 
     def create_playlist_from_selection(self):
         selected_items = self.view.get_selected_items()

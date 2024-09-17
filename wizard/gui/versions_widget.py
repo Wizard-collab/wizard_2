@@ -272,7 +272,6 @@ class versions_widget(QtWidgets.QWidget):
             if version_id in self.version_icon_ids.keys():
                 self.version_icon_ids[version_id].setHidden(True)
 
-
     def connect_functions(self):
         self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
         self.icon_view_scrollBar.rangeChanged.connect(lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))

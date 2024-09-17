@@ -91,8 +91,13 @@ class production_table_widget(QtWidgets.QWidget):
 
     def context_menu_requested(self, point):
         menu = gui_utils.QMenu(self)
+        selection = self.get_selection()
+        if len(selection) == 1:
+            launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), "Launch")
 
         create_playlist_from_selection_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), "Create playist from selection")
+
+        
 
         menu.addSeparator()
         show_notes_icon = ressources._uncheck_icon_
@@ -133,8 +138,22 @@ class production_table_widget(QtWidgets.QWidget):
                 self.update_layout()
             if action == create_playlist_from_selection_action:
                 self.create_playlist_from_selection()
+            if action == launch_action:
+                self.launch_selection()
 
-    def create_playlist_from_selection(self):
+    def launch_selection(self):
+        selection = self.get_selection()
+        if len(selection) != 1:
+            return
+        default_variant_id = project.get_stage_data(selection[0], 'default_variant_id')
+        default_work_env_id = project.get_variant_data(default_variant_id, 'default_work_env_id')
+        work_version_id = project.get_last_work_version(default_work_env_id, 'id')
+        if len(work_version_id) != 1:
+            logger.warning("No work version found")
+            return
+        launch.launch_work_version(work_version_id[0])
+
+    def get_selection(self):
         stages_ids = []
         for modelIndex in self.table_widget.selectedIndexes():
             widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
@@ -144,9 +163,12 @@ class production_table_widget(QtWidgets.QWidget):
                 stage_row = widget.stage_row
                 stage_id = stage_row['id']
                 stages_ids.append(stage_id)
-        if len(stages_ids) < 1:
-            return
-        gui_server.create_playlist_from_stages(stages_ids)
+        return stages_ids
+
+    def create_playlist_from_selection(self):
+        selection = self.get_selection()
+        if len(selection) == 0:
+            gui_server.create_playlist_from_stages(selection)
 
     def update_stage_datas_visibility(self):
         for stage_id in self.stage_ids.keys():

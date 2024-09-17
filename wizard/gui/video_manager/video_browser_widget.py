@@ -191,10 +191,7 @@ class video_browser_widget(QtWidgets.QWidget):
                 self.variants_ids[video_row['variant_id']]['asset_name'] = variants[video_row['variant_id']]['string']
                 self.variants_ids[video_row['variant_id']]['variant_row'] = variants[video_row['variant_id']]
                 self.variants_ids[video_row['variant_id']]['stage_row'] = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
-                comb_row = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
-                comb_row['variant'] = variants[video_row['variant_id']]['name']
-                comb_row['variant_id'] = variants[video_row['variant_id']]['id']
-                self.comb_rows_for_search.append(comb_row)
+                
                 video_item = custom_video_icon_item(video_row,
                                                 self.variants_ids[video_row['variant_id']]['asset_name'],
                                                 self.variants_ids[video_row['variant_id']]['stage_row'],
@@ -204,6 +201,12 @@ class video_browser_widget(QtWidgets.QWidget):
                 if int(video_row['name']) > int(self.variants_ids[video_row['variant_id']]['last_video']['name']):
                     self.variants_ids[video_row['variant_id']]['last_video'] = video_row
                     self.variants_ids[video_row['variant_id']]['video_item'].update_row(video_row)
+
+            comb_row = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
+            comb_row['variant'] = variants[video_row['variant_id']]['name']
+            comb_row['variant_id'] = variants[video_row['variant_id']]['id']
+            self.comb_rows_for_search.append(comb_row)
+        logger.info(self.comb_rows_for_search)
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, video_row, asset_name, stage_row, parent=None):
@@ -298,14 +301,12 @@ class search_thread(QtCore.QThread):
 
             keywords_sets = self.search_data.split('+')
             for comb_row in self.comb_rows:
-
                 variant_id = comb_row['variant_id']
                 values = []
                 for key in comb_row:
                     if key in ['variant_id', 'id', 'creation_time', 'creation_user']:
                         continue
                     values.append(comb_row[key])
-
                 data_list = []
                 for data_block in values:
                     data_list.append(str(data_block))
