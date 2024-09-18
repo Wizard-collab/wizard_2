@@ -269,7 +269,7 @@ class general_widget(QtWidgets.QWidget):
 
         self.app_scale_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.app_scale_accept_button = QtWidgets.QPushButton('Apply ( need restart )')
+        self.app_scale_accept_button = QtWidgets.QPushButton('Apply ( Will restart )')
         self.app_scale_accept_button.setObjectName('blue_button')
         self.app_scale_buttons_layout.addWidget(self.app_scale_accept_button)
 
