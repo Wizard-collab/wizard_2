@@ -243,8 +243,8 @@ class create_project_widget(QtWidgets.QDialog):
     def open_explorer(self):
         project_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Open project directory",
                                        "",
-                                       QtWidgets.QFileDialog.ShowDirsOnly
-                                       | QtWidgets.QFileDialog.DontResolveSymlinks)
+                                       QtWidgets.QFileDialog.Option.ShowDirsOnly
+                                       | QtWidgets.QFileDialog.Option.DontResolveSymlinks)
         if project_path:
             self.project_path = project_path + '/'
             self.update_project_path()
