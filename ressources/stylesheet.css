@@ -660,7 +660,7 @@ QTableCornerButton::section {
 }
 
 #android_checkbox::indicator {
-    width: 28px;
+	width: 28px;
     height: 18px;
     background-color:#18181c;
     border-radius: 9px;
@@ -668,7 +668,7 @@ QTableCornerButton::section {
 }
 
 #android_checkbox::indicator:checked {
-    background-color:#7785de;
+	background-color:#7785de;
     image: url(ressources/icons/android_cb_on.svg);
 }
 

@@ -132,8 +132,8 @@ class renamer(QtWidgets.QWidget):
     def set_directory(self):
         directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Choose directory",
                                                                    "",
-                                                                   QtWidgets.QFileDialog.ShowDirsOnly
-                                                                   | QtWidgets.QFileDialog.DontResolveSymlinks)
+                                                                   QtWidgets.QFileDialog.Option.ShowDirsOnly
+                                                                   | QtWidgets.QFileDialog.Option.DontResolveSymlinks)
         if directory is not None and directory != '':
             self.clear_all()
             self.directory = path_utils.clean_path(directory)

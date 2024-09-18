@@ -405,7 +405,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_textEdit.apply_signal.connect(self.update_comment)
         self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
         self.action_button.clicked.connect(self.action)
-        self.comment_textEdit.textChanged.connect(self.propose_tags)
+        #self.comment_textEdit.textChanged.connect(self.propose_tags)
         self.comment_textEdit.textChanged.connect(self.update_comment_validity)
 
     def propose_tags(self):

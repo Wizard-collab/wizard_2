@@ -157,6 +157,7 @@ class calendar_widget(QtWidgets.QWidget):
         selection = self.view.get_selected_items()
         menu = gui_utils.QMenu(self)
 
+        launch_action = None
         if len(selection) == 1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), "Launch")
 

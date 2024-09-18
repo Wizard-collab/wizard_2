@@ -9,6 +9,7 @@ import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+from wizard.gui import gui_server
 from wizard.gui import custom_tab_widget
 
 # Wizard modules
@@ -98,6 +99,9 @@ class general_widget(QtWidgets.QWidget):
         self.keep_until_comment_checkbox.setChecked(keep_until_comment)
         self.popups_duration_spinBox.setValue(popups_duration)
 
+        app_scale = int(float(user.user().get_app_scale())*100)
+        self.app_scale_spinBox.setValue(app_scale)
+
         self.install_dir_data.setText(path_utils.abspath(''))
         version_dic = application.get_version()
         self.version_data.setText(f"{version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']}")
@@ -132,6 +136,11 @@ class general_widget(QtWidgets.QWidget):
         if user.user().set_local_path(local_path):
             self.refresh()
 
+    def apply_app_scale(self):
+        app_scale = str(self.app_scale_spinBox.value()/100)
+        if user.user().set_app_scale(app_scale):
+            gui_server.restart_ui()
+
     def apply_team_dns(self):
         host = self.team_host_lineEdit.text()
         port = self.team_port_lineEdit.text()
@@ -159,12 +168,13 @@ class general_widget(QtWidgets.QWidget):
         self.enable_popups_blink_checkbox.stateChanged.connect(self.apply_popups_settings)
         self.keep_until_comment_checkbox.stateChanged.connect(self.apply_popups_settings)
         self.popups_duration_spinBox.valueChanged.connect(self.apply_popups_settings)
+        self.app_scale_accept_button.clicked.connect(self.apply_app_scale)
 
     def open_explorer(self):
         project_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Open local project directory",
                                        "",
-                                       QtWidgets.QFileDialog.ShowDirsOnly
-                                       | QtWidgets.QFileDialog.DontResolveSymlinks)
+                                       QtWidgets.QFileDialog.Option.ShowDirsOnly
+                                       | QtWidgets.QFileDialog.Option.DontResolveSymlinks)
         if project_path:
             self.local_path_lineEdit.setText(project_path)
 
@@ -230,6 +240,38 @@ class general_widget(QtWidgets.QWidget):
         self.popups_duration_spinBox = QtWidgets.QSpinBox()
         self.popups_duration_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.popups_sublayout.addRow(QtWidgets.QLabel('Duration ( seconds )'), self.popups_duration_spinBox)
+
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
+        self.app_scale_frame = QtWidgets.QFrame()
+        self.app_scale_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.app_scale_layout = QtWidgets.QVBoxLayout()
+        self.app_scale_layout.setContentsMargins(0,0,0,0)
+        self.app_scale_layout.setSpacing(6)
+        self.app_scale_frame.setLayout(self.app_scale_layout)
+        self.scrollArea_layout.addWidget(self.app_scale_frame)
+
+        self.app_scale_sublayout = QtWidgets.QFormLayout()
+        self.app_scale_sublayout.setContentsMargins(0,0,0,0)
+        self.app_scale_sublayout.setSpacing(6)
+        self.app_scale_layout.addLayout(self.app_scale_sublayout)
+
+        self.app_scale_spinBox = QtWidgets.QSpinBox()
+        self.app_scale_spinBox.setRange(50,150)
+        self.app_scale_spinBox.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.app_scale_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.app_scale_sublayout.addRow(QtWidgets.QLabel('App scale ( % )'), self.app_scale_spinBox)
+
+        self.app_scale_buttons_layout = QtWidgets.QHBoxLayout()
+        self.app_scale_buttons_layout.setContentsMargins(0,0,0,0)
+        self.app_scale_buttons_layout.setSpacing(6)
+        self.app_scale_layout.addLayout(self.app_scale_buttons_layout)
+
+        self.app_scale_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
+        self.app_scale_accept_button = QtWidgets.QPushButton('Apply ( need restart )')
+        self.app_scale_accept_button.setObjectName('blue_button')
+        self.app_scale_buttons_layout.addWidget(self.app_scale_accept_button)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
