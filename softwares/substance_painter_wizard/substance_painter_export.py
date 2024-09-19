@@ -13,6 +13,7 @@ import substance_painter.project
 import substance_painter.textureset
 import substance_painter.js
 import substance_painter.logging as logging
+import substance_painter.resource
 
 # Wizard modules
 import wizard_communicate
@@ -20,7 +21,7 @@ import wizard_hooks
 
 def export_textures(material, size, file_type, comment='') :
     if file_type == 'exr':
-        bitdepth = '32'
+        bitdepth = '32f'
     else:
         bitdepth = '16'
 
@@ -28,7 +29,38 @@ def export_textures(material, size, file_type, comment='') :
     temp_export_path = os.path.dirname(wizard_communicate.request_export(int(os.environ['wizard_work_env_id']),
                                         export_name)).replace('\\', '/')
 
-    js_code = 'alg.mapexport.exportDocumentMaps("%s", "%s", "%s", {resolution:[%s,%s], bitDepth:[%s]})' % ( material, temp_export_path, file_type, size, size, bitdepth )
+    #js_code = 'alg.mapexport.exportDocumentMaps("%s", "%s", "%s", {resolution:[%s,%s], bitDepth:[%s]})' % ( material, temp_export_path, file_type, size, size, bitdepth )
+
+    resource = substance_painter.resource.ResourceID(
+        context="resource", name='PBR Metallic Roughness')
+    export_preset = substance_painter.export.ResourceExportPreset(resource)
+    print(export_preset.list_output_maps())
+    '''
+    
+    export_config = {
+    "exportShaderParams": False,
+    "exportPath": temp_export_path,
+    "defaultExportPreset" : export_preset.resource_id.url(),
+    "exportList": [
+        {
+            "rootPath": "DefaultMaterial"
+        }],
+    "exportParameters": [
+        {
+            "parameters": {
+                "dithering": True,
+                "paddingAlgorithm": "infinite",
+                "fileFormat" : file_type,
+                "bitDepth" : bitdepth,
+                "sizeLog2": int(math.log2(int(size)))
+            }
+        }]
+    }
+
+    print(export_config)
+    print(temp_export_path)
+    export_result = substance_painter.export.export_project_textures(export_config)
+    print(export_result.message)
     try:
         export_result = substance_painter.js.evaluate(js_code)
     except:
@@ -48,6 +80,7 @@ def export_textures(material, size, file_type, comment='') :
                                                                 comment=comment)
 
         trigger_after_export_hook('texturing', export_dir)
+    '''
 
 def trigger_after_export_hook(stage_name, export_dir):
     string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
