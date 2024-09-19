@@ -292,6 +292,17 @@ class user:
         else:
             return 1
 
+    def get_app_scale(self):
+        if user_vars._app_scale_ in self.prefs_dic.keys():
+            return self.prefs_dic[user_vars._app_scale_]
+        else:
+            return "0.9"
+
+    def set_app_scale(self, app_scale):
+        self.prefs_dic[user_vars._app_scale_] = app_scale
+        self.write_prefs_dic()
+        return 1
+
     def get_keep_until_comment(self):
         return self.prefs_dic[user_vars._popups_settings_]['keep_until_comment']
 
