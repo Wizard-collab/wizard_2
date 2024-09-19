@@ -237,6 +237,8 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
         del env['QML2_IMPORT_PATH']
     if 'QT_AUTO_SCREEN_SCALE_FACTOR' in env.keys():
         del env['QT_AUTO_SCREEN_SCALE_FACTOR']
+    if 'QT_SCALE_FACTOR' in env.keys():
+        del env['QT_SCALE_FACTOR']
 
     return env
 
