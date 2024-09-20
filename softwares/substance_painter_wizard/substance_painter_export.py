@@ -42,6 +42,7 @@ def export_textures(material, size, file_type, comment='') :
             "defaultExportPreset": wizard_tools.get_export_preset_url(material),
             "exportParameters": [{"parameters": {"paddingAlgorithm": "infinite",
                                                 "dithering": True,
+                                                "fileFormat" : file_type,
                                                 "bitDepth" : bitdepth,
                                                 "sizeLog2": int(math.log2(int(size)))}}],
         }
