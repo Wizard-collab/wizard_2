@@ -59,3 +59,6 @@ def add_rendering_extensions():
 				extension = assets_vars._ext_dic_[stage][software][0]
 				if not project.get_default_extension_row(stage, software_id, ignore_warning=True):
 					project.create_extension_row(stage, software_id, extension)
+
+	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS OCIO text;"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)

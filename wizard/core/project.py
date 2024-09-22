@@ -1932,6 +1932,26 @@ def get_frame_rate():
         return
     return json.loads(frame_rate_list[0])
 
+def set_OCIO(OCIO_config_file):
+    if not db_utils.update_data('project',
+                            'settings',
+                            ('OCIO', OCIO_config_file),
+                            ('id', 1)):
+        logger.warning('Project OCIO not modified')
+        return
+    logger.info('Project OCIO modified')
+    return 1
+
+def get_OCIO():
+    ocio_list = db_utils.get_row_by_column_data('project',
+                                                        'settings',
+                                                        ('id', 1),
+                                                        'OCIO')
+    if ocio_list is None or len(ocio_list) < 1:
+        logger.error("Project settings not found")
+        return
+    return ocio_list[0]
+
 def set_image_format(image_format):
     if not db_utils.update_data('project',
                             'settings',
@@ -3078,7 +3098,8 @@ def create_settings_table(database):
                                         frame_rate text NOT NULL,
                                         image_format text NOT NULL,
                                         deadline real NOT NULL,
-                                        users_ids text NOT NULL
+                                        users_ids text NOT NULL,
+                                        OCIO text
                                     );"""
     if not db_utils.create_table(database, sql_cmd):
         return

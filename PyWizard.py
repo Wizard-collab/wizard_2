@@ -81,6 +81,7 @@ class app():
         app_utils.init_repository(self)
         app_utils.init_user(self)
         app_utils.init_project(self)
+        app_utils.init_OCIO()
         self.stats_schedule = app_utils.init_stats()
         self.communicate_server = communicate.communicate_server()
         self.communicate_server.start()

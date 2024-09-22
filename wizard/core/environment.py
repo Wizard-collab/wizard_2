@@ -62,6 +62,9 @@ def set_psql_dns(DNS):
 	os.environ[env_vars._psql_dns_] = DNS
 	return 1
 
+def set_OCIO(OCIO):
+	os.environ['OCIO'] = OCIO
+
 def get_psql_dns():
 	if env_vars._psql_dns_ not in os.environ.keys():
 		logger.error('No PostgreSQL DNS defined')

@@ -32,6 +32,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         deadline_string = datetime.datetime.fromtimestamp(deadline_float).strftime('%d/%m/%Y')
         frame_rate = project.get_frame_rate()
         image_format = project.get_image_format()
+        OCIO = project.get_OCIO()
         project_name = environment.get_project_name()
         project_path = environment.get_project_path()
         self.frame_rate_spinBox.setValue(frame_rate)
@@ -40,6 +41,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.project_name_data.setText(project_name)
         self.project_path_data.setText(project_path)
         self.deadline_lineedit.setText(deadline_string)
+        self.OCIO_lineEdit.setText(OCIO)
         self.update_deadline_timeleft(deadline_float)
 
         project_row = repository.get_project_row_by_name(environment.get_project_name())
@@ -56,6 +58,19 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.frame_rate_accept_button.clicked.connect(self.apply_frame_rate)
         self.format_accept_button.clicked.connect(self.apply_format)
         self.deadline_accept_button.clicked.connect(self.apply_deadline)
+        self.OCIO_folder_button.clicked.connect(self.open_OCIO_explorer)
+        self.OCIO_accept_button.clicked.connect(self.apply_OCIO)
+
+    def open_OCIO_explorer(self):
+        OCIO_config_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select OCIO config file", "",
+                            "All Files (*);;OCIO Files (*.ocio)")
+        if OCIO_config_file:
+            self.OCIO_lineEdit.setText(OCIO_config_file)
+
+    def apply_OCIO(self):
+        OCIO_config = self.OCIO_lineEdit.text()
+        project.set_OCIO(OCIO_config)
+        environment.set_OCIO()
 
     def apply_frame_rate(self):
         frame_rate = self.frame_rate_spinBox.value()
@@ -276,6 +291,50 @@ class project_general_preferences_widget(QtWidgets.QWidget):
         self.format_accept_button = QtWidgets.QPushButton('Apply')
         self.format_accept_button.setObjectName('blue_button')
         self.format_buttons_layout.addWidget(self.format_accept_button)
+
+        self.scrollArea_layout.addWidget(gui_utils.separator())
+
+        self.OCIO_frame = QtWidgets.QFrame()
+        self.OCIO_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.OCIO_layout = QtWidgets.QVBoxLayout()
+        self.OCIO_layout.setContentsMargins(0,0,0,0)
+        self.OCIO_layout.setSpacing(6)
+        self.OCIO_frame.setLayout(self.OCIO_layout)
+        self.scrollArea_layout.addWidget(self.OCIO_frame)
+
+        self.OCIO_title = QtWidgets.QLabel('Color management')
+        self.OCIO_title.setObjectName('bold_label')
+        self.OCIO_layout.addWidget(self.OCIO_title)
+
+        self.OCIO_subwidget = QtWidgets.QWidget()
+        self.OCIO_subwidget_layout = QtWidgets.QHBoxLayout()
+        self.OCIO_subwidget_layout.setContentsMargins(0,0,0,0)
+        self.OCIO_subwidget_layout.setSpacing(6)
+        self.OCIO_subwidget.setLayout(self.OCIO_subwidget_layout)
+        self.OCIO_layout.addWidget(self.OCIO_subwidget)
+
+        self.OCIO_lineEdit = QtWidgets.QLineEdit()
+        self.OCIO_lineEdit.setPlaceholderText('OCIO config file')
+        self.OCIO_subwidget_layout.addWidget(self.OCIO_lineEdit)
+
+        self.OCIO_folder_button = QtWidgets.QPushButton()
+        self.OCIO_folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
+        self.OCIO_folder_button.setIconSize(QtCore.QSize(20,20))
+        self.OCIO_folder_button.setFixedSize(28,28)
+        self.OCIO_subwidget_layout.addWidget(self.OCIO_folder_button)
+
+        self.OCIO_buttons_widget = QtWidgets.QWidget()
+        self.OCIO_buttons_layout = QtWidgets.QHBoxLayout()
+        self.OCIO_buttons_layout.setContentsMargins(0,0,0,0)
+        self.OCIO_buttons_layout.setSpacing(6)
+        self.OCIO_buttons_widget.setLayout(self.OCIO_buttons_layout)
+        self.OCIO_layout.addWidget(self.OCIO_buttons_widget)
+
+        self.OCIO_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
+        self.OCIO_accept_button = QtWidgets.QPushButton('Apply')
+        self.OCIO_accept_button.setObjectName('blue_button')
+        self.OCIO_buttons_layout.addWidget(self.OCIO_accept_button)
 
         self.scrollArea_layout.addWidget(gui_utils.separator())
 

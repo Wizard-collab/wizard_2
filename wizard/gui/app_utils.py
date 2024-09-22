@@ -168,6 +168,13 @@ def init_project(app, project_manager=False):
     project.add_user(repository.get_user_row_by_name(environment.get_user(), 'id'))
     hooks.init_wizard_hooks()
 
+def init_OCIO():
+    OCIO = project.get_OCIO()
+    if not OCIO:
+        logger.info("No OCIO config file defined")
+    else:
+        environment.set_OCIO(OCIO)
+
 def init_stats():
     stats.add_progress_event()
     stats_schedule = stats.schedule()

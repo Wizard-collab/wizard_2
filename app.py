@@ -61,6 +61,7 @@ class app():
         app_utils.init_repository(self, change_repo)
         app_utils.init_user(self, log_user)
         app_utils.init_project(self, project_manager)
+        app_utils.init_OCIO()
         self.stats_schedule = app_utils.init_stats()
 
         # Main gui app
