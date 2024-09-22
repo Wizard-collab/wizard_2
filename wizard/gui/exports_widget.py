@@ -21,6 +21,7 @@ from wizard.core import subtasks_library
 from wizard.core import path_utils
 from wizard.core import repository
 from wizard.vars import ressources
+from wizard.vars import assets_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -32,6 +33,7 @@ from wizard.gui import comment_widget
 from wizard.gui import destination_manager
 from wizard.gui import tag_label
 from wizard.gui import current_asset_viewer
+from wizard.gui import create_video_from_render_widget
 
 logger = logging.getLogger(__name__)
 
@@ -476,9 +478,12 @@ class exports_widget(QtWidgets.QWidget):
         launch_action = None
         set_default_action = None
         focus_version_action = None
+        create_video_action = None
         comment_action = None
         if len(selection)>=1:
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
+        if len(selection) == 1 and project.get_stage_data(self.stage_id, 'name') == assets_vars._rendering_ and selection[0].type == 'export_version':
+            create_video_action = menu.addAction(QtGui.QIcon(ressources._tool_video_), 'Create video from files')
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
             destination_action = menu.addAction(QtGui.QIcon(ressources._destination_icon_), 'Open destination manager')
@@ -507,6 +512,13 @@ class exports_widget(QtWidgets.QWidget):
                 self.set_default_export_version()
             elif action == focus_version_action:
                 self.focus_on_work_version()
+            elif action == create_video_action:
+                self.create_video_from_render_files()
+
+    def create_video_from_render_files(self):
+        export_version_id = self.list_view.selectedItems()[0].export_version_row['id']
+        self.create_video_from_render_widget = create_video_from_render_widget.create_video_from_render_widget(export_version_id)
+        self.create_video_from_render_widget.exec()
 
     def set_default_export_version(self):
         selection = self.list_view.selectedItems()

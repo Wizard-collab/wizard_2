@@ -13,3 +13,5 @@ rotate-screen
 pywin32
 PyInstaller
 winshell
+opencolorio
+OpenExr

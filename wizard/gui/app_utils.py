@@ -21,6 +21,7 @@ from wizard.core import hooks
 from wizard.core import stats
 from wizard.core import tools
 from wizard.core import create_project
+from wizard.core import path_utils
 from wizard.vars import ressources
 
 # Wizard gui modules
@@ -36,10 +37,10 @@ logger = logging.getLogger(__name__)
 def get_app():
     os.environ["QT_SCALE_FACTOR"] = user.user().get_app_scale()
 
-    if not os.path.isdir("binaries/ffmpeg/bin"):
+    if not path_utils.isdir("binaries/ffmpeg/bin"):
         logger.error("FFmpeg not found")
         sys.exit()
-    os.environ['PATH'] += os.pathsep + "binaries/ffmpeg/bin"
+    os.environ['PATH'] += os.pathsep + path_utils.abspath("binaries/ffmpeg/bin")
 
     app = QtWidgets.QApplication(sys.argv)
 

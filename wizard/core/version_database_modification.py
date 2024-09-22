@@ -43,6 +43,7 @@ from wizard.core import db_utils
 
 def main():
 	add_rendering_extensions()
+	add_OCIO_project_settings()
 
 def add_rendering_extensions():
 	from wizard.core import project
@@ -60,5 +61,6 @@ def add_rendering_extensions():
 				if not project.get_default_extension_row(stage, software_id, ignore_warning=True):
 					project.create_extension_row(stage, software_id, extension)
 
+def add_OCIO_project_settings():
 	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS OCIO text;"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)

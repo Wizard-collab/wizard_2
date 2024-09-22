@@ -33,6 +33,7 @@ import cv2
 import numpy as np
 import shutil
 from PIL import Image, ImageCms, ImageFont, ImageDraw
+import re
 
 # Wizard modules
 from wizard.core import assets
@@ -40,11 +41,13 @@ from wizard.core import project
 from wizard.core import path_utils
 from wizard.core import environment
 from wizard.core import image
+from wizard.core import tools
+from wizard.core import ocio_utils
 
 logger = logging.getLogger(__name__)
 
-def add_video(variant_id, images_directory, frange, version_id, focal_lengths_dic=None, comment='', analyse_comment=None):
-    temp_video_file, to_thumbnail = merge_video(images_directory, frange, version_id, focal_lengths_dic)
+def add_video(variant_id, images_directory, frange, string_asset, focal_lengths_dic=None, comment='', analyse_comment=None):
+    temp_video_file, to_thumbnail = merge_video(images_directory, frange, string_asset, focal_lengths_dic)
     if not temp_video_file:
         return
     video_id = assets.add_video(variant_id, comment=comment, analyse_comment=analyse_comment)
@@ -64,7 +67,7 @@ def request_video(variant_id):
     logger.info(f"Temporary directory created : {temp_video_dir}, if something goes wrong in the video process please go there to find your temporary video file")
     return temp_video_dir
 
-def merge_video(images_directory, frange, version_id, focal_lengths_dic=None):
+def merge_video(images_directory, frange, string_asset, focal_lengths_dic=None):
     temp_video_file = path_utils.join(images_directory, "temp.mp4")
 
     files_list = []
@@ -79,7 +82,7 @@ def merge_video(images_directory, frange, version_id, focal_lengths_dic=None):
         return
     
     frame_rate = project.get_frame_rate()
-    img_array, size = merge_with_overlay(files_list, frange, frame_rate, version_id, focal_lengths_dic)
+    img_array, size = merge_with_overlay(files_list, frange, frame_rate, string_asset, focal_lengths_dic)
 
     out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*"X264"), frame_rate, size)
     logger.info("Adding video overlay")
@@ -94,9 +97,8 @@ def merge_video(images_directory, frange, version_id, focal_lengths_dic=None):
     if path_utils.isfile(temp_video_file):
         return temp_video_file, to_thumbnail
 
-def merge_with_overlay(files_list, frange, frame_rate, version_id, focal_lengths_dic=None):
+def merge_with_overlay(files_list, frange, frame_rate, string_asset, focal_lengths_dic=None):
     img_array = []
-    string_asset = project.get_version_data(version_id, 'string')
     for file in files_list:
         frame_number = frange[0] + files_list.index(file)
         focal_len = 'Focal not found'
@@ -160,3 +162,47 @@ def add_overlay(file, string_asset, frame_number, frange, frame_rate, focal_len)
     out = Image.alpha_composite(out, over_image)
     out = out.convert('RGB')
     return out
+
+def video_from_render(export_version_id, ics, ocs, comment=''):
+
+    directory = assets.get_export_version_path(export_version_id)
+    export_id = project.get_export_version_data(export_version_id, 'export_id')
+    stage_id = project.get_export_data(export_id, 'stage_id')
+    variant_id = project.get_stage_data(stage_id, 'default_variant_id')
+
+    all_files = path_utils.listdir(directory)
+    if len(all_files) == 0:
+        logger.warning(f'No files found in {directory}')
+        return
+
+    files_dic = dict()
+    for file in path_utils.listdir(directory):
+        extension = path_utils.splitext(file)[-1].replace('.', '')
+        if extension not in files_dic.keys():
+            files_dic[extension] = []
+        files_dic[extension].append(path_utils.join(directory, file))
+
+    for extension in files_dic.keys():
+        if extension in ['exr', 'png']:
+            temp_dir = tools.temp_dir()
+            ocio_utils.exr_to_png(files=files_dic[extension],
+                                          output_dir=temp_dir,
+                                          ics=ics,
+                                          ocs=ocs)
+            string_asset = assets.instance_to_string(('export_version', export_version_id))
+
+            frame_range = [find_frame_number(files_dic[extension][0]), len(files_dic[extension])]
+
+            add_video(variant_id, temp_dir, frame_range, string_asset, comment=comment)
+            break
+
+def find_frame_number(filename):
+    # Regular expression to match "frame" followed by 3 to 5 digits, with optional underscore, hyphen, or dot
+    match = re.search(r"[\._](\d+)\.(exr|png)$", filename)
+    
+    if match:
+        # Return the frame number as an integer
+        return int(match.group(1))
+    else:
+        # Return None if no valid frame number is found
+        return 0

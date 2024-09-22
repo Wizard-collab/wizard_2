@@ -345,11 +345,11 @@ class production_table_widget(QtWidgets.QWidget):
             assets_preview[assets_preview_row['asset_id']] = assets_preview_row
         
         if self.domain == assets_vars._assets_:
-            labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading"]
-            self.task_list = ["", "modeling", "rigging", "grooming", "texturing", "shading"]
+            labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading", "Rendering", "Compositing"]
+            self.task_list = ["", "modeling", "rigging", "grooming", "texturing", "shading", 'rendering', 'compositing']
         elif self.domain == assets_vars._sequences_:
-            labels_names = ["Name", "Frame range", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Compositing"]
-            self.task_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "compositing"]
+            labels_names = ["Name", "Frame range", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Rendering", "Compositing"]
+            self.task_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "rendering", "compositing"]
 
         stage_ids = list(self.stage_ids.keys())
         project_stage_ids = project.get_all_stages('id')

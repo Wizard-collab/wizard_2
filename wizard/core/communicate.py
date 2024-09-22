@@ -204,7 +204,8 @@ def add_video(work_env_id, temp_dir, frange, version_id, focal_lengths_dic=None,
         analyse_comment = False
     else:
         analyse_comment = True
-    video_path = video.add_video(variant_id, temp_dir, frange, version_id, focal_lengths_dic, comment=comment, analyse_comment=analyse_comment)
+    string_asset = assets.instance_to_string(('work_version', version_id))
+    video_path = video.add_video(variant_id, temp_dir, frange, string_asset, focal_lengths_dic, comment=comment, analyse_comment=analyse_comment)
     gui_server.refresh_ui()
     return video_path
 

@@ -217,3 +217,14 @@ def threaded_copy(files_list, destination, max_threads=16, print_stdout=False):
 	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
 	task.start()
 	logger.info('Threaded copy started as subtask, open the subtask manager to get more informations')
+
+def create_video_from_render(export_version_id, ics, ocs, comment='', print_stdout=False):
+	command =  "# coding: utf-8\n"
+	command += "from wizard.gui import gui_server\n"
+	command += "from wizard.core import video\n"
+	command += f"video.video_from_render({export_version_id}, '{ics}', '{ocs}', comment='''{comment}''')\n"
+	command += "gui_server.refresh_team_ui()\n"
+	command += "print('wizard_task_status:done')\n"
+	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+	task.start()
+	logger.info('Render to video started as subtask, open the subtask manager to get more informations')

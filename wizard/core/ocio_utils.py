@@ -30,11 +30,13 @@
 import PyOpenColorIO as OCIO
 import OpenEXR
 import Imath
+import os
 import numpy as np
 from PIL import Image
 
 # Wizard core modules
 from wizard.core import path_utils
+from wizard.core import project
 
 def save_as_png(image_array, output_path):
    # Convert the float array to uint8 (0-255) range
@@ -81,9 +83,9 @@ def exr_to_rgba_array(file_path):
 
    return rgba_array
 
-def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs):
+def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs, OCIO_config_file):
    try:
-      config = OCIO.Config.CreateFromFile("W:/guest/3d/ressource/OpenColorIO-Configs-feature-aces-1.2-config/OpenColorIO-Configs-feature-aces-1.2-config/aces_1.2/config.ocio")
+      config = OCIO.Config.CreateFromFile(OCIO_config_file)
       OCIO.SetCurrentConfig(config)
       config = OCIO.GetCurrentConfig()
       processor = config.getProcessor(OCIO.ColorSpaceTransform(
@@ -96,12 +98,37 @@ def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs):
       for file in files:
          img = exr_to_rgba_array(file)
          cpu.applyRGBA(img)
-         save_as_png(img, path_utils.join(output_dir, f"{path_utils.splitext(path_utils.basename(file))[]}.png"))
+         file_path=path_utils.join(output_dir, f"{path_utils.basename(path_utils.splitext(file)[0])}.png")
+         save_as_png(img, file_path)
+      return 1
 
    except Exception as e:
       print("OpenColorIO Error: ", e)
 
-convert_exr_to_png_with_color_transform(files=["W:/SBOX/dev2/assets/characters/etst/rendering/_EXPORTS/main_render_LD/0003/RenderPass_Layer_Beauty_1.00111.exr"],
-                                          output_dir="",
-                                          ics='ACES - ACEScg',
-                                          ocs='out_srgb')
+def convert_exr_to_png(files, output_dir):
+   for file in files:
+      img = exr_to_rgba_array(file)
+      file_path=path_utils.join(output_dir, f"{path_utils.basename(path_utils.splitext(file)[0])}.png")
+      save_as_png(img, file_path)
+   return 1
+
+def exr_to_png(files, output_dir, ics=None, ocs=None):
+   OCIO_config_file = project.get_OCIO()
+   if not OCIO_config_file:
+      return convert_exr_to_png(files, output_dir)
+   return convert_exr_to_png_with_color_transform(files=files,
+                                                   output_dir=output_dir,
+                                                   ics=ics, 
+                                                   ocs=ocs, 
+                                                   OCIO_config_file=OCIO_config_file)
+
+def get_OCIO_available_color_spaces():
+   available_color_spaces = []
+   OCIO_config_file = project.get_OCIO()
+   if not OCIO_config_file:
+      return available_color_spaces
+   config = OCIO.Config.CreateFromFile(OCIO_config_file)
+   OCIO.SetCurrentConfig(config)
+   for cs in config.getColorSpaces():
+      available_color_spaces.append(cs.getName())
+   return available_color_spaces
