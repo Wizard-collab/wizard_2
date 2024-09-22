@@ -21,7 +21,12 @@ def __init__():
     pass
 
 def setup_render_directory(stage_name, export_name):
+    if os.environ['wizard_stage_name'] == 'rendering':
+        rendering_work_env_id = int(os.environ['wizard_work_env_id'])
+    else:
+        rendering_work_env_id = wizard_communicate.create_or_get_rendering_work_env(int(os.environ['wizard_work_env_id']))
     render_directory = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
+                                                                rendering_work_env_id,
                                                                 export_name)
     if render_directory:
         render_pass_list = wizard_tools.get_all_render_passes()

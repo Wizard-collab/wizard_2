@@ -15,6 +15,7 @@ from guerilla_render_wizard import wizard_reference
 from guerilla_render_wizard import guerilla_shader
 from guerilla_render_wizard.export import shading
 from guerilla_render_wizard.export import custom
+from guerilla_render_wizard.export import rendering
 from guerilla_render_wizard.export import lighting
 
 # Guerilla modules
@@ -29,14 +30,16 @@ def export():
         shading.main()
     elif stage_name == 'custom':
         custom.main()
+    elif stage_name == 'lighting':
+        lighting.main()
     else:
         logger.warning("Unplugged stage : {0}".format(stage_name))
 
 def setup_render(render_type):
     stage_name = os.environ['wizard_stage_name']
-    if stage_name == 'lighting':
+    if stage_name in ['lighting', 'shading', 'rendering']:
         frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
-        lighting.setup_render_directory(render_type, frame_range)
+        rendering.setup_render_directory(render_type, frame_range)
     else:
         logger.warning("Unplugged stage : {0}".format(stage_name))
 
@@ -58,6 +61,7 @@ def reference_all(references=None):
     import_cfx(references)
     import_fx(references)
     import_camera(references)
+    import_lighting(references)
 
 def update_all(references=None):
     if not references:
@@ -72,6 +76,7 @@ def update_all(references=None):
     update_cfx(references)
     update_fx(references)
     update_camera(references)
+    update_lighting(references)
 
 def import_modeling(references=None):
     if not references:
@@ -218,6 +223,20 @@ def update_camera(references=None):
     if 'camera' in references.keys():
         for reference in references['camera']:
             wizard_reference.update_camera(reference)
+
+def import_lighting(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'lighting' in references.keys():
+        for reference in references['lighting']:
+            wizard_reference.reference_lighting(reference)
+
+def update_lighting(references=None):
+    if not references:
+        references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    if 'lighting' in references.keys():
+        for reference in references['lighting']:
+            wizard_reference.update_lighting(reference)
 
 def set_frame_range(*args):
     frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))

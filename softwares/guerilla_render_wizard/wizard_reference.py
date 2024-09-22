@@ -84,6 +84,14 @@ def update_camera(reference_dic):
     update_file(reference_dic['namespace'], reference_dic['files'], 'CAMERA', 'camera', reference_dic['string_stage'])
     append_wizardTags_to_guerillaTags(reference_dic['namespace'])
 
+def reference_lighting(reference_dic):
+    import_file(reference_dic['namespace'], reference_dic['files'], 'LIGHTING', 'lighting', reference_dic['string_stage'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
+
+def update_lighting(reference_dic):
+    update_file(reference_dic['namespace'], reference_dic['files'], 'LIGHTING', 'lighting', reference_dic['string_stage'])
+    append_wizardTags_to_guerillaTags(reference_dic['namespace'])
+
 def import_file(namespace, files_list, parent_GRP_name, stage_name, referenced_string_asset):
     old_objects = wizard_tools.get_all_nodes()
     if namespace not in wizard_tools.get_all_nodes():

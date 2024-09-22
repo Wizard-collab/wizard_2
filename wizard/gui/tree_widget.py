@@ -89,6 +89,7 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic['stage']['cfx'] = QtGui.QIcon(ressources._cfx_icon_)
         self.icons_dic['stage']['fx'] = QtGui.QIcon(ressources._fx_icon_)
         self.icons_dic['stage']['lighting'] = QtGui.QIcon(ressources._lighting_icon_)
+        self.icons_dic['stage']['rendering'] = QtGui.QIcon(ressources._rendering_icon_)
         self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_)
         self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
         self.icons_dic['stage']['custom'] = QtGui.QIcon(ressources._custom_icon_)

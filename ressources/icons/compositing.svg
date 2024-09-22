@@ -7,7 +7,7 @@
    viewBox="0 0 132.29167 132.29167"
    version="1.1"
    id="svg5"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
    sodipodi:docname="compositing.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,14 +25,16 @@
      showgrid="false"
      units="px"
      inkscape:zoom="1.0766645"
-     inkscape:cx="315.32571"
-     inkscape:cy="283.7467"
-     inkscape:window-width="1920"
-     inkscape:window-height="1121"
-     inkscape:window-x="-7"
-     inkscape:window-y="-7"
+     inkscape:cx="314.86131"
+     inkscape:cy="283.2823"
+     inkscape:window-width="2880"
+     inkscape:window-height="1676"
+     inkscape:window-x="-12"
+     inkscape:window-y="-12"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer12" />
+     inkscape:current-layer="layer12"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1" />
   <defs
      id="defs2" />
   <g
@@ -40,11 +42,11 @@
      id="layer12"
      inkscape:label="compositing">
     <path
-       style="fill:#a7ec85;fill-opacity:1;stroke-width:0.264583"
+       style="fill:#70acd4;fill-opacity:1;stroke-width:0.264583"
        d="M 36.644793,73.683609 C 20.491982,61.55209 7.2760448,51.507849 7.2760448,51.363071 c 0,-0.14478 13.2529672,-10.204473 29.4510392,-22.354875 L 66.178123,6.9165544 95.663019,29.028389 c 16.216691,12.161512 29.484891,22.199033 29.484891,22.305607 0,0.172027 -58.902051,44.473517 -59.067653,44.426045 -0.03669,-0.01052 -13.282652,-9.944914 -29.435464,-22.076432 z"
        id="path94296" />
     <path
-       style="fill:#74b554;fill-opacity:1;stroke-width:0.264583"
+       style="fill:#4291c6;fill-opacity:1;stroke-width:0.264583"
        d="M 36.644793,103.27113 C 20.491982,91.130288 7.2420072,81.101554 7.200406,80.985061 7.1249778,80.773838 20.123907,70.908333 20.477641,70.908333 c 0.102456,0 10.420321,7.679616 22.928587,17.065815 L 66.14853,105.03996 88.899745,87.974148 c 12.513165,-9.386199 22.829825,-17.065815 22.925895,-17.065815 0.28471,0 13.32227,9.83275 13.32227,10.047478 0,0.184018 -58.639595,44.286109 -58.978515,44.356989 -0.08572,0.0179 -13.37179,-9.90082 -29.524602,-22.04167 z"
        id="path94253" />
   </g>

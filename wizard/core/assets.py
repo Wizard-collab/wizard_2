@@ -782,11 +782,8 @@ def request_export(work_env_id, raw_export_name, multiple=None, only_dir=None):
     elif file_name and only_dir:
         return dir_name
 
-def request_render(version_id, export_name, comment=''):
-    work_env_id = project.get_version_data(version_id, 'work_env_id')
-    if not work_env_id:
-        return
-    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
+def request_render(version_id, rendering_work_env_id, export_name, comment=''):
+    variant_id = project.get_work_env_data(rendering_work_env_id, 'variant_id')
     if not variant_id:
         return
     stage_id = project.get_variant_data(variant_id, 'stage_id')
@@ -1274,6 +1271,25 @@ def create_or_get_camera_work_env(work_env_id):
         software_id = project.get_software_data_by_name(software, 'id')
         camera_work_env_id = create_work_env(software_id, camera_default_variant_id)
     return camera_work_env_id
+
+def create_or_get_rendering_work_env(work_env_id):
+    work_env_row = project.get_work_env_data(work_env_id)
+    software = work_env_row['name']
+    stage_id = project.get_variant_data(work_env_row['variant_id'], 'stage_id')
+    asset_id = project.get_stage_data(stage_id, 'asset_id')
+    stages = project.get_asset_childs(asset_id, 'name')
+    if 'rendering' in stages:
+        rendering_stage_id = project.get_asset_child_by_name(asset_id, 'rendering', 'id')
+    else:
+        rendering_stage_id = create_stage('rendering', asset_id)
+    rendering_default_variant_id = project.get_stage_data(rendering_stage_id, 'default_variant_id')
+    work_envs = project.get_variant_work_envs_childs(rendering_default_variant_id, 'name')
+    if software in work_envs:
+        rendering_work_env_id = project.get_variant_work_env_child_by_name(rendering_default_variant_id, software, 'id')
+    else:
+        software_id = project.get_software_data_by_name(software, 'id')
+        rendering_work_env_id = create_work_env(software_id, rendering_default_variant_id)
+    return rendering_work_env_id
 
 def add_asset_tracking_event(stage_id, event_type, data, comment=''):
     if not project.add_asset_tracking_event(stage_id, event_type, data, comment):

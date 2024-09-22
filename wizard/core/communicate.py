@@ -101,6 +101,7 @@ class communicate_server(Thread):
             returned = get_export_format(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'request_render':
             returned = request_render(signal_dic['version_id'],
+                                        signal_dic['rendering_work_env_id'],
                                         signal_dic['export_name'],
                                         signal_dic['comment'])
         elif signal_dic['function'] == 'add_export_version':
@@ -125,6 +126,8 @@ class communicate_server(Thread):
                                                     signal_dic['namespaces_list'])
         elif signal_dic['function'] == 'create_or_get_camera_work_env':
             returned = create_or_get_camera_work_env(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'create_or_get_rendering_work_env':
+            returned = create_or_get_rendering_work_env(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'get_hooks_folder':
             returned = project.get_hooks_folder()
         elif signal_dic['function'] == 'get_plugins_folder':
@@ -205,9 +208,9 @@ def add_video(work_env_id, temp_dir, frange, version_id, focal_lengths_dic=None,
     gui_server.refresh_ui()
     return video_path
 
-def request_render(version_id, export_name, comment=''):
+def request_render(version_id, rendering_work_env_id, export_name, comment=''):
     # Just return a temporary file name using the 'assets' module
-    render_directory = assets.request_render(version_id, export_name, comment=comment)
+    render_directory = assets.request_render(version_id, rendering_work_env_id, export_name, comment=comment)
     gui_server.refresh_ui()
     return render_directory
 
@@ -254,6 +257,9 @@ def get_user_folder():
 
 def create_or_get_camera_work_env(work_env_id):
     return assets.create_or_get_camera_work_env(work_env_id)
+
+def create_or_get_rendering_work_env(work_env_id):
+    return assets.create_or_get_rendering_work_env(work_env_id)
 
 def get_local_path():
     return user.user().get_local_path()

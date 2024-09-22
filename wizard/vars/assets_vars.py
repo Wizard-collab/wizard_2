@@ -73,6 +73,7 @@ _fx_ = 'fx'
 _camera_ = 'camera'
 _lighting_ = 'lighting'
 _compositing_ = 'compositing'
+_rendering_ = 'rendering'
 
 _all_stages_ = [_modeling_,
 				_rigging_,
@@ -87,7 +88,8 @@ _all_stages_ = [_modeling_,
 				_fx_,
 				_camera_,
 				_lighting_,
-				_compositing_,
+				_rendering_,
+				_compositing_
 				]
 
 # Stage rules
@@ -95,7 +97,9 @@ _assets_stages_list_ = [_modeling_,
 							_rigging_,
 							_grooming_,
 							_texturing_,
-							_shading_]
+							_shading_,
+							_rendering_,
+							_compositing_]
 
 _sequences_stages_list_ = [_layout_, 
 								_animation_,
@@ -103,12 +107,14 @@ _sequences_stages_list_ = [_layout_,
 								_fx_,
 								_camera_,
 								_lighting_,
-								_compositing_,
+								_rendering_,
+								_compositing_
 								]
 
-_library_stages_list_ = _assets_stages_list_ + _sequences_stages_list_ + [_custom_stage_, _camera_rig_]
+_library_stages_list_ = list(set(_assets_stages_list_ + _sequences_stages_list_ + [_custom_stage_, _camera_rig_]))
 
 _camera_export_stages_ = [_animation_, _layout_]
+_rendering_export_stages_ = [_shading_, _lighting_]
 
 _stages_list_ = dict()
 _stages_list_[_assets_] = _assets_stages_list_
@@ -165,10 +171,15 @@ _ext_dic_[_camera_][_maya_] = ['abc', 'ma']
 _ext_dic_[_camera_][_blender_] = ['abc', 'blend']
 _ext_dic_[_camera_][_houdini_] = ['abc', 'hip']
 _ext_dic_[_lighting_] = dict()
-_ext_dic_[_lighting_][_maya_] = ['exr']
-_ext_dic_[_lighting_][_blender_] = ['exr']
-_ext_dic_[_lighting_][_guerilla_render_] = ['exr']
-_ext_dic_[_lighting_][_houdini_] = ['exr']
+_ext_dic_[_lighting_][_maya_] = ['ma']
+_ext_dic_[_lighting_][_blender_] = ['blend']
+_ext_dic_[_lighting_][_guerilla_render_] = ['gnode', 'gproject']
+_ext_dic_[_lighting_][_houdini_] = ['hip']
+_ext_dic_[_rendering_] = dict()
+_ext_dic_[_rendering_][_maya_] = ['exr']
+_ext_dic_[_rendering_][_blender_] = ['exr']
+_ext_dic_[_rendering_][_guerilla_render_] = ['exr']
+_ext_dic_[_rendering_][_houdini_] = ['exr']
 _ext_dic_[_compositing_] = dict()
 _ext_dic_[_compositing_][_blender_] = ['exr']
 _ext_dic_[_compositing_][_nuke_] = ['exr']
@@ -198,6 +209,7 @@ _stage_softwares_rules_dic_[_cfx_] = [_houdini_, _maya_, _blender_]
 _stage_softwares_rules_dic_[_fx_] = [_houdini_, _maya_, _blender_]
 _stage_softwares_rules_dic_[_camera_] = [_maya_, _houdini_, _blender_]
 _stage_softwares_rules_dic_[_lighting_] = [_guerilla_render_, _maya_, _houdini_, _blender_]
+_stage_softwares_rules_dic_[_rendering_] = [_guerilla_render_, _maya_, _houdini_, _blender_]
 _stage_softwares_rules_dic_[_compositing_] = [_nuke_, _blender_]
 _stage_softwares_rules_dic_[_custom_stage_] = [_maya_, _blender_, _houdini_, _guerilla_render_, _substance_painter_, _substance_designer_, _nuke_ ]
 _stage_softwares_rules_dic_[_camera_rig_] = [_maya_, _blender_, _houdini_]

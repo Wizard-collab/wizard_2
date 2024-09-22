@@ -1872,13 +1872,14 @@ def get_default_extension(stage, software_id):
         return
     return export_row[0]['extension']
 
-def get_default_extension_row(stage, software_id):
+def get_default_extension_row(stage, software_id, ignore_warning=False):
     export_row = db_utils.get_row_by_multiple_data('project', 
                                                         'extensions', 
                                                         ('stage', 'software_id'), 
                                                         (stage, software_id))
     if export_row is None or len(export_row) < 1:
-        logger.error("Extension row not found")
+        if not ignore_warning:
+            logger.error("Extension row not found")
         return
     return export_row[0]
 

@@ -40,14 +40,14 @@ def reference_all(references=None):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     reference_custom(references)
     reference_camera(references)
-    reference_lighting(references)
+    reference_rendering(references)
 
 def update_all(references=None):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     update_custom(references)
     update_camera(references)
-    update_lighting(references)
+    update_rendering(references)
 
 def reference_custom(references=None):
     if not references:
@@ -77,18 +77,18 @@ def update_camera(references=None):
         for reference in references['camera']:
             wizard_reference.update_camera(reference)
 
-def reference_lighting(references=None, local=True):
+def reference_rendering(references=None, local=True):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
-    if 'lighting' in references.keys():
-        for reference in references['lighting']:
+    if 'rendering' in references.keys():
+        for reference in references['rendering']:
             wizard_reference.reference_lighting(reference, local)
 
-def update_lighting(references=None, local=True):
+def update_rendering(references=None, local=True):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
-    if 'lighting' in references.keys():
-        for reference in references['lighting']:
+    if 'rendering' in references.keys():
+        for reference in references['rendering']:
             wizard_reference.update_lighting(reference, local)
 
 def set_frame_rate():

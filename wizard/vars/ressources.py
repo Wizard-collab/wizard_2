@@ -449,6 +449,7 @@ _animation_icon_ = path_utils.join(_icons_path_, 'animation.svg')
 _cfx_icon_ = path_utils.join(_icons_path_, 'cfx.svg')
 _fx_icon_ = path_utils.join(_icons_path_, 'fx.svg')
 _lighting_icon_ = path_utils.join(_icons_path_, 'lighting.svg')
+_rendering_icon_ = path_utils.join(_icons_path_, 'rendering.svg')
 _compositing_icon_ = path_utils.join(_icons_path_, 'compositing.svg')
 _camera_icon_ = path_utils.join(_icons_path_, 'camera.svg')
 _available_icons_list_.append(_layout_icon_)
@@ -475,6 +476,7 @@ _stage_icons_dic_['animation'] = _animation_icon_
 _stage_icons_dic_['cfx'] = _cfx_icon_
 _stage_icons_dic_['fx'] = _fx_icon_
 _stage_icons_dic_['lighting'] = _lighting_icon_
+_stage_icons_dic_['rendering'] = _rendering_icon_
 _stage_icons_dic_['compositing'] = _compositing_icon_
 _stage_icons_dic_['camera'] = _camera_icon_
 _stage_icons_dic_['custom'] = _custom_icon_
@@ -530,6 +532,7 @@ _stages_colors_['cfx'] = '#865439'
 _stages_colors_['fx'] = '#4b8673'
 _stages_colors_['camera'] = '#94b49f'
 _stages_colors_['lighting'] = '#63f191'
+_stages_colors_['rendering'] = '#63f191'
 _stages_colors_['compositing'] = '#676fa3'
 
 _whatsnew_yaml_ = path_utils.join(_ressources_path_, 'whatsnew.yaml')

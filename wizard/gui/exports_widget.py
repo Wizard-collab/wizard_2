@@ -52,6 +52,7 @@ class exports_widget(QtWidgets.QWidget):
         self.icons_dic['cfx'] = QtGui.QIcon(ressources._cfx_icon_)
         self.icons_dic['fx'] = QtGui.QIcon(ressources._fx_icon_)
         self.icons_dic['lighting'] = QtGui.QIcon(ressources._lighting_icon_)
+        self.icons_dic['rendering'] = QtGui.QIcon(ressources._rendering_icon_)
         self.icons_dic['camera'] = QtGui.QIcon(ressources._camera_icon_)
         self.icons_dic['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
         self.icons_dic['custom'] = QtGui.QIcon(ressources._custom_icon_)

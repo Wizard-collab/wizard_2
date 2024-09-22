@@ -29,11 +29,11 @@ def reference_camera(reference_dic):
 def update_camera(reference_dic):
     update_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
 
-def reference_lighting(reference_dic, local):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_stage'], local)
+def reference_rendering(reference_dic, local):
+    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'rendering', reference_dic['string_stage'], local)
 
-def update_lighting(reference_dic, local):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'lighting', reference_dic['string_stage'], local)
+def update_rendering(reference_dic, local):
+    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'rendering', reference_dic['string_stage'], local)
 
 def import_from_extension(namespace, files_list, stage_name, referenced_string_asset, local=True):
     old_nodes = wizard_tools.get_all_nodes()

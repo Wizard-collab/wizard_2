@@ -75,11 +75,12 @@ def get_export_format(work_env_id):
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return file_path
 
-def request_render(version_id, export_name, comment=''):
+def request_render(version_id, rendering_work_env_id, export_name, comment=''):
     # Get a temporary export dir and file from wizard
     signal_dic=dict()
     signal_dic['function'] = 'request_render'
     signal_dic['version_id'] = version_id
+    signal_dic['rendering_work_env_id'] = rendering_work_env_id
     signal_dic['export_name'] = export_name
     signal_dic['comment'] = comment
     file_path = socket_utils.send_signal(('localhost', get_port()), signal_dic)
@@ -151,6 +152,13 @@ def modify_reference_LOD(work_env_id, LOD, namespaces_list):
 def create_or_get_camera_work_env(work_env_id):
     signal_dic=dict()
     signal_dic['function'] = 'create_or_get_camera_work_env'
+    signal_dic['work_env_id'] = work_env_id
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
+
+def create_or_get_rendering_work_env(work_env_id):
+    signal_dic=dict()
+    signal_dic['function'] = 'create_or_get_rendering_work_env'
     signal_dic['work_env_id'] = work_env_id
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned

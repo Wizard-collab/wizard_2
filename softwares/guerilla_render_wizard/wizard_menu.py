@@ -178,19 +178,19 @@ class menu():
     cmd = save_increment('Save', 'icons/save_increment.png')
     cmd.install('Wizard')
     
-    if os.environ['wizard_stage_name'] not in ['lighting']:
+    if os.environ['wizard_stage_name'] not in ['rendering']:
         cmd = export_data('Export data', 'icons/export.png')
         cmd.install('Wizard')
 
-    if os.environ['wizard_stage_name'] in ['lighting']:
+
+    if os.environ['wizard_stage_name'] in ['shading', 'lighting', 'rendering']:
         command.addseparator ('Wizard')
         cmd = setup_render_FML('Setup render FML', 'icons/export.png')
-        cmd.install('Wizard')
+        cmd.install('Wizard', 'Rendering')
         cmd = setup_render_LD('Setup render LD', 'icons/export.png')
-        cmd.install('Wizard')
+        cmd.install('Wizard', 'Rendering')
         cmd = setup_render_HD('Setup render HD', 'icons/export.png')
-        cmd.install('Wizard')
-        command.addseparator ('Wizard')
+        cmd.install('Wizard', 'Rendering')
 
     command.addseparator ('Wizard')
     cmd = import_and_update_all('Import and update all', 'icons/all.png')
@@ -217,6 +217,8 @@ class menu():
     cmd.install('Wizard', ' Import')
     cmd = import_camera('Import camera', 'icons/camera.png')
     cmd.install('Wizard', ' Import')
+    cmd = import_camera('Import lighting', 'icons/lighting.png')
+    cmd.install('Wizard', ' Import')
     cmd = update_all('Update all', 'icons/all.png')
     cmd.install('Wizard', ' Update')
     cmd = update_modeling('Update modeling', 'icons/modeling.png')
@@ -238,6 +240,8 @@ class menu():
     cmd = update_fx('Update fx', 'icons/fx.png')
     cmd.install('Wizard', ' Update')
     cmd = update_camera('Update camera', 'icons/camera.png')
+    cmd.install('Wizard', ' Update')
+    cmd = update_camera('Update lighting', 'icons/lighting.png')
     cmd.install('Wizard', ' Update')
     command.addseparator ('Wizard')
     cmd = set_image_format('Set image size', 'icons/set_image_size.png')
