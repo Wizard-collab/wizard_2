@@ -70,7 +70,7 @@ class project_general_preferences_widget(QtWidgets.QWidget):
     def apply_OCIO(self):
         OCIO_config = self.OCIO_lineEdit.text()
         project.set_OCIO(OCIO_config)
-        environment.set_OCIO()
+        environment.set_OCIO(OCIO_config)
 
     def apply_frame_rate(self):
         frame_rate = self.frame_rate_spinBox.value()
