@@ -1,6 +1,15 @@
 'last':
   update_list:
   - !!python/tuple
+    - new
+    - Added OCIO in project preferences
+  - !!python/tuple
+    - new
+    - Added render to video tool
+  time: 1727078969.195829 
+'4.0.0.396':
+  update_list:
+  - !!python/tuple
     - update
     - References are no longer deleted when you remove an export version
   - !!python/tuple

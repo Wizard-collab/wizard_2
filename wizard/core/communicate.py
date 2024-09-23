@@ -101,7 +101,7 @@ class communicate_server(Thread):
             returned = get_export_format(signal_dic['work_env_id'])
         elif signal_dic['function'] == 'request_render':
             returned = request_render(signal_dic['version_id'],
-                                        signal_dic['rendering_work_env_id'],
+                                        signal_dic['work_env_id'],
                                         signal_dic['export_name'],
                                         signal_dic['comment'])
         elif signal_dic['function'] == 'add_export_version':
@@ -209,9 +209,9 @@ def add_video(work_env_id, temp_dir, frange, version_id, focal_lengths_dic=None,
     gui_server.refresh_ui()
     return video_path
 
-def request_render(version_id, rendering_work_env_id, export_name, comment=''):
+def request_render(version_id, work_env_id, export_name, comment=''):
     # Just return a temporary file name using the 'assets' module
-    render_directory = assets.request_render(version_id, rendering_work_env_id, export_name, comment=comment)
+    render_directory = assets.request_render(version_id, work_env_id, export_name, comment=comment)
     gui_server.refresh_ui()
     return render_directory
 

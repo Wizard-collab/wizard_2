@@ -198,7 +198,7 @@ class video_player(QtWidgets.QWidget):
         self.seek(frame)
 
     def toggle_play_pause(self):
-        if self.media_player.playbackState() == QtMultimedia.QMediaPlayer.PlaybackState.PlayingState:
+        if self.playing == True:
             self.media_player.pause()
             self.ensure_frame()
             self.playing = False

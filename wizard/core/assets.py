@@ -782,8 +782,8 @@ def request_export(work_env_id, raw_export_name, multiple=None, only_dir=None):
     elif file_name and only_dir:
         return dir_name
 
-def request_render(version_id, rendering_work_env_id, export_name, comment=''):
-    variant_id = project.get_work_env_data(rendering_work_env_id, 'variant_id')
+def request_render(version_id, work_env_id, export_name, comment=''):
+    variant_id = project.get_work_env_data(work_env_id, 'variant_id')
     if not variant_id:
         return
     stage_id = project.get_variant_data(variant_id, 'stage_id')

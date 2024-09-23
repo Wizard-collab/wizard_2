@@ -23,7 +23,10 @@ def export(stage_name, export_name, exported_string_asset, out_node, frange=[0,0
         else:
             work_env_id = int(os.environ['wizard_work_env_id'])
         export_file = wizard_communicate.request_export(work_env_id, export_name)
-        export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']), export_name)
+        export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
+                                                        work_env_id,
+                                                        export_name,
+                                                        comment=comment)
         export_file = os.path.join(export_dir, os.path.basename(export_file))
         export_by_extension(export_file, frange, out_node, parent, prepare_only=prepare_only)
         if prepare_only:

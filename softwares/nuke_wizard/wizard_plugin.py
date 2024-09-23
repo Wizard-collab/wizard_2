@@ -82,14 +82,14 @@ def reference_rendering(references=None, local=True):
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'rendering' in references.keys():
         for reference in references['rendering']:
-            wizard_reference.reference_lighting(reference, local)
+            wizard_reference.reference_rendering(reference, local)
 
 def update_rendering(references=None, local=True):
     if not references:
         references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
     if 'rendering' in references.keys():
         for reference in references['rendering']:
-            wizard_reference.update_lighting(reference, local)
+            wizard_reference.update_rendering(reference, local)
 
 def set_frame_rate():
     frame_rate = wizard_communicate.get_frame_rate()

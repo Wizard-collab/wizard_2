@@ -32,14 +32,6 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, comm
                                                             comment=comment)
         trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
 
-def prepare_render(stage_name, export_name):
-    if trigger_sanity_hook(stage_name):
-        trigger_before_export_hook(stage_name)
-        render_dir = wizard_communicate.request_render(export_name,
-                                                int(os.environ['wizard_version_id']))
-        trigger_after_export_hook(stage_name, render_dir)
-        return render_dir
-
 def export_custom():
     export_dir = None
     export_name = 'main'

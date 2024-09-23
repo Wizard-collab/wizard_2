@@ -14,7 +14,7 @@ def hip_command(export_file):
     Be carreful on what you are modifying'''
     hou.hipFile.save(file_name=export_file)
 
-def abc_command(wizard_abc_output, frange, export_file):
+def abc_command(wizard_abc_output, frange, export_file, prepare_only=False):
     ''' This function is used to store 
     a default alembic export command.
     You can modify it from here
@@ -28,9 +28,11 @@ def abc_command(wizard_abc_output, frange, export_file):
     wizard_abc_output.parm("shutter1").set(-0.2)
     wizard_abc_output.parm("shutter2").set(0.2)
     wizard_abc_output.parm("filename").set(export_file)
+    if prepare_only:
+        return
     wizard_abc_output.parm("execute").pressButton()
 
-def vdb_command(wizard_vdb_output, frange, export_dir):
+def vdb_command(wizard_vdb_output, frange, export_dir, prepare_only=False):
     ''' This function is used to store 
     a default vdb export command.
     You can modify it from here
@@ -43,4 +45,6 @@ def vdb_command(wizard_vdb_output, frange, export_dir):
     wizard_vdb_output.parm("f2").setExpression('$FEND')
     wizard_vdb_output.parm('lpostframe').set("python")
     wizard_vdb_output.parm('postframe').set(wizard_tools.by_frame_progress_script())
+    if prepare_only:
+        return
     wizard_vdb_output.parm("execute").pressButton()

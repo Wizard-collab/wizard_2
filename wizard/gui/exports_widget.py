@@ -482,7 +482,7 @@ class exports_widget(QtWidgets.QWidget):
         comment_action = None
         if len(selection)>=1:
             archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
-        if len(selection) == 1 and project.get_stage_data(self.stage_id, 'name') == assets_vars._rendering_ and selection[0].type == 'export_version':
+        if len(selection) == 1 and project.get_stage_data(self.stage_id, 'name') in [assets_vars._rendering_, assets_vars._compositing_] and selection[0].type == 'export_version':
             create_video_action = menu.addAction(QtGui.QIcon(ressources._tool_video_), 'Create video from files')
         if len(selection)==1:
             launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch related work version')
