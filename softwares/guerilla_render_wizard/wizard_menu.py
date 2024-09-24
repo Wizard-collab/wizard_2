@@ -85,6 +85,11 @@ class menu():
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.import_camera()
 
+    class import_lighting(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.import_lighting()
+
     class update_all(command):
         @staticmethod
         def action(luaObj, window, x, y, suffix):
@@ -139,6 +144,11 @@ class menu():
         @staticmethod
         def action(luaObj, window, x, y, suffix):
             wizard_plugin.update_camera()
+
+    class update_lighting(command):
+        @staticmethod
+        def action(luaObj, window, x, y, suffix):
+            wizard_plugin.update_lighting()
 
     class set_image_format(command):
         @staticmethod
@@ -217,7 +227,7 @@ class menu():
     cmd.install('Wizard', ' Import')
     cmd = import_camera('Import camera', 'icons/camera.png')
     cmd.install('Wizard', ' Import')
-    cmd = import_camera('Import lighting', 'icons/lighting.png')
+    cmd = import_lighting('Import lighting', 'icons/lighting.png')
     cmd.install('Wizard', ' Import')
     cmd = update_all('Update all', 'icons/all.png')
     cmd.install('Wizard', ' Update')
@@ -241,7 +251,7 @@ class menu():
     cmd.install('Wizard', ' Update')
     cmd = update_camera('Update camera', 'icons/camera.png')
     cmd.install('Wizard', ' Update')
-    cmd = update_camera('Update lighting', 'icons/lighting.png')
+    cmd = update_lighting('Update lighting', 'icons/lighting.png')
     cmd.install('Wizard', ' Update')
     command.addseparator ('Wizard')
     cmd = set_image_format('Set image size', 'icons/set_image_size.png')

@@ -196,6 +196,10 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
         if 'NUKE_PATH' in env.keys():
             env['NUKE_PATH'] += os.pathsep + softwares_vars._plugins_path_[software_row['name']]
 
+    if software_row['name'] == softwares_vars._maya_:
+        if 'OCIO' in env.keys():
+            del env['OCIO']
+
     # Getting the project software additionnal environment
     additionnal_script_paths = []
     if software_row['additionnal_scripts']:
