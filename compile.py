@@ -37,7 +37,10 @@ class compile():
 			else:
 				with open(compil_data_file, 'r') as f:
 					compil_data_dic = yaml.load(f, Loader=yaml.Loader)
-			build_no = compil_data_dic['builds'] + 1
+			
+			build_no = compil_data_dic['builds']
+			if self.release_type != 'BUILD':
+				build_no += 1
 			MAJOR = compil_data_dic['MAJOR']
 			MINOR = compil_data_dic['MINOR']
 			PATCH = compil_data_dic['PATCH']
@@ -51,6 +54,8 @@ class compile():
 			elif self.release_type == 'PATCH':
 				PATCH += 1
 			elif self.release_type == 'REBUILD':
+				pass
+			elif self.release_type == 'BUILD':
 				pass
 			else:
 				logger.error(f"{self.release_type} is not a valid release type")
