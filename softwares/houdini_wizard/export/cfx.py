@@ -44,7 +44,6 @@ def invoke_settings_widget(prepare_only=False):
 def export_cfx(rigging_reference, frange, comment='', prepare_only=False):
     rig_nspace = rigging_reference['namespace']
     asset_name = rigging_reference['asset_name']
-    variant_name = rigging_reference['variant_name']
     exported_string_asset = rigging_reference['string_stage']
     count = rigging_reference['count']
 
@@ -55,18 +54,14 @@ def export_cfx(rigging_reference, frange, comment='', prepare_only=False):
     for out_node_name in out_nodes_dic.keys():
         logger.info(f"Exporting {rig_nspace} | {out_node_name}")
         wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
-        export_name = buid_export_name(asset_name, variant_name, count, out_nodes_dic[out_node_name])
+        export_name = buid_export_name(asset_name, count, out_nodes_dic[out_node_name])
         wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name, exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace, comment=comment, prepare_only=prepare_only)
 
-def buid_export_name(asset_name, variant_name, count, additionnal_name):
-    if variant_name == 'main':
-        export_name = asset_name
-    else:
-        export_name = "{}_{}".format(asset_name, variant_name)
+def buid_export_name(asset_name, count, var):
+    export_name = asset_name
     if count != '0':
         export_name += "_{}".format(count)
-    if additionnal_name != 'main':
-        export_name += "_{}".format(additionnal_name)
+    export_name += f"_{var}"
     return export_name
 
 def get_rig_nspaces():

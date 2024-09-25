@@ -228,11 +228,13 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
                 python_path_list.remove(path)
         env['PYTHONPATH'] = (';').join(python_path_list)
     
-    #if software_row['name'] == 'blender':
-    #    import PyQt6
-    #    PyQt6_path = path_utils.dirname(path_utils.dirname(PyQt6.__file__))
-    #    logger.info(PyQt6_path)
-    #    env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+PyQt6_path
+    '''
+    if software_row['name'] == 'blender':
+        import PyQt6
+        PyQt6_path = path_utils.dirname(path_utils.dirname(PyQt6.__file__))
+        logger.info(PyQt6_path)
+        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+PyQt6_path
+    '''
 
     # Clean QT from env
     if 'QT_PLUGIN_PATH' in env.keys():

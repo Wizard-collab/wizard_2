@@ -6,7 +6,14 @@
 import os
 import logging
 import json
+import sys
 logger = logging.getLogger('batch_startup')
+
+pythonpath_env = os.getenv('PYTHONPATH')
+if pythonpath_env:
+    for path in pythonpath_env.split(os.pathsep):
+        if path not in sys.path:
+            sys.path.append(path)
 
 # Wizard modules
 from blender_wizard import wizard_plugin

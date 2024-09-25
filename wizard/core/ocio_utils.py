@@ -85,9 +85,12 @@ def exr_to_rgba_array(file_path):
 
 def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs, OCIO_config_file):
    try:
-      config = OCIO.Config.CreateFromFile(OCIO_config_file)
+      OCIO_config_file = project.get_OCIO()
+      if OCIO_config_file:
+         config = OCIO.Config.CreateFromFile(OCIO_config_file)
+      else:
+         config = OCIO.GetCurrentConfig()
       OCIO.SetCurrentConfig(config)
-      config = OCIO.GetCurrentConfig()
       processor = config.getProcessor(OCIO.ColorSpaceTransform(
                src=ics,
                dst=ocs
@@ -125,9 +128,10 @@ def exr_to_png(files, output_dir, ics=None, ocs=None):
 def get_OCIO_available_color_spaces():
    available_color_spaces = []
    OCIO_config_file = project.get_OCIO()
-   if not OCIO_config_file:
-      return available_color_spaces
-   config = OCIO.Config.CreateFromFile(OCIO_config_file)
+   if OCIO_config_file:
+      config = OCIO.Config.CreateFromFile(OCIO_config_file)
+   else:
+      config = OCIO.GetCurrentConfig()
    OCIO.SetCurrentConfig(config)
    for cs in config.getColorSpaces():
       available_color_spaces.append(cs.getName())
