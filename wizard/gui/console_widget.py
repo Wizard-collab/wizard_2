@@ -22,7 +22,11 @@ from wizard.gui import submit_log_widget
 logger = logging.getLogger(__name__)
 
 known_errors = ['libpng warning: iCCP: known incorrect sRGB profile',
-                'The requested filter buffer is too big, ignoring']
+                'The requested filter buffer is too big, ignoring',
+                'QPainter::drawRects: Painter not active',
+                'QPainter::setBrush: Painter not active',
+                'QPainter::setPen: Painter not active',
+                'QPainter::begin: Paint device returned engine == 0, type: 2']
 
 class custom_stdout(QtCore.QObject):
 
