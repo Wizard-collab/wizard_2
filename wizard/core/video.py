@@ -46,8 +46,8 @@ from wizard.core import ocio_utils
 
 logger = logging.getLogger(__name__)
 
-def add_video(variant_id, images_directory, frange, string_asset, focal_lengths_dic=None, comment='', analyse_comment=None):
-    temp_video_file, to_thumbnail = merge_video(images_directory, frange, string_asset, focal_lengths_dic)
+def add_video(variant_id, images_directory, frange, string_asset, focal_lengths_dic=None, comment='', analyse_comment=None, frame_rate=None):
+    temp_video_file, to_thumbnail = merge_video(images_directory, frange, string_asset, focal_lengths_dic, frame_rate)
     if not temp_video_file:
         return
     video_id = assets.add_video(variant_id, comment=comment, analyse_comment=analyse_comment)
@@ -67,7 +67,7 @@ def request_video(variant_id):
     logger.info(f"Temporary directory created : {temp_video_dir}, if something goes wrong in the video process please go there to find your temporary video file")
     return temp_video_dir
 
-def merge_video(images_directory, frange, string_asset, focal_lengths_dic=None):
+def merge_video(images_directory, frange, string_asset, focal_lengths_dic=None, frame_rate=None):
     temp_video_file = path_utils.join(images_directory, "temp.mp4")
 
     files_list = []
@@ -81,7 +81,8 @@ def merge_video(images_directory, frange, string_asset, focal_lengths_dic=None):
         logger.warning(f"{images_directory} is empty, can't create video.")
         return
     
-    frame_rate = project.get_frame_rate()
+    if not frame_rate:
+        frame_rate = project.get_frame_rate()
     img_array, size = merge_with_overlay(files_list, frange, frame_rate, string_asset, focal_lengths_dic)
 
     out = cv2.VideoWriter(temp_video_file,cv2.VideoWriter_fourcc(*"X264"), frame_rate, size)
@@ -163,7 +164,7 @@ def add_overlay(file, string_asset, frame_number, frange, frame_rate, focal_len)
     out = out.convert('RGB')
     return out
 
-def video_from_render(export_version_id, ics, ocs, comment=''):
+def video_from_render(export_version_id, ics, ocs, frame_rate, comment=''):
 
     directory = assets.get_export_version_path(export_version_id)
     export_id = project.get_export_version_data(export_version_id, 'export_id')
@@ -193,7 +194,7 @@ def video_from_render(export_version_id, ics, ocs, comment=''):
 
             frame_range = [find_frame_number(files_dic[extension][0]), len(files_dic[extension])]
 
-            add_video(variant_id, temp_dir, frame_range, string_asset, comment=comment)
+            add_video(variant_id, temp_dir, frame_range, string_asset, comment=comment, frame_rate=frame_rate)
             break
 
 def find_frame_number(filename):

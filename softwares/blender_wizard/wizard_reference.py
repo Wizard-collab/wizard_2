@@ -8,7 +8,6 @@ import bpy
 # Wizard modules
 import wizard_communicate
 import wizard_hooks
-from blender_wizard import redshift_shader
 from blender_wizard import cycles_shader
 from blender_wizard import wizard_tools
 
@@ -21,10 +20,7 @@ logger = logging.getLogger(__name__)
 
 def reference_texturing(reference_dic):
     old_objects = wizard_tools.get_all_nodes()
-    if bpy.context.scene.render.engine == 'REDSHIFT':
-        redshift_shader.plug_textures(reference_dic['namespace'], reference_dic['files'])
-    elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':
-        cycles_shader.plug_textures(reference_dic['namespace'], reference_dic['files'])
+    cycles_shader.plug_textures(reference_dic['namespace'], reference_dic['files'])
     trigger_after_reference_hook('texturing',
                                 reference_dic['files'],
                                 reference_dic['namespace'],
@@ -33,10 +29,7 @@ def reference_texturing(reference_dic):
 
 def update_texturing(reference_dic):
     old_objects = wizard_tools.get_all_nodes()
-    if bpy.context.scene.render.engine == 'REDSHIFT':
-        redshift_shader.plug_textures(reference_dic['namespace'], reference_dic['files'], update=True)
-    elif bpy.context.scene.render.engine == 'BLENDER_EEVEE' or bpy.context.scene.render.engine == 'CYCLES':
-        cycles_shader.plug_textures(reference_dic['namespace'], reference_dic['files'], update=True)
+    cycles_shader.plug_textures(reference_dic['namespace'], reference_dic['files'], update=True)
     trigger_after_reference_hook('texturing',
                                 reference_dic['files'],
                                 reference_dic['namespace'],

@@ -36,6 +36,39 @@ class export(bpy.types.Operator):
         wizard_plugin.export()
         return {'FINISHED'}
 
+class setup_LD(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.setup_ld"
+    bl_label = "Setup LD"
+    bl_description = "Setup the render settings for render in Low definition"
+    
+    def execute(self, context):
+        wizard_plugin.setup_render('LD')
+        return {'FINISHED'}
+
+class setup_FML(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.setup_fml"
+    bl_label = "Setup FML"
+    bl_description = "Setup the render settings for render first, middle and last frame"
+    
+    def execute(self, context):
+        wizard_plugin.setup_render('FML')
+        return {'FINISHED'}
+
+class setup_HD(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.setup_hd"
+    bl_label = "Setup HD"
+    bl_description = "Setup the render settings for render in high definition"
+    
+    def execute(self, context):
+        wizard_plugin.setup_render('HD')
+        return {'FINISHED'}
+
 class export_camera(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
@@ -361,16 +394,29 @@ class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
         layout.operator("wizard.update_custom", icon_value=wizard_icons["custom"].icon_id)
         layout.operator("wizard.update_camrig", icon_value=wizard_icons["camrig"].icon_id)
 
+class TOPBAR_MT_wizard_render_submenu(bpy.types.Menu):
+    bl_label = "Render"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("wizard.setup_ld", icon_value=wizard_icons["rendering"].icon_id)
+        layout.operator("wizard.setup_fml", icon_value=wizard_icons["rendering"].icon_id)
+        layout.operator("wizard.setup_hd", icon_value=wizard_icons["rendering"].icon_id)
+
 class TOPBAR_MT_wizard_menu(bpy.types.Menu):
     bl_label = "Wizard"
 
     def draw(self, context):
         layout = self.layout
         layout.operator("wizard.save_increment", icon_value=wizard_icons["save_increment"].icon_id)
-        
+        layout.operator("wizard.export", icon_value=wizard_icons["export"].icon_id)
+
         layout.separator()
 
-        layout.operator("wizard.export", icon_value=wizard_icons["export"].icon_id)
+        if os.environ['wizard_stage_name'] in ['shading', 'lighting', 'rendering', 'compositing']:
+            layout.menu("TOPBAR_MT_wizard_render_submenu", icon_value=wizard_icons["rendering"].icon_id)
+            layout.separator()
+
         stage_name = os.environ['wizard_stage_name']
         camera_export_stage_names = ['animation', 'layout']
         if stage_name in camera_export_stage_names:
@@ -395,6 +441,9 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
 classes = (save_increment,
                 export,
+                setup_LD,
+                setup_FML,
+                setup_HD,
                 export_camera,
                 import_and_update_all,
                 import_modeling,
@@ -424,6 +473,7 @@ classes = (save_increment,
                 create_video,
                 TOPBAR_MT_wizard_import_submenu,
                 TOPBAR_MT_wizard_update_submenu,
+                TOPBAR_MT_wizard_render_submenu,
                 TOPBAR_MT_wizard_menu)
 
 def register():
@@ -450,6 +500,7 @@ def register():
     wizard_icons.load("custom", 'icons/custom.png', 'IMAGE')
     wizard_icons.load("camrig", 'icons/camera_rig.png', 'IMAGE')
     wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
+    wizard_icons.load("rendering", 'icons/rendering.png', 'IMAGE')
     wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
     wizard_icons.load("set_frame_rate", 'icons/set_frame_rate.png', 'IMAGE')
     wizard_icons.load("set_frame_range", 'icons/set_frame_range.png', 'IMAGE')

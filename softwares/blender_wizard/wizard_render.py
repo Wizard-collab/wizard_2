@@ -8,14 +8,11 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-# Guerilla modules
-import guerilla
-from guerilla import Document, pynode, Modifier
+# Blender modules
+import bpy
 
 # Wizard modules
 import wizard_communicate
-from guerilla_render_wizard import wizard_tools
-from guerilla_render_wizard import wizard_export
 
 def __init__():
     pass
@@ -28,34 +25,29 @@ def setup_render_directory(stage_name, export_name):
     render_directory = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
                                                                 rendering_work_env_id,
                                                                 export_name)
+
+
     if render_directory:
-        render_pass_list = wizard_tools.get_all_render_passes()
-        for render_pass in render_pass_list:
-            old_file_pattern = render_pass.FileName.get()
-            if old_file_pattern != '':
-                file_pattern = os.path.basename(old_file_pattern)
-            else:
-                file_pattern = "$L_$n_$o.$05f.$x"
-            render_pass.FileName.set(os.path.join(render_directory, file_pattern))
+        extension = wizard_communicate.get_export_format(rendering_work_env_id)
+        file_name = f"{os.environ['wizard_asset_name']}_{os.environ['wizard_stage_name']}"
+        file_path = f"{render_directory}/{file_name}.####.{extension}"
+        bpy.context.scene.render.filepath = file_path
+        bpy.context.scene.render.image_settings.file_format = "OPEN_EXR"
         return render_directory
 
 def setup_frame_range(render_type, frame_range=None):
     if not frame_range:
         frame_range = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
-    if len(frame_range) == 2:
-        frame_range.append(frame_range[1])
-        frame_range.insert(0, frame_range[0])
     if render_type == 'FML':
-        frames = "{0},{1},{2}".format(frame_range[1], int((frame_range[1]+frame_range[2])/2), frame_range[2])
+        frame_step = int((frame_range[2] - frame_range[1])/2)
     elif render_type == 'HD' or render_type == 'LD':
-        frames = "{0}-{1}".format(frame_range[1], frame_range[2])
+        frame_step = 1
     else:
         logger.info("Unkown render type : {0}".format(render_type))
-        frames = None
-    if frames is not None:
-        with Modifier() as mod: 
-            preferences_node = wizard_tools.get_node_from_name('Preferences')
-            preferences_node.RenderRange.set(frames)
+        frame_step = 1
+    bpy.context.scene.frame_start = frame_range[1]
+    bpy.context.scene.frame_end = frame_range[2]
+    bpy.context.scene.frame_step = frame_step
 
 def setup_image_format(render_type):
     image_format = wizard_communicate.get_image_format()
@@ -68,11 +60,8 @@ def setup_image_format(render_type):
         image_format = None
 
     if image_format:
-        width=float(image_format[0])
-        height=float(image_format[1])
-        Document().ProjectWidth.set(width)
-        Document().ProjectHeight.set(height)
-        Document().ProjectAspectRatio.set(1)
+        bpy.context.scene.render.resolution_x = image_format[0]
+        bpy.context.scene.render.resolution_y = image_format[1]
 
 def setup_FML():
     setup_frame_range('FML')

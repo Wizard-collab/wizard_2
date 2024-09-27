@@ -12,6 +12,7 @@ from wizard.gui import gui_utils
 # Wizard modules
 from wizard.core import ocio_utils
 from wizard.core import video
+from wizard.core import project
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 
@@ -46,11 +47,14 @@ class create_video_from_render_widget(QtWidgets.QDialog):
             self.input_color_space_combobox.setCurrentText('ACES - ACEScg')
         if 'out_srgb' in available_color_spaces:
             self.output_color_space_combobox.setCurrentText('out_srgb')
+        frame_rate = project.get_frame_rate()
+        self.frame_rate_spinBox.setValue(frame_rate)
 
     def create_video(self):
         subtasks_library.create_video_from_render(self.export_version_id,
                                 self.input_color_space_combobox.currentText(),
                                 self.output_color_space_combobox.currentText(),
+                                self.frame_rate_spinBox.value(),
                                 comment=self.comment_textEdit.toPlainText())
         self.accept()
 
@@ -68,6 +72,10 @@ class create_video_from_render_widget(QtWidgets.QDialog):
 
         self.output_color_space_combobox = gui_utils.QComboBox()
         self.form_layout.addRow(QtWidgets.QLabel('Output color space'), self.output_color_space_combobox)
+
+        self.frame_rate_spinBox = QtWidgets.QSpinBox()
+        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.form_layout.addRow(self.frame_rate_spinBox)
 
         self.comment_textEdit = QtWidgets.QTextEdit()
         self.comment_textEdit.setPlaceholderText('Your comment here')
