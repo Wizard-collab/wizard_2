@@ -124,7 +124,7 @@ class video_browser_widget(QtWidgets.QWidget):
             return
         videos = []
         for item in items:
-            videos.append(item.video_row['id'])
+            videos.append((item.video_row['file_path'], item.video_row['id']))
         if not add:
             self.create_playlist_and_add_videos.emit(videos)
         else:
@@ -136,7 +136,6 @@ class video_browser_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setObjectName('dark_widget')
         self.setMinimumWidth(380)
-        self.setMaximumWidth(380)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setContentsMargins(0,0,0,0)
         self.main_layout.setSpacing(0)
@@ -191,7 +190,10 @@ class video_browser_widget(QtWidgets.QWidget):
                 self.variants_ids[video_row['variant_id']]['asset_name'] = variants[video_row['variant_id']]['string']
                 self.variants_ids[video_row['variant_id']]['variant_row'] = variants[video_row['variant_id']]
                 self.variants_ids[video_row['variant_id']]['stage_row'] = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
-                
+                comb_row = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
+                comb_row['variant'] = variants[video_row['variant_id']]['name']
+                comb_row['variant_id'] = variants[video_row['variant_id']]['id']
+                self.comb_rows_for_search.append(comb_row)
                 video_item = custom_video_icon_item(video_row,
                                                 self.variants_ids[video_row['variant_id']]['asset_name'],
                                                 self.variants_ids[video_row['variant_id']]['stage_row'],
@@ -201,11 +203,6 @@ class video_browser_widget(QtWidgets.QWidget):
                 if int(video_row['name']) > int(self.variants_ids[video_row['variant_id']]['last_video']['name']):
                     self.variants_ids[video_row['variant_id']]['last_video'] = video_row
                     self.variants_ids[video_row['variant_id']]['video_item'].update_row(video_row)
-
-            comb_row = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
-            comb_row['variant'] = variants[video_row['variant_id']]['name']
-            comb_row['variant_id'] = variants[video_row['variant_id']]['id']
-            self.comb_rows_for_search.append(comb_row)
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, video_row, asset_name, stage_row, parent=None):
@@ -233,6 +230,7 @@ class custom_video_icon_item(QtWidgets.QListWidgetItem):
         self.widget.set_background(ressources._stages_colors_[self.stage_row['name']])
         self.widget.set_state(self.stage_row['state'])
         self.setSizeHint(self.widget.size())
+        print(self.widget.size())
 
 class video_item_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -300,12 +298,14 @@ class search_thread(QtCore.QThread):
 
             keywords_sets = self.search_data.split('+')
             for comb_row in self.comb_rows:
+
                 variant_id = comb_row['variant_id']
                 values = []
                 for key in comb_row:
                     if key in ['variant_id', 'id', 'creation_time', 'creation_user']:
                         continue
                     values.append(comb_row[key])
+
                 data_list = []
                 for data_block in values:
                     data_list.append(str(data_block))
