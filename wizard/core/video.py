@@ -192,7 +192,7 @@ def video_from_render(export_version_id, ics, ocs, frame_rate, comment=''):
                                           ocs=ocs)
             string_asset = assets.instance_to_string(('export_version', export_version_id))
 
-            frame_range = [find_frame_number(files_dic[extension][0]), len(files_dic[extension])]
+            frame_range = [find_frame_number(files_dic[extension][0]), find_frame_number(files_dic[extension][0])+len(files_dic[extension])-1]
 
             add_video(variant_id, temp_dir, frame_range, string_asset, comment=comment, frame_rate=frame_rate)
             break

@@ -44,11 +44,13 @@ def get_frames_count(video_file):
     cap = cv2.VideoCapture(video_file)
     return cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
-def extract_first_frame(video_file, destination_file):
+def extract_first_frame(video_file, temp_dir):
     cap = cv2.VideoCapture(video_file)
     cap.set(cv2.CAP_PROP_POS_FRAMES, int(cap.get(cv2.CAP_PROP_FRAME_COUNT)/2))
     ret, frame = cap.read()
+    destination_file = path_utils.join(temp_dir, f"{path_utils.basename(video_file)}.png")
     cv2.imwrite(destination_file, frame)
+    return destination_file
 
 def get_concat_video_file(temp_dir, player_id):
     return path_utils.join(temp_dir, f'{player_id}.mp4')

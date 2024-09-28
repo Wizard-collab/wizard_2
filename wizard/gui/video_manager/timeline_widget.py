@@ -37,7 +37,6 @@ class signal_manager(QtCore.QObject):
     current_video_name = pyqtSignal(str)
     on_video_item_in_out_modified = pyqtSignal(object)
     on_video_item_double_clicked = pyqtSignal(object)
-    on_videos_dropped = pyqtSignal(list)
     on_select = pyqtSignal(list)
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
@@ -63,7 +62,6 @@ class timeline_widget(QtWidgets.QWidget):
     on_beginning_requested = pyqtSignal(int)
     on_order_changed = pyqtSignal(list)
     on_video_in_out_modified = pyqtSignal(dict)
-    on_videos_dropped = pyqtSignal(list)
     on_delete = pyqtSignal(list)
     current_stage = pyqtSignal(int)
     current_variant = pyqtSignal(int)
@@ -154,7 +152,6 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport.signal_manager.on_video_item_moved.connect(self.on_order_changed.emit)
         self.timeline_viewport.signal_manager.on_video_item_in_out_modified.connect(self.on_video_in_out_modified.emit)
         self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
-        self.timeline_viewport.signal_manager.on_videos_dropped.connect(self.on_videos_dropped.emit)
         self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
         self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
         self.timeline_viewport.signal_manager.current_variant.connect(self.current_variant.emit)
@@ -349,7 +346,7 @@ class playing_infos_widget(QtWidgets.QWidget):
     def update_current_stage_row(self, stage_row):
         self.assignment_label.setPixmap(self.users_images_dic[stage_row['assignment']])
         self.state_label.setText(stage_row['state'])
-        self.state_label.setStyleSheet("background-color:%s;border-radius:4px;padding-left:3px;padding_right:4px;"%ressources._states_colors_[stage_row['state']])
+        self.state_label.setStyleSheet("background-color:%s;border-radius:4px;padding-left:3px;padding-right:4px;"%ressources._states_colors_[stage_row['state']])
         self.priority_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[stage_row['priority']]).pixmap(22))
 
     def update_is_last(self, is_last):
@@ -362,7 +359,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def __init__(self):
         super(timeline_viewport, self).__init__()
-        self.setAcceptDrops(True)
+        self.setAcceptDrops(False)
         self.setFixedHeight(80)
         self.timeline_scene = timeline_scene()
         self.signal_manager = signal_manager()
@@ -415,17 +412,6 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def dragLeaveEvent(self, event):
         pass
-
-    def dropEvent(self, event):
-        data = event.mimeData()
-        urls = data.urls()
-
-        paths = []
-        for url in urls:
-            if url and url.scheme() == 'file':
-                path = str(url.path())[1:]
-                paths.append(path)
-        self.signal_manager.on_videos_dropped.emit(paths)
 
     def update_selection(self, video_items):
         modifiers = QtWidgets.QApplication.keyboardModifiers()

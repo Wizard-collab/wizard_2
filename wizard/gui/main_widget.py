@@ -280,6 +280,7 @@ class main_widget(QtWidgets.QWidget):
         self.gui_server.raise_ui_signal.connect(self.raise_window)
         self.gui_server.popup_signal.connect(self.popup_wall_widget.add_custom_popup)
         self.gui_server.create_playlist_from_stages_signal.connect(self.video_manager.create_playlist_from_stages)
+        self.gui_server.show_video_signal.connect(self.video_manager.show_single_video)
 
     def show_documentation(self):
         webbrowser.open_new_tab(ressources._documentation_url_)

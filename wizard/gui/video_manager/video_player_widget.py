@@ -122,7 +122,7 @@ class video_player_widget(QtWidgets.QFrame):
         self.videos_dic[video_id]['frames_count'] = ffmpeg_utils.get_frames_count(video_file)
         self.videos_dic[video_id]['inpoint'] = 0
         self.videos_dic[video_id]['outpoint'] = self.videos_dic[video_id]['frames_count']
-        self.videos_dic[video_id]['thumbnail'] = None
+        self.videos_dic[video_id]['thumbnail'] = ffmpeg_utils.extract_first_frame(video_file, self.temp_dir)
         self.videos_dic[video_id]['project_video_id'] = project_video_id
         self.set_modified(True)
 
@@ -170,8 +170,6 @@ class video_player_widget(QtWidgets.QFrame):
         self.menu_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.player_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Player')
-        self.clear_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(ressources._tool_clear_cache_), "Clear cache")
-        self.clear_all_cache_and_reload_action = self.player_action.addAction(QtGui.QIcon(ressources._tool_clear_cache_), "Clear all cache")
         self.show_preferences_action = self.player_action.addAction(QtGui.QIcon(ressources._settings_icon_), "Preferences")
         self.playlist_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, title='Playlist')
         self.save_playlist_action = self.playlist_action.addAction(QtGui.QIcon(ressources._tool_save_), "Save playlist")
@@ -246,7 +244,6 @@ class video_player_widget(QtWidgets.QFrame):
         self.timeline_widget.on_beginning_requested.connect(self.video_player.seek_beginning)
         self.timeline_widget.on_order_changed.connect(self.order_changed)
         self.timeline_widget.on_video_in_out_modified.connect(self.in_out_modified)
-        self.timeline_widget.on_videos_dropped.connect(self.add_videos)
         self.timeline_widget.on_delete.connect(self.delete_videos)
         self.timeline_widget.current_stage.connect(self.current_stage.emit)
         self.timeline_widget.current_variant.connect(self.current_variant.emit)
@@ -261,6 +258,7 @@ class video_player_widget(QtWidgets.QFrame):
 
     def replace_current_video(self, project_video_id):
         self.timeline_widget.replace_current_video(project_video_id)
+        self.update_concat()
         self.set_modified(True)
 
     def replace_videos(self, data_tuples_list):
@@ -283,6 +281,7 @@ class video_player_widget(QtWidgets.QFrame):
             self.videos_dic[video_id]['proxy'] = False
             self.videos_dic[video_id]['thumbnail'] = None
             self.videos_dic[video_id]['project_video_id'] = project_video_id
+        self.update_concat()
         self.set_modified(True)
 
     def order_changed(self, new_order):
@@ -304,15 +303,12 @@ class video_player_widget(QtWidgets.QFrame):
             self.current_playlist_label.setText(self.current_playlist_name)
 
     def clear(self):
-        if self.videos_dic != {} and self.modified:
-            self.confirm_widget = confirm_widget.confirm_widget(f"Create a new playlist without saving ?", parent=self)
-            if self.confirm_widget.exec() != QtWidgets.QDialog.DialogCode.Accepted:
-                return
         self.delete_videos(list(self.videos_dic.keys()))
         self.current_playlist = None
         self.current_playlist_name = ''
         self.current_playlist_label.setText(self.current_playlist_name)
         self.update()
+        self.update_concat()
         self.set_modified(False)
         return 1
 
@@ -349,7 +345,7 @@ class video_player_widget(QtWidgets.QFrame):
         video_ids = list(self.videos_dic.keys())
         if len(video_ids) == 0:
             return
-        thumbnail_path = ffmpeg_utils.check_if_thumbnail_exists(self.temp_dir, self.videos_dic[video_ids[0]]['original_file'])
+        thumbnail_path = self.videos_dic[video_ids[0]]['thumbnail']
         return thumbnail_path
 
     def export_playlist_as_file(self):
@@ -381,6 +377,7 @@ class video_player_widget(QtWidgets.QFrame):
             with open(file_name, 'r') as f:
                 videos_dic = json.load(f)
                 self.load_playlist_dic(videos_dic)
+        self.update_concat()
         self.set_modified(False)
 
     def load_playlist(self, playlist_id):
@@ -396,11 +393,11 @@ class video_player_widget(QtWidgets.QFrame):
         self.current_playlist_label.setText(self.current_playlist_name)
         playlist_data = json.loads(playlist_row['data'])
         self.load_playlist_dic(playlist_data)
+        self.update_concat()
         self.set_modified(False)
 
     def load_playlist_dic(self, videos_dic):
         for video_id in videos_dic:
-            videos_dic[video_id]['proxy'] = False
             videos_dic[video_id]['thumbnail'] = None
         self.videos_dic = videos_dic
         logger.info("Loading playlist")

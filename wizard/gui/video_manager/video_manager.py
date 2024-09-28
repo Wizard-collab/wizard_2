@@ -93,8 +93,13 @@ class video_manager(QtWidgets.QWidget):
         self.raise_()
         self.clear_and_add_videos(video_tuples)
 
+    def show_single_video(self, video_id):
+        video_file = project.get_video_data(video_id, 'file_path')
+        self.show()
+        self.raise_()
+        self.clear_and_add_videos([(video_file, video_id)])
+
     def closeEvent(self, event):
-        #self.video_player.quit()
         self.hide()
         event.ignore()
 
