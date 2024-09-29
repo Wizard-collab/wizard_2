@@ -348,18 +348,8 @@ class video_player_widget(QtWidgets.QFrame):
         thumbnail_path = self.videos_dic[video_ids[0]]['thumbnail']
         return thumbnail_path
 
-    def export_playlist_as_file(self):
-        options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Playlist File", "", "JSON Files (*.json)", options=options)
-        if file_name:
-            with open(file_name, 'w') as f:
-                json.dump(self.get_playlist_dic(), f, indent=4)
-            logger.info("Playlist saved successfully")
-            self.set_info("Playlist saved successfully")
-
     def export_video_file(self):
-        options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save video file", "", "Mp4 Files (*.mp4)", options=options)
+        file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save video file", "", "Mp4 Files (*.mp4)")
         if file_name:
             concat_file = ffmpeg_utils.get_concat_video_file(self.temp_dir, self.player_id)
             if not path_utils.isfile(concat_file):
@@ -369,16 +359,6 @@ class video_player_widget(QtWidgets.QFrame):
             path_utils.copyfile(concat_file, file_name)
             logger.info("Video exported successfully")
             self.set_info("Video exported successfully")
-
-    def load_playlist_file(self):
-        options = QtWidgets.QFileDialog.Options()
-        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Load Playlist File", "", "JSON Files (*.json)", options=options)
-        if file_name:
-            with open(file_name, 'r') as f:
-                videos_dic = json.load(f)
-                self.load_playlist_dic(videos_dic)
-        self.update_concat()
-        self.set_modified(False)
 
     def load_playlist(self, playlist_id):
         if not self.clear():

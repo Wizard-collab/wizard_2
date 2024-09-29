@@ -32,6 +32,7 @@ class create_playlist_widget(QtWidgets.QDialog):
 
     def create_playlist(self):
         playlist_name = self.playlist_name_field.text()
+        print(self.thumbnail_temp_path)
         playlist_id = assets.create_playlist(name=playlist_name, data=self.data, thumbnail_temp_path=self.thumbnail_temp_path)
         if playlist_id:
             self.playlist_id = playlist_id
