@@ -15,4 +15,4 @@ PyInstaller
 winshell
 opencolorio
 OpenExr
-mpv
+python-mpv
