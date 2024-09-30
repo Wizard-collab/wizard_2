@@ -25,6 +25,7 @@ from blender_wizard.export import grooming
 from blender_wizard.export import animation
 from blender_wizard.export import camrig
 from blender_wizard.export import camera
+from blender_wizard.export import rendering
 
 def save_increment(comment=''):
     wizard_tools.save_increment(comment)
@@ -51,6 +52,14 @@ def export():
         camera.invoke_settings_widget()
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
+
+def setup_render(render_type):
+    stage_name = os.environ['wizard_stage_name']
+    if stage_name in ['lighting', 'shading', 'rendering']:
+        frame_range = wizard_communicate.get_frame_range(int(os.environ['wizard_work_env_id']))
+        rendering.setup_render_directory(render_type, frame_range)
+    else:
+        logger.warning("Unplugged stage : {0}".format(stage_name))
 
 def export_camera():
     camera.invoke_settings_widget()

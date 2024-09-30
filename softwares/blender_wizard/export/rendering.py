@@ -2,8 +2,8 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
-# Guerilla modules
-import guerilla
+# Blender modules
+import bpy
 
 # Python modules
 import traceback
@@ -12,9 +12,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
-from guerilla_render_wizard import wizard_tools
-from guerilla_render_wizard import wizard_export
-from guerilla_render_wizard import wizard_render
+from blender_wizard import wizard_export
+from blender_wizard import wizard_render
 import wizard_communicate
 
 def main(render_type, frange, farm=0):
@@ -30,14 +29,12 @@ def main(render_type, frange, farm=0):
             string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
             exported_string_asset = string_asset
 
-            if wizard_export.trigger_sanity_hook('lighting', exported_string_asset):
-                wizard_export.trigger_before_export_hook('lighting', exported_string_asset)
-                render_directory = wizard_render.setup_render_directory('lighting', export_name)
-                wizard_export.trigger_after_export_hook('lighting', render_directory, exported_string_asset)
+            if wizard_export.trigger_sanity_hook('rendering', exported_string_asset):
+                wizard_export.trigger_before_export_hook('rendering', exported_string_asset)
+                render_directory = wizard_render.setup_render_directory('rendering', export_name)
+                wizard_export.trigger_after_export_hook('rendering', render_directory, exported_string_asset)
                 if not farm:
                     batch()
-                else:
-                    deadline()
         else:
             logger.warning("Unkown render type : {0}".format(render_type))
     except:
@@ -52,10 +49,4 @@ def setup_render_directory(render_type, frange):
         return render_directory
 
 def batch():
-    guerilla.render('batch', None)
-
-def deadline():
-    settings_dic = dict()
-    settings_dic['Name'] = "test"
-    settings_dic['DeferredRibGen '] = True
-    guerilla.render('farm', settings_dic)
+    bpy.ops.render.render(animation=True, use_viewport=True)

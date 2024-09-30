@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - New
+    - New video manager
+  time: 1727636913.037098
+'4.1.0.402':
+  update_list:
+  - !!python/tuple
     - debug
     - Houdini grooming exports fix
   - !!python/tuple

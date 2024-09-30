@@ -90,9 +90,14 @@ def is_referenced(camrig_nspace):
     return 1
 
 def select_default_cam():
-    default_camera = bpy.data.objects.get("Camera")
-    logger.info(default_camera)
-    if not default_camera:
-        return
-    logger.info(f"No namespace given, creating video trough {default_camera}")
-    return default_camera
+    default_camera = None
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'CAMERA':
+            logger.info(f"No namespace given, creating video trough {default_camera}")
+            return obj
+
+    for collection in bpy.data.collections:
+        for obj in collection.objects:
+            if obj.type == 'CAMERA' and obj.name not in camera_names:
+                logger.info(f"No namespace given, creating video trough {default_camera}")
+                return obj

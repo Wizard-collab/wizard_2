@@ -42,6 +42,11 @@ def get_app():
         sys.exit()
     os.environ['PATH'] += os.pathsep + path_utils.abspath("binaries/ffmpeg/bin")
 
+    if not path_utils.isfile("binaries/mpv-2.dll"):
+        logger.error("MPV not found")
+        sys.exit()
+    os.environ['PATH'] += os.pathsep + path_utils.abspath("binaries")
+
     app = QtWidgets.QApplication(sys.argv)
 
     QtGui.QFontDatabase.addApplicationFont("ressources/fonts/Roboto-Black.ttf")
