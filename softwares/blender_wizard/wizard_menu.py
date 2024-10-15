@@ -275,7 +275,7 @@ class update_animation(bpy.types.Operator):
     bl_description = "Update existing animation"
     
     def execute(self, context):
-        wizard_plugin.refupdate_animation()
+        wizard_plugin.update_animation()
         return {'FINISHED'}
 
 class update_camera(bpy.types.Operator):
