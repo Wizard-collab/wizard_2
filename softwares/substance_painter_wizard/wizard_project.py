@@ -5,7 +5,10 @@
 # Python modules
 import os
 import shutil
-from PySide6 import QtWidgets, QtCore, QtGui
+try:
+    from PySide6 import QtWidgets, QtGui
+except ModuleNotFoundError:
+    from PySide2 import QtWidgets, QtGui
 
 # Substance Painter modules
 import substance_painter.project

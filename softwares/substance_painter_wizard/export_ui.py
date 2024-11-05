@@ -3,7 +3,10 @@
 # Contact: contact@leobrunel.com
     
 # Python modules
-from PySide6 import QtWidgets, QtGui
+try:
+    from PySide6 import QtWidgets, QtGui
+except ModuleNotFoundError:
+    from PySide2 import QtWidgets, QtGui
 import os
 import json
 

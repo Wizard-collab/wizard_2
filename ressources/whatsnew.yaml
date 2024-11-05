@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - Debug
+    - Substance painter old versions fix
+  time: 1729496031.5788555
+'4.2.0.405':
+  update_list:
+  - !!python/tuple
     - New
     - New video manager
   time: 1727636913.037098

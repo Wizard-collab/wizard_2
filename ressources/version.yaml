@@ -1,7 +1,7 @@
-BUILDS: 405
+BUILDS: 406
 MAJOR: 4
 MINOR: 2
-PATCH: 0
-builds: 405
-date: 1727637618.0349286
-setup_name: 4.2.0.0405-setup.exe
+PATCH: 1
+builds: 406
+date: 1729496060.092896
+setup_name: 4.2.1.0406-setup.exe
