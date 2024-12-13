@@ -2,6 +2,15 @@
   update_list:
   - !!python/tuple
     - Debug
+    - Added variant name into wizard tags
+  - !!python/tuple
+    - New
+    - Added xgen grooming export as abc ( Wizard > custom export > Export XGen grooming as abc )
+  time: 1734024697.6642177
+'4.2.1.406':
+  update_list:
+  - !!python/tuple
+    - Debug
     - Substance painter old versions fix
   time: 1729496031.5788555
 '4.2.0.405':

@@ -11,6 +11,7 @@ import pymel.core as pm
 # Wizard modules
 from maya_wizard import wizard_plugin
 from maya_wizard import wizard_video
+from maya_wizard.export import export_xgen_abc_groom
 from maya_wizard.export import export_xgen_cache
 from maya_wizard.export import export_yeti_cache
 
@@ -31,6 +32,9 @@ class menu():
         if stage_name in camera_export_stage_names:
             pm.menuItem(l='Export camera', c=wizard_plugin.export_camera, i='icons/export.png')
 
+        if stage_name == 'grooming':
+            custom_exports_menu = pm.menuItem(l='Custom exports', subMenu=True, parent=mainMenu, i='icons/export.png')
+            pm.menuItem(l='Export XGen grooming as abc', c=export_xgen_abc_groom.main, i='icons/grooming.png')
         if stage_name == 'cfx':
             custom_exports_menu = pm.menuItem(l='Custom exports', subMenu=True, parent=mainMenu, i='icons/export.png')
             pm.menuItem(l='Xgen export cache', c=export_xgen_cache.invoke_settings_widget, i='icons/cfx.png')

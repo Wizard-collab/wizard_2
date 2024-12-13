@@ -176,6 +176,8 @@ def apply_tags(object_list):
         else:
             existing_tags = obj['wizardTags'].split(',')
         asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+        if os.environ['wizard_variant_name'] != 'main':
+            asset_tag += f"_{os.environ['wizard_variant_name']}"
         to_tag = [os.environ['wizard_category_name'], asset_tag, obj.name]
         tags = existing_tags + to_tag
         obj['wizardTags'] = (',').join(set(tags))

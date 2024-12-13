@@ -150,6 +150,8 @@ def apply_tags(out_node):
     tags_node.parm('type1').set('index')
 
     asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+    if os.environ['wizard_variant_name'] != 'main':
+            asset_tag += f"_{os.environ['wizard_variant_name']}"
     to_tag = [os.environ['wizard_category_name'], asset_tag]
 
     tags_node.parm('string1').set((',').join(to_tag))
