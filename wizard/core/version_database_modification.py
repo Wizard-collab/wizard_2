@@ -44,6 +44,8 @@ from wizard.core import db_utils
 def main():
 	add_rendering_extensions()
 	add_OCIO_project_settings()
+	add_render_nodes_number_project_settings()
+	add_mean_render_time_project_settings()
 
 def add_rendering_extensions():
 	from wizard.core import project
@@ -64,3 +66,12 @@ def add_rendering_extensions():
 def add_OCIO_project_settings():
 	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS OCIO text;"""
 	db_utils.create_table(environment.get_project_name(), sql_cmd)
+
+def add_render_nodes_number_project_settings():
+	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS render_nodes_number integer NOT NULL DEFAULT 1;"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+
+def add_mean_render_time_project_settings():
+	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS mean_render_time integer DEFAULT 1800;"""
+	db_utils.create_table(environment.get_project_name(), sql_cmd)
+

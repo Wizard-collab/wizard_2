@@ -257,7 +257,20 @@ def get_all_frames():
         all_frames += asset_row['outframe'] - asset_row['inframe']
     return all_frames
 
+def get_rendered_frames():
+    assets_rows = project.get_all_sequence_assets()
+    done_frames = 0
+    for asset_row in assets_rows:
 
+        # Get rendering stage
+        stage = project.get_asset_child_by_name(asset_row['id'], 'rendering', ignore_warning=True)
+        if not stage:
+            continue
+        if stage['state'] != 'done':
+            continue
+
+        done_frames += asset_row['outframe'] - asset_row['inframe']
+    return done_frames
 
 class schedule(threading.Thread):
     def __init__(self, parent=None):

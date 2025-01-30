@@ -15,6 +15,7 @@ from wizard.gui import logging_widget
 from wizard.gui import overview_widget
 from wizard.gui import production_table_widget
 from wizard.gui import production_calendar_widget
+from wizard.gui import render_time_manager
 from wizard.gui import custom_tab_widget
 
 # Wizard core modules
@@ -34,6 +35,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.overview_widget = overview_widget.overview_widget()
         self.production_table_widget = production_table_widget.production_table_widget()
         self.production_calendar_widget = production_calendar_widget.calendar_widget()
+        self.render_time_manager = render_time_manager.render_time_manager_widget()
         self.build_ui()
 
     def build_ui(self):
@@ -49,6 +51,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.production_table_index = self.tabs_widget.addTab(self.production_table_widget, '', QtGui.QIcon(ressources._table_viewer_icon_))
         self.production_calendar_index = self.tabs_widget.addTab(self.production_calendar_widget, '', QtGui.QIcon(ressources._calendar_icon_))
         self.overview_index = self.tabs_widget.addTab(self.overview_widget, '', QtGui.QIcon(ressources._chart_icon_))
+        self.render_time_manager_index = self.tabs_widget.addTab(self.render_time_manager, '', QtGui.QIcon(ressources._render_time_icon_))
 
     def set_context(self):
         current_tab = self.tabs_widget.current_index()
@@ -70,6 +73,7 @@ class production_manager_widget(QtWidgets.QWidget):
         self.overview_widget.refresh()
         self.production_table_widget.refresh()
         self.production_calendar_widget.refresh()
+        self.render_time_manager.refresh()
 
     def toggle(self):
         if self.isVisible():

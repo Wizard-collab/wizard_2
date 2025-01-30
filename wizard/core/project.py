@@ -392,13 +392,15 @@ def get_asset_childs(asset_id, column='*'):
                                                         column)
     return stages_rows
 
-def get_asset_child_by_name(asset_id, stage_name, column='*'):
+def get_asset_child_by_name(asset_id, stage_name, column='*', ignore_warning=False):
     stages_rows = db_utils.get_row_by_multiple_data('project',
                                                     'stages',
                                                     ('asset_id', 'name'),
                                                     (asset_id, stage_name),
                                                     column)
     if stages_rows is None or len(stages_rows) < 1:
+        if ignore_warning:
+            return
         logger.error("Stage not found")
         return
     return stages_rows[0]
@@ -1952,6 +1954,50 @@ def get_OCIO():
         return
     return ocio_list[0]
 
+def get_mean_render_time():
+    mean_render_time_list = db_utils.get_row_by_column_data('project',
+                                                        'settings',
+                                                        ('id', 1),
+                                                        'mean_render_time')
+    if mean_render_time_list is None or len(mean_render_time_list) < 1:
+        logger.error("Project settings not found")
+        return
+    return mean_render_time_list[0]
+
+def set_mean_render_time(render_time_in_seconds):
+    if render_time_in_seconds <= 0:
+        render_time_in_seconds = 60
+    if not db_utils.update_data('project',
+                            'settings',
+                            ('mean_render_time', render_time_in_seconds),
+                            ('id', 1)):
+        logger.warning('Project mean render time not modified')
+        return
+    logger.info('Project mean render time modified')
+    return 1
+
+def get_render_nodes_number():
+    render_nodes_number_list = db_utils.get_row_by_column_data('project',
+                                                        'settings',
+                                                        ('id', 1),
+                                                        'render_nodes_number')
+    if render_nodes_number_list is None or len(render_nodes_number_list) < 1:
+        logger.error("Project settings not found")
+        return
+    return render_nodes_number_list[0]
+
+def set_render_nodes_number(render_nodes_number):
+    if render_nodes_number <= 0:
+        render_nodes_number = 1
+    if not db_utils.update_data('project',
+                            'settings',
+                            ('render_nodes_number', render_nodes_number),
+                            ('id', 1)):
+        logger.warning('Project render nodes number not modified')
+        return
+    logger.info('Project render nodes number time modified')
+    return 1
+
 def set_image_format(image_format):
     if not db_utils.update_data('project',
                             'settings',
@@ -3099,6 +3145,8 @@ def create_settings_table(database):
                                         image_format text NOT NULL,
                                         deadline real NOT NULL,
                                         users_ids text NOT NULL,
+                                        mean_render_time integer NOT NULL DEFAULT 1800,
+                                        render_nodes_number integer NOT NULL DEFAULT 1,
                                         OCIO text
                                     );"""
     if not db_utils.create_table(database, sql_cmd):
