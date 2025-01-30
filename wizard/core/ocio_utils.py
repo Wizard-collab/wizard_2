@@ -27,6 +27,8 @@
 # SOFTWARE.
 
 # Python modules
+
+import os
 import PyOpenColorIO as OCIO
 import OpenEXR
 import Imath

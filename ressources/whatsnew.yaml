@@ -2,6 +2,18 @@
   update_list:
   - !!python/tuple
     - Debug
+    - Houdini tags on curves
+  - !!python/tuple
+    - New
+    - Added opacity, transmissive, emissive, sheen_color_ sheen_opacity, sheen_roughness and translucency\nin guerilla auto plug
+  - !!python/tuple
+    - New
+    - Render time manager
+  time: 1738254023.7297094
+'4.2.2.408':
+  update_list:
+  - !!python/tuple
+    - Debug
     - Added variant name into wizard tags
   - !!python/tuple
     - New

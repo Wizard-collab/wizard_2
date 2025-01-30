@@ -27,6 +27,7 @@
 # SOFTWARE.
 
 # Python modules
+import PyOpenColorIO
 import sys
 import time
 from PyQt6 import QtWidgets, QtCore, QtGui
@@ -63,7 +64,6 @@ class app():
         app_utils.init_project(self, project_manager)
         app_utils.init_OCIO()
         self.stats_schedule = app_utils.init_stats()
-
         # Main gui app
         start_time = time.perf_counter()
         self.loading_widget = loading_widget.loading_widget()

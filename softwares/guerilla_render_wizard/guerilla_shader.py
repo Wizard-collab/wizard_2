@@ -100,6 +100,28 @@ def plug_texturing(namespace, files_list, asset_name, update=False):
         attribute = get_attribute(displacement_node, 'Amount', 'MaskTexture', [('Gamma', 'data')])
         set_file(attribute, '<attr:height>')
 
+    if textures_dic['opacity']:
+        plug = get_plug(material_override_node, 'opacity', dataType='string')
+        plug.set(textures_dic['opacity'])
+    if textures_dic['emissive']:
+        plug = get_plug(material_override_node, 'emissive', dataType='string')
+        plug.set(textures_dic['emissive'])
+    if textures_dic['transmissive']:
+        plug = get_plug(material_override_node, 'transmissive', dataType='string')
+        plug.set(textures_dic['transmissive'])
+    if textures_dic['sheen_color']:
+        plug = get_plug(material_override_node, 'sheen_color', dataType='string')
+        plug.set(textures_dic['sheen_color'])
+    if textures_dic['sheen_opacity']:
+        plug = get_plug(material_override_node, 'sheen_opacity', dataType='string')
+        plug.set(textures_dic['sheen_opacity'])
+    if textures_dic['sheen_roughness']:
+        plug = get_plug(material_override_node, 'sheen_roughness', dataType='string')
+        plug.set(textures_dic['sheen_roughness'])
+    if textures_dic['translucency']:
+        plug = get_plug(material_override_node, 'translucency', dataType='string')
+        plug.set(textures_dic['translucency'])
+
 def set_file(attribute, file):
     with Modifier() as mod:
         # Force file reload by deleting the plug
@@ -208,6 +230,13 @@ def get_textures_dic(files_list):
     metalness_maps = []
     normal_maps = []
     height_maps = []
+    opacity_maps = []
+    emissive_maps = []
+    transmissive_maps = []
+    sheen_color_maps = []
+    sheen_opacity_maps = []
+    sheen_roughness_maps = []
+    translucency_maps = []
 
     for file in files_list:
         file = file.replace('\\', '/')
@@ -221,6 +250,20 @@ def get_textures_dic(files_list):
             normal_maps.append(file)
         if 'HEIGHT' in file.upper():
             height_maps.append(file)
+        if 'OPACITY' in file.upper():
+            opacity_maps.append(file)
+        if 'EMISSIVE' in file.upper():
+            emissive_maps.append(file)
+        if 'TRANSMISSIVE' in file.upper():
+            transmissive_maps.append(file)
+        if 'TRANSLUCENCY' in file.upper():
+            translucency_maps.append(file)
+        if 'SHEEN_COLOR' in file.upper():
+            sheen_color_maps.append(file)
+        if 'SHEEN_OPACITY' in file.upper():
+            sheen_opacity_maps.append(file)
+        if 'SHEEN_ROUGHNESS' in file.upper():
+            sheen_roughness_maps.append(file)
 
     if len(diffuse_maps) >=1:
         texture = get_udim_path(diffuse_maps[0])
@@ -251,5 +294,48 @@ def get_textures_dic(files_list):
         textures_dic['height_map'] = texture
     else:
         textures_dic['height_map'] = None
+
+    if len(opacity_maps) >=1:
+        texture = get_udim_path(opacity_maps[0])
+        textures_dic['opacity'] = texture
+    else:
+        textures_dic['opacity'] = None
+
+    if len(emissive_maps) >=1:
+        texture = get_udim_path(emissive_maps[0])
+        textures_dic['emissive'] = texture
+    else:
+        textures_dic['emissive'] = None
+
+    if len(transmissive_maps) >=1:
+        texture = get_udim_path(transmissive_maps[0])
+        textures_dic['transmissive'] = texture
+    else:
+        textures_dic['transmissive'] = None
+
+    if len(sheen_color_maps) >=1:
+        texture = get_udim_path(sheen_color_maps[0])
+        textures_dic['sheen_color'] = texture
+    else:
+        textures_dic['sheen_color'] = None
+
+    if len(sheen_opacity_maps) >=1:
+        texture = get_udim_path(sheen_opacity_maps[0])
+        textures_dic['sheen_opacity'] = texture
+    else:
+        textures_dic['sheen_opacity'] = None
+
+    if len(sheen_roughness_maps) >=1:
+        texture = get_udim_path(sheen_roughness_maps[0])
+        textures_dic['sheen_roughness'] = texture
+    else:
+        textures_dic['sheen_roughness'] = None
+
+    if len(translucency_maps) >=1:
+        texture = get_udim_path(translucency_maps[0])
+        textures_dic['translucency'] = texture
+    else:
+        textures_dic['translucency'] = None
+
 
     return textures_dic

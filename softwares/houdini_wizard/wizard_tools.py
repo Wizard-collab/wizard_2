@@ -144,17 +144,17 @@ def apply_tags(out_node):
 
     name = f"wizardTags_{out_node.name()}"
 
-    tags_node = create_node_without_duplicate('attribcreate', name, out_node_parent)
-    tags_node.parm('name1').set('wizardTags')
-    tags_node.parm('class1').set('detail')
-    tags_node.parm('type1').set('index')
+    tags_node = create_node_without_duplicate('attribwrangle', name, out_node_parent)
+    tags_node.parm('class').set('detail')
 
     asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
     if os.environ['wizard_variant_name'] != 'main':
             asset_tag += f"_{os.environ['wizard_variant_name']}"
     to_tag = [os.environ['wizard_category_name'], asset_tag]
 
-    tags_node.parm('string1').set((',').join(to_tag))
+    tags_list_string = (',').join(to_tag)
+
+    tags_node.parm('snippet').set(f'''s@wizardTags += "{tags_list_string}";''')
 
     tags_node.setInput(0, out_node_input)
     out_node.setInput(0, tags_node)
