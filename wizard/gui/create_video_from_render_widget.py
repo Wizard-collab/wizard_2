@@ -55,7 +55,8 @@ class create_video_from_render_widget(QtWidgets.QDialog):
                                 self.input_color_space_combobox.currentText(),
                                 self.output_color_space_combobox.currentText(),
                                 self.frame_rate_spinBox.value(),
-                                comment=self.comment_textEdit.toPlainText())
+                                comment=self.comment_textEdit.toPlainText(),
+                                overlay = self.burn_details_checkbox.isChecked())
         self.accept()
 
     def build_ui(self):
@@ -76,6 +77,10 @@ class create_video_from_render_widget(QtWidgets.QDialog):
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
         self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.form_layout.addRow(self.frame_rate_spinBox)
+
+        self.burn_details_checkbox = QtWidgets.QCheckBox("Burn details")
+        self.burn_details_checkbox.setChecked(True)
+        self.form_layout.addRow(self.burn_details_checkbox)
 
         self.comment_textEdit = QtWidgets.QTextEdit()
         self.comment_textEdit.setPlaceholderText('Your comment here')
