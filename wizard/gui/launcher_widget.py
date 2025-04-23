@@ -5,13 +5,9 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
-import os
-import time
 
 # Wizard modules
-from wizard.vars import assets_vars
 from wizard.vars import ressources
-from wizard.core import environment
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import image
@@ -26,14 +22,15 @@ from wizard.gui import image_viewer_widget
 from wizard.gui import confirm_widget
 from wizard.gui import tag_label
 
+
 class launcher_widget(QtWidgets.QFrame):
 
     work_env_changed_signal = pyqtSignal(object)
     variant_changed_signal = pyqtSignal(object)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(launcher_widget, self).__init__(parent)
-        
+
         self.work_env_id = None
         self.version_row = None
         self.refresh_version_changed = None
@@ -62,25 +59,28 @@ class launcher_widget(QtWidgets.QFrame):
             version_rows = project.get_work_versions(self.work_env_id)
             versions_names = []
             if (version_rows is not None) and (version_rows != []):
-                new=0
+                new = 0
                 for version_row in version_rows:
                     versions_names.append(version_row['name'])
                     if version_row['name'] not in self.versions.keys():
                         self.version_comboBox.addItem(version_row['name'])
                         self.versions[version_row['name']] = version_row['id']
-                        new=1
+                        new = 1
 
                 current_version = self.version_comboBox.currentText()
-                combobox_all_items = [self.version_comboBox.itemText(i) for i in range(self.version_comboBox.count())]
+                combobox_all_items = [self.version_comboBox.itemText(
+                    i) for i in range(self.version_comboBox.count())]
                 for version_name in combobox_all_items:
                     if version_name not in versions_names:
-                        version_index = self.version_comboBox.findData(version_name)
+                        version_index = self.version_comboBox.findData(
+                            version_name)
                         self.version_comboBox.removeItem(version_index)
                         if version_name == current_version:
                             set_last = True
 
                 if new or set_last:
-                    self.version_comboBox.setCurrentText(version_rows[-1]['name'])
+                    self.version_comboBox.setCurrentText(
+                        version_rows[-1]['name'])
                     self.version_row = version_rows[-1]
 
         self.refresh_version_changed = True
@@ -96,7 +96,7 @@ class launcher_widget(QtWidgets.QFrame):
         if self.refresh_version_changed:
             self.version_row = None
             if self.work_env_id:
-                self.version_row = project.get_work_version_by_name(self.work_env_id, 
+                self.version_row = project.get_work_version_by_name(self.work_env_id,
                                                                     self.version_comboBox.currentText())
             self.refresh_infos()
 
@@ -134,9 +134,11 @@ class launcher_widget(QtWidgets.QFrame):
 
     def refresh_screenshot(self, screenshot_path):
         if path_utils.isfile(screenshot_path):
-            image_bytes, width, height = image.convert_screenshot(screenshot_path)
+            image_bytes, width, height = image.convert_screenshot(
+                screenshot_path)
             self.screenshot_button.setFixedSize(width, height)
-            pm = gui_utils.round_corners_image_button(image_bytes, (width, height), 10)
+            pm = gui_utils.round_corners_image_button(
+                image_bytes, (width, height), 10)
             icon = QtGui.QIcon()
             icon.addPixmap(pm)
             self.screenshot_button.setIcon(icon)
@@ -147,17 +149,20 @@ class launcher_widget(QtWidgets.QFrame):
 
     def refresh_lock_button(self):
         self.lock_button.setStyleSheet('')
-        gui_utils.modify_application_tooltip(self.lock_button, "Lock work environment")
+        gui_utils.modify_application_tooltip(
+            self.lock_button, "Lock work environment")
         self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[0]))
         if self.work_env_id:
             lock_id = project.get_work_env_data(self.work_env_id, 'lock_id')
             if lock_id is not None:
-                gui_utils.modify_application_tooltip(self.lock_button, "Unlock work environment")
+                gui_utils.modify_application_tooltip(
+                    self.lock_button, "Unlock work environment")
                 css = "QPushButton{border: 2px solid #f0605b;background-color: #f0605b;}"
                 css += "QPushButton::hover{border: 2px solid #ff817d;background-color: #ff817d;}"
                 css += "QPushButton::pressed{border: 2px solid #ab4946;background-color: #ab4946;}"
                 self.lock_button.setStyleSheet(css)
-                self.lock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
+                self.lock_button.setIcon(
+                    QtGui.QIcon(ressources._lock_icons_[1]))
 
     def toggle_lock(self):
         if self.work_env_id:
@@ -179,14 +184,16 @@ class launcher_widget(QtWidgets.QFrame):
 
     def unlock_context_menu(self):
         menu = gui_utils.QMenu(self)
-        force_unlock_action = menu.addAction(QtGui.QIcon(ressources._lock_icons_[0]), 'Force unlock')
+        force_unlock_action = menu.addAction(QtGui.QIcon(
+            ressources._lock_icons_[0]), 'Force unlock')
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == force_unlock_action:
                 self.force_unlock()
 
     def force_unlock(self):
-        self.confirm_widget = confirm_widget.confirm_widget("Do you want to continue ?\nPlease make sure this work environment is not used by someone.", parent=self)
+        self.confirm_widget = confirm_widget.confirm_widget(
+            "Do you want to continue ?\nPlease make sure this work environment is not used by someone.", parent=self)
         if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             assets.force_unlock(self.work_env_id)
             gui_server.refresh_team_ui()
@@ -200,7 +207,8 @@ class launcher_widget(QtWidgets.QFrame):
         if self.version_row is not None:
             screenshot_path = self.version_row['screenshot_path']
             if path_utils.isfile(screenshot_path):
-                self.image_viewer_widget = image_viewer_widget.image_viewer_widget(screenshot_path)
+                self.image_viewer_widget = image_viewer_widget.image_viewer_widget(
+                    screenshot_path)
                 self.image_viewer_widget.show()
 
     def show_kill_button(self):
@@ -208,7 +216,8 @@ class launcher_widget(QtWidgets.QFrame):
             self.kill_button.setMaximumWidth(60)
             self.kill_button.setMinimumWidth(0)
             self.kill_button.setVisible(1)
-            self.anim = QtCore.QPropertyAnimation(self.kill_button, b"maximumWidth")
+            self.anim = QtCore.QPropertyAnimation(
+                self.kill_button, b"maximumWidth")
             self.anim.setDuration(100)
             self.anim.setStartValue(0)
             self.anim.setEndValue(60)
@@ -218,22 +227,25 @@ class launcher_widget(QtWidgets.QFrame):
         if self.kill_button.isVisible():
             self.kill_button.setMaximumWidth(60)
             self.kill_button.setMinimumWidth(0)
-            self.anim = QtCore.QPropertyAnimation(self.kill_button, b"maximumWidth")
+            self.anim = QtCore.QPropertyAnimation(
+                self.kill_button, b"maximumWidth")
             self.anim.setDuration(100)
             self.anim.setStartValue(60)
             self.anim.setEndValue(0)
-            self.anim.finished.connect(lambda:self.kill_button.setVisible(0))
+            self.anim.finished.connect(lambda: self.kill_button.setVisible(0))
             self.anim.start()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.screenshot_button = QtWidgets.QPushButton()
         self.screenshot_button.setObjectName('screenshot_button')
-        gui_utils.application_tooltip(self.screenshot_button, "Show version screenshot")
+        gui_utils.application_tooltip(
+            self.screenshot_button, "Show version screenshot")
         self.screenshot_button.setFixedWidth(300)
         self.screenshot_button.setIconSize(QtCore.QSize(298, 298))
         self.main_layout.addWidget(self.screenshot_button)
@@ -249,7 +261,7 @@ class launcher_widget(QtWidgets.QFrame):
 
         self.version_infos_widget = QtWidgets.QWidget()
         self.version_infos_layout = QtWidgets.QHBoxLayout()
-        self.version_infos_layout.setContentsMargins(0,0,0,0)
+        self.version_infos_layout.setContentsMargins(0, 0, 0, 0)
         self.version_infos_layout.setSpacing(6)
         self.version_infos_widget.setLayout(self.version_infos_layout)
         self.main_layout.addWidget(self.version_infos_widget)
@@ -263,44 +275,49 @@ class launcher_widget(QtWidgets.QFrame):
         gui_utils.application_tooltip(self.user_label, "Version user")
         self.version_infos_layout.addWidget(self.user_label)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.version_infos_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
         self.lock_button = gui_utils.QRightClickButton()
-        gui_utils.application_tooltip(self.lock_button, "Lock work environment")
-        self.lock_button.setFixedSize(60,60)
-        self.lock_button.setIconSize(QtCore.QSize(25,25))
+        gui_utils.application_tooltip(
+            self.lock_button, "Lock work environment")
+        self.lock_button.setFixedSize(60, 60)
+        self.lock_button.setIconSize(QtCore.QSize(25, 25))
         self.buttons_layout.addWidget(self.lock_button)
 
         self.launch_button = custom_launchButton('Launch')
-        gui_utils.application_tooltip(self.launch_button, "Launch work version")
+        gui_utils.application_tooltip(
+            self.launch_button, "Launch work version")
         self.launch_button.setMinimumHeight(60)
         self.launch_button.setObjectName('blue_button')
         self.launch_button.setStyleSheet('font:bold')
         self.buttons_layout.addWidget(self.launch_button)
 
         self.kill_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.kill_button, "Kill work environment")
-        self.kill_button.setFixedSize(0,60)
+        gui_utils.application_tooltip(
+            self.kill_button, "Kill work environment")
+        self.kill_button.setFixedSize(0, 60)
         self.kill_button.setVisible(0)
-        self.kill_button.setIconSize(QtCore.QSize(25,25))
+        self.kill_button.setIconSize(QtCore.QSize(25, 25))
         self.kill_button.setIcon(QtGui.QIcon(ressources._kill_task_icon_))
         self.buttons_layout.addWidget(self.kill_button)
+
 
 class custom_launchButton(QtWidgets.QPushButton):
     def __init__(self, parent=None):
         super(custom_launchButton, self).__init__(parent)
         self.setIcon(QtGui.QIcon())
-        self.setIconSize(QtCore.QSize(25,25))
+        self.setIconSize(QtCore.QSize(25, 25))
         self.animated_spinner = QtGui.QMovie(ressources._running_gif_)
-        self.animated_spinner.frameChanged.connect(self.updateSpinnerAnimation)           
+        self.animated_spinner.frameChanged.connect(self.updateSpinnerAnimation)
 
     def updateSpinnerAnimation(self):
         self.setIcon(QtGui.QIcon(self.animated_spinner.currentPixmap()))

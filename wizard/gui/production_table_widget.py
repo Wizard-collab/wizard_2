@@ -13,7 +13,6 @@ import copy
 # Wizard gui modules
 from wizard.gui import gui_server
 from wizard.gui import gui_utils
-from wizard.gui import logging_widget
 from wizard.gui import tag_label
 from wizard.gui import comment_widget
 from wizard.gui import asset_tracking_widget
@@ -21,18 +20,16 @@ from wizard.gui import asset_tracking_widget
 # Wizard modules
 from wizard.core import user
 from wizard.core import repository
-from wizard.core import tools
 from wizard.core import assets
 from wizard.core import project
 from wizard.core import launch
-from wizard.core import environment
 from wizard.core import image
-from wizard.core import path_utils
 from wizard.vars import ressources
 from wizard.vars import assets_vars
 from wizard.vars import user_vars
 
 logger = logging.getLogger(__name__)
+
 
 class production_table_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -60,18 +57,19 @@ class production_table_widget(QtWidgets.QWidget):
     def init_users_images(self):
         self.users_images_dic = dict()
         for user_row in repository.get_users_list():
-            user_image =  user_row['profile_picture']
-            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
+            user_image = user_row['profile_picture']
+            pixmap = gui_utils.mask_image(
+                image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def set_context(self):
         context_dic = dict()
-        context_dic['show_notes'] = self.show_notes 
-        context_dic['show_states'] = self.show_states 
-        context_dic['show_assignments'] = self.show_assignments 
-        context_dic['show_priorities'] = self.show_priorities 
-        context_dic['domain'] = self.domain 
-        context_dic['search_text'] = self.search_bar.text() 
+        context_dic['show_notes'] = self.show_notes
+        context_dic['show_states'] = self.show_states
+        context_dic['show_assignments'] = self.show_assignments
+        context_dic['show_priorities'] = self.show_priorities
+        context_dic['domain'] = self.domain
+        context_dic['search_text'] = self.search_bar.text()
         user.user().add_context(user_vars._production_table_context_, context_dic)
         self.asset_tracking_widget.set_context()
 
@@ -95,9 +93,11 @@ class production_table_widget(QtWidgets.QWidget):
 
         launch_action = None
         if len(selection) == 1:
-            launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), "Launch")
+            launch_action = menu.addAction(
+                QtGui.QIcon(ressources._launch_icon_), "Launch")
 
-        create_playlist_from_selection_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), "Create playist from selection")
+        create_playlist_from_selection_action = menu.addAction(
+            QtGui.QIcon(ressources._playlist_icon_), "Create playist from selection")
 
         menu.addSeparator()
         show_notes_icon = ressources._uncheck_icon_
@@ -113,10 +113,14 @@ class production_table_widget(QtWidgets.QWidget):
         if self.show_priorities:
             show_priorities_icon = ressources._check_icon_
 
-        show_states_item = menu.addAction(QtGui.QIcon(show_states_icon), f'Show states')
-        show_assignment_item = menu.addAction(QtGui.QIcon(show_assignments_icon), f'Show assignments')
-        show_notes_item = menu.addAction(QtGui.QIcon(show_notes_icon), f'Show notes')
-        show_priorities_item = menu.addAction(QtGui.QIcon(show_priorities_icon), f'Show priorities')
+        show_states_item = menu.addAction(
+            QtGui.QIcon(show_states_icon), f'Show states')
+        show_assignment_item = menu.addAction(
+            QtGui.QIcon(show_assignments_icon), f'Show assignments')
+        show_notes_item = menu.addAction(
+            QtGui.QIcon(show_notes_icon), f'Show notes')
+        show_priorities_item = menu.addAction(
+            QtGui.QIcon(show_priorities_icon), f'Show priorities')
 
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
@@ -145,9 +149,12 @@ class production_table_widget(QtWidgets.QWidget):
         selection = self.get_selection()
         if len(selection) != 1:
             return
-        default_variant_id = project.get_stage_data(selection[0], 'default_variant_id')
-        default_work_env_id = project.get_variant_data(default_variant_id, 'default_work_env_id')
-        work_version_id = project.get_last_work_version(default_work_env_id, 'id')
+        default_variant_id = project.get_stage_data(
+            selection[0], 'default_variant_id')
+        default_work_env_id = project.get_variant_data(
+            default_variant_id, 'default_work_env_id')
+        work_version_id = project.get_last_work_version(
+            default_work_env_id, 'id')
         if len(work_version_id) != 1:
             logger.warning("No work version found")
             return
@@ -156,7 +163,8 @@ class production_table_widget(QtWidgets.QWidget):
     def get_selection(self):
         stages_ids = []
         for modelIndex in self.table_widget.selectedIndexes():
-            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            widget = self.table_widget.cellWidget(
+                modelIndex.row(), modelIndex.column())
             if widget and widget.type == 'stage':
                 if not widget.isVisible():
                     continue
@@ -172,10 +180,14 @@ class production_table_widget(QtWidgets.QWidget):
 
     def update_stage_datas_visibility(self):
         for stage_id in self.stage_ids.keys():
-            self.stage_ids[stage_id]['widget'].update_notes_visibility(self.show_notes)
-            self.stage_ids[stage_id]['widget'].update_states_visibility(self.show_states)
-            self.stage_ids[stage_id]['widget'].update_assignments_visibility(self.show_assignments)
-            self.stage_ids[stage_id]['widget'].update_priorities_visibility(self.show_priorities)
+            self.stage_ids[stage_id]['widget'].update_notes_visibility(
+                self.show_notes)
+            self.stage_ids[stage_id]['widget'].update_states_visibility(
+                self.show_states)
+            self.stage_ids[stage_id]['widget'].update_assignments_visibility(
+                self.show_assignments)
+            self.stage_ids[stage_id]['widget'].update_priorities_visibility(
+                self.show_priorities)
 
     def update_layout(self):
         QtWidgets.QApplication.processEvents()
@@ -184,10 +196,10 @@ class production_table_widget(QtWidgets.QWidget):
         QtWidgets.QApplication.processEvents()
 
     def build_ui(self):
-        self.resize(1400,800)
+        self.resize(1400, 800)
         self.setObjectName('dark_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
@@ -203,21 +215,28 @@ class production_table_widget(QtWidgets.QWidget):
         self.search_bar = gui_utils.search_bar(red=36, green=36, blue=43)
         self.header_layout.addWidget(self.search_bar)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.content_widget = gui_utils.QSplitter()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.content_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.content_widget)
 
         self.table_widget = QtWidgets.QTableWidget()
         self.table_widget.setObjectName('dark_widget')
-        self.table_widget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table_widget.setEditTriggers(
+            QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table_widget.setAlternatingRowColors(True)
-        self.table_widget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Fixed)
-        self.table_widget.horizontalHeader().setObjectName('table_widget_horizontal_header_view')
-        self.table_widget.verticalHeader().setObjectName('table_widget_vertical_header_view')
-        self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table_widget.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.table_widget.horizontalHeader().setObjectName(
+            'table_widget_horizontal_header_view')
+        self.table_widget.verticalHeader().setObjectName(
+            'table_widget_vertical_header_view')
+        self.table_widget.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.content_widget.addWidget(self.table_widget)
         self.content_widget.setCollapsible(0, False)
 
@@ -228,12 +247,13 @@ class production_table_widget(QtWidgets.QWidget):
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(11,11,11,11)
+        self.infos_layout.setContentsMargins(11, 11, 11, 11)
         self.infos_layout.setSpacing(4)
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
@@ -245,7 +265,8 @@ class production_table_widget(QtWidgets.QWidget):
         if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             comment = self.comment_widget.comment
         for modelIndex in self.table_widget.selectedIndexes():
-            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            widget = self.table_widget.cellWidget(
+                modelIndex.row(), modelIndex.column())
             if widget and widget.type == 'stage':
                 if not widget.isVisible():
                     continue
@@ -257,7 +278,8 @@ class production_table_widget(QtWidgets.QWidget):
 
     def update_priority(self, priority):
         for modelIndex in self.table_widget.selectedIndexes():
-            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            widget = self.table_widget.cellWidget(
+                modelIndex.row(), modelIndex.column())
             if widget and widget.type == 'stage':
                 if not widget.isVisible():
                     continue
@@ -269,7 +291,8 @@ class production_table_widget(QtWidgets.QWidget):
 
     def update_assignment(self, assignment):
         for modelIndex in self.table_widget.selectedIndexes():
-            widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+            widget = self.table_widget.cellWidget(
+                modelIndex.row(), modelIndex.column())
             if widget and widget.type == 'stage':
                 if not widget.isVisible():
                     continue
@@ -281,9 +304,11 @@ class production_table_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.domain_comboBox.currentTextChanged.connect(self.refresh_assets)
-        self.table_widget.itemSelectionChanged.connect(self.change_stage_asset_tracking_widget)
+        self.table_widget.itemSelectionChanged.connect(
+            self.change_stage_asset_tracking_widget)
         self.search_bar.textChanged.connect(self.update_search)
-        self.table_widget.customContextMenuRequested.connect(self.context_menu_requested)
+        self.table_widget.customContextMenuRequested.connect(
+            self.context_menu_requested)
 
     def showEvent(self, event):
         self.refresh()
@@ -294,7 +319,8 @@ class production_table_widget(QtWidgets.QWidget):
             domain_rows = project.get_domains()
             for domain_row in domain_rows:
                 if (domain_row['id'] not in self.domain_ids) and (domain_row['name'] != 'library'):
-                    self.domain_comboBox.addItem(QtGui.QIcon(ressources._domains_icons_dic_[domain_row['name']]), domain_row['name'])
+                    self.domain_comboBox.addItem(QtGui.QIcon(ressources._domains_icons_dic_[
+                                                 domain_row['name']]), domain_row['name'])
                     self.domain_ids.append(domain_row['id'])
             self.update_assets = True
             self.refresh_assets()
@@ -305,7 +331,8 @@ class production_table_widget(QtWidgets.QWidget):
             self.asset_tracking_widget.change_stage(None)
             return
         modelIndex = self.table_widget.selectedIndexes()[0]
-        widget = self.table_widget.cellWidget(modelIndex.row(), modelIndex.column())
+        widget = self.table_widget.cellWidget(
+            modelIndex.row(), modelIndex.column())
         if not widget:
             self.asset_tracking_widget.change_stage(None)
             return
@@ -325,12 +352,12 @@ class production_table_widget(QtWidgets.QWidget):
         if current_domain != self.domain:
             self.show_all_stages()
             self.show_all_assets()
-            #self.update_layout()
+            # self.update_layout()
             self.table_widget.clear()
             self.asset_ids = dict()
             self.stage_ids = dict()
             self.domain = current_domain
-        
+
         assets_preview_rows = project.get_all_assets_preview()
         assets_preview = dict()
 
@@ -343,13 +370,17 @@ class production_table_widget(QtWidgets.QWidget):
 
         for assets_preview_row in assets_preview_rows:
             assets_preview[assets_preview_row['asset_id']] = assets_preview_row
-        
+
         if self.domain == assets_vars._assets_:
-            labels_names = ["Name", "Modeling", "Rigging", "Grooming", "Texturing", "Shading", "Rendering", "Compositing"]
-            self.task_list = ["", "modeling", "rigging", "grooming", "texturing", "shading", 'rendering', 'compositing']
+            labels_names = ["Name", "Modeling", "Rigging", "Grooming",
+                            "Texturing", "Shading", "Rendering", "Compositing"]
+            self.task_list = ["", "modeling", "rigging", "grooming",
+                              "texturing", "shading", 'rendering', 'compositing']
         elif self.domain == assets_vars._sequences_:
-            labels_names = ["Name", "Frame range", "Layout", "Animation", "Cfx", "Fx", "Camera", "Lighting", "Rendering", "Compositing"]
-            self.task_list = ["", "", "layout", "animation", "cfx", "fx", "camera", "lighting", "rendering", "compositing"]
+            labels_names = ["Name", "Frame range", "Layout", "Animation",
+                            "Cfx", "Fx", "Camera", "Lighting", "Rendering", "Compositing"]
+            self.task_list = ["", "", "layout", "animation", "cfx",
+                              "fx", "camera", "lighting", "rendering", "compositing"]
 
         stage_ids = list(self.stage_ids.keys())
         project_stage_ids = project.get_all_stages('id')
@@ -371,29 +402,37 @@ class production_table_widget(QtWidgets.QWidget):
             if asset_row['id'] not in self.asset_ids.keys():
                 index = self.asset_rows.index(asset_row)
                 item = QtWidgets.QTableWidgetItem()
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsSelectable)
+                item.setFlags(
+                    item.flags() ^ QtCore.Qt.ItemFlag.ItemIsSelectable)
                 self.table_widget.setItem(index, 0, item)
-                widget = asset_widget(asset_row, self.category_rows[asset_row['category_id']], assets_preview[asset_row['id']])
+                widget = asset_widget(
+                    asset_row, self.category_rows[asset_row['category_id']], assets_preview[asset_row['id']])
                 self.table_widget.setCellWidget(index, 0, widget)
                 self.asset_ids[asset_row['id']] = dict()
                 self.asset_ids[asset_row['id']]['row'] = asset_row
                 self.asset_ids[asset_row['id']]['table_row'] = index
-                self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
+                self.asset_ids[asset_row['id']
+                               ]['preview_row'] = assets_preview[asset_row['id']]
                 self.asset_ids[asset_row['id']]['widget'] = widget
                 if self.domain == assets_vars._sequences_:
                     item = QtWidgets.QTableWidgetItem()
-                    item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsSelectable)
+                    item.setFlags(
+                        item.flags() ^ QtCore.Qt.ItemFlag.ItemIsSelectable)
                     self.table_widget.setItem(index, 1, item)
                     frange_widget = frame_range_widget(asset_row)
                     self.table_widget.setCellWidget(index, 1, frange_widget)
-                    self.asset_ids[asset_row['id']]['frame_range_widget'] = frange_widget
+                    self.asset_ids[asset_row['id']
+                                   ]['frame_range_widget'] = frange_widget
             else:
                 if assets_preview[asset_row['id']] != self.asset_ids[asset_row['id']]['preview_row']:
-                    self.asset_ids[asset_row['id']]['widget'].refresh(asset_row, assets_preview[asset_row['id']])
+                    self.asset_ids[asset_row['id']]['widget'].refresh(
+                        asset_row, assets_preview[asset_row['id']])
                     self.asset_ids[asset_row['id']]['row'] = asset_row
-                    self.asset_ids[asset_row['id']]['preview_row'] = assets_preview[asset_row['id']]
+                    self.asset_ids[asset_row['id']
+                                   ]['preview_row'] = assets_preview[asset_row['id']]
                     if self.domain == assets_vars._sequences_:
-                        self.asset_ids[asset_row['id']]['frame_range_widget'].refresh(asset_row)
+                        self.asset_ids[asset_row['id']
+                                       ]['frame_range_widget'].refresh(asset_row)
 
         self.update_layout()
 
@@ -404,20 +443,30 @@ class production_table_widget(QtWidgets.QWidget):
             if stage_row['asset_id'] in self.asset_ids.keys():
                 self.stage_rows.append(stage_row)
                 if stage_row['id'] not in self.stage_ids.keys():
-                    row_index = self.get_asset_coord(stage_row['asset_id']).row()
+                    row_index = self.get_asset_coord(
+                        stage_row['asset_id']).row()
                     self.stage_ids[stage_row['id']] = dict()
                     self.stage_ids[stage_row['id']]['row'] = stage_row
-                    self.stage_ids[stage_row['id']]['widget'] = stage_widget(stage_row, self.users_images_dic)
-                    self.table_widget.setCellWidget(row_index, self.task_list.index(stage_row['name']), self.stage_ids[stage_row['id']]['widget'])
-                    self.stage_ids[stage_row['id']]['widget'].show_comment_signal.connect(self.view_comment_widget.show_comment)
-                    self.stage_ids[stage_row['id']]['widget'].hide_comment_signal.connect(self.view_comment_widget.close)
-                    self.stage_ids[stage_row['id']]['widget'].move_comment.connect(self.view_comment_widget.move_ui)
-                    self.stage_ids[stage_row['id']]['widget'].state_signal.connect(self.update_state)
-                    self.stage_ids[stage_row['id']]['widget'].priority_signal.connect(self.update_priority)
-                    self.stage_ids[stage_row['id']]['widget'].assignment_signal.connect(self.update_assignment)
+                    self.stage_ids[stage_row['id']]['widget'] = stage_widget(
+                        stage_row, self.users_images_dic)
+                    self.table_widget.setCellWidget(row_index, self.task_list.index(
+                        stage_row['name']), self.stage_ids[stage_row['id']]['widget'])
+                    self.stage_ids[stage_row['id']]['widget'].show_comment_signal.connect(
+                        self.view_comment_widget.show_comment)
+                    self.stage_ids[stage_row['id']]['widget'].hide_comment_signal.connect(
+                        self.view_comment_widget.close)
+                    self.stage_ids[stage_row['id']]['widget'].move_comment.connect(
+                        self.view_comment_widget.move_ui)
+                    self.stage_ids[stage_row['id']]['widget'].state_signal.connect(
+                        self.update_state)
+                    self.stage_ids[stage_row['id']]['widget'].priority_signal.connect(
+                        self.update_priority)
+                    self.stage_ids[stage_row['id']]['widget'].assignment_signal.connect(
+                        self.update_assignment)
                 else:
                     if stage_row != self.stage_ids[stage_row['id']]['row']:
-                        self.stage_ids[stage_row['id']]['widget'].refresh(stage_row)
+                        self.stage_ids[stage_row['id']
+                                       ]['widget'].refresh(stage_row)
                         self.stage_ids[stage_row['id']]['row'] = stage_row
 
         self.update_stage_datas_visibility()
@@ -457,7 +506,8 @@ class production_table_widget(QtWidgets.QWidget):
     def remove_stage(self, stage_id):
         if stage_id in self.stage_ids.keys():
             model_index = self.get_stage_coord(stage_id)
-            self.table_widget.removeCellWidget(model_index.row(), model_index.column())
+            self.table_widget.removeCellWidget(
+                model_index.row(), model_index.column())
             del self.stage_ids[stage_id]
 
     def remove_asset(self, asset_id):
@@ -473,26 +523,37 @@ class production_table_widget(QtWidgets.QWidget):
         self.search_start_time = time.perf_counter()
         self.accept_item_from_thread = False
         if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
-            self.search_threads[self.old_thread_id].show_stage_signal.disconnect()
-            self.search_threads[self.old_thread_id].hide_stage_signal.disconnect()
-            self.search_threads[self.old_thread_id].show_asset_signal.disconnect()
-            self.search_threads[self.old_thread_id].hide_asset_signal.disconnect()
-            self.search_threads[self.old_thread_id].hide_task_signal.disconnect()
-            self.search_threads[self.old_thread_id].show_task_signal.disconnect()
+            self.search_threads[self.old_thread_id].show_stage_signal.disconnect(
+            )
+            self.search_threads[self.old_thread_id].hide_stage_signal.disconnect(
+            )
+            self.search_threads[self.old_thread_id].show_asset_signal.disconnect(
+            )
+            self.search_threads[self.old_thread_id].hide_asset_signal.disconnect(
+            )
+            self.search_threads[self.old_thread_id].hide_task_signal.disconnect(
+            )
+            self.search_threads[self.old_thread_id].show_task_signal.disconnect(
+            )
         thread_id = time.time()
         self.search_threads[thread_id] = search_thread()
-        self.search_threads[thread_id].show_stage_signal.connect(self.show_stage)
-        self.search_threads[thread_id].hide_stage_signal.connect(self.hide_stage)
-        self.search_threads[thread_id].show_asset_signal.connect(self.show_asset)
-        self.search_threads[thread_id].hide_asset_signal.connect(self.hide_asset)
+        self.search_threads[thread_id].show_stage_signal.connect(
+            self.show_stage)
+        self.search_threads[thread_id].hide_stage_signal.connect(
+            self.hide_stage)
+        self.search_threads[thread_id].show_asset_signal.connect(
+            self.show_asset)
+        self.search_threads[thread_id].hide_asset_signal.connect(
+            self.hide_asset)
         self.search_threads[thread_id].hide_task_signal.connect(self.hide_task)
         self.search_threads[thread_id].show_task_signal.connect(self.show_task)
         self.old_thread_id = thread_id
         if len(search_data) > 0:
             self.accept_item_from_thread = True
-            self.search_threads[thread_id].update_search(self.asset_rows, self.stage_rows, self.task_list, search_data)
+            self.search_threads[thread_id].update_search(
+                self.asset_rows, self.stage_rows, self.task_list, search_data)
         else:
-            self.search_threads[thread_id].running=False
+            self.search_threads[thread_id].running = False
             self.show_all_stages()
             self.show_all_assets()
             self.show_all_tasks()
@@ -544,6 +605,7 @@ class production_table_widget(QtWidgets.QWidget):
         for task in self.task_list:
             self.show_task(task)
 
+
 class asset_widget(QtWidgets.QWidget):
     def __init__(self, asset_row, category_row, preview_row, parent=None):
         super(asset_widget, self).__init__(parent)
@@ -556,9 +618,10 @@ class asset_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed,
+                           QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,8,0)
+        self.main_layout.setContentsMargins(0, 0, 8, 0)
         self.setLayout(self.main_layout)
 
         self.image_label = QtWidgets.QLabel()
@@ -569,15 +632,16 @@ class asset_widget(QtWidgets.QWidget):
 
         self.name_layout = QtWidgets.QVBoxLayout()
         self.name_layout.setSpacing(2)
-        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
         self.asset_name_label = QtWidgets.QLabel()
         self.name_layout.addWidget(self.asset_name_label)
         self.category_name_label = QtWidgets.QLabel()
         self.category_name_label.setObjectName('gray_label')
         self.name_layout.addWidget(self.category_name_label)
-        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.name_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
         self.main_layout.addLayout(self.name_layout)
-
 
     def fill_ui(self):
         self.asset_name_label.setText(self.asset_row['name'])
@@ -589,12 +653,15 @@ class asset_widget(QtWidgets.QWidget):
                 image = self.preview_row['preview_path']
         else:
             image = self.preview_row['manual_override']
-        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(self.thumbnail_width, int(self.thumbnail_width/1.8)))
+        self.image_label.setPixmap(QtGui.QIcon(image).pixmap(
+            self.thumbnail_width, int(self.thumbnail_width/1.8)))
 
     def show_context_menu(self):
         menu = gui_utils.QMenu(self)
-        custom_preview_action = menu.addAction(QtGui.QIcon(ressources._add_icon_), 'Add custom preview')
-        default_preview_action = menu.addAction(QtGui.QIcon(ressources._refresh_icon_), 'Set preview to auto')
+        custom_preview_action = menu.addAction(
+            QtGui.QIcon(ressources._add_icon_), 'Add custom preview')
+        default_preview_action = menu.addAction(QtGui.QIcon(
+            ressources._refresh_icon_), 'Set preview to auto')
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             if action == default_preview_action:
@@ -605,14 +672,16 @@ class asset_widget(QtWidgets.QWidget):
 
     def set_preview(self):
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select preview image", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
+                                                              "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
-                assets.set_asset_preview(self.preview_row['asset_id'], image_file)
+                assets.set_asset_preview(
+                    self.preview_row['asset_id'], image_file)
                 gui_server.refresh_team_ui()
             else:
-                logger.warning('{} is not a valid image file...'.format(image_file))
+                logger.warning(
+                    '{} is not a valid image file...'.format(image_file))
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.RightButton:
@@ -623,24 +692,28 @@ class asset_widget(QtWidgets.QWidget):
         self.preview_row = preview_row
         self.fill_ui()
 
+
 class frame_range_widget(QtWidgets.QWidget):
-    def __init__(self, asset_row, parent = None):
+    def __init__(self, asset_row, parent=None):
         super(frame_range_widget, self).__init__(parent)
         self.asset_row = asset_row
         self.build_ui()
         self.fill_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(2)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.frame_range_label = QtWidgets.QLabel()
-        self.frame_range_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.frame_range_label.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.addWidget(self.frame_range_label)
 
         self.details_label = QtWidgets.QLabel()
@@ -648,15 +721,19 @@ class frame_range_widget(QtWidgets.QWidget):
         self.details_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.details_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def fill_ui(self):
-        self.frame_range_label.setText(f"{self.asset_row['inframe']} - {self.asset_row['outframe']}")
-        self.details_label.setText(f"{self.asset_row['outframe'] - self.asset_row['inframe']} frames")
+        self.frame_range_label.setText(
+            f"{self.asset_row['inframe']} - {self.asset_row['outframe']}")
+        self.details_label.setText(
+            f"{self.asset_row['outframe'] - self.asset_row['inframe']} frames")
 
     def refresh(self, asset_row):
         self.asset_row = asset_row
         self.fill_ui()
+
 
 class stage_widget(QtWidgets.QWidget):
 
@@ -693,13 +770,15 @@ class stage_widget(QtWidgets.QWidget):
         self.state_label.enter.connect(self.show_comment)
         self.state_label.leave.connect(self.hide_comment)
         self.state_label.move_event.connect(self.move_comment.emit)
-        self.user_image_label.assignment_signal.connect(self.assignment_signal.emit)
+        self.user_image_label.assignment_signal.connect(
+            self.assignment_signal.emit)
         self.priority_label.priority_signal.connect(self.priority_signal.emit)
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -709,49 +788,60 @@ class stage_widget(QtWidgets.QWidget):
 
         self.data_layout = QtWidgets.QHBoxLayout()
         self.data_layout.setSpacing(3)
-        self.data_layout.setContentsMargins(3,3,3,3)
+        self.data_layout.setContentsMargins(3, 3, 3, 3)
         self.main_layout.addLayout(self.data_layout)
 
         self.priority_label = priority_widget()
-        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.priority_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.priority_label.setFixedSize(30, 30)
         self.data_layout.addWidget(self.priority_label)
 
         self.state_label = state_widget()
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.state_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.state_label.setFixedHeight(30)
         self.data_layout.addWidget(self.state_label)
 
         self.user_image_label = assignment_widget()
-        self.user_image_label.setFixedSize(QtCore.QSize(30,30))
+        self.user_image_label.setFixedSize(QtCore.QSize(30, 30))
         self.data_layout.addWidget(self.user_image_label)
 
         self.note_content = gui_utils.minimum_height_textEdit(77)
         self.note_content.setFixedWidth(150)
         self.note_content.setReadOnly(True)
-        self.note_content.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.NoTextInteraction)
-        self.note_content.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.NoContextMenu)
+        self.note_content.setTextInteractionFlags(
+            QtCore.Qt.TextInteractionFlag.NoTextInteraction)
+        self.note_content.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.NoContextMenu)
         self.note_content.setObjectName('gray_label')
-        self.note_content.setStyleSheet('background-color:transparent;padding:0px;')
+        self.note_content.setStyleSheet(
+            'background-color:transparent;padding:0px;')
         self.data_layout.addWidget(self.note_content)
 
     def show_comment(self):
         if self.isActiveWindow():
-            tracking_events = project.get_asset_tracking_events(self.stage_row['id'])
+            tracking_events = project.get_asset_tracking_events(
+                self.stage_row['id'])
             if len(tracking_events) == 0:
                 return
             user = tracking_events[-1]['creation_user']
-            self.show_comment_signal.emit(self.stage_row['tracking_comment'], user)
+            self.show_comment_signal.emit(
+                self.stage_row['tracking_comment'], user)
 
     def hide_comment(self):
         self.hide_comment_signal.emit(1)
 
     def fill_ui(self):
-        self.color_frame.setStyleSheet('background-color:%s;'%ressources._stages_colors_[self.stage_row['name']])
-        self.priority_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[self.stage_row['priority']]).pixmap(22))
+        self.color_frame.setStyleSheet(
+            'background-color:%s;' % ressources._stages_colors_[self.stage_row['name']])
+        self.priority_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[
+                                      self.stage_row['priority']]).pixmap(22))
         self.state_label.setText(self.stage_row['state'])
-        self.state_label.setStyleSheet('#bold_label{background-color:%s;border-radius:4px;padding:6px;}'%ressources._states_colors_[self.stage_row['state']])
-        self.user_image_label.setPixmap(self.users_images_dic[self.stage_row['assignment']])
+        self.state_label.setStyleSheet(
+            '#bold_label{background-color:%s;border-radius:4px;padding:6px;}' % ressources._states_colors_[self.stage_row['state']])
+        self.user_image_label.setPixmap(
+            self.users_images_dic[self.stage_row['assignment']])
         if self.stage_row['note'] is None or self.stage_row['note'] == '':
             self.note_content.setText('Missing note')
         else:
@@ -761,6 +851,7 @@ class stage_widget(QtWidgets.QWidget):
         self.stage_row = stage_row
         self.fill_ui()
 
+
 class priority_widget(QtWidgets.QLabel):
 
     priority_signal = pyqtSignal(str)
@@ -769,9 +860,11 @@ class priority_widget(QtWidgets.QLabel):
         super(priority_widget, self).__init__(parent)
         self.setFixedWidth(60)
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.setObjectName('priority_label')
-        self.setStyleSheet('#priority_label{border-radius:4px;background-color:rgba(0,0,0,40);}')
+        self.setStyleSheet(
+            '#priority_label{border-radius:4px;background-color:rgba(0,0,0,40);}')
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.RightButton:
@@ -780,13 +873,15 @@ class priority_widget(QtWidgets.QLabel):
     def states_menu_requested(self):
         menu = gui_utils.QMenu(self)
         for priority in assets_vars._priority_list_:
-            menu.addAction(QtGui.QIcon(ressources._priority_icons_list_[priority]), priority)
+            menu.addAction(QtGui.QIcon(
+                ressources._priority_icons_list_[priority]), priority)
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             self.priority_signal.emit(action.text())
 
     def contextMenuEvent(self, event):
         event.accept()
+
 
 class state_widget(QtWidgets.QLabel):
 
@@ -801,7 +896,8 @@ class state_widget(QtWidgets.QLabel):
         self.setFixedWidth(60)
         self.setObjectName('bold_label')
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.RightButton:
@@ -810,7 +906,8 @@ class state_widget(QtWidgets.QLabel):
     def states_menu_requested(self):
         menu = gui_utils.QMenu(self)
         for state in assets_vars._asset_states_list_:
-            menu.addAction(QtGui.QIcon(ressources._states_icons_[state]), state)
+            menu.addAction(QtGui.QIcon(
+                ressources._states_icons_[state]), state)
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
             self.state_signal.emit(action.text())
@@ -828,13 +925,15 @@ class state_widget(QtWidgets.QLabel):
     def contextMenuEvent(self, event):
         event.accept()
 
+
 class assignment_widget(QtWidgets.QLabel):
 
     assignment_signal = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(assignment_widget, self).__init__(parent)
-        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.RightButton:
@@ -847,7 +946,8 @@ class assignment_widget(QtWidgets.QLabel):
         for user_id in users_ids:
             user_row = repository.get_user_data(user_id)
             icon = QtGui.QIcon()
-            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(
+                user_row['profile_picture']), 'png', 24)
             icon.addPixmap(pm)
             menu.addAction(icon, user_row['user_name'])
         action = menu.exec(QtGui.QCursor().pos())
@@ -856,6 +956,7 @@ class assignment_widget(QtWidgets.QLabel):
 
     def contextMenuEvent(self, event):
         event.accept()
+
 
 class search_thread(QtCore.QThread):
 
@@ -885,7 +986,7 @@ class search_thread(QtCore.QThread):
             task_to_show = []
 
             keywords_sets = self.search_data.split('+')
-            
+
             for stage_row in self.stage_rows:
 
                 stage_id = stage_row['id']
@@ -899,8 +1000,8 @@ class search_thread(QtCore.QThread):
                 for data_block in values:
                     data_list.append(str(data_block))
                 data = (' ').join(data_list)
-                data = data.replace('assets','')
-                data = data.replace('sequences','')
+                data = data.replace('assets', '')
+                data = data.replace('sequences', '')
 
                 for keywords_set in keywords_sets:
                     if keywords_set == '':

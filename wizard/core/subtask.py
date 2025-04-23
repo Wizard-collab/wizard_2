@@ -51,6 +51,7 @@ from wizard.core import socket_utils
 
 logger = logging.getLogger(__name__)
 
+
 class subtask(Thread):
     def __init__(self, cmd=None, pycmd=None, env=None, cwd=None, print_stdout=False):
         super(subtask, self).__init__()
@@ -75,7 +76,7 @@ class subtask(Thread):
         self.out = ''
 
     def set_print_stdout(self):
-        self.print_stdout=True
+        self.print_stdout = True
 
     def set_command(self, command):
         self.command = command
@@ -86,7 +87,7 @@ class subtask(Thread):
     def set_env(self, env):
         if env is None:
             return
-        if type(env)!=dict:
+        if type(env) != dict:
             return
         self.env = env
 
@@ -109,7 +110,8 @@ class subtask(Thread):
                 self.analyse_signal(out)
             if self.process.poll() is not None:
                 self.running = False
-                self.communicate_thread.send_signal([self.process_id, 'status', 'Done'])
+                self.communicate_thread.send_signal(
+                    [self.process_id, 'status', 'Done'])
                 self.set_done()
                 break
 
@@ -130,7 +132,8 @@ class subtask(Thread):
                 try:
                     last_percent = round(float(line.split(':')[-1]), 0)
                 except:
-                    self.communicate_thread.send_signal([self.process_id, 'stdout', str(traceback.format_exc())])
+                    self.communicate_thread.send_signal(
+                        [self.process_id, 'stdout', str(traceback.format_exc())])
             elif 'wizard_task_name:' in line:
                 last_task = line.split(':')[-1]
             else:
@@ -138,12 +141,15 @@ class subtask(Thread):
                 last_stdout_line = line
 
         self.out += buffered_stdout
-        self.communicate_thread.send_signal([self.process_id, 'stdout', self.stream_stdout_buffer+buffered_stdout])
+        self.communicate_thread.send_signal(
+            [self.process_id, 'stdout', self.stream_stdout_buffer+buffered_stdout])
 
         if last_percent is not None:
-            self.communicate_thread.send_percent([self.process_id, 'percent', last_percent])
+            self.communicate_thread.send_percent(
+                [self.process_id, 'percent', last_percent])
         if last_task is not None:
-            self.communicate_thread.send_signal([self.process_id, 'current_task', last_task])
+            self.communicate_thread.send_signal(
+                [self.process_id, 'current_task', last_task])
 
         if self.print_stdout:
             print(buffered_stdout)
@@ -161,27 +167,31 @@ class subtask(Thread):
         if 'wizard_task_percent:' in out:
             try:
                 percent = round(float(out.split(':')[-1]), 0)
-                self.communicate_thread.send_percent([self.process_id, 'percent', percent])
+                self.communicate_thread.send_percent(
+                    [self.process_id, 'percent', percent])
                 self.percent = percent
             except:
                 logger.error(str(traceback.format_exc()))
         elif 'wizard_task_name:' in out:
             task = out.split(':')[-1]
-            self.communicate_thread.send_signal([self.process_id, 'current_task', task])
+            self.communicate_thread.send_signal(
+                [self.process_id, 'current_task', task])
             self.current_task = task
         elif 'wizard_task_status:' in out:
             status = out.split(':')[-1]
             if status == 'done':
-                self.communicate_thread.send_signal([self.process_id, 'status', 'Done'])
+                self.communicate_thread.send_signal(
+                    [self.process_id, 'status', 'Done'])
                 self.status = 'Done'
                 self.set_done()
         else:
-            self.out+='\n'+out
+            self.out += '\n'+out
             self.stream_stdout_buffer += '\n'+out
             if self.print_stdout:
                 print(out)
             if time.time() - self.stream_stdout_last_send > 0.2:
-                self.communicate_thread.send_signal([self.process_id, 'stdout', self.stream_stdout_buffer])
+                self.communicate_thread.send_signal(
+                    [self.process_id, 'stdout', self.stream_stdout_buffer])
                 self.stream_stdout_buffer = ''
                 self.stream_stdout_last_send = time.time()
 
@@ -201,20 +211,22 @@ class subtask(Thread):
         for child in psutil.Process(self.process.pid).children(recursive=True):
             child.kill()
         self.process.kill()
-        self.communicate_thread.send_signal([self.process_id, 'status', 'Killed'])
+        self.communicate_thread.send_signal(
+            [self.process_id, 'status', 'Killed'])
         self.status = 'Killed'
         self.running = False
 
     def write_log(self):
         log_name = f"subtask_{self.process_id}.log"
         log_file = path_utils.join(user_vars._subtasks_logs_, log_name)
-        subtasks_datas_file = path_utils.join(user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
+        subtasks_datas_file = path_utils.join(
+            user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
         tools.create_folder_if_not_exist(user_vars._subtasks_logs_)
         with open(log_file, 'w') as f:
             f.write(self.out)
         if path_utils.isfile(subtasks_datas_file):
             with open(subtasks_datas_file, 'r') as f:
-                datas_dic = yaml.load(f, Loader = yaml.Loader)
+                datas_dic = yaml.load(f, Loader=yaml.Loader)
         else:
             datas_dic = dict()
         datas_dic[self.process_id] = dict()
@@ -228,7 +240,8 @@ class subtask(Thread):
         with open(subtasks_datas_file, 'w') as f:
             yaml.dump(datas_dic, f)
 
-        self.communicate_thread.send_signal([self.process_id, 'log_file', log_file])
+        self.communicate_thread.send_signal(
+            [self.process_id, 'log_file', log_file])
 
     def build_pycmd(self):
         if self.pycmd is None:
@@ -237,7 +250,7 @@ class subtask(Thread):
             py_file = self.pycmd
         else:
             py_file = tools.temp_file_from_pycmd(self.pycmd)
-        
+
         if sys.argv[0].endswith('.py'):
             executable = 'python wizard_cmd.py'
         else:
@@ -269,11 +282,12 @@ class subtask(Thread):
 
             self.build_pycmd()
 
-            self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=self.cwd,
-                                            stdout = subprocess.PIPE, stderr = subprocess.STDOUT, stdin = subprocess.PIPE)
+            self.process = subprocess.Popen(args=shlex.split(self.command), env=self.env, cwd=self.cwd,
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
 
-            self.communicate_thread.send_signal([self.process_id, 'status', 'Running'])
-            
+            self.communicate_thread.send_signal(
+                [self.process_id, 'status', 'Running'])
+
             self.check_realtime_output()
             self.analyse_missed_stdout()
             self.task_time = time.perf_counter()-start_time
@@ -281,22 +295,27 @@ class subtask(Thread):
             self.write_log()
             self.communicate_thread.send_signal([self.process_id, 'end', 1])
             self.communicate_thread.stop()
-            
+
         except:
             logger.error(str(traceback.format_exc()))
 
+
 def send_signal(signal_list):
-    socket_utils.send_bottle(('localhost', environment.get_subtasks_server_port()), signal_list, 0.001)
+    socket_utils.send_bottle(
+        ('localhost', environment.get_subtasks_server_port()), signal_list, 0.001)
+
 
 class communicate_thread(Thread):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(communicate_thread, self).__init__()
         self.parent = parent
         self.percent = 0
         self.running = True
-        self.conn = socket_utils.get_connection(('localhost', environment.get_subtasks_server_port()))
+        self.conn = socket_utils.get_connection(
+            ('localhost', environment.get_subtasks_server_port()))
         if self.conn is not None:
-            socket_utils.send_signal_with_conn(self.conn, self.parent.process_id)
+            socket_utils.send_signal_with_conn(
+                self.conn, self.parent.process_id)
 
     def stop(self):
         self.running = False
@@ -333,12 +352,14 @@ class communicate_thread(Thread):
             self.conn = None
             self.stop()
 
+
 class tasks_server(Thread):
     def __init__(self):
         super(tasks_server, self).__init__()
         self.port = socket_utils.get_port('localhost')
         environment.set_subtasks_server_port(self.port)
-        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
+        self.server, self.server_address = socket_utils.get_server(
+            ('localhost', self.port))
         self.running = True
         self.threads = dict()
 
@@ -366,6 +387,7 @@ class tasks_server(Thread):
         self.server.close()
         self.running = False
 
+
 class task_thread(Thread):
     def __init__(self, conn, process_id):
         super(task_thread, self).__init__()
@@ -383,7 +405,7 @@ class task_thread(Thread):
                     if self.conn is not None:
                         self.conn.close()
                         self.conn = None
-                        #self.connection_dead.emit(1)
+                        # self.connection_dead.emit(1)
             except:
                 logger.error(str(traceback.format_exc()))
                 continue
@@ -394,7 +416,7 @@ class task_thread(Thread):
                 if self.conn is not None:
                     self.conn.close()
                     self.conn = None
-                    #self.connection_dead.emit(1)
+                    # self.connection_dead.emit(1)
 
     def get_stdout(self):
         if self.conn is not None:
@@ -402,14 +424,14 @@ class task_thread(Thread):
                 if self.conn is not None:
                     self.conn.close()
                     self.conn = None
-                    #self.connection_dead.emit(1)
+                    # self.connection_dead.emit(1)
 
     def stop(self):
         self.running = False
         if self.conn is not None:
             self.conn.close()
             self.conn = None
-            #self.connection_dead.emit(1)
+            # self.connection_dead.emit(1)
 
     def analyse_signal(self, raw_data):
         try:
@@ -433,8 +455,10 @@ class task_thread(Thread):
         except json.decoder.JSONDecodeError:
             logger.debug("cannot read json data")
 
+
 def remove_task_from_subtasks_datas_file(task_id):
-    subtasks_datas_file = path_utils.join(user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
+    subtasks_datas_file = path_utils.join(
+        user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
     if not path_utils.isfile(subtasks_datas_file):
         return
     with open(subtasks_datas_file, 'r') as f:

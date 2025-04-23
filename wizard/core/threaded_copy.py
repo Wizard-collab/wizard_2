@@ -31,7 +31,6 @@ import numpy as np
 import multiprocessing
 import threading
 import time
-import random
 import shutil
 import os
 import logging
@@ -40,6 +39,7 @@ import logging
 from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
+
 
 class threaded_copy:
     def __init__(self, files_list, destination, max_threads=None):
@@ -54,7 +54,8 @@ class threaded_copy:
 
     def copy(self):
         print(f"wizard_task_name: Copying {len(self.files_list)} files")
-        logger.info(f"Starting copy of {len(self.files_list)} files to {self.destination}")
+        logger.info(
+            f"Starting copy of {len(self.files_list)} files to {self.destination}")
         logger.info(f"Using {self.max_threads} maximum threads")
         percent_step = 100/len(self.files_list)
         progress = 0.0
@@ -76,6 +77,7 @@ class threaded_copy:
             progress = len(self.copied_files)*percent_step
             print(f"wizard_task_percent: {progress}")
 
+
 class copy_thread(threading.Thread):
     def __init__(self, files_chunk, destination):
         super(copy_thread, self).__init__()
@@ -86,10 +88,13 @@ class copy_thread(threading.Thread):
     def run(self):
         for file in self.files_chunk:
             file_size = os.path.getsize(file)
-            destination_file = path_utils.join(self.destination, path_utils.basename(file))
+            destination_file = path_utils.join(
+                self.destination, path_utils.basename(file))
             shutil.copyfile(file, destination_file)
             if os.path.getsize(destination_file) == file_size:
-                logger.info(f'"{destination_file}" ({file_size}b) successfully copied')
+                logger.info(
+                    f'"{destination_file}" ({file_size}b) successfully copied')
                 self.copied_files.append(file)
             else:
-                logger.warning(f'"{destination_file}" not successfully copied, retrying')
+                logger.warning(
+                    f'"{destination_file}" not successfully copied, retrying')

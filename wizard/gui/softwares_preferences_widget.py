@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 import json
 import logging
 
@@ -17,6 +17,7 @@ from wizard.core import softwares_search
 from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
+
 
 class softwares_preferences_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -36,12 +37,12 @@ class softwares_preferences_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.container_layout = QtWidgets.QVBoxLayout()
-        self.container_layout.setContentsMargins(0,0,0,0)
+        self.container_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.container_layout)
 
         self.main_widget = QtWidgets.QWidget()
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(24,24,24,24)
+        self.main_layout.setContentsMargins(24, 24, 24, 24)
         self.main_layout.setSpacing(12)
         self.main_widget.setLayout(self.main_layout)
         self.container_layout.addWidget(self.main_widget)
@@ -58,7 +59,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
 
         self.path_widget = QtWidgets.QWidget()
         self.path_layout = QtWidgets.QHBoxLayout()
-        self.path_layout.setContentsMargins(0,0,0,0)
+        self.path_layout.setContentsMargins(0, 0, 0, 0)
         self.path_layout.setSpacing(6)
         self.path_widget.setLayout(self.path_layout)
         self.main_layout.addWidget(self.path_widget)
@@ -78,29 +79,34 @@ class softwares_preferences_widget(QtWidgets.QWidget):
         self.path_layout.addWidget(self.guess_button)
 
         self.batch_path_lineEdit = QtWidgets.QLineEdit()
-        self.batch_path_lineEdit.setPlaceholderText('Software batch executable path')
+        self.batch_path_lineEdit.setPlaceholderText(
+            'Software batch executable path')
         self.main_layout.addWidget(self.batch_path_lineEdit)
 
-        self.main_layout.addWidget(QtWidgets.QLabel("Additionnal scripts path"))
+        self.main_layout.addWidget(
+            QtWidgets.QLabel("Additionnal scripts path"))
 
         self.custom_script_paths_textEdit = QtWidgets.QTextEdit()
-        self.custom_script_paths_textEdit.setPlaceholderText('path/to/my/scripts')
+        self.custom_script_paths_textEdit.setPlaceholderText(
+            'path/to/my/scripts')
         self.main_layout.addWidget(self.custom_script_paths_textEdit)
 
         self.main_layout.addWidget(QtWidgets.QLabel("Additionnal environment"))
 
         self.custom_env_textEdit = QtWidgets.QTextEdit()
-        self.custom_env_textEdit.setPlaceholderText('PYTHONPATH=path/to/my/scripts')
+        self.custom_env_textEdit.setPlaceholderText(
+            'PYTHONPATH=path/to/my/scripts')
         self.main_layout.addWidget(self.custom_env_textEdit)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.apply_button = QtWidgets.QPushButton('Apply')
         self.apply_button.setObjectName('blue_button')
@@ -110,7 +116,7 @@ class softwares_preferences_widget(QtWidgets.QWidget):
 
     def open_folder(self):
         software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select software executable", "",
-                            "All Files (*);;")
+                                                                 "All Files (*);;")
         if software_path:
             self.path_lineEdit.setText(software_path.replace('\\', '/'))
 
@@ -139,8 +145,10 @@ class softwares_preferences_widget(QtWidgets.QWidget):
                 software_row = project.get_software_data_by_name(software)
                 self.path_lineEdit.setText(software_row['path'])
                 self.batch_path_lineEdit.setText(software_row['batch_path'])
-                self.custom_script_paths_textEdit.setText(self.load_additionnal_scripts(software_row['additionnal_scripts']))
-                self.custom_env_textEdit.setText(self.load_additionnal_env(software_row['additionnal_env']))
+                self.custom_script_paths_textEdit.setText(
+                    self.load_additionnal_scripts(software_row['additionnal_scripts']))
+                self.custom_env_textEdit.setText(
+                    self.load_additionnal_env(software_row['additionnal_env']))
 
     def apply(self):
         software = self.softwares_comboBox.currentText()
@@ -153,10 +161,12 @@ class softwares_preferences_widget(QtWidgets.QWidget):
             project.set_software_batch_path(software_row['id'], batch_path)
         additionnal_scripts = self.custom_script_paths_textEdit.toPlainText().split('\n')
         if additionnal_scripts != software_row['additionnal_scripts']:
-            project.set_software_additionnal_scripts(software_row['id'], additionnal_scripts)
+            project.set_software_additionnal_scripts(
+                software_row['id'], additionnal_scripts)
         additionnal_env = self.custom_env_textEdit.toPlainText()
         if additionnal_env != software_row['additionnal_env']:
-            project.set_software_additionnal_env(software_row['id'], self.convert_additionnal_env(additionnal_env))
+            project.set_software_additionnal_env(
+                software_row['id'], self.convert_additionnal_env(additionnal_env))
 
     def convert_additionnal_env(self, additionnal_env):
         env_dic = dict()
@@ -171,9 +181,9 @@ class softwares_preferences_widget(QtWidgets.QWidget):
     def load_additionnal_env(self, additionnal_env):
         text = ""
         if additionnal_env is not None and additionnal_env != '':
-	        dic = json.loads(additionnal_env)
-	        for key in dic.keys():
-	            text += f"{key}={dic[key]}\n"
+            dic = json.loads(additionnal_env)
+            for key in dic.keys():
+                text += f"{key}={dic[key]}\n"
         return text
 
     def load_additionnal_scripts(self, additionnal_scripts):
@@ -183,4 +193,3 @@ class softwares_preferences_widget(QtWidgets.QWidget):
             for script in scripts_list:
                 text += script + '\n'
         return text
-

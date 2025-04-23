@@ -29,16 +29,16 @@
 # Python modules
 import time
 import threading
-import statistics
 import json
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
-from wizard.core import tools
-from wizard.core import project
-from wizard.core import environment
 from wizard.vars import assets_vars
+from wizard.core import project
+from wizard.core import tools
+
+logger = logging.getLogger(__name__)
+
 
 def get_all_progresses(to_round=1):
     stages_rows = project.get_all_stages()
@@ -57,30 +57,37 @@ def get_all_progresses(to_round=1):
             assets_progresses_lists[asset_id] = []
         asset_row = project.get_asset_data(asset_id)
         frames_number = asset_row['outframe'] - asset_row['inframe']
-        assets_progresses_lists[asset_id].append((stage_row['progress'],1))
+        assets_progresses_lists[asset_id].append((stage_row['progress'], 1))
         domain_row = project.get_domain_data(stage_row['domain_id'])
         if asset_row['category_id'] not in categories_progresses_lists.keys():
             categories_progresses_lists[asset_row['category_id']] = []
         if domain_row['name'] == assets_vars._sequences_:
-            categories_progresses_lists[asset_row['category_id']].append((stage_row['progress'], frames_number / all_frames))
+            categories_progresses_lists[asset_row['category_id']].append(
+                (stage_row['progress'], frames_number / all_frames))
         else:
-            categories_progresses_lists[asset_row['category_id']].append((stage_row['progress'], 1))
+            categories_progresses_lists[asset_row['category_id']].append(
+                (stage_row['progress'], 1))
         if domain_row['id'] not in domains_progresses_lists.keys():
             domains_progresses_lists[domain_row['id']] = []
         if domain_row['name'] == assets_vars._sequences_:
-            domains_progresses_lists[domain_row['id']].append((stage_row['progress'], frames_number / all_frames))
+            domains_progresses_lists[domain_row['id']].append(
+                (stage_row['progress'], frames_number / all_frames))
         else:
-            domains_progresses_lists[domain_row['id']].append((stage_row['progress'], 1))
+            domains_progresses_lists[domain_row['id']].append(
+                (stage_row['progress'], 1))
 
     for asset_id in assets_progresses_lists.keys():
-        assets_progresses[asset_id] = round(get_mean(assets_progresses_lists[asset_id]), to_round)
+        assets_progresses[asset_id] = round(
+            get_mean(assets_progresses_lists[asset_id]), to_round)
     for category_id in categories_progresses_lists.keys():
-        categories_progresses[category_id] = round(get_mean(categories_progresses_lists[category_id]), to_round)
+        categories_progresses[category_id] = round(
+            get_mean(categories_progresses_lists[category_id]), to_round)
     for domain_id in domains_progresses_lists.keys():
-        domains_progresses[domain_id] = round(get_mean(domains_progresses_lists[domain_id]), to_round)
-
+        domains_progresses[domain_id] = round(
+            get_mean(domains_progresses_lists[domain_id]), to_round)
 
     return assets_progresses, categories_progresses, domains_progresses
+
 
 def add_progress_event(new_stage=None, removed_stage=None):
     start_time = time.time()
@@ -107,18 +114,23 @@ def add_progress_event(new_stage=None, removed_stage=None):
             if stage_name not in datas_dic:
                 continue
             if stage_name in assets_vars._assets_stages_list_:
-                datas_dic[stage_name] = datas_dic[stage_name] * ((stage_len-1) / stage_len)
+                datas_dic[stage_name] = datas_dic[stage_name] * \
+                    ((stage_len-1) / stage_len)
                 if 'total' in datas_dic:
-                    datas_dic['total'] = datas_dic['total'] * ((total_len-1) / total_len)
+                    datas_dic['total'] = datas_dic['total'] * \
+                        ((total_len-1) / total_len)
             elif stage_name in assets_vars._sequences_stages_list_:
                 asset_row = assets[new_stage_row['asset_id']]
                 frames_number = asset_row['outframe'] - asset_row['inframe']
-                datas_dic[stage_name] = datas_dic[stage_name] * (all_frames-frames_number) / (all_frames)
+                datas_dic[stage_name] = datas_dic[stage_name] * \
+                    (all_frames-frames_number) / (all_frames)
                 if 'total' in datas_dic:
-                    datas_dic['total'] = datas_dic['total'] * (all_frames-frames_number) / (all_frames)
+                    datas_dic['total'] = datas_dic['total'] * \
+                        (all_frames-frames_number) / (all_frames)
             if datas_dic == original_datas_dic:
                 continue
-            datas_to_update.append((progress_row['id'], 'datas_dic', json.dumps(datas_dic)))
+            datas_to_update.append(
+                (progress_row['id'], 'datas_dic', json.dumps(datas_dic)))
         project.update_progress_events(datas_to_update)
 
     if removed_stage:
@@ -131,12 +143,15 @@ def add_progress_event(new_stage=None, removed_stage=None):
             datas_dic = json.loads(progress_row['datas_dic'])
             if new_stage not in datas_dic:
                 continue
-            datas_dic[new_stage] = datas_dic[new_stage] * ((stage_len+1) / stage_len)
+            datas_dic[new_stage] = datas_dic[new_stage] * \
+                ((stage_len+1) / stage_len)
             if 'total' in datas_dic:
-                datas_dic['total'] = datas_dic['total'] * ((total_len+1) / total_len)
+                datas_dic['total'] = datas_dic['total'] * \
+                    ((total_len+1) / total_len)
             if datas_dic == json.loads(progress_row['datas_dic']):
                 continue
-            project.update_progress_event(progress_row['id'], ('datas_dic', json.dumps(datas_dic)))
+            project.update_progress_event(
+                progress_row['id'], ('datas_dic', json.dumps(datas_dic)))
 
     domains_rows = project.get_domains()
     domains = dict()
@@ -151,7 +166,8 @@ def add_progress_event(new_stage=None, removed_stage=None):
     assets_rows = project.get_all_assets()
     assets_categories = dict()
     for asset_row in assets_rows:
-        assets_categories[asset_row['id']] = categories[asset_row['category_id']]
+        assets_categories[asset_row['id']
+                          ] = categories[asset_row['category_id']]
 
     stages_rows = project.get_all_stages()
 
@@ -228,27 +244,35 @@ def add_progress_event(new_stage=None, removed_stage=None):
 
     for stage in total_progresses_dic.keys():
         total_progresses_dic[stage] = get_mean(total_progresses_dic[stage])
-    project.add_progress_event('total', 'All project', json.dumps(total_progresses_dic))
+    project.add_progress_event(
+        'total', 'All project', json.dumps(total_progresses_dic))
 
     for domain in domains_progresses_dic.keys():
         for stage in domains_progresses_dic[domain].keys():
-            domains_progresses_dic[domain][stage] = get_mean(domains_progresses_dic[domain][stage])
-        project.add_progress_event('domain', domain, json.dumps(domains_progresses_dic[domain]))
+            domains_progresses_dic[domain][stage] = get_mean(
+                domains_progresses_dic[domain][stage])
+        project.add_progress_event(
+            'domain', domain, json.dumps(domains_progresses_dic[domain]))
 
     for category in categories_progresses_dic.keys():
         for stage in categories_progresses_dic[category].keys():
-            categories_progresses_dic[category][stage] = get_mean(categories_progresses_dic[category][stage])
-        project.add_progress_event('category', category, json.dumps(categories_progresses_dic[category]))
+            categories_progresses_dic[category][stage] = get_mean(
+                categories_progresses_dic[category][stage])
+        project.add_progress_event('category', category, json.dumps(
+            categories_progresses_dic[category]))
 
-    logger.debug(f"Progress event calculation duration : {time.time()-start_time}s")
+    logger.debug(
+        f"Progress event calculation duration : {time.time()-start_time}s")
+
 
 def get_mean(data_list):
     if data_list == []:
-        data_list = [(0,1)]
+        data_list = [(0, 1)]
     weighted_sum = sum(value * weight for value, weight in data_list)
     total_weight = sum(weight for _, weight in data_list)
-    
+
     return weighted_sum / total_weight
+
 
 def get_all_frames():
     assets_rows = project.get_all_sequence_assets()
@@ -257,13 +281,15 @@ def get_all_frames():
         all_frames += asset_row['outframe'] - asset_row['inframe']
     return all_frames
 
+
 def get_rendered_frames():
     assets_rows = project.get_all_sequence_assets()
     done_frames = 0
     for asset_row in assets_rows:
 
         # Get rendering stage
-        stage = project.get_asset_child_by_name(asset_row['id'], 'rendering', ignore_warning=True)
+        stage = project.get_asset_child_by_name(
+            asset_row['id'], 'rendering', ignore_warning=True)
         if not stage:
             continue
         if stage['state'] != 'done':
@@ -271,6 +297,7 @@ def get_rendered_frames():
 
         done_frames += asset_row['outframe'] - asset_row['inframe']
     return done_frames
+
 
 class schedule(threading.Thread):
     def __init__(self, parent=None):
@@ -285,8 +312,8 @@ class schedule(threading.Thread):
     def run(self):
         while self.running:
             day, hour = tools.convert_time(time.time())
-            #if hour.split(':')[0] == '17':  
-            if hour == '17:25':  
+            # if hour.split(':')[0] == '17':
+            if hour == '17:25':
                 if day != self.day:
                     self.day = day
                     self.is_done = False

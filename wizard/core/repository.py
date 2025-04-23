@@ -26,7 +26,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# This module is used to manage and access 
+# This module is used to manage and access
 # the repository database
 
 # The repository database stores the following informations:
@@ -35,7 +35,6 @@
 #       - The ip wraps ( roughly looks like cookies in web )
 
 # Python modules
-import os
 import time
 import socket
 import json
@@ -50,12 +49,12 @@ from wizard.core import path_utils
 from wizard.core import environment
 from wizard.core import image
 from wizard.vars import repository_vars
-from wizard.vars import ressources
 from wizard.vars import game_vars
 
 logger = logging.getLogger(__name__)
 
-def create_project(project_name, project_path, project_password, project_image = None):
+
+def create_project(project_name, project_path, project_password, project_image=None):
     do_creation = 1
     if project_name == '':
         logger.warning("Please provide a project name")
@@ -67,7 +66,7 @@ def create_project(project_name, project_path, project_password, project_image =
         logger.warning("Please provide a password")
         do_creation = 0
     if project_image is None:
-        project_image = image.project_random_image(project_name)   
+        project_image = image.project_random_image(project_name)
     project_image_ascii = process_project_image(project_image)
     if not do_creation:
         return
@@ -75,29 +74,32 @@ def create_project(project_name, project_path, project_password, project_image =
         logger.warning(f'Project {project_name} already exists')
         return
     if project_path in get_projects_paths_list():
-        logger.warning(f'Path {project_path} already assigned to another project')
+        logger.warning(
+            f'Path {project_path} already assigned to another project')
         return
     if not get_user_row_by_name(environment.get_user())['administrator']:
         logger.warning("You need to be administrator to create a project")
         return
     project_id = db_utils.create_row('repository',
-                    'projects', 
-                    ('project_name',
-                        'project_path',
-                        'project_password',
-                        'project_image',
-                        'creation_user',
-                        'creation_time'), 
-                    (project_name,
-                    project_path,
-                    tools.encrypt_string(project_password),
-                    project_image_ascii,
-                    environment.get_user(),
-                    time.time()))
+                                     'projects',
+                                     ('project_name',
+                                      'project_path',
+                                      'project_password',
+                                      'project_image',
+                                      'creation_user',
+                                      'creation_time'),
+                                     (project_name,
+                                         project_path,
+                                         tools.encrypt_string(
+                                             project_password),
+                                         project_image_ascii,
+                                         environment.get_user(),
+                                         time.time()))
     if not project_id:
         return
     logger.info(f'Project {project_name} added to repository')
     return project_id
+
 
 def remove_project_row(project_id):
     if not db_utils.delete_row('repository', 'projects', project_id):
@@ -105,20 +107,25 @@ def remove_project_row(project_id):
     logger.info('Project row removed')
     return 1
 
+
 def get_administrator_pass():
     user_row = get_user_row_by_name('admin')
     if not user_row:
         return
     return user_row['pass']
 
+
 def get_projects_list():
     return db_utils.get_rows('repository', 'projects')
+
 
 def get_projects_names_list():
     return db_utils.get_rows('repository', 'projects', 'project_name')
 
+
 def get_projects_paths_list():
     return db_utils.get_rows('repository', 'projects', 'project_path')
+
 
 def get_project_row_by_name(name):
     projects_rows = db_utils.get_row_by_column_data('repository',
@@ -128,6 +135,7 @@ def get_project_row_by_name(name):
         logger.error("Project not found")
         return
     return projects_rows[0]
+
 
 def get_project_row(project_id, column='*'):
     projects_rows = db_utils.get_row_by_column_data('repository',
@@ -139,18 +147,20 @@ def get_project_row(project_id, column='*'):
         return
     return projects_rows[0]
 
+
 def get_project_path_by_name(name):
     project_row = get_project_row_by_name(name)
     if not project_row:
         return
     return project_row['project_path']
 
+
 def modify_project_password(project_name,
                             project_password,
                             new_password,
                             administrator_pass=''):
     if not tools.decrypt_string(get_administrator_pass(),
-                            administrator_pass):
+                                administrator_pass):
         logger.warning('Wrong administrator pass')
         return
     if project_name not in get_projects_names_list():
@@ -162,12 +172,14 @@ def modify_project_password(project_name,
         logger.warning(f'Wrong password for {project_name}')
         return
     if not db_utils.update_data('repository',
-                'projects',
-                ('project_password', tools.encrypt_string(new_password)),
-                ('project_name', project_name)):
+                                'projects',
+                                ('project_password',
+                                 tools.encrypt_string(new_password)),
+                                ('project_name', project_name)):
         return
     logger.info(f'{project_name} password modified')
     return 1
+
 
 def modify_project_image(project_name, project_image):
     if not project_image:
@@ -177,27 +189,30 @@ def modify_project_image(project_name, project_image):
         return
     project_image_ascii = process_project_image(project_image)
     if not db_utils.update_data('repository',
-                            'projects',
-                            ('project_image', project_image_ascii),
-                            ('project_name', project_name)):
+                                'projects',
+                                ('project_image', project_image_ascii),
+                                ('project_name', project_name)):
         return
     logger.info(f'{project_name} image modified')
     return 1
 
+
 def process_project_image(image_file):
     bytes_data = image.convert_image_to_bytes(image_file)
     pillow_image = image.convert_image_bytes_to_pillow(bytes_data)
-    pillow_image, fixed_width, height_size = image.resize_image_with_fixed_width(pillow_image, 600)
+    pillow_image, fixed_width, height_size = image.resize_image_with_fixed_width(
+        pillow_image, 600)
     pillow_image = image.crop_image_height(pillow_image, 337)
     bytes_data = image.convert_PILLOW_image_to_bytes(pillow_image)
     return image.convert_bytes_to_str_data(bytes_data)
 
+
 def create_user(user_name,
-                    password,
-                    email,
-                    administrator_pass='',
-                    profile_picture=None,
-                    championship_participation=1):
+                password,
+                email,
+                administrator_pass='',
+                profile_picture=None,
+                championship_participation=1):
     do_creation = 1
     if user_name == '':
         logger.warning('Please provide a user name')
@@ -222,43 +237,44 @@ def create_user(user_name,
             profile_picture = image.user_random_image(user_name)
     else:
         profile_picture = image.user_random_image(user_name)
-    profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
+    profile_picture_ascii = image.convert_image_to_str_data(
+        profile_picture, 100)
     if not db_utils.create_row('repository',
-                'users', 
-                ('user_name',
-                    'pass',
-                    'email',
-                    'profile_picture',
-                    'xp',
-                    'total_xp',
-                    'work_time',
-                    'comments_count',
-                    'deaths',
-                    'level',
-                    'life',
-                    'administrator',
-                    'coins',
-                    'championship_participation',
-                    'championship_ban_time',
-                    'artefacts',
-                    'keeped_artefacts'), 
-                (user_name,
-                    tools.encrypt_string(password),
-                    email,
-                    profile_picture_ascii,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    100,
-                    administrator,
-                    0,
-                    int(championship_participation),
-                    None,
-                    json.dumps({}),
-                    json.dumps({}))):
+                               'users',
+                               ('user_name',
+                                'pass',
+                                'email',
+                                'profile_picture',
+                                'xp',
+                                'total_xp',
+                                'work_time',
+                                'comments_count',
+                                'deaths',
+                                'level',
+                                'life',
+                                'administrator',
+                                'coins',
+                                'championship_participation',
+                                'championship_ban_time',
+                                'artefacts',
+                                'keeped_artefacts'),
+                               (user_name,
+                                tools.encrypt_string(password),
+                                email,
+                                profile_picture_ascii,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                100,
+                                administrator,
+                                0,
+                                int(championship_participation),
+                                   None,
+                                   json.dumps({}),
+                                   json.dumps({}))):
         return
     info = f"User {user_name} created"
     if administrator:
@@ -268,20 +284,23 @@ def create_user(user_name,
     logger.info(info)
     return 1
 
+
 def modify_user_profile_picture(user_name, profile_picture):
     if not profile_picture:
         return
     if not path_utils.isfile(profile_picture):
         logger.warning(f'{profile_picture} not found')
         return
-    profile_picture_ascii = image.convert_image_to_str_data(profile_picture, 100)
+    profile_picture_ascii = image.convert_image_to_str_data(
+        profile_picture, 100)
     if not db_utils.update_data('repository',
-                            'users',
-                            ('profile_picture', profile_picture_ascii),
-                            ('user_name', user_name)):
+                                'users',
+                                ('profile_picture', profile_picture_ascii),
+                                ('user_name', user_name)):
         return
     logger.info(f'{user_name} profile picture modified')
     return 1
+
 
 def upgrade_user_privilege(user_name, administrator_pass):
     if user_name not in get_user_names_list():
@@ -296,12 +315,13 @@ def upgrade_user_privilege(user_name, administrator_pass):
         logger.warning('Wrong administrator pass')
         return
     if not db_utils.update_data('repository',
-                            'users',
-                            ('administrator',1),
-                            ('user_name', user_name)):
+                                'users',
+                                ('administrator', 1),
+                                ('user_name', user_name)):
         return
     logger.info(f'Administrator privilege set for {user_name}')
     return 1
+
 
 def downgrade_user_privilege(user_name, administrator_pass):
     if user_name not in get_user_names_list():
@@ -316,12 +336,13 @@ def downgrade_user_privilege(user_name, administrator_pass):
         logger.warning('Wrong administrator pass')
         return
     if not db_utils.update_data('repository',
-                            'users',
-                            ('administrator',0),
-                            ('user_name', user_name)):
+                                'users',
+                                ('administrator', 0),
+                                ('user_name', user_name)):
         return
     logger.info(f'Privilege downgraded to user for {user_name}')
     return 1
+
 
 def modify_user_password(user_name, password, new_password):
     user_row = get_user_row_by_name(user_name)
@@ -331,13 +352,14 @@ def modify_user_password(user_name, password, new_password):
         logger.warning(f'Wrong password for {user_name}')
         return
     if not db_utils.update_data('repository',
-                            'users',
-                            ('pass',
-                                tools.encrypt_string(new_password)),
-                            ('user_name', user_name)):
+                                'users',
+                                ('pass',
+                                 tools.encrypt_string(new_password)),
+                                ('user_name', user_name)):
         return
     logger.info(f'{user_name} password modified')
     return 1
+
 
 def reset_user_password(user_name, administrator_pass, new_password):
     user_row = get_user_row_by_name(user_name)
@@ -348,51 +370,60 @@ def reset_user_password(user_name, administrator_pass, new_password):
         logger.warning("Wrong administrator_pass")
         return
     if not db_utils.update_data('repository',
-                            'users',
-                            ('pass',
-                                tools.encrypt_string(new_password)),
-                            ('user_name', user_name)):
+                                'users',
+                                ('pass',
+                                 tools.encrypt_string(new_password)),
+                                ('user_name', user_name)):
         return
     logger.info(f'{user_name} password modified')
     return 1
 
+
 def get_users_list():
     return db_utils.get_rows('repository', 'users', order='level DESC, total_xp DESC;')
 
+
 def get_users_list_by_xp_order():
-    return db_utils.get_rows('repository', 'users', order='total_xp DESC;')   
+    return db_utils.get_rows('repository', 'users', order='total_xp DESC;')
+
 
 def get_users_list_by_deaths_order():
     return db_utils.get_rows('repository', 'users', order='deaths DESC;')
 
+
 def get_users_list_by_work_time_order():
     return db_utils.get_rows('repository', 'users', order='work_time DESC;')
+
 
 def get_users_list_by_comments_count_order():
     return db_utils.get_rows('repository', 'users', order='comments_count DESC;')
 
+
 def get_user_names_list():
     return db_utils.get_rows('repository', 'users', 'user_name')
 
+
 def get_user_row_by_name(name, column='*'):
     users_rows = db_utils.get_row_by_column_data('repository',
-                                                    'users',
-                                                    ('user_name', name),
-                                                    column)
+                                                 'users',
+                                                 ('user_name', name),
+                                                 column)
     if users_rows is None or len(users_rows) < 1:
         logger.error("User not found")
         return
     return users_rows[0]
 
+
 def get_user_data(user_id, column='*'):
     users_rows = db_utils.get_row_by_column_data('repository',
-                                                    'users',
-                                                    ('id', user_id),
-                                                    column)
+                                                 'users',
+                                                 ('id', user_id),
+                                                 column)
     if users_rows is None or len(users_rows) < 1:
         logger.error("User not found")
         return
     return users_rows[0]
+
 
 def modify_user_xp(user_name, xp):
     return db_utils.update_data('repository',
@@ -400,35 +431,42 @@ def modify_user_xp(user_name, xp):
                                 ('xp', xp),
                                 ('user_name', user_name))
 
+
 def modify_user_total_xp(user_name, total_xp):
     return db_utils.update_data('repository',
                                 'users',
                                 ('total_xp', total_xp),
                                 ('user_name', user_name))
 
-def modify_user_championship_participation(user_name, championship_participation, ban_time = game_vars._default_ban_time_):
+
+def modify_user_championship_participation(user_name, championship_participation, ban_time=game_vars._default_ban_time_):
     user_row = get_user_row_by_name(user_name)
     championship_ban_time = user_row['championship_ban_time']
     if championship_ban_time:
         if time.time() < championship_ban_time:
-            time_left = tools.convert_seconds_to_string_time_with_days(championship_ban_time - time.time())
-            logger.warning(f"You can't modify your participation for now. You will be able to switch again in {time_left}")
+            time_left = tools.convert_seconds_to_string_time_with_days(
+                championship_ban_time - time.time())
+            logger.warning(
+                f"You can't modify your participation for now. You will be able to switch again in {time_left}")
             return
     db_utils.update_data('repository',
-                            'users',
-                            ('championship_ban_time', time.time()+ban_time),
-                            ('user_name', user_name))
+                         'users',
+                         ('championship_ban_time', time.time()+ban_time),
+                         ('user_name', user_name))
     db_utils.update_data('repository',
-                            'users',
-                            ('championship_participation', championship_participation),
-                            ('user_name', user_name))
-    logger.info(f"{user_name} participation modified, ban time : {tools.convert_seconds_to_string_time_with_days(ban_time)}")
+                         'users',
+                         ('championship_participation',
+                             championship_participation),
+                         ('user_name', user_name))
+    logger.info(
+        f"{user_name} participation modified, ban time : {tools.convert_seconds_to_string_time_with_days(ban_time)}")
+
 
 def increase_user_comments_count(user_name):
     old_comments_count = db_utils.get_row_by_column_data('repository',
-                                                        'users',
-                                                        ('user_name', user_name), 
-                                                        'comments_count')
+                                                         'users',
+                                                         ('user_name', user_name),
+                                                         'comments_count')
     if old_comments_count and old_comments_count != []:
         comments_count = old_comments_count[0] + 1
     else:
@@ -438,11 +476,12 @@ def increase_user_comments_count(user_name):
                                 ('comments_count', comments_count),
                                 ('user_name', user_name))
 
+
 def add_user_work_time(user_name, work_time_to_add):
     old_work_time = db_utils.get_row_by_column_data('repository',
-                                                        'users',
-                                                        ('user_name', user_name), 
-                                                        'work_time')
+                                                    'users',
+                                                    ('user_name', user_name),
+                                                    'work_time')
     if old_work_time and old_work_time != []:
         work_time = old_work_time[0] + work_time_to_add
     else:
@@ -452,11 +491,12 @@ def add_user_work_time(user_name, work_time_to_add):
                                 ('work_time', work_time),
                                 ('user_name', user_name))
 
+
 def add_death(user_name):
     old_deaths = db_utils.get_row_by_column_data('repository',
-                                                        'users',
-                                                        ('user_name', user_name), 
-                                                        'deaths')
+                                                 'users',
+                                                 ('user_name', user_name),
+                                                 'deaths')
     if old_deaths and old_deaths != []:
         deaths = old_deaths[0] + 1
     else:
@@ -466,44 +506,49 @@ def add_death(user_name):
                                 ('deaths', deaths),
                                 ('user_name', user_name))
 
+
 def modify_user_level(user_name, new_level):
     if not db_utils.update_data('repository',
-                            'users',
-                            ('level', new_level),
-                            ('user_name', user_name)):
+                                'users',
+                                ('level', new_level),
+                                ('user_name', user_name)):
         return
     logger.info(f'{user_name} is now level {new_level}')
     return 1
+
 
 def modify_user_life(user_name, life):
     if life > 100:
         life = 100
     if not db_utils.update_data('repository',
-                                    'users',
-                                    ('life', life),
-                                    ('user_name', user_name)):
+                                'users',
+                                ('life', life),
+                                ('user_name', user_name)):
         return
     logger.debug(f'{user_name} life is {life}%')
     return 1
 
+
 def modify_user_coins(user_name, coins):
     if not db_utils.update_data('repository',
-                                    'users',
-                                    ('coins', coins),
-                                    ('user_name', user_name)):
+                                'users',
+                                ('coins', coins),
+                                ('user_name', user_name)):
         return
     logger.info(f'{user_name} have now {coins} coins')
     return 1
 
+
 def add_user_coins(user_name, coins):
     user_coins = get_user_row_by_name(user_name, 'coins')
     if not db_utils.update_data('repository',
-                                    'users',
-                                    ('coins', user_coins+coins),
-                                    ('user_name', user_name)):
+                                'users',
+                                ('coins', user_coins+coins),
+                                ('user_name', user_name)):
         return
     logger.debug(f'{user_name} just won {coins} coins !')
     return 1
+
 
 def remove_user_coins(user_name, coins):
     user_coins = get_user_row_by_name(user_name, 'coins')
@@ -511,39 +556,43 @@ def remove_user_coins(user_name, coins):
     if new_coins < 0:
         new_coins = 0
     if not db_utils.update_data('repository',
-                                    'users',
-                                    ('coins', new_coins),
-                                    ('user_name', user_name)):
+                                'users',
+                                ('coins', new_coins),
+                                ('user_name', user_name)):
         return
     logger.debug(f'{user_name} just lost {coins} coins !')
     return 1
 
+
 def modify_user_artefacts(user_name, artefacts_list):
     if not db_utils.update_data('repository',
-                                    'users',
-                                    ('artefacts', json.dumps(artefacts_list)),
-                                    ('user_name', user_name)):
+                                'users',
+                                ('artefacts', json.dumps(artefacts_list)),
+                                ('user_name', user_name)):
         return
     logger.debug(f'Artefacts list modified')
     return 1
 
+
 def modify_keeped_artefacts(user_name, artefacts_dic):
     if not db_utils.update_data('repository',
-                                    'users',
-                                    ('keeped_artefacts', json.dumps(artefacts_dic)),
-                                    ('user_name', user_name)):
+                                'users',
+                                ('keeped_artefacts', json.dumps(artefacts_dic)),
+                                ('user_name', user_name)):
         return
     logger.debug(f'Keeped artefacts dic modified')
     return 1
+
 
 def modify_user_email(user_name, email):
     if email == '':
         logger.warning('Please enter a valid email')
         return
     return db_utils.update_data('repository',
-                                    'users',
-                                    ('email', email),
-                                    ('user_name', user_name))
+                                'users',
+                                ('email', email),
+                                ('user_name', user_name))
+
 
 def is_admin():
     is_admin = get_user_row_by_name(environment.get_user(), 'administrator')
@@ -551,28 +600,30 @@ def is_admin():
         logger.warning("You are not administrator")
     return is_admin
 
+
 def add_quote(content):
     if content is None or content == '':
         logger.warning("Please enter quote content")
         return
-    if len(content)>100:
+    if len(content) > 100:
         logger.warning("Your quote needs to be under 100 characters")
         return
     quote_id = db_utils.create_row('repository',
-                            'quotes', 
-                            ('creation_user',
-                                'content',
-                                'score',
-                                'voters'), 
-                            (environment.get_user(),
-                                content,
-                                json.dumps([]),
-                                json.dumps([])))
+                                   'quotes',
+                                   ('creation_user',
+                                    'content',
+                                    'score',
+                                    'voters'),
+                                   (environment.get_user(),
+                                    content,
+                                    json.dumps([]),
+                                    json.dumps([])))
     if not quote_id:
         return
     logger.info("Quote added")
     support.send_quote(content)
     return quote_id
+
 
 def add_quote_score(quote_id, score):
     sanity = 1
@@ -585,8 +636,8 @@ def add_quote_score(quote_id, score):
     if not sanity:
         return
     current_quote_row = db_utils.get_row_by_column_data('repository',
-                                                    'quotes',
-                                                    ('id', quote_id))
+                                                        'quotes',
+                                                        ('id', quote_id))
 
     if current_quote_row is None or current_quote_row == []:
         logger.warning("Quote not found")
@@ -602,31 +653,33 @@ def add_quote_score(quote_id, score):
     current_scores_list.append(score)
     voters_list.append(environment.get_user())
     if not db_utils.update_data('repository',
-                                    'quotes',
-                                    ('score',
-                                        json.dumps(current_scores_list)),
-                                    ('id',
-                                        quote_id)):
+                                'quotes',
+                                ('score',
+                                 json.dumps(current_scores_list)),
+                                ('id',
+                                 quote_id)):
         return
     logger.info("Quote score updated")
     if not db_utils.update_data('repository',
-                                    'quotes',
-                                    ('voters',
-                                        json.dumps(voters_list)),
-                                    ('id',
-                                        quote_id)):
+                                'quotes',
+                                ('voters',
+                                 json.dumps(voters_list)),
+                                ('id',
+                                 quote_id)):
         return
     logger.info("Quote voters updated")
 
+
 def get_quote_data(quote_id, column='*'):
     quotes_rows = db_utils.get_row_by_column_data('repository',
-                                                    'quotes',
-                                                    ('id', quote_id),
-                                                    column)
+                                                  'quotes',
+                                                  ('id', quote_id),
+                                                  column)
     if quotes_rows is None or len(quotes_rows) < 1:
         logger.error("Quote not found")
         return
     return quotes_rows[0]
+
 
 def remove_quote(quote_id):
     quote_row = get_quote_data(quote_id)
@@ -640,29 +693,34 @@ def remove_quote(quote_id):
     logger.info("Quote removed from repository")
     return 1
 
+
 def get_all_quotes(column='*'):
     return db_utils.get_rows('repository', 'quotes', column)
+
 
 def get_user_quotes(column='*'):
     return db_utils.get_row_by_column_data('repository', 'quotes', ('creation_user', environment.get_user()))
 
+
 def get_ips(column='*'):
     return db_utils.get_rows('repository', 'ips_wrap', column)
+
 
 def add_ip_user():
     ip = socket.gethostbyname(socket.gethostname())
     ip_rows = get_ips('ip')
     if not ip_rows:
-        ip_rows=[]
+        ip_rows = []
     if ip in ip_rows:
         return
     if not db_utils.create_row('repository',
-                        'ips_wrap', 
-                        ('ip', 'user_id', 'project_id'), 
-                        (ip, None, None)):
+                               'ips_wrap',
+                               ('ip', 'user_id', 'project_id'),
+                               (ip, None, None)):
         return
     logger.debug("Machine ip added to ips wrap table")
     return 1
+
 
 def flush_ips():
     if not is_admin():
@@ -672,19 +730,21 @@ def flush_ips():
     logger.info("All users ip removed")
     return 1
 
+
 def flush_user_ip():
     ip = socket.gethostbyname(socket.gethostname())
     ip_rows = get_ips('ip')
     if not ip_rows:
-        ip_rows=[]
+        ip_rows = []
     if ip not in ip_rows:
         return
     if not db_utils.delete_row('repository',
-                        'ips_wrap', 
-                        ip, 'ip'):
+                               'ips_wrap',
+                               ip, 'ip'):
         return
     logger.debug("Machine ip removed from ips wrap table")
     return 1
+
 
 def update_current_ip_data(column, data):
     ip = socket.gethostbyname(socket.gethostname())
@@ -698,28 +758,34 @@ def update_current_ip_data(column, data):
         return 1
     return unlog_project()
 
+
 def unlog_project():
     ip = socket.gethostbyname(socket.gethostname())
     if not db_utils.update_data('repository',
-                            'ips_wrap',
-                            ('project_id', None),
-                            ('ip', ip)):
+                                'ips_wrap',
+                                ('project_id', None),
+                                ('ip', ip)):
         return
     logger.debug("Project unlogged")
     return 1
 
+
 def add_attack_event(user, destination_user, artefact):
     if not db_utils.create_row('repository',
-                        'attack_events', 
-                        ('creation_user', 'destination_user', 'artefact', 'attack_date'), 
-                        (user, destination_user, artefact, time.time())):
+                               'attack_events',
+                               ('creation_user', 'destination_user',
+                                'artefact', 'attack_date'),
+                               (user, destination_user, artefact, time.time())):
         return
+
 
 def get_all_attack_events(column='*'):
     return db_utils.get_rows('repository', 'attack_events', column)
 
+
 def get_all_artefacts_stocks(column='*'):
     return db_utils.get_rows('repository', 'artefacts', column)
+
 
 def init_artefacts_stock():
     repository_artefacts = get_all_artefacts_stocks('artefact')
@@ -734,15 +800,17 @@ def init_artefacts_stock():
                                 (artefact,
                                     game_vars.artefacts_dic[artefact]['stock']))
 
+
 def get_artefact_stock(artefact):
     artefact_rows = db_utils.get_row_by_column_data('repository',
-                                            'artefacts',
-                                            ('artefact', artefact),
-                                            'stock')
+                                                    'artefacts',
+                                                    ('artefact', artefact),
+                                                    'stock')
     if artefact_rows is None or len(artefact_rows) < 1:
         logger.error(f"Artefact {artefact} not found")
         return
     return artefact_rows[0]
+
 
 def remove_artefact_stock(artefact):
     stock = get_artefact_stock(artefact)
@@ -756,23 +824,26 @@ def remove_artefact_stock(artefact):
                                 ('stock', new_stock),
                                 ('artefact', artefact))
 
-def add_artefact_stock(artefact):   
+
+def add_artefact_stock(artefact):
     stock = get_artefact_stock(artefact)
     return db_utils.update_data('repository',
                                 'artefacts',
                                 ('stock', stock+1),
                                 ('artefact', artefact))
 
+
 def get_current_ip_data(column='*'):
     ip = socket.gethostbyname(socket.gethostname())
     ip_rows = db_utils.get_row_by_column_data('repository',
-                                                    'ips_wrap',
-                                                    ('ip', ip),
-                                                    column)
+                                              'ips_wrap',
+                                              ('ip', ip),
+                                              column)
     if ip_rows is None or len(ip_rows) < 1:
         logger.error("Ip not found")
         return
     return ip_rows[0]
+
 
 def init_repository(admin_password, admin_email):
     create_admin_user(admin_password, admin_email)
@@ -780,18 +851,20 @@ def init_repository(admin_password, admin_email):
     init_artefacts_stock()
     return 1
 
+
 def init_quotes():
     for quote in repository_vars._default_quotes_list_:
         db_utils.create_row('repository',
-                            'quotes', 
+                            'quotes',
                             ('creation_user',
                                 'content',
                                 'score',
-                                'voters'), 
+                                'voters'),
                             ('admin',
                                 quote,
                                 json.dumps([]),
                                 json.dumps([])))
+
 
 def create_repository_database():
     if not db_utils.create_database(environment.get_repository()):
@@ -804,20 +877,23 @@ def create_repository_database():
     create_artefacts_table()
     return 1
 
-def is_repository_database(repository_name = None):
+
+def is_repository_database(repository_name=None):
     if not repository_name:
         repository_name = environment.get_repository()
     else:
         repository_name = f"repository_{repository_name}"
     return db_utils.check_database_existence(repository_name)
 
+
 def create_admin_user(admin_password, admin_email):
-    profile_picture = image.convert_image_to_str_data(image.user_random_image('admin'), 100)
+    profile_picture = image.convert_image_to_str_data(
+        image.user_random_image('admin'), 100)
     if not db_utils.create_row('repository',
-                            'users', 
-                            ('user_name', 
-                                'pass', 
-                                'email', 
+                               'users',
+                               ('user_name',
+                                'pass',
+                                'email',
                                 'profile_picture',
                                 'xp',
                                 'total_xp',
@@ -825,14 +901,14 @@ def create_admin_user(admin_password, admin_email):
                                 'comments_count',
                                 'deaths',
                                 'level',
-                                'life', 
+                                'life',
                                 'administrator',
                                 'coins',
                                 'championship_participation',
                                 'championship_ban_time',
                                 'artefacts',
-                                'keeped_artefacts'), 
-                            ('admin',
+                                'keeped_artefacts'),
+                               ('admin',
                                 tools.encrypt_string(admin_password),
                                 admin_email,
                                 profile_picture,
@@ -852,6 +928,7 @@ def create_admin_user(admin_password, admin_email):
         return
     logger.info('Admin user created')
     return 1
+
 
 def create_users_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS users (
@@ -879,6 +956,7 @@ def create_users_table():
     logger.info("Users table created")
     return 1
 
+
 def create_projects_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS projects (
                                         id serial PRIMARY KEY,
@@ -894,6 +972,7 @@ def create_projects_table():
     logger.info("Projects table created")
     return 1
 
+
 def create_ip_wrap_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS ips_wrap (
                                         id serial PRIMARY KEY,
@@ -908,6 +987,7 @@ def create_ip_wrap_table():
     logger.info("Ips wrap table created")
     return 1
 
+
 def create_quotes_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS quotes (
                                         id serial PRIMARY KEY,
@@ -921,6 +1001,7 @@ def create_quotes_table():
     logger.info("Quotes table created")
     return 1
 
+
 def create_attack_events_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS attack_events (
                                         id serial PRIMARY KEY,
@@ -933,6 +1014,7 @@ def create_attack_events_table():
         return
     logger.info("Attack events table created")
     return 1
+
 
 def create_artefacts_table():
     sql_cmd = """ CREATE TABLE IF NOT EXISTS artefacts (

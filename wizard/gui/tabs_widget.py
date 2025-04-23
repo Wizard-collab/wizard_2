@@ -3,18 +3,14 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import pyqtSignal
 import os
 
-# Wizard gui modules
-from wizard.gui import gui_utils
-
 # Wizard modules
 from wizard.core import user
-from wizard.core import assets
 from wizard.vars import user_vars
-from wizard.vars import ressources
+
 
 class tabs_widget(QtWidgets.QFrame):
 
@@ -27,12 +23,12 @@ class tabs_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.tabs_widget = QtWidgets.QTabWidget()
-        self.tabs_widget.setIconSize(QtCore.QSize(16,16))
+        self.tabs_widget.setIconSize(QtCore.QSize(16, 16))
         self.main_layout.addWidget(self.tabs_widget)
 
     def addTab(self, widget, icon, title):
@@ -55,5 +51,3 @@ class tabs_widget(QtWidgets.QFrame):
         if context_dic is not None and context_dic != dict():
             index = context_dic['index']
             self.setCurrentIndex(index)
-
-

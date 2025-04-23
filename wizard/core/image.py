@@ -29,12 +29,11 @@
 # This module is used to manage images in wizard
 
 # Python modules
-from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtGui, QtCore
 from PIL import Image, ImageCms, ImageFont, ImageDraw
 import io
 import base64
 import random
-import json
 import colorsys
 import os
 
@@ -205,7 +204,8 @@ def project_random_image(project_name):
     size = font.getbbox(letter)
     w, h = size[2], size[3]
 
-    draw.text(((500 - w) / 2, (282 - h - 30) / 2), letter, (255, 255, 255), font=font)
+    draw.text(((500 - w) / 2, (282 - h - 30) / 2),
+              letter, (255, 255, 255), font=font)
 
     img_file = path_utils.join(tools.temp_dir(), "temp_img.png")
     img.save(img_file)
@@ -228,7 +228,8 @@ def user_random_image(user_name):
     size = font.getbbox(letter)
     w, h = size[2], size[3]
 
-    draw.text(((100 - w) / 2, (100 - h - 10) / 2), letter, (255, 255, 255), font=font)
+    draw.text(((100 - w) / 2, (100 - h - 10) / 2),
+              letter, (255, 255, 255), font=font)
 
     img_file = path_utils.join(tools.temp_dir(), "temp_img.png")
     img.save(img_file)

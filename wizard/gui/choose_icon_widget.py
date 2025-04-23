@@ -14,11 +14,13 @@ from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
+
 class choose_icon_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(choose_icon_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint |
+                            QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.icon_path = None
@@ -38,7 +40,7 @@ class choose_icon_widget(QtWidgets.QDialog):
         self.reject()
 
     def build_ui(self):
-        self.resize(290,200)
+        self.resize(290, 200)
         self.main_widget_layout = QtWidgets.QHBoxLayout()
         self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
         self.setLayout(self.main_widget_layout)
@@ -48,19 +50,21 @@ class choose_icon_widget(QtWidgets.QDialog):
         self.main_widget_layout.addWidget(self.main_widget)
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
 
         self.icon_view = QtWidgets.QListWidget()
         self.icon_view.setObjectName('icon_view')
-        self.icon_view.setStyleSheet('#icon_view{background-color:transparent}')
+        self.icon_view.setStyleSheet(
+            '#icon_view{background-color:transparent}')
         self.icon_view.setSpacing(4)
-        self.icon_view.setIconSize(QtCore.QSize(20,20))
+        self.icon_view.setIconSize(QtCore.QSize(20, 20))
         self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
         self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
         self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.icon_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.main_layout.addWidget(self.icon_view)
 
@@ -68,7 +72,7 @@ class choose_icon_widget(QtWidgets.QDialog):
         for icon in ressources._available_icons_list_:
             item = QtWidgets.QListWidgetItem()
             item.setIcon(QtGui.QIcon(icon))
-            item.setSizeHint(QtCore.QSize(26,26))
+            item.setSizeHint(QtCore.QSize(26, 26))
             item.icon_path = icon
             self.icon_view.addItem(item)
 

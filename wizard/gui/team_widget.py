@@ -4,7 +4,6 @@
 
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import QThread, pyqtSignal
 
 # Wizard modules
 from wizard.core import environment
@@ -16,11 +15,13 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
+
 class team_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(team_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(
+            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.user_ids = dict()
@@ -40,7 +41,7 @@ class team_widget(QtWidgets.QWidget):
         self.main_widget = QtWidgets.QFrame()
         self.main_widget.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.main_widget_layout.addWidget(self.main_widget)
@@ -54,9 +55,10 @@ class team_widget(QtWidgets.QWidget):
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('dark_widget')
-        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:8px;border-top-right-radius:8px;}')
+        self.header_widget.setStyleSheet(
+            '#dark_widget{border-top-left-radius:8px;border-top-right-radius:8px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(10,10,10,10)
+        self.header_layout.setContentsMargins(10, 10, 10, 10)
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
 
@@ -69,7 +71,8 @@ class team_widget(QtWidgets.QWidget):
         self.dns_info_label.setObjectName('gray_label')
         self.header_layout.addWidget(self.dns_info_label)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.main_layout.addWidget(self.header_widget)
 
@@ -84,15 +87,17 @@ class team_widget(QtWidgets.QWidget):
         self.users_scrollArea_widget = QtWidgets.QWidget()
         self.users_scrollArea_widget.setObjectName('transparent_widget')
         self.users_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.users_scrollArea_layout.setContentsMargins(10,10,10,10)
+        self.users_scrollArea_layout.setContentsMargins(10, 10, 10, 10)
         self.users_scrollArea_layout.setSpacing(3)
         self.users_scrollArea_widget.setLayout(self.users_scrollArea_layout)
 
-        self.users_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.users_scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.users_scrollArea.setWidgetResizable(True)
         self.users_scrollArea.setWidget(self.users_scrollArea_widget)
 
-        self.users_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.users_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.users_scrollArea)
 
@@ -102,7 +107,8 @@ class team_widget(QtWidgets.QWidget):
             self.users_scrollArea_layout.addWidget(widget)
             self.user_ids[user_name] = widget
             self.refresh()
-            gui_server.custom_popup(f"{user_name} is online !", "", icon=None, profile_picture=user_name)
+            gui_server.custom_popup(
+                f"{user_name} is online !", "", icon=None, profile_picture=user_name)
 
     def remove_user(self, user_name):
         if user_name in self.user_ids.keys():
@@ -112,7 +118,8 @@ class team_widget(QtWidgets.QWidget):
             widget.deleteLater()
             del self.user_ids[user_name]
             self.refresh()
-            gui_server.custom_popup(f"{user_name} is offline !", "", icon=None, profile_picture=user_name)
+            gui_server.custom_popup(
+                f"{user_name} is offline !", "", icon=None, profile_picture=user_name)
 
     def set_team_connection(self, connection_status):
         self.connection_status = connection_status
@@ -122,7 +129,8 @@ class team_widget(QtWidgets.QWidget):
 
     def refresh(self):
         if self.connection_status:
-            self.connection_status_frame.setStyleSheet('border-radius:4px;background-color:#9cf277;')
+            self.connection_status_frame.setStyleSheet(
+                'border-radius:4px;background-color:#9cf277;')
             if len(self.user_ids) == 0:
                 self.users_scrollArea.setVisible(0)
                 self.info_widget.setVisible(1)
@@ -132,7 +140,8 @@ class team_widget(QtWidgets.QWidget):
                 self.info_widget.setVisible(0)
                 self.users_scrollArea.setVisible(1)
         else:
-            self.connection_status_frame.setStyleSheet('border-radius:4px;background-color:#f0605b;')
+            self.connection_status_frame.setStyleSheet(
+                'border-radius:4px;background-color:#f0605b;')
             self.users_scrollArea.setVisible(0)
             self.info_widget.setVisible(1)
             self.info_widget.setText("Not connected to any server...")
@@ -161,6 +170,7 @@ class team_widget(QtWidgets.QWidget):
             self.raise_()
             gui_utils.move_ui(self)
 
+
 class user_widget(QtWidgets.QFrame):
     def __init__(self, user_name, parent=None):
         super(user_widget, self).__init__(parent)
@@ -169,8 +179,10 @@ class user_widget(QtWidgets.QFrame):
         self.fill_ui()
 
     def fill_ui(self):
-        profile_image = repository.get_user_row_by_name(self.user_name, 'profile_picture')
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 26)
+        profile_image = repository.get_user_row_by_name(
+            self.user_name, 'profile_picture')
+        pm = gui_utils.mask_image(
+            image.convert_str_data_to_image_bytes(profile_image), 'png', 26)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.user_name)
 
@@ -183,15 +195,16 @@ class user_widget(QtWidgets.QFrame):
 
         self.profile_frame = QtWidgets.QFrame()
         self.profile_frame.setObjectName('user_profile_frame')
-        self.profile_frame.setStyleSheet('#user_profile_frame{background-color:#9cf277;border-radius:15px;}')
+        self.profile_frame.setStyleSheet(
+            '#user_profile_frame{background-color:#9cf277;border-radius:15px;}')
         self.profile_layout = QtWidgets.QHBoxLayout()
-        self.profile_layout.setContentsMargins(0,0,0,0)
+        self.profile_layout.setContentsMargins(0, 0, 0, 0)
         self.profile_frame.setLayout(self.profile_layout)
-        self.profile_frame.setFixedSize(30,30)
+        self.profile_frame.setFixedSize(30, 30)
         self.main_layout.addWidget(self.profile_frame)
 
         self.profile_picture = QtWidgets.QLabel()
-        self.profile_picture.setFixedSize(26,26)
+        self.profile_picture.setFixedSize(26, 26)
         self.profile_layout.addWidget(self.profile_picture)
 
         self.user_name_label = QtWidgets.QLabel()

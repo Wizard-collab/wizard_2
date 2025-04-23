@@ -3,19 +3,16 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 import logging
 
 # Wizard modules
-from wizard.core import environment
 from wizard.core import user
 from wizard.core import repository
 from wizard.vars import ressources
 
-# Wizard gui modules
-from wizard.gui import gui_utils
-
 logger = logging.getLogger(__name__)
+
 
 class repository_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -43,11 +40,12 @@ class repository_widget(QtWidgets.QDialog):
         self.button_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setSpacing(4)
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.button_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.button_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 0, QtWidgets.QSizePolicy.Policy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
         self.quit_button = QtWidgets.QPushButton('Quit')

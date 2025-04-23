@@ -21,6 +21,7 @@ from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
+
 class groups_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(groups_manager_widget, self).__init__(parent)
@@ -55,40 +56,43 @@ class groups_manager_widget(QtWidgets.QWidget):
             self.groups_comboBox.setCurrentText(group_name)
 
     def build_ui(self):
-        self.resize(QtCore.QSize(1200,700))
+        self.resize(QtCore.QSize(1200, 700))
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header = QtWidgets.QWidget()
-        self.header.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.header.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(6)
         self.header.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header)
 
         self.create_group_button = QtWidgets.QPushButton()
-        self.create_group_button.setFixedSize(26,26)
+        self.create_group_button.setFixedSize(26, 26)
         self.create_group_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.create_group_button.setIconSize(QtCore.QSize(16,16))
+        self.create_group_button.setIconSize(QtCore.QSize(16, 16))
         self.header_layout.addWidget(self.create_group_button)
 
         self.groups_comboBox = gui_utils.QComboBox()
         self.groups_comboBox.setFixedWidth(300)
         self.header_layout.addWidget(self.groups_comboBox)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.color_button = QtWidgets.QPushButton()
-        self.color_button.setFixedSize(26,26)
+        self.color_button.setFixedSize(26, 26)
         self.color_button.setObjectName('color_button')
         self.header_layout.addWidget(self.color_button)
 
         self.delete_group_button = QtWidgets.QPushButton()
-        self.delete_group_button.setFixedSize(26,26)
-        self.delete_group_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
-        self.delete_group_button.setIconSize(QtCore.QSize(24,24))
+        self.delete_group_button.setFixedSize(26, 26)
+        self.delete_group_button.setIcon(
+            QtGui.QIcon(ressources._tool_archive_))
+        self.delete_group_button.setIconSize(QtCore.QSize(24, 24))
         self.header_layout.addWidget(self.delete_group_button)
 
         self.references_widget = references_widget.references_widget('groups')
@@ -98,7 +102,8 @@ class groups_manager_widget(QtWidgets.QWidget):
         self.create_group_button.clicked.connect(self.create_group)
         self.color_button.clicked.connect(self.modify_color)
         self.delete_group_button.clicked.connect(self.delete_group)
-        self.groups_comboBox.currentTextChanged.connect(self.current_group_changed)
+        self.groups_comboBox.currentTextChanged.connect(
+            self.current_group_changed)
 
     def current_group_changed(self):
         self.old_group_id = self.group_id
@@ -152,7 +157,8 @@ class groups_manager_widget(QtWidgets.QWidget):
     def delete_group(self):
         current_group = self.groups_comboBox.currentText()
         if current_group != '':
-            self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+            self.confirm_widget = confirm_widget.confirm_widget(
+                'Do you want to continue ?', parent=self)
             security_sentence = f"{current_group}"
             if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 group_id = self.groups[current_group]['id']
@@ -174,11 +180,11 @@ class groups_manager_widget(QtWidgets.QWidget):
                 project_groups.append(group_row['name'])
                 if group_row['name'] not in self.groups.keys():
                     index = self.groups_comboBox.addItem(gui_utils.QIcon_from_svg(ressources._group_icon_,
-                                                            group_row['color']), group_row['name'])
+                                                                                  group_row['color']), group_row['name'])
                 else:
                     index = self.groups_comboBox.findText(group_row['name'])
                     self.groups_comboBox.setItemIcon(index, gui_utils.QIcon_from_svg(ressources._group_icon_,
-                                                            group_row['color']))
+                                                                                     group_row['color']))
                 self.groups[group_row['name']] = group_row
 
             groups = list(self.groups.keys())
@@ -188,7 +194,7 @@ class groups_manager_widget(QtWidgets.QWidget):
             self.update_grouped_references = True
             self.get_current_group_id()
 
-            #comboBox->model()->sort(0, Qt::DescendingOrder)
+            # comboBox->model()->sort(0, Qt::DescendingOrder)
             self.groups_comboBox.model().sort(0, QtCore.Qt.SortOrder.AscendingOrder)
 
             if self.group_id != self.old_group_id:
@@ -197,13 +203,15 @@ class groups_manager_widget(QtWidgets.QWidget):
                 self.references_widget.refresh()
                 self.update_color()
 
+
 class group_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(group_creation_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
-        
-        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
@@ -213,11 +221,12 @@ class group_creation_widget(QtWidgets.QDialog):
         self.name_field.setFocus()
 
     def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#variant_creation_widget{border-%s-radius:0px;}"%corner)
+        self.main_frame.setStyleSheet(
+            "#variant_creation_widget{border-%s-radius:0px;}" % corner)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.setLayout(self.main_layout)
 
         self.main_frame = QtWidgets.QFrame()
@@ -236,15 +245,17 @@ class group_creation_widget(QtWidgets.QDialog):
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel('New group'))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 
@@ -260,5 +271,3 @@ class group_creation_widget(QtWidgets.QDialog):
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
         self.close_pushButton.clicked.connect(self.reject)
-
-

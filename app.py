@@ -37,21 +37,24 @@ import logging
 from wizard.core import application
 from wizard.core import custom_logger
 from wizard.core import version_database_modification
-custom_logger.get_root_logger()
-logger = logging.getLogger('wizard')
 
 # Wizard gui modules
 from wizard.gui import app_utils
 from wizard.gui import loading_widget
 from wizard.gui import main_widget
+from wizard.gui import table_viewer_widget
 import error_handler
+
+custom_logger.get_root_logger()
+logger = logging.getLogger('wizard')
+
 
 class app():
     def __init__(self, project_manager,
-                        log_user,
-                        change_repo, 
-                        change_psql,
-                        table_viewer):
+                 log_user,
+                 change_repo,
+                 change_psql,
+                 table_viewer):
         self.stats_schedule = None
 
         # Init
@@ -85,7 +88,8 @@ class app():
         self.loading_widget.close()
         self.main_widget.whatsnew()
         self.main_widget.is_latest_build(force=0)
-        logger.info(f"Wizard start time : {str(round((time.perf_counter()-start_time), 1))}s")
+        logger.info(
+            f"Wizard start time : {str(round((time.perf_counter()-start_time), 1))}s")
 
     def quit(self):
         sys.stdout = sys.__stdout__
@@ -96,20 +100,22 @@ class app():
         QtWidgets.QApplication.quit()
         sys.exit()
 
+
 def main(project_manager=False,
-            log_user=False,
-            change_repo=False,
-            change_psql=False,
-            table_viewer=False):
+         log_user=False,
+         change_repo=False,
+         change_psql=False,
+         table_viewer=False):
     sys.excepthook = app_utils.excepthook
     application.log_app_infos()
     wizard_app = app(project_manager,
-                        log_user,
-                        change_repo,
-                        change_psql,
-                        table_viewer)
+                     log_user,
+                     change_repo,
+                     change_psql,
+                     table_viewer)
     ret = wizard_app.app.exec()
     sys.exit(ret)
+
 
 if __name__ == '__main__':
     main()

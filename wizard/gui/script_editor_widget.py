@@ -3,13 +3,12 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtGui
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.Qsci import QsciScintilla
 from PyQt6.Qsci import QsciLexerCustom
-import sys
 import re
-import copy
+
 
 class script_editor_widget(QsciScintilla):
     ARROW_MARKER_NUM = 8
@@ -57,9 +56,9 @@ class script_editor_widget(QsciScintilla):
 
         self.setMarginSensitivity(1, True)
         self.markerDefine(QsciScintilla.MarkerSymbol.RightArrow,
-            self.ARROW_MARKER_NUM)
+                          self.ARROW_MARKER_NUM)
         self.setMarkerBackgroundColor(QtGui.QColor("#ffffff"),
-            self.ARROW_MARKER_NUM)
+                                      self.ARROW_MARKER_NUM)
 
         self.setBraceMatching(QsciScintilla.BraceMatch.SloppyBraceMatch)
 
@@ -76,7 +75,8 @@ class script_editor_widget(QsciScintilla):
         self.setMinimumSize(0, 200)
 
     def text(self):
-        text = str(super(script_editor_widget, self).text()).replace('\r\n', '\n')
+        text = str(super(script_editor_widget, self).text()
+                   ).replace('\r\n', '\n')
         return text
 
     def selectedText(self):
@@ -107,6 +107,7 @@ class script_editor_widget(QsciScintilla):
                 self.drop_signal.emit(filepath)
         self.setStyleSheet('')
 
+
 class python_lexer(QsciLexerCustom):
     def __init__(self, parent):
         super(python_lexer, self).__init__(parent)
@@ -133,37 +134,38 @@ class python_lexer(QsciLexerCustom):
         self.setFont(italic_font, 5)
 
         self.keyword_list = ["from",
-                            "import",
-                            "if",
-                            "elif",
-                            "else",
-                            "finally",
-                            "try",
-                            "except",
-                            "for",
-                            "while",
-                            "return",
-                            "in",
-                            "as",
-                            "=",
-                            "+",
-                            "*"
-                            "-",
-                            "/",
-                            "*",
-                            "!",
-                            "<",
-                            ">",
-                            "@",
-                            '__name__',
-                            'pass']
+                             "import",
+                             "if",
+                             "elif",
+                             "else",
+                             "finally",
+                             "try",
+                             "except",
+                             "for",
+                             "while",
+                             "return",
+                             "in",
+                             "as",
+                             "=",
+                             "+",
+                             "*"
+                             "-",
+                             "/",
+                             "*",
+                             "!",
+                             "<",
+                             ">",
+                             "@",
+                             '__name__',
+                             'pass']
 
         self.function_key_list = ['def', 'class', 'wapi']
         self.class_keys_list = ['self', 'parent']
         self.string_quotes = ['"', "'"]
         self.comment_quotes = ["#"]
         self.boolean_list = ['True', 'False', 'None']
-        self.return_list = ['\n', '\r', '\r\n', '\\r', '\\n', '\\r\\n', '\n\n', '\\n\\n']
+        self.return_list = ['\n', '\r', '\r\n',
+                            '\\r', '\\n', '\\r\\n', '\n\n', '\\n\\n']
 
     def language(self):
         return "Python"
@@ -218,7 +220,8 @@ class python_lexer(QsciLexerCustom):
         source = source.decode('utf-8')
         p = re.compile(r"[*]\/|\/[*]|\s+|\w+|\W")
 
-        token_list = [(token, len(bytearray(token, "utf-8"))) for token in p.findall(source)]
+        token_list = [(token, len(bytearray(token, "utf-8")))
+                      for token in p.findall(source)]
 
         next_is_fun_name = 0
         string_started = None
@@ -253,7 +256,7 @@ class python_lexer(QsciLexerCustom):
                     style = 8
                     is_number = 0
                 else:
-                    
+
                     style = 0
 
                     if (i+1) < len(token_list):

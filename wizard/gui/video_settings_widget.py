@@ -3,19 +3,15 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 import logging
 
 # Wizard modules
-from wizard.core import project
 from wizard.core import assets
-from wizard.vars import assets_vars
 from wizard.vars import ressources
 
-# Wizard gui modules
-from wizard.gui import gui_utils
-
 logger = logging.getLogger(__name__)
+
 
 class video_settings_widget(QtWidgets.QDialog):
     def __init__(self, work_env_id, parent=None):
@@ -34,7 +30,8 @@ class video_settings_widget(QtWidgets.QDialog):
         self.cam_list_changed()
 
     def apply(self):
-        self.frange = [self.inrollframe_spinBox.value(), self.outrollframe_spinBox.value()]
+        self.frange = [self.inrollframe_spinBox.value(
+        ), self.outrollframe_spinBox.value()]
         self.refresh_assets = self.refresh_assets_checkbox.isChecked()
         self.nspace_list = self.get_selected_nspaces()
         self.comment = self.comment_textEdit.toPlainText()
@@ -70,7 +67,8 @@ class video_settings_widget(QtWidgets.QDialog):
         self.warning_label.setText(text)
 
     def fill_ui(self):
-        self.video_icon_label.setPixmap(QtGui.QIcon(ressources._videos_icon_).pixmap(22))
+        self.video_icon_label.setPixmap(
+            QtGui.QIcon(ressources._videos_icon_).pixmap(22))
         self.header_text.setText(f"Please set the video settings")
 
         asset_row = assets.get_asset_data_from_work_env_id(self.work_env_id)
@@ -83,7 +81,7 @@ class video_settings_widget(QtWidgets.QDialog):
             if stage in ['camrig', 'camera']:
                 for reference_row in all_references[stage]:
                     item = QtWidgets.QListWidgetItem(QtGui.QIcon(ressources._stage_icons_dic_[stage]),
-                                                                reference_row['namespace'])
+                                                     reference_row['namespace'])
                     self.assets_list.addItem(item)
 
     def refresh(self):
@@ -104,7 +102,7 @@ class video_settings_widget(QtWidgets.QDialog):
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(8)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
@@ -115,15 +113,17 @@ class video_settings_widget(QtWidgets.QDialog):
         self.header_text = QtWidgets.QLabel()
         self.header_layout.addWidget(self.header_text)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         # Refresh assets section
 
         self.refresh_assets_label = QtWidgets.QLabel('References settings')
         self.refresh_assets_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.refresh_assets_label)
-        
-        self.refresh_assets_checkbox = QtWidgets.QCheckBox('Refresh assets in scene')
+
+        self.refresh_assets_checkbox = QtWidgets.QCheckBox(
+            'Refresh assets in scene')
         self.refresh_assets_checkbox.setObjectName('transparent_widget')
         self.main_layout.addWidget(self.refresh_assets_checkbox)
 
@@ -132,7 +132,7 @@ class video_settings_widget(QtWidgets.QDialog):
         self.range_setup_widget = QtWidgets.QWidget()
         self.range_setup_widget.setObjectName('transparent_widget')
         self.range_setup_layout = QtWidgets.QVBoxLayout()
-        self.range_setup_layout.setContentsMargins(0,0,0,0)
+        self.range_setup_layout.setContentsMargins(0, 0, 0, 0)
         self.range_setup_layout.setSpacing(8)
         self.range_setup_widget.setLayout(self.range_setup_layout)
         self.main_layout.addWidget(self.range_setup_widget)
@@ -141,13 +141,14 @@ class video_settings_widget(QtWidgets.QDialog):
         self.frame_range_label.setObjectName('gray_label')
         self.range_setup_layout.addWidget(self.frame_range_label)
 
-        self.rolls_checkbox = QtWidgets.QCheckBox('Create video with prerolls and postrolls')
+        self.rolls_checkbox = QtWidgets.QCheckBox(
+            'Create video with prerolls and postrolls')
         self.rolls_checkbox.setObjectName('transparent_widget')
         self.range_setup_layout.addWidget(self.rolls_checkbox)
         self.range_widget = QtWidgets.QWidget()
         self.range_widget.setObjectName('transparent_widget')
         self.range_layout = QtWidgets.QHBoxLayout()
-        self.range_layout.setContentsMargins(0,0,0,0)
+        self.range_layout.setContentsMargins(0, 0, 0, 0)
         self.range_layout.setSpacing(8)
         self.range_widget.setLayout(self.range_layout)
         self.range_setup_layout.addWidget(self.range_widget)
@@ -156,24 +157,28 @@ class video_settings_widget(QtWidgets.QDialog):
         self.inrollframe_spinBox.setEnabled(False)
         self.inrollframe_spinBox.setObjectName('gray_label')
         self.inrollframe_spinBox.setRange(-1000000, 1000000)
-        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.inrollframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inrollframe_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-1000000, 1000000)
-        self.inframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.inframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 1000000)
-        self.outframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.outframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outframe_spinBox)
 
         self.outrollframe_spinBox = QtWidgets.QSpinBox()
         self.outrollframe_spinBox.setEnabled(False)
         self.outrollframe_spinBox.setObjectName('gray_label')
         self.outrollframe_spinBox.setRange(-1000000, 1000000)
-        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.outrollframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outrollframe_spinBox)
 
         # Camera namespaces selection section
@@ -181,7 +186,7 @@ class video_settings_widget(QtWidgets.QDialog):
         self.nspace_list_widget = QtWidgets.QWidget()
         self.nspace_list_widget.setObjectName('transparent_widget')
         self.nspace_list_layout = QtWidgets.QVBoxLayout()
-        self.nspace_list_layout.setContentsMargins(0,0,0,0)
+        self.nspace_list_layout.setContentsMargins(0, 0, 0, 0)
         self.nspace_list_layout.setSpacing(8)
         self.nspace_list_widget.setLayout(self.nspace_list_layout)
         self.main_layout.addWidget(self.nspace_list_widget)
@@ -191,7 +196,8 @@ class video_settings_widget(QtWidgets.QDialog):
         self.nspace_list_layout.addWidget(self.infos_label)
 
         self.assets_list = QtWidgets.QListWidget()
-        self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.assets_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.nspace_list_layout.addWidget(self.assets_list)
 
         self.warning_label = QtWidgets.QLabel('')
@@ -210,12 +216,13 @@ class video_settings_widget(QtWidgets.QDialog):
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

@@ -17,7 +17,8 @@ class current_asset_viewer(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(current_asset_viewer, self).__init__(parent)
         self.setObjectName('dark_widget')
-        self.arrow_pixmap = gui_utils.QIcon_from_svg(ressources._right_icon_, '#505061').pixmap(20)
+        self.arrow_pixmap = gui_utils.QIcon_from_svg(
+            ressources._right_icon_, '#505061').pixmap(20)
         self.build_ui()
 
     def refresh(self, instance_type, instance_id):
@@ -32,7 +33,8 @@ class current_asset_viewer(QtWidgets.QFrame):
         if instance_type == 'work_env':
             work_env_row = project.get_work_env_data(instance_id)
             variant_id = work_env_row['variant_id']
-            self.work_env_label.setPixmap(QtGui.QIcon(ressources._softwares_icons_dic_[work_env_row['name']]).pixmap(12))
+            self.work_env_label.setPixmap(QtGui.QIcon(
+                ressources._softwares_icons_dic_[work_env_row['name']]).pixmap(12))
             self.work_env_label.setVisible(1)
             self.arrow_4.setVisible(1)
             if not variant_id:
@@ -57,7 +59,7 @@ class current_asset_viewer(QtWidgets.QFrame):
                 return
             self.variant_label.setText(variant_row['name'])
             stage_row = project.get_stage_data(variant_row['stage_id'])
-            
+
         if not stage_row:
             return
         asset_row = project.get_asset_data(stage_row['asset_id'])
@@ -75,14 +77,14 @@ class current_asset_viewer(QtWidgets.QFrame):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
         self.infos_widget = QtWidgets.QFrame()
         self.infos_widget.setObjectName('round_frame')
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(6,2,6,2)
+        self.infos_layout.setContentsMargins(6, 2, 6, 2)
         self.infos_layout.setSpacing(2)
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
@@ -95,7 +97,7 @@ class current_asset_viewer(QtWidgets.QFrame):
         self.viewer_widget = QtWidgets.QFrame()
         self.viewer_widget.setObjectName('round_frame')
         self.viewer_layout = QtWidgets.QHBoxLayout()
-        self.viewer_layout.setContentsMargins(6,2,6,2)
+        self.viewer_layout.setContentsMargins(6, 2, 6, 2)
         self.viewer_layout.setSpacing(2)
         self.viewer_widget.setLayout(self.viewer_layout)
         self.main_layout.addWidget(self.viewer_widget)
@@ -136,4 +138,5 @@ class current_asset_viewer(QtWidgets.QFrame):
         self.work_env_label.setObjectName('bold_label')
         self.viewer_layout.addWidget(self.work_env_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))

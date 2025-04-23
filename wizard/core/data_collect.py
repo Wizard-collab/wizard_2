@@ -27,9 +27,6 @@
 # SOFTWARE.
 
 # Python modules
-from threading import Thread
-import json
-import os
 import time
 
 # Wizard modules
@@ -37,13 +34,14 @@ from wizard.vars import user_vars
 
 _FILE_ = user_vars._data_collect_file_
 
-class collect_object():
-	def __init__(self):
-		self.data_dic = dict()
 
-	def add_data(self, name, data):
-		key_id = time.time()
-		if name not in self.data_dic.keys():
-			self.data_dic[name] = dict()
-		self.data_dic[name][key_id] = data
-		print(self.data_dic)
+class collect_object():
+    def __init__(self):
+        self.data_dic = dict()
+
+    def add_data(self, name, data):
+        key_id = time.time()
+        if name not in self.data_dic.keys():
+            self.data_dic[name] = dict()
+        self.data_dic[name][key_id] = data
+        print(self.data_dic)

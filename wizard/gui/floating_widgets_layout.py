@@ -5,19 +5,19 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtCore import pyqtProperty
-import sys
-import os
 
 # Wizard core modules
 from wizard.core import user
 
+
 def save_widget_pos(widget, widget_name):
     pos_dic = dict()
-    pos_dic['coord'] = [widget.x(), widget.y(), widget.width(), widget.height()]
+    pos_dic['coord'] = [widget.x(), widget.y(), widget.width(),
+                        widget.height()]
     pos_dic['visibility'] = widget.isVisible()
     pos_dic['is_maximized'] = widget.isMaximized()
     user.user().set_widget_pos(widget_name, pos_dic)
+
 
 def init_widget_pos(widget, widget_name, force_show=0, maximized=0):
     pos_dic = user.user().get_widget_pos(widget_name)

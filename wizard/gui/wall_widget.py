@@ -10,6 +10,7 @@ import os
 import json
 import copy
 import traceback
+import logging
 
 # Wizard modules
 from wizard.core import environment
@@ -26,6 +27,9 @@ from wizard.vars import user_vars
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import tag_label
+
+logger = logging.getLogger(__name__)
+
 
 class wall_widget(QtWidgets.QWidget):
 
@@ -49,12 +53,14 @@ class wall_widget(QtWidgets.QWidget):
     def init_users_images(self):
         self.users_images_dic = dict()
         for user_row in repository.get_users_list():
-            user_image =  user_row['profile_picture']
-            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 30)
+            user_image = user_row['profile_picture']
+            pixmap = gui_utils.mask_image(
+                image.convert_str_data_to_image_bytes(user_image), 'png', 30)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def connect_functions(self):
-        self.wall_scrollBar.rangeChanged.connect(lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
+        self.wall_scrollBar.rangeChanged.connect(
+            lambda: self.wall_scrollBar.setValue(self.wall_scrollBar.maximum()))
         self.search_bar.textChanged.connect(self.update_search)
         self.event_count_spinBox.valueChanged.connect(self.change_events_count)
 
@@ -65,17 +71,18 @@ class wall_widget(QtWidgets.QWidget):
         self.setMinimumWidth(300)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         self.header_frame = QtWidgets.QFrame()
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_frame.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_frame)
 
         self.search_bar = gui_utils.search_bar()
-        self.search_bar.setPlaceholderText('"tag", "@j.smith&export", "shot_0021", "creation"')
+        self.search_bar.setPlaceholderText(
+            '"tag", "@j.smith&export", "shot_0021", "creation"')
         self.header_layout.addWidget(self.search_bar)
 
         self.wall_scrollArea = QtWidgets.QScrollArea()
@@ -83,34 +90,39 @@ class wall_widget(QtWidgets.QWidget):
 
         self.wall_scrollArea_widget = QtWidgets.QWidget()
         self.wall_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.wall_scrollArea_layout.setContentsMargins(0,0,0,8)
+        self.wall_scrollArea_layout.setContentsMargins(0, 0, 0, 8)
         self.wall_scrollArea_layout.setSpacing(0)
         self.wall_scrollArea_widget.setLayout(self.wall_scrollArea_layout)
 
-        self.wall_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        self.wall_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.wall_scrollArea.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.wall_scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.wall_scrollArea.setWidgetResizable(True)
         self.wall_scrollArea.setWidget(self.wall_scrollArea_widget)
 
-        self.wall_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.wall_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.wall_scrollArea)
 
         self.infos_frame = QtWidgets.QFrame()
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(4,4,4,4)
+        self.infos_layout.setContentsMargins(4, 4, 4, 4)
         self.infos_frame.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_frame)
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('tree_datas_label')
         self.infos_layout.addWidget(self.refresh_label)
-        
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.infos_layout.addWidget(QtWidgets.QLabel('Show'))
         self.event_count_spinBox = QtWidgets.QSpinBox()
-        self.event_count_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.event_count_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.event_count_spinBox.setRange(1, 10000000)
         self.event_count_spinBox.setFixedWidth(50)
         self.infos_layout.addWidget(self.event_count_spinBox)
@@ -184,7 +196,8 @@ class wall_widget(QtWidgets.QWidget):
 
             for event_row in self.event_rows[-event_number:]:
                 if event_row['id'] not in self.event_ids.keys():
-                    event_widget = wall_event_widget(event_row, self.users_images_dic)
+                    event_widget = wall_event_widget(
+                        event_row, self.users_images_dic)
                     if event_row['creation_time']-self.last_time > 350:
                         event_widget.add_time()
                     self.wall_scrollArea_layout.addWidget(event_widget)
@@ -200,7 +213,8 @@ class wall_widget(QtWidgets.QWidget):
                             for tag_group_row in all_tag_groups:
                                 if tag_group_row['name'] not in event_row['title']:
                                     continue
-                                user_id = repository.get_user_row_by_name(environment.get_user(), 'id')
+                                user_id = repository.get_user_row_by_name(
+                                    environment.get_user(), 'id')
                                 if user_id not in json.loads(tag_group_row['user_ids']):
                                     continue
                                 self.popup.emit(event_row)
@@ -209,7 +223,7 @@ class wall_widget(QtWidgets.QWidget):
                 else:
                     if event_row != self.event_ids[event_row['id']].event_row:
                         self.event_ids[event_row['id']].refresh(event_row)
-                            
+
             self.remove_useless_events(event_number)
 
         self.update_search()
@@ -240,22 +254,25 @@ class wall_widget(QtWidgets.QWidget):
         refresh_time = str(round((time.perf_counter()-start_time), 3))
         self.refresh_label.setText(f"refresh : {refresh_time}s")
 
+
 class wall_time_widget(QtWidgets.QWidget):
-    def __init__(self, time_float, parent = None):
+    def __init__(self, time_float, parent=None):
         super(wall_time_widget, self).__init__(parent)
         self.time_float = time_float
         self.build_ui()
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(12,12,12,12)
+        self.main_layout.setContentsMargins(12, 12, 12, 12)
         self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         day, hour = tools.convert_time(self.time_float)
-        self.day_label = QtWidgets.QLabel(f"{tools.time_ago_from_timestamp(self.time_float)} - ")
+        self.day_label = QtWidgets.QLabel(
+            f"{tools.time_ago_from_timestamp(self.time_float)} - ")
         self.day_label.setObjectName('gray_label')
         self.hour_label = QtWidgets.QLabel(hour)
         self.hour_label.setObjectName('bold_label')
@@ -263,10 +280,12 @@ class wall_time_widget(QtWidgets.QWidget):
         current_day, current_hour = tools.convert_time(time.time())
         if current_day != day:
             self.main_layout.addWidget(self.day_label)
-            
+
         self.main_layout.addWidget(self.hour_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+
 
 class wall_event_widget(QtWidgets.QFrame):
 
@@ -286,11 +305,12 @@ class wall_event_widget(QtWidgets.QFrame):
     def refresh(self, event_row):
         self.event_row = event_row
         self.fill_ui(init=None)
-    
+
     def fill_ui(self, init=True):
         if self.event_row['creation_user'] in self.users_images_dic.keys():
-            self.profile_picture.setPixmap(self.users_images_dic[self.event_row['creation_user']])
-            
+            self.profile_picture.setPixmap(
+                self.users_images_dic[self.event_row['creation_user']])
+
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
         if self.event_row['message'] is not None and self.event_row['message'] != '':
@@ -299,33 +319,39 @@ class wall_event_widget(QtWidgets.QFrame):
         else:
             self.event_content_label.setVisible(0)
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
-            self.event_additional_content_label.setText(self.event_row['additional_message'])
+            self.event_additional_content_label.setText(
+                self.event_row['additional_message'])
             self.event_additional_content_label.setVisible(1)
         else:
             self.event_additional_content_label.setVisible(0)
         if self.event_row['image_path'] is not None:
-            self.image_label.setPixmap(QtGui.QIcon(self.event_row['image_path']).pixmap(300))
+            self.image_label.setPixmap(QtGui.QIcon(
+                self.event_row['image_path']).pixmap(300))
             self.image_label.setVisible(1)
         else:
             self.image_label.setVisible(0)
         self.action_button_button.setText('View')
-        
+
         if self.event_row['type'] == 'creation':
             profile_color = '#77c5f2'
             if init:
-                gui_utils.application_tooltip(self.action_button_button, "Focus on instance")
+                gui_utils.application_tooltip(
+                    self.action_button_button, "Focus on instance")
         elif self.event_row['type'] == 'export':
             profile_color = '#9cf277'
             if init:
-                gui_utils.application_tooltip(self.action_button_button, "Focus on export version")
+                gui_utils.application_tooltip(
+                    self.action_button_button, "Focus on export version")
         elif self.event_row['type'] == 'archive':
             profile_color = '#f0605b'
             if init:
-                gui_utils.application_tooltip(self.action_button_button, "Open .zip file")
+                gui_utils.application_tooltip(
+                    self.action_button_button, "Open .zip file")
         elif self.event_row['type'] == 'video':
             profile_color = '#B988F3'
             if init:
-                gui_utils.application_tooltip(self.action_button_button, "Focus on video")
+                gui_utils.application_tooltip(
+                    self.action_button_button, "Focus on video")
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 
@@ -334,14 +360,19 @@ class wall_event_widget(QtWidgets.QFrame):
 
         if self.event_row['creation_user'] == environment.get_user():
             self.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
-            self.content_layout.setContentsMargins(0,0,41,0)
-            self.event_title_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
-            self.user_name_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+            self.content_layout.setContentsMargins(0, 0, 41, 0)
+            self.event_title_label.setAlignment(
+                QtCore.Qt.AlignmentFlag.AlignRight)
+            self.user_name_label.setAlignment(
+                QtCore.Qt.AlignmentFlag.AlignRight)
             self.event_content_label.setAlignRight()
-            self.event_additional_content_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
-            self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-left-radius:6px;}'%profile_color)
+            self.event_additional_content_label.setAlignment(
+                QtCore.Qt.AlignmentFlag.AlignRight)
+            self.profile_frame.setStyleSheet(
+                '#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-left-radius:6px;}' % profile_color)
         else:
-            self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-right-radius:6px;}'%profile_color)
+            self.profile_frame.setStyleSheet(
+                '#wall_profile_frame{background-color:%s;border-radius:17px;border-bottom-right-radius:6px;}' % profile_color)
 
     def connect_functions(self):
         self.action_button_button.clicked.connect(self.action)
@@ -377,52 +408,56 @@ class wall_event_widget(QtWidgets.QFrame):
 
     def add_time(self):
         if self.time_widget == None:
-            self.time_widget = wall_time_widget(self.event_row['creation_time'])
+            self.time_widget = wall_time_widget(
+                self.event_row['creation_time'])
             self.widget_layout.insertWidget(0, self.time_widget)
             if self.event_row['creation_user'] == environment.get_user():
-                self.time_widget.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+                self.time_widget.setLayoutDirection(
+                    QtCore.Qt.LayoutDirection.LeftToRight)
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.widget_layout = QtWidgets.QVBoxLayout()
-        self.widget_layout.setContentsMargins(8,1,8,1)
+        self.widget_layout.setContentsMargins(8, 1, 8, 1)
         self.widget_layout.setSpacing(1)
         self.setLayout(self.widget_layout)
 
         self.event_frame = QtWidgets.QFrame()
         self.event_frame.setObjectName('wall_event_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(9,9,9,9)
+        self.main_layout.setContentsMargins(9, 9, 9, 9)
         self.main_layout.setSpacing(6)
         self.event_frame.setLayout(self.main_layout)
         self.widget_layout.addWidget(self.event_frame)
 
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(6)
         self.main_layout.addLayout(self.header_layout)
 
         self.profile_subwidget_layout = QtWidgets.QVBoxLayout()
-        self.profile_subwidget_layout.setContentsMargins(0,0,0,0)
+        self.profile_subwidget_layout.setContentsMargins(0, 0, 0, 0)
         self.profile_subwidget_layout.setSpacing(0)
         self.header_layout.addLayout(self.profile_subwidget_layout)
 
         self.profile_frame = QtWidgets.QFrame()
         self.profile_frame.setObjectName('wall_profile_frame')
         self.profile_layout = QtWidgets.QHBoxLayout()
-        self.profile_layout.setContentsMargins(0,0,0,0)
+        self.profile_layout.setContentsMargins(0, 0, 0, 0)
         self.profile_frame.setLayout(self.profile_layout)
-        self.profile_frame.setFixedSize(34,34)
+        self.profile_frame.setFixedSize(34, 34)
         self.profile_subwidget_layout.addWidget(self.profile_frame)
 
         self.profile_picture = QtWidgets.QLabel()
-        self.profile_picture.setFixedSize(30,30)
+        self.profile_picture.setFixedSize(30, 30)
         self.profile_layout.addWidget(self.profile_picture)
 
-        self.profile_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.profile_subwidget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.title_layout = QtWidgets.QVBoxLayout()
-        self.title_layout.setContentsMargins(0,0,0,0)
+        self.title_layout.setContentsMargins(0, 0, 0, 0)
         self.title_layout.setSpacing(2)
         self.header_layout.addLayout(self.title_layout)
 
@@ -435,13 +470,15 @@ class wall_event_widget(QtWidgets.QFrame):
         self.user_name_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.user_name_label)
 
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.content_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_layout.setContentsMargins(41,0,0,0)
+        self.content_layout.setContentsMargins(41, 0, 0, 0)
         self.content_layout.setSpacing(6)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -458,7 +495,7 @@ class wall_event_widget(QtWidgets.QFrame):
         self.content_layout.addWidget(self.image_label)
 
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(2)
         self.content_layout.addLayout(self.buttons_layout)
 
@@ -466,15 +503,19 @@ class wall_event_widget(QtWidgets.QFrame):
         self.time_label.setObjectName('gray_label')
         self.buttons_layout.addWidget(self.time_label)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
-        
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
         self.action_button_button = QtWidgets.QPushButton()
-        self.action_button_button.setIcon(QtGui.QIcon(ressources._rigth_arrow_icon_))
-        self.action_button_button.setIconSize(QtCore.QSize(14,14))
-        self.action_button_button.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        self.action_button_button.setIcon(
+            QtGui.QIcon(ressources._rigth_arrow_icon_))
+        self.action_button_button.setIconSize(QtCore.QSize(14, 14))
+        self.action_button_button.setLayoutDirection(
+            QtCore.Qt.LayoutDirection.RightToLeft)
 
         self.action_button_button.setObjectName('blue_text_button')
         self.buttons_layout.addWidget(self.action_button_button)
+
 
 class search_thread(QtCore.QThread):
 

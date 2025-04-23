@@ -9,6 +9,7 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 from wizard.core import repository
 from wizard.vars import ressources
 
+
 class create_quote_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_quote_widget, self).__init__()
@@ -22,7 +23,7 @@ class create_quote_widget(QtWidgets.QDialog):
     def update_count(self):
         content = self.quote_field.toPlainText()
         self.count_label.setText(f'{str(len(content))}/100 characters')
-        if len(content)>100:
+        if len(content) > 100:
             self.count_label.setStyleSheet('color:#f0605b;')
         else:
             self.count_label.setStyleSheet('')
@@ -43,12 +44,13 @@ class create_quote_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel('Warning, the quotes are not anonymous')
+        self.infos_label = QtWidgets.QLabel(
+            'Warning, the quotes are not anonymous')
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding,
-                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding,
+                                                             QtWidgets.QSizePolicy.Policy.MinimumExpanding))
 
         self.count_label = QtWidgets.QLabel('0/100 characters')
         self.main_layout.addWidget(self.count_label)
@@ -61,15 +63,17 @@ class create_quote_widget(QtWidgets.QDialog):
         self.warning_frame = QtWidgets.QFrame()
         self.warning_layout = QtWidgets.QHBoxLayout()
         self.warning_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
-        self.warning_layout.setContentsMargins(6,6,6,6)
+        self.warning_layout.setContentsMargins(6, 6, 6, 6)
         self.warning_layout.setSpacing(6)
         self.warning_frame.setLayout(self.warning_layout)
         self.main_layout.addWidget(self.warning_frame)
 
         self.warning_icon = QtWidgets.QLabel()
         self.warning_icon.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
-        self.warning_icon.setPixmap(QtGui.QIcon(ressources._agreement_icon_).pixmap(30))
-        self.warning_icon.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.warning_icon.setPixmap(QtGui.QIcon(
+            ressources._agreement_icon_).pixmap(30))
+        self.warning_icon.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.warning_layout.addWidget(self.warning_icon)
 
         warning_text = "Please ensure that you're respectful, everybody has access to your publication.\n"
@@ -79,17 +83,18 @@ class create_quote_widget(QtWidgets.QDialog):
         self.warning_label = QtWidgets.QLabel(warning_text)
         self.warning_layout.addWidget(self.warning_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding,
-                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding,
+                                                             QtWidgets.QSizePolicy.Policy.MinimumExpanding))
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.cancel_button.setDefault(False)

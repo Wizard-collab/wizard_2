@@ -15,11 +15,11 @@ from wizard.gui import create_quote_widget
 
 # Wizard modules
 from wizard.core import repository
-from wizard.core import tools
 from wizard.vars import ressources
 
+
 class quotes_manager(QtWidgets.QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(quotes_manager, self).__init__(parent)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
@@ -40,7 +40,7 @@ class quotes_manager(QtWidgets.QWidget):
         self.setObjectName('dark_widget')
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -53,11 +53,13 @@ class quotes_manager(QtWidgets.QWidget):
         self.quotes_scrollArea_layout.setSpacing(6)
         self.quotes_scrollArea_widget.setLayout(self.quotes_scrollArea_layout)
 
-        self.quotes_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.quotes_scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.quotes_scrollArea.setWidgetResizable(True)
         self.quotes_scrollArea.setWidget(self.quotes_scrollArea_widget)
 
-        self.quotes_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.quotes_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.quotes_scrollArea)
 
@@ -67,7 +69,7 @@ class quotes_manager(QtWidgets.QWidget):
 
         self.infos_widget = QtWidgets.QWidget()
         self.infos_layout = QtWidgets.QVBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setContentsMargins(0, 0, 0, 0)
         self.infos_layout.setSpacing(6)
         self.infos_widget.setLayout(self.infos_layout)
         self.footer_layout.addWidget(self.infos_widget)
@@ -77,13 +79,14 @@ class quotes_manager(QtWidgets.QWidget):
 
         self.rank_widget = QtWidgets.QWidget()
         self.rank_layout = QtWidgets.QHBoxLayout()
-        self.rank_layout.setContentsMargins(0,0,0,0)
+        self.rank_layout.setContentsMargins(0, 0, 0, 0)
         self.rank_layout.setSpacing(2)
         self.rank_widget.setLayout(self.rank_layout)
         self.infos_layout.addWidget(self.rank_widget)
 
         self.star_icon = QtWidgets.QLabel()
-        self.star_icon.setPixmap(QtGui.QIcon(ressources._star_icon_).pixmap(12))
+        self.star_icon.setPixmap(QtGui.QIcon(
+            ressources._star_icon_).pixmap(12))
         self.rank_layout.addWidget(self.star_icon)
 
         self.quote_rank = QtWidgets.QLabel()
@@ -97,12 +100,14 @@ class quotes_manager(QtWidgets.QWidget):
         self.voters_number.setObjectName('gray_label')
         self.rank_layout.addWidget(self.voters_number)
 
-        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.create_quote_button = QtWidgets.QPushButton()
-        self.create_quote_button.setFixedSize(QtCore.QSize(30,30))
+        self.create_quote_button.setFixedSize(QtCore.QSize(30, 30))
         self.create_quote_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.footer_layout.addWidget(self.create_quote_button)
 
@@ -126,7 +131,8 @@ class quotes_manager(QtWidgets.QWidget):
         gui_server.refresh_ui()
 
     def add_quote(self):
-        self.create_quote_widget = create_quote_widget.create_quote_widget(self)
+        self.create_quote_widget = create_quote_widget.create_quote_widget(
+            self)
         self.create_quote_widget.exec()
         gui_server.refresh_ui()
 
@@ -171,6 +177,7 @@ class quotes_manager(QtWidgets.QWidget):
         self.quote_rank.setText(f"{all_quotes_mean}")
         self.voters_number.setText(f"{len(all_votes)} votes")
 
+
 class quote_widget(QtWidgets.QFrame):
 
     delete_signal = pyqtSignal(int)
@@ -202,13 +209,14 @@ class quote_widget(QtWidgets.QFrame):
 
         self.rank_widget = QtWidgets.QWidget()
         self.rank_layout = QtWidgets.QHBoxLayout()
-        self.rank_layout.setContentsMargins(0,0,0,0)
+        self.rank_layout.setContentsMargins(0, 0, 0, 0)
         self.rank_layout.setSpacing(2)
         self.rank_widget.setLayout(self.rank_layout)
         self.main_layout.addWidget(self.rank_widget)
 
         self.star_icon = QtWidgets.QLabel()
-        self.star_icon.setPixmap(QtGui.QIcon(ressources._star_icon_).pixmap(12))
+        self.star_icon.setPixmap(QtGui.QIcon(
+            ressources._star_icon_).pixmap(12))
         self.rank_layout.addWidget(self.star_icon)
 
         self.quote_rank = QtWidgets.QLabel()
@@ -222,11 +230,12 @@ class quote_widget(QtWidgets.QFrame):
         self.voters_number.setObjectName('gray_label')
         self.rank_layout.addWidget(self.voters_number)
 
-        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.rank_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.delete_button = QtWidgets.QPushButton()
-        self.delete_button.setFixedSize(QtCore.QSize(18,18))
-        self.delete_button.setIconSize(QtCore.QSize(12,12))
+        self.delete_button.setFixedSize(QtCore.QSize(18, 18))
+        self.delete_button.setIconSize(QtCore.QSize(12, 12))
         self.delete_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
         self.rank_layout.addWidget(self.delete_button)
 

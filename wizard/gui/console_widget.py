@@ -28,6 +28,7 @@ known_errors = ['libpng warning: iCCP: known incorrect sRGB profile',
                 'QPainter::setPen: Painter not active',
                 'QPainter::begin: Paint device returned engine == 0, type: 2']
 
+
 class custom_stdout(QtCore.QObject):
 
     stdout_signal = pyqtSignal(str)
@@ -52,6 +53,7 @@ class custom_stdout(QtCore.QObject):
         if not sys.__stdout__:
             sys.__stdout__.flush()
 
+
 class custom_stderr(QtCore.QObject):
 
     stderr_signal = pyqtSignal(str)
@@ -70,6 +72,7 @@ class custom_stderr(QtCore.QObject):
             return
         sys.__stderr__.flush()
 
+
 class console_widget(QtWidgets.QWidget):
 
     notification = pyqtSignal(str)
@@ -80,7 +83,8 @@ class console_widget(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Wizard - Console")
 
-        self.custom_handler = logging_widget.custom_handler(long_formatter=True, parent=self)
+        self.custom_handler = logging_widget.custom_handler(
+            long_formatter=True, parent=self)
         root_logger = logging.getLogger()
         root_logger.addHandler(self.custom_handler)
         self.script_editor_widget = script_editor_widget.script_editor_widget()
@@ -113,31 +117,39 @@ class console_widget(QtWidgets.QWidget):
         event.accept()
 
     def build_ui(self):
-        self.resize(800,600)
+        self.resize(800, 600)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_custom_widget = QtWidgets.QWidget()
         self.header_custom_widget.setObjectName('transparent_widget')
         self.header_custom_layout = QtWidgets.QHBoxLayout()
-        self.header_custom_layout.setContentsMargins(4,4,4,4)
+        self.header_custom_layout.setContentsMargins(4, 4, 4, 4)
         self.header_custom_layout.setSpacing(0)
         self.header_custom_widget.setLayout(self.header_custom_layout)
 
         self.menu_bar = QtWidgets.QMenuBar()
-        self.menu_bar.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.menu_bar.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_custom_layout.addWidget(self.menu_bar)
-        self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_custom_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
         self.main_layout.addWidget(self.header_custom_widget)
-        self.console_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Console")
-        self.clear_console_action = self.console_action.addAction(QtGui.QIcon(ressources._archive_icon_), "Clear")
-        self.send_to_support_action = self.console_action.addAction(QtGui.QIcon(ressources._send_icon_), "Send to support")
+        self.console_action = gui_utils.add_menu_to_menu_bar(
+            self.menu_bar, "Console")
+        self.clear_console_action = self.console_action.addAction(
+            QtGui.QIcon(ressources._archive_icon_), "Clear")
+        self.send_to_support_action = self.console_action.addAction(
+            QtGui.QIcon(ressources._send_icon_), "Send to support")
 
-        self.script_action = gui_utils.add_menu_to_menu_bar(self.menu_bar, "Script")
-        self.execute_action = self.script_action.addAction(QtGui.QIcon(ressources._play_icon_), "Execute ( Ctrl+Return )")
-        self.clear_script_action = self.script_action.addAction(QtGui.QIcon(ressources._archive_icon_), "Clear")
+        self.script_action = gui_utils.add_menu_to_menu_bar(
+            self.menu_bar, "Script")
+        self.execute_action = self.script_action.addAction(
+            QtGui.QIcon(ressources._play_icon_), "Execute ( Ctrl+Return )")
+        self.clear_script_action = self.script_action.addAction(
+            QtGui.QIcon(ressources._archive_icon_), "Clear")
 
         self.console_viewer = QtWidgets.QTextEdit()
         self.console_viewer.setObjectName('console_textEdit')
@@ -148,7 +160,8 @@ class console_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.script_editor_widget)
 
     def connect_functions(self):
-        self.console_scrollBar.rangeChanged.connect(lambda: self.console_scrollBar.setValue(self.console_scrollBar.maximum()))
+        self.console_scrollBar.rangeChanged.connect(
+            lambda: self.console_scrollBar.setValue(self.console_scrollBar.maximum()))
         self.custom_handler.log_record.connect(self.handle_record)
         self.exec_sc = QtGui.QShortcut(QtGui.QKeySequence('Ctrl+Return'), self)
         self.exec_sc.activated.connect(self.execute_script)
@@ -157,14 +170,16 @@ class console_widget(QtWidgets.QWidget):
         self.send_to_support_action.triggered.connect(self.send_to_support)
 
         self.execute_action.triggered.connect(self.execute_script)
-        self.clear_script_action.triggered.connect(self.script_editor_widget.clear)
-        
+        self.clear_script_action.triggered.connect(
+            self.script_editor_widget.clear)
+
         sys.stdout.stdout_signal.connect(self.handle_stdout)
         sys.stderr.stderr_signal.connect(self.handle_stderr)
 
     def send_to_support(self):
         log = self.console_viewer.toPlainText()
-        self.submit_log_widget = submit_log_widget.submit_log_widget(log, 'console')
+        self.submit_log_widget = submit_log_widget.submit_log_widget(
+            log, 'console')
         self.submit_log_widget.show()
 
     def execute_script(self):
@@ -186,12 +201,12 @@ class console_widget(QtWidgets.QWidget):
             self.script_editor_widget.setText(data)
 
     def handle_stdout(self, buf):
-        if buf!='\n' and buf != '\r' and buf != '\r\n':
+        if buf != '\n' and buf != '\r' and buf != '\r\n':
             self.console_viewer.insertHtml(buf)
             self.console_viewer.insertHtml('<br>')
 
     def handle_stderr(self, buf):
-        if buf!='\n' and buf != '\r' and buf != '\r\n':
+        if buf != '\n' and buf != '\r' and buf != '\r\n':
             buf = f'<strong><span style="color:#f0605b;">{buf}</strong>'
             self.console_viewer.insertHtml(buf)
             self.console_viewer.insertHtml('<br>')
@@ -199,7 +214,7 @@ class console_widget(QtWidgets.QWidget):
     def handle_record(self, record_tuple):
         level = record_tuple[0]
         record_msg = record_tuple[1]
-        if record_msg is not None and record_msg!='\n' and record_msg != '\r' and record_msg != '\r\n':
+        if record_msg is not None and record_msg != '\n' and record_msg != '\r' and record_msg != '\r\n':
             if level == 'INFO':
                 record_msg = f'<span style="color:#90d1f0;">{record_msg}'
                 if not self.isActiveWindow():

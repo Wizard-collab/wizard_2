@@ -7,6 +7,7 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
 import os
 import time
+import logging
 
 # Wizard modules
 from wizard.vars import assets_vars
@@ -25,6 +26,9 @@ from wizard.core import repository
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import confirm_widget
+
+logger = logging.getLogger(__name__)
+
 
 class context_widget(QtWidgets.QFrame):
 
@@ -86,7 +90,8 @@ class context_widget(QtWidgets.QFrame):
                         self.variants[variant_row['name']] = variant_row['id']
 
             if apply_default and self.stage_row['default_variant_id']:
-                default_variant_name = project.get_variant_data(self.stage_row['default_variant_id'], 'name')
+                default_variant_name = project.get_variant_data(
+                    self.stage_row['default_variant_id'], 'name')
                 self.variant_comboBox.setCurrentText(default_variant_name)
 
         self.refresh_variant_changed = 1
@@ -115,13 +120,16 @@ class context_widget(QtWidgets.QFrame):
         if self.refresh_variant_changed:
             self.variant_row = None
             if self.stage_row is not None:
-                self.variant_row = project.get_variant_by_name(self.stage_id, self.variant_comboBox.currentText())
+                self.variant_row = project.get_variant_by_name(
+                    self.stage_id, self.variant_comboBox.currentText())
             self.refresh_work_envs_hard()
 
             if self.variant_row is not None:
-                self.archive_variant_button.setVisible(self.variant_row['name'] != 'main')
+                self.archive_variant_button.setVisible(
+                    self.variant_row['name'] != 'main')
                 if by_user:
-                    project.set_stage_default_variant(self.stage_row['id'], self.variant_row['id'])
+                    project.set_stage_default_variant(
+                        self.stage_row['id'], self.variant_row['id'])
                 self.variant_changed_signal.emit(self.variant_row['id'])
 
             else:
@@ -135,11 +143,13 @@ class context_widget(QtWidgets.QFrame):
         if self.variant_row is not None:
             self.variant_row = project.get_variant_data(self.variant_row['id'])
             for software_name in assets_vars._stage_softwares_rules_dic_[self.stage_row['name']]:
-                    icon = QtGui.QIcon(ressources._softwares_icons_dic_[software_name])
-                    self.work_env_comboBox.addItem(icon, software_name)
+                icon = QtGui.QIcon(
+                    ressources._softwares_icons_dic_[software_name])
+                self.work_env_comboBox.addItem(icon, software_name)
 
             if self.variant_row['default_work_env_id'] is not None:
-                default_work_env_name = project.get_work_env_data(self.variant_row['default_work_env_id'], 'name')
+                default_work_env_name = project.get_work_env_data(
+                    self.variant_row['default_work_env_id'], 'name')
                 self.work_env_comboBox.setCurrentText(default_work_env_name)
 
         self.refresh_work_env_changed = 1
@@ -150,11 +160,12 @@ class context_widget(QtWidgets.QFrame):
             self.work_env_row = None
             if self.variant_row is not None:
                 self.work_env_row = project.get_work_env_by_name(self.variant_row['id'],
-                                                                self.work_env_comboBox.currentText())
+                                                                 self.work_env_comboBox.currentText())
 
                 if by_user:
                     if self.work_env_row is not None:
-                        project.set_variant_data(self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
+                        project.set_variant_data(
+                            self.variant_row['id'], 'default_work_env_id', self.work_env_row['id'])
 
                 if self.work_env_row is not None and self.variant_row is not None:
                     self.work_env_changed_signal.emit(self.work_env_row['id'])
@@ -172,15 +183,18 @@ class context_widget(QtWidgets.QFrame):
         self.export_extension_comboBox.clear()
 
         if self.stage_row is not None and self.work_env_row is not None:
-            extensions_list = assets_vars._ext_dic_[self.stage_row['name']][self.work_env_row['name']]
+            extensions_list = assets_vars._ext_dic_[
+                self.stage_row['name']][self.work_env_row['name']]
             default_extension = f"Default ({project.get_default_extension(self.stage_row['name'], self.work_env_row['software_id'])})"
             extensions_list = [default_extension] + extensions_list
             self.export_extension_comboBox.addItems(extensions_list)
 
             if self.work_env_row['export_extension'] is None:
-                self.export_extension_comboBox.setCurrentText(default_extension)
+                self.export_extension_comboBox.setCurrentText(
+                    default_extension)
             else:
-                self.export_extension_comboBox.setCurrentText(self.work_env_row['export_extension'])
+                self.export_extension_comboBox.setCurrentText(
+                    self.work_env_row['export_extension'])
 
         self.refresh_extension_changed = 1
 
@@ -189,12 +203,15 @@ class context_widget(QtWidgets.QFrame):
             export_extension = self.export_extension_comboBox.currentText()
             if 'Default' in export_extension:
                 export_extension = None
-            project.set_work_env_extension(self.work_env_row['id'], export_extension)
+            project.set_work_env_extension(
+                self.work_env_row['id'], export_extension)
 
     def connect_functions(self):
         self.variant_comboBox.currentTextChanged.connect(self.variant_changed)
-        self.work_env_comboBox.currentTextChanged.connect(self.work_env_changed)
-        self.export_extension_comboBox.currentTextChanged.connect(self.extension_changed)
+        self.work_env_comboBox.currentTextChanged.connect(
+            self.work_env_changed)
+        self.export_extension_comboBox.currentTextChanged.connect(
+            self.extension_changed)
         self.add_variant_button.clicked.connect(self.create_variant)
         self.folder_button.clicked.connect(self.open_work_env_folder)
         self.sandbox_button.clicked.connect(self.open_sandbox_folder)
@@ -205,11 +222,12 @@ class context_widget(QtWidgets.QFrame):
         if not repository.is_admin():
             return
         if self.variant_row is not None:
-            self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+            self.confirm_widget = confirm_widget.confirm_widget(
+                'Do you want to continue ?', parent=self)
             security_sentence = f"{self.variant_row['name']}"
             self.confirm_widget.set_security_sentence(security_sentence)
             if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-                subtasks_library.archive_variant(self.variant_row['id'])        
+                subtasks_library.archive_variant(self.variant_row['id'])
         else:
             logger.warning("No variant found")
 
@@ -221,7 +239,8 @@ class context_widget(QtWidgets.QFrame):
 
     def open_sandbox_folder(self):
         if self.variant_row is not None:
-            sandbox_path = path_utils.join(assets.get_variant_path(self.variant_row['id']), '_SANDBOX')
+            sandbox_path = path_utils.join(
+                assets.get_variant_path(self.variant_row['id']), '_SANDBOX')
             if path_utils.isdir(sandbox_path):
                 path_utils.startfile(sandbox_path)
 
@@ -230,17 +249,22 @@ class context_widget(QtWidgets.QFrame):
             self.variant_creation_widget = variant_creation_widget(self)
             if self.variant_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 variant_name = self.variant_creation_widget.name_field.text()
-                new_variant_id = assets.create_variant(variant_name, self.stage_row['id'])
+                new_variant_id = assets.create_variant(
+                    variant_name, self.stage_row['id'])
                 if new_variant_id:
-                    project.set_stage_default_variant(self.stage_row['id'], new_variant_id)
+                    project.set_stage_default_variant(
+                        self.stage_row['id'], new_variant_id)
                     gui_server.refresh_team_ui()
 
     def init_work_env(self):
         if self.work_env_row is None:
             software_name = self.work_env_comboBox.currentText()
-            software_id = project.get_software_data_by_name(software_name, 'id')
-            work_env_id = assets.create_work_env(software_id, self.variant_row['id'])
-            project.set_variant_data(self.variant_row['id'], 'default_work_env_id', work_env_id)
+            software_id = project.get_software_data_by_name(
+                software_name, 'id')
+            work_env_id = assets.create_work_env(
+                software_id, self.variant_row['id'])
+            project.set_variant_data(
+                self.variant_row['id'], 'default_work_env_id', work_env_id)
             self.refresh_work_envs_hard()
             gui_server.refresh_team_ui()
 
@@ -249,7 +273,8 @@ class context_widget(QtWidgets.QFrame):
             self.init_work_env_button.setMaximumWidth(200)
             self.init_work_env_button.setMinimumWidth(0)
             self.init_work_env_button.setVisible(1)
-            self.anim = QtCore.QPropertyAnimation(self.init_work_env_button, b"maximumWidth")
+            self.anim = QtCore.QPropertyAnimation(
+                self.init_work_env_button, b"maximumWidth")
             self.anim.setDuration(100)
             self.anim.setStartValue(0)
             self.anim.setEndValue(200)
@@ -259,24 +284,27 @@ class context_widget(QtWidgets.QFrame):
         if self.init_work_env_button.isVisible():
             self.init_work_env_button.setMaximumWidth(200)
             self.init_work_env_button.setMinimumWidth(0)
-            self.anim = QtCore.QPropertyAnimation(self.init_work_env_button, b"maximumWidth")
+            self.anim = QtCore.QPropertyAnimation(
+                self.init_work_env_button, b"maximumWidth")
             self.anim.setDuration(100)
             self.anim.setStartValue(200)
             self.anim.setEndValue(0)
-            self.anim.finished.connect(lambda:self.init_work_env_button.setVisible(0))
+            self.anim.finished.connect(
+                lambda: self.init_work_env_button.setVisible(0))
             self.anim.start()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(3,3,3,3)
+        self.main_layout.setContentsMargins(3, 3, 3, 3)
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
         self.add_variant_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.add_variant_button, "Create variant")
-        self.add_variant_button.setFixedSize(29,29)
+        gui_utils.application_tooltip(
+            self.add_variant_button, "Create variant")
+        self.add_variant_button.setFixedSize(29, 29)
         self.add_variant_button.setIcon(QtGui.QIcon(ressources._add_icon_))
-        self.add_variant_button.setIconSize(QtCore.QSize(14,14))
+        self.add_variant_button.setIconSize(QtCore.QSize(14, 14))
         self.main_layout.addWidget(self.add_variant_button)
 
         self.variant_comboBox = gui_utils.QComboBox()
@@ -285,51 +313,62 @@ class context_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.variant_comboBox)
 
         self.archive_variant_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.archive_variant_button, "Archive variant")
-        self.archive_variant_button.setFixedSize(29,29)
-        self.archive_variant_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
-        self.archive_variant_button.setIconSize(QtCore.QSize(14,14))
+        gui_utils.application_tooltip(
+            self.archive_variant_button, "Archive variant")
+        self.archive_variant_button.setFixedSize(29, 29)
+        self.archive_variant_button.setIcon(
+            QtGui.QIcon(ressources._archive_icon_))
+        self.archive_variant_button.setIconSize(QtCore.QSize(14, 14))
         self.main_layout.addWidget(self.archive_variant_button)
 
         self.work_env_comboBox = gui_utils.QComboBox()
         self.work_env_comboBox.setFixedWidth(190)
-        gui_utils.application_tooltip(self.work_env_comboBox, "Change work environment")
+        gui_utils.application_tooltip(
+            self.work_env_comboBox, "Change work environment")
         self.main_layout.addWidget(self.work_env_comboBox)
 
-        self.init_work_env_button = QtWidgets.QPushButton('Init work environment')
+        self.init_work_env_button = QtWidgets.QPushButton(
+            'Init work environment')
         self.init_work_env_button.setObjectName('init_work_env_button')
         self.init_work_env_button.setFixedHeight(29)
         self.init_work_env_button.setVisible(0)
-        gui_utils.application_tooltip(self.init_work_env_button, "Init work environment")
+        gui_utils.application_tooltip(
+            self.init_work_env_button, "Init work environment")
         self.main_layout.addWidget(self.init_work_env_button)
 
         self.export_extension_comboBox = gui_utils.QComboBox()
         self.export_extension_comboBox.setFixedWidth(150)
-        gui_utils.application_tooltip(self.export_extension_comboBox, "Change export extension")
+        gui_utils.application_tooltip(
+            self.export_extension_comboBox, "Change export extension")
         self.main_layout.addWidget(self.export_extension_comboBox)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.folder_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.folder_button, "Open work environment folder")
+        gui_utils.application_tooltip(
+            self.folder_button, "Open work environment folder")
         self.folder_button.setFixedSize(QtCore.QSize(26, 26))
         self.folder_button.setIconSize(QtCore.QSize(20, 20))
         self.folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
         self.main_layout.addWidget(self.folder_button)
 
         self.sandbox_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.sandbox_button, "Open sandbox folder")
+        gui_utils.application_tooltip(
+            self.sandbox_button, "Open sandbox folder")
         self.sandbox_button.setFixedSize(QtCore.QSize(26, 26))
         self.sandbox_button.setIconSize(QtCore.QSize(20, 20))
         self.sandbox_button.setIcon(QtGui.QIcon(ressources._sandbox_icon_))
         self.main_layout.addWidget(self.sandbox_button)
+
 
 class variant_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(variant_creation_widget, self).__init__(parent)
         self.build_ui()
         self.connect_functions()
-        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
@@ -339,11 +378,12 @@ class variant_creation_widget(QtWidgets.QDialog):
         self.name_field.setFocus()
 
     def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#variant_creation_widget{border-%s-radius:0px;}"%corner)
+        self.main_frame.setStyleSheet(
+            "#variant_creation_widget{border-%s-radius:0px;}" % corner)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.setLayout(self.main_layout)
 
         self.main_frame = QtWidgets.QFrame()
@@ -362,15 +402,17 @@ class variant_creation_widget(QtWidgets.QDialog):
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel('New variant'))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 

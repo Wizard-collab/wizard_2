@@ -39,8 +39,9 @@ from wizard.vars import ressources
 from wizard.core import support
 from wizard.core import environment
 
+
 class error_handler(QtWidgets.QWidget):
-    def __init__(self, error, parent = None):
+    def __init__(self, error, parent=None):
         super(error_handler, self).__init__(parent)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
@@ -64,27 +65,31 @@ class error_handler(QtWidgets.QWidget):
         self.setMaximumHeight(700)
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('header_frame')
-        self.header_widget.setStyleSheet('#header_frame{background-color:rgba(119, 133, 222, 190);}')
+        self.header_widget.setStyleSheet(
+            '#header_frame{background-color:rgba(119, 133, 222, 190);}')
         self.header_layout = QtWidgets.QHBoxLayout()
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
         self.crash_image = QtWidgets.QLabel()
-        self.crash_image.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
-        self.crash_image.setPixmap(QtGui.QIcon(ressources._crash_icon_).pixmap(60))
+        self.crash_image.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.crash_image.setPixmap(QtGui.QIcon(
+            ressources._crash_icon_).pixmap(60))
         self.header_layout.addWidget(self.crash_image)
 
         self.header_content_widget = QtWidgets.QWidget()
-        self.header_content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.header_content_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_content_widget.setObjectName('transparent_widget')
         self.header_content_layout = QtWidgets.QVBoxLayout()
-        self.header_content_layout.setContentsMargins(0,0,0,0)
+        self.header_content_layout.setContentsMargins(0, 0, 0, 0)
         self.header_content_layout.setSpacing(3)
         self.header_content_widget.setLayout(self.header_content_layout)
         self.header_layout.addWidget(self.header_content_widget)
@@ -93,10 +98,12 @@ class error_handler(QtWidgets.QWidget):
         self.title_label.setObjectName('title_label_2')
         self.header_content_layout.addWidget(self.title_label)
 
-        self.info_label = QtWidgets.QLabel('Please send this error to the support,\nThat way wizard will probably be more stable in the future')
+        self.info_label = QtWidgets.QLabel(
+            'Please send this error to the support,\nThat way wizard will probably be more stable in the future')
         self.header_content_layout.addWidget(self.info_label)
 
-        self.header_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.header_content_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
         self.content_layout = QtWidgets.QVBoxLayout()
@@ -108,15 +115,18 @@ class error_handler(QtWidgets.QWidget):
 
         self.error_label = QtWidgets.QTextEdit()
         self.error_label.setText(self.error)
-        self.error_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.error_label.setTextInteractionFlags(
+            QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.content_layout.addWidget(self.error_label)
 
-        self.content_layout.addWidget(QtWidgets.QLabel('You can add some details :'))
+        self.content_layout.addWidget(
+            QtWidgets.QLabel('You can add some details :'))
 
         self.additionnal_message_field = QtWidgets.QTextEdit()
         self.content_layout.addWidget(self.additionnal_message_field)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
@@ -124,7 +134,8 @@ class error_handler(QtWidgets.QWidget):
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.close_button = QtWidgets.QPushButton('Close')
         self.buttons_layout.addWidget(self.close_button)
@@ -140,11 +151,12 @@ class error_handler(QtWidgets.QWidget):
 
     def center(self):
         frameGm = self.frameGeometry()
-        #screen = QtWidgets.QGuiApplication.primaryScreen().screenNumber(QtWidgets.QGuiApplication.primaryScreen().cursor().pos())
+        # screen = QtWidgets.QGuiApplication.primaryScreen().screenNumber(QtWidgets.QGuiApplication.primaryScreen().cursor().pos())
         screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor.pos())
         centerPoint = screen.geometry().center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
+
 
 def main():
     app = app_utils.get_app()
@@ -152,6 +164,7 @@ def main():
     error_handler_widget = error_handler(error)
     error_handler_widget.show()
     sys.exit(app.exec())
+
 
 if __name__ == '__main__':
     main()

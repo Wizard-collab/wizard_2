@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 import logging
 
 # Wizard modules
@@ -11,10 +11,8 @@ from wizard.core import user
 from wizard.core import environment
 from wizard.vars import ressources
 
-# Wizard gui modules
-from wizard.gui import gui_utils
-
 logger = logging.getLogger(__name__)
+
 
 class team_dns_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -39,11 +37,13 @@ class team_dns_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel('Contact your IT to get those informations')
+        self.infos_label = QtWidgets.QLabel(
+            'Contact your IT to get those informations')
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 25, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.host_lineEdit = QtWidgets.QLineEdit()
@@ -54,20 +54,23 @@ class team_dns_widget(QtWidgets.QDialog):
         self.port_lineEdit.setPlaceholderText('Port ( ex: 11111 )')
         self.main_layout.addWidget(self.port_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 25, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.button_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setSpacing(4)
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.button_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.button_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 0, QtWidgets.QSizePolicy.Policy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
-        self.quit_button = QtWidgets.QPushButton('Continue without setting team DNS')
+        self.quit_button = QtWidgets.QPushButton(
+            'Continue without setting team DNS')
         self.quit_button.setDefault(False)
         self.quit_button.setAutoDefault(False)
         self.buttons_layout.addWidget(self.quit_button)
@@ -92,7 +95,7 @@ class team_dns_widget(QtWidgets.QDialog):
             logger.info('The port needs to be an int')
         if team_port is not None:
             if user.user().set_team_dns(
-                                team_host,
-                                team_port
-                                ):
+                team_host,
+                team_port
+            ):
                 self.accept()

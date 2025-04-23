@@ -20,6 +20,7 @@ from wizard.vars import assets_vars
 
 logger = logging.getLogger(__name__)
 
+
 class filter_sets_editor_widget(QtWidgets.QWidget):
     def __init__(self, context, parent=None):
         super(filter_sets_editor_widget, self).__init__(parent)
@@ -50,13 +51,15 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         self.priority_exclude_button.clicked.connect(self.exclude_priority)
         self.save_button.clicked.connect(self.apply)
         self.filter_sets_add_button.clicked.connect(self.add_filter_set)
-        self.delete_filter_set_button.clicked.connect(self.delete_selected_filter_set)
-        self.filter_sets_list.itemSelectionChanged.connect(self.refresh_filters)
+        self.delete_filter_set_button.clicked.connect(
+            self.delete_selected_filter_set)
+        self.filter_sets_list.itemSelectionChanged.connect(
+            self.refresh_filters)
 
     def build_ui(self):
         self.setObjectName('main_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
@@ -71,18 +74,19 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         self.second_layout.addWidget(self.filter_sets_title_label)
 
         self.filter_sets_header = QtWidgets.QHBoxLayout()
-        self.filter_sets_header.setContentsMargins(0,0,0,0)
+        self.filter_sets_header.setContentsMargins(0, 0, 0, 0)
         self.second_layout.addLayout(self.filter_sets_header)
         self.filter_set_name_lineEdit = QtWidgets.QLineEdit()
         self.filter_set_name_lineEdit.setPlaceholderText('New filter set')
         self.filter_sets_header.addWidget(self.filter_set_name_lineEdit)
         self.filter_sets_add_button = QtWidgets.QPushButton()
-        self.filter_sets_add_button.setFixedSize(22,22)
+        self.filter_sets_add_button.setFixedSize(22, 22)
         self.filter_sets_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.filter_sets_header.addWidget(self.filter_sets_add_button)
         self.delete_filter_set_button = QtWidgets.QPushButton()
-        self.delete_filter_set_button.setFixedSize(22,22)
-        self.delete_filter_set_button.setIcon(QtGui.QIcon(ressources._archive_icon_))
+        self.delete_filter_set_button.setFixedSize(22, 22)
+        self.delete_filter_set_button.setIcon(
+            QtGui.QIcon(ressources._archive_icon_))
         self.filter_sets_header.addWidget(self.delete_filter_set_button)
 
         self.filter_sets_list = QtWidgets.QListWidget()
@@ -96,130 +100,155 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
         self.title_label = QtWidgets.QLabel("Choose your filters")
         self.title_label.setObjectName('title_label_2')
         self.third_layout.addWidget(self.title_label)
-        self.description_label = QtWidgets.QLabel("Click on + to filter via the selected item. Click on - to exclude the selected item.")
+        self.description_label = QtWidgets.QLabel(
+            "Click on + to filter via the selected item. Click on - to exclude the selected item.")
         self.description_label.setObjectName('gray_label')
         self.third_layout.addWidget(self.description_label)
 
-        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 25, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.combobox_layout = QtWidgets.QGridLayout()
         self.combobox_layout.setSpacing(4)
-        self.combobox_layout.setContentsMargins(0,0,0,0)
+        self.combobox_layout.setContentsMargins(0, 0, 0, 0)
         self.third_layout.addLayout(self.combobox_layout)
 
         self.domain_label = QtWidgets.QLabel('Domains')
-        self.domain_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
-        self.domain_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.domain_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.domain_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.domain_comboBox = gui_utils.QComboBox()
         self.domain_add_button = QtWidgets.QPushButton()
-        self.domain_add_button.setFixedSize(30,30)
+        self.domain_add_button.setFixedSize(30, 30)
         self.domain_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.domain_exclude_button = QtWidgets.QPushButton()
-        self.domain_exclude_button.setFixedSize(30,30)
-        self.domain_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.domain_exclude_button.setFixedSize(30, 30)
+        self.domain_exclude_button.setIcon(
+            QtGui.QIcon(ressources._remove_icon_))
         self.combobox_layout.addWidget(self.domain_label, 0, 0)
         self.combobox_layout.addWidget(self.domain_comboBox, 0, 1)
         self.combobox_layout.addWidget(self.domain_add_button, 0, 2)
         self.combobox_layout.addWidget(self.domain_exclude_button, 0, 3)
 
         self.category_label = QtWidgets.QLabel('Categories')
-        self.category_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.category_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.category_comboBox = gui_utils.QComboBox()
         self.category_add_button = QtWidgets.QPushButton()
-        self.category_add_button.setFixedSize(30,30)
+        self.category_add_button.setFixedSize(30, 30)
         self.category_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.category_exclude_button = QtWidgets.QPushButton()
-        self.category_exclude_button.setFixedSize(30,30)
-        self.category_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.category_exclude_button.setFixedSize(30, 30)
+        self.category_exclude_button.setIcon(
+            QtGui.QIcon(ressources._remove_icon_))
         self.combobox_layout.addWidget(self.category_label, 1, 0)
         self.combobox_layout.addWidget(self.category_comboBox, 1, 1)
         self.combobox_layout.addWidget(self.category_add_button, 1, 2)
         self.combobox_layout.addWidget(self.category_exclude_button, 1, 3)
 
         self.stage_label = QtWidgets.QLabel('Stages')
-        self.stage_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.stage_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.stage_comboBox = gui_utils.QComboBox()
         self.stage_add_button = QtWidgets.QPushButton()
-        self.stage_add_button.setFixedSize(30,30)
+        self.stage_add_button.setFixedSize(30, 30)
         self.stage_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.stage_exclude_button = QtWidgets.QPushButton()
-        self.stage_exclude_button.setFixedSize(30,30)
-        self.stage_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.stage_exclude_button.setFixedSize(30, 30)
+        self.stage_exclude_button.setIcon(
+            QtGui.QIcon(ressources._remove_icon_))
         self.combobox_layout.addWidget(self.stage_label, 2, 0)
         self.combobox_layout.addWidget(self.stage_comboBox, 2, 1)
         self.combobox_layout.addWidget(self.stage_add_button, 2, 2)
         self.combobox_layout.addWidget(self.stage_exclude_button, 2, 3)
 
-        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 0, 4)
-        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 1, 4)
-        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 2, 4)
-        self.combobox_layout.addItem(QtWidgets.QSpacerItem(50,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 3, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(
+            50, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 0, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(
+            50, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 1, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(
+            50, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 2, 4)
+        self.combobox_layout.addItem(QtWidgets.QSpacerItem(
+            50, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed), 3, 4)
 
         self.state_label = QtWidgets.QLabel('State')
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.state_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.state_comboBox = gui_utils.QComboBox()
         self.state_add_button = QtWidgets.QPushButton()
-        self.state_add_button.setFixedSize(30,30)
+        self.state_add_button.setFixedSize(30, 30)
         self.state_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.state_exclude_button = QtWidgets.QPushButton()
-        self.state_exclude_button.setFixedSize(30,30)
-        self.state_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.state_exclude_button.setFixedSize(30, 30)
+        self.state_exclude_button.setIcon(
+            QtGui.QIcon(ressources._remove_icon_))
         self.combobox_layout.addWidget(self.state_label, 0, 5)
         self.combobox_layout.addWidget(self.state_comboBox, 0, 6)
         self.combobox_layout.addWidget(self.state_add_button, 0, 7)
         self.combobox_layout.addWidget(self.state_exclude_button, 0, 8)
 
         self.assignment_label = QtWidgets.QLabel('Assignment')
-        self.assignment_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.assignment_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.assignment_comboBox = gui_utils.QComboBox()
         self.assignment_add_button = QtWidgets.QPushButton()
-        self.assignment_add_button.setFixedSize(30,30)
+        self.assignment_add_button.setFixedSize(30, 30)
         self.assignment_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.assignment_exclude_button = QtWidgets.QPushButton()
-        self.assignment_exclude_button.setFixedSize(30,30)
-        self.assignment_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.assignment_exclude_button.setFixedSize(30, 30)
+        self.assignment_exclude_button.setIcon(
+            QtGui.QIcon(ressources._remove_icon_))
         self.combobox_layout.addWidget(self.assignment_label, 1, 5)
         self.combobox_layout.addWidget(self.assignment_comboBox, 1, 6)
         self.combobox_layout.addWidget(self.assignment_add_button, 1, 7)
         self.combobox_layout.addWidget(self.assignment_exclude_button, 1, 8)
 
         self.priority_label = QtWidgets.QLabel('Priority')
-        self.priority_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.priority_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.priority_comboBox = gui_utils.QComboBox()
         self.priority_add_button = QtWidgets.QPushButton()
-        self.priority_add_button.setFixedSize(30,30)
+        self.priority_add_button.setFixedSize(30, 30)
         self.priority_add_button.setIcon(QtGui.QIcon(ressources._add_icon_))
         self.priority_exclude_button = QtWidgets.QPushButton()
-        self.priority_exclude_button.setFixedSize(30,30)
-        self.priority_exclude_button.setIcon(QtGui.QIcon(ressources._remove_icon_))
+        self.priority_exclude_button.setFixedSize(30, 30)
+        self.priority_exclude_button.setIcon(
+            QtGui.QIcon(ressources._remove_icon_))
         self.combobox_layout.addWidget(self.priority_label, 2, 5)
         self.combobox_layout.addWidget(self.priority_comboBox, 2, 6)
         self.combobox_layout.addWidget(self.priority_add_button, 2, 7)
         self.combobox_layout.addWidget(self.priority_exclude_button, 2, 8)
 
-        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 25, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.title_label_2 = QtWidgets.QLabel("Your filters")
         self.title_label_2.setObjectName('title_label_2')
         self.third_layout.addWidget(self.title_label_2)
-        self.description_label_2 = QtWidgets.QLabel("Click on x to delete a filter.")
+        self.description_label_2 = QtWidgets.QLabel(
+            "Click on x to delete a filter.")
         self.description_label_2.setObjectName('gray_label')
         self.third_layout.addWidget(self.description_label_2)
 
-        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 25, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.filters_list = QtWidgets.QListWidget()
         self.filters_list.setSpacing(10)
-        self.filters_list.setContentsMargins(0,0,0,0)
-        self.filters_list.setStyleSheet("QListWidget:item{padding:0px;}QListWidget:item:hover{background-color:transparent;}")
+        self.filters_list.setContentsMargins(0, 0, 0, 0)
+        self.filters_list.setStyleSheet(
+            "QListWidget:item{padding:0px;}QListWidget:item:hover{background-color:transparent;}")
         self.filters_list.setObjectName('transparent_widget')
         self.filters_list.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
         self.filters_list.setMovement(QtWidgets.QListView.Movement.Static)
         self.filters_list.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
-        self.filters_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
+        self.filters_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
         self.third_layout.addWidget(self.filters_list)
 
-        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(0,25,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.third_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 25, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.save_button = QtWidgets.QPushButton('Save')
         self.save_button.setObjectName('blue_button')
@@ -240,7 +269,8 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
 
     def add_item(self, data):
         for i in range(self.filters_list.count()):
-            item_data = self.filters_list.itemWidget(self.filters_list.item(i)).data
+            item_data = self.filters_list.itemWidget(
+                self.filters_list.item(i)).data
             if data == item_data:
                 return
         item = QtWidgets.QListWidgetItem()
@@ -382,10 +412,10 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
             data = item_text.split(':')[-1]
 
             if key.startswith('!'):
-                dic = filter_dic['exclude'] 
+                dic = filter_dic['exclude']
                 key = key.replace('!', '')
             else:
-                dic = filter_dic['include'] 
+                dic = filter_dic['include']
 
             if key not in dic.keys():
                 dic[key] = []
@@ -396,6 +426,7 @@ class filter_sets_editor_widget(QtWidgets.QWidget):
             return
         user.user().edit_filter_set(self.context, selected_filter_set, filter_dic)
         gui_server.refresh_ui()
+
 
 class filter_item(QtWidgets.QFrame):
 
@@ -412,7 +443,7 @@ class filter_item(QtWidgets.QFrame):
         self.setObjectName('round_frame')
         self.setFixedHeight(30)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(11,3,11,3)
+        self.main_layout.setContentsMargins(11, 3, 11, 3)
         self.main_layout.setSpacing(20)
         self.setLayout(self.main_layout)
 
@@ -421,16 +452,19 @@ class filter_item(QtWidgets.QFrame):
         else:
             bg_color = '#7ca657'
 
-        self.setStyleSheet("#round_frame{background-color:%s;border-radius:14px;}"%bg_color)
+        self.setStyleSheet(
+            "#round_frame{background-color:%s;border-radius:14px;}" % bg_color)
 
         self.label = QtWidgets.QLabel(self.text)
         self.label.setObjectName('bold_label')
-        self.label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addWidget(self.label)
 
-        self.delete_filter_button = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.delete_filter_button.setFixedSize(12,12)
-        self.delete_filter_button.setIconSize(QtCore.QSize(12,12))
+        self.delete_filter_button = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.delete_filter_button.setFixedSize(12, 12)
+        self.delete_filter_button.setIconSize(QtCore.QSize(12, 12))
         self.main_layout.addWidget(self.delete_filter_button)
 
     def connect_functions(self):
@@ -438,6 +472,3 @@ class filter_item(QtWidgets.QFrame):
 
     def remove_filter(self):
         self.remove_filter_signal.emit(self.data)
-
-
-

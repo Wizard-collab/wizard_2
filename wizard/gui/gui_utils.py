@@ -18,6 +18,7 @@ from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
+
 class QFlowLayout(QtWidgets.QLayout):
     def __init__(self, parent=None):
         super(QFlowLayout, self).__init__(parent)
@@ -73,7 +74,8 @@ class QFlowLayout(QtWidgets.QLayout):
         for item in self._item_list:
             size = size.expandedTo(item.minimumSize())
 
-        size += QtCore.QSize(2 * self.contentsMargins().top(), 2 * self.contentsMargins().top())
+        size += QtCore.QSize(2 * self.contentsMargins().top(),
+                             2 * self.contentsMargins().top())
         return size
 
     def _do_layout(self, rect, test_only):
@@ -100,20 +102,24 @@ class QFlowLayout(QtWidgets.QLayout):
                 line_height = 0
 
             if not test_only:
-                item.setGeometry(QtCore.QRect(QtCore.QPoint(x, y), item.sizeHint()))
+                item.setGeometry(QtCore.QRect(
+                    QtCore.QPoint(x, y), item.sizeHint()))
 
             x = next_x
             line_height = max(line_height, item.sizeHint().height())
 
         return y + line_height - rect.y()
 
+
 def QIcon_from_svg(svg_filepath, color='black'):
     img = QtGui.QPixmap(svg_filepath)
     qp = QtGui.QPainter(img)
-    qp.setCompositionMode(QtGui.QPainter.CompositionMode.CompositionMode_SourceIn)
-    qp.fillRect( img.rect(), QtGui.QColor(color) )
+    qp.setCompositionMode(
+        QtGui.QPainter.CompositionMode.CompositionMode_SourceIn)
+    qp.fillRect(img.rect(), QtGui.QColor(color))
     qp.end()
     return QtGui.QIcon(img)
+
 
 def move_ui(widget, margin=0, pos=None):
     screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
@@ -153,6 +159,7 @@ def move_ui(widget, margin=0, pos=None):
     widget.move(posx, posy)
     return f"{angley}-{anglex}"
 
+
 def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
     image = QtGui.QImage.fromData(imgdata, imgtype)
     image.convertToFormat(QtGui.QImage.Format.Format_ARGB32)
@@ -170,9 +177,10 @@ def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
     painter = QtGui.QPainter(out_img)  # Paint the output image
     painter.setBrush(brush)      # Use the image texture brush
     painter.setPen(QtCore.Qt.PenStyle.NoPen)     # Don't draw an outline
-    painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)  # Use AA
+    painter.setRenderHint(
+        QtGui.QPainter.RenderHint.Antialiasing, True)  # Use AA
     if custom_radius:
-        rect = QtCore.QRect(0,0,imgsize,imgsize)
+        rect = QtCore.QRect(0, 0, imgsize, imgsize)
         painter.drawRoundedRect(rect, custom_radius, custom_radius)
     else:
         painter.drawEllipse(0, 0, imgsize, imgsize)  # Actually draw the circle
@@ -181,21 +189,26 @@ def mask_image(imgdata, imgtype='png', size=64, custom_radius=None):
     pm = QtGui.QPixmap.fromImage(out_img)
     pm.setDevicePixelRatio(pr)
     size *= pr
-    pm = pm.scaled(int(size), int(size), QtCore.Qt.AspectRatioMode.KeepAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
+    pm = pm.scaled(int(size), int(size), QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+                   QtCore.Qt.TransformationMode.SmoothTransformation)
     return pm
-    
+
+
 def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     pr = QtGui.QWindow().devicePixelRatio()
     image = QtGui.QImage.fromData(imgdata, imgtype)
     image.convertToFormat(QtGui.QImage.Format.Format_ARGB32)
-    image = image.scaled(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtCore.Qt.AspectRatioMode.KeepAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
-    out_img = QtGui.QImage(int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtGui.QImage.Format.Format_ARGB32)
+    image = image.scaled(int(size_tuple[0]*pr), int(size_tuple[1]*pr),
+                         QtCore.Qt.AspectRatioMode.KeepAspectRatio, QtCore.Qt.TransformationMode.SmoothTransformation)
+    out_img = QtGui.QImage(
+        int(size_tuple[0]*pr), int(size_tuple[1]*pr), QtGui.QImage.Format.Format_ARGB32)
     out_img.fill(QtCore.Qt.GlobalColor.transparent)
     brush = QtGui.QBrush(image)        # Create texture brush
     painter = QtGui.QPainter(out_img)  # Paint the output image
     painter.setBrush(brush)      # Use the image texture brush
     painter.setPen(QtCore.Qt.PenStyle.NoPen)     # Don't draw an outline
-    painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)  # Use AA
+    painter.setRenderHint(
+        QtGui.QPainter.RenderHint.Antialiasing, True)  # Use AA
     path = QtGui.QPainterPath()
     path.addRoundedRect(
         0, 0, int(size_tuple[0]*pr), int(size_tuple[1]*pr), int(radius*pr), int(radius*pr))
@@ -205,6 +218,7 @@ def round_corners_image_button(imgdata, size_tuple, radius, imgtype='png'):
     pm = QtGui.QPixmap.fromImage(out_img)
     pm.setDevicePixelRatio(pr)
     return pm
+
 
 class no_return_textEdit(QtWidgets.QTextEdit):
 
@@ -228,33 +242,42 @@ class no_return_textEdit(QtWidgets.QTextEdit):
 
 
 class QComboBox(QtWidgets.QComboBox):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(QComboBox, self).__init__(parent)
-        self.view().window().setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
-        self.view().window().setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.view().window().setStyleSheet("QListView::item:hover{background:#4b4b57;color:white;}QListView::item:selected{background:#4b4b57;color:white;}")
+        self.view().window().setWindowFlags(QtCore.Qt.WindowType.Popup |
+                                            QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
+        self.view().window().setAttribute(
+            QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.view().window().setStyleSheet(
+            "QListView::item:hover{background:#4b4b57;color:white;}QListView::item:selected{background:#4b4b57;color:white;}")
         self.setItemDelegate(QtWidgets.QStyledItemDelegate())
 
+
 class QMenu(QtWidgets.QMenu):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(QMenu, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(QtCore.Qt.WindowType.Popup |
+                            QtCore.Qt.WindowType.NoDropShadowWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setStyleSheet("QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
+        self.setStyleSheet(
+            "QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
+
 
 class separator(QtWidgets.QFrame):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(separator, self).__init__(parent)
         self.setMinimumHeight(1)
         self.setMaximumHeight(1)
         self.setObjectName('separator')
 
+
 class vertical_separator(QtWidgets.QFrame):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(vertical_separator, self).__init__(parent)
         self.setMinimumWidth(1)
         self.setMaximumWidth(1)
         self.setObjectName('separator')
+
 
 class ElidedLabel(QtWidgets.QLabel):
     _width = _text = _elided = None
@@ -285,6 +308,7 @@ class ElidedLabel(QtWidgets.QLabel):
             painter, rect, self.alignment(), option.palette,
             self.isEnabled(), self._elided, self.foregroundRole())
 
+
 class QProgressBar(QtWidgets.QProgressBar):
     def __init__(self, parent=None):
         super(QProgressBar, self).__init__(parent)
@@ -293,7 +317,8 @@ class QProgressBar(QtWidgets.QProgressBar):
         qp = QtWidgets.QStylePainter(self)
         opt = QtWidgets.QStyleOptionProgressBar()
         self.initStyleOption(opt)
-        rect = self.style().subElementRect(QtWidgets.QStyle.SubElement.SE_ProgressBarContents, opt, self)
+        rect = self.style().subElementRect(
+            QtWidgets.QStyle.SubElement.SE_ProgressBarContents, opt, self)
         minSize = rect.height()
         grooveSize = rect.width() - minSize - 1
         valueRange = self.maximum() - self.minimum()
@@ -303,6 +328,7 @@ class QProgressBar(QtWidgets.QProgressBar):
             newValue = min(self.maximum(), newValue + 1)
         opt.progress = int(newValue)
         qp.drawControl(QtWidgets.QStyle.ControlElement.CE_ProgressBar, opt)
+
 
 class QRightClickButton(QtWidgets.QPushButton):
 
@@ -319,6 +345,7 @@ class QRightClickButton(QtWidgets.QPushButton):
             self.leftClicked.emit(1)
         super().mouseReleaseEvent(event)
 
+
 class password_lineEdit(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(password_lineEdit, self).__init__(parent)
@@ -329,7 +356,7 @@ class password_lineEdit(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('password_lineEdit_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,10,0)
+        self.main_layout.setContentsMargins(0, 0, 10, 0)
 
         self.setLayout(self.main_layout)
 
@@ -337,24 +364,32 @@ class password_lineEdit(QtWidgets.QFrame):
         self.main_layout.addWidget(self.password_lineEdit)
 
         self.toggle_visibility_button = QtWidgets.QPushButton()
-        self.toggle_visibility_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.toggle_visibility_button.setObjectName('password_visibility_button')
-        self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_on_))
+        self.toggle_visibility_button.setFocusPolicy(
+            QtCore.Qt.FocusPolicy.NoFocus)
+        self.toggle_visibility_button.setObjectName(
+            'password_visibility_button')
+        self.toggle_visibility_button.setIcon(
+            QtGui.QIcon(ressources._password_visibility_on_))
         self.toggle_visibility_button.setCheckable(True)
-        self.toggle_visibility_button.setFixedSize(16,16)
-        self.toggle_visibility_button.setIconSize(QtCore.QSize(14,14))
+        self.toggle_visibility_button.setFixedSize(16, 16)
+        self.toggle_visibility_button.setIconSize(QtCore.QSize(14, 14))
         self.main_layout.addWidget(self.toggle_visibility_button)
 
     def connect_functions(self):
-        self.toggle_visibility_button.clicked.connect(self.toggle_password_visibility)
+        self.toggle_visibility_button.clicked.connect(
+            self.toggle_password_visibility)
 
     def toggle_password_visibility(self):
         if not self.toggle_visibility_button.isChecked():
-            self.password_lineEdit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
-            self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_off_))
+            self.password_lineEdit.setEchoMode(
+                QtWidgets.QLineEdit.EchoMode.Password)
+            self.toggle_visibility_button.setIcon(
+                QtGui.QIcon(ressources._password_visibility_off_))
         else:
-            self.password_lineEdit.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal)
-            self.toggle_visibility_button.setIcon(QtGui.QIcon(ressources._password_visibility_on_))
+            self.password_lineEdit.setEchoMode(
+                QtWidgets.QLineEdit.EchoMode.Normal)
+            self.toggle_visibility_button.setIcon(
+                QtGui.QIcon(ressources._password_visibility_on_))
 
     def text(self):
         return self.password_lineEdit.text()
@@ -365,6 +400,7 @@ class password_lineEdit(QtWidgets.QFrame):
     def setPlaceholderText(self, placeholderText):
         self.password_lineEdit.setPlaceholderText(placeholderText)
 
+
 class search_bar(QtWidgets.QFrame):
 
     textChanged = pyqtSignal(str)
@@ -374,24 +410,25 @@ class search_bar(QtWidgets.QFrame):
         self.bg_color = QtGui.QColor(red, green, blue, alpha)
         self.build_ui()
         self.connect_functions()
-        self.old_text=''
+        self.old_text = ''
         self._set_color(self.bg_color)
 
     def build_ui(self):
         self.setObjectName('search_bar_frame')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(8,4,8,4)
+        self.main_layout.setContentsMargins(8, 4, 8, 4)
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
         self.search_icon_label = QtWidgets.QLabel()
-        self.search_icon_label.setPixmap(QtGui.QIcon(ressources._search_icon_).pixmap(18))
+        self.search_icon_label.setPixmap(
+            QtGui.QIcon(ressources._search_icon_).pixmap(18))
         self.main_layout.addWidget(self.search_icon_label)
         self.search_bar = QtWidgets.QLineEdit()
         self.search_bar.setObjectName("search_lineEdit")
         self.main_layout.addWidget(self.search_bar)
         self.clear_search_button = close_button()
-        self.clear_search_button.setFixedSize(16,16)
-        self.clear_search_button.setIconSize(QtCore.QSize(12,12))
+        self.clear_search_button.setFixedSize(16, 16)
+        self.clear_search_button.setIconSize(QtCore.QSize(12, 12))
         self.clear_search_button.setObjectName('clear_search_button')
         self.clear_search_button.setVisible(0)
         self.main_layout.addWidget(self.clear_search_button)
@@ -424,13 +461,13 @@ class search_bar(QtWidgets.QFrame):
         self.update_bg(text)
 
     def _set_color(self, color):
-        self.setStyleSheet('#search_bar_frame{background-color:rgba(%s, %s, %s, %s);}' % (color.red() ,
-                                                                                                color.green(),
-                                                                                                color.blue(), 
-                                                                                                color.alpha()))
+        self.setStyleSheet('#search_bar_frame{background-color:rgba(%s, %s, %s, %s);}' % (color.red(),
+                                                                                          color.green(),
+                                                                                          color.blue(),
+                                                                                          color.alpha()))
 
     def update_bg(self, text):
-        if text == '' and self.old_text!='':
+        if text == '' and self.old_text != '':
             self.anim = QtCore.QPropertyAnimation(self, b"color")
             self.anim.setDuration(200)
             self.anim.setStartValue(QtGui.QColor(119, 133, 222, 255))
@@ -452,22 +489,25 @@ class search_bar(QtWidgets.QFrame):
 
     color = pyqtProperty(QtGui.QColor, fset=_set_color)
 
+
 class ScrollLabel(QtWidgets.QScrollArea):
- 
+
     def __init__(self, *args, **kwargs):
         QtWidgets.QScrollArea.__init__(self, *args, **kwargs)
         self.setWidgetResizable(True)
         content = QtWidgets.QWidget(self)
         self.setWidget(content)
         lay = QtWidgets.QVBoxLayout(content)
-        lay.setContentsMargins(0,0,0,0)
+        lay.setContentsMargins(0, 0, 0, 0)
         self.label = QtWidgets.QLabel(content)
-        self.label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
+        self.label.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.label.setWordWrap(True)
         lay.addWidget(self.label)
- 
+
     def setText(self, text):
         self.label.setText(text)
+
 
 class close_button(QtWidgets.QPushButton):
     def __init__(self, parent=None):
@@ -482,30 +522,30 @@ class close_button(QtWidgets.QPushButton):
 
 
 class RoundProgress(QtWidgets.QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(RoundProgress, self).__init__(parent)
         self.chunck_color = '#d9d9d9'
         self.bg_color = '#24242b'
-        self.percent=0
-        self.line_width=18
- 
+        self.percent = 0
+        self.line_width = 18
+
     def setValue(self, percent):
-        self.percent=percent
+        self.percent = percent
         self.update()
 
     def set_line_width(self, line_width):
-        self.line_width=line_width
+        self.line_width = line_width
         self.update()
 
     def setChunckColor(self, color):
         self.chunck_color = color
         self.update()
 
-    def paintEvent(self,event):
-        rect=QtCore.QRectF(self.line_width/2,
-                            self.line_width/2,
-                            self.width()-self.line_width,
-                            self.height()-self.line_width)
+    def paintEvent(self, event):
+        rect = QtCore.QRectF(self.line_width/2,
+                             self.line_width/2,
+                             self.width()-self.line_width,
+                             self.height()-self.line_width)
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
@@ -521,24 +561,28 @@ class RoundProgress(QtWidgets.QWidget):
         return coord_path.currentPosition()
 
     def draw_arc(self, painter, start_angle, angle, color):
-        outer_rect = QtCore.QRectF(0,0,self.width(), self.height())
-        inner_rect = QtCore.QRectF(self.line_width, self.line_width,   
-                          self.width() - self.line_width*2, self.height() - self.line_width*2)
+        outer_rect = QtCore.QRectF(0, 0, self.width(), self.height())
+        inner_rect = QtCore.QRectF(self.line_width, self.line_width,
+                                   self.width() - self.line_width*2, self.height() - self.line_width*2)
         path = QtGui.QPainterPath()
         path.arcMoveTo(outer_rect, start_angle)
         path.arcTo(outer_rect, start_angle, angle)
         path.lineTo(self.find_ellipse_coord(inner_rect, start_angle, angle))
         path.arcTo(inner_rect, start_angle+angle, -angle)
-        path.lineTo(self.find_ellipse_coord(outer_rect, -angle, start_angle+angle))
+        path.lineTo(self.find_ellipse_coord(
+            outer_rect, -angle, start_angle+angle))
         painter.fillPath(path, QtGui.QBrush(QtGui.QColor(color)))
+
 
 def enterEvent(self, event=None):
     gui_server.tooltip(self.application_tooltip)
     self.legacy_enterEvent(event)
 
+
 def leaveEvent(self, event=None):
     gui_server.tooltip('Tooltips')
     self.legacy_leaveEvent(event)
+
 
 def application_tooltip(widget, custom_tooltip):
     widget.legacy_enterEvent = widget.enterEvent
@@ -547,23 +591,27 @@ def application_tooltip(widget, custom_tooltip):
     widget.legacy_leaveEvent = widget.leaveEvent
     widget.leaveEvent = lambda self: leaveEvent(widget)
 
+
 def modify_application_tooltip(widget, custom_tooltip):
     widget.application_tooltip = custom_tooltip
+
 
 def add_menu_to_menu_bar(menu_bar, title, icon=None):
     if icon is not None:
         menu = menu_bar.addMenu(icon, title)
     else:
         menu = menu_bar.addMenu(title)
-    menu.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.NoDropShadowWindowHint)
+    menu.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.FramelessWindowHint |
+                        QtCore.Qt.WindowType.NoDropShadowWindowHint)
     menu.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
     return menu
+
 
 class info_widget(QtWidgets.QFrame):
 
     customContextMenuRequested = pyqtSignal(int)
 
-    def __init__(self, parent=None, transparent = None):
+    def __init__(self, parent=None, transparent=None):
         super(info_widget, self).__init__(parent)
         self.transparent = transparent
         self.build_ui()
@@ -572,14 +620,16 @@ class info_widget(QtWidgets.QFrame):
         self.setObjectName('dark_widget')
         if self.transparent:
             self.setObjectName('transparent_widget')
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.image = QtWidgets.QLabel()
         self.image.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -589,7 +639,8 @@ class info_widget(QtWidgets.QFrame):
         self.text.setObjectName('title_label_gray')
         self.main_layout.addWidget(self.text)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def setImage(self, image):
         self.image.setPixmap(QtGui.QIcon(image).pixmap(200))
@@ -601,6 +652,7 @@ class info_widget(QtWidgets.QFrame):
         super().mouseReleaseEvent(event)
         if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.customContextMenuRequested.emit(1)
+
 
 class transparent_button(QtWidgets.QPushButton):
     def __init__(self, icon, hover_icon, checked_icon=None, parent=None):
@@ -641,11 +693,13 @@ class transparent_button(QtWidgets.QPushButton):
     def reset_stylesheet(self):
         self.setStyleSheet('background-color: transparent;border: none;')
 
+
 class minimum_height_textEdit(QtWidgets.QTextEdit):
     def __init__(self, max_height=100, parent=None):
         super(minimum_height_textEdit, self).__init__(parent)
         self.max_height = max_height
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Expanding)
         self.connect_functions()
         self.update_height()
 
@@ -666,12 +720,14 @@ class minimum_height_textEdit(QtWidgets.QTextEdit):
         self.setMinimumHeight(int(doc_height))
         self.setMaximumHeight(int(doc_height))
 
+
 class QSplitter(QtWidgets.QSplitter):
     def __init__(self, parent=None):
         super(QSplitter, self).__init__(parent)
 
     def createHandle(self):
         return QSplitterHandle(self.orientation(), self)
+
 
 class QSplitterHandle(QtWidgets.QSplitterHandle):
 
@@ -704,11 +760,12 @@ class QSplitterHandle(QtWidgets.QSplitterHandle):
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         if self.hovered and not self.pressed:
-            painter.fillRect(self.rect(), QtGui.QColor(245,245,255,30))
+            painter.fillRect(self.rect(), QtGui.QColor(245, 245, 255, 30))
         elif self.pressed:
-            painter.fillRect(self.rect(), QtGui.QColor(0,0,10,30))
+            painter.fillRect(self.rect(), QtGui.QColor(0, 0, 10, 30))
         else:
             painter.fillRect(self.rect(), QtGui.QColor("#292930"))
+
 
 class GlobalClickDetector(QtCore.QObject):
 
@@ -722,7 +779,8 @@ class GlobalClickDetector(QtCore.QObject):
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.Type.MouseButtonPress:
             global_pos = event.globalPosition()
-            target_global_geometry = self.target_widget.mapToGlobal(self.target_widget.rect().topLeft())
+            target_global_geometry = self.target_widget.mapToGlobal(
+                self.target_widget.rect().topLeft())
             target_global_rect = self.target_widget.rect().translated(target_global_geometry)
 
             if not target_global_rect.contains(global_pos.toPoint()):

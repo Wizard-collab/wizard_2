@@ -18,6 +18,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class create_video_from_render_widget(QtWidgets.QDialog):
     def __init__(self, export_version_id, parent=None):
         super(create_video_from_render_widget, self).__init__()
@@ -52,15 +53,15 @@ class create_video_from_render_widget(QtWidgets.QDialog):
 
     def create_video(self):
         subtasks_library.create_video_from_render(self.export_version_id,
-                                self.input_color_space_combobox.currentText(),
-                                self.output_color_space_combobox.currentText(),
-                                self.frame_rate_spinBox.value(),
-                                comment=self.comment_textEdit.toPlainText(),
-                                overlay = self.burn_details_checkbox.isChecked())
+                                                  self.input_color_space_combobox.currentText(),
+                                                  self.output_color_space_combobox.currentText(),
+                                                  self.frame_rate_spinBox.value(),
+                                                  comment=self.comment_textEdit.toPlainText(),
+                                                  overlay=self.burn_details_checkbox.isChecked())
         self.accept()
 
     def build_ui(self):
-        self.resize(500,250)
+        self.resize(500, 250)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(8)
         self.setLayout(self.main_layout)
@@ -69,13 +70,16 @@ class create_video_from_render_widget(QtWidgets.QDialog):
         self.main_layout.addLayout(self.form_layout)
 
         self.input_color_space_combobox = gui_utils.QComboBox()
-        self.form_layout.addRow(QtWidgets.QLabel('Input color space'), self.input_color_space_combobox)
+        self.form_layout.addRow(QtWidgets.QLabel(
+            'Input color space'), self.input_color_space_combobox)
 
         self.output_color_space_combobox = gui_utils.QComboBox()
-        self.form_layout.addRow(QtWidgets.QLabel('Output color space'), self.output_color_space_combobox)
+        self.form_layout.addRow(QtWidgets.QLabel(
+            'Output color space'), self.output_color_space_combobox)
 
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
-        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.frame_rate_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.form_layout.addRow(self.frame_rate_spinBox)
 
         self.burn_details_checkbox = QtWidgets.QCheckBox("Burn details")
@@ -88,14 +92,16 @@ class create_video_from_render_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.comment_textEdit)
 
         self.buttons_widget = QtWidgets.QWidget()
-        self.buttons_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.buttons_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

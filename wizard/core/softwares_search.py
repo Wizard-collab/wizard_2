@@ -39,102 +39,112 @@ logger = logging.getLogger(__name__)
 
 program_files = os.environ.get("PROGRAMFILES")
 
+
 def get_blender():
-	to_list = path_utils.join(program_files, 'Blender Foundation')
-	executables_dic = dict()
-	if not path_utils.isdir(to_list):
-		return
-	versions = os.listdir(to_list)
-	for version_folder in versions:
-		executable = path_utils.join(to_list, version_folder, 'blender.exe')
-		if path_utils.isfile(executable):
-			executables_dic[version_folder] = executable.replace('\\', '/')
-	if executables_dic == dict():
-		return
-	return executables_dic
+    to_list = path_utils.join(program_files, 'Blender Foundation')
+    executables_dic = dict()
+    if not path_utils.isdir(to_list):
+        return
+    versions = os.listdir(to_list)
+    for version_folder in versions:
+        executable = path_utils.join(to_list, version_folder, 'blender.exe')
+        if path_utils.isfile(executable):
+            executables_dic[version_folder] = executable.replace('\\', '/')
+    if executables_dic == dict():
+        return
+    return executables_dic
+
 
 def get_maya():
-	to_list = path_utils.join(program_files, 'Autodesk')
-	executables_dic = dict()
-	if not path_utils.isdir(to_list):
-		return
-	versions = os.listdir(to_list)
-	for version_folder in versions:
-		executable = path_utils.join(to_list, version_folder, 'bin/maya.exe')
-		if path_utils.isfile(executable):
-			executables_dic[version_folder] = executable.replace('\\', '/')
-	if executables_dic == dict():
-		return
-	return executables_dic
+    to_list = path_utils.join(program_files, 'Autodesk')
+    executables_dic = dict()
+    if not path_utils.isdir(to_list):
+        return
+    versions = os.listdir(to_list)
+    for version_folder in versions:
+        executable = path_utils.join(to_list, version_folder, 'bin/maya.exe')
+        if path_utils.isfile(executable):
+            executables_dic[version_folder] = executable.replace('\\', '/')
+    if executables_dic == dict():
+        return
+    return executables_dic
+
 
 def get_guerilla():
-	executable = path_utils.join(program_files,
-								'Guerilla Render',
-								'guerilla.exe')
-	if not path_utils.isfile(executable):
-		return
-	return {'Guerilla Render':executable.replace('\\', '/')}
+    executable = path_utils.join(program_files,
+                                 'Guerilla Render',
+                                 'guerilla.exe')
+    if not path_utils.isfile(executable):
+        return
+    return {'Guerilla Render': executable.replace('\\', '/')}
+
 
 def get_substance_painter():
-	executable = path_utils.join(program_files,
-								'Adobe',
-								'Adobe Substance 3D Painter',
-								'Adobe Substance 3D Painter.exe')
-	if not path_utils.isfile(executable):
-		return
-	return {'Adobe Substance 3D Painter':executable.replace('\\', '/')}
+    executable = path_utils.join(program_files,
+                                 'Adobe',
+                                 'Adobe Substance 3D Painter',
+                                 'Adobe Substance 3D Painter.exe')
+    if not path_utils.isfile(executable):
+        return
+    return {'Adobe Substance 3D Painter': executable.replace('\\', '/')}
+
 
 def get_substance_designer():
-	executable = path_utils.join(program_files,
-								'Adobe',
-								'Adobe Substance 3D Designer',
-								'Adobe Substance 3D Designer.exe')
-	if not path_utils.isfile(executable):
-		return
-	return {'Adobe Substance 3D Designer':executable.replace('\\', '/')}
+    executable = path_utils.join(program_files,
+                                 'Adobe',
+                                 'Adobe Substance 3D Designer',
+                                 'Adobe Substance 3D Designer.exe')
+    if not path_utils.isfile(executable):
+        return
+    return {'Adobe Substance 3D Designer': executable.replace('\\', '/')}
+
 
 def get_houdini():
-	to_list = path_utils.join(program_files, 'Side Effects Software')
-	executables_dic = dict()
-	if not path_utils.isdir(to_list):
-		return
-	versions = os.listdir(to_list)
-	for version_folder in versions:
-		executable = path_utils.join(to_list, version_folder, 'bin/houdini.exe')
-		if path_utils.isfile(executable):
-			executables_dic[version_folder] = executable.replace('\\', '/')
-	if executables_dic == dict():
-		return
-	return executables_dic
+    to_list = path_utils.join(program_files, 'Side Effects Software')
+    executables_dic = dict()
+    if not path_utils.isdir(to_list):
+        return
+    versions = os.listdir(to_list)
+    for version_folder in versions:
+        executable = path_utils.join(
+            to_list, version_folder, 'bin/houdini.exe')
+        if path_utils.isfile(executable):
+            executables_dic[version_folder] = executable.replace('\\', '/')
+    if executables_dic == dict():
+        return
+    return executables_dic
+
 
 def get_nuke():
-	to_list = program_files
-	executables_dic = dict()
-	if not path_utils.isdir(to_list):
-		return
-	versions = os.listdir(to_list)
-	for version_folder in versions:
-		if version_folder.startswith("Nuke"):
-			files = os.listdir(path_utils.join(to_list, version_folder))
-			for file in files:
-				if file.startswith("Nuke") and file.endswith('.exe'):
-					executable = path_utils.join(to_list, version_folder, file)
-					if path_utils.isfile(executable):
-						executables_dic[version_folder] = executable.replace('\\', '/')
+    to_list = program_files
+    executables_dic = dict()
+    if not path_utils.isdir(to_list):
+        return
+    versions = os.listdir(to_list)
+    for version_folder in versions:
+        if version_folder.startswith("Nuke"):
+            files = os.listdir(path_utils.join(to_list, version_folder))
+            for file in files:
+                if file.startswith("Nuke") and file.endswith('.exe'):
+                    executable = path_utils.join(to_list, version_folder, file)
+                    if path_utils.isfile(executable):
+                        executables_dic[version_folder] = executable.replace(
+                            '\\', '/')
 
-	if executables_dic == dict():
-		return
-	return executables_dic
+    if executables_dic == dict():
+        return
+    return executables_dic
+
 
 def get_software_executables(software_name):
-	functions_dic = dict()
-	functions_dic['guerilla_render'] = get_guerilla
-	functions_dic['blender'] = get_blender
-	functions_dic['maya'] = get_maya
-	functions_dic['substance_painter'] = get_substance_painter
-	functions_dic['substance_designer'] = get_substance_designer
-	functions_dic['houdini'] = get_houdini
-	functions_dic['nuke'] = get_nuke
-	if software_name not in functions_dic.keys():
-		return
-	return functions_dic[software_name]()
+    functions_dic = dict()
+    functions_dic['guerilla_render'] = get_guerilla
+    functions_dic['blender'] = get_blender
+    functions_dic['maya'] = get_maya
+    functions_dic['substance_painter'] = get_substance_painter
+    functions_dic['substance_designer'] = get_substance_designer
+    functions_dic['houdini'] = get_houdini
+    functions_dic['nuke'] = get_nuke
+    if software_name not in functions_dic.keys():
+        return
+    return functions_dic[software_name]()

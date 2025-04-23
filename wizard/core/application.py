@@ -38,6 +38,7 @@ from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
 
+
 def get_version():
     version_file = 'ressources/version.yaml'
     if not path_utils.isfile(version_file):
@@ -47,24 +48,30 @@ def get_version():
         version_dic = yaml.load(f, Loader=yaml.Loader)
     return version_dic
 
+
 def add_binaries_to_path():
     binaries_path = os.path.abspath('binaries')
     os.environ['PATH'] += os.pathsep+binaries_path
 
+
 def log_app_infos():
-	print('')
-	log_version()
-	print('')
-	log_license()
-	print('')
+    print('')
+    log_version()
+    print('')
+    log_license()
+    print('')
+
 
 def log_version():
     version_dic = get_version()
-    print(f"Wizard {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']} build {version_dic['builds']}, {time.ctime(version_dic['date'])}")
+    print(
+        f"Wizard {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']} build {version_dic['builds']},{time.ctime(version_dic['date'])}")
+
 
 def log_license():
     with open('ressources/LICENSE', 'r') as f:
         print(f.read())
+
 
 sys.path.append(os.path.abspath(''))
 add_binaries_to_path()

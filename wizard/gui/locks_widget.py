@@ -4,8 +4,6 @@
 
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import QThread, pyqtSignal
-import time
 
 # Wizard modules
 from wizard.core import environment
@@ -20,11 +18,13 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
+
 class locks_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(locks_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(
+            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.work_env_ids = dict()
@@ -48,7 +48,7 @@ class locks_widget(QtWidgets.QWidget):
         self.main_widget = QtWidgets.QFrame()
         self.main_widget.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.main_widget.setLayout(self.main_layout)
         self.main_widget_layout.addWidget(self.main_widget)
@@ -62,16 +62,18 @@ class locks_widget(QtWidgets.QWidget):
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('dark_widget')
-        self.header_widget.setStyleSheet('#dark_widget{border-top-left-radius:8px;border-top-right-radius:8px;}')
+        self.header_widget.setStyleSheet(
+            '#dark_widget{border-top-left-radius:8px;border-top-right-radius:8px;}')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(10,10,10,10)
+        self.header_layout.setContentsMargins(10, 10, 10, 10)
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
 
         self.title = QtWidgets.QLabel('Locked work environments')
         self.header_layout.addWidget(self.title)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.unlock_all_button = QtWidgets.QPushButton('Unlock all')
         self.unlock_all_button.setStyleSheet('padding:3px;')
@@ -91,15 +93,18 @@ class locks_widget(QtWidgets.QWidget):
         self.work_envs_scrollArea_widget = QtWidgets.QWidget()
         self.work_envs_scrollArea_widget.setObjectName('transparent_widget')
         self.work_envs_scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.work_envs_scrollArea_layout.setContentsMargins(10,10,10,10)
+        self.work_envs_scrollArea_layout.setContentsMargins(10, 10, 10, 10)
         self.work_envs_scrollArea_layout.setSpacing(3)
-        self.work_envs_scrollArea_widget.setLayout(self.work_envs_scrollArea_layout)
+        self.work_envs_scrollArea_widget.setLayout(
+            self.work_envs_scrollArea_layout)
 
-        self.work_envs_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.work_envs_scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.work_envs_scrollArea.setWidgetResizable(True)
         self.work_envs_scrollArea.setWidget(self.work_envs_scrollArea_widget)
 
-        self.work_envs_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.work_envs_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.work_envs_scrollArea)
 
@@ -152,6 +157,7 @@ class locks_widget(QtWidgets.QWidget):
             self.raise_()
             gui_utils.move_ui(self)
 
+
 class work_env_widget(QtWidgets.QFrame):
     def __init__(self, work_env_row, parent=None):
         super(work_env_widget, self).__init__(parent)
@@ -161,10 +167,12 @@ class work_env_widget(QtWidgets.QFrame):
         self.connect_functions()
 
     def fill_ui(self):
-        software = project.get_software_data(self.work_env_row['software_id'], 'name')
+        software = project.get_software_data(
+            self.work_env_row['software_id'], 'name')
         icon = ressources._softwares_icons_dic_[software]
         self.software_icon.setPixmap(QtGui.QIcon(icon).pixmap(26))
-        work_env_label = assets.instance_to_string(('work_env', self.work_env_row['id']))
+        work_env_label = assets.instance_to_string(
+            ('work_env', self.work_env_row['id']))
         self.work_env_label.setText(work_env_label)
 
     def connect_functions(self):
@@ -182,7 +190,7 @@ class work_env_widget(QtWidgets.QFrame):
         self.setLayout(self.main_layout)
 
         self.software_icon = QtWidgets.QLabel()
-        self.software_icon.setFixedSize(26,26)
+        self.software_icon.setFixedSize(26, 26)
         self.main_layout.addWidget(self.software_icon)
 
         self.work_env_label = QtWidgets.QLabel()
@@ -190,7 +198,8 @@ class work_env_widget(QtWidgets.QFrame):
 
         self.unlock_button = QtWidgets.QPushButton()
         self.unlock_button.setObjectName('locked_button')
-        self.unlock_button.setFixedSize(26,26)
+        self.unlock_button.setFixedSize(26, 26)
         self.unlock_button.setIcon(QtGui.QIcon(ressources._lock_icons_[1]))
-        gui_utils.application_tooltip(self.unlock_button, "Unlock software instance")
+        gui_utils.application_tooltip(
+            self.unlock_button, "Unlock software instance")
         self.main_layout.addWidget(self.unlock_button)

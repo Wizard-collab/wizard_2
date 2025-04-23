@@ -5,7 +5,6 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
-import math
 import logging
 
 # Wizard modules
@@ -15,13 +14,13 @@ from wizard.core import repository
 from wizard.core import assets
 from wizard.core import image
 from wizard.vars import ressources
-from wizard.vars import assets_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
+
 
 class signal_manager(QtCore.QObject):
 
@@ -50,6 +49,7 @@ class signal_manager(QtCore.QObject):
     def __init__(self, parent=None):
         super(signal_manager, self).__init__(parent)
 
+
 class timeline_widget(QtWidgets.QWidget):
 
     on_seek = pyqtSignal(int)
@@ -74,18 +74,19 @@ class timeline_widget(QtWidgets.QWidget):
         self.timeline_viewport = timeline_viewport()
         self.playing_infos_widget = playing_infos_widget()
         self.videos_dic = dict()
-        self.frame_range = [0,1000]
-        self.bounds_range = [0,1000]
+        self.frame_range = [0, 1000]
+        self.bounds_range = [0, 1000]
         self.fps = 24
         self.build_ui()
         self.connect_functions()
         self.set_frame(0)
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.setObjectName("main_widget")
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(1)
         self.main_layout.addWidget(self.playing_infos_widget)
         self.main_layout.addWidget(self.timeline_viewport)
@@ -144,30 +145,54 @@ class timeline_widget(QtWidgets.QWidget):
         self.playing_infos_widget.set_frame(frame)
 
     def connect_functions(self):
-        self.timeline_viewport.signal_manager.on_seek.connect(self.on_seek.emit)
-        self.timeline_viewport.signal_manager.on_play_pause.connect(self.on_play_pause.emit)
-        self.timeline_viewport.signal_manager.on_next_frame.connect(self.on_next_frame.emit)
-        self.timeline_viewport.signal_manager.on_prev_frame.connect(self.on_prev_frame.emit)
-        self.timeline_viewport.signal_manager.on_bounds_change.connect(self.bounds_changed)
-        self.timeline_viewport.signal_manager.on_video_item_moved.connect(self.on_order_changed.emit)
-        self.timeline_viewport.signal_manager.on_video_item_in_out_modified.connect(self.on_video_in_out_modified.emit)
-        self.timeline_viewport.signal_manager.current_video_name.connect(self.playing_infos_widget.update_current_video_name)
-        self.timeline_viewport.signal_manager.on_delete.connect(self.on_delete.emit)
-        self.timeline_viewport.signal_manager.current_stage.connect(self.current_stage.emit)
-        self.timeline_viewport.signal_manager.current_variant.connect(self.current_variant.emit)
-        self.timeline_viewport.signal_manager.current_video_row.connect(self.current_video_row.emit)
-        self.timeline_viewport.signal_manager.current_video_row.connect(self.playing_infos_widget.update_current_video_row)
-        self.timeline_viewport.signal_manager.current_stage_row.connect(self.playing_infos_widget.update_current_stage_row)
-        self.timeline_viewport.signal_manager.is_last.connect(self.playing_infos_widget.update_is_last)
-        self.timeline_viewport.signal_manager.replace_videos.connect(self.replace_videos.emit)
-        self.timeline_viewport.signal_manager.clear_playlist.connect(self.clear_playlist.emit)
+        self.timeline_viewport.signal_manager.on_seek.connect(
+            self.on_seek.emit)
+        self.timeline_viewport.signal_manager.on_play_pause.connect(
+            self.on_play_pause.emit)
+        self.timeline_viewport.signal_manager.on_next_frame.connect(
+            self.on_next_frame.emit)
+        self.timeline_viewport.signal_manager.on_prev_frame.connect(
+            self.on_prev_frame.emit)
+        self.timeline_viewport.signal_manager.on_bounds_change.connect(
+            self.bounds_changed)
+        self.timeline_viewport.signal_manager.on_video_item_moved.connect(
+            self.on_order_changed.emit)
+        self.timeline_viewport.signal_manager.on_video_item_in_out_modified.connect(
+            self.on_video_in_out_modified.emit)
+        self.timeline_viewport.signal_manager.current_video_name.connect(
+            self.playing_infos_widget.update_current_video_name)
+        self.timeline_viewport.signal_manager.on_delete.connect(
+            self.on_delete.emit)
+        self.timeline_viewport.signal_manager.current_stage.connect(
+            self.current_stage.emit)
+        self.timeline_viewport.signal_manager.current_variant.connect(
+            self.current_variant.emit)
+        self.timeline_viewport.signal_manager.current_video_row.connect(
+            self.current_video_row.emit)
+        self.timeline_viewport.signal_manager.current_video_row.connect(
+            self.playing_infos_widget.update_current_video_row)
+        self.timeline_viewport.signal_manager.current_stage_row.connect(
+            self.playing_infos_widget.update_current_stage_row)
+        self.timeline_viewport.signal_manager.is_last.connect(
+            self.playing_infos_widget.update_is_last)
+        self.timeline_viewport.signal_manager.replace_videos.connect(
+            self.replace_videos.emit)
+        self.timeline_viewport.signal_manager.clear_playlist.connect(
+            self.clear_playlist.emit)
 
-        self.playing_infos_widget.on_play_pause.connect(self.on_play_pause.emit)
-        self.playing_infos_widget.on_loop_toggle.connect(self.on_loop_toggle.emit)
-        self.playing_infos_widget.on_end_requested.connect(self.on_end_requested.emit)
-        self.playing_infos_widget.on_beginning_requested.connect(self.on_beginning_requested.emit)
-        self.playing_infos_widget.on_previous_video_requested.connect(self.timeline_viewport.jump_to_previous_video)
-        self.playing_infos_widget.on_next_video_requested.connect(self.timeline_viewport.jump_to_next_video)
+        self.playing_infos_widget.on_play_pause.connect(
+            self.on_play_pause.emit)
+        self.playing_infos_widget.on_loop_toggle.connect(
+            self.on_loop_toggle.emit)
+        self.playing_infos_widget.on_end_requested.connect(
+            self.on_end_requested.emit)
+        self.playing_infos_widget.on_beginning_requested.connect(
+            self.on_beginning_requested.emit)
+        self.playing_infos_widget.on_previous_video_requested.connect(
+            self.timeline_viewport.jump_to_previous_video)
+        self.playing_infos_widget.on_next_video_requested.connect(
+            self.timeline_viewport.jump_to_next_video)
+
 
 class playing_infos_widget(QtWidgets.QWidget):
 
@@ -180,7 +205,7 @@ class playing_infos_widget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(playing_infos_widget, self).__init__(parent)
-        self.frame_range = [0,1000]
+        self.frame_range = [0, 1000]
         self.fps = 24
         self.build_ui()
         self.connect_functions()
@@ -189,20 +214,22 @@ class playing_infos_widget(QtWidgets.QWidget):
     def init_users_images(self):
         self.users_images_dic = dict()
         for user_row in repository.get_users_list():
-            user_image =  user_row['profile_picture']
-            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 22, 8)
+            user_image = user_row['profile_picture']
+            pixmap = gui_utils.mask_image(
+                image.convert_str_data_to_image_bytes(user_image), 'png', 22, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
         self.video_infos_widget = QtWidgets.QWidget()
-        self.video_infos_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.video_infos_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.video_infos_layout = QtWidgets.QHBoxLayout()
-        self.video_infos_layout.setContentsMargins(6,6,6,6)
+        self.video_infos_layout.setContentsMargins(6, 6, 6, 6)
         self.video_infos_widget.setLayout(self.video_infos_layout)
         self.main_layout.addWidget(self.video_infos_widget)
 
@@ -221,7 +248,8 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.video_date_label.setObjectName('gray_label')
         self.video_infos_layout.addWidget(self.video_date_label)
 
-        self.video_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.video_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.assignment_label = QtWidgets.QLabel()
         self.video_infos_layout.addWidget(self.assignment_label)
@@ -234,32 +262,37 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.video_infos_layout.addWidget(self.priority_label)
 
         self.content_1_layout = QtWidgets.QHBoxLayout()
-        self.content_1_layout.setContentsMargins(6,6,6,6)
+        self.content_1_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.addLayout(self.content_1_layout)
 
-        self.beginning_button = gui_utils.transparent_button(ressources._player_beginning_icon_, ressources._player_beginning_icon_hover_)
+        self.beginning_button = gui_utils.transparent_button(
+            ressources._player_beginning_icon_, ressources._player_beginning_icon_hover_)
         self.beginning_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.beginning_button.setFixedSize(QtCore.QSize(20,20))
+        self.beginning_button.setFixedSize(QtCore.QSize(20, 20))
         self.content_1_layout.addWidget(self.beginning_button)
 
-        self.previous_button = gui_utils.transparent_button(ressources._player_previous_icon_, ressources._player_previous_icon_hover_)
+        self.previous_button = gui_utils.transparent_button(
+            ressources._player_previous_icon_, ressources._player_previous_icon_hover_)
         self.previous_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.previous_button.setFixedSize(QtCore.QSize(20,20))
+        self.previous_button.setFixedSize(QtCore.QSize(20, 20))
         self.content_1_layout.addWidget(self.previous_button)
 
-        self.play_pause_button = gui_utils.transparent_button(ressources._player_play_icon_, ressources._player_play_icon_hover_)
+        self.play_pause_button = gui_utils.transparent_button(
+            ressources._player_play_icon_, ressources._player_play_icon_hover_)
         self.play_pause_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.play_pause_button.setFixedSize(QtCore.QSize(20,20))
+        self.play_pause_button.setFixedSize(QtCore.QSize(20, 20))
         self.content_1_layout.addWidget(self.play_pause_button)
 
-        self.next_button = gui_utils.transparent_button(ressources._player_next_icon_, ressources._player_next_icon_hover_)
+        self.next_button = gui_utils.transparent_button(
+            ressources._player_next_icon_, ressources._player_next_icon_hover_)
         self.next_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.next_button.setFixedSize(QtCore.QSize(20,20))
+        self.next_button.setFixedSize(QtCore.QSize(20, 20))
         self.content_1_layout.addWidget(self.next_button)
 
-        self.end_button = gui_utils.transparent_button(ressources._player_end_icon_, ressources._player_end_icon_hover_)
+        self.end_button = gui_utils.transparent_button(
+            ressources._player_end_icon_, ressources._player_end_icon_hover_)
         self.end_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.end_button.setFixedSize(QtCore.QSize(20,20))
+        self.end_button.setFixedSize(QtCore.QSize(20, 20))
         self.content_1_layout.addWidget(self.end_button)
 
         self.loop_button = gui_utils.transparent_button(ressources._player_loop_icon_,
@@ -267,10 +300,11 @@ class playing_infos_widget(QtWidgets.QWidget):
                                                         checked_icon=ressources._player_loop_icon_checked_)
         self.loop_button.setCheckable(True)
         self.loop_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.loop_button.setFixedSize(QtCore.QSize(20,20))
+        self.loop_button.setFixedSize(QtCore.QSize(20, 20))
         self.content_1_layout.addWidget(self.loop_button)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.time_label = QtWidgets.QLabel('00:00:00:00')
         self.content_1_layout.addWidget(self.time_label)
@@ -279,24 +313,28 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.total_time_label.setObjectName('gray_label')
         self.content_1_layout.addWidget(self.total_time_label)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.fps_label = QtWidgets.QLabel()
         self.content_1_layout.addWidget(self.fps_label)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(12,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            12, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.resolution_label = QtWidgets.QLabel()
         self.content_1_layout.addWidget(self.resolution_label)
 
-        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.content_1_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
     def connect_functions(self):
         self.play_pause_button.clicked.connect(self.on_play_pause.emit)
         self.loop_button.toggled.connect(self.on_loop_toggle.emit)
         self.end_button.clicked.connect(self.on_end_requested.emit)
         self.beginning_button.clicked.connect(self.on_beginning_requested.emit)
-        self.previous_button.clicked.connect(self.on_previous_video_requested.emit)
+        self.previous_button.clicked.connect(
+            self.on_previous_video_requested.emit)
         self.next_button.clicked.connect(self.on_next_video_requested.emit)
 
     def set_play_pause(self, playing):
@@ -312,16 +350,20 @@ class playing_infos_widget(QtWidgets.QWidget):
     def set_frame_range(self, frame_range):
         self.frame_range = frame_range
         total_time = (frame_range[1]-frame_range[0]+1)/self.fps
-        hours, minutes, seconds, miliseconds = tools.convert_seconds_with_miliseconds(total_time)
-        self.total_time_label.setText(f"| {str(hours).zfill(2)}:{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(miliseconds).zfill(2)}")
+        hours, minutes, seconds, miliseconds = tools.convert_seconds_with_miliseconds(
+            total_time)
+        self.total_time_label.setText(
+            f"| {str(hours).zfill(2)}:{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(miliseconds).zfill(2)}")
 
     def set_bounds_range(self, bounds_range):
         self.bounds_range = bounds_range
 
     def set_frame(self, frame):
         time_s = frame/self.fps
-        hours, minutes, seconds, miliseconds = tools.convert_seconds_with_miliseconds(time_s)
-        self.time_label.setText(f"{str(hours).zfill(2)}:{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(miliseconds).zfill(2)}")
+        hours, minutes, seconds, miliseconds = tools.convert_seconds_with_miliseconds(
+            time_s)
+        self.time_label.setText(
+            f"{str(hours).zfill(2)}:{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(miliseconds).zfill(2)}")
 
     def set_fps(self, fps):
         self.fps = fps
@@ -341,19 +383,24 @@ class playing_infos_widget(QtWidgets.QWidget):
             return
         self.video_version_label.setText(video_row['name'])
         self.video_user_label.setText(video_row['creation_user'])
-        self.video_date_label.setText(tools.time_ago_from_timestamp(video_row['creation_time']))
+        self.video_date_label.setText(
+            tools.time_ago_from_timestamp(video_row['creation_time']))
 
     def update_current_stage_row(self, stage_row):
-        self.assignment_label.setPixmap(self.users_images_dic[stage_row['assignment']])
+        self.assignment_label.setPixmap(
+            self.users_images_dic[stage_row['assignment']])
         self.state_label.setText(stage_row['state'])
-        self.state_label.setStyleSheet("background-color:%s;border-radius:4px;padding-left:3px;padding-right:4px;"%ressources._states_colors_[stage_row['state']])
-        self.priority_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[stage_row['priority']]).pixmap(22))
+        self.state_label.setStyleSheet(
+            "background-color:%s;border-radius:4px;padding-left:3px;padding-right:4px;" % ressources._states_colors_[stage_row['state']])
+        self.priority_label.setPixmap(QtGui.QIcon(
+            ressources._priority_icons_list_[stage_row['priority']]).pixmap(22))
 
     def update_is_last(self, is_last):
         if is_last:
             self.video_version_label.setStyleSheet("color:#b3f07d")
         else:
             self.video_version_label.setStyleSheet("color:#ffae4f")
+
 
 class timeline_viewport(QtWidgets.QGraphicsView):
 
@@ -366,16 +413,21 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.setScene(self.timeline_scene)
         self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
         self.setRenderHint(QtGui.QPainter.RenderHint.TextAntialiasing, True)
-        self.setRenderHint(QtGui.QPainter.RenderHint.SmoothPixmapTransform, True)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setRenderHint(
+            QtGui.QPainter.RenderHint.SmoothPixmapTransform, True)
+        self.setTransformationAnchor(
+            QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(
+            QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.pan = False
         self.move_cursor = False
         self.last_mouse_pos = None
         self.frame_width = 2
-        self.frame_range = [0,1000]
+        self.frame_range = [0, 1000]
         self.videos_dic = dict()
         self.moving_items = []
 
@@ -473,34 +525,50 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.signal_manager.on_seek.emit(self.videos_dic[video_id].start_frame)
 
     def connect_functions(self):
-        self.cursor_item.signal_manager.on_seek.connect(self.signal_manager.on_seek.emit)
-        self.in_bound_item.signal_manager.on_bounds_change.connect(self.bounds_changed)
-        self.out_bound_item.signal_manager.on_bounds_change.connect(self.bounds_changed)
+        self.cursor_item.signal_manager.on_seek.connect(
+            self.signal_manager.on_seek.emit)
+        self.in_bound_item.signal_manager.on_bounds_change.connect(
+            self.bounds_changed)
+        self.out_bound_item.signal_manager.on_bounds_change.connect(
+            self.bounds_changed)
 
     def update_videos_dic(self, videos_dic):
         for video_id in videos_dic.keys():
             if video_id not in self.videos_dic.keys():
-                self.videos_dic[video_id] = video_item(videos_dic[video_id]['name'], video_id, videos_dic[video_id]['frames_count'])
+                self.videos_dic[video_id] = video_item(
+                    videos_dic[video_id]['name'], video_id, videos_dic[video_id]['frames_count'])
                 self.timeline_scene.addItem(self.videos_dic[video_id])
-                self.videos_dic[video_id].signal_manager.on_video_item_moved.connect(self.video_items_moved)
-                self.videos_dic[video_id].signal_manager.on_video_item_move.connect(self.video_item_is_moving)
-                self.videos_dic[video_id].signal_manager.on_video_item_in_out_modified.connect(self.video_item_in_out_modified)
-                self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(self.video_item_double_clicked)
-                self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(self.video_item_double_clicked)
-                self.videos_dic[video_id].signal_manager.on_select.connect(self.update_selection)
-                self.videos_dic[video_id].signal_manager.on_current.connect(self.current_playing_item)
+                self.videos_dic[video_id].signal_manager.on_video_item_moved.connect(
+                    self.video_items_moved)
+                self.videos_dic[video_id].signal_manager.on_video_item_move.connect(
+                    self.video_item_is_moving)
+                self.videos_dic[video_id].signal_manager.on_video_item_in_out_modified.connect(
+                    self.video_item_in_out_modified)
+                self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(
+                    self.video_item_double_clicked)
+                self.videos_dic[video_id].signal_manager.on_video_item_double_clicked.connect(
+                    self.video_item_double_clicked)
+                self.videos_dic[video_id].signal_manager.on_select.connect(
+                    self.update_selection)
+                self.videos_dic[video_id].signal_manager.on_current.connect(
+                    self.current_playing_item)
             self.videos_dic[video_id].set_frame_width(self.frame_width)
-            self.videos_dic[video_id].set_frames_count(videos_dic[video_id]['frames_count'])
-            self.videos_dic[video_id].set_in_frame((videos_dic[video_id]['inpoint']))
-            self.videos_dic[video_id].set_out_frame((videos_dic[video_id]['outpoint']))
-            self.videos_dic[video_id].set_thumbnail(videos_dic[video_id]['thumbnail'])
+            self.videos_dic[video_id].set_frames_count(
+                videos_dic[video_id]['frames_count'])
+            self.videos_dic[video_id].set_in_frame(
+                (videos_dic[video_id]['inpoint']))
+            self.videos_dic[video_id].set_out_frame(
+                (videos_dic[video_id]['outpoint']))
+            self.videos_dic[video_id].set_thumbnail(
+                videos_dic[video_id]['thumbnail'])
             self.videos_dic[video_id].name = videos_dic[video_id]['name']
             self.videos_dic[video_id].project_video_id = videos_dic[video_id]['project_video_id']
         existing_video_ids = list(self.videos_dic.keys())
         for video_id in existing_video_ids:
             if video_id not in videos_dic.keys():
                 self.remove_video(video_id)
-        self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: list(videos_dic.keys()).index(x[0])))
+        self.videos_dic = dict(sorted(self.videos_dic.items(
+        ), key=lambda x: list(videos_dic.keys()).index(x[0])))
         self.reorganise_items()
         self.refresh()
 
@@ -533,7 +601,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 stage_row = stages[variant_row['stage_id']]
                 video_item.set_stage_row(stage_row)
                 last_variant_video_id = variant_videos[video_row['variant_id']]
-                video_item.set_is_last(video_row['id'] == last_variant_video_id)
+                video_item.set_is_last(
+                    video_row['id'] == last_variant_video_id)
             if video_item.is_current():
                 self.current_playing_item(video_item, force=True)
         self.update()
@@ -541,17 +610,21 @@ class timeline_viewport(QtWidgets.QGraphicsView):
     def show_context_menu(self):
         selection = self.get_selected_items()
         menu = gui_utils.QMenu(self)
-        
+
         update_selection_action = None
         remove_selection_action = None
 
-        update_all_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update all')
+        update_all_action = menu.addAction(
+            QtGui.QIcon(ressources._tool_update_), 'Update all')
 
         if len(selection) > 0:
-            update_selection_action = menu.addAction(QtGui.QIcon(ressources._tool_update_), 'Update selected')
-            remove_selection_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Remove selected')
-        
-        clear_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Clear playlist')
+            update_selection_action = menu.addAction(
+                QtGui.QIcon(ressources._tool_update_), 'Update selected')
+            remove_selection_action = menu.addAction(
+                QtGui.QIcon(ressources._tool_archive_), 'Remove selected')
+
+        clear_playlist_action = menu.addAction(
+            QtGui.QIcon(ressources._tool_archive_), 'Clear playlist')
 
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
@@ -588,7 +661,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             if not last_video_row:
                 continue
             last_video_row = last_video_row[-1]
-            tuples_list.append((video_id, last_video_row['file_path'], last_video_row['id']))
+            tuples_list.append(
+                (video_id, last_video_row['file_path'], last_video_row['id']))
         self.signal_manager.replace_videos.emit(tuples_list)
 
     def modify_state_on_selected(self, state):
@@ -620,7 +694,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
 
     def current_playing_item(self, item, force=False):
         if item.stage_row:
-            self.signal_manager.current_video_name.emit(item.variant_row['string'])
+            self.signal_manager.current_video_name.emit(
+                item.variant_row['string'])
             video_id = item.video_row['id']
         else:
             self.signal_manager.current_video_name.emit(item.video_name)
@@ -646,7 +721,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             logger.error("No current video found")
             return
         video_path = project.get_video_data(project_video_id, 'file_path')
-        self.signal_manager.replace_videos.emit([(current_video_id, video_path, project_video_id)])
+        self.signal_manager.replace_videos.emit(
+            [(current_video_id, video_path, project_video_id)])
 
     def remove_video(self, video_id):
         if video_id in self.videos_dic.keys():
@@ -677,9 +753,11 @@ class timeline_viewport(QtWidgets.QGraphicsView):
                 continue
             start_frames.append(self.videos_dic[video_id].start_frame)
             ordered_ids.append(video_id)
-        start_frames.append(self.videos_dic[video_id].start_frame+self.videos_dic[video_id].get_frames_count())
+        start_frames.append(
+            self.videos_dic[video_id].start_frame+self.videos_dic[video_id].get_frames_count())
         cursor_pos = self.mapToScene(self.mapFromGlobal(QtGui.QCursor().pos()))
-        closest_frame = min(start_frames, key=lambda x: abs(x - int(cursor_pos.x()/self.frame_width)))
+        closest_frame = min(start_frames, key=lambda x: abs(
+            x - int(cursor_pos.x()/self.frame_width)))
         selected_items = self.get_selected_items()
         moved_videos_ids = []
         for video_item in selected_items:
@@ -689,7 +767,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         for video_id in reversed(moved_videos_ids):
             ordered_ids.insert(new_index, video_id)
         self.moving_items = []
-        self.videos_dic = dict(sorted(self.videos_dic.items(), key=lambda x: ordered_ids.index(x[0])))
+        self.videos_dic = dict(
+            sorted(self.videos_dic.items(), key=lambda x: ordered_ids.index(x[0])))
         self.reorganise_items()
         self.signal_manager.on_video_item_moved.emit(ordered_ids)
 
@@ -709,11 +788,14 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             if self.videos_dic[video_id] in self.moving_items:
                 continue
             start_frames.append(self.videos_dic[video_id].start_frame)
-        start_frames.append(self.videos_dic[video_id].start_frame+self.videos_dic[video_id].get_frames_count())
+        start_frames.append(
+            self.videos_dic[video_id].start_frame+self.videos_dic[video_id].get_frames_count())
         cursor_pos = self.mapToScene(self.mapFromGlobal(QtGui.QCursor().pos()))
-        closest_frame = min(start_frames, key=lambda x: abs(x - int(cursor_pos.x()/self.frame_width)))
+        closest_frame = min(start_frames, key=lambda x: abs(
+            x - int(cursor_pos.x()/self.frame_width)))
         self.insert_item.setVisible(True)
-        self.insert_item.setPos(closest_frame*self.frame_width, self.insert_item.pos().y())
+        self.insert_item.setPos(
+            closest_frame*self.frame_width, self.insert_item.pos().y())
 
     def video_item_in_out_modified(self, video_item):
         self.reorganise_items()
@@ -724,7 +806,8 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         modification_dic['id'] = video_id
         modification_dic['inpoint'] = inpoint
         modification_dic['outpoint'] = outpoint
-        self.signal_manager.on_video_item_in_out_modified.emit(modification_dic)
+        self.signal_manager.on_video_item_in_out_modified.emit(
+            modification_dic)
 
     def bounds_changed(self):
         in_frame = self.in_bound_item.get_frame()
@@ -766,7 +849,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.update()
 
     def init_scene(self):
-        self.move_scene_center_to_left(force = True)
+        self.move_scene_center_to_left(force=True)
         self.cursor_item.set_frame(0)
 
     def set_frame(self, frame):
@@ -776,7 +859,7 @@ class timeline_viewport(QtWidgets.QGraphicsView):
         self.update()
 
     def move_scene_center_to_left(self, force=False):
-        delta_x = self.mapToScene(QtCore.QPoint(0,0)).x() + 20
+        delta_x = self.mapToScene(QtCore.QPoint(0, 0)).x() + 20
         if (delta_x >= 0) and not force:
             return
         self.update_scene_rect(self.sceneRect().translated(-delta_x, 0))
@@ -834,11 +917,12 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             delta = event.position().toPoint() - self.last_mouse_pos
             self.last_mouse_pos = event.position().toPoint()
             dx = -delta.x()
-            point = self.mapToScene(QtCore.QPoint(0,0))
+            point = self.mapToScene(QtCore.QPoint(0, 0))
             self.update_scene_rect(self.sceneRect().translated(dx, 0))
             self.move_scene_center_to_left()
         if self.move_cursor:
-            self.cursor_item.move_item(self.mapToScene(event.position().toPoint()).x())
+            self.cursor_item.move_item(
+                self.mapToScene(event.position().toPoint()).x())
 
     def wheelEvent(self, event):
         if event.modifiers() & QtCore.Qt.KeyboardModifier.ShiftModifier:
@@ -852,14 +936,16 @@ class timeline_viewport(QtWidgets.QGraphicsView):
             frame_width = self.frame_width/-delta
         frame_width = min(max(frame_width, 0.1), 30)
         mouse_view_pos = event.position()
-        mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.frame_width
+        mouse_scene_pos = self.mapToScene(
+            mouse_view_pos.toPoint()).x() / self.frame_width
         self.set_frame_width(frame_width)
-        new_mouse_scene_pos = self.mapToScene(mouse_view_pos.toPoint()).x() / self.frame_width
+        new_mouse_scene_pos = self.mapToScene(
+            mouse_view_pos.toPoint()).x() / self.frame_width
         diff = (new_mouse_scene_pos - mouse_scene_pos) * self.frame_width
         self.update_scene_rect(QtCore.QRectF(self.sceneRect().x() - diff,
-                                        self.sceneRect().y(),
-                                        self.sceneRect().width(),
-                                        self.sceneRect().height()))
+                                             self.sceneRect().y(),
+                                             self.sceneRect().width(),
+                                             self.sceneRect().height()))
         self.move_scene_center_to_left()
 
 
@@ -868,13 +954,13 @@ class timeline_scene(QtWidgets.QGraphicsScene):
         super(timeline_scene, self).__init__()
         self.frame_width = 2
         self.fps = 24
-        self.frame_range = [0,1000]
-        self.bounds_range = [0,1000]
+        self.frame_range = [0, 1000]
+        self.bounds_range = [0, 1000]
         self.cache_scene_painting()
 
     def cache_scene_painting(self):
-        self.color1 = QtGui.QColor(0,0,10,60)
-        self.color2 = QtGui.QColor(245,245,255,10)
+        self.color1 = QtGui.QColor(0, 0, 10, 60)
+        self.color2 = QtGui.QColor(245, 245, 255, 10)
 
     def set_frame_width(self, frame_width):
         self.frame_width = frame_width
@@ -892,29 +978,34 @@ class timeline_scene(QtWidgets.QGraphicsScene):
         self.update()
 
     def is_in_cursor_zone(self, pos):
-        cursor_zone_rect = QtCore.QRectF(self.sceneRect().left(),10,self.sceneRect().width(),20)
+        cursor_zone_rect = QtCore.QRectF(
+            self.sceneRect().left(), 10, self.sceneRect().width(), 20)
         return cursor_zone_rect.contains(pos)
 
     def drawBackground(self, painter, rect):
         painter.fillRect(rect, self.color1)
 
-        bounds_zone = QtCore.QRectF(rect.left(),0,rect.width(),10)
-        painter.fillRect(bounds_zone, QtGui.QColor(0,0,10,10))
+        bounds_zone = QtCore.QRectF(rect.left(), 0, rect.width(), 10)
+        painter.fillRect(bounds_zone, QtGui.QColor(0, 0, 10, 10))
 
-        bounds_rect = QtCore.QRectF(self.bounds_range[0]*self.frame_width,2,(self.bounds_range[1]-self.bounds_range[0])*self.frame_width,6)
-        painter.fillRect(bounds_rect, QtGui.QColor(245,245,255,20))
+        bounds_rect = QtCore.QRectF(
+            self.bounds_range[0]*self.frame_width, 2, (self.bounds_range[1]-self.bounds_range[0])*self.frame_width, 6)
+        painter.fillRect(bounds_rect, QtGui.QColor(245, 245, 255, 20))
 
-        time_rect = QtCore.QRectF(rect.left(),10,rect.width(),20)
-        painter.fillRect(time_rect, QtGui.QColor(0,0,10,10))
+        time_rect = QtCore.QRectF(rect.left(), 10, rect.width(), 20)
+        painter.fillRect(time_rect, QtGui.QColor(0, 0, 10, 10))
 
-        frame_range_rect = QtCore.QRectF(self.frame_range[0]*self.frame_width,10,(self.frame_range[1]-self.frame_range[0]+1)*self.frame_width,20)
-        painter.fillRect(frame_range_rect, QtGui.QColor(245,245,255,10))
+        frame_range_rect = QtCore.QRectF(
+            self.frame_range[0]*self.frame_width, 10, (self.frame_range[1]-self.frame_range[0]+1)*self.frame_width, 20)
+        painter.fillRect(frame_range_rect, QtGui.QColor(245, 245, 255, 10))
 
-        in_rect = QtCore.QRectF((self.frame_range[0]*self.frame_width),10,1,20)
-        painter.fillRect(in_rect, QtGui.QColor(100,100,110,150))
+        in_rect = QtCore.QRectF(
+            (self.frame_range[0]*self.frame_width), 10, 1, 20)
+        painter.fillRect(in_rect, QtGui.QColor(100, 100, 110, 150))
 
-        out_rect = QtCore.QRectF((self.frame_range[1]+1)*self.frame_width,10,1,20)
-        painter.fillRect(out_rect, QtGui.QColor(100,100,110,150))
+        out_rect = QtCore.QRectF(
+            (self.frame_range[1]+1)*self.frame_width, 10, 1, 20)
+        painter.fillRect(out_rect, QtGui.QColor(100, 100, 110, 150))
 
         start_x = 0
         end_x = int(rect.right() // self.frame_width)
@@ -939,16 +1030,20 @@ class timeline_scene(QtWidgets.QGraphicsScene):
             step = self.fps*12
         if self.frame_width <= 0.1:
             step = self.fps*18
-        
+
         for x in range(start_x, end_x + 1, step):
             x_pos = int(x * self.frame_width)
             rect = QtCore.QRectF(x_pos-25+int(self.frame_width/2), 10, 50, 20)
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.2)), 1, QtCore.Qt.PenStyle.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(255, 255, 255, int(
+                255*0.2)), 1, QtCore.Qt.PenStyle.SolidLine)
             painter.setPen(pen)
-            painter.drawText(rect, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter, str(x))
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.05)), 1, QtCore.Qt.PenStyle.SolidLine)
+            painter.drawText(rect, QtCore.Qt.AlignmentFlag.AlignCenter |
+                             QtCore.Qt.AlignmentFlag.AlignHCenter, str(x))
+            pen = QtGui.QPen(QtGui.QColor(255, 255, 255, int(
+                255*0.05)), 1, QtCore.Qt.PenStyle.SolidLine)
             painter.setPen(pen)
             painter.drawLine(x_pos, 30, x_pos, 80)
+
 
 class custom_graphic_item(QtWidgets.QGraphicsItem):
     def __init__(self):
@@ -966,7 +1061,7 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
     def toggle_selection(self):
         self.selected = 1-self.selected
 
-    def setRect(self, x, y , width, height):
+    def setRect(self, x, y, width, height):
         self.x = x
         self.y = y
         self.width = width
@@ -988,22 +1083,25 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         color = QtGui.QColor('transparent')
-        pen = QtGui.QPen(QtGui.QColor('transparent'), 1, QtCore.Qt.PenStyle.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor('transparent'), 1,
+                         QtCore.Qt.PenStyle.SolidLine)
         brush = QtGui.QBrush(color)
         painter.setPen(pen)
         painter.setBrush(brush)
         painter.drawRect(self.x, self.y, self.width, self.height)
 
+
 class insert_item(custom_graphic_item):
     def __init__(self):
         super(insert_item, self).__init__()
         self.height = 50
-        self.width = 2 
+        self.width = 2
         self.setPos(self.pos().x(), 30)
 
     def paint(self, painter, option, widget):
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(255,255,int(255*0.85))))
+        painter.setBrush(QtGui.QBrush(QtGui.QColor(255, 255, int(255*0.85))))
         painter.drawRoundedRect(option.rect, 1, 1)
+
 
 class video_item(custom_graphic_item):
     def __init__(self, video_name, video_id, frames_count):
@@ -1029,7 +1127,7 @@ class video_item(custom_graphic_item):
         self.margin = 1
         self.frame = 0
         self.start_frame = 0
-        self.video_frame_range = [0,1]
+        self.video_frame_range = [0, 1]
         self.scale_handle_width = 8
         self.hover_in_frame_handle = False
         self.hover_out_frame_handle = False
@@ -1098,7 +1196,7 @@ class video_item(custom_graphic_item):
 
     def stop_moving(self):
         self.start_move_pos = None
-        self.moved=False
+        self.moved = False
         self.setPos(self.pos().x(), 30)
         self.setZValue(1)
 
@@ -1111,7 +1209,8 @@ class video_item(custom_graphic_item):
             abs_frame = int(self.mapToScene(event.pos()).x()/self.frame_width)
             in_frame = int((abs_frame+(self.start_crop_in)) - self.start_frame)
             in_frame = min(max(0, in_frame), self.out_frame-1)
-            self.setPos(int((in_frame-self.start_crop_in+self.start_frame)*self.frame_width), self.pos().y())
+            self.setPos(int((in_frame-self.start_crop_in +
+                        self.start_frame)*self.frame_width), self.pos().y())
             self.set_in_frame(in_frame)
             self.in_or_out_modified = True
             self.signal_manager.on_select.emit([self])
@@ -1119,7 +1218,8 @@ class video_item(custom_graphic_item):
         if self.start_crop_out:
             self.setZValue(500)
             abs_frame = self.mapToScene(event.pos()).x()/self.frame_width
-            self.set_out_frame(int((abs_frame+self.in_frame) - self.start_frame))
+            self.set_out_frame(
+                int((abs_frame+self.in_frame) - self.start_frame))
             self.in_or_out_modified = True
             self.signal_manager.on_select.emit([self])
 
@@ -1164,7 +1264,8 @@ class video_item(custom_graphic_item):
         self.update_width()
 
     def set_out_frame(self, out_frame):
-        self.out_frame = max(self.in_frame+1, min(self.frames_count, out_frame))
+        self.out_frame = max(
+            self.in_frame+1, min(self.frames_count, out_frame))
         self.update_video_frame_range()
         self.update_width()
 
@@ -1173,7 +1274,8 @@ class video_item(custom_graphic_item):
         self.thumbnail_pixmap = QtGui.QIcon(thumbnail_path).pixmap(120)
         if self.thumbnail_pixmap.height() > 0:
             height_ratio = 38 / self.thumbnail_pixmap.height()
-            self.thumbnail_pixmap = self.thumbnail_pixmap.scaled(int(self.thumbnail_pixmap.width()*height_ratio), 38)
+            self.thumbnail_pixmap = self.thumbnail_pixmap.scaled(
+                int(self.thumbnail_pixmap.width()*height_ratio), 38)
 
     def set_start_frame(self, start_frame):
         self.start_frame = int(start_frame)
@@ -1182,7 +1284,8 @@ class video_item(custom_graphic_item):
         self.update()
 
     def update_video_frame_range(self):
-        self.video_frame_range = [int(self.start_frame), int(self.out_frame-self.in_frame)]
+        self.video_frame_range = [
+            int(self.start_frame), int(self.out_frame-self.in_frame)]
 
     def set_frame_width(self, frame_width):
         self.frame_width = frame_width
@@ -1209,52 +1312,58 @@ class video_item(custom_graphic_item):
         self.scene().update()
 
     def paint(self, painter, option, widget):
-        bg_color = QtGui.QColor(100,100,110,190)
+        bg_color = QtGui.QColor(100, 100, 110, 190)
         if self.is_current():
             bg_color.setAlpha(255)
         # Paint cropping effect
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.45)), 1, QtCore.Qt.PenStyle.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255, 255, 255, int(
+            255*0.45)), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         if self.start_crop_in is not None or self.start_crop_out is not None:
             shadow_rect = QtCore.QRectF(self.x-(self.in_frame*self.frame_width),
-                                self.y+self.margin*4,
-                                self.frames_count*self.frame_width,
-                                self.height-self.margin*8)
-            brush = QtGui.QBrush(QtGui.QColor(30,30,40,100))
+                                        self.y+self.margin*4,
+                                        self.frames_count*self.frame_width,
+                                        self.height-self.margin*8)
+            brush = QtGui.QBrush(QtGui.QColor(30, 30, 40, 100))
             painter.setBrush(brush)
-            painter.drawRoundedRect(shadow_rect, 2,2)
+            painter.drawRoundedRect(shadow_rect, 2, 2)
             bg_color.setAlpha(255)
         # Paint background
         brush = QtGui.QBrush(bg_color)
         painter.setBrush(brush)
         if not self.selected:
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(255, 255, 255, 0),
+                             1, QtCore.Qt.PenStyle.SolidLine)
         else:
-            pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.PenStyle.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(255, 255, 255, int(
+                255*0.85)), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         bg_rect = QtCore.QRect(int(self.x),
-                            int(self.y+self.margin*4),
-                            int(self.width-self.margin),
-                            int(self.height-self.margin*8))
-        painter.drawRoundedRect(bg_rect, 2,2)
+                               int(self.y+self.margin*4),
+                               int(self.width-self.margin),
+                               int(self.height-self.margin*8))
+        painter.drawRoundedRect(bg_rect, 2, 2)
 
         display_thumbnail_rect = QtCore.QRect(bg_rect.x()+self.margin*2,
-                            int(bg_rect.y()+self.margin*2),
-                            min(bg_rect.width()-self.margin*4, self.thumbnail_pixmap.width()),
-                            self.thumbnail_pixmap.height())
+                                              int(bg_rect.y()+self.margin*2),
+                                              min(bg_rect.width()-self.margin*4,
+                                                  self.thumbnail_pixmap.width()),
+                                              self.thumbnail_pixmap.height())
         pixmap = self.thumbnail_pixmap.copy(display_thumbnail_rect)
         painter.drawPixmap(display_thumbnail_rect, pixmap)
         if not self.is_last:
             painter.setBrush(QtGui.QBrush())
-            painter.setPen(QtGui.QPen(QtGui.QColor('#f79360'), 2, QtCore.Qt.PenStyle.SolidLine))
+            painter.setPen(QtGui.QPen(QtGui.QColor('#f79360'),
+                           2, QtCore.Qt.PenStyle.SolidLine))
             painter.drawRect(display_thumbnail_rect)
 
-        pen = QtGui.QPen(QtGui.QColor("#ffffff"), 1, QtCore.Qt.PenStyle.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor("#ffffff"), 1,
+                         QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         text_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
-                            int(bg_rect.y()+self.margin*3)),
-                            QtCore.QPoint(int(bg_rect.width()-self.margin*4),
-                            int(bg_rect.height()-self.margin*8)))
+                                               int(bg_rect.y()+self.margin*3)),
+                                 QtCore.QPoint(int(bg_rect.width()-self.margin*4),
+                                               int(bg_rect.height()-self.margin*8)))
         if self.variant_row:
             text_tokens = self.variant_row['string'].split('/')
             category = text_tokens[1]
@@ -1263,27 +1372,31 @@ class video_item(custom_graphic_item):
             text = f"{category} / {asset} / {variant}"
         else:
             text = self.video_name
-        painter.drawText(text_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop, text)
-        
+        painter.drawText(text_rect, QtCore.Qt.AlignmentFlag.AlignLeft |
+                         QtCore.Qt.AlignmentFlag.AlignTop, text)
+
         if self.stage_row:
             stage_name = self.stage_row['name']
-            pen = QtGui.QPen(QtGui.QColor(ressources._stages_colors_[self.stage_row['name']]), 1, QtCore.Qt.PenStyle.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor(ressources._stages_colors_[
+                             self.stage_row['name']]), 1, QtCore.Qt.PenStyle.SolidLine)
             painter.setPen(pen)
             stage_rect = QtCore.QRect(QtCore.QPoint(display_thumbnail_rect.x()+display_thumbnail_rect.width()+self.margin*4,
-                            int(bg_rect.y()+self.margin*3+12)),
-                            QtCore.QPoint(int(bg_rect.width()-self.margin*4),
-                            int(bg_rect.height()-self.margin*8)))
-            painter.drawText(stage_rect, QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop, stage_name)
+                                                    int(bg_rect.y()+self.margin*3+12)),
+                                      QtCore.QPoint(int(bg_rect.width()-self.margin*4),
+                                                    int(bg_rect.height()-self.margin*8)))
+            painter.drawText(stage_rect, QtCore.Qt.AlignmentFlag.AlignLeft |
+                             QtCore.Qt.AlignmentFlag.AlignTop, stage_name)
 
         # Draw crop handles
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255, 255, 255, 0),
+                         1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         if self.hover_in_frame_handle:
             handle_rect = QtCore.QRectF(bg_rect.x(),
                                         bg_rect.y(),
                                         int(self.scale_handle_width/2),
                                         bg_rect.height())
-            brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
+            brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, int(255*0.85)))
             painter.setBrush(brush)
             painter.drawRoundedRect(handle_rect,
                                     int(self.scale_handle_width/4),
@@ -1293,9 +1406,11 @@ class video_item(custom_graphic_item):
                                         bg_rect.y(),
                                         int(self.scale_handle_width/2),
                                         bg_rect.height())
-            brush = QtGui.QBrush(QtGui.QColor(255,255,255,int(255*0.85)))
+            brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, int(255*0.85)))
             painter.setBrush(brush)
-            painter.drawRoundedRect(handle_rect, int(self.scale_handle_width/4), int(self.scale_handle_width/4))
+            painter.drawRoundedRect(handle_rect, int(
+                self.scale_handle_width/4), int(self.scale_handle_width/4))
+
 
 class cursor_item(custom_graphic_item):
     def __init__(self):
@@ -1306,8 +1421,8 @@ class cursor_item(custom_graphic_item):
         self.frame_width = 2
         self.frame = 0
         self.start_move_pos = None
-        self.frame_range = [0,1000]
-        self.bounds_range = [0,1000]
+        self.frame_range = [0, 1000]
+        self.bounds_range = [0, 1000]
         self.setZValue(1000)
         self.setPos(self.pos().x(), 10)
 
@@ -1329,10 +1444,12 @@ class cursor_item(custom_graphic_item):
             self.signal_manager.on_seek.emit(self.frame)
 
     def update_pos(self):
-        self.setPos((self.frame*self.frame_width)- int(self.width/2) + int(self.frame_width/2), self.pos().y())
+        self.setPos((self.frame*self.frame_width) -
+                    int(self.width/2) + int(self.frame_width/2), self.pos().y())
 
     def update_frame(self):
-        self.frame = int((self.pos().x() + self.width/2 - int(self.frame_width/2))/self.frame_width)
+        self.frame = int((self.pos().x() + self.width/2 -
+                         int(self.frame_width/2))/self.frame_width)
         self.update()
 
     def set_frame_width(self, frame_width):
@@ -1357,21 +1474,27 @@ class cursor_item(custom_graphic_item):
         self.signal_manager.on_seek.emit(self.frame)
 
     def paint(self, painter, option, widget):
-        pen = QtGui.QPen(QtGui.QColor(255,100,100,200), max(self.frame_width, 2), QtCore.Qt.PenStyle.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255, 100, 100, 200), max(
+            self.frame_width, 2), QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
-        painter.drawLine(self.x+int(self.width/2), 20, self.x+int(self.width/2), self.height)
+        painter.drawLine(self.x+int(self.width/2), 20,
+                         self.x+int(self.width/2), self.height)
         frame_rect = QtCore.QRectF(self.x, 0, self.width, 20)
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
-        brush = QtGui.QBrush(QtGui.QColor(255,100,100,255))
+        pen = QtGui.QPen(QtGui.QColor(255, 255, 255, 0),
+                         1, QtCore.Qt.PenStyle.SolidLine)
+        brush = QtGui.QBrush(QtGui.QColor(255, 100, 100, 255))
         painter.setBrush(brush)
         painter.setPen(pen)
         painter.drawRoundedRect(frame_rect, 4, 4)
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,int(255*0.85)), 1, QtCore.Qt.PenStyle.SolidLine)
+        pen = QtGui.QPen(QtGui.QColor(255, 255, 255, int(
+            255*0.85)), 1, QtCore.Qt.PenStyle.SolidLine)
         painter.setPen(pen)
         font = QtGui.QFont()
         font.setBold(True)
         painter.setFont(font)
-        painter.drawText(frame_rect, QtCore.Qt.AlignmentFlag.AlignCenter | QtCore.Qt.AlignmentFlag.AlignHCenter, str(self.frame))
+        painter.drawText(frame_rect, QtCore.Qt.AlignmentFlag.AlignCenter |
+                         QtCore.Qt.AlignmentFlag.AlignHCenter, str(self.frame))
+
 
 class bound_item(custom_graphic_item):
     def __init__(self):
@@ -1385,8 +1508,8 @@ class bound_item(custom_graphic_item):
         self.frame = 0
         self.type = 'in'
         self.start_move_pos = None
-        self.frame_range = [0,1000]
-        self.bounds_range = [0,1000]
+        self.frame_range = [0, 1000]
+        self.bounds_range = [0, 1000]
         self.setPos(self.pos().x(), 1)
 
     def set_type(self, bound_type):
@@ -1406,10 +1529,12 @@ class bound_item(custom_graphic_item):
         self.bounds_range = bounds_range
 
     def update_pos(self):
-        self.setPos((self.frame)*self.frame_width - int(self.width/2) + int(self.frame_width/2), self.pos().y())
+        self.setPos((self.frame)*self.frame_width -
+                    int(self.width/2) + int(self.frame_width/2), self.pos().y())
 
     def update_frame(self):
-        self.frame = int((self.pos().x() + self.width/2 - int(self.frame_width/2))/self.frame_width)
+        self.frame = int((self.pos().x() + self.width/2 -
+                         int(self.frame_width/2))/self.frame_width)
         self.update()
 
     def set_frame_width(self, frame_width):
@@ -1433,7 +1558,8 @@ class bound_item(custom_graphic_item):
     def mouseMoveEvent(self, event):
         if not self.start_move_pos:
             return
-        delta = int((event.pos().x() - self.start_move_pos.x())/self.frame_width)*self.frame_width
+        delta = int((event.pos().x() - self.start_move_pos.x()) /
+                    self.frame_width)*self.frame_width
         if self.type == 'in':
             if self.get_pos() + delta >= (self.bounds_range[1])*self.frame_width:
                 self.set_frame(self.bounds_range[1]-1)
@@ -1461,8 +1587,10 @@ class bound_item(custom_graphic_item):
         self.signal_manager.on_bounds_change.emit(1)
 
     def paint(self, painter, option, widget):
-        brush = QtGui.QBrush(QtGui.QColor(255,100,100,255))
-        pen = QtGui.QPen(QtGui.QColor(255,255,255,0), 1, QtCore.Qt.PenStyle.SolidLine)
+        brush = QtGui.QBrush(QtGui.QColor(255, 100, 100, 255))
+        pen = QtGui.QPen(QtGui.QColor(255, 255, 255, 0),
+                         1, QtCore.Qt.PenStyle.SolidLine)
         painter.setBrush(brush)
         painter.setPen(pen)
-        painter.drawRoundedRect(QtCore.QRectF(0,0, self.width, self.height), 4, 4)
+        painter.drawRoundedRect(QtCore.QRectF(
+            0, 0, self.width, self.height), 4, 4)

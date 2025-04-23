@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 
 # Wizard modules
 from wizard.core import user
@@ -14,6 +14,7 @@ from wizard.gui import create_user_widget
 from wizard.gui import reset_password_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
+
 
 class user_log_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -30,13 +31,15 @@ class user_log_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.title_label = QtWidgets.QLabel("Log In")
         self.title_label.setObjectName("title_label_2")
         self.main_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            0, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.user_name_lineEdit = QtWidgets.QLineEdit()
@@ -47,12 +50,13 @@ class user_log_widget(QtWidgets.QDialog):
         self.password_lineEdit.setPlaceholderText('Password')
         self.main_layout.addWidget(self.password_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -69,12 +73,13 @@ class user_log_widget(QtWidgets.QDialog):
 
         self.sign_up_line_widget = QtWidgets.QWidget()
         self.sign_up_line_layout = QtWidgets.QHBoxLayout()
-        self.sign_up_line_layout.setContentsMargins(4,4,4,4)
+        self.sign_up_line_layout.setContentsMargins(4, 4, 4, 4)
         self.sign_up_line_layout.setSpacing(4)
         self.sign_up_line_widget.setLayout(self.sign_up_line_layout)
         self.main_layout.addWidget(self.sign_up_line_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 0, QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.sign_up_line_layout.addSpacerItem(self.spaceItem)
 
         self.info_label = QtWidgets.QLabel("Doesn't have an account?")
@@ -86,12 +91,13 @@ class user_log_widget(QtWidgets.QDialog):
 
         self.reset_line_widget = QtWidgets.QWidget()
         self.reset_line_layout = QtWidgets.QHBoxLayout()
-        self.reset_line_layout.setContentsMargins(4,0,4,4)
+        self.reset_line_layout.setContentsMargins(4, 0, 4, 4)
         self.reset_line_layout.setSpacing(4)
         self.reset_line_widget.setLayout(self.reset_line_layout)
         self.main_layout.addWidget(self.reset_line_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 0, QtWidgets.QSizePolicy.Policy.MinimumExpanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.reset_line_layout.addSpacerItem(self.spaceItem)
 
         self.forgotten_info_label = QtWidgets.QLabel("Password forgotten?")
@@ -119,5 +125,6 @@ class user_log_widget(QtWidgets.QDialog):
         self.create_user_widget.exec()
 
     def reset_password(self):
-        self.reset_password_widget = reset_password_widget.reset_password_widget(self)
+        self.reset_password_widget = reset_password_widget.reset_password_widget(
+            self)
         self.reset_password_widget.exec()

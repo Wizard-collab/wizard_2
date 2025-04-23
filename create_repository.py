@@ -43,8 +43,6 @@ from wizard.core import repository
 from wizard.core import db_core
 from wizard.core import db_utils
 from wizard.core import custom_logger
-custom_logger.get_root_logger()
-logger = logging.getLogger('wizard')
 
 # Wizard gui modules
 from wizard.gui import app_utils
@@ -55,6 +53,9 @@ from wizard.gui import warning_tooltip
 from wizard.gui import logging_widget
 import error_handler
 
+custom_logger.get_root_logger()
+logger = logging.getLogger('wizard')
+
 
 class app():
     def __init__(self):
@@ -62,7 +63,8 @@ class app():
         QtCore.qInstallMessageHandler(customQtMsgHandler)
 
         self.warning_tooltip = warning_tooltip.warning_tooltip()
-        self.custom_handler = logging_widget.custom_handler(long_formatter=False, parent=None)
+        self.custom_handler = logging_widget.custom_handler(
+            long_formatter=False, parent=None)
         self.custom_handler.log_record.connect(self.warning_tooltip.invoke)
         logging.getLogger().addHandler(self.custom_handler)
 
@@ -78,11 +80,13 @@ class app():
         QtWidgets.QApplication.quit()
         sys.exit()
 
+
 def customQtMsgHandler(msg_type, msg_log_context, msg_string):
     if msg_string.startswith('QWindowsWindow::setGeometry:'):
         pass
     else:
         print(msg_string)
+
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
@@ -93,6 +97,7 @@ def excepthook(exc_type, exc_value, exc_tb):
         command = f'python error_handler.py "{tb}"'
     subprocess.Popen(command, start_new_session=True)
 
+
 def main():
     sys.excepthook = excepthook
     application.log_app_infos()
@@ -100,6 +105,7 @@ def main():
     ret = wizard_app.app.exec()
 
     sys.exit(ret)
+
 
 if __name__ == '__main__':
     main()

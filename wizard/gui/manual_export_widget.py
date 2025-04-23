@@ -14,6 +14,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class manual_export_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(manual_export_widget, self).__init__()
@@ -78,13 +79,14 @@ class manual_export_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(8)
         self.setLayout(self.main_layout)
 
-        self.infos_label = QtWidgets.QLabel('Drag and drop files or use explorer to manually merge files as exports.')
+        self.infos_label = QtWidgets.QLabel(
+            'Drag and drop files or use explorer to manually merge files as exports.')
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(4)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
@@ -92,7 +94,8 @@ class manual_export_widget(QtWidgets.QDialog):
         self.header_layout.addWidget(QtWidgets.QLabel('Export name'))
 
         self.export_name_lineEdit = QtWidgets.QLineEdit()
-        self.export_name_lineEdit.setPlaceholderText('The asset exported, Ex: {asset_name}_{stage}')
+        self.export_name_lineEdit.setPlaceholderText(
+            'The asset exported, Ex: {asset_name}_{stage}')
         self.header_layout.addWidget(self.export_name_lineEdit)
 
         self.comment_textEdit = QtWidgets.QTextEdit()
@@ -101,7 +104,8 @@ class manual_export_widget(QtWidgets.QDialog):
         self.main_layout.addWidget(self.comment_textEdit)
 
         self.files_list = QtWidgets.QListWidget()
-        self.files_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.files_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.main_layout.addWidget(self.files_list)
 
         self.drop_files_button = drop_files_widget.drop_files_button()
@@ -109,12 +113,13 @@ class manual_export_widget(QtWidgets.QDialog):
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

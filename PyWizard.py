@@ -38,10 +38,6 @@ import code
 from PyQt6 import QtWidgets
 import logging
 
-# Append current dir to sys.path
-sys.path.append(os.path.abspath(''))
-
-
 # Wizard modules
 from wizard.core import application
 from wizard.core import user
@@ -58,12 +54,17 @@ from wizard.core import subtasks_library
 from wizard.core import subtask
 from wizard.core import hooks
 from wizard.core import custom_logger
-custom_logger.get_root_logger()
-logger = logging.getLogger(__name__)
 
 # Wizard gui modules
 from wizard.gui import app_utils
 from wizard.gui import gui_server
+
+custom_logger.get_root_logger()
+logger = logging.getLogger(__name__)
+
+# Append current dir to sys.path
+sys.path.append(os.path.abspath(''))
+
 
 class app():
     def __init__(self):
@@ -93,7 +94,7 @@ class app():
         console = code.InteractiveConsole()
         console.interact(banner=None, exitmsg=None)
         self.quit()
-            
+
     def quit(self):
         if self.stats_schedule:
             self.stats_schedule.stop()
@@ -105,6 +106,7 @@ class app():
             self.tasks_server.stop()
         QtWidgets.QApplication.quit()
         sys.exit()
+
 
 if __name__ == '__main__':
     _app = app()

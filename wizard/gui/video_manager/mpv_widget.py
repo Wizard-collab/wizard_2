@@ -1,19 +1,18 @@
-
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
 # Python modules
+import logging
+import mpv
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
-import traceback
 import time
 import os
-os.environ["PATH"] = os.path.abspath('') + os.pathsep + os.environ["PATH"]
-import mpv
-import logging
 
+os.environ["PATH"] = os.path.abspath('') + os.pathsep + os.environ["PATH"]
 logger = logging.getLogger(__name__)
+
 
 class mpv_widget(QtWidgets.QWidget):
 
@@ -31,9 +30,10 @@ class mpv_widget(QtWidgets.QWidget):
         self.playing = False
         self.loop = False
         self.mouse_pos = None
-        self.bounds_range = [0,1000]
+        self.bounds_range = [0, 1000]
 
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors)
+        self.setAttribute(
+            QtCore.Qt.WidgetAttribute.WA_DontCreateNativeAncestors)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_NativeWindow)
 
         self.player = None
@@ -73,14 +73,15 @@ class mpv_widget(QtWidgets.QWidget):
         self.player.play(video_file)
         MPV_EVENT_FILE_LOADED = 8
         self.player.wait_for_event(MPV_EVENT_FILE_LOADED)
-        
+
         if pos is not None:
             self.seek(pos, force=True)
-        
+
         self.update_frame_range()
 
     def update_frame_range(self):
-        self.on_frame_range_modified.emit([0, round(self.player.duration*self.fps)-1])
+        self.on_frame_range_modified.emit(
+            [0, round(self.player.duration*self.fps)-1])
 
     def force_pause(self):
         if not self.player.pause:

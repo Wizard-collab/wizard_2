@@ -11,13 +11,13 @@ from PyQt6.QtCore import pyqtSignal
 from wizard.vars import ressources
 from wizard.core import shelf
 from wizard.core import project
-from wizard.core import tools
 from wizard.core import path_utils
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import create_tool_widget
+
 
 class shelf_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -34,34 +34,37 @@ class shelf_widget(QtWidgets.QFrame):
         self.setObjectName('shelf_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(2)
-        self.main_layout.setContentsMargins(4,4,4,4)
+        self.main_layout.setContentsMargins(4, 4, 4, 4)
         self.setLayout(self.main_layout)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(2)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.edit_mode_widget = QtWidgets.QWidget()
         self.edit_mode_layout = QtWidgets.QHBoxLayout()
-        self.edit_mode_layout.setContentsMargins(0,0,0,0)
+        self.edit_mode_layout.setContentsMargins(0, 0, 0, 0)
         self.edit_mode_layout.setSpacing(1)
         self.edit_mode_widget.setLayout(self.edit_mode_layout)
         self.main_layout.addWidget(self.edit_mode_widget)
         self.edit_mode_widget.setVisible(False)
 
         self.move_left_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.move_left_button, 'Move selected shelf tool')
+        gui_utils.application_tooltip(
+            self.move_left_button, 'Move selected shelf tool')
         self.move_left_button.setIcon(QtGui.QIcon(ressources._left_icon_))
-        self.move_left_button.setFixedSize(20,20)
+        self.move_left_button.setFixedSize(20, 20)
         self.move_right_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.move_right_button, 'Move selected shelf tool')
+        gui_utils.application_tooltip(
+            self.move_right_button, 'Move selected shelf tool')
         self.move_right_button.setIcon(QtGui.QIcon(ressources._right_icon_))
-        self.move_right_button.setFixedSize(20,20)
+        self.move_right_button.setFixedSize(20, 20)
         self.edit_mode_layout.addWidget(self.move_left_button)
         self.edit_mode_layout.addWidget(self.move_right_button)
 
@@ -69,23 +72,29 @@ class shelf_widget(QtWidgets.QFrame):
         self.edit_mode_label.setObjectName('orange_label')
         self.edit_mode_layout.addWidget(self.edit_mode_label)
 
-        self.edit_mode_button = gui_utils.transparent_button(ressources._edit_transparent_icon_, ressources._edit_icon_)
-        gui_utils.application_tooltip(self.edit_mode_button, 'Switch to edit mode')
+        self.edit_mode_button = gui_utils.transparent_button(
+            ressources._edit_transparent_icon_, ressources._edit_icon_)
+        gui_utils.application_tooltip(
+            self.edit_mode_button, 'Switch to edit mode')
         self.edit_mode_button.setCheckable(True)
-        self.edit_mode_button.setIconSize(QtCore.QSize(16,16))
-        self.edit_mode_button.setFixedSize(20,20)
+        self.edit_mode_button.setIconSize(QtCore.QSize(16, 16))
+        self.edit_mode_button.setFixedSize(20, 20)
         self.main_layout.addWidget(self.edit_mode_button)
 
-        self.add_script_button = gui_utils.transparent_button(ressources._add_transparent_icon_, ressources._add_icon_)
-        gui_utils.application_tooltip(self.add_script_button, 'Create shelf tool')
-        self.add_script_button.setIconSize(QtCore.QSize(16,16))
-        self.add_script_button.setFixedSize(20,20)
+        self.add_script_button = gui_utils.transparent_button(
+            ressources._add_transparent_icon_, ressources._add_icon_)
+        gui_utils.application_tooltip(
+            self.add_script_button, 'Create shelf tool')
+        self.add_script_button.setIconSize(QtCore.QSize(16, 16))
+        self.add_script_button.setFixedSize(20, 20)
         self.main_layout.addWidget(self.add_script_button)
 
-        self.script_folder_button = gui_utils.transparent_button(ressources._folder_transparent_icon_, ressources._folder_icon_)
-        gui_utils.application_tooltip(self.script_folder_button, 'Open scripts folder')
-        self.add_script_button.setIconSize(QtCore.QSize(16,16))
-        self.script_folder_button.setFixedSize(20,20)
+        self.script_folder_button = gui_utils.transparent_button(
+            ressources._folder_transparent_icon_, ressources._folder_icon_)
+        gui_utils.application_tooltip(
+            self.script_folder_button, 'Open scripts folder')
+        self.add_script_button.setIconSize(QtCore.QSize(16, 16))
+        self.script_folder_button.setFixedSize(20, 20)
         self.main_layout.addWidget(self.script_folder_button)
 
     def connect_functions(self):
@@ -100,8 +109,10 @@ class shelf_widget(QtWidgets.QFrame):
 
     def create_script(self):
         menu = gui_utils.QMenu()
-        tool_action = menu.addAction(QtGui.QIcon(ressources._python_icon_), 'Tool')
-        separator_action = menu.addAction(QtGui.QIcon(ressources._separator_icon_), 'Separator')
+        tool_action = menu.addAction(
+            QtGui.QIcon(ressources._python_icon_), 'Tool')
+        separator_action = menu.addAction(QtGui.QIcon(
+            ressources._separator_icon_), 'Separator')
         action = menu.exec(QtGui.QCursor().pos())
         if action == tool_action:
             self.create_tool_widget = create_tool_widget.create_tool_widget()
@@ -111,7 +122,8 @@ class shelf_widget(QtWidgets.QFrame):
             gui_server.refresh_team_ui()
 
     def edit_script(self, script_id):
-        self.create_tool_widget = create_tool_widget.create_tool_widget(script_id=script_id)
+        self.create_tool_widget = create_tool_widget.create_tool_widget(
+            script_id=script_id)
         self.create_tool_widget.show()
 
     def delete_script(self, script_id):
@@ -129,12 +141,14 @@ class shelf_widget(QtWidgets.QFrame):
             self.edit_mode_button.reset_stylesheet()
         self.edit_mode_widget.setVisible(self.edit_mode)
         for script_id in self.scripts_ids.keys():
-            self.scripts_ids[script_id]['widget'].toggle_edit_mode(self.edit_mode)
+            self.scripts_ids[script_id]['widget'].toggle_edit_mode(
+                self.edit_mode)
 
     def apply_positions(self):
         for script_id in self.scripts_ids.keys():
             script_id = self.scripts_ids[script_id]['row']['id']
-            position = self.buttons_layout.indexOf(self.scripts_ids[script_id]['widget'])
+            position = self.buttons_layout.indexOf(
+                self.scripts_ids[script_id]['widget'])
             if position != self.scripts_ids[script_id]['row']['position']:
                 project.modify_shelf_script_position(script_id, position)
         gui_server.refresh_team_ui()
@@ -143,19 +157,22 @@ class shelf_widget(QtWidgets.QFrame):
         positions_dic = self.get_positions()
         for index in sorted(list(positions_dic.keys())):
             if index > 0:
-                self.buttons_layout.insertWidget(index-1, self.scripts_ids[positions_dic[index]]['widget'])
+                self.buttons_layout.insertWidget(
+                    index-1, self.scripts_ids[positions_dic[index]]['widget'])
 
     def move_checked_right(self):
         positions_dic = self.get_positions()
         for index in sorted(list(positions_dic.keys()), reverse=True):
             if index < self.buttons_layout.count()-1:
-                self.buttons_layout.insertWidget(index+1, self.scripts_ids[positions_dic[index]]['widget'])
+                self.buttons_layout.insertWidget(
+                    index+1, self.scripts_ids[positions_dic[index]]['widget'])
 
     def get_positions(self):
         positions_dic = dict()
         for script_id in self.scripts_ids.keys():
             if self.scripts_ids[script_id]['widget'].isChecked():
-                index = self.buttons_layout.indexOf(self.scripts_ids[script_id]['widget'])
+                index = self.buttons_layout.indexOf(
+                    self.scripts_ids[script_id]['widget'])
                 positions_dic[index] = script_id
         return positions_dic
 
@@ -167,7 +184,8 @@ class shelf_widget(QtWidgets.QFrame):
                 project_scripts_ids.append(shelf_script_row['id'])
                 if shelf_script_row['id'] not in self.scripts_ids.keys():
                     self.scripts_ids[shelf_script_row['id']] = dict()
-                    self.scripts_ids[shelf_script_row['id']]['row'] = shelf_script_row
+                    self.scripts_ids[shelf_script_row['id']
+                                     ]['row'] = shelf_script_row
 
                     if shelf_script_row['type'] == 'tool':
                         self.button = shelf_script_button(shelf_script_row)
@@ -177,18 +195,26 @@ class shelf_widget(QtWidgets.QFrame):
                         self.button.hide_help_signal.connect(self.hide_help)
                         self.button.edit_signal.connect(self.edit_script)
                         self.button.delete_signal.connect(self.delete_script)
-                        self.buttons_layout.insertWidget(shelf_script_row['position'], self.button)
-                        self.scripts_ids[shelf_script_row['id']]['widget'] = self.button
+                        self.buttons_layout.insertWidget(
+                            shelf_script_row['position'], self.button)
+                        self.scripts_ids[shelf_script_row['id']
+                                         ]['widget'] = self.button
                     elif shelf_script_row['type'] == 'separator':
                         self.separator = shelf_separator(shelf_script_row)
-                        self.separator.delete_signal.connect(self.delete_script)
-                        self.buttons_layout.insertWidget(shelf_script_row['position'], self.separator)
-                        self.scripts_ids[shelf_script_row['id']]['widget'] = self.separator
+                        self.separator.delete_signal.connect(
+                            self.delete_script)
+                        self.buttons_layout.insertWidget(
+                            shelf_script_row['position'], self.separator)
+                        self.scripts_ids[shelf_script_row['id']
+                                         ]['widget'] = self.separator
                 else:
-                    self.scripts_ids[shelf_script_row['id']]['row'] = shelf_script_row
+                    self.scripts_ids[shelf_script_row['id']
+                                     ]['row'] = shelf_script_row
                     if shelf_script_row['type'] == 'tool':
-                        self.scripts_ids[shelf_script_row['id']]['widget'].update(shelf_script_row)
-                    self.buttons_layout.insertWidget(shelf_script_row['position'], self.scripts_ids[shelf_script_row['id']]['widget'])
+                        self.scripts_ids[shelf_script_row['id']
+                                         ]['widget'].update(shelf_script_row)
+                    self.buttons_layout.insertWidget(
+                        shelf_script_row['position'], self.scripts_ids[shelf_script_row['id']]['widget'])
 
             scripts_ids_list = list(self.scripts_ids.keys())
             for script_id in scripts_ids_list:
@@ -203,7 +229,7 @@ class shelf_widget(QtWidgets.QFrame):
     def show_help(self, script_id):
         self.help_widget = help_widget(self)
         self.help_widget.show_help(self.scripts_ids[script_id]['row']['name'],
-                                    self.scripts_ids[script_id]['row']['help'])
+                                   self.scripts_ids[script_id]['row']['help'])
 
     def hide_help(self):
         self.help_widget.close()
@@ -214,11 +240,13 @@ class shelf_widget(QtWidgets.QFrame):
     def exec_subtask(self, script_id):
         shelf.execute_script_as_subtask(script_id)
 
+
 class help_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(help_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(
+            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.build_ui()
@@ -258,11 +286,12 @@ class help_widget(QtWidgets.QWidget):
         QtWidgets.QApplication.processEvents()
         self.show()
 
+
 class shelf_separator(QtWidgets.QFrame):
 
     delete_signal = pyqtSignal(int)
 
-    def __init__(self, shelf_script_row, parent = None):
+    def __init__(self, shelf_script_row, parent=None):
         super(shelf_separator, self).__init__(parent)
         self.shelf_script_row = shelf_script_row
         self.is_checked = False
@@ -273,7 +302,7 @@ class shelf_separator(QtWidgets.QFrame):
         self.setFixedWidth(11)
         self.setObjectName('shelf_seperator_container')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(5,1,5,1)
+        self.main_layout.setContentsMargins(5, 1, 5, 1)
         self.setLayout(self.main_layout)
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setFixedWidth(1)
@@ -289,21 +318,25 @@ class shelf_separator(QtWidgets.QFrame):
     def enterEvent(self, event):
         if self.edit_mode:
             if not self.isChecked():
-                self.setStyleSheet('#shelf_seperator_container{background-color: rgba(255,255,255,30);}')
+                self.setStyleSheet(
+                    '#shelf_seperator_container{background-color: rgba(255,255,255,30);}')
             else:
-                self.setStyleSheet('#shelf_seperator_container{background-color: rgba(255,255,255,30);border:1px solid #f79360;}')
+                self.setStyleSheet(
+                    '#shelf_seperator_container{background-color: rgba(255,255,255,30);border:1px solid #f79360;}')
 
     def leaveEvent(self, event):
         if self.edit_mode:
             if not self.isChecked():
                 self.setStyleSheet('')
             else:
-                self.setStyleSheet('#shelf_seperator_container{border:1px solid #f79360;}')
+                self.setStyleSheet(
+                    '#shelf_seperator_container{border:1px solid #f79360;}')
 
     def mousePressEvent(self, event):
         if self.edit_mode:
             if event.button() == QtCore.Qt.MouseButton.LeftButton:
-                self.setStyleSheet('#shelf_seperator_container{background-color:#1d1d21;}')
+                self.setStyleSheet(
+                    '#shelf_seperator_container{background-color:#1d1d21;}')
 
     def mouseReleaseEvent(self, event):
         event.accept()
@@ -313,8 +346,9 @@ class shelf_separator(QtWidgets.QFrame):
                     self.setStyleSheet('')
                     self.setChecked(False)
                 else:
-                    self.setStyleSheet('#shelf_seperator_container{border:1px solid #f79360;}')
-                    self.setChecked(True)   
+                    self.setStyleSheet(
+                        '#shelf_seperator_container{border:1px solid #f79360;}')
+                    self.setChecked(True)
         else:
             if event.button() == QtCore.Qt.MouseButton.RightButton:
                 self.custom_menu()
@@ -322,7 +356,8 @@ class shelf_separator(QtWidgets.QFrame):
     def custom_menu(self):
         if not self.edit_mode:
             menu = gui_utils.QMenu()
-            delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
+            delete_action = menu.addAction(
+                QtGui.QIcon(ressources._tool_archive_), 'Delete')
             action = menu.exec(QtGui.QCursor().pos())
             if action == delete_action:
                 self.delete_signal.emit(self.shelf_script_row['id'])
@@ -333,11 +368,12 @@ class shelf_separator(QtWidgets.QFrame):
             self.setChecked(False)
             self.setStyleSheet('')
 
+
 class shelf_script_button(QtWidgets.QPushButton):
 
     exec_signal = pyqtSignal(int)
     subtask_signal = pyqtSignal(int)
-    help_signal = pyqtSignal(int) 
+    help_signal = pyqtSignal(int)
     hide_help_signal = pyqtSignal(int)
     edit_signal = pyqtSignal(int)
     delete_signal = pyqtSignal(int)
@@ -345,8 +381,8 @@ class shelf_script_button(QtWidgets.QPushButton):
     def __init__(self, shelf_script_row, parent=None):
         super(shelf_script_button, self).__init__(parent)
 
-        self.timer=QtCore.QTimer(self)
-        self.w=QtWidgets.QWidget()
+        self.timer = QtCore.QTimer(self)
+        self.w = QtWidgets.QWidget()
 
         self.edit_mode = False
 
@@ -368,7 +404,8 @@ class shelf_script_button(QtWidgets.QPushButton):
 
     def refresh(self):
         self.setIcon(QtGui.QIcon(self.shelf_script_row['icon']))
-        gui_utils.modify_application_tooltip(self, self.shelf_script_row['name'])
+        gui_utils.modify_application_tooltip(
+            self, self.shelf_script_row['name'])
 
     def connect_functions(self):
         self.timer.timeout.connect(self.show_details)
@@ -420,13 +457,15 @@ class shelf_script_button(QtWidgets.QPushButton):
                     self.setStyleSheet('border:1px solid #f79360;')
                     self.setChecked(True)
 
-
     def custom_menu(self):
         if not self.edit_mode:
             menu = gui_utils.QMenu()
-            subtask_action = menu.addAction(QtGui.QIcon(ressources._tasks_icon_), 'Execute as subtask')
-            edit_action = menu.addAction(QtGui.QIcon(ressources._tool_edit_), 'Edit')
-            delete_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Delete')
+            subtask_action = menu.addAction(QtGui.QIcon(
+                ressources._tasks_icon_), 'Execute as subtask')
+            edit_action = menu.addAction(
+                QtGui.QIcon(ressources._tool_edit_), 'Edit')
+            delete_action = menu.addAction(
+                QtGui.QIcon(ressources._tool_archive_), 'Delete')
             action = menu.exec(QtGui.QCursor().pos())
             if action == edit_action:
                 self.edit_signal.emit(self.shelf_script_row['id'])

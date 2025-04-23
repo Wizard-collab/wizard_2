@@ -27,9 +27,6 @@
 # SOFTWARE.
 
 # Python modules
-import threading
-import traceback
-import json
 import time
 import logging
 
@@ -40,15 +37,19 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 # Wizard modules
 from wizard.core import environment
-from wizard.core import socket_utils
+
 logger = logging.getLogger(__name__)
+
 
 class Singleton(type):
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
 
 class db_access_singleton(metaclass=Singleton):
     def __init__(self):
@@ -67,10 +68,10 @@ class db_access_singleton(metaclass=Singleton):
         self.project_conn = None
 
     def execute_signal(self, level,
-                            sql_cmd,
-                            as_dict=1,
-                            data=None,
-                            fetch=2):
+                       sql_cmd,
+                       as_dict=1,
+                       data=None,
+                       fetch=2):
         rows = None
         retry_count = 0
         while rows is None:
@@ -78,17 +79,20 @@ class db_access_singleton(metaclass=Singleton):
                 if level == 'repository':
                     if not self.repository_conn:
                         if self.repository:
-                            self.repository_conn = create_connection(self.repository)
+                            self.repository_conn = create_connection(
+                                self.repository)
                     conn = self.repository_conn
                 else:
                     if not self.project_conn:
                         if self.project_name:
-                            self.project_conn = create_connection(self.project_name)
+                            self.project_conn = create_connection(
+                                self.project_name)
                     conn = self.project_conn
                 if conn:
                     rows = None
                     if as_dict:
-                        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                        cursor = conn.cursor(
+                            cursor_factory=psycopg2.extras.RealDictCursor)
                     else:
                         cursor = conn.cursor()
                     if data:
@@ -116,22 +120,25 @@ class db_access_singleton(metaclass=Singleton):
                 self.repository_conn = None
                 self.project_conn = None
             if retry_count == 5:
-                logger.error("Database max retry reached ( 5 ). Can't access database")
+                logger.error(
+                    "Database max retry reached ( 5 ). Can't access database")
                 time.sleep(0.02)
                 return None
             retry_count += 1
             logger.error(f"Can't reach database, retrying ( {retry_count} )")
 
+
 def create_connection(database=None):
     try:
         conn = psycopg2.connect(environment.get_psql_dns(), database=database)
         if conn and database:
-            conn.autocommit=True
+            conn.autocommit = True
             logger.info(f"Wizard is connected to {database} database")
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
         logger.error(error)
         return
+
 
 def try_connection(DNS):
     try:
@@ -141,11 +148,13 @@ def try_connection(DNS):
         return 1
     except psycopg2.OperationalError as e:
         logger.error(e)
-        logger.error(f"Wizard could not connect to PostgreSQL server with this DNS : {DNS}")
+        logger.error(
+            f"Wizard could not connect to PostgreSQL server with this DNS : {DNS}")
         return
 
+
 def create_database(database):
-    conn=None
+    conn = None
     try:
         conn = create_connection()
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -160,6 +169,7 @@ def create_database(database):
     finally:
         if conn is not None:
             conn.close()
+
 
 def create_table(database, cmd):
     try:

@@ -28,18 +28,20 @@ class pie_chart(QtWidgets.QWidget):
         self.update()
 
     def paintEvent(self, event):
-        rectangle = QtCore.QRectF(0,0,self.width(), self.height())
+        rectangle = QtCore.QRectF(0, 0, self.width(), self.height())
         last_angle = 0
         painter = QtGui.QPainter(self)
         for pie in self.pies_list:
             painter.setPen(QtGui.QPen(QtGui.QColor(pie[1]), 0))
-            painter.setBrush(QtGui.QBrush(QtGui.QColor(pie[1]), QtCore.Qt.BrushStyle.SolidPattern))
+            painter.setBrush(QtGui.QBrush(QtGui.QColor(
+                pie[1]), QtCore.Qt.BrushStyle.SolidPattern))
             painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
             painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
             angle = 360*pie[0]/100
             span_angle = int(angle*16)
             painter.drawPie(rectangle, last_angle, span_angle)
             last_angle += span_angle
+
 
 class time_left_chart(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -53,20 +55,23 @@ class time_left_chart(QtWidgets.QFrame):
         self.update()
 
     def paintEvent(self, event):
-        rectangle = QtCore.QRectF(0,0,self.width(), self.height())
+        rectangle = QtCore.QRectF(0, 0, self.width(), self.height())
         time_range = self.deadline - self.project_creation_time
         current_time = time.time() - self.project_creation_time
         percent = current_time/time_range*100
         painter = QtGui.QPainter(self)
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 0))
-        painter.setBrush(QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.BrushStyle.SolidPattern))
+        painter.setBrush(QtGui.QBrush(QtGui.QColor('#d7d7d7'),
+                         QtCore.Qt.BrushStyle.SolidPattern))
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         # Draw gradient
-        gradient_line_rect = QtCore.QRectF(0, (self.height()/2)-3, self.width(), 6)
+        gradient_line_rect = QtCore.QRectF(
+            0, (self.height()/2)-3, self.width(), 6)
         path = QtGui.QPainterPath()
-        path.addRoundedRect(gradient_line_rect, 3, 3);
-        gradient = QtGui.QLinearGradient(gradient_line_rect.topLeft(), gradient_line_rect.topRight())
+        path.addRoundedRect(gradient_line_rect, 3, 3)
+        gradient = QtGui.QLinearGradient(
+            gradient_line_rect.topLeft(), gradient_line_rect.topRight())
         gradient.setColorAt(0, QtGui.QColor('transparent'))
         gradient.setColorAt(percent/100, QtGui.QColor('#d7d7d7'))
         gradient.setColorAt(1, QtGui.QColor('#d7d7d7'))
@@ -76,8 +81,9 @@ class time_left_chart(QtWidgets.QFrame):
         position_y = (self.height()/2) - 20
         position_rect = QtCore.QRectF(position_x, position_y, 4, 12)
         path = QtGui.QPainterPath()
-        path.addRoundedRect(position_rect, 2, 2);
-        painter.fillPath(path, QtGui.QBrush(QtGui.QColor('#d7d7d7'), QtCore.Qt.BrushStyle.SolidPattern))
+        path.addRoundedRect(position_rect, 2, 2)
+        painter.fillPath(path, QtGui.QBrush(QtGui.QColor(
+            '#d7d7d7'), QtCore.Qt.BrushStyle.SolidPattern))
         # Draw percent text
         text = f"{int(percent)} %"
         font = QtGui.QFont()
@@ -92,6 +98,7 @@ class time_left_chart(QtWidgets.QFrame):
             text_point_x = self.width() - width
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
         painter.drawText(int(text_point_x), int(text_point_y), text)
+
 
 class curves_chart(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -125,10 +132,10 @@ class curves_chart(QtWidgets.QFrame):
     def clear(self):
         self.lines = dict()
 
-    def set_points_thickness(self, thickness = 5):
+    def set_points_thickness(self, thickness=5):
         self.point_thickness = thickness
 
-    def set_margin(self, margin = 30):
+    def set_margin(self, margin=30):
         self.margin = margin
 
     def set_ordonea_headers(self, headers):
@@ -163,7 +170,7 @@ class curves_chart(QtWidgets.QFrame):
             if data_len >= 2:
                 old_point = None
                 pen = QtGui.QPen()
-                color =  QtGui.QColor(line_dic['color'])
+                color = QtGui.QColor(line_dic['color'])
                 pen.setBrush(color)
                 pen.setStyle(line_dic['style'])
                 pen.setCapStyle(QtCore.Qt.PenCapStyle.RoundCap)
@@ -176,8 +183,10 @@ class curves_chart(QtWidgets.QFrame):
                     if not old_point:
                         old_point = point
                     else:
-                        old_point_x = (w-self.margin*2)*old_point[0]/100+self.margin
-                        old_point_y = h-(((h-self.margin*2)*old_point[1])/100+self.margin)
+                        old_point_x = (w-self.margin*2) * \
+                            old_point[0]/100+self.margin
+                        old_point_y = h - \
+                            (((h-self.margin*2)*old_point[1])/100+self.margin)
                         path.moveTo(old_point_x, old_point_y)
                         path.lineTo(point_x, point_y)
                         if self.point_thickness > 0:
@@ -194,15 +203,21 @@ class curves_chart(QtWidgets.QFrame):
 
                 if self.prevision_visibility:
                     if (last_point[0]-first_point[0]) != 0:
-                        prevision_at_100_time = (last_point[1]-first_point[1])/(last_point[0]-first_point[0])*100
+                        prevision_at_100_time = (
+                            last_point[1]-first_point[1])/(last_point[0]-first_point[0])*100
                         prevision_time_at_100 = 100
                         if prevision_at_100_time > 100:
-                            prevision_time_at_100 = (100/prevision_at_100_time)*100 + first_point[0]
+                            prevision_time_at_100 = (
+                                100/prevision_at_100_time)*100 + first_point[0]
                             prevision_at_100_time = 100
-                        last_point_x = ((w-self.margin*2)*last_point[0])/100+self.margin
-                        last_point_y = h-(((h-self.margin*2)*last_point[1])/100+self.margin)
-                        point_x = ((w-self.margin*2)*prevision_time_at_100)/100+self.margin
-                        point_y = h-(((h-self.margin*2)*prevision_at_100_time)/100+self.margin)
+                        last_point_x = ((w-self.margin*2) *
+                                        last_point[0])/100+self.margin
+                        last_point_y = h - \
+                            (((h-self.margin*2)*last_point[1])/100+self.margin)
+                        point_x = ((w-self.margin*2) *
+                                   prevision_time_at_100)/100+self.margin
+                        point_y = h - \
+                            (((h-self.margin*2)*prevision_at_100_time)/100+self.margin)
                         color.setAlpha(100)
                         pen.setStyle(QtCore.Qt.PenStyle.DotLine)
                         pen.setBrush(color)
@@ -221,7 +236,7 @@ class curves_chart(QtWidgets.QFrame):
             if self.prevision_visibility:
                 if 'prevision_path' in line_dic.keys():
                     if line_dic['prevision_path'].intersects(mouseRect):
-                        self.draw_tip(mouse, line_dic, painter, projection = 1)
+                        self.draw_tip(mouse, line_dic, painter, projection=1)
 
     def draw_tip(self, point, line_dic, painter, projection=0):
         if point.x() <= 0+self.margin:
@@ -282,8 +297,10 @@ class curves_chart(QtWidgets.QFrame):
         painter.setPen(QtGui.QPen(QtGui.QColor('#d7d7d7'), 1))
         painter.drawText(int(text_point_x), int(text_point_y), text)
 
-        painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1, QtCore.Qt.PenStyle.DashLine))
-        painter.drawLine(int(point.x()), int(point.y()), int(point.x()), int(self.height()-self.margin))
+        painter.setPen(QtGui.QPen(QtGui.QColor('gray'),
+                       1, QtCore.Qt.PenStyle.DashLine))
+        painter.drawLine(int(point.x()), int(point.y()), int(
+            point.x()), int(self.height()-self.margin))
 
         pen = QtGui.QPen()
         pen.setCapStyle(QtCore.Qt.PenCapStyle.RoundCap)
@@ -295,7 +312,8 @@ class curves_chart(QtWidgets.QFrame):
     def draw_grid(self, painter, w, h):
         painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 2))
         painter.drawLine(self.margin, self.margin, self.margin, h-self.margin)
-        painter.drawLine(self.margin, h-self.margin, w-self.margin, h-self.margin)
+        painter.drawLine(self.margin, h-self.margin,
+                         w-self.margin, h-self.margin)
 
     def draw_ordonea_headers(self, painter, w, h):
         font = QtGui.QFont()
@@ -303,12 +321,14 @@ class curves_chart(QtWidgets.QFrame):
         header_index = 0
         for header in self.ordonea_headers:
             painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1))
-            painter.drawText(int(self.margin-font_metric.horizontalAdvance(header)), int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin), header)
-            painter.setPen(QtGui.QPen(QtGui.QColor(255,255,255,10), 1))
+            painter.drawText(int(self.margin-font_metric.horizontalAdvance(header)), int(
+                h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin), header)
+            painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 10), 1))
             painter.drawLine(int(self.margin),
-                            int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin),
-                            int(w-self.margin),
-                            int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin))
+                             int(h-(h-self.margin*2)*(header_index /
+                                 (len(self.ordonea_headers)-1))-self.margin),
+                             int(w-self.margin),
+                             int(h-(h-self.margin*2)*(header_index/(len(self.ordonea_headers)-1))-self.margin))
             header_index += 1
 
     def draw_abscissa_headers(self, painter, w, h):
@@ -318,13 +338,12 @@ class curves_chart(QtWidgets.QFrame):
         for header in self.abscissa_headers:
             painter.setPen(QtGui.QPen(QtGui.QColor('gray'), 1))
             painter.drawText(int((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin-font_metric.horizontalAdvance(header)/2),
-                                int(h-self.margin+font_metric.height()),
-                                header)
-            painter.setPen(QtGui.QPen(QtGui.QColor(255,255,255,10), 1))
+                             int(h-self.margin+font_metric.height()),
+                             header)
+            painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 10), 1))
             painter.drawLine(int((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin),
-                                int(self.margin),
-                                int((w-self.margin*2)*(header_index/(len(self.abscissa_headers)-1))+self.margin),
-                                int(h-self.margin))
+                             int(self.margin),
+                             int((w-self.margin*2)*(header_index /
+                                 (len(self.abscissa_headers)-1))+self.margin),
+                             int(h-self.margin))
             header_index += 1
-
-

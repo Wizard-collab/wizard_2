@@ -8,16 +8,12 @@ import logging
 from PyQt6 import QtWidgets, QtGui, QtCore
 from PyQt6.QtCore import pyqtSignal
 
-# Wizard gui modules
-from wizard.gui import gui_utils
-
 # Wizard core modules
-from wizard.core import path_utils
 from wizard.core import project
 from wizard.core import tools
-from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
+
 
 class video_history_widget(QtWidgets.QFrame):
 
@@ -48,7 +44,8 @@ class video_history_widget(QtWidgets.QFrame):
         for video_row in video_rows:
             project_videos_ids.append(video_row['id'])
             if video_row['id'] not in self.video_ids.keys():
-                item = video_item(video_row, self.list_view.invisibleRootItem())
+                item = video_item(
+                    video_row, self.list_view.invisibleRootItem())
                 self.video_ids[video_row['id']] = item
                 self.video_ids[video_row['id']].refresh()
             else:
@@ -88,12 +85,12 @@ class video_history_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('dark_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(6,6,6,6)
+        self.header_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.addLayout(self.header_layout)
 
         self.header_label = QtWidgets.QLabel("Video history")
@@ -102,22 +99,26 @@ class video_history_widget(QtWidgets.QFrame):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setHeaderHidden(True)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setStyleSheet("#tree_as_list_widget::item{padding:0px;}")
+        self.list_view.setStyleSheet(
+            "#tree_as_list_widget::item{padding:0px;}")
         self.list_view.setColumnCount(1)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.main_layout.addWidget(self.list_view)
 
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(6,6,6,6)
+        self.infos_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.addLayout(self.infos_layout)
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
         self.infos_layout.addWidget(self.refresh_label)
+
 
 class video_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, video_row, parent=None):
@@ -131,13 +132,16 @@ class video_item(QtWidgets.QTreeWidgetItem):
         self.refresh()
 
     def refresh(self):
-        thumbnail_pixmap = QtGui.QIcon(self.video_row['thumbnail_path']).pixmap(100)
+        thumbnail_pixmap = QtGui.QIcon(
+            self.video_row['thumbnail_path']).pixmap(100)
         self.widget.thumbnail_label.setPixmap(thumbnail_pixmap)
         self.widget.video_version_label.setText(self.video_row['name'])
         self.widget.user_label.setText(self.video_row['creation_user'])
-        self.widget.time_label.setText(tools.time_ago_from_timestamp(self.video_row['creation_time']))
+        self.widget.time_label.setText(
+            tools.time_ago_from_timestamp(self.video_row['creation_time']))
         self.widget.comment_label.setText(self.video_row['comment'])
         self.setSizeHint(0, self.widget.sizeHint())
+
 
 class video_item_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -146,7 +150,7 @@ class video_item_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(3,3,3,3)
+        self.main_layout.setContentsMargins(3, 3, 3, 3)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -154,11 +158,11 @@ class video_item_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.thumbnail_label)
 
         self.infos_layout = QtWidgets.QVBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(self.infos_layout)
 
         self.header_infos_layout = QtWidgets.QHBoxLayout()
-        self.header_infos_layout.setContentsMargins(0,0,0,0)
+        self.header_infos_layout.setContentsMargins(0, 0, 0, 0)
         self.infos_layout.addLayout(self.header_infos_layout)
 
         self.video_version_label = QtWidgets.QLabel()
@@ -173,10 +177,13 @@ class video_item_widget(QtWidgets.QWidget):
         self.time_label.setObjectName("gray_label")
         self.header_infos_layout.addWidget(self.time_label)
 
-        self.header_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_infos_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.comment_label = QtWidgets.QLabel()
-        self.comment_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.comment_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.infos_layout.addWidget(self.comment_label)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))

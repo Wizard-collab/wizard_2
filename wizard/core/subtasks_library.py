@@ -39,192 +39,218 @@ from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
+
 def batch_export(version_id, settings_dic=None, print_stdout=False):
-	asset_string = assets.instance_to_string(('work_version', version_id))
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import launch_batch\n"
-	command += "from wizard.core import tools\n"
-	command += "from wizard.core import team_client\n"
-	command += "from wizard.core import environment\n"
-	command += f"print('wizard_task_name:Exporting {asset_string}')\n"
-	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
-	command += "tools.wait_for_child_processes()\n"
-	command += "team_client.refresh_team(environment.get_team_dns())\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Export started as subtask, open the subtask manager to get more informations')
+    asset_string = assets.instance_to_string(('work_version', version_id))
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import launch_batch\n"
+    command += "from wizard.core import tools\n"
+    command += "from wizard.core import team_client\n"
+    command += "from wizard.core import environment\n"
+    command += f"print('wizard_task_name:Exporting {asset_string}')\n"
+    command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+    command += "tools.wait_for_child_processes()\n"
+    command += "team_client.refresh_team(environment.get_team_dns())\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Export started as subtask, open the subtask manager to get more informations')
+
 
 def batch_video(version_id, settings_dic=None, print_stdout=False):
-	asset_string = assets.instance_to_string(('work_version', version_id))
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import launch_batch\n"
-	command += "from wizard.core import team_client\n"
-	command += "from wizard.core import environment\n"
-	command += f"print('wizard_task_name:Creating video for {asset_string}')\n"
-	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
-	command += "team_client.refresh_team(environment.get_team_dns())\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Video creation started as subtask, open the subtask manager to get more informations')
+    asset_string = assets.instance_to_string(('work_version', version_id))
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import launch_batch\n"
+    command += "from wizard.core import team_client\n"
+    command += "from wizard.core import environment\n"
+    command += f"print('wizard_task_name:Creating video for {asset_string}')\n"
+    command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+    command += "team_client.refresh_team(environment.get_team_dns())\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Video creation started as subtask, open the subtask manager to get more informations')
+
 
 def deadline_batch_export(version_id, settings_dic=None, print_stdout=False):
-	asset_string = assets.instance_to_string(('work_version', version_id))
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import launch_batch\n"
-	command += "from wizard.core import team_client\n"
-	command += "from wizard.core import environment\n"
-	command += f"print('wizard_task_name:Exporting {asset_string}')\n"
-	command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
-	command += "team_client.refresh_team(environment.get_team_dns())\n"
-	command += "print('wizard_task_status:done')\n"
-	deadline.submit_job(pycmd=command, name=f'{environment.get_project_name()} - {asset_string} export')
+    asset_string = assets.instance_to_string(('work_version', version_id))
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import launch_batch\n"
+    command += "from wizard.core import team_client\n"
+    command += "from wizard.core import environment\n"
+    command += f"print('wizard_task_name:Exporting {asset_string}')\n"
+    command += f"launch_batch.batch_export({version_id}, {settings_dic})\n"
+    command += "team_client.refresh_team(environment.get_team_dns())\n"
+    command += "print('wizard_task_status:done')\n"
+    deadline.submit_job(
+        pycmd=command, name=f'{environment.get_project_name()} - {asset_string} export')
+
 
 def archive_versions(version_ids, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Version archiving')\n"
-	command += f"percent_step=100.0/len({version_ids})\n"
-	command += "percent=0.0\n"
-	command += "print(f'wizard_task_percent:{percent}')\n"
-	command += f"for version_id in {version_ids}:\n"
-	command += "	assets.archive_version(version_id)\n"
-	command += "	percent+=percent_step\n"
-	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Version archiving')\n"
+    command += f"percent_step=100.0/len({version_ids})\n"
+    command += "percent=0.0\n"
+    command += "print(f'wizard_task_percent:{percent}')\n"
+    command += f"for version_id in {version_ids}:\n"
+    command += "	assets.archive_version(version_id)\n"
+    command += "	percent+=percent_step\n"
+    command += "	print(f'wizard_task_percent:{percent}')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_videos(videos_ids, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Video archiving')\n"
-	command += f"percent_step=100.0/len({videos_ids})\n"
-	command += "percent=0.0\n"
-	command += "print(f'wizard_task_percent:{percent}')\n"
-	command += f"for video_id in {videos_ids}:\n"
-	command += "	assets.archive_video(video_id)\n"
-	command += "	percent+=percent_step\n"
-	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Video archiving')\n"
+    command += f"percent_step=100.0/len({videos_ids})\n"
+    command += "percent=0.0\n"
+    command += "print(f'wizard_task_percent:{percent}')\n"
+    command += f"for video_id in {videos_ids}:\n"
+    command += "	assets.archive_video(video_id)\n"
+    command += "	percent+=percent_step\n"
+    command += "	print(f'wizard_task_percent:{percent}')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_export_versions(export_version_ids, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Export version archiving')\n"
-	command += f"percent_step=100.0/len({export_version_ids})\n"
-	command += "percent=0.0\n"
-	command += "print(f'wizard_task_percent:{percent}')\n"
-	command += f"for export_version_id in {export_version_ids}:\n"
-	command += "	assets.archive_export_version(export_version_id)\n"
-	command += "	percent+=percent_step\n"
-	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Export version archiving')\n"
+    command += f"percent_step=100.0/len({export_version_ids})\n"
+    command += "percent=0.0\n"
+    command += "print(f'wizard_task_percent:{percent}')\n"
+    command += f"for export_version_id in {export_version_ids}:\n"
+    command += "	assets.archive_export_version(export_version_id)\n"
+    command += "	percent+=percent_step\n"
+    command += "	print(f'wizard_task_percent:{percent}')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_exports(export_ids, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Export archiving')\n"
-	command += f"percent_step=100.0/len({export_ids})\n"
-	command += "percent=0.0\n"
-	command += "print(f'wizard_task_percent:{percent}')\n"
-	command += f"for export_id in {export_ids}:\n"
-	command += "	assets.archive_export(export_id)\n"
-	command += "	percent+=percent_step\n"
-	command += "	print(f'wizard_task_percent:{percent}')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Export archiving')\n"
+    command += f"percent_step=100.0/len({export_ids})\n"
+    command += "percent=0.0\n"
+    command += "print(f'wizard_task_percent:{percent}')\n"
+    command += f"for export_id in {export_ids}:\n"
+    command += "	assets.archive_export(export_id)\n"
+    command += "	percent+=percent_step\n"
+    command += "	print(f'wizard_task_percent:{percent}')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_asset(asset_id, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Asset archiving')\n"
-	command += "print('wizard_task_percent:0')\n"
-	command += f"assets.archive_asset({asset_id})\n"
-	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Asset archiving')\n"
+    command += "print('wizard_task_percent:0')\n"
+    command += f"assets.archive_asset({asset_id})\n"
+    command += "print('wizard_task_percent:100')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_category(category_id, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Category archiving')\n"
-	command += "print('wizard_task_percent:0')\n"
-	command += f"assets.archive_category({category_id})\n"
-	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Category archiving')\n"
+    command += "print('wizard_task_percent:0')\n"
+    command += f"assets.archive_category({category_id})\n"
+    command += "print('wizard_task_percent:100')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_stage(stage_id, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Stage archiving')\n"
-	command += "print('wizard_task_percent:0')\n"
-	command += f"assets.archive_stage({stage_id})\n"
-	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Stage archiving')\n"
+    command += "print('wizard_task_percent:0')\n"
+    command += f"assets.archive_stage({stage_id})\n"
+    command += "print('wizard_task_percent:100')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def archive_variant(variant_id, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import assets\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "print('wizard_task_name:Variant archiving')\n"
-	command += "print('wizard_task_percent:0')\n"
-	command += f"assets.archive_variant({variant_id})\n"
-	command += "print('wizard_task_percent:100')\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Archiving started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import assets\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "print('wizard_task_name:Variant archiving')\n"
+    command += "print('wizard_task_percent:0')\n"
+    command += f"assets.archive_variant({variant_id})\n"
+    command += "print('wizard_task_percent:100')\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Archiving started as subtask, open the subtask manager to get more informations')
+
 
 def threaded_copy(files_list, destination, max_threads=16, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.core import threaded_copy\n"
-	command += f"threaded_copy.threaded_copy({files_list}, '{destination}', {max_threads}).copy()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Threaded copy started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.core import threaded_copy\n"
+    command += f"threaded_copy.threaded_copy({files_list}, '{destination}', {max_threads}).copy()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Threaded copy started as subtask, open the subtask manager to get more informations')
+
 
 def create_video_from_render(export_version_id, ics, ocs, frame_rate, comment='', overlay=True, print_stdout=False):
-	command =  "# coding: utf-8\n"
-	command += "from wizard.gui import gui_server\n"
-	command += "from wizard.core import video\n"
-	command += f"video.video_from_render({export_version_id}, '{ics}', '{ocs}', {frame_rate}, comment='''{comment}''', overlay={overlay})\n"
-	command += "gui_server.refresh_team_ui()\n"
-	command += "print('wizard_task_status:done')\n"
-	task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
-	task.start()
-	logger.info('Render to video started as subtask, open the subtask manager to get more informations')
+    command = "# coding: utf-8\n"
+    command += "from wizard.gui import gui_server\n"
+    command += "from wizard.core import video\n"
+    command += f"video.video_from_render({export_version_id}, '{ics}', '{ocs}', {frame_rate}, comment='''{comment}''', overlay={overlay})\n"
+    command += "gui_server.refresh_team_ui()\n"
+    command += "print('wizard_task_status:done')\n"
+    task = subtask.subtask(pycmd=command, print_stdout=print_stdout)
+    task.start()
+    logger.info(
+        'Render to video started as subtask, open the subtask manager to get more informations')

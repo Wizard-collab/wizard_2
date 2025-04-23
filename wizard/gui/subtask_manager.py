@@ -30,11 +30,12 @@ logger = logging.getLogger(__name__)
 
 _DNS_ = ('localhost', 10231)
 
+
 class subtask_manager(QtWidgets.QWidget):
 
     global_status_signal = pyqtSignal(object)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(subtask_manager, self).__init__(parent)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
@@ -44,7 +45,7 @@ class subtask_manager(QtWidgets.QWidget):
 
         self.build_ui()
 
-        self.timer=QtCore.QTimer(self)
+        self.timer = QtCore.QTimer(self)
         self.timer.start(1000)
 
         self.tasks_server = tasks_server()
@@ -68,8 +69,10 @@ class subtask_manager(QtWidgets.QWidget):
         self.tasks_server.new_process.connect(self.add_task)
         self.timer.timeout.connect(self.update_time)
         self.list_view.itemSelectionChanged.connect(self.refresh_stdout_viewer)
-        self.stdout_viewer.verticalScrollBar().rangeChanged.connect(lambda: self.stdout_viewer.verticalScrollBar().setValue(self.stdout_viewer.verticalScrollBar().maximum()))
-        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.stdout_viewer.verticalScrollBar().rangeChanged.connect(
+            lambda: self.stdout_viewer.verticalScrollBar().setValue(self.stdout_viewer.verticalScrollBar().maximum()))
+        self.list_view.customContextMenuRequested.connect(
+            self.context_menu_requested)
 
     def build_ui(self):
         self.setMinimumWidth(800)
@@ -77,7 +80,7 @@ class subtask_manager(QtWidgets.QWidget):
 
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(1)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         self.info_widget = gui_utils.info_widget(transparent=1)
@@ -91,13 +94,16 @@ class subtask_manager(QtWidgets.QWidget):
         self.list_view.setColumnCount(6)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setHeaderLabels(['Task ID', 'Created', 'Process status', 'Elapsed time', 'Status', 'Current task', 'Progress'])
+        self.list_view.setHeaderLabels(
+            ['Task ID', 'Created', 'Process status', 'Elapsed time', 'Status', 'Current task', 'Progress'])
         self.list_view.header().resizeSection(0, 350)
         self.list_view.header().resizeSection(1, 200)
         self.list_view.header().resizeSection(5, 550)
         self.list_view.header().resizeSection(6, 400)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view_scrollBar = self.list_view.verticalScrollBar()
         self.main_layout.addWidget(self.list_view)
 
@@ -106,28 +112,35 @@ class subtask_manager(QtWidgets.QWidget):
         self.stdout_viewer.setReadOnly(True)
         self.stdout_viewer.setVisible(0)
         self.main_layout.addWidget(self.stdout_viewer)
-    
+
     def add_task(self, data_tuple):
         conn = data_tuple[0]
         process_id = data_tuple[1]
         if process_id not in self.tasks_ids.keys():
             self.tasks_ids[process_id] = dict()
-            self.tasks_ids[process_id]['thread'] = task_thread(process_id, conn)
-            self.tasks_ids[process_id]['thread'].signal.connect(self.analyse_task_signal)
-            self.tasks_ids[process_id]['thread'].connection_dead.connect(self.task_connection_dead)
-            self.tasks_ids[process_id]['item'] = subtask_tree_item(process_id, self.list_view.invisibleRootItem())
+            self.tasks_ids[process_id]['thread'] = task_thread(
+                process_id, conn)
+            self.tasks_ids[process_id]['thread'].signal.connect(
+                self.analyse_task_signal)
+            self.tasks_ids[process_id]['thread'].connection_dead.connect(
+                self.task_connection_dead)
+            self.tasks_ids[process_id]['item'] = subtask_tree_item(
+                process_id, self.list_view.invisibleRootItem())
             self.tasks_ids[process_id]['thread'].start()
-            gui_server.custom_popup('Subtask started !', 'Open the subtask manager to see details', ressources._tasks_icon_)
+            gui_server.custom_popup(
+                'Subtask started !', 'Open the subtask manager to see details', ressources._tasks_icon_)
             self.refresh()
             self.check_global_status()
 
     def load_old_tasks(self):
-        subtasks_datas_file = path_utils.join(user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
+        subtasks_datas_file = path_utils.join(
+            user_vars._subtasks_logs_, user_vars._subtasks_datas_yaml_)
         if not path_utils.isfile(subtasks_datas_file):
             return
         with open(subtasks_datas_file, 'r') as f:
-            datas_dic = yaml.load(f, Loader = yaml.Loader)
-            datas_dic = dict(sorted(datas_dic.items(), key=lambda item: item[1]['creation_time']))
+            datas_dic = yaml.load(f, Loader=yaml.Loader)
+            datas_dic = dict(
+                sorted(datas_dic.items(), key=lambda item: item[1]['creation_time']))
         for process_id in datas_dic.keys():
             if datas_dic[process_id]['project'] != environment.get_project_name():
                 continue
@@ -138,16 +151,23 @@ class subtask_manager(QtWidgets.QWidget):
             else:
                 log = ''
             self.tasks_ids[process_id] = dict()
-            self.tasks_ids[process_id]['thread'] = task_thread(process_id, None)
+            self.tasks_ids[process_id]['thread'] = task_thread(
+                process_id, None)
             self.tasks_ids[process_id]['thread'].analyse_stdout(log)
             self.tasks_ids[process_id]['thread'].running = False
-            self.tasks_ids[process_id]['item'] = subtask_tree_item(process_id, self.list_view.invisibleRootItem())
-            self.tasks_ids[process_id]['item'].update_progress(datas_dic[process_id]['percent'])
-            self.tasks_ids[process_id]['item'].update_current_task(datas_dic[process_id]['current_task'])
-            self.tasks_ids[process_id]['item'].update_status(datas_dic[process_id]['status'])
+            self.tasks_ids[process_id]['item'] = subtask_tree_item(
+                process_id, self.list_view.invisibleRootItem())
+            self.tasks_ids[process_id]['item'].update_progress(
+                datas_dic[process_id]['percent'])
+            self.tasks_ids[process_id]['item'].update_current_task(
+                datas_dic[process_id]['current_task'])
+            self.tasks_ids[process_id]['item'].update_status(
+                datas_dic[process_id]['status'])
             self.tasks_ids[process_id]['item'].update_process_status('closed')
-            self.tasks_ids[process_id]['item'].set_time(datas_dic[process_id]['time'])
-            self.tasks_ids[process_id]['item'].set_creation_time(datas_dic[process_id]['creation_time'])
+            self.tasks_ids[process_id]['item'].set_time(
+                datas_dic[process_id]['time'])
+            self.tasks_ids[process_id]['item'].set_creation_time(
+                datas_dic[process_id]['creation_time'])
         self.refresh()
         self.check_global_status()
 
@@ -165,7 +185,8 @@ class subtask_manager(QtWidgets.QWidget):
         if process_id not in self.tasks_ids.keys():
             return
         if self.tasks_ids[process_id]['thread'].running:
-            logger.warning(f"Can't remove openned task ({process_id}), kill it first")
+            logger.warning(
+                f"Can't remove openned task ({process_id}), kill it first")
             return
         task_item = self.tasks_ids[process_id]['item']
         self.list_view.invisibleRootItem().removeChild(task_item)
@@ -202,7 +223,8 @@ class subtask_manager(QtWidgets.QWidget):
             return
         with open(log_file, 'r') as f:
             data = f.read()
-        self.submit_log_widget = submit_log_widget.submit_log_widget(data, 'subtask')
+        self.submit_log_widget = submit_log_widget.submit_log_widget(
+            data, 'subtask')
         self.submit_log_widget.show()
 
     def refresh(self):
@@ -289,11 +311,14 @@ class subtask_manager(QtWidgets.QWidget):
         kill_action = None
         remove_action = None
         submit_log_action = None
-        if len(selection)>=1:
-            kill_action = menu.addAction(QtGui.QIcon(ressources._kill_task_icon_), 'Kill selected task(s)')
-            remove_action = menu.addAction(QtGui.QIcon(ressources._archive_icon_), 'Remove selected task(s)')
+        if len(selection) >= 1:
+            kill_action = menu.addAction(QtGui.QIcon(
+                ressources._kill_task_icon_), 'Kill selected task(s)')
+            remove_action = menu.addAction(QtGui.QIcon(
+                ressources._archive_icon_), 'Remove selected task(s)')
         if len(selection) == 1:
-            submit_log_action = menu.addAction(QtGui.QIcon(ressources._send_icon_), 'Submit to support')
+            submit_log_action = menu.addAction(QtGui.QIcon(
+                ressources._send_icon_), 'Submit to support')
         pos = QtGui.QCursor().pos()
         action = menu.exec(pos)
         if action is None:
@@ -304,6 +329,7 @@ class subtask_manager(QtWidgets.QWidget):
             self.remove_tasks()
         elif action == submit_log_action:
             self.send_to_support()
+
 
 class subtask_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, process_id, parent=None):
@@ -317,7 +343,7 @@ class subtask_tree_item(QtWidgets.QTreeWidgetItem):
         self.progress_widget = QtWidgets.QWidget()
         self.progress_widget.setObjectName('transparent_widget')
         self.progress_layout = QtWidgets.QVBoxLayout()
-        self.progress_layout.setContentsMargins(6,6,6,6)
+        self.progress_layout.setContentsMargins(6, 6, 6, 6)
         self.progress_widget.setLayout(self.progress_layout)
         self.progress = QtWidgets.QProgressBar()
         self.progress.setObjectName('task_progressBar')
@@ -325,7 +351,7 @@ class subtask_tree_item(QtWidgets.QTreeWidgetItem):
         self.progress_layout.addWidget(self.progress)
         self.treeWidget().setItemWidget(self, 6, self.progress_widget)
 
-        bold_font=QtGui.QFont()
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(4, bold_font)
         self.setText(0, self.process_id)
@@ -344,7 +370,8 @@ class subtask_tree_item(QtWidgets.QTreeWidgetItem):
     def update_process_status(self, process_status):
         self.setText(2, process_status)
         if process_status == 'closed':
-            self.progress.setStyleSheet('#task_progressBar{color:transparent;}\n#task_progressBar::chunk{background-color:gray;}')
+            self.progress.setStyleSheet(
+                '#task_progressBar{color:transparent;}\n#task_progressBar::chunk{background-color:gray;}')
             self.setForeground(1, QtGui.QBrush(QtGui.QColor('gray')))
             self.setForeground(3, QtGui.QBrush(QtGui.QColor('gray')))
             self.setForeground(5, QtGui.QBrush(QtGui.QColor('gray')))
@@ -375,6 +402,7 @@ class subtask_tree_item(QtWidgets.QTreeWidgetItem):
     def update_progress(self, progress):
         self.progress.setValue(int(progress))
 
+
 class tasks_server(QThread):
 
     new_process = pyqtSignal(object)
@@ -383,7 +411,8 @@ class tasks_server(QThread):
         super(tasks_server, self).__init__()
         self.port = socket_utils.get_port('localhost')
         environment.set_subtasks_server_port(self.port)
-        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
+        self.server, self.server_address = socket_utils.get_server(
+            ('localhost', self.port))
         self.running = True
 
     def run(self):
@@ -404,6 +433,7 @@ class tasks_server(QThread):
     def stop(self):
         self.server.close()
         self.running = False
+
 
 class task_thread(QThread):
 
@@ -485,5 +515,3 @@ class task_thread(QThread):
             self.stdout += line+'<br>'
             new_lines += line+'<br>'
         self.signal.emit([self.process_id, 'stdout', new_lines])
-
-        

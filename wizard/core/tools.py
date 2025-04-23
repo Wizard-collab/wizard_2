@@ -28,7 +28,8 @@
 
 # Python modules
 from zipfile import ZipFile
-import hashlib, binascii
+import hashlib
+import binascii
 import os
 import re
 import traceback
@@ -44,27 +45,34 @@ from wizard.core import path_utils
 
 logger = logging.getLogger(__name__)
 
-def natural_sort(l): 
-    convert = lambda text: int(text) if text.isdigit() else text.lower() 
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
+
+def natural_sort(l):
+    def convert(text): return int(text) if text.isdigit() else text.lower()
+    def alphanum_key(key): return [convert(c)
+                                   for c in re.split('([0-9]+)', key)]
     return sorted(l, key=alphanum_key)
+
 
 def flushed_input(placeholder):
     user_input = input(placeholder)
     return user_input
+
 
 def convert_time(time_float):
     day = time.strftime('%Y-%m-%d', time.localtime(time_float))
     hour = time.strftime('%H:%M', time.localtime(time_float))
     return day, hour
 
+
 def get_month(time_float):
     return datetime.datetime.fromtimestamp(time_float).strftime('%b')
+
 
 def get_day(time_float):
     return time.strftime('%d', time.localtime(time_float))
 
-def get_time_float_from_string_date(date_string, no_warning = False):
+
+def get_time_float_from_string_date(date_string, no_warning=False):
     try:
         time_tokens = date_string.split('/')
         day = int(time_tokens[0])
@@ -76,8 +84,10 @@ def get_time_float_from_string_date(date_string, no_warning = False):
     except:
         if no_warning:
             return
-        logger.warning(f"{date_string} not a valid date format\nPlease enter a date like following 'day/month/year'")
+        logger.warning(
+            f"{date_string} not a valid date format\nPlease enter a date like following 'day/month/year'")
         return
+
 
 def time_ago_from_timestamp(timestamp):
     now = datetime.datetime.utcfromtimestamp(time.time())
@@ -104,11 +114,12 @@ def time_ago_from_timestamp(timestamp):
     else:
         return f"{seconds} second{'s' if seconds > 1 else ''} ago"
 
+
 def time_left_from_timestamp(timestamp):
     now = datetime.datetime.utcfromtimestamp(time.time())
     timestamp_datetime = datetime.datetime.utcfromtimestamp(timestamp)
 
-    time_diff = timestamp_datetime - now 
+    time_diff = timestamp_datetime - now
     days = time_diff.days
     seconds = time_diff.seconds
 
@@ -129,6 +140,7 @@ def time_left_from_timestamp(timestamp):
     else:
         return f"{seconds} second{'s' if seconds > 1 else ''} left"
 
+
 def convert_seconds(time_float):
     hours = int(time_float/3600)
     time_float = time_float - (hours*3600)
@@ -136,6 +148,7 @@ def convert_seconds(time_float):
     time_float = time_float - (minutes*60)
     seconds = int(time_float)
     return hours, minutes, seconds
+
 
 def convert_seconds_with_miliseconds(time_float):
     hours = int(time_float/3600)
@@ -147,6 +160,7 @@ def convert_seconds_with_miliseconds(time_float):
     miliseconds = int(time_float*100)
     return hours, minutes, seconds, miliseconds
 
+
 def convert_seconds_with_days(time_float):
     days = int(time_float/(3600*24))
     time_float = time_float - (days*3600*24)
@@ -157,6 +171,7 @@ def convert_seconds_with_days(time_float):
     seconds = int(time_float)
     return days, hours, minutes, seconds
 
+
 def convert_seconds_to_string_time(time_float):
     hours, minutes, seconds = convert_seconds(time_float)
     if int(hours) != 0:
@@ -166,6 +181,7 @@ def convert_seconds_to_string_time(time_float):
     if int(minutes) == 0 and int(hours) == 0:
         string_time = f"{seconds}s"
     return string_time
+
 
 def convert_seconds_to_string_time_with_days(time_float):
     days, hours, minutes, seconds = convert_seconds_with_days(time_float)
@@ -182,12 +198,14 @@ def convert_seconds_to_string_time_with_days(time_float):
         string_time = f"{seconds}s"
         return string_time
 
+
 def encrypt_string(string):
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
     pwdhash = hashlib.pbkdf2_hmac('sha512', string.encode('utf-8'),
                                   salt, 100000)
     pwdhash = binascii.hexlify(pwdhash)
     return (salt + pwdhash).decode('ascii')
+
 
 def decrypt_string(stored_string, provided_string):
     salt = stored_string[:64]
@@ -198,6 +216,7 @@ def decrypt_string(stored_string, provided_string):
                                   100000)
     pwdhash = binascii.hexlify(pwdhash).decode('ascii')
     return pwdhash == stored_string
+
 
 def is_safe(input_string):
     if input_string == '':
@@ -217,10 +236,12 @@ def is_safe(input_string):
         pass
     return success
 
+
 def is_dbname_safe(input_string):
     charRe = re.compile(r'[^a-z0-9_]')
     string = charRe.search(input_string)
     return not bool(string)
+
 
 def zip_files(files_list, destination):
     try:
@@ -233,22 +254,24 @@ def zip_files(files_list, destination):
         logger.error(str(traceback.format_exc()))
         return
 
+
 def make_archive(source):
     try:
         format = 'zip'
         root_dir = path_utils.dirname(source)
         base_dir = os.path.basename(source.strip(os.sep))
         base_name = get_filename_without_override(path_utils.join(root_dir,
-                                                    f"{base_dir}_archive.zip"))
+                                                                  f"{base_dir}_archive.zip"))
         shutil.make_archive(os.path.splitext(base_name)[0],
-                                                format,
-                                                root_dir,
-                                                base_dir)
+                            format,
+                            root_dir,
+                            base_dir)
         logger.info(f"Folder {base_dir} archived in {base_name}")
         return base_name
     except:
         logger.error(str(traceback.format_exc()))
         return
+
 
 def get_filename_without_override(file):
     folder = path_utils.dirname(file)
@@ -259,14 +282,16 @@ def get_filename_without_override(file):
     while path_utils.isfile(file):
         new_filename = "{}_{}{}".format(filename, index, extension)
         file = path_utils.join(folder, new_filename)
-        index+=1
+        index += 1
     return file
+
 
 def get_files_list_size(files_list):
     total_size = 0
     for file in files_list:
         total_size += os.path.getsize(file)
     return total_size
+
 
 def copy_files(files_list, destination):
     sanity = 1
@@ -276,15 +301,15 @@ def copy_files(files_list, destination):
             logger.warning(f"{file} doesn't exists")
     if not path_utils.isdir(destination):
         logger.warning(f"{destination} doesn't exists")
-        sanity=0
+        sanity = 0
     if not sanity:
         logger.warning("Can't execute copy")
         return
     new_files = []
     for file in files_list:
         file_name = os.path.split(file)[-1]
-        destination_file = get_filename_without_override(path_utils.join(destination, 
-                                                                        file_name))
+        destination_file = get_filename_without_override(path_utils.join(destination,
+                                                                         file_name))
         path_utils.copyfile(file, destination_file)
         new_files.append(destination_file)
     valid_files = []
@@ -296,13 +321,16 @@ def copy_files(files_list, destination):
             logger.info(f"Can't copy {destination_file}")
     return valid_files
 
+
 def temp_dir():
     tempdir = tempfile.mkdtemp()
     return path_utils.clean_path(tempdir)
 
+
 def temp_dir_in_dir(directory):
     tempdir = tempfile.mkdtemp(dir=directory)
     return path_utils.clean_path(tempdir)
+
 
 def create_folder(dir_name):
     try:
@@ -319,6 +347,7 @@ def create_folder(dir_name):
         logger.error(f"{dir_name} access denied")
         return
 
+
 def create_folder_if_not_exist(dir_name):
     try:
         path_utils.mkdir(dir_name)
@@ -334,6 +363,7 @@ def create_folder_if_not_exist(dir_name):
         logger.error(f"{dir_name} access denied")
         return
 
+
 def remove_folder(dir_name):
     try:
         path_utils.rmdir(dir_name)
@@ -345,6 +375,7 @@ def remove_folder(dir_name):
     except PermissionError:
         logger.error(f"{dir_name} access denied")
         return
+
 
 def remove_tree(dir_name):
     try:
@@ -358,9 +389,11 @@ def remove_tree(dir_name):
         logger.error(f"{dir_name} access denied")
         return
 
+
 def remove_files(files):
     for file in files:
         remove_file(file)
+
 
 def remove_file(file):
     try:
@@ -374,6 +407,7 @@ def remove_file(file):
         logger.error(f"{file} access denied")
         return
 
+
 def temp_file_from_pycmd(pycmd):
     tempdir = path_utils.clean_path(tempfile.mkdtemp())
     temporary_python_file = path_utils.join(tempdir, 'wizard_temp_script.py')
@@ -381,11 +415,14 @@ def temp_file_from_pycmd(pycmd):
         f.write(pycmd)
     return path_utils.clean_path(temporary_python_file)
 
+
 def shared_temp_file_from_pycmd(pycmd, directory):
-    dunno, temporary_python_file = tempfile.mkstemp(suffix='.py', dir=directory)
+    dunno, temporary_python_file = tempfile.mkstemp(
+        suffix='.py', dir=directory)
     with open(temporary_python_file, 'w') as f:
         f.write(pycmd)
     return path_utils.clean_path(temporary_python_file)
+
 
 def wait_for_child_processes():
     current_process = psutil.Process()
@@ -396,7 +433,8 @@ def wait_for_child_processes():
             try:
                 if child.status() == psutil.STATUS_RUNNING:
                     is_running = 1
-                    logger.info(f"Waiting for child process to end ( PID : {child.pid})")
+                    logger.info(
+                        f"Waiting for child process to end ( PID : {child.pid})")
             except psutil.NoSuchProcess:
                 pass
         if is_running:

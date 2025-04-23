@@ -37,10 +37,11 @@
 #    - set_dress
 # - library
 # - sequences
-# It intialize the defaults softwares in the 
+# It intialize the defaults softwares in the
 # project database and initialize the project settings
 
 # Python modules
+import os
 import time
 import datetime
 import logging
@@ -56,22 +57,23 @@ from wizard.core import path_utils
 from wizard.vars import assets_vars
 from wizard.vars import project_vars
 from wizard.vars import softwares_vars
+
 logger = logging.getLogger(__name__)
 
-# Python modules
-import os
 
 def get_default_deadline():
-    deadline_string = datetime.datetime.fromtimestamp(time.time()+23328000).strftime('%d/%m/%Y')
+    deadline_string = datetime.datetime.fromtimestamp(
+        time.time()+23328000).strftime('%d/%m/%Y')
     return deadline_string
 
+
 def create_project(project_name,
-                    project_path,
-                    project_password,
-                    frame_rate=24,
-                    image_format=[1920,1080],
-                    project_image=None,
-                    deadline=get_default_deadline()):
+                   project_path,
+                   project_password,
+                   frame_rate=24,
+                   image_format=[1920, 1080],
+                   project_image=None,
+                   deadline=get_default_deadline()):
     do_creation = 1
     if project_name == '':
         logger.warning("Please provide a project name")
@@ -85,25 +87,26 @@ def create_project(project_name,
     deadline_float = tools.get_time_float_from_string_date(deadline)
     if not deadline_float:
         do_creation = 0
-    if not do_creation: 
+    if not do_creation:
         return
     old_project_name = environment.get_project_name()
     if not project.create_project(project_name, project_path, project_password, project_image):
         return
     db_utils.modify_db_name('project', project_name)
     environment.build_project_env(project_name, project_path)
-    init_project(project_name, project_path, project_password, frame_rate, image_format, deadline_float)
+    init_project(project_name, project_path, project_password,
+                 frame_rate, image_format, deadline_float)
     if old_project_name is not None:
         user.log_project_without_cred(old_project_name)
     return 1
 
 
 def init_project(project_name,
-                    project_path,
-                    project_password,
-                    frame_rate=24,
-                    image_format=[1920,1080],
-                    deadline=time.time()+23328000):
+                 project_path,
+                 project_password,
+                 frame_rate=24,
+                 image_format=[1920, 1080],
+                 deadline=time.time()+23328000):
     do_creation = 1
     if project_name == '':
         logger.warning("Please provide a project name")
@@ -114,7 +117,7 @@ def init_project(project_name,
     if project_password == '':
         logger.warning("Please provide a password")
         do_creation = 0
-    if not do_creation: 
+    if not do_creation:
         return
     project.create_settings_row(frame_rate, image_format, deadline)
     for domain in assets_vars._domains_list_:
@@ -124,11 +127,15 @@ def init_project(project_name,
         assets.create_category(category, assets_domain_id)
     for software in softwares_vars._softwares_list_:
         software_id = project.add_software(software,
-                        softwares_vars._extensions_dic_[software],
-                        softwares_vars._file_command_[software],
-                        softwares_vars._no_file_command_[software],
-                        softwares_vars._batch_file_command_[software],
-                        softwares_vars._batch_no_file_command_[software])
+                                           softwares_vars._extensions_dic_[
+                                               software],
+                                           softwares_vars._file_command_[
+                                               software],
+                                           softwares_vars._no_file_command_[
+                                               software],
+                                           softwares_vars._batch_file_command_[
+                                               software],
+                                           softwares_vars._batch_no_file_command_[software])
         for stage in assets_vars._ext_dic_.keys():
             if software in assets_vars._ext_dic_[stage].keys():
                 extension = assets_vars._ext_dic_[stage][software][0]
@@ -141,9 +148,10 @@ def init_project(project_name,
     init_hooks()
     return 1
 
+
 def init_hooks():
     hooks_dir = 'ressources/hooks'
     for file in os.listdir(hooks_dir):
         base = path_utils.join(hooks_dir, file)
-        destination = path_utils.join(project.get_hooks_folder(), file) 
+        destination = path_utils.join(project.get_hooks_folder(), file)
         path_utils.copyfile(base, destination)

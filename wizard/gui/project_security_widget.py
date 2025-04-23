@@ -3,19 +3,18 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
-import os
+from PyQt6 import QtWidgets, QtCore
 import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 
 # Wizard modules
-from wizard.vars import ressources
 from wizard.core import repository
 from wizard.core import environment
 
 logger = logging.getLogger(__name__)
+
 
 class project_security_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -60,7 +59,7 @@ class project_security_widget(QtWidgets.QWidget):
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -70,11 +69,12 @@ class project_security_widget(QtWidgets.QWidget):
         self.scrollArea_widget = QtWidgets.QWidget()
         self.scrollArea_widget.setObjectName('transparent_widget')
         self.scrollArea_layout = QtWidgets.QVBoxLayout()
-        self.scrollArea_layout.setContentsMargins(24,24,24,24)
+        self.scrollArea_layout.setContentsMargins(24, 24, 24, 24)
         self.scrollArea_layout.setSpacing(12)
         self.scrollArea_widget.setLayout(self.scrollArea_layout)
 
-        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollArea_widget)
 
@@ -87,9 +87,10 @@ class project_security_widget(QtWidgets.QWidget):
         self.scrollArea_layout.addWidget(gui_utils.separator())
 
         self.pwd_frame = QtWidgets.QFrame()
-        self.pwd_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.pwd_frame.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.pwd_layout = QtWidgets.QVBoxLayout()
-        self.pwd_layout.setContentsMargins(0,0,0,0)
+        self.pwd_layout.setContentsMargins(0, 0, 0, 0)
         self.pwd_layout.setSpacing(6)
         self.pwd_frame.setLayout(self.pwd_layout)
         self.scrollArea_layout.addWidget(self.pwd_frame)
@@ -111,20 +112,23 @@ class project_security_widget(QtWidgets.QWidget):
         self.pwd_layout.addWidget(self.confirm_pwd_lineEdit)
 
         self.admin_pwd_lineEdit = gui_utils.password_lineEdit()
-        self.admin_pwd_lineEdit.setPlaceholderText('Enter the administrator password')
+        self.admin_pwd_lineEdit.setPlaceholderText(
+            'Enter the administrator password')
         self.pwd_layout.addWidget(self.admin_pwd_lineEdit)
 
         self.pwd_buttons_widget = QtWidgets.QWidget()
         self.pwd_buttons_layout = QtWidgets.QHBoxLayout()
-        self.pwd_buttons_layout.setContentsMargins(0,0,0,0)
+        self.pwd_buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.pwd_buttons_layout.setSpacing(6)
         self.pwd_buttons_widget.setLayout(self.pwd_buttons_layout)
         self.pwd_layout.addWidget(self.pwd_buttons_widget)
 
-        self.pwd_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.pwd_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.pwd_accept_button = QtWidgets.QPushButton('Apply')
         self.pwd_accept_button.setObjectName('blue_button')
         self.pwd_buttons_layout.addWidget(self.pwd_accept_button)
 
-        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))

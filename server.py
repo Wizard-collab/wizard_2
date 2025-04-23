@@ -26,13 +26,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import socket
-host_name = socket.gethostname()
-local_ip = socket.gethostbyname(host_name)
-
-ip_address = local_ip
-port = 50333
-
 # Python modules
 import socket
 import sys
@@ -45,6 +38,12 @@ from logging.handlers import RotatingFileHandler
 import os
 import struct
 
+host_name = socket.gethostname()
+local_ip = socket.gethostbyname(host_name)
+
+ip_address = local_ip
+port = 50333
+
 # create logger
 logger = logging.getLogger('WIZARD-SERVER')
 logger.setLevel(logging.DEBUG)
@@ -54,12 +53,14 @@ if not os.path.isdir(user_path):
     os.mkdir(user_path)
 log_file = os.path.join(user_path, "wizard_server.log")
 # create file handler and set level to debug
-file_handler = RotatingFileHandler(log_file, mode='a', maxBytes=1000000, backupCount=1000, encoding=None, delay=False)
+file_handler = RotatingFileHandler(
+    log_file, mode='a', maxBytes=1000000, backupCount=1000, encoding=None, delay=False)
 # create console handler and set level to debug
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 # add formatter to handlers
 stream_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
@@ -68,27 +69,31 @@ logger.addHandler(stream_handler)
 logger.addHandler(file_handler)
 logger.info("Python : " + str(sys.version))
 
+
 def get_server(DNS):
     server = None
     server_address = None
     try:
         server_address = socket.gethostbyname(DNS[0])
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind(DNS)
         server.listen(100)
     except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return None
     except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket timeout")
         return None
     except:
         logger.debug(str(traceback.format_exc()))
         return None
     return server, server_address
 
-def send_signal_with_conn(conn, msg_raw, only_debug = False):
+
+def send_signal_with_conn(conn, msg_raw, only_debug=False):
     try:
         msg = json.dumps(msg_raw).encode('utf8')
         msg = struct.pack('>I', len(msg)) + msg
@@ -96,15 +101,19 @@ def send_signal_with_conn(conn, msg_raw, only_debug = False):
         return 1
     except ConnectionRefusedError:
         if only_debug:
-            logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+            logger.debug(
+                f"Socket connection refused")
         else:
-            logger.error(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+            logger.error(
+                f"Socket connection refused")
         return None
     except socket.timeout:
         if only_debug:
-            logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
-        else:    
-            logger.error(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+            logger.debug(
+                f"Socket timeout")
+        else:
+            logger.error(
+                f"Socket timeout")
         return None
     except:
         if only_debug:
@@ -112,6 +121,7 @@ def send_signal_with_conn(conn, msg_raw, only_debug = False):
         else:
             logger.error(str(traceback.format_exc()))
         return None
+
 
 def recvall(sock):
     try:
@@ -121,14 +131,17 @@ def recvall(sock):
         msglen = struct.unpack('>I', raw_msglen)[0]
         return recvall_with_given_len(sock, msglen)
     except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket connection refused")
         return None
     except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket timeout")
         return None
     except:
         logger.debug(str(traceback.format_exc()))
         return None
+
 
 def recvall_with_given_len(sock, n):
     try:
@@ -140,15 +153,18 @@ def recvall_with_given_len(sock, n):
             data.extend(packet)
         return data
     except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket connection refused")
         return None
     except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket timeout")
         return None
     except:
         logger.debug(str(traceback.format_exc()))
         return None
     return data
+
 
 class server(threading.Thread):
     def __init__(self):
@@ -168,7 +184,7 @@ class server(threading.Thread):
             except:
                 logger.error(str(traceback.format_exc()))
                 continue
-        
+
     def analyse_signal(self, msg_raw, conn, addr):
         data = json.loads(msg_raw)
         if data['type'] == 'test_conn':
@@ -176,7 +192,8 @@ class server(threading.Thread):
         elif data['type'] == 'new_client':
             self.add_client(data['user_name'], conn, addr, data['project'])
         elif data['type'] == 'prank':
-            client_id = next((client_id for client_id, client_dic in self.client_ids.items() if client_dic['user_name'] == data['prank_data']['destination_user']), None)
+            client_id = next((client_id for client_id, client_dic in self.client_ids.items(
+            ) if client_dic['user_name'] == data['prank_data']['destination_user']), None)
             if client_id:
                 client_dic = dict()
                 client_dic['id'] = None
@@ -197,10 +214,12 @@ class server(threading.Thread):
         client_dic['project'] = project
         client_id = str(time.time())
         client_dic['id'] = client_id
-        self.client_ids[client_id]=client_dic
+        self.client_ids[client_id] = client_dic
 
-        threading.Thread(target=self.clientThread, args=(client_id, user_name, conn, addr, project)).start()
-        logger.info("New client : {}, {}, {}, {}".format(client_id, user_name, addr, project))
+        threading.Thread(target=self.clientThread, args=(
+            client_id, user_name, conn, addr, project)).start()
+        logger.info("New client : {}, {}, {}, {}".format(
+            client_id, user_name, addr, project))
         signal_dic = dict()
         signal_dic['type'] = 'new_user'
         signal_dic['user_name'] = user_name
@@ -237,18 +256,19 @@ class server(threading.Thread):
                         running = False
             except:
                 logger.error(str(traceback.format_exc()))
-                continue           
+                continue
 
     def broadcast(self, data, client_dic):
         logger.debug("Broadcasting : " + str(data))
-        for client in self.client_ids.keys(): 
+        for client in self.client_ids.keys():
             if client != client_dic['id']:
                 if not send_signal_with_conn(self.client_ids[client]['conn'], data):
                     self.remove_client(self.client_ids[client])
 
-    def remove_client(self, client_dic): 
-        if client_dic['id'] in self.client_ids.keys(): 
-            logger.info("Removing client : {}, {}, {}, {}".format(client_dic['id'], client_dic['user_name'], client_dic['addr'], client_dic['project']))
+    def remove_client(self, client_dic):
+        if client_dic['id'] in self.client_ids.keys():
+            logger.info("Removing client : {}, {}, {}, {}".format(
+                client_dic['id'], client_dic['user_name'], client_dic['addr'], client_dic['project']))
             del self.client_ids[client_dic['id']]
             client_dic['conn'].close()
             signal_dic = dict()
@@ -257,15 +277,16 @@ class server(threading.Thread):
             signal_dic['project'] = client_dic['project']
             self.broadcast(signal_dic, client_dic)
 
+
 if __name__ == "__main__":
     try:
         server = server()
         server.daemon = True
         server.start()
         print('Press Ctrl+C to quit...')
-        while 1:time.sleep(1)
+        while 1:
+            time.sleep(1)
     except KeyboardInterrupt:
         print('Stopping server...')
         raise SystemExit
         sys.exit()
-

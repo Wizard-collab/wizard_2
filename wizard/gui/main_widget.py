@@ -3,10 +3,9 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import pyqtSignal
 import time
-import os
 import subprocess
 import sys
 import logging
@@ -68,6 +67,7 @@ from wizard.gui.video_manager import video_manager
 
 logger = logging.getLogger(__name__)
 
+
 class main_widget(QtWidgets.QWidget):
 
     stop_threads = pyqtSignal(int)
@@ -75,16 +75,19 @@ class main_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(main_widget, self).__init__(parent)
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
-        self.setWindowTitle(f"Wizard - {environment.get_repository()[11:]} - {environment.get_project_name()}")
-        
+        self.setWindowTitle(
+            f"Wizard - {environment.get_repository()[11:]} - {environment.get_project_name()}")
+
         self.tree_widget = tree_widget.tree_widget(self)
         self.shelf_widget = shelf_widget.shelf_widget(self)
         self.console_widget = console_widget.console_widget()
         self.user_preferences_widget = user_preferences_widget.user_preferences_widget()
         self.project_preferences_widget = project_preferences_widget.project_preferences_widget()
-        self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget(self)
+        self.asset_tracking_widget = asset_tracking_widget.asset_tracking_widget(
+            self)
         self.launcher_widget = launcher_widget.launcher_widget(self)
-        self.references_widget = references_widget.references_widget('work_env', self)
+        self.references_widget = references_widget.references_widget(
+            'work_env', self)
         self.versions_widget = versions_widget.versions_widget(self)
         self.videos_widget = videos_widget.videos_widget(self)
         self.exports_widget = exports_widget.exports_widget(self)
@@ -140,7 +143,8 @@ class main_widget(QtWidgets.QWidget):
             link = latest_build[1]
             current_build = application.get_version()['builds']
             if (build['BUILDS'] > current_build) and (user.user().get_show_latest_build() or force):
-                self.new_build_widget = new_build_widget.new_build_widget(build, link)
+                self.new_build_widget = new_build_widget.new_build_widget(
+                    build, link)
                 self.new_build_widget.show()
             elif build['BUILDS'] <= current_build:
                 logger.info("Wizard is up to date !")
@@ -166,17 +170,28 @@ class main_widget(QtWidgets.QWidget):
 
     def init_widgets_pos(self):
         logger.info("Loading interface context")
-        floating_widgets_layout.init_widget_pos(self, 'main_widget', force_show=1, maximized=1)
-        floating_widgets_layout.init_widget_pos(self.console_widget, 'console_widget')
-        floating_widgets_layout.init_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
-        floating_widgets_layout.init_widget_pos(self.project_preferences_widget, 'project_preferences_widget')
-        floating_widgets_layout.init_widget_pos(self.subtask_manager, 'subtask_manager')
-        floating_widgets_layout.init_widget_pos(self.championship_widget, 'championship_widget')
-        floating_widgets_layout.init_widget_pos(self.production_manager_widget, 'production_manager_widget')
-        floating_widgets_layout.init_widget_pos(self.groups_manager_widget, 'groups_manager_widget')
-        floating_widgets_layout.init_widget_pos(self.quotes_manager, 'quotes_manager')
-        floating_widgets_layout.init_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
-        floating_widgets_layout.init_widget_pos(self.video_manager, 'video_manager')
+        floating_widgets_layout.init_widget_pos(
+            self, 'main_widget', force_show=1, maximized=1)
+        floating_widgets_layout.init_widget_pos(
+            self.console_widget, 'console_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.user_preferences_widget, 'user_preferences_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.project_preferences_widget, 'project_preferences_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.subtask_manager, 'subtask_manager')
+        floating_widgets_layout.init_widget_pos(
+            self.championship_widget, 'championship_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.production_manager_widget, 'production_manager_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.groups_manager_widget, 'groups_manager_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.quotes_manager, 'quotes_manager')
+        floating_widgets_layout.init_widget_pos(
+            self.table_viewer_widget, 'table_viewer_widget')
+        floating_widgets_layout.init_widget_pos(
+            self.video_manager, 'video_manager')
 
     def init_contexts(self):
         logger.info("Loading user context")
@@ -194,16 +209,26 @@ class main_widget(QtWidgets.QWidget):
     def save_widgets_pos(self):
         logger.info("Saving user interface")
         floating_widgets_layout.save_widget_pos(self, 'main_widget')
-        floating_widgets_layout.save_widget_pos(self.console_widget, 'console_widget')
-        floating_widgets_layout.save_widget_pos(self.user_preferences_widget, 'user_preferences_widget')
-        floating_widgets_layout.save_widget_pos(self.project_preferences_widget, 'project_preferences_widget')
-        floating_widgets_layout.save_widget_pos(self.subtask_manager, 'subtask_manager')
-        floating_widgets_layout.save_widget_pos(self.championship_widget, 'championship_widget')
-        floating_widgets_layout.save_widget_pos(self.production_manager_widget, 'production_manager_widget')
-        floating_widgets_layout.save_widget_pos(self.groups_manager_widget, 'groups_manager_widget')
-        floating_widgets_layout.save_widget_pos(self.quotes_manager, 'quotes_manager')
-        floating_widgets_layout.save_widget_pos(self.table_viewer_widget, 'table_viewer_widget')
-        floating_widgets_layout.save_widget_pos(self.video_manager, 'video_manager')
+        floating_widgets_layout.save_widget_pos(
+            self.console_widget, 'console_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.user_preferences_widget, 'user_preferences_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.project_preferences_widget, 'project_preferences_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.subtask_manager, 'subtask_manager')
+        floating_widgets_layout.save_widget_pos(
+            self.championship_widget, 'championship_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.production_manager_widget, 'production_manager_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.groups_manager_widget, 'groups_manager_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.quotes_manager, 'quotes_manager')
+        floating_widgets_layout.save_widget_pos(
+            self.table_viewer_widget, 'table_viewer_widget')
+        floating_widgets_layout.save_widget_pos(
+            self.video_manager, 'video_manager')
 
     def save_contexts(self):
         logger.info("Saving user context")
@@ -220,74 +245,109 @@ class main_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.header_widget.show_console.connect(self.console_widget.toggle)
-        self.header_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
-        self.header_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
-        self.header_widget.show_quotes_manager.connect(self.quotes_manager.toggle)
-        self.header_widget.show_project_preferences.connect(self.project_preferences_widget.toggle)
-        self.header_widget.show_production_manager.connect(self.production_manager_widget.toggle)
-        self.header_widget.show_groups_manager.connect(self.groups_manager_widget.toggle)
+        self.header_widget.show_subtask_manager.connect(
+            self.subtask_manager.toggle)
+        self.header_widget.show_user_preferences.connect(
+            self.user_preferences_widget.toggle)
+        self.header_widget.show_quotes_manager.connect(
+            self.quotes_manager.toggle)
+        self.header_widget.show_project_preferences.connect(
+            self.project_preferences_widget.toggle)
+        self.header_widget.show_production_manager.connect(
+            self.production_manager_widget.toggle)
+        self.header_widget.show_groups_manager.connect(
+            self.groups_manager_widget.toggle)
         self.header_widget.show_batcher.connect(self.batcher_widget.toggle)
-        self.header_widget.show_tables_viewer.connect(self.table_viewer_widget.toggle)
+        self.header_widget.show_tables_viewer.connect(
+            self.table_viewer_widget.toggle)
         self.header_widget.close_signal.connect(self.close)
-        self.header_widget.show_championship.connect(self.championship_widget.toggle)
+        self.header_widget.show_championship.connect(
+            self.championship_widget.toggle)
         self.header_widget.show_pywizard.connect(self.show_pywizard)
         self.header_widget.show_license.connect(self.license_widget.toggle)
-        self.header_widget.show_splash_screen.connect(self.splash_screen_widget.show)
-        self.header_widget.show_latest_build.connect(lambda:self.is_latest_build(force=1))
+        self.header_widget.show_splash_screen.connect(
+            self.splash_screen_widget.show)
+        self.header_widget.show_latest_build.connect(
+            lambda: self.is_latest_build(force=1))
         self.header_widget.show_documentation.connect(self.show_documentation)
-        self.header_widget.show_video_manager.connect(self.video_manager.toggle)
+        self.header_widget.show_video_manager.connect(
+            self.video_manager.toggle)
 
         self.tree_widget.stage_changed_signal.connect(self.stage_changed)
-        self.tree_widget.launch_stage_signal.connect(self.launcher_widget.launch)
-        self.context_widget.work_env_changed_signal.connect(self.work_env_changed)
-        self.context_widget.variant_changed_signal.connect(self.variant_changed)
-        self.versions_widget.version_changed_signal.connect(self.launcher_widget.focus_version)
+        self.tree_widget.launch_stage_signal.connect(
+            self.launcher_widget.launch)
+        self.context_widget.work_env_changed_signal.connect(
+            self.work_env_changed)
+        self.context_widget.variant_changed_signal.connect(
+            self.variant_changed)
+        self.versions_widget.version_changed_signal.connect(
+            self.launcher_widget.focus_version)
         self.tabs_widget.currentChanged.connect(self.tab_changed)
         self.footer_widget.show_console.connect(self.console_widget.toggle)
         self.footer_widget.show_wall.connect(self.wall_widget.toggle)
-        self.footer_widget.show_subtask_manager.connect(self.subtask_manager.toggle)
-        self.footer_widget.show_production_manager.connect(self.production_manager_widget.toggle)
+        self.footer_widget.show_subtask_manager.connect(
+            self.subtask_manager.toggle)
+        self.footer_widget.show_production_manager.connect(
+            self.production_manager_widget.toggle)
         self.footer_widget.connect_team.connect(self.init_team_client)
         self.footer_widget.show_team_widget.connect(self.team_widget.toggle)
-        self.footer_widget.show_user_preferences.connect(self.user_preferences_widget.toggle)
+        self.footer_widget.show_user_preferences.connect(
+            self.user_preferences_widget.toggle)
         self.footer_widget.refresh_signal.connect(self.refresh)
-        self.footer_widget.show_softwares_widget.connect(self.softwares_widget.toggle)
+        self.footer_widget.show_softwares_widget.connect(
+            self.softwares_widget.toggle)
         self.footer_widget.show_locks_widget.connect(self.locks_widget.toggle)
-        self.console_widget.notification.connect(self.footer_widget.update_console_button)
-        self.wall_widget.notification.connect(self.footer_widget.update_wall_button)
+        self.console_widget.notification.connect(
+            self.footer_widget.update_console_button)
+        self.wall_widget.notification.connect(
+            self.footer_widget.update_wall_button)
         self.wall_widget.popup.connect(self.popup_wall_widget.add_popup)
-        self.subtask_manager.global_status_signal.connect(self.footer_widget.update_subtask_manager_button)
+        self.subtask_manager.global_status_signal.connect(
+            self.footer_widget.update_subtask_manager_button)
         self.references_widget.focus_export.connect(self.focus_export_version)
-        self.references_widget.focus_on_group_signal.connect(self.focus_on_group)
+        self.references_widget.focus_on_group_signal.connect(
+            self.focus_on_group)
 
-        self.team_client.team_connection_status_signal.connect(self.footer_widget.set_team_connection)
-        self.team_client.team_connection_status_signal.connect(self.team_widget.set_team_connection)
+        self.team_client.team_connection_status_signal.connect(
+            self.footer_widget.set_team_connection)
+        self.team_client.team_connection_status_signal.connect(
+            self.team_widget.set_team_connection)
         self.team_client.refresh_signal.connect(self.refresh)
         self.team_client.prank_signal.connect(self.pranks.execute_attack)
         self.team_client.new_user_signal.connect(self.team_widget.add_user)
-        self.team_client.remove_user_signal.connect(self.team_widget.remove_user)
+        self.team_client.remove_user_signal.connect(
+            self.team_widget.remove_user)
 
         self.gui_server.refresh_signal.connect(self.refresh)
-        self.gui_server.refresh_team_signal.connect(self.team_client.refresh_team)
+        self.gui_server.refresh_team_signal.connect(
+            self.team_client.refresh_team)
         self.gui_server.restart_signal.connect(self.restart)
-        self.gui_server.tooltip_signal.connect(self.footer_widget.update_tooltip)
+        self.gui_server.tooltip_signal.connect(
+            self.footer_widget.update_tooltip)
         self.gui_server.stdout_signal.connect(self.update_stdout)
         self.gui_server.focus_instance_signal.connect(self.focus_instance)
-        self.gui_server.export_version_focus_signal.connect(self.focus_export_version)
+        self.gui_server.export_version_focus_signal.connect(
+            self.focus_export_version)
         self.gui_server.video_focus_signal.connect(self.focus_video)
-        self.gui_server.work_version_focus_signal.connect(self.focus_work_version)
-        self.gui_server.save_popup_signal.connect(self.popup_wall_widget.add_save_popup)
+        self.gui_server.work_version_focus_signal.connect(
+            self.focus_work_version)
+        self.gui_server.save_popup_signal.connect(
+            self.popup_wall_widget.add_save_popup)
         self.gui_server.raise_ui_signal.connect(self.raise_window)
-        self.gui_server.popup_signal.connect(self.popup_wall_widget.add_custom_popup)
-        self.gui_server.create_playlist_from_stages_signal.connect(self.video_manager.create_playlist_from_stages)
-        self.gui_server.show_video_signal.connect(self.video_manager.show_single_video)
+        self.gui_server.popup_signal.connect(
+            self.popup_wall_widget.add_custom_popup)
+        self.gui_server.create_playlist_from_stages_signal.connect(
+            self.video_manager.create_playlist_from_stages)
+        self.gui_server.show_video_signal.connect(
+            self.video_manager.show_single_video)
 
     def show_documentation(self):
         webbrowser.open_new_tab(ressources._documentation_url_)
 
     def show_pywizard(self):
         if sys.argv[0].endswith('.py'):
-            subprocess.Popen('python PyWizard.py', creationflags=subprocess.CREATE_NEW_CONSOLE)
+            subprocess.Popen('python PyWizard.py',
+                             creationflags=subprocess.CREATE_NEW_CONSOLE)
         elif sys.argv[0].endswith('.exe'):
             path_utils.startfile('PyWizard.exe')
 
@@ -309,7 +369,8 @@ class main_widget(QtWidgets.QWidget):
     def focus_export_version(self, export_version_id):
         export_version_row = project.get_export_version_data(export_version_id)
         if export_version_row is not None:
-            self.tree_widget.focus_instance(('stage', export_version_row['stage_id']))
+            self.tree_widget.focus_instance(
+                ('stage', export_version_row['stage_id']))
             self.tabs_widget.setCurrentIndex(self.exports_tab_index)
             self.exports_widget.focus_export_version(export_version_id)
 
@@ -322,7 +383,8 @@ class main_widget(QtWidgets.QWidget):
 
     def focus_work_version(self, work_version_id):
         work_version_row = project.get_version_data(work_version_id)
-        work_env_row = project.get_work_env_data(work_version_row['work_env_id'])
+        work_env_row = project.get_work_env_data(
+            work_version_row['work_env_id'])
         variant_row = project.get_variant_data(work_env_row['variant_id'])
         stage_row = project.get_stage_data(variant_row['stage_id'])
         if stage_row is not None:
@@ -460,22 +522,23 @@ class main_widget(QtWidgets.QWidget):
     def build_ui(self):
         logger.info("Loading user interface")
         self.main_widget_layout = QtWidgets.QHBoxLayout()
-        self.main_widget_layout.setContentsMargins(0,0,0,0)
+        self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.main_widget = QtWidgets.QWidget()
         self.main_widget.setObjectName('main_widget')
         self.main_widget_layout.addWidget(self.main_widget)
         self.setLayout(self.main_widget_layout)
-        
+
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(1)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_widget.setLayout(self.main_layout)
 
         self.main_layout.addWidget(self.header_widget)
         self.main_layout.addWidget(self.shelf_widget)
 
         self.contents_widget = gui_utils.QSplitter()
-        self.contents_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.contents_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.contents_widget.setObjectName('main_widget')
         self.main_layout.addWidget(self.contents_widget)
 
@@ -485,7 +548,7 @@ class main_widget(QtWidgets.QWidget):
         self.contents_1_widget.setObjectName('main_widget')
         self.contents_1_layout = QtWidgets.QHBoxLayout()
         self.contents_1_layout.setSpacing(1)
-        self.contents_1_layout.setContentsMargins(0,0,0,0)
+        self.contents_1_layout.setContentsMargins(0, 0, 0, 0)
         self.contents_1_widget.setLayout(self.contents_1_layout)
         self.contents_widget.addWidget(self.contents_1_widget)
         self.contents_widget.setCollapsible(1, False)
@@ -494,28 +557,32 @@ class main_widget(QtWidgets.QWidget):
         self.contents_2_widget.setObjectName('main_widget')
         self.contents_2_layout = QtWidgets.QVBoxLayout()
         self.contents_2_layout.setSpacing(1)
-        self.contents_2_layout.setContentsMargins(0,0,0,0)
+        self.contents_2_layout.setContentsMargins(0, 0, 0, 0)
         self.contents_2_widget.setLayout(self.contents_2_layout)
         self.contents_1_layout.addWidget(self.contents_2_widget)
 
         self.contents_2_layout.addWidget(self.context_widget)
         self.contents_2_layout.addWidget(self.tabs_widget)
-        self.references_tab_index = self.tabs_widget.addTab(self.references_widget, QtGui.QIcon(ressources._references_icon_), 'References')
-        self.work_versions_tab_index = self.tabs_widget.addTab(self.versions_widget, QtGui.QIcon(ressources._work_icon_), 'Work versions')
-        self.exports_tab_index = self.tabs_widget.addTab(self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
-        self.videos_tab_index = self.tabs_widget.addTab(self.videos_widget, QtGui.QIcon(ressources._videos_icon_), 'Videos')
-        
+        self.references_tab_index = self.tabs_widget.addTab(
+            self.references_widget, QtGui.QIcon(ressources._references_icon_), 'References')
+        self.work_versions_tab_index = self.tabs_widget.addTab(
+            self.versions_widget, QtGui.QIcon(ressources._work_icon_), 'Work versions')
+        self.exports_tab_index = self.tabs_widget.addTab(
+            self.exports_widget, QtGui.QIcon(ressources._exports_icon_), 'Exports')
+        self.videos_tab_index = self.tabs_widget.addTab(
+            self.videos_widget, QtGui.QIcon(ressources._videos_icon_), 'Videos')
+
         self.contents_3_widget = QtWidgets.QWidget()
         self.contents_3_widget.setObjectName('main_widget')
         self.contents_3_layout = QtWidgets.QVBoxLayout()
         self.contents_3_layout.setSpacing(1)
-        self.contents_3_layout.setContentsMargins(0,0,0,0)
+        self.contents_3_layout.setContentsMargins(0, 0, 0, 0)
         self.contents_3_widget.setLayout(self.contents_3_layout)
         self.contents_1_layout.addWidget(self.contents_3_widget)
 
         self.contents_3_layout.addWidget(self.asset_tracking_widget)
         self.contents_3_layout.addWidget(self.launcher_widget)
-        
+
         self.contents_widget.addWidget(self.wall_widget)
         self.contents_widget.setCollapsible(2, False)
         self.wall_widget.setVisible(0)

@@ -18,6 +18,7 @@ from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
+
 class create_repository_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_repository_widget, self).__init__()
@@ -33,13 +34,15 @@ class create_repository_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.title_label = QtWidgets.QLabel("Create repository")
         self.title_label.setObjectName("title_label_2")
         self.main_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            0, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.repository_name_lineEdit = QtWidgets.QLineEdit()
@@ -58,17 +61,19 @@ class create_repository_widget(QtWidgets.QDialog):
         self.email_lineEdit.setPlaceholderText('Administrator email')
         self.main_layout.addWidget(self.email_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.button_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setSpacing(4)
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.button_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.button_widget)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,0,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 0, QtWidgets.QSizePolicy.Policy.Expanding)
         self.buttons_layout.addSpacerItem(self.spaceItem)
 
         self.quit_button = QtWidgets.QPushButton('Quit')

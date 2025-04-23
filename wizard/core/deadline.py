@@ -35,28 +35,30 @@ from wizard.core import environment
 from wizard.core import tools
 from wizard.core import project
 
+
 def submit_job(pycmd, name, priority=50):
-	deadline_path = "C:/Program files/Thinkbox/Deadline10/bin/deadlinecommand.exe"
-	wizard_cmd = "C:/Program files/wizard/wizard_cmd.exe"
+    deadline_path = "C:/Program files/Thinkbox/Deadline10/bin/deadlinecommand.exe"
+    wizard_cmd = "C:/Program files/wizard/wizard_cmd.exe"
 
-	psql_dns = environment.get_psql_dns()
-	repository_name = environment.get_repository()[11:]
-	user_name = environment.get_user()
-	project_name = environment.get_project_name()
-	team_dns = json.dumps(environment.get_team_dns())
-	pyfile = tools.shared_temp_file_from_pycmd(pycmd, project.get_temp_scripts_folder())
+    psql_dns = environment.get_psql_dns()
+    repository_name = environment.get_repository()[11:]
+    user_name = environment.get_user()
+    project_name = environment.get_project_name()
+    team_dns = json.dumps(environment.get_team_dns())
+    pyfile = tools.shared_temp_file_from_pycmd(
+        pycmd, project.get_temp_scripts_folder())
 
-	command = f"{deadline_path} "
-	command += "-SubmitCommandLineJob "
-	command += f'-executable "{wizard_cmd}" '
-	command += f'-name "{name}" '
-	command += f'-arguments "-psqlDns <QUOTE>{psql_dns}<QUOTE> '
-	command += f'-repository <QUOTE>{repository_name}<QUOTE> '
-	command += f'-user <QUOTE>{user_name}<QUOTE> '
-	command += f'-project <QUOTE>{project_name}<QUOTE> '
-	if team_dns:
-		command += f'-teamDns <QUOTE>{team_dns}<QUOTE> '
-	command += f'-pyfile <QUOTE>{pyfile}<QUOTE>"'
+    command = f"{deadline_path} "
+    command += "-SubmitCommandLineJob "
+    command += f'-executable "{wizard_cmd}" '
+    command += f'-name "{name}" '
+    command += f'-arguments "-psqlDns <QUOTE>{psql_dns}<QUOTE> '
+    command += f'-repository <QUOTE>{repository_name}<QUOTE> '
+    command += f'-user <QUOTE>{user_name}<QUOTE> '
+    command += f'-project <QUOTE>{project_name}<QUOTE> '
+    if team_dns:
+        command += f'-teamDns <QUOTE>{team_dns}<QUOTE> '
+    command += f'-pyfile <QUOTE>{pyfile}<QUOTE>"'
 
-	process = subprocess.Popen(command, stdout=subprocess.PIPE)
-	print(process.stdout)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    print(process.stdout)

@@ -18,6 +18,7 @@ from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
+
 class destination_manager(QtWidgets.QWidget):
     def __init__(self, export_id, parent=None):
         super(destination_manager, self).__init__(parent)
@@ -33,9 +34,9 @@ class destination_manager(QtWidgets.QWidget):
         self.refresh()
 
     def build_ui(self):
-        self.setMinimumSize(QtCore.QSize(900,500))
+        self.setMinimumSize(QtCore.QSize(900, 500))
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -57,40 +58,47 @@ class destination_manager(QtWidgets.QWidget):
         self.main_layout.addWidget(self.content_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(4)
-        self.list_view.setHeaderLabels(['Destination', 'Reference namespace', 'Referenced version', 'Auto update'])
+        self.list_view.setHeaderLabels(
+            ['Destination', 'Reference namespace', 'Referenced version', 'Auto update'])
         self.list_view.header().resizeSection(0, 450)
         self.list_view.header().resizeSection(1, 200)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.content_layout.addWidget(self.list_view)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.content_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.remove_selection_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.remove_selection_button, "Remove selected references")
-        self.remove_selection_button.setFixedSize(35,35)
-        self.remove_selection_button.setIconSize(QtCore.QSize(25,25))
-        self.remove_selection_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
+        gui_utils.application_tooltip(
+            self.remove_selection_button, "Remove selected references")
+        self.remove_selection_button.setFixedSize(35, 35)
+        self.remove_selection_button.setIconSize(QtCore.QSize(25, 25))
+        self.remove_selection_button.setIcon(
+            QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.remove_selection_button)
 
         self.update_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.update_button, "Update selected references")
-        self.update_button.setFixedSize(35,35)
-        self.update_button.setIconSize(QtCore.QSize(25,25))
+        gui_utils.application_tooltip(
+            self.update_button, "Update selected references")
+        self.update_button.setFixedSize(35, 35)
+        self.update_button.setIconSize(QtCore.QSize(25, 25))
         self.update_button.setIcon(QtGui.QIcon(ressources._tool_update_))
-        self.buttons_layout.addWidget(self.update_button)     
+        self.buttons_layout.addWidget(self.update_button)
 
     def connect_functions(self):
         self.fill_thread.data_signal.connect(self.update_reference)
@@ -98,13 +106,15 @@ class destination_manager(QtWidgets.QWidget):
         self.update_button.clicked.connect(self.update_selection)
 
     def refresh(self):
-        self.header_label.setText(assets.instance_to_string(('export', self.export_id)))
+        self.header_label.setText(
+            assets.instance_to_string(('export', self.export_id)))
         reference_rows = project.get_references_by_export(self.export_id)
         project_references_id = []
         for reference_row in reference_rows:
             project_references_id.append(reference_row['id'])
             if reference_row['id'] not in self.references_ids.keys():
-                target_item = custom_target_item(reference_row, self.list_view.invisibleRootItem())
+                target_item = custom_target_item(
+                    reference_row, self.list_view.invisibleRootItem())
                 self.references_ids[reference_row['id']] = target_item
         references_list_ids = list(self.references_ids.keys())
         for reference_id in references_list_ids:
@@ -136,26 +146,29 @@ class destination_manager(QtWidgets.QWidget):
         if data_tuple[0]['id'] in self.references_ids.keys():
             self.references_ids[data_tuple[0]['id']].update(data_tuple)
 
+
 class custom_target_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, reference_row, parent=None):
         super(custom_target_item, self).__init__(parent)
         self.reference_row = reference_row
         self.fill_ui()
         self.connect_functions()
-        self.setSizeHint(0, QtCore.QSize(1,30))
+        self.setSizeHint(0, QtCore.QSize(1, 30))
 
     def connect_functions(self):
-        self.version_widget.button_clicked.connect(self.version_modification_requested)
+        self.version_widget.button_clicked.connect(
+            self.version_modification_requested)
         self.auto_update_checkbox.stateChanged.connect(self.modify_auto_update)
 
     def fill_ui(self):
-        bold_font=QtGui.QFont()
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(0, bold_font)
         self.version_widget = editable_data_widget(bold=True)
         self.treeWidget().setItemWidget(self, 2, self.version_widget)
         self.auto_update_checkbox = QtWidgets.QCheckBox()
-        self.auto_update_checkbox.setStyleSheet('background-color:transparent;')
+        self.auto_update_checkbox.setStyleSheet(
+            'background-color:transparent;')
         self.treeWidget().setItemWidget(self, 3, self.auto_update_checkbox)
 
     def update(self, data_tuple):
@@ -180,11 +193,13 @@ class custom_target_item(QtWidgets.QTreeWidgetItem):
 
     def modify_auto_update(self, auto_update):
         if self.apply_auto_update_change:
-            project.modify_reference_auto_update(self.reference_row['id'], auto_update)
+            project.modify_reference_auto_update(
+                self.reference_row['id'], auto_update)
             gui_server.refresh_team_ui()
 
     def version_modification_requested(self, point):
-        versions_list = project.get_export_versions(self.reference_row['export_id'])
+        versions_list = project.get_export_versions(
+            self.reference_row['export_id'])
         if versions_list is not None and versions_list != []:
             menu = gui_utils.QMenu()
             for version in versions_list:
@@ -202,11 +217,12 @@ class custom_target_item(QtWidgets.QTreeWidgetItem):
         project.update_reference(self.reference_row['id'], export_version_id)
         gui_server.refresh_team_ui()
 
+
 class fill_thread(QtCore.QThread):
 
     data_signal = pyqtSignal(tuple)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(fill_thread, self).__init__(parent)
         self.export_id = None
         self.references_rows = []
@@ -220,16 +236,21 @@ class fill_thread(QtCore.QThread):
 
     def run(self):
         if self.running:
-            default_export_version_id = project.get_default_export_version(self.export_id, 'id')
+            default_export_version_id = project.get_default_export_version(
+                self.export_id, 'id')
             for reference_row in self.references_rows:
-                work_env_string = assets.instance_to_string(('work_env', reference_row['work_env_id']))
-                export_version_row = project.get_export_version_data(reference_row['export_version_id'])
+                work_env_string = assets.instance_to_string(
+                    ('work_env', reference_row['work_env_id']))
+                export_version_row = project.get_export_version_data(
+                    reference_row['export_version_id'])
                 if default_export_version_id != export_version_row['id']:
                     up_to_date = 0
                 else:
                     up_to_date = 1
 
-                self.data_signal.emit((reference_row, work_env_string, export_version_row['name'], up_to_date))
+                self.data_signal.emit(
+                    (reference_row, work_env_string, export_version_row['name'], up_to_date))
+
 
 class editable_data_widget(QtWidgets.QFrame):
 
@@ -237,7 +258,7 @@ class editable_data_widget(QtWidgets.QFrame):
 
     def __init__(self, parent=None, bold=False):
         super(editable_data_widget, self).__init__(parent)
-        self.bold=bold
+        self.bold = bold
         self.build_ui()
         self.connect_functions()
 
@@ -247,20 +268,20 @@ class editable_data_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('reference_edit_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(8,4,4,4)
+        self.main_layout.setContentsMargins(8, 4, 4, 4)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.label)
         if self.bold:
-            bold_font=QtGui.QFont()
+            bold_font = QtGui.QFont()
             bold_font.setBold(True)
             self.label.setFont(bold_font)
 
         self.main_button = QtWidgets.QPushButton()
         self.main_button.setObjectName('dropdown_button')
-        self.main_button.setFixedSize(QtCore.QSize(14,14))
+        self.main_button.setFixedSize(QtCore.QSize(14, 14))
         self.main_layout.addWidget(self.main_button)
 
     def hide_button(self):

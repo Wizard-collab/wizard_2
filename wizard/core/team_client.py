@@ -37,6 +37,7 @@ from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
+
 class team_client(QThread):
 
     team_connection_status_signal = pyqtSignal(bool)
@@ -114,16 +115,19 @@ class team_client(QThread):
         if data['type'] == 'prank' and (data['prank_data']['destination_user'] == environment.get_user()):
             self.prank_signal.emit(data['prank_data'])
 
+
 def try_connection(DNS):
     signal_dic = dict()
     signal_dic['type'] = 'test_conn'
     return socket_utils.send_bottle(DNS, signal_dic, timeout=1)
+
 
 def refresh_team(DNS):
     signal_dic = dict()
     signal_dic['type'] = 'refresh_team'
     signal_dic['project'] = environment.get_project_name()
     return socket_utils.send_bottle(DNS, signal_dic)
+
 
 def send_prank(DNS, prank_data):
     signal_dic = dict()

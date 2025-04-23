@@ -4,14 +4,9 @@
 
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import pyqtSignal
-import time
 import logging
 
 # Wizard gui modules
-from wizard.gui import gui_server
-from wizard.gui import gui_utils
-from wizard.gui import logging_widget
 from wizard.gui import overview_widget
 from wizard.gui import production_table_widget
 from wizard.gui import production_calendar_widget
@@ -24,6 +19,7 @@ from wizard.vars import ressources
 from wizard.vars import user_vars
 
 logger = logging.getLogger(__name__)
+
 
 class production_manager_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -39,19 +35,23 @@ class production_manager_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def build_ui(self):
-        self.resize(1300,1000)
+        self.resize(1300, 1000)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.tabs_widget = custom_tab_widget.custom_tab_widget()
         self.main_layout.addWidget(self.tabs_widget)
 
-        self.production_table_index = self.tabs_widget.addTab(self.production_table_widget, '', QtGui.QIcon(ressources._table_viewer_icon_))
-        self.production_calendar_index = self.tabs_widget.addTab(self.production_calendar_widget, '', QtGui.QIcon(ressources._calendar_icon_))
-        self.overview_index = self.tabs_widget.addTab(self.overview_widget, '', QtGui.QIcon(ressources._chart_icon_))
-        self.render_time_manager_index = self.tabs_widget.addTab(self.render_time_manager, '', QtGui.QIcon(ressources._render_time_icon_))
+        self.production_table_index = self.tabs_widget.addTab(
+            self.production_table_widget, '', QtGui.QIcon(ressources._table_viewer_icon_))
+        self.production_calendar_index = self.tabs_widget.addTab(
+            self.production_calendar_widget, '', QtGui.QIcon(ressources._calendar_icon_))
+        self.overview_index = self.tabs_widget.addTab(
+            self.overview_widget, '', QtGui.QIcon(ressources._chart_icon_))
+        self.render_time_manager_index = self.tabs_widget.addTab(
+            self.render_time_manager, '', QtGui.QIcon(ressources._render_time_icon_))
 
     def set_context(self):
         current_tab = self.tabs_widget.current_index()

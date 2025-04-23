@@ -8,26 +8,29 @@ from PyQt6.QtCore import pyqtSignal
 import time
 import copy
 import logging
-logger = logging.getLogger(__name__)
+import traceback
 
 # Wizard modules
-from wizard.core import repository
-from wizard.core import image
-from wizard.vars import ressources
+from wizard.gui import gui_utils
 
 # Wizard gui modules
-from wizard.gui import gui_utils
+from wizard.vars import ressources
+from wizard.core import image
+from wizard.core import repository
+
+logger = logging.getLogger(__name__)
+
 
 class artefact_interaction_widget(QtWidgets.QDialog):
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(artefact_interaction_widget, self).__init__(parent)
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Choose target")
 
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)    
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.parent = parent
         self.search_thread = search_thread()
@@ -71,7 +74,8 @@ class artefact_interaction_widget(QtWidgets.QDialog):
             if not user_row['championship_participation']:
                 continue
             if user_row['id'] not in self.user_ids.keys():
-                user_item = custom_item(user_row, self.icons_dic, self.list_view.invisibleRootItem())
+                user_item = custom_item(
+                    user_row, self.icons_dic, self.list_view.invisibleRootItem())
                 self.user_ids[user_row['id']] = user_item
             else:
                 if user_row != self.user_ids[user_row['id']].user_row:
@@ -109,17 +113,18 @@ class artefact_interaction_widget(QtWidgets.QDialog):
     def return_user(self):
         selected_items = self.list_view.selectedItems()
         if len(selected_items) != 1:
-            return 
+            return
         self.user = self.list_view.selectedItems()[0].user_row['user_name']
         self.accept()
 
     def build_ui(self):
         self.setMinimumWidth(550)
         self.setMinimumHeight(500)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Preferred)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum,
+                           QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(12,12,12,12)
+        self.main_layout.setContentsMargins(12, 12, 12, 12)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -127,7 +132,7 @@ class artefact_interaction_widget(QtWidgets.QDialog):
         self.main_widget.setObjectName('dark_widget')
         self.main_widget.setStyleSheet('border-radius:5px;')
         self.main_widget_layout = QtWidgets.QVBoxLayout()
-        self.main_widget_layout.setContentsMargins(0,0,0,0)
+        self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.main_widget_layout.setSpacing(0)
         self.main_widget.setLayout(self.main_widget_layout)
         self.main_layout.addWidget(self.main_widget)
@@ -142,10 +147,11 @@ class artefact_interaction_widget(QtWidgets.QDialog):
         self.search_bar = gui_utils.search_bar()
         self.search_bar.setPlaceholderText('"j.dupont"')
         self.main_widget_layout.addWidget(self.search_bar)
-        
+
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setStyleSheet('border-top-left-radius:0px;border-top-right-radius:0px;')
+        self.list_view.setStyleSheet(
+            'border-top-left-radius:0px;border-top-right-radius:0px;')
         self.list_view.setColumnCount(5)
         self.list_view.setHeaderHidden(False)
         self.list_view.setHeaderLabels(['', '', 'Life', 'Coins', 'Level'])
@@ -153,8 +159,10 @@ class artefact_interaction_widget(QtWidgets.QDialog):
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().resizeSection(0, 30)
         self.list_view.header().resizeSection(1, 150)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.main_widget_layout.addWidget(self.list_view)
+
 
 class custom_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, user_row, icons_dic, parent=None):
@@ -166,7 +174,8 @@ class custom_item(QtWidgets.QTreeWidgetItem):
 
     def init_icons(self):
         user_icon = QtGui.QIcon()
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(self.user_row['profile_picture']), 'png', 30)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(
+            self.user_row['profile_picture']), 'png', 30)
         user_icon.addPixmap(pm)
         self.setIcon(0, user_icon)
         self.setIcon(2, self.icons_dic['life'])
@@ -175,7 +184,7 @@ class custom_item(QtWidgets.QTreeWidgetItem):
 
     def fill_ui(self):
         self.setText(1, self.user_row['user_name'])
-        bold_font=QtGui.QFont()
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
         self.setText(2, f"{self.user_row['life']}%")
@@ -185,6 +194,7 @@ class custom_item(QtWidgets.QTreeWidgetItem):
     def refresh(self, user_row):
         self.user_row = user_row
         self.fill_ui()
+
 
 class search_thread(QtCore.QThread):
 

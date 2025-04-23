@@ -12,6 +12,7 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 from wizard.gui import tags_widget
 
+
 class comment_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, title='Add comment', old_comment='', pos=None, propose_tags=True, button_text='Comment'):
         super(comment_widget, self).__init__(parent)
@@ -23,8 +24,9 @@ class comment_widget(QtWidgets.QDialog):
 
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Comment")
-        
-        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint)
+
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
@@ -33,7 +35,7 @@ class comment_widget(QtWidgets.QDialog):
 
     def build_ui(self, title):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.setLayout(self.main_layout)
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('instance_creation_frame')
@@ -51,15 +53,17 @@ class comment_widget(QtWidgets.QDialog):
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.close_layout.addWidget(QtWidgets.QLabel(title))
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 
@@ -75,15 +79,17 @@ class comment_widget(QtWidgets.QDialog):
         self.frame_layout.addWidget(self.accept_button)
 
     def confirm(self):
-    	self.comment = self.comment_field.toPlainText()
-    	self.accept()
+        self.comment = self.comment_field.toPlainText()
+        self.accept()
 
     def propose_tags(self):
         text = self.comment_field.toPlainText()
         position_rect = self.comment_field.cursorRect()
-        pos = self.comment_field.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+        pos = self.comment_field.mapToGlobal(
+            QtCore.QPoint(position_rect.x()+20, position_rect.y()))
         self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
-        self.tags_widget.other_key_pressed.connect(self.comment_field.keyPressEvent)
+        self.tags_widget.other_key_pressed.connect(
+            self.comment_field.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_field.setText)
         self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.execute()

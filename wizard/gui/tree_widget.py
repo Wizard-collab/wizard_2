@@ -10,7 +10,6 @@ import sys
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
 import logging
-import traceback
 
 # Wizard modules
 from wizard.core import project
@@ -34,6 +33,7 @@ from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
+
 class tree_widget(QtWidgets.QFrame):
 
     stage_changed_signal = pyqtSignal(object)
@@ -49,12 +49,12 @@ class tree_widget(QtWidgets.QFrame):
         self.color_visibility = 0
         self.progress_visibility = 1
 
-        self.domain_ids=dict()
-        self.category_ids=dict()
-        self.assets_groups_ids=dict()
-        self.asset_ids=dict()
-        self.stage_ids=dict()
-        self.creation_items=[]
+        self.domain_ids = dict()
+        self.category_ids = dict()
+        self.assets_groups_ids = dict()
+        self.asset_ids = dict()
+        self.stage_ids = dict()
+        self.creation_items = []
 
         self.users_icons_dic = dict()
 
@@ -65,7 +65,8 @@ class tree_widget(QtWidgets.QFrame):
         for user_row in repository.get_users_list():
             if user_row['user_name'] not in self.users_icons_dic.keys():
                 user_icon = QtGui.QIcon()
-                pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 16)
+                pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(
+                    user_row['profile_picture']), 'png', 16)
                 user_icon.addPixmap(pm)
                 self.users_icons_dic[user_row['user_name']] = user_icon
 
@@ -73,46 +74,65 @@ class tree_widget(QtWidgets.QFrame):
         self.icons_dic = dict()
         self.icons_dic['add'] = QtGui.QIcon(ressources._add_icon_small_)
         self.icons_dic['folder'] = QtGui.QIcon(ressources._folder_icon_small_)
-        self.icons_dic['assets_groups'] = QtGui.QIcon(ressources._assets_group_icon_)
+        self.icons_dic['assets_groups'] = QtGui.QIcon(
+            ressources._assets_group_icon_)
         self.icons_dic['domain'] = dict()
-        self.icons_dic['domain']['assets'] = QtGui.QIcon(ressources._assets_icon_)
-        self.icons_dic['domain']['library'] = QtGui.QIcon(ressources._library_icon_)
-        self.icons_dic['domain']['sequences'] = QtGui.QIcon(ressources._sequences_icon_)
+        self.icons_dic['domain']['assets'] = QtGui.QIcon(
+            ressources._assets_icon_)
+        self.icons_dic['domain']['library'] = QtGui.QIcon(
+            ressources._library_icon_)
+        self.icons_dic['domain']['sequences'] = QtGui.QIcon(
+            ressources._sequences_icon_)
         self.icons_dic['stage'] = dict()
-        self.icons_dic['stage']['modeling'] = QtGui.QIcon(ressources._modeling_icon_)
-        self.icons_dic['stage']['rigging'] = QtGui.QIcon(ressources._rigging_icon_)
-        self.icons_dic['stage']['grooming'] = QtGui.QIcon(ressources._grooming_icon_)
-        self.icons_dic['stage']['texturing'] = QtGui.QIcon(ressources._texturing_icon_)
-        self.icons_dic['stage']['shading'] = QtGui.QIcon(ressources._shading_icon_)
-        self.icons_dic['stage']['layout'] = QtGui.QIcon(ressources._layout_icon_)
-        self.icons_dic['stage']['animation'] = QtGui.QIcon(ressources._animation_icon_)
+        self.icons_dic['stage']['modeling'] = QtGui.QIcon(
+            ressources._modeling_icon_)
+        self.icons_dic['stage']['rigging'] = QtGui.QIcon(
+            ressources._rigging_icon_)
+        self.icons_dic['stage']['grooming'] = QtGui.QIcon(
+            ressources._grooming_icon_)
+        self.icons_dic['stage']['texturing'] = QtGui.QIcon(
+            ressources._texturing_icon_)
+        self.icons_dic['stage']['shading'] = QtGui.QIcon(
+            ressources._shading_icon_)
+        self.icons_dic['stage']['layout'] = QtGui.QIcon(
+            ressources._layout_icon_)
+        self.icons_dic['stage']['animation'] = QtGui.QIcon(
+            ressources._animation_icon_)
         self.icons_dic['stage']['cfx'] = QtGui.QIcon(ressources._cfx_icon_)
         self.icons_dic['stage']['fx'] = QtGui.QIcon(ressources._fx_icon_)
-        self.icons_dic['stage']['lighting'] = QtGui.QIcon(ressources._lighting_icon_)
-        self.icons_dic['stage']['rendering'] = QtGui.QIcon(ressources._rendering_icon_)
-        self.icons_dic['stage']['camera'] = QtGui.QIcon(ressources._camera_icon_)
-        self.icons_dic['stage']['compositing'] = QtGui.QIcon(ressources._compositing_icon_)
-        self.icons_dic['stage']['custom'] = QtGui.QIcon(ressources._custom_icon_)
-        self.icons_dic['stage']['camrig'] = QtGui.QIcon(ressources._camera_rig_icon_)
+        self.icons_dic['stage']['lighting'] = QtGui.QIcon(
+            ressources._lighting_icon_)
+        self.icons_dic['stage']['rendering'] = QtGui.QIcon(
+            ressources._rendering_icon_)
+        self.icons_dic['stage']['camera'] = QtGui.QIcon(
+            ressources._camera_icon_)
+        self.icons_dic['stage']['compositing'] = QtGui.QIcon(
+            ressources._compositing_icon_)
+        self.icons_dic['stage']['custom'] = QtGui.QIcon(
+            ressources._custom_icon_)
+        self.icons_dic['stage']['camrig'] = QtGui.QIcon(
+            ressources._camera_rig_icon_)
         self.icons_dic['priority'] = dict()
         for priority in assets_vars._priority_list_:
-            self.icons_dic['priority'][priority] = QtGui.QIcon(ressources._priority_icons_list_[priority])
+            self.icons_dic['priority'][priority] = QtGui.QIcon(
+                ressources._priority_icons_list_[priority])
 
         self.setMinimumWidth(330)
         self.resize(330, self.height())
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(2)
         self.setLayout(self.main_layout)
 
         self.search_frame = QtWidgets.QFrame()
         self.search_layout = QtWidgets.QHBoxLayout()
-        self.search_layout.setContentsMargins(0,0,0,0)
+        self.search_layout.setContentsMargins(0, 0, 0, 0)
         self.search_layout.setSpacing(8)
         self.search_frame.setLayout(self.search_layout)
 
         self.search_bar = gui_utils.search_bar()
-        gui_utils.application_tooltip(self.search_bar, "Search for a specific item")
+        gui_utils.application_tooltip(
+            self.search_bar, "Search for a specific item")
         self.search_bar.setPlaceholderText('characters&Lola&grooming')
         self.search_layout.addWidget(self.search_bar)
 
@@ -129,24 +149,33 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setColumnCount(5)
         self.tree.header().setStretchLastSection(False)
         self.tree.header().resizeSection(0, 190)
-        self.tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.tree.header().setSectionResizeMode(
+            0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.tree.header().resizeSection(1, 16)
-        self.tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.tree.header().setSectionResizeMode(
+            1, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.header().resizeSection(2, 16)
-        self.tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.tree.header().setSectionResizeMode(
+            2, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.header().resizeSection(3, 32)
-        self.tree.header().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.tree.header().setSectionResizeMode(
+            3, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.header().resizeSection(4, 52)
-        self.tree.header().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.tree.header().setSectionResizeMode(
+            4, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.tree.setIconSize(QtCore.QSize(16, 16))
-        self.tree.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tree.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.tree.setDragEnabled(True)
-        self.tree.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
+        self.tree.setDragDropMode(
+            QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.tree.setAlternatingRowColors(True)
         self.tree.setHeaderHidden(True)
         self.tree.setIndentation(16)
-        self.tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.tree.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.tree.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.tree.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.main_layout.addWidget(self.tree)
 
         self.refresh_label = QtWidgets.QLabel()
@@ -159,9 +188,12 @@ class tree_widget(QtWidgets.QFrame):
         self.search_thread.item_signal.connect(self.add_search_item)
         self.tree.itemDoubleClicked.connect(self.double_click)
         self.tree.itemSelectionChanged.connect(self.item_changed)
-        self.tree.customContextMenuRequested.connect(self.context_menu_requested)
-        self.tree.move_asset_to_assets_group.connect(self.move_asset_to_assets_group)
-        self.tree.remove_asset_from_assets_group.connect(self.remove_asset_from_assets_group)
+        self.tree.customContextMenuRequested.connect(
+            self.context_menu_requested)
+        self.tree.move_asset_to_assets_group.connect(
+            self.move_asset_to_assets_group)
+        self.tree.remove_asset_from_assets_group.connect(
+            self.remove_asset_from_assets_group)
 
     def item_changed(self):
         item = self.tree.currentItem()
@@ -175,10 +207,10 @@ class tree_widget(QtWidgets.QFrame):
 
     def init_tree(self):
         self.set_context()
-        self.domain_ids=dict()
-        self.category_ids=dict()
-        self.asset_ids=dict()
-        self.stage_ids=dict()
+        self.domain_ids = dict()
+        self.category_ids = dict()
+        self.asset_ids = dict()
+        self.stage_ids = dict()
         self.tree.clear()
 
     def set_context(self):
@@ -207,7 +239,7 @@ class tree_widget(QtWidgets.QFrame):
         if selected_item:
             if 'creation' not in selected_item.instance_type:
                 context_dic['selected_instance'] = (selected_item.instance_type,
-                                                            selected_item.instance_id)
+                                                    selected_item.instance_id)
         user.user().add_context(user_vars._tree_context_, context_dic)
 
     def get_context(self):
@@ -225,16 +257,20 @@ class tree_widget(QtWidgets.QFrame):
             if context_dic['selected_instance']:
                 if context_dic['selected_instance'][0] == 'domain':
                     if context_dic['selected_instance'][1] in self.domain_ids.keys():
-                        self.focus_on_item(self.domain_ids[context_dic['selected_instance'][1]])
+                        self.focus_on_item(
+                            self.domain_ids[context_dic['selected_instance'][1]])
                 if context_dic['selected_instance'][0] == 'category':
                     if context_dic['selected_instance'][1] in self.category_ids.keys():
-                        self.focus_on_item(self.category_ids[context_dic['selected_instance'][1]])
+                        self.focus_on_item(
+                            self.category_ids[context_dic['selected_instance'][1]])
                 if context_dic['selected_instance'][0] == 'asset':
                     if context_dic['selected_instance'][1] in self.asset_ids.keys():
-                        self.focus_on_item(self.asset_ids[context_dic['selected_instance'][1]])
+                        self.focus_on_item(
+                            self.asset_ids[context_dic['selected_instance'][1]])
                 if context_dic['selected_instance'][0] == 'stage':
                     if context_dic['selected_instance'][1] in self.stage_ids.keys():
-                        self.focus_on_item(self.stage_ids[context_dic['selected_instance'][1]])
+                        self.focus_on_item(
+                            self.stage_ids[context_dic['selected_instance'][1]])
             self.search_bar.setText(context_dic['search_string'])
             self.apply_search()
             self.creation_items_visibility = context_dic['creation_items_visibility']
@@ -281,11 +317,11 @@ class tree_widget(QtWidgets.QFrame):
         stage_ids = list(self.stage_ids.keys())
         for id in stage_ids:
             if id not in self.project_stage_ids:
-                self.remove_stage(id)  
+                self.remove_stage(id)
         asset_ids = list(self.asset_ids.keys())
         for id in asset_ids:
             if id not in self.project_asset_ids:
-                self.remove_asset(id)     
+                self.remove_asset(id)
         category_ids = list(self.category_ids.keys())
         for id in category_ids:
             if id not in self.project_category_ids:
@@ -294,7 +330,7 @@ class tree_widget(QtWidgets.QFrame):
         for id in assets_groups_ids:
             if id not in self.project_assets_groups_ids:
                 self.remove_assets_group(id)
-        
+
         for domain_id in self.domain_ids.keys():
             self.sort_domain_children(domain_id)
         for category_id in self.category_ids.keys():
@@ -306,11 +342,14 @@ class tree_widget(QtWidgets.QFrame):
 
         assets_progresses, categories_progresses, domains_progresses = stats.get_all_progresses()
         for asset_id in assets_progresses.keys():
-            self.asset_ids[asset_id].progress_indicator.set_progress(assets_progresses[asset_id])
+            self.asset_ids[asset_id].progress_indicator.set_progress(
+                assets_progresses[asset_id])
         for category_id in categories_progresses.keys():
-            self.category_ids[category_id].progress_indicator.set_progress(categories_progresses[category_id])
+            self.category_ids[category_id].progress_indicator.set_progress(
+                categories_progresses[category_id])
         for domain_id in domains_progresses.keys():
-            self.domain_ids[domain_id].progress_indicator.set_progress(domains_progresses[domain_id])
+            self.domain_ids[domain_id].progress_indicator.set_progress(
+                domains_progresses[domain_id])
 
         self.apply_search()
         self.refresh_datas()
@@ -344,7 +383,8 @@ class tree_widget(QtWidgets.QFrame):
         names = tools.natural_sort(names)
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.domain_ids[domain_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
+        self.domain_ids[domain_id].sortChildren(
+            50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_category_children(self, category_id):
         names_dic = dict()
@@ -360,7 +400,8 @@ class tree_widget(QtWidgets.QFrame):
         names = tools.natural_sort(names)
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.category_ids[category_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
+        self.category_ids[category_id].sortChildren(
+            50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_asset_group_children(self, asset_group_id):
         names_dic = dict()
@@ -373,7 +414,8 @@ class tree_widget(QtWidgets.QFrame):
         names = tools.natural_sort(names)
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.assets_groups_ids[asset_group_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
+        self.assets_groups_ids[asset_group_id].sortChildren(
+            50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_asset_children(self, asset_id):
         names_dic = dict()
@@ -390,7 +432,8 @@ class tree_widget(QtWidgets.QFrame):
         names = sorted(names, key=lambda x: order_list.index(x))
         for name in names:
             names_dic[name].setText(50, str(names.index(name)).zfill(10))
-        self.asset_ids[asset_id].sortChildren(50, QtCore.Qt.SortOrder.AscendingOrder)
+        self.asset_ids[asset_id].sortChildren(
+            50, QtCore.Qt.SortOrder.AscendingOrder)
 
     def update_columns_visibility(self):
         self.tree.setColumnHidden(1, not self.assignment_visibility)
@@ -436,11 +479,11 @@ class tree_widget(QtWidgets.QFrame):
 
     def add_domain(self, row):
         if row['id'] not in self.domain_ids.keys():
-            domain_item = custom_treeWidgetItem(self.tree.invisibleRootItem(), 
-                                                    instance_name = row['name'],
-                                                    instance_type = 'domain',
-                                                    instance_id = row['id'])
-            
+            domain_item = custom_treeWidgetItem(self.tree.invisibleRootItem(),
+                                                instance_name=row['name'],
+                                                instance_type='domain',
+                                                instance_id=row['id'])
+
             domain_item.setIcon(0, self.icons_dic['domain'][f"{row['name']}"])
             domain_item.setText(0, row['name'])
             domain_item.add_progress_indicator()
@@ -453,10 +496,10 @@ class tree_widget(QtWidgets.QFrame):
         if row['domain_id'] in self.domain_ids.keys():
             if row['id'] not in self.category_ids.keys():
                 parent_widget = self.domain_ids[row['domain_id']]
-                category_item = custom_treeWidgetItem(parent_widget, 
-                                                        instance_name = row['name'],
-                                                        instance_type = 'category',
-                                                        instance_id = row['id'])
+                category_item = custom_treeWidgetItem(parent_widget,
+                                                      instance_name=row['name'],
+                                                      instance_type='category',
+                                                      instance_id=row['id'])
                 category_item.setIcon(0, self.icons_dic['folder'])
                 category_item.setText(0, row['name'])
                 self.category_ids[row['id']] = category_item
@@ -465,24 +508,27 @@ class tree_widget(QtWidgets.QFrame):
                 self.add_creation_item(category_item, 'new', 'asset_creation')
             else:
                 self.category_ids[row['id']].state_indicator.clear_states()
-                self.category_ids[row['id']].priority_indicator.clear_priorities()
+                self.category_ids[row['id']
+                                  ].priority_indicator.clear_priorities()
 
     def add_assets_group(self, row):
         if row['category_id'] in self.category_ids.keys():
             if row['id'] not in self.assets_groups_ids.keys():
                 parent_widget = self.category_ids[row['category_id']]
-                assets_group_item = custom_treeWidgetItem(parent_widget, 
-                                                        instance_name = row['name'],
-                                                        instance_type = 'assets_group',
-                                                        instance_id = row['id'])
+                assets_group_item = custom_treeWidgetItem(parent_widget,
+                                                          instance_name=row['name'],
+                                                          instance_type='assets_group',
+                                                          instance_id=row['id'])
                 assets_group_item.setIcon(0, self.icons_dic['assets_groups'])
                 assets_group_item.setText(0, row['name'])
                 self.assets_groups_ids[row['id']] = assets_group_item
                 parent_widget.addChild(assets_group_item)
                 assets_group_item.add_indicators()
             else:
-                self.assets_groups_ids[row['id']].state_indicator.clear_states()
-                self.assets_groups_ids[row['id']].priority_indicator.clear_priorities()
+                self.assets_groups_ids[row['id']
+                                       ].state_indicator.clear_states()
+                self.assets_groups_ids[row['id']
+                                       ].priority_indicator.clear_priorities()
 
     def add_asset(self, row):
         if row['category_id'] in self.category_ids.keys():
@@ -491,16 +537,17 @@ class tree_widget(QtWidgets.QFrame):
                     parent_widget = self.assets_groups_ids[row['assets_group_id']]
                 else:
                     parent_widget = self.category_ids[row['category_id']]
-                asset_item = custom_treeWidgetItem(parent_widget, 
-                                                        instance_name = row['name'],
-                                                        instance_type = 'asset',
-                                                        instance_id = row['id'])
+                asset_item = custom_treeWidgetItem(parent_widget,
+                                                   instance_name=row['name'],
+                                                   instance_type='asset',
+                                                   instance_id=row['id'])
                 asset_item.setIcon(0, self.icons_dic['folder'])
                 asset_item.setText(0, row['name'])
                 self.asset_ids[row['id']] = asset_item
                 parent_widget.addChild(asset_item)
                 asset_item.add_indicators()
-                domain_id = project.get_category_data(row['category_id'], 'domain_id')
+                domain_id = project.get_category_data(
+                    row['category_id'], 'domain_id')
                 domain_name = project.get_domain_data(domain_id, 'name')
                 self.add_creation_item(asset_item, 'new', 'stage_creation')
             else:
@@ -519,11 +566,16 @@ class tree_widget(QtWidgets.QFrame):
         for domain_id in self.domain_ids.keys():
             domain_item = self.domain_ids[domain_id]
             if self.color_visibility:
-                self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[domain_item.instance_name], opacity=110)
-                self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[domain_item.instance_name], opacity=110)
-                self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[domain_item.instance_name], opacity=110)
-                self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[domain_item.instance_name], opacity=110)
-                self.tree.set_background_color(domain_item, 4, ressources._domains_colors_[domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 0, ressources._domains_colors_[
+                                               domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 1, ressources._domains_colors_[
+                                               domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 2, ressources._domains_colors_[
+                                               domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 3, ressources._domains_colors_[
+                                               domain_item.instance_name], opacity=110)
+                self.tree.set_background_color(domain_item, 4, ressources._domains_colors_[
+                                               domain_item.instance_name], opacity=110)
             else:
                 self.tree.set_background_color(domain_item, 0, None)
                 self.tree.set_background_color(domain_item, 1, None)
@@ -534,11 +586,16 @@ class tree_widget(QtWidgets.QFrame):
             category_item = self.category_ids[category_id]
             parent_widget = category_item.parent()
             if self.color_visibility:
-                self.tree.set_background_color(category_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(category_item, 4, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 0, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 1, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 2, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 3, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(category_item, 4, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
             else:
                 self.tree.set_background_color(category_item, 0, None)
                 self.tree.set_background_color(category_item, 1, None)
@@ -552,11 +609,16 @@ class tree_widget(QtWidgets.QFrame):
                 parent_widget = parent_widget.parent()
             domain_widget = parent_widget.parent()
             if self.color_visibility:
-                self.tree.set_background_color(asset_item, 0, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
-                self.tree.set_background_color(asset_item, 1, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
-                self.tree.set_background_color(asset_item, 2, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
-                self.tree.set_background_color(asset_item, 3, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
-                self.tree.set_background_color(asset_item, 4, ressources._domains_colors_[domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 0, ressources._domains_colors_[
+                                               domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 1, ressources._domains_colors_[
+                                               domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 2, ressources._domains_colors_[
+                                               domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 3, ressources._domains_colors_[
+                                               domain_widget.instance_name], opacity=40)
+                self.tree.set_background_color(asset_item, 4, ressources._domains_colors_[
+                                               domain_widget.instance_name], opacity=40)
             else:
                 self.tree.set_background_color(asset_item, 0, None)
                 self.tree.set_background_color(asset_item, 1, None)
@@ -568,11 +630,16 @@ class tree_widget(QtWidgets.QFrame):
             category_item = assets_group_item.parent()
             parent_widget = category_item.parent()
             if self.color_visibility:
-                self.tree.set_background_color(assets_group_item, 0, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 1, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 2, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 3, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
-                self.tree.set_background_color(assets_group_item, 4, ressources._domains_colors_[parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 0, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 1, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 2, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 3, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
+                self.tree.set_background_color(assets_group_item, 4, ressources._domains_colors_[
+                                               parent_widget.instance_name], opacity=80)
             else:
                 self.tree.set_background_color(assets_group_item, 0, None)
                 self.tree.set_background_color(assets_group_item, 1, None)
@@ -591,12 +658,13 @@ class tree_widget(QtWidgets.QFrame):
         if row['asset_id'] in self.asset_ids.keys():
             if row['id'] not in self.stage_ids.keys():
                 parent_widget = self.asset_ids[row['asset_id']]
-                stage_item = custom_treeWidgetItem( None,
-                                                    instance_name = row['name'],
-                                                    instance_id = row['id'],
-                                                    instance_type = 'stage')
+                stage_item = custom_treeWidgetItem(None,
+                                                   instance_name=row['name'],
+                                                   instance_id=row['id'],
+                                                   instance_type='stage')
                 stage_item.setText(0, row['name'])
-                stage_item.setIcon(0, self.icons_dic['stage'][f"{row['name']}"])
+                stage_item.setIcon(
+                    0, self.icons_dic['stage'][f"{row['name']}"])
                 self.stage_ids[row['id']] = stage_item
 
                 parent_widget.addChild(stage_item)
@@ -604,20 +672,28 @@ class tree_widget(QtWidgets.QFrame):
 
                 self.remove_stage_creation_item(parent_widget)
             self.stage_ids[row['id']].state_indicator.set_state(row['state'])
-            self.stage_ids[row['id']].priority_indicator.set_priority(row['priority'])
-            self.stage_ids[row['id']].setIcon(1, self.users_icons_dic[row['assignment']])
-            self.stage_ids[row['id']].progress_indicator.set_progress(row['progress'])
+            self.stage_ids[row['id']].priority_indicator.set_priority(
+                row['priority'])
+            self.stage_ids[row['id']].setIcon(
+                1, self.users_icons_dic[row['assignment']])
+            self.stage_ids[row['id']].progress_indicator.set_progress(
+                row['progress'])
             if row['state'] in ['error', 'rtk']:
-                self.stage_ids[row['id']].parent().state_indicator.add_state(row['state'])
-                self.stage_ids[row['id']].parent().parent().state_indicator.add_state(row['state'])
+                self.stage_ids[row['id']].parent(
+                ).state_indicator.add_state(row['state'])
+                self.stage_ids[row['id']].parent().parent(
+                ).state_indicator.add_state(row['state'])
                 if self.stage_ids[row['id']].parent().parent().instance_type == 'assets_group':
-                    self.stage_ids[row['id']].parent().parent().parent().state_indicator.add_state(row['state'])
+                    self.stage_ids[row['id']].parent().parent(
+                    ).parent().state_indicator.add_state(row['state'])
             if row['priority'] != assets_vars._priority_normal_:
-                self.stage_ids[row['id']].parent().priority_indicator.add_priority(row['priority'])
-                self.stage_ids[row['id']].parent().parent().priority_indicator.add_priority(row['priority'])
+                self.stage_ids[row['id']].parent(
+                ).priority_indicator.add_priority(row['priority'])
+                self.stage_ids[row['id']].parent().parent(
+                ).priority_indicator.add_priority(row['priority'])
                 if self.stage_ids[row['id']].parent().parent().instance_type == 'assets_group':
-                    self.stage_ids[row['id']].parent().parent().parent().priority_indicator.add_priority(row['priority'])
-
+                    self.stage_ids[row['id']].parent().parent().parent(
+                    ).priority_indicator.add_priority(row['priority'])
 
     def remove_stage_creation_item(self, parent_widget):
         child_count = parent_widget.childCount()
@@ -643,11 +719,11 @@ class tree_widget(QtWidgets.QFrame):
                 break
 
     def add_creation_item(self, parent_widget, text, item_type, use_index=False):
-        creation_item = custom_treeWidgetItem( None,
-                                                instance_name = text,
-                                                instance_id = None,
-                                                instance_type = item_type,
-                                                parent_id=parent_widget.instance_id)
+        creation_item = custom_treeWidgetItem(None,
+                                              instance_name=text,
+                                              instance_id=None,
+                                              instance_type=item_type,
+                                              parent_id=parent_widget.instance_id)
         creation_item.setIcon(0, self.icons_dic['add'])
         creation_item.setText(0, text)
         creation_item.setForeground(0, QtGui.QBrush(QtGui.QColor('gray')))
@@ -681,7 +757,7 @@ class tree_widget(QtWidgets.QFrame):
             self.assets_groups_ids[id].setHidden(visibility)
 
     def filter_stage(self, string):
-        if not string or len(string)<2:
+        if not string or len(string) < 2:
             for id in self.asset_ids.keys():
                 for i in range(self.asset_ids[id].childCount()):
                     if self.asset_ids[id].child(i) not in self.creation_items:
@@ -699,7 +775,7 @@ class tree_widget(QtWidgets.QFrame):
         self.tree.setCurrentItem(item)
         if expand is not None:
             item.setExpanded(expand)
-        self.item_changed()#item)
+        self.item_changed()  # item)
 
     def focus_instance(self, instance_tuple):
         instance_type = instance_tuple[0]
@@ -726,16 +802,19 @@ class tree_widget(QtWidgets.QFrame):
             search_text = f"{item.instance_name}/"
         elif item.instance_type == 'asset':
             if item.parent().instance_type == 'assets_group':
-                category_item = self.category_ids[item.parent().parent().instance_id]
+                category_item = self.category_ids[item.parent(
+                ).parent().instance_id]
             else:
                 category_item = self.category_ids[item.parent().instance_id]
             search_text = f"{category_item.instance_name}/{item.instance_name}"
         elif item.instance_type == 'stage':
             asset_item = self.asset_ids[item.parent().instance_id]
             if asset_item.parent().instance_type == 'assets_group':
-                category_item = self.category_ids[asset_item.parent().parent().instance_id]
+                category_item = self.category_ids[asset_item.parent(
+                ).parent().instance_id]
             else:
-                category_item = self.category_ids[asset_item.parent().instance_id]
+                category_item = self.category_ids[asset_item.parent(
+                ).instance_id]
             search_text = f"{category_item.instance_name}/{asset_item.instance_name}/{item.instance_name}"
         if search_text != '':
             self.search_bar.setText(search_text)
@@ -750,7 +829,7 @@ class tree_widget(QtWidgets.QFrame):
             self.reduce_all()
             self.search_thread.update_search(search)
         else:
-            self.search_thread.running=False
+            self.search_thread.running = False
             self.toggle_all_visibility(0)
 
     def double_click(self, item):
@@ -759,17 +838,20 @@ class tree_widget(QtWidgets.QFrame):
         new_category_id = None
 
         if item.instance_type == 'stage_creation':
-            existing_stages = project.get_asset_childs(item.instance_parent_id, 'name')
+            existing_stages = project.get_asset_childs(
+                item.instance_parent_id, 'name')
             menu = gui_utils.QMenu()
-            domain_item = item.parent().parent().parent() 
+            domain_item = item.parent().parent().parent()
             if domain_item.instance_type != 'domain':
-                domain_item=domain_item.parent()
-            domain_name = domain_item.instance_name 
+                domain_item = domain_item.parent()
+            domain_name = domain_item.instance_name
             for stage in assets_vars._stages_list_[domain_name]:
                 if stage not in existing_stages:
-                    action = menu.addAction(QtGui.QIcon(self.icons_dic['stage'][stage]), stage)
+                    action = menu.addAction(QtGui.QIcon(
+                        self.icons_dic['stage'][stage]), stage)
                     action.name = stage
-            action = menu.addAction(QtGui.QIcon(ressources._guess_icon_), 'Create all stages')
+            action = menu.addAction(QtGui.QIcon(
+                ressources._guess_icon_), 'Create all stages')
             action.name = 'create_all'
             action = menu.exec(QtGui.QCursor().pos())
             if action is not None:
@@ -788,7 +870,8 @@ class tree_widget(QtWidgets.QFrame):
                         gui_server.refresh_team_ui()
 
         elif item.instance_type == 'asset_creation':
-            self.instance_creation_widget = instance_creation_widget(self, title='Create asset')
+            self.instance_creation_widget = instance_creation_widget(
+                self, title='Create asset')
             if self.instance_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 asset_name = self.instance_creation_widget.name_field.text()
                 inframe = self.instance_creation_widget.inframe
@@ -796,16 +879,19 @@ class tree_widget(QtWidgets.QFrame):
                 preroll = self.instance_creation_widget.preroll
                 postroll = self.instance_creation_widget.postroll
                 parent_id = item.instance_parent_id
-                new_asset_id = assets.create_asset(asset_name, parent_id, inframe, outframe, preroll, postroll)
+                new_asset_id = assets.create_asset(
+                    asset_name, parent_id, inframe, outframe, preroll, postroll)
                 if new_asset_id is not None:
                     self.refresh()
                     gui_server.refresh_team_ui()
         elif item.instance_type == 'category_creation':
-            self.instance_creation_widget = instance_creation_widget(self, request_frames=None, title='Create category')
+            self.instance_creation_widget = instance_creation_widget(
+                self, request_frames=None, title='Create category')
             if self.instance_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 category_name = self.instance_creation_widget.name_field.text()
                 parent_id = item.instance_parent_id
-                new_category_id = assets.create_category(category_name, parent_id)
+                new_category_id = assets.create_category(
+                    category_name, parent_id)
                 if new_category_id is not None:
                     self.refresh()
                     gui_server.refresh_team_ui()
@@ -820,13 +906,15 @@ class tree_widget(QtWidgets.QFrame):
                 self.focus_on_item(self.asset_ids[new_asset_id], expand=1)
         if new_category_id:
             if new_category_id in self.category_ids.keys():
-                self.focus_on_item(self.category_ids[new_category_id], expand=1)
+                self.focus_on_item(
+                    self.category_ids[new_category_id], expand=1)
 
     def context_menu_requested(self, point):
         menu = gui_utils.QMenu(self)
-        
+
         item = self.tree.itemAt(point)
-        reduce_all_action = menu.addAction(QtGui.QIcon(ressources._reduce_icon_), 'Reduce all')
+        reduce_all_action = menu.addAction(
+            QtGui.QIcon(ressources._reduce_icon_), 'Reduce all')
         launch_action = None
         archive_action = None
         isolate_action = None
@@ -837,21 +925,28 @@ class tree_widget(QtWidgets.QFrame):
         expand_all_children_action = None
         if item:
             if 'creation' not in item.instance_type:
-                open_folder_action = menu.addAction(QtGui.QIcon(ressources._folder_icon_), 'Open folder')
+                open_folder_action = menu.addAction(
+                    QtGui.QIcon(ressources._folder_icon_), 'Open folder')
             if 'creation' not in item.instance_type and item.instance_type != 'domain':
-                archive_action = menu.addAction(QtGui.QIcon(ressources._archive_icon_), f'Archive {item.instance_type}')
-                isolate_action = menu.addAction(QtGui.QIcon(ressources._isolate_icon_), f'Isolate {item.instance_type}')
+                archive_action = menu.addAction(QtGui.QIcon(
+                    ressources._archive_icon_), f'Archive {item.instance_type}')
+                isolate_action = menu.addAction(QtGui.QIcon(
+                    ressources._isolate_icon_), f'Isolate {item.instance_type}')
             if 'creation' not in item.instance_type and item.instance_type == 'asset':
-                edit_frame_range_action = menu.addAction(QtGui.QIcon(ressources._tool_frame_range_), f'Edit frame range')
+                edit_frame_range_action = menu.addAction(QtGui.QIcon(
+                    ressources._tool_frame_range_), f'Edit frame range')
             if 'creation' not in item.instance_type and item.instance_type == 'stage':
                 menu.addSeparator()
-                open_sandbox_folder_action = menu.addAction(QtGui.QIcon(ressources._sandbox_icon_), 'Open Sandbox folder')
-                launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), f'Launch {item.instance_type} (Double click)')
+                open_sandbox_folder_action = menu.addAction(
+                    QtGui.QIcon(ressources._sandbox_icon_), 'Open Sandbox folder')
+                launch_action = menu.addAction(QtGui.QIcon(
+                    ressources._launch_icon_), f'Launch {item.instance_type} (Double click)')
             if 'creation' not in item.instance_type and item.instance_type == 'category':
-                create_assets_group_action = menu.addAction(QtGui.QIcon(ressources._assets_group_icon_), f'Create assets group')
+                create_assets_group_action = menu.addAction(QtGui.QIcon(
+                    ressources._assets_group_icon_), f'Create assets group')
             if 'creation' not in item.instance_type and item.instance_type in ['category', 'domain', 'assets_group']:
-                expand_all_children_action = menu.addAction(QtGui.QIcon(ressources._expand_icon_), f'Expand all children')
-
+                expand_all_children_action = menu.addAction(
+                    QtGui.QIcon(ressources._expand_icon_), f'Expand all children')
 
         menu.addSeparator()
 
@@ -879,12 +974,18 @@ class tree_widget(QtWidgets.QFrame):
         if self.color_visibility:
             color_visibility_icon = ressources._check_icon_
 
-        hide_creation_items = menu.addAction(QtGui.QIcon(creation_items_visibility_icon), f'Creation items')
-        hide_assignment = menu.addAction(QtGui.QIcon(assignment_visibility_icon), f'Assignment')
-        hide_state = menu.addAction(QtGui.QIcon(state_visibility_icon), f'State')
-        hide_priority = menu.addAction(QtGui.QIcon(priority_visibility_icon), f'Priority')
-        hide_progress = menu.addAction(QtGui.QIcon(progress_visibility_icon), f'Progress')
-        hide_colors = menu.addAction(QtGui.QIcon(color_visibility_icon), f'Color')
+        hide_creation_items = menu.addAction(QtGui.QIcon(
+            creation_items_visibility_icon), f'Creation items')
+        hide_assignment = menu.addAction(QtGui.QIcon(
+            assignment_visibility_icon), f'Assignment')
+        hide_state = menu.addAction(
+            QtGui.QIcon(state_visibility_icon), f'State')
+        hide_priority = menu.addAction(QtGui.QIcon(
+            priority_visibility_icon), f'Priority')
+        hide_progress = menu.addAction(QtGui.QIcon(
+            progress_visibility_icon), f'Progress')
+        hide_colors = menu.addAction(
+            QtGui.QIcon(color_visibility_icon), f'Color')
 
         action = menu.exec(QtGui.QCursor().pos())
         if action is not None:
@@ -932,7 +1033,7 @@ class tree_widget(QtWidgets.QFrame):
             path = assets.get_category_path(item.instance_id)
         elif item.instance_type == 'asset':
             path = assets.get_asset_path(item.instance_id)
-        elif item.instance_type== 'stage':
+        elif item.instance_type == 'stage':
             path = assets.get_stage_path(item.instance_id)
         if path_utils.isdir(path):
             path_utils.startfile(path)
@@ -943,7 +1044,8 @@ class tree_widget(QtWidgets.QFrame):
         if item.instance_type != 'category':
             return
         category_id = item.instance_id
-        self.assets_group_creation_widget = assets_group_creation_widget(title='Create assets group')
+        self.assets_group_creation_widget = assets_group_creation_widget(
+            title='Create assets group')
         if self.assets_group_creation_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             assets_group_name = self.assets_group_creation_widget.name_field.text()
             if project.create_assets_group(assets_group_name, category_id):
@@ -951,15 +1053,18 @@ class tree_widget(QtWidgets.QFrame):
                 return 1
 
     def open_sandbox_folder(self, item):
-        variant_id = project.get_stage_data(item.instance_id, 'default_variant_id')
-        sandbox_path = path_utils.join(assets.get_variant_path(variant_id), '_SANDBOX')
+        variant_id = project.get_stage_data(
+            item.instance_id, 'default_variant_id')
+        sandbox_path = path_utils.join(
+            assets.get_variant_path(variant_id), '_SANDBOX')
         path_utils.startfile(sandbox_path)
 
     def archive_instance(self, item):
         if not repository.is_admin():
             return
-        self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
-        
+        self.confirm_widget = confirm_widget.confirm_widget(
+            'Do you want to continue ?', parent=self)
+
         security_sentence = f"{item.instance_name}"
         if item.instance_type == 'category':
             security_sentence = f"{environment.get_project_name()}/{item.instance_name}"
@@ -971,15 +1076,16 @@ class tree_widget(QtWidgets.QFrame):
                 subtasks_library.archive_category(item.instance_id)
             elif item.instance_type == 'asset':
                 subtasks_library.archive_asset(item.instance_id)
-            elif item.instance_type== 'stage':
+            elif item.instance_type == 'stage':
                 subtasks_library.archive_stage(item.instance_id)
-            elif item.instance_type== 'assets_group':
+            elif item.instance_type == 'assets_group':
                 project.remove_assets_group(item.instance_id)
                 gui_server.refresh_team_ui()
 
     def edit_frame_range(self, item):
         if item.instance_type == 'asset':
-            self.edit_frame_range_widget = edit_frame_range_widget(asset_id=item.instance_id)
+            self.edit_frame_range_widget = edit_frame_range_widget(
+                asset_id=item.instance_id)
             self.edit_frame_range_widget.exec()
 
     def remove_category(self, id):
@@ -996,7 +1102,7 @@ class tree_widget(QtWidgets.QFrame):
         parent = item.parent()
         for child in range(item.childCount()):
             child_item = item.child(child)
-            move_asset(child_item, parent)
+            self.move_asset(child_item, parent)
         is_selected = item.isSelected()
         item.parent().removeChild(item)
         del self.assets_groups_ids[id]
@@ -1025,7 +1131,8 @@ class tree_widget(QtWidgets.QFrame):
                 stage_creation_presence = True
                 break
         if not stage_creation_presence:
-            self.add_creation_item(parent_item, 'new', 'stage_creation', use_index=0)
+            self.add_creation_item(
+                parent_item, 'new', 'stage_creation', use_index=0)
 
         del self.stage_ids[id]
         if is_selected:
@@ -1041,19 +1148,25 @@ class tree_widget(QtWidgets.QFrame):
                 self.stage_ids[instance_id].parent().setExpanded(1)
                 self.stage_ids[instance_id].parent().parent().setHidden(0)
                 self.stage_ids[instance_id].parent().parent().setExpanded(1)
-                self.stage_ids[instance_id].parent().parent().parent().setExpanded(1)
-                self.stage_ids[instance_id].parent().parent().parent().setHidden(0)
+                self.stage_ids[instance_id].parent(
+                ).parent().parent().setExpanded(1)
+                self.stage_ids[instance_id].parent(
+                ).parent().parent().setHidden(0)
                 if self.stage_ids[instance_id].parent().parent().instance_type == 'assets_group':
-                    self.stage_ids[instance_id].parent().parent().parent().parent().setExpanded(1)
-                    self.stage_ids[instance_id].parent().parent().parent().parent().setHidden(0)
+                    self.stage_ids[instance_id].parent(
+                    ).parent().parent().parent().setExpanded(1)
+                    self.stage_ids[instance_id].parent(
+                    ).parent().parent().parent().setHidden(0)
         elif instance_type == 'assets_group':
             if instance_id in self.assets_groups_ids.keys():
                 self.assets_groups_ids[instance_id].setHidden(0)
                 self.assets_groups_ids[instance_id].setExpanded(1)
                 self.assets_groups_ids[instance_id].parent().setHidden(0)
                 self.assets_groups_ids[instance_id].parent().setExpanded(1)
-                self.assets_groups_ids[instance_id].parent().parent().setHidden(0)
-                self.assets_groups_ids[instance_id].parent().parent().setExpanded(1)
+                self.assets_groups_ids[instance_id].parent(
+                ).parent().setHidden(0)
+                self.assets_groups_ids[instance_id].parent(
+                ).parent().setExpanded(1)
                 self.unhideAllDescendants(self.assets_groups_ids[instance_id])
 
     def unhideAllDescendants(self, item):
@@ -1064,9 +1177,10 @@ class tree_widget(QtWidgets.QFrame):
                 childItem = item.child(i)
                 self.unhideAllDescendants(childItem)
 
+
 class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
     def __init__(self, parent, instance_name, instance_type, instance_id=None, parent_id=None):
-        super(custom_treeWidgetItem, self ).__init__(parent)
+        super(custom_treeWidgetItem, self).__init__(parent)
 
         self.setForeground(2, QtGui.QBrush(QtGui.QColor('gray')))
 
@@ -1086,13 +1200,14 @@ class custom_treeWidgetItem(QtWidgets.QTreeWidgetItem):
         self.progress_indicator = progress_indicator()
         self.treeWidget().setItemWidget(self, 4, self.progress_indicator)
 
+
 class progress_indicator(QtWidgets.QWidget):
     def __init__(self):
         super(progress_indicator, self).__init__()
         self.setFixedWidth(35)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(2)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
         self.progress_label = QtWidgets.QLabel()
         self.progress_label.setObjectName('bold_label')
@@ -1102,13 +1217,14 @@ class progress_indicator(QtWidgets.QWidget):
     def set_progress(self, progress):
         self.progress_label.setText(f"{progress}%")
 
+
 class state_indicator(QtWidgets.QWidget):
     def __init__(self):
         super(state_indicator, self).__init__()
         self.setFixedWidth(18)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(2)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
         self.states = []
         self.indicators = dict()
@@ -1118,8 +1234,9 @@ class state_indicator(QtWidgets.QWidget):
             if state in self.indicators.keys():
                 continue
             indicator_frame = QtWidgets.QFrame()
-            indicator_frame.setFixedSize(8,8)
-            indicator_frame.setStyleSheet(f'background-color:{ressources._states_colors_[state]};border-radius:4px;')
+            indicator_frame.setFixedSize(8, 8)
+            indicator_frame.setStyleSheet(
+                f'background-color:{ressources._states_colors_[state]};border-radius:4px;')
             self.main_layout.addWidget(indicator_frame)
             self.indicators[state] = indicator_frame
         current_states = list(self.indicators.keys())
@@ -1144,13 +1261,14 @@ class state_indicator(QtWidgets.QWidget):
         self.states = []
         self.update_indicators()
 
+
 class priority_indicator(QtWidgets.QWidget):
     def __init__(self):
         super(priority_indicator, self).__init__()
         self.setFixedWidth(32)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
         self.priorities = []
         self.indicators = dict()
@@ -1160,7 +1278,8 @@ class priority_indicator(QtWidgets.QWidget):
             if priority in self.indicators.keys():
                 continue
             indicator_label = QtWidgets.QLabel()
-            indicator_label.setPixmap(QtGui.QIcon(ressources._priority_icons_list_[priority]).pixmap(18))
+            indicator_label.setPixmap(QtGui.QIcon(
+                ressources._priority_icons_list_[priority]).pixmap(18))
             self.main_layout.addWidget(indicator_label)
             self.indicators[priority] = indicator_label
         current_priorities = list(self.indicators.keys())
@@ -1185,6 +1304,7 @@ class priority_indicator(QtWidgets.QWidget):
         self.priorities = []
         self.update_indicators()
 
+
 class instance_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, request_frames=1, title=''):
         super(instance_creation_widget, self).__init__(parent)
@@ -1196,8 +1316,9 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.title = title
         self.build_ui()
         self.connect_functions()
-        
-        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
@@ -1207,11 +1328,12 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.name_field.setFocus()
 
     def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
+        self.main_frame.setStyleSheet(
+            "#instance_creation_frame{border-%s-radius:0px;}" % corner)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.setLayout(self.main_layout)
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('instance_creation_frame')
@@ -1229,16 +1351,18 @@ class instance_creation_widget(QtWidgets.QDialog):
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.title_label = QtWidgets.QLabel(self.title)
         self.close_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 
@@ -1247,7 +1371,7 @@ class instance_creation_widget(QtWidgets.QDialog):
 
         self.frange_frame = QtWidgets.QFrame()
         self.frange_layout = QtWidgets.QHBoxLayout()
-        self.frange_layout.setContentsMargins(0,0,0,0)
+        self.frange_layout.setContentsMargins(0, 0, 0, 0)
         self.frange_layout.setSpacing(6)
         self.frange_frame.setLayout(self.frange_layout)
 
@@ -1259,26 +1383,30 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.preroll_spinBox.setObjectName('gray_label')
         self.preroll_spinBox.setRange(0, 1000000)
         self.preroll_spinBox.setValue(100)
-        self.preroll_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.preroll_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.preroll_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-100000, 219)
         self.inframe_spinBox.setValue(100)
-        self.inframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.inframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(101, 100000)
         self.outframe_spinBox.setValue(220)
-        self.outframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.outframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.outframe_spinBox)
 
         self.postroll_spinBox = QtWidgets.QSpinBox()
         self.postroll_spinBox.setObjectName('gray_label')
         self.postroll_spinBox.setRange(0, 1000000)
         self.postroll_spinBox.setValue(0)
-        self.postroll_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.postroll_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.postroll_spinBox)
 
         self.frame_layout.addWidget(self.frange_frame)
@@ -1308,14 +1436,16 @@ class instance_creation_widget(QtWidgets.QDialog):
         self.postroll_spinBox.valueChanged.connect(self.update_range)
         self.close_pushButton.clicked.connect(self.reject)
 
+
 class assets_group_creation_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, title=''):
         super(assets_group_creation_widget, self).__init__(parent)
         self.title = title
         self.build_ui()
         self.connect_functions()
-        
-        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def showEvent(self, event):
@@ -1325,11 +1455,12 @@ class assets_group_creation_widget(QtWidgets.QDialog):
         self.name_field.setFocus()
 
     def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
+        self.main_frame.setStyleSheet(
+            "#instance_creation_frame{border-%s-radius:0px;}" % corner)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.setLayout(self.main_layout)
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('instance_creation_frame')
@@ -1347,16 +1478,18 @@ class assets_group_creation_widget(QtWidgets.QDialog):
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.title_label = QtWidgets.QLabel(self.title)
         self.close_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 
@@ -1372,6 +1505,7 @@ class assets_group_creation_widget(QtWidgets.QDialog):
     def connect_functions(self):
         self.accept_button.clicked.connect(self.accept)
 
+
 class edit_frame_range_widget(QtWidgets.QDialog):
     def __init__(self, parent=None, asset_id=None):
         super(edit_frame_range_widget, self).__init__(parent)
@@ -1379,8 +1513,9 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.build_ui()
         self.load_old_range()
         self.connect_functions()
-        
-        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
     def load_old_range(self):
@@ -1411,11 +1546,12 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         event.accept()
 
     def apply_round_corners(self, corner):
-        self.main_frame.setStyleSheet("#instance_creation_frame{border-%s-radius:0px;}"%corner)
+        self.main_frame.setStyleSheet(
+            "#instance_creation_frame{border-%s-radius:0px;}" % corner)
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.setLayout(self.main_layout)
         self.main_frame = QtWidgets.QFrame()
         self.main_frame.setObjectName('instance_creation_frame')
@@ -1433,22 +1569,24 @@ class edit_frame_range_widget(QtWidgets.QDialog):
 
         self.close_frame = QtWidgets.QFrame()
         self.close_layout = QtWidgets.QHBoxLayout()
-        self.close_layout.setContentsMargins(2,2,2,2)
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
         self.close_layout.setSpacing(2)
         self.close_frame.setLayout(self.close_layout)
         self.title_label = QtWidgets.QLabel("Edit frame range")
         self.close_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(100,10,QtWidgets.QSizePolicy.Policy.Expanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
         self.close_layout.addSpacerItem(self.spaceItem)
-        self.close_pushButton = gui_utils.transparent_button(ressources._close_tranparent_icon_, ressources._close_icon_)
-        self.close_pushButton.setFixedSize(16,16)
-        self.close_pushButton.setIconSize(QtCore.QSize(12,12))
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
         self.close_layout.addWidget(self.close_pushButton)
         self.frame_layout.addWidget(self.close_frame)
 
         self.frange_frame = QtWidgets.QFrame()
         self.frange_layout = QtWidgets.QHBoxLayout()
-        self.frange_layout.setContentsMargins(0,0,0,0)
+        self.frange_layout.setContentsMargins(0, 0, 0, 0)
         self.frange_layout.setSpacing(6)
         self.frange_frame.setLayout(self.frange_layout)
 
@@ -1460,26 +1598,30 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.preroll_spinBox.setObjectName('gray_label')
         self.preroll_spinBox.setRange(0, 1000000)
         self.preroll_spinBox.setValue(100)
-        self.preroll_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.preroll_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.preroll_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-100000, 100000)
         self.inframe_spinBox.setValue(100)
-        self.inframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.inframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 100000)
         self.outframe_spinBox.setValue(220)
-        self.outframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.outframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.outframe_spinBox)
 
         self.postroll_spinBox = QtWidgets.QSpinBox()
         self.postroll_spinBox.setObjectName('gray_label')
         self.postroll_spinBox.setRange(0, 1000000)
         self.postroll_spinBox.setValue(0)
-        self.postroll_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.postroll_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frange_layout.addWidget(self.postroll_spinBox)
 
         self.frame_layout.addWidget(self.frange_frame)
@@ -1489,6 +1631,7 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.accept_button.setDefault(True)
         self.accept_button.setAutoDefault(True)
         self.frame_layout.addWidget(self.accept_button)
+
 
 class search_thread(QtCore.QThread):
 
@@ -1508,9 +1651,9 @@ class search_thread(QtCore.QThread):
 
     def run(self):
         all_stages = project.get_all_stages()
-        keywords_sets = self.string.split('+') 
+        keywords_sets = self.string.split('+')
         for keywords_set in keywords_sets:
-            keywords = keywords_set.split('&') 
+            keywords = keywords_set.split('&')
             for stage_row in all_stages:
 
                 stage_row_cp = copy.deepcopy(stage_row)
@@ -1552,7 +1695,9 @@ class search_thread(QtCore.QThread):
                 data = (' ').join(data_list)
 
                 if all(keyword.upper() in data.upper() for keyword in keywords):
-                    self.item_signal.emit(('assets_group', assets_group_row['id']))
+                    self.item_signal.emit(
+                        ('assets_group', assets_group_row['id']))
+
 
 class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
@@ -1593,7 +1738,8 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
         elif index.column() == visible_columns[0]:
             rect = QtCore.QRectF(option.rect)
             left_path = QtGui.QPainterPath()
-            left_path.addRoundedRect(rect.adjusted(0, 0, -rect.width() + 4*2, 0), 4, 4)
+            left_path.addRoundedRect(rect.adjusted(
+                0, 0, -rect.width() + 4*2, 0), 4, 4)
             right_path = QtGui.QPainterPath()
             right_path.addRoundedRect(rect.adjusted(4, 0, 0, 0), 0, 0)
             path = left_path + right_path
@@ -1605,10 +1751,12 @@ class ColoredItemDelegate(QtWidgets.QStyledItemDelegate):
             left_path = QtGui.QPainterPath()
             left_path.addRoundedRect(rect.adjusted(0, 0, -4, 0), 0, 0)
             right_path = QtGui.QPainterPath()
-            right_path.addRoundedRect(rect.adjusted(rect.width(), 0, -rect.width() + 4*2, 0), 4, 4)
+            right_path.addRoundedRect(rect.adjusted(
+                rect.width(), 0, -rect.width() + 4*2, 0), 4, 4)
             path = left_path + right_path
             painter.drawPath(path)
         super(ColoredItemDelegate, self).paint(painter, option, index)
+
 
 class tree(QtWidgets.QTreeWidget):
 
@@ -1677,11 +1825,12 @@ class tree(QtWidgets.QTreeWidget):
             self.setDropIndicatorShown(True)
             parent = item.parent()
             if parent is None:
-                parent=self.invisibleRootItem()
+                parent = self.invisibleRootItem()
             for item in item, parent:
                 if item is not None:
                     flags = item.flags()
-                    item.setFlags(flags & ~QtCore.Qt.ItemFlag.ItemIsDropEnabled)
+                    item.setFlags(
+                        flags & ~QtCore.Qt.ItemFlag.ItemIsDropEnabled)
                     items.append((item, flags))
         else:
             self.setDropIndicatorShown(False)
@@ -1695,7 +1844,8 @@ class tree(QtWidgets.QTreeWidget):
 
     def dropEvent(self, event):
         if isinstance(event.source(), tree):
-            destination_assets_group_item = self.itemAt(event.position().toPoint())
+            destination_assets_group_item = self.itemAt(
+                event.position().toPoint())
             asset_item = self.currentItem()
             if not asset_item:
                 return
@@ -1706,15 +1856,19 @@ class tree(QtWidgets.QTreeWidget):
             if destination_assets_group_item.instance_type not in ['assets_group', 'category']:
                 return
             if destination_assets_group_item.instance_type == 'category':
-                self.remove_asset_from_assets_group.emit(asset_item.instance_id)
+                self.remove_asset_from_assets_group.emit(
+                    asset_item.instance_id)
                 return
-            self.move_asset_to_assets_group.emit((asset_item.instance_id, destination_assets_group_item.instance_id))
+            self.move_asset_to_assets_group.emit(
+                (asset_item.instance_id, destination_assets_group_item.instance_id))
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
     widget = tree_widget()
     widget.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()

@@ -10,8 +10,6 @@ import os
 # Wizard modules
 from wizard.vars import ressources
 
-# Wizard gui modules
-from wizard.gui import gui_utils
 
 class drop_files_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -23,20 +21,22 @@ class drop_files_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         self.files_scrollArea = QtWidgets.QScrollArea()
-        self.files_scrollArea.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.files_scrollArea.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.files_scrollArea.setVisible(False)
 
         self.files_scrollArea_widget = QtWidgets.QWidget()
         self.files_scrollArea_layout = QtWidgets.QHBoxLayout()
         self.files_scrollArea_layout.setSpacing(6)
-        self.files_scrollArea_layout.setContentsMargins(0,0,0,0)
+        self.files_scrollArea_layout.setContentsMargins(0, 0, 0, 0)
         self.files_scrollArea_widget.setLayout(self.files_scrollArea_layout)
 
-        self.files_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.files_scrollArea.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.files_scrollArea.setWidgetResizable(True)
         self.files_scrollArea.setWidget(self.files_scrollArea_widget)
 
@@ -53,7 +53,7 @@ class drop_files_widget(QtWidgets.QWidget):
 
     def clear(self):
         self.files_widgets = []
-        for i in reversed(range(self.files_scrollArea_layout.count())): 
+        for i in reversed(range(self.files_scrollArea_layout.count())):
             self.files_scrollArea_layout.itemAt(i).widget().setParent(None)
         self.update_files_visibility()
 
@@ -66,7 +66,7 @@ class drop_files_widget(QtWidgets.QWidget):
         new_file_widget.remove_file.connect(self.remove_file)
         self.files_widgets.append(new_file_widget)
         self.files_scrollArea_layout.addWidget(new_file_widget)
-        #self.update_files_visibility()
+        # self.update_files_visibility()
 
     def remove_file(self, file_widget):
         if file_widget in self.files_widgets:
@@ -76,10 +76,11 @@ class drop_files_widget(QtWidgets.QWidget):
         self.update_files_visibility()
 
     def update_files_visibility(self):
-        if len(self.files_widgets)>=1:
+        if len(self.files_widgets) >= 1:
             self.files_scrollArea.setVisible(1)
         else:
             self.files_scrollArea.setVisible(0)
+
 
 class file_widget(QtWidgets.QFrame):
 
@@ -95,21 +96,24 @@ class file_widget(QtWidgets.QFrame):
         self.setObjectName('file_frame')
         self.setMaximumHeight(30)
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
-        
+
         self.main_label = QtWidgets.QLabel(os.path.basename(self.file))
         self.main_layout.addWidget(self.main_label)
 
         self.remove_file_button = QtWidgets.QPushButton()
-        self.remove_file_button.setIcon(QtGui.QIcon(ressources._close_thin_icon_))
-        self.remove_file_button.setIconSize(QtCore.QSize(18,18))
-        self.remove_file_button.setFixedSize(18,18)
+        self.remove_file_button.setIcon(
+            QtGui.QIcon(ressources._close_thin_icon_))
+        self.remove_file_button.setIconSize(QtCore.QSize(18, 18))
+        self.remove_file_button.setFixedSize(18, 18)
         self.main_layout.addWidget(self.remove_file_button)
 
     def connect_functions(self):
-        self.remove_file_button.clicked.connect(lambda:self.remove_file.emit(self))
+        self.remove_file_button.clicked.connect(
+            lambda: self.remove_file.emit(self))
+
 
 class drop_files_button(QtWidgets.QPushButton):
 
@@ -120,7 +124,7 @@ class drop_files_button(QtWidgets.QPushButton):
         self.setAcceptDrops(True)
         self.setObjectName('drop_files_button')
         self.setIcon(QtGui.QIcon(ressources._dragdrop_))
-        self.setIconSize(QtCore.QSize(40,40))
+        self.setIconSize(QtCore.QSize(40, 40))
         self.setMinimumHeight(50)
         self.setText('Drop files here or click to attach files')
         self.connect_functions()
@@ -156,12 +160,13 @@ class drop_files_button(QtWidgets.QPushButton):
 
     def open_files(self):
         software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select software executable", "",
-                            "All Files (*);;")
+                                                                 "All Files (*);;")
         if software_path:
             self.path_lineEdit.setText(software_path.replace('\\', '/'))
 
+
 class drop_widget(QtWidgets.QFrame):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(drop_widget, self).__init__(parent)
         self.setObjectName('drop_widget')
         self.parent = parent
@@ -175,7 +180,8 @@ class drop_widget(QtWidgets.QFrame):
         self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setLayout(self.main_layout)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.image = QtWidgets.QLabel()
         self.image.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -185,7 +191,8 @@ class drop_widget(QtWidgets.QFrame):
         self.text.setObjectName('title_label')
         self.main_layout.addWidget(self.text)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
         self.setImage(ressources._merge_info_image_)
 
     def setImage(self, image):

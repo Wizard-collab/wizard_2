@@ -8,6 +8,7 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 # Wizard modules
 from wizard.vars import ressources
 
+
 class license_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(license_widget, self).__init__(parent)
@@ -19,9 +20,9 @@ class license_widget(QtWidgets.QWidget):
         self.fill_ui()
 
     def build_ui(self):
-        self.setFixedSize(QtCore.QSize(600,500))
+        self.setFixedSize(QtCore.QSize(600, 500))
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(8,8,8,8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -44,4 +45,3 @@ class license_widget(QtWidgets.QWidget):
         else:
             self.show()
             self.raise_()
-

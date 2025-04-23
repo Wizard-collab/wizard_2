@@ -36,6 +36,7 @@ from wizard.gui import current_asset_viewer
 
 logger = logging.getLogger(__name__)
 
+
 class versions_widget(QtWidgets.QWidget):
 
     version_changed_signal = pyqtSignal(str)
@@ -58,7 +59,8 @@ class versions_widget(QtWidgets.QWidget):
         self.build_ui()
         self.start_timer()
         self.connect_functions()
-        self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+        self.show_info_mode(
+            "Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
 
     def start_timer(self):
         self.timer = QtCore.QTimer(self)
@@ -104,13 +106,14 @@ class versions_widget(QtWidgets.QWidget):
 
     def open_files(self):
         fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select files", "",
-                                                  "All Files (*);")
+                                                             "All Files (*);")
         if fileList:
             self.merge_files(fileList)
 
     def merge_files(self, files=[]):
         for file in files:
-            assets.merge_file(file, self.work_env_id, "Manually merged file", 0)
+            assets.merge_file(file, self.work_env_id,
+                              "Manually merged file", 0)
         gui_server.refresh_team_ui()
 
     def change_work_env(self, work_env_id):
@@ -126,7 +129,8 @@ class versions_widget(QtWidgets.QWidget):
 
     def refresh_camera_button(self):
         if self.work_env_id:
-            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
+            stage = assets.get_stage_data_from_work_env_id(
+                self.work_env_id, 'name')
             if stage in assets_vars._camera_export_stages_:
                 self.batch_camera_button.setVisible(True)
             else:
@@ -162,59 +166,78 @@ class versions_widget(QtWidgets.QWidget):
     def refresh_list_view(self):
         if self.list_mode:
             if self.work_env_id is not None and self.work_env_id != 0:
-                software_name = project.get_work_env_data(self.work_env_id, 'name')
-                software_icon = QtGui.QIcon(ressources._softwares_icons_dic_[software_name])
+                software_name = project.get_work_env_data(
+                    self.work_env_id, 'name')
+                software_icon = QtGui.QIcon(
+                    ressources._softwares_icons_dic_[software_name])
 
-                self.versions_rows = project.get_work_versions(self.work_env_id)
+                self.versions_rows = project.get_work_versions(
+                    self.work_env_id)
                 project_versions_id = []
                 if self.versions_rows is not None:
                     self.hide_info_mode()
                     for version_row in self.versions_rows:
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_list_ids.keys():
-                            version_item = custom_version_tree_item(version_row, software_icon, self.list_view.invisibleRootItem())
-                            version_item.signal_handler.enter.connect(self.view_comment_widget.show_comment)
-                            version_item.signal_handler.leave.connect(self.view_comment_widget.close)
-                            version_item.signal_handler.move_event.connect(self.view_comment_widget.move_ui)
-                            self.version_list_ids[version_row['id']] = version_item
+                            version_item = custom_version_tree_item(
+                                version_row, software_icon, self.list_view.invisibleRootItem())
+                            version_item.signal_handler.enter.connect(
+                                self.view_comment_widget.show_comment)
+                            version_item.signal_handler.leave.connect(
+                                self.view_comment_widget.close)
+                            version_item.signal_handler.move_event.connect(
+                                self.view_comment_widget.move_ui)
+                            self.version_list_ids[version_row['id']
+                                                  ] = version_item
                         else:
-                            self.version_list_ids[version_row['id']].refresh(version_row)
+                            self.version_list_ids[version_row['id']].refresh(
+                                version_row)
 
                 version_list_ids = list(self.version_list_ids.keys())
                 for version_id in version_list_ids:
                     if version_id not in project_versions_id:
                         self.remove_tree_version(version_id)
-                self.check_existence_thread.update_versions_rows(self.versions_rows)
+                self.check_existence_thread.update_versions_rows(
+                    self.versions_rows)
             elif self.work_env_id is None:
-                self.show_info_mode("Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
+                self.show_info_mode(
+                    "Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
             else:
-                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+                self.show_info_mode(
+                    "Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
 
     def refresh_icons_view(self):
         if self.icon_mode:
             if self.work_env_id is not None and self.work_env_id != 0:
-                self.versions_rows = project.get_work_versions(self.work_env_id)
+                self.versions_rows = project.get_work_versions(
+                    self.work_env_id)
                 project_versions_id = []
                 if self.versions_rows is not None:
                     self.hide_info_mode()
                     for version_row in self.versions_rows:
                         project_versions_id.append(version_row['id'])
                         if version_row['id'] not in self.version_icon_ids.keys():
-                            version_item = custom_version_icon_item(version_row)
+                            version_item = custom_version_icon_item(
+                                version_row)
                             self.icon_view.addItem(version_item)
-                            self.version_icon_ids[version_row['id']] = version_item
+                            self.version_icon_ids[version_row['id']
+                                                  ] = version_item
                         else:
-                            self.version_icon_ids[version_row['id']].refresh(version_row)
+                            self.version_icon_ids[version_row['id']].refresh(
+                                version_row)
                 version_icon_ids = list(self.version_icon_ids.keys())
                 for version_id in version_icon_ids:
                     if version_id not in project_versions_id:
                         self.remove_icon_version(version_id)
-                self.check_existence_thread.update_versions_rows(self.versions_rows)
+                self.check_existence_thread.update_versions_rows(
+                    self.versions_rows)
             elif self.work_env_id is None:
-                self.show_info_mode("Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
+                self.show_info_mode(
+                    "Init the work environment\nto create the first version !", ressources._init_work_env_info_image_)
             else:
-                self.show_info_mode("Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
+                self.show_info_mode(
+                    "Select or create a stage\nin the project tree !", ressources._select_stage_info_image_)
             self.refresh_infos()
 
     def missing_file(self, version_id):
@@ -273,18 +296,22 @@ class versions_widget(QtWidgets.QWidget):
                 self.version_icon_ids[version_id].setHidden(True)
 
     def connect_functions(self):
-        self.list_view_scrollBar.rangeChanged.connect(lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
-        self.icon_view_scrollBar.rangeChanged.connect(lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))
+        self.list_view_scrollBar.rangeChanged.connect(
+            lambda: self.list_view_scrollBar.setValue(self.list_view_scrollBar.maximum()))
+        self.icon_view_scrollBar.rangeChanged.connect(
+            lambda: self.icon_view_scrollBar.setValue(self.icon_view_scrollBar.maximum()))
 
         self.list_view.itemSelectionChanged.connect(self.version_changed)
         self.list_view.itemDoubleClicked.connect(self.launch)
         self.list_view.itemSelectionChanged.connect(self.refresh_infos)
-        self.list_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.list_view.customContextMenuRequested.connect(
+            self.context_menu_requested)
 
         self.icon_view.itemSelectionChanged.connect(self.version_changed)
         self.icon_view.itemDoubleClicked.connect(self.launch)
         self.icon_view.itemSelectionChanged.connect(self.refresh_infos)
-        self.icon_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.icon_view.customContextMenuRequested.connect(
+            self.context_menu_requested)
 
         self.archive_button.clicked.connect(self.archive)
         self.manual_merge_button.clicked.connect(self.open_files)
@@ -296,10 +323,13 @@ class versions_widget(QtWidgets.QWidget):
         self.folder_button.clicked.connect(self.open_folder)
         self.toggle_view_button.clicked.connect(self.toggle_view)
         self.launch_button.clicked.connect(self.launch)
-        self.comment_button.clicked.connect(lambda:self.modify_comment(pos=None))
+        self.comment_button.clicked.connect(
+            lambda: self.modify_comment(pos=None))
 
-        self.check_existence_thread.missing_file_signal.connect(self.missing_file)
-        self.check_existence_thread.not_missing_file_signal.connect(self.not_missing_file)
+        self.check_existence_thread.missing_file_signal.connect(
+            self.missing_file)
+        self.check_existence_thread.not_missing_file_signal.connect(
+            self.not_missing_file)
 
         self.search_bar.textChanged.connect(self.update_search)
         self.search_thread.show_id_signal.connect(self.show_search_version)
@@ -313,15 +343,19 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection) == 1:
             version_id = selection[0].version_row['id']
         elif len(selection) == 0:
-            last_version_id = project.get_last_work_version(self.work_env_id, 'id')
+            last_version_id = project.get_last_work_version(
+                self.work_env_id, 'id')
             if last_version_id:
                 version_id = last_version_id[0]
         if version_id:
-            domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
-            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
-            self.batch_settings_widget = batch_settings_widget.batch_settings_widget(self.work_env_id, stage)
+            domain = assets.get_domain_data_from_work_env_id(
+                self.work_env_id, 'name')
+            stage = assets.get_stage_data_from_work_env_id(
+                self.work_env_id, 'name')
+            self.batch_settings_widget = batch_settings_widget.batch_settings_widget(
+                self.work_env_id, stage)
             if self.batch_settings_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-                
+
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'export'
                 settings_dic['frange'] = self.batch_settings_widget.frange
@@ -338,7 +372,8 @@ class versions_widget(QtWidgets.QWidget):
                         settings_dic['farm'] = False
 
                 if self.batch_settings_widget.deadline:
-                    subtasks_library.deadline_batch_export(version_id, settings_dic)
+                    subtasks_library.deadline_batch_export(
+                        version_id, settings_dic)
                 else:
                     subtasks_library.batch_export(version_id, settings_dic)
 
@@ -348,13 +383,17 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection) == 1:
             version_id = selection[0].version_row['id']
         elif len(selection) == 0:
-            last_version_id = project.get_last_work_version(self.work_env_id, 'id')
+            last_version_id = project.get_last_work_version(
+                self.work_env_id, 'id')
             if last_version_id:
                 version_id = last_version_id[0]
         if version_id:
-            domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
-            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
-            self.batch_settings_widget = batch_settings_widget.batch_settings_widget(self.work_env_id, 'camera')
+            domain = assets.get_domain_data_from_work_env_id(
+                self.work_env_id, 'name')
+            stage = assets.get_stage_data_from_work_env_id(
+                self.work_env_id, 'name')
+            self.batch_settings_widget = batch_settings_widget.batch_settings_widget(
+                self.work_env_id, 'camera')
             if self.batch_settings_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'export'
@@ -365,7 +404,8 @@ class versions_widget(QtWidgets.QWidget):
                 settings_dic['stage_to_export'] = 'camera'
 
                 if self.batch_settings_widget.deadline:
-                    subtasks_library.deadline_batch_export(version_id, settings_dic)
+                    subtasks_library.deadline_batch_export(
+                        version_id, settings_dic)
                 else:
                     subtasks_library.batch_export(version_id, settings_dic)
 
@@ -375,15 +415,19 @@ class versions_widget(QtWidgets.QWidget):
         if len(selection) == 1:
             version_id = selection[0].version_row['id']
         elif len(selection) == 0:
-            last_version_id = project.get_last_work_version(self.work_env_id, 'id')
+            last_version_id = project.get_last_work_version(
+                self.work_env_id, 'id')
             if last_version_id:
                 version_id = last_version_id[0]
         if version_id:
-            domain = assets.get_domain_data_from_work_env_id(self.work_env_id, 'name')
-            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
-            self.video_settings_widget = video_settings_widget.video_settings_widget(self.work_env_id)
+            domain = assets.get_domain_data_from_work_env_id(
+                self.work_env_id, 'name')
+            stage = assets.get_stage_data_from_work_env_id(
+                self.work_env_id, 'name')
+            self.video_settings_widget = video_settings_widget.video_settings_widget(
+                self.work_env_id)
             if self.video_settings_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-                
+
                 settings_dic = dict()
                 settings_dic['batch_type'] = 'video'
                 settings_dic['frange'] = self.video_settings_widget.frange
@@ -396,7 +440,7 @@ class versions_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setObjectName('dark_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -409,20 +453,23 @@ class versions_widget(QtWidgets.QWidget):
 
         self.views_widget = QtWidgets.QWidget()
         self.views_layout = QtWidgets.QHBoxLayout()
-        self.views_layout.setContentsMargins(0,0,0,0)
+        self.views_layout.setContentsMargins(0, 0, 0, 0)
         self.views_layout.setSpacing(0)
         self.views_widget.setLayout(self.views_layout)
         self.main_layout.addWidget(self.views_widget)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget')
         self.list_view.setColumnCount(7)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
 
-        self.list_view.setHeaderLabels(['Version', 'Software', 'User', 'Date', 'Comment', 'File', 'ID'])
+        self.list_view.setHeaderLabels(
+            ['Version', 'Software', 'User', 'Date', 'Comment', 'File', 'ID'])
         self.list_view.header().resizeSection(3, 150)
         self.list_view.header().resizeSection(4, 250)
         self.list_view.header().resizeSection(5, 400)
@@ -431,14 +478,16 @@ class versions_widget(QtWidgets.QWidget):
         self.views_layout.addWidget(self.list_view)
 
         self.icon_view = QtWidgets.QListWidget()
-        self.icon_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.icon_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.icon_view.setObjectName('icon_view')
         self.icon_view.setSpacing(4)
-        self.icon_view.setIconSize(QtCore.QSize(200,200))
+        self.icon_view.setIconSize(QtCore.QSize(200, 200))
         self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
         self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
         self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.icon_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.views_layout.addWidget(self.icon_view)
         self.icon_view.setVisible(0)
@@ -446,12 +495,13 @@ class versions_widget(QtWidgets.QWidget):
         self.infos_widget = QtWidgets.QWidget()
         self.infos_widget.setObjectName('dark_widget')
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(8,8,8,0)
+        self.infos_layout.setContentsMargins(8, 8, 8, 0)
         self.infos_layout.setSpacing(4)
         self.infos_widget.setLayout(self.infos_layout)
         self.main_layout.addWidget(self.infos_widget)
 
-        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.infos_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.versions_count_label = QtWidgets.QLabel()
         self.versions_count_label.setObjectName('gray_label')
@@ -467,92 +517,104 @@ class versions_widget(QtWidgets.QWidget):
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('dark_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(8,8,8,8)
+        self.buttons_layout.setContentsMargins(8, 8, 8, 8)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
-        
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
         self.search_bar = gui_utils.search_bar()
-        gui_utils.application_tooltip(self.search_bar, "Search for a specific version")
-        self.search_bar.setPlaceholderText('"0023", "j.smith&maya", "retake eye"')
+        gui_utils.application_tooltip(
+            self.search_bar, "Search for a specific version")
+        self.search_bar.setPlaceholderText(
+            '"0023", "j.smith&maya", "retake eye"')
         self.buttons_layout.addWidget(self.search_bar)
 
         self.toggle_view_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.toggle_view_button, "Switch to list view")
-        self.toggle_view_button.setFixedSize(35,35)
-        self.toggle_view_button.setIconSize(QtCore.QSize(25,25))
-        self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
+        gui_utils.application_tooltip(
+            self.toggle_view_button, "Switch to list view")
+        self.toggle_view_button.setFixedSize(35, 35)
+        self.toggle_view_button.setIconSize(QtCore.QSize(25, 25))
+        self.toggle_view_button.setIcon(
+            QtGui.QIcon(ressources._tool_icon_view_))
         self.buttons_layout.addWidget(self.toggle_view_button)
 
         self.manual_merge_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.manual_merge_button, "Manually merge a file")
-        self.manual_merge_button.setFixedSize(35,35)
-        self.manual_merge_button.setIconSize(QtCore.QSize(25,25))
-        self.manual_merge_button.setIcon(QtGui.QIcon(ressources._tool_manually_publish_))
+        gui_utils.application_tooltip(
+            self.manual_merge_button, "Manually merge a file")
+        self.manual_merge_button.setFixedSize(35, 35)
+        self.manual_merge_button.setIconSize(QtCore.QSize(25, 25))
+        self.manual_merge_button.setIcon(
+            QtGui.QIcon(ressources._tool_manually_publish_))
         self.buttons_layout.addWidget(self.manual_merge_button)
 
         self.batch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.batch_button, "Batch export")
-        self.batch_button.setFixedSize(35,35)
-        self.batch_button.setIconSize(QtCore.QSize(25,25))
+        self.batch_button.setFixedSize(35, 35)
+        self.batch_button.setIconSize(QtCore.QSize(25, 25))
         self.batch_button.setIcon(QtGui.QIcon(ressources._tool_batch_publish_))
         self.buttons_layout.addWidget(self.batch_button)
 
         self.batch_camera_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.batch_camera_button, "Batch export cameras")
-        self.batch_camera_button.setFixedSize(35,35)
-        self.batch_camera_button.setIconSize(QtCore.QSize(25,25))
-        self.batch_camera_button.setIcon(QtGui.QIcon(ressources._tool_batch_camera_))
+        gui_utils.application_tooltip(
+            self.batch_camera_button, "Batch export cameras")
+        self.batch_camera_button.setFixedSize(35, 35)
+        self.batch_camera_button.setIconSize(QtCore.QSize(25, 25))
+        self.batch_camera_button.setIcon(
+            QtGui.QIcon(ressources._tool_batch_camera_))
         self.buttons_layout.addWidget(self.batch_camera_button)
 
         self.batch_video_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.batch_video_button, "Batch video")
-        self.batch_video_button.setFixedSize(35,35)
-        self.batch_video_button.setIconSize(QtCore.QSize(25,25))
+        self.batch_video_button.setFixedSize(35, 35)
+        self.batch_video_button.setIconSize(QtCore.QSize(25, 25))
         self.batch_video_button.setIcon(QtGui.QIcon(ressources._tool_video_))
         self.buttons_layout.addWidget(self.batch_video_button)
 
         self.comment_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.comment_button, "Modify comment")
-        self.comment_button.setFixedSize(35,35)
-        self.comment_button.setIconSize(QtCore.QSize(25,25))
+        self.comment_button.setFixedSize(35, 35)
+        self.comment_button.setIconSize(QtCore.QSize(25, 25))
         self.comment_button.setIcon(QtGui.QIcon(ressources._tool_comment_))
         self.buttons_layout.addWidget(self.comment_button)
 
         self.launch_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.launch_button, "Launch selection")
-        self.launch_button.setFixedSize(35,35)
-        self.launch_button.setIconSize(QtCore.QSize(25,25))
+        self.launch_button.setFixedSize(35, 35)
+        self.launch_button.setIconSize(QtCore.QSize(25, 25))
         self.launch_button.setIcon(QtGui.QIcon(ressources._launch_icon_))
         self.buttons_layout.addWidget(self.launch_button)
 
         self.duplicate_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.duplicate_button, "Duplicate selection")
-        self.duplicate_button.setFixedSize(35,35)
-        self.duplicate_button.setIconSize(QtCore.QSize(25,25))
+        gui_utils.application_tooltip(
+            self.duplicate_button, "Duplicate selection")
+        self.duplicate_button.setFixedSize(35, 35)
+        self.duplicate_button.setIconSize(QtCore.QSize(25, 25))
         self.duplicate_button.setIcon(QtGui.QIcon(ressources._tool_duplicate_))
         self.buttons_layout.addWidget(self.duplicate_button)
 
         self.new_version_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.new_version_button, "Create empty version")
-        self.new_version_button.setFixedSize(35,35)
-        self.new_version_button.setIconSize(QtCore.QSize(25,25))
+        gui_utils.application_tooltip(
+            self.new_version_button, "Create empty version")
+        self.new_version_button.setFixedSize(35, 35)
+        self.new_version_button.setIconSize(QtCore.QSize(25, 25))
         self.new_version_button.setIcon(QtGui.QIcon(ressources._tool_add_))
         self.buttons_layout.addWidget(self.new_version_button)
 
         self.folder_button = QtWidgets.QPushButton()
-        gui_utils.application_tooltip(self.folder_button, "Open versions folder")
-        self.folder_button.setFixedSize(35,35)
-        self.folder_button.setIconSize(QtCore.QSize(25,25))
+        gui_utils.application_tooltip(
+            self.folder_button, "Open versions folder")
+        self.folder_button.setFixedSize(35, 35)
+        self.folder_button.setIconSize(QtCore.QSize(25, 25))
         self.folder_button.setIcon(QtGui.QIcon(ressources._tool_folder_))
         self.buttons_layout.addWidget(self.folder_button)
 
         self.archive_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(self.archive_button, "Archive selection")
-        self.archive_button.setFixedSize(35,35)
-        self.archive_button.setIconSize(QtCore.QSize(25,25))
+        self.archive_button.setFixedSize(35, 35)
+        self.archive_button.setIconSize(QtCore.QSize(25, 25))
         self.archive_button.setIcon(QtGui.QIcon(ressources._tool_archive_))
         self.buttons_layout.addWidget(self.archive_button)
 
@@ -563,9 +625,12 @@ class versions_widget(QtWidgets.QWidget):
     def context_menu_requested(self):
         selection = self.get_selection()
         menu = gui_utils.QMenu(self)
-        folder_action = menu.addAction(QtGui.QIcon(ressources._tool_folder_), 'Open folder')
-        empty_version_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Create new empty version')
-        merge_action = menu.addAction(QtGui.QIcon(ressources._tool_manually_publish_), 'Manually merge a file')
+        folder_action = menu.addAction(QtGui.QIcon(
+            ressources._tool_folder_), 'Open folder')
+        empty_version_action = menu.addAction(QtGui.QIcon(
+            ressources._tool_add_), 'Create new empty version')
+        merge_action = menu.addAction(QtGui.QIcon(
+            ressources._tool_manually_publish_), 'Manually merge a file')
         duplicate_action = None
         archive_action = None
         comment_action = None
@@ -573,21 +638,32 @@ class versions_widget(QtWidgets.QWidget):
         batch_camera_action = None
         batch_video_action = None
         copy_action = None
-        if len(selection)>=1:
-            duplicate_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Duplicate version(s)')
-            archive_action = menu.addAction(QtGui.QIcon(ressources._tool_archive_), 'Archive version(s)')
-            comment_action = menu.addAction(QtGui.QIcon(ressources._tool_comment_), 'Modify comment')
+        if len(selection) >= 1:
+            duplicate_action = menu.addAction(QtGui.QIcon(
+                ressources._tool_duplicate_), 'Duplicate version(s)')
+            archive_action = menu.addAction(QtGui.QIcon(
+                ressources._tool_archive_), 'Archive version(s)')
+            comment_action = menu.addAction(QtGui.QIcon(
+                ressources._tool_comment_), 'Modify comment')
         launch_action = None
-        if len(selection)==1:
-            launch_action = menu.addAction(QtGui.QIcon(ressources._launch_icon_), 'Launch version')
-            batch_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_publish_), 'Batch export version')
-            stage = assets.get_stage_data_from_work_env_id(self.work_env_id, 'name')
+        if len(selection) == 1:
+            launch_action = menu.addAction(QtGui.QIcon(
+                ressources._launch_icon_), 'Launch version')
+            batch_action = menu.addAction(QtGui.QIcon(
+                ressources._tool_batch_publish_), 'Batch export version')
+            stage = assets.get_stage_data_from_work_env_id(
+                self.work_env_id, 'name')
             if stage in assets_vars._camera_export_stages_:
-                batch_camera_action = menu.addAction(QtGui.QIcon(ressources._tool_batch_camera_), 'Batch export camera')
-            batch_video_action = menu.addAction(QtGui.QIcon(ressources._tool_video_), 'Batch video version')
-            copy_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Copy version to clipboard')
-        paste_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard')
-        paste_and_mirror_action = menu.addAction(QtGui.QIcon(ressources._tool_duplicate_), 'Paste version from clipboard and mirror references')
+                batch_camera_action = menu.addAction(QtGui.QIcon(
+                    ressources._tool_batch_camera_), 'Batch export camera')
+            batch_video_action = menu.addAction(QtGui.QIcon(
+                ressources._tool_video_), 'Batch video version')
+            copy_action = menu.addAction(QtGui.QIcon(
+                ressources._tool_duplicate_), 'Copy version to clipboard')
+        paste_action = menu.addAction(QtGui.QIcon(
+            ressources._tool_duplicate_), 'Paste version from clipboard')
+        paste_and_mirror_action = menu.addAction(QtGui.QIcon(
+            ressources._tool_duplicate_), 'Paste version from clipboard and mirror references')
 
         pos = QtGui.QCursor().pos()
         action = menu.exec(pos)
@@ -626,11 +702,13 @@ class versions_widget(QtWidgets.QWidget):
                 old_comment = ''
                 if len(items) == 1:
                     old_comment = items[0].version_row['comment']
-                self.comment_widget = comment_widget.comment_widget(old_comment=old_comment, pos=pos)
+                self.comment_widget = comment_widget.comment_widget(
+                    old_comment=old_comment, pos=pos)
                 if self.comment_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     comment = self.comment_widget.comment
                     for item in items:
-                        assets.modify_version_comment(item.version_row['id'], comment)
+                        assets.modify_version_comment(
+                            item.version_row['id'], comment)
                     gui_server.refresh_team_ui()
 
     def copy_version(self):
@@ -644,14 +722,16 @@ class versions_widget(QtWidgets.QWidget):
         gui_server.refresh_team_ui()
 
     def paste_work_version_and_mirror_references(self):
-        assets.paste_work_version(self.work_env_id, mirror_work_env_references=True)
+        assets.paste_work_version(
+            self.work_env_id, mirror_work_env_references=True)
         gui_server.refresh_team_ui()
 
     def version_changed(self):
         selection = self.get_selection()
         if len(selection) == 1:
             if selection[0] is not None:
-                self.version_changed_signal.emit(selection[0].version_row['name'])
+                self.version_changed_signal.emit(
+                    selection[0].version_row['name'])
 
     def toggle_view(self):
         selection = self.get_selection()
@@ -666,11 +746,15 @@ class versions_widget(QtWidgets.QWidget):
             self.list_mode = 0
             self.icon_mode = 1
         if self.icon_mode:
-            self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_list_view_))
-            gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to list view")
+            self.toggle_view_button.setIcon(
+                QtGui.QIcon(ressources._tool_list_view_))
+            gui_utils.modify_application_tooltip(
+                self.toggle_view_button, "Switch to list view")
         elif self.list_mode:
-            self.toggle_view_button.setIcon(QtGui.QIcon(ressources._tool_icon_view_))
-            gui_utils.modify_application_tooltip(self.toggle_view_button, "Switch to icon view")
+            self.toggle_view_button.setIcon(
+                QtGui.QIcon(ressources._tool_icon_view_))
+            gui_utils.modify_application_tooltip(
+                self.toggle_view_button, "Switch to icon view")
         self.refresh()
         self.set_selection(selection)
 
@@ -724,9 +808,11 @@ class versions_widget(QtWidgets.QWidget):
         if selection is not None:
             for item in selection:
                 if self.icon_mode:
-                    self.version_icon_ids[item.version_row['id']].setSelected(True)
+                    self.version_icon_ids[item.version_row['id']].setSelected(
+                        True)
                 elif self.list_mode:
-                    self.version_list_ids[item.version_row['id']].setSelected(True)
+                    self.version_list_ids[item.version_row['id']].setSelected(
+                        True)
 
     def clear_selection(self):
         for version_id in self.version_icon_ids.keys():
@@ -738,7 +824,8 @@ class versions_widget(QtWidgets.QWidget):
         selection = self.get_selection()
         if selection is not None:
             for item in selection:
-                assets.duplicate_version(item.version_row['id'], comment=f"Duplicate from version {item.version_row['name']}")
+                assets.duplicate_version(
+                    item.version_row['id'], comment=f"Duplicate from version {item.version_row['name']}")
             gui_server.refresh_team_ui()
 
     def launch(self):
@@ -751,8 +838,9 @@ class versions_widget(QtWidgets.QWidget):
     def archive(self):
         items = self.get_selection()
         if items is not None:
-            if items!=[]:
-                self.confirm_widget = confirm_widget.confirm_widget('Do you want to continue ?', parent=self)
+            if items != []:
+                self.confirm_widget = confirm_widget.confirm_widget(
+                    'Do you want to continue ?', parent=self)
                 if self.confirm_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                     version_ids = []
                     for item in items:
@@ -789,6 +877,7 @@ class versions_widget(QtWidgets.QWidget):
         if self.work_env_id is not None:
             path_utils.startfile(assets.get_work_env_path(self.work_env_id))
 
+
 class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, version_row, software_icon, parent=None):
         super(custom_version_tree_item, self).__init__(parent)
@@ -804,19 +893,22 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
 
     def show_comment(self):
         if self.comment_label.isActiveWindow():
-            self.signal_handler.enter.emit(self.version_row['comment'], self.version_row['creation_user'])
+            self.signal_handler.enter.emit(
+                self.version_row['comment'], self.version_row['creation_user'])
 
     def connect_functions(self):
         self.comment_label.enter.connect(self.show_comment)
         self.comment_label.leave.connect(self.signal_handler.leave.emit)
-        self.comment_label.move_event.connect(self.signal_handler.move_event.emit)
+        self.comment_label.move_event.connect(
+            self.signal_handler.move_event.emit)
 
     def update_time_ago(self):
-        self.setText(3, tools.time_ago_from_timestamp(self.version_row['creation_time']))
+        self.setText(3, tools.time_ago_from_timestamp(
+            self.version_row['creation_time']))
 
     def fill_ui(self):
         self.setText(0, self.version_row['name'])
-        bold_font=QtGui.QFont()
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(0, bold_font)
         self.setIcon(0, QtGui.QIcon(ressources._file_icon_))
@@ -838,6 +930,7 @@ class custom_version_tree_item(QtWidgets.QTreeWidgetItem):
         self.version_row = version_row
         self.fill_ui()
 
+
 class signal_handler(QtCore.QObject):
 
     enter = pyqtSignal(str, str)
@@ -847,6 +940,7 @@ class signal_handler(QtCore.QObject):
     def __init__(self, parent=None):
         super(signal_handler, self).__init__(parent)
 
+
 class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, version_row, parent=None):
         super(custom_version_icon_item, self).__init__(parent)
@@ -855,7 +949,7 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
 
     def fill_ui(self):
         icon = QtGui.QIcon()
-        
+
         pixmap = QtGui.QPixmap(self.version_row['thumbnail_path'])
         icon.addPixmap(pixmap, QtGui.QIcon.Mode.Normal)
         icon.addPixmap(pixmap, QtGui.QIcon.Mode.Selected)
@@ -865,7 +959,8 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
             icon.addPixmap(default_icon.pixmap(200), QtGui.QIcon.Mode.Selected)
 
         self.setIcon(icon)
-        self.setText(f"{self.version_row['name']} - {self.version_row['creation_user']}")
+        self.setText(
+            f"{self.version_row['name']} - {self.version_row['creation_user']}")
         self.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
     def set_missing(self):
@@ -877,6 +972,7 @@ class custom_version_icon_item(QtWidgets.QListWidgetItem):
     def refresh(self, version_row):
         self.version_row = version_row
         self.fill_ui()
+
 
 class check_existence_thread(QtCore.QThread):
 
@@ -903,6 +999,7 @@ class check_existence_thread(QtCore.QThread):
         self.versions_rows = versions_rows
         self.running = True
         self.start()
+
 
 class search_thread(QtCore.QThread):
 
@@ -945,4 +1042,3 @@ class search_thread(QtCore.QThread):
                     self.hide_id_signal.emit(version_id)
         except:
             logger.debug(str(traceback.format_exc()))
-

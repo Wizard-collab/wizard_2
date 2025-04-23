@@ -27,26 +27,19 @@
 # SOFTWARE.
 
 # Python modules
-import os
 import subprocess
 import shlex
 import json
-import traceback
 import logging
 
 # Wizard modules
 from wizard.core import launch
-from wizard.core import assets
 from wizard.core import project
-from wizard.core import environment
 from wizard.core import path_utils
-from wizard.core import socket_utils
 from wizard.vars import softwares_vars
 
-# Wizard gui modules
-from wizard.gui import gui_server
-
 logger = logging.getLogger(__name__)
+
 
 def batch_export(version_id, settings_dic=None):
     work_version_row = project.get_version_data(version_id)
@@ -59,17 +52,20 @@ def batch_export(version_id, settings_dic=None):
     command = build_command(file_path, software_row, version_id)
     env = launch.build_env(work_env_id, software_row, version_id, mode='batch')
     env = add_settings_dic_to_env(env, settings_dic)
-    if not command :
+    if not command:
         return
-    process = subprocess.Popen(args = shlex.split(command), env=env, cwd=path_utils.abspath('softwares'))
+    process = subprocess.Popen(args=shlex.split(
+        command), env=env, cwd=path_utils.abspath('softwares'))
     logger.info(f"{software_row['name']} launched")
     process.wait()
     logger.info(f"{software_row['name']} closed")
     return 1
 
+
 def add_settings_dic_to_env(env, settings_dic):
     env['wizard_json_settings'] = json.dumps(settings_dic)
     return env
+
 
 def build_command(file_path, software_row, version_id):
     software_batch_path = software_row['batch_path']
@@ -81,9 +77,10 @@ def build_command(file_path, software_row, version_id):
     else:
         raw_command = software_row['batch_no_file_command']
         logger.info("File not existing, launching software with empty scene")
-    raw_command = raw_command.replace(softwares_vars._executable_key_, software_batch_path)
+    raw_command = raw_command.replace(
+        softwares_vars._executable_key_, software_batch_path)
     raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
     if software_row['name'] in softwares_vars._batch_scripts_dic_.keys():
         raw_command = raw_command.replace(softwares_vars._script_key_,
-                            softwares_vars._batch_scripts_dic_[software_row['name']])
+                                          softwares_vars._batch_scripts_dic_[software_row['name']])
     return raw_command

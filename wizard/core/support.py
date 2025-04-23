@@ -29,19 +29,15 @@
 # Python modules
 import requests
 import traceback
-import json
 import logging
-import os
-import sys
 
 # Wizard modules
 from wizard.core import application
 from wizard.core import environment
-from wizard.core import tools
-from wizard.core import path_utils
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
+
 
 def get_latest_build():
     URL = f"{ressources._web_server_url_}latest_build/"
@@ -58,6 +54,7 @@ def get_latest_build():
         logger.error(str(traceback.format_exc()))
         return
 
+
 '''
 def download_install_latest_build():
     latest_build = get_latest_build()
@@ -71,6 +68,7 @@ def download_install_latest_build():
     os.startfile(destination)
     sys.exit()
 '''
+
 
 def send_log(log, type, additionnal_message=''):
     URL = f"{ressources._web_server_url_}support/"
@@ -92,7 +90,8 @@ def send_log(log, type, additionnal_message=''):
         if success:
             logger.info("Log successfully submitted")
         else:
-            logger.info("Can't submit log, server error\nPlease contact the administrator")
+            logger.info(
+                "Can't submit log, server error\nPlease contact the administrator")
     except requests.Timeout:
         logger.error('Connection timed out')
         return
@@ -102,6 +101,7 @@ def send_log(log, type, additionnal_message=''):
     except:
         logger.error(str(traceback.format_exc()))
         return
+
 
 def send_quote(quote):
     URL = f"{ressources._web_server_url_}quotes/"
@@ -116,7 +116,8 @@ def send_quote(quote):
         if success:
             logger.info("Quote successfully submitted")
         else:
-            logger.info("Can't submit quote, server error\nPlease contact the administrator")
+            logger.info(
+                "Can't submit quote, server error\nPlease contact the administrator")
     except requests.Timeout:
         logger.error('Connection timed out')
         return

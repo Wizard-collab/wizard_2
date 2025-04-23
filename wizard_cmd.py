@@ -26,43 +26,48 @@ app = app_utils.get_app()
 app_utils.set_wizard_cmd()
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-psqlDns', dest='psql_dns', type=str, help='PostgreSQL connection DNS')
-parser.add_argument('-repository', dest='repository', type=str, help='Wizard repository')
+parser.add_argument('-psqlDns', dest='psql_dns', type=str,
+                    help='PostgreSQL connection DNS')
+parser.add_argument('-repository', dest='repository',
+                    type=str, help='Wizard repository')
 parser.add_argument('-user', dest='user', type=str, help='Wizard user')
-parser.add_argument('-project', dest='project', type=str, help='Wizard project')
-parser.add_argument('-teamDns', dest='team_dns', type=str, help='Wizard team connection DNS')
-parser.add_argument('-pyfile', dest='pyfile', type=str, help='The python file to execute')
+parser.add_argument('-project', dest='project',
+                    type=str, help='Wizard project')
+parser.add_argument('-teamDns', dest='team_dns', type=str,
+                    help='Wizard team connection DNS')
+parser.add_argument('-pyfile', dest='pyfile', type=str,
+                    help='The python file to execute')
 args = parser.parse_args()
 
 if not args.psql_dns:
-	logger.error("Please provide a PostgreSQL DNS")
+    logger.error("Please provide a PostgreSQL DNS")
 else:
-	logger.info(f"PostgreSQL DNS : {args.psql_dns}")
+    logger.info(f"PostgreSQL DNS : {args.psql_dns}")
 
 if not args.repository:
-	logger.error("Please provide a repository")
+    logger.error("Please provide a repository")
 else:
-	logger.info(f"repository : {args.repository}")
+    logger.info(f"repository : {args.repository}")
 
 if not args.user:
-	logger.error("Please provide a user")
+    logger.error("Please provide a user")
 else:
-	logger.info(f"User : {args.user}")
+    logger.info(f"User : {args.user}")
 
 if not args.project:
-	logger.error("Please provide a project")
+    logger.error("Please provide a project")
 else:
-	logger.info(f"Project : {args.project}")
+    logger.info(f"Project : {args.project}")
 
 if not args.team_dns:
-	logger.error("No team DNS defined")
+    logger.error("No team DNS defined")
 else:
-	logger.info(f"Team DNS : {args.team_dns}")
+    logger.info(f"Team DNS : {args.team_dns}")
 
 if not args.pyfile:
-	logger.error("Please provide a python file to execute")
+    logger.error("Please provide a python file to execute")
 else:
-	logger.info(f"Pyfile : {args.pyfile}")
+    logger.info(f"Pyfile : {args.pyfile}")
 
 environment.set_psql_dns(args.psql_dns)
 
@@ -73,7 +78,8 @@ user_row = repository.get_user_row_by_name(args.user)
 environment.build_user_env(user_row)
 
 project_row = repository.get_project_row_by_name(args.project)
-environment.build_project_env(project_row['project_name'], project_row['project_path'])
+environment.build_project_env(
+    project_row['project_name'], project_row['project_path'])
 
 db_core.db_access_singleton().set_project(environment.get_project_name())
 
@@ -86,12 +92,12 @@ softwares_server.start()
 hooks.init_wizard_hooks()
 
 if args.team_dns:
-	environment.set_team_dns(args.team_dns)
+    environment.set_team_dns(args.team_dns)
 try:
     exec(open(args.pyfile).read())
 except:
     logger.error(str(traceback.format_exc()))
 finally:
-    #db_server.stop()
+    # db_server.stop()
     softwares_server.stop()
     communicate_server.stop()

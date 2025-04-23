@@ -38,6 +38,7 @@ from wizard import vars
 from wizard import gui
 logger = logging.getLogger(__name__)
 
+
 class repository:
     def __init__(self):
         pass
@@ -47,17 +48,17 @@ class repository:
         return core.repository.get_projects_names_list()
 
     def create_project(self, project_name,
-                            project_path,
-                            project_password,
-                            frame_rate=24,
-                            image_format=[1920,1080]
-                            ):
+                       project_path,
+                       project_password,
+                       frame_rate=24,
+                       image_format=[1920, 1080]
+                       ):
         return core.create_project.create_project(project_name,
-                            project_path,
-                            project_password,
-                            frame_rate,
-                            image_format
-                            )
+                                                  project_path,
+                                                  project_password,
+                                                  frame_rate,
+                                                  image_format
+                                                  )
 
     def users(self):
         # Return a list of the existing users in the repository database
@@ -68,17 +69,18 @@ class repository:
 
     def create_user(self, user_name, user_password, email, administrator_pass=''):
         return core.repository.create_user(user_name,
-                                            user_password,
-                                            email,
-                                            administrator_pass)
+                                           user_password,
+                                           email,
+                                           administrator_pass)
 
     def upgrade_user_privilege(self, user_name, administrator_pass):
         return core.repository.upgrade_user_privilege(user_name,
-                                                        administrator_pass)
+                                                      administrator_pass)
 
     def downgrade_user_privilege(self, user_name, administrator_pass):
         return core.repository.downgrade_user_privilege(user_name,
                                                         administrator_pass)
+
 
 class user:
     def __init__(self):
@@ -114,6 +116,7 @@ class user:
         # Set the given popups settings for the current user
         return core.user.user().set_popups_settings(enabled, duration, keep_until_comment)
 
+
 class project:
     def __init__(self):
         pass
@@ -133,19 +136,23 @@ class project:
 
     def change_password(self, old_password, new_password, administrator_pass):
         return core.repository.modify_project_password(core.environment.get_project_name(),
-                                                    old_password,
-                                                    new_password,
-                                                    administrator_pass)
+                                                       old_password,
+                                                       new_password,
+                                                       administrator_pass)
 
     def set_software_executable(self, software_name, executable_path):
-        software_id = core.project.get_software_data_by_name(software_name, 'id')
+        software_id = core.project.get_software_data_by_name(
+            software_name, 'id')
         if software_id:
             core.project.set_software_path(software_id, executable_path)
 
     def set_software_batch_executable(self, software_name, batch_executable_path):
-        software_id = core.project.get_software_data_by_name(software_name, 'id')
+        software_id = core.project.get_software_data_by_name(
+            software_name, 'id')
         if software_id:
-            core.project.set_software_batch_path(software_id, batch_executable_path)
+            core.project.set_software_batch_path(
+                software_id, batch_executable_path)
+
 
 class shelf:
     def __init__(self):
@@ -159,6 +166,7 @@ class shelf:
         # Create a shelf separator
         return core.shelf.create_separator()
 
+
 class assets:
     def __init__(self):
         pass
@@ -170,7 +178,7 @@ class assets:
         sequence_id = core.assets.create_category(name, 3)
         if sequence_id:
             string_sequence = core.assets.instance_to_string(('category',
-                                                                sequence_id))
+                                                              sequence_id))
         return string_sequence
 
     def create_asset(self, parent, name):
@@ -187,7 +195,7 @@ class assets:
             asset_id = core.assets.create_asset(name, category_id)
             if asset_id:
                 string_asset = core.assets.instance_to_string(('asset',
-                                                                asset_id))
+                                                               asset_id))
         return string_asset
 
     def create_stage(self, parent, stage):
@@ -204,7 +212,7 @@ class assets:
             stage_id = core.assets.create_stage(stage, asset_id)
             if stage_id:
                 string_stage = core.assets.instance_to_string(('stage',
-                                                                stage_id))
+                                                               stage_id))
         return string_stage
 
     def create_variant(self, parent, name):
@@ -221,7 +229,7 @@ class assets:
             variant_id = core.assets.create_variant(name, stage_id)
             if variant_id:
                 string_variant = core.assets.instance_to_string(('variant',
-                                                                    variant_id))
+                                                                 variant_id))
         return string_variant
 
     def create_work_env(self, parent, software):
@@ -237,10 +245,11 @@ class assets:
         if variant_id:
             software_id = core.assets.get_software_id_by_name(software)
             if software_id:
-                work_env_id = core.assets.create_work_env(software_id, variant_id)
+                work_env_id = core.assets.create_work_env(
+                    software_id, variant_id)
                 if work_env_id:
                     string_work_env = core.assets.instance_to_string(('work_env',
-                                                                        work_env_id))
+                                                                      work_env_id))
         return string_work_env
 
     # Exports commands
@@ -255,13 +264,15 @@ class assets:
             variant_id = variant
 
         if variant_id and instance_type == 'variant':
-            success = core.assets.merge_file_as_export_version(export_name, files_list, variant_id, comment)
+            success = core.assets.merge_file_as_export_version(
+                export_name, files_list, variant_id, comment)
         return success
 
     def batch_export(self, work_env, namespaces_list=[], rolls=False, custom_frame_range=None, refresh_assets_in_scene=False):
-        
+
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -269,8 +280,10 @@ class assets:
             version_id = core.project.get_last_work_version(work_env_id, 'id')
             if version_id:
                 version_id = version_id[0]
-                stage = core.assets.get_stage_data_from_work_env_id(work_env_id, 'name')
-                asset_row = core.assets.get_asset_data_from_work_env_id(work_env_id)
+                stage = core.assets.get_stage_data_from_work_env_id(
+                    work_env_id, 'name')
+                asset_row = core.assets.get_asset_data_from_work_env_id(
+                    work_env_id)
                 if not custom_frame_range:
                     frange = [asset_row['inframe'], asset_row['outframe']]
                 else:
@@ -290,7 +303,8 @@ class assets:
     def batch_export_camera(self, work_env, namespaces_list=[], rolls=False, custom_frame_range=None, refresh_assets_in_scene=False):
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -298,8 +312,9 @@ class assets:
             version_id = core.project.get_last_work_version(work_env_id, 'id')
             if version_id:
                 version_id = version_id[0]
-                #stage = core.assets.get_stage_data_from_work_env_id(work_env_id, 'name')
-                asset_row = core.assets.get_asset_data_from_work_env_id(work_env_id)
+                # stage = core.assets.get_stage_data_from_work_env_id(work_env_id, 'name')
+                asset_row = core.assets.get_asset_data_from_work_env_id(
+                    work_env_id)
                 if not custom_frame_range:
                     frange = [asset_row['inframe'], asset_row['outframe']]
                 else:
@@ -355,19 +370,23 @@ class assets:
         new_references = None
 
         if type(destination_work_env) == str:
-            dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
+            dest_instance_type, work_env_id = core.assets.string_to_work_instance(
+                destination_work_env)
         else:
             work_env_id = destination_work_env
 
         if type(stage_to_reference) == str:
-            orig_instance_type, stage_id = core.assets.string_to_instance(stage_to_reference)
+            orig_instance_type, stage_id = core.assets.string_to_instance(
+                stage_to_reference)
         else:
             stage_id = stage_to_reference
 
         if work_env_id and stage_id:
-            old_references = core.project.get_references(work_env_id, 'namespace')
+            old_references = core.project.get_references(
+                work_env_id, 'namespace')
             core.assets.create_references_from_stage_id(work_env_id, stage_id)
-            new_references = list(set(core.project.get_references(work_env_id, 'namespace')) - set(old_references))
+            new_references = list(set(core.project.get_references(
+                work_env_id, 'namespace')) - set(old_references))
         return new_references
 
     def create_grouped_reference(self, destination_group, stage_to_reference):
@@ -380,21 +399,26 @@ class assets:
             group_id = destination_group
 
         if type(stage_to_reference) == str:
-            orig_instance_type, stage_id = core.assets.string_to_instance(stage_to_reference)
+            orig_instance_type, stage_id = core.assets.string_to_instance(
+                stage_to_reference)
         else:
             stage_id = stage_to_reference
 
         if group_id and stage_id:
-            old_references = core.project.get_grouped_references(group_id, 'namespace')
-            core.assets.create_grouped_references_from_stage_id(group_id, stage_id)
-            new_references = list(set(core.project.get_grouped_references(group_id, 'namespace')) - set(old_references))
+            old_references = core.project.get_grouped_references(
+                group_id, 'namespace')
+            core.assets.create_grouped_references_from_stage_id(
+                group_id, stage_id)
+            new_references = list(set(core.project.get_grouped_references(
+                group_id, 'namespace')) - set(old_references))
         return new_references
 
     def create_referenced_group(self, destination_work_env, group):
         # Reference the given group in the given destination work environment
 
         if type(destination_work_env) == str:
-            dest_instance_type, work_env_id = core.assets.string_to_work_instance(destination_work_env)
+            dest_instance_type, work_env_id = core.assets.string_to_work_instance(
+                destination_work_env)
         else:
             work_env_id = destination_work_env
 
@@ -410,7 +434,8 @@ class assets:
         # Return the work environment references as a list of namespaces
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -436,7 +461,8 @@ class assets:
         # Return the work environment referenced groups as a list of namespaces
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -449,12 +475,14 @@ class assets:
         # Remove the given reference from the work environment
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
         if work_env_id:
-            reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
+            reference_id = core.project.get_reference_by_namespace(
+                work_env_id, reference, 'id')
             if reference_id:
                 return core.assets.remove_reference(reference_id)
 
@@ -467,7 +495,8 @@ class assets:
             group_id = group
 
         if group_id:
-            grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
+            grouped_reference_id = core.project.get_grouped_reference_by_namespace(
+                group_id, reference, 'id')
             if grouped_reference_id:
                 return core.assets.remove_grouped_reference(grouped_reference_id)
 
@@ -475,12 +504,14 @@ class assets:
         # Remove the given referenced group from the work environment
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
         if work_env_id:
-            referenced_group_id = core.project.get_referenced_group_by_namespace(work_env_id, referenced_group, 'id')
+            referenced_group_id = core.project.get_referenced_group_by_namespace(
+                work_env_id, referenced_group, 'id')
             if referenced_group_id:
                 return core.assets.remove_referenced_group(referenced_group_id)
 
@@ -488,12 +519,14 @@ class assets:
         # Modify the given reference to match the default export version
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
         if work_env_id:
-            reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
+            reference_id = core.project.get_reference_by_namespace(
+                work_env_id, reference, 'id')
             if reference_id:
                 return core.assets.set_reference_last_version(reference_id)
 
@@ -506,7 +539,8 @@ class assets:
             group_id = group
 
         if group_id:
-            grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
+            grouped_reference_id = core.project.get_grouped_reference_by_namespace(
+                group_id, reference, 'id')
             if grouped_reference_id:
                 return core.assets.set_grouped_reference_last_version(grouped_reference_id)
 
@@ -518,12 +552,14 @@ class assets:
             auto_update = 0
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
         if work_env_id:
-            reference_id = core.project.get_reference_by_namespace(work_env_id, reference, 'id')
+            reference_id = core.project.get_reference_by_namespace(
+                work_env_id, reference, 'id')
             if reference_id:
                 return core.project.modify_reference_auto_update(reference_id, auto_update)
 
@@ -540,7 +576,8 @@ class assets:
             group_id = group
 
         if group_id:
-            grouped_reference_id = core.project.get_grouped_reference_by_namespace(group_id, reference, 'id')
+            grouped_reference_id = core.project.get_grouped_reference_by_namespace(
+                group_id, reference, 'id')
             if grouped_reference_id:
                 return core.project.modify_grouped_reference_auto_update(grouped_reference_id, auto_update)
 
@@ -562,7 +599,8 @@ class assets:
         success = None
 
         if type(sequence) == str:
-            instance_type, sequence_id = core.assets.string_to_instance(sequence)
+            instance_type, sequence_id = core.assets.string_to_instance(
+                sequence)
         else:
             sequence_id = sequence
 
@@ -598,7 +636,8 @@ class assets:
         success = None
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             instance_type = 'work_env'
             work_env_id = work_env
@@ -611,7 +650,8 @@ class assets:
         success = None
 
         if type(work_version) == str:
-            instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+            instance_type, work_version_id = core.assets.string_to_work_instance(
+                work_version)
         else:
             instance_type = 'work_version'
             work_version_id = work_version
@@ -693,7 +733,8 @@ class assets:
             variant_id = parent
 
         if variant_id:
-            work_envs = core.project.get_variant_work_envs_childs(variant_id, column)
+            work_envs = core.project.get_variant_work_envs_childs(
+                variant_id, column)
         return work_envs
 
     def list_work_versions(self, parent, column='*'):
@@ -702,7 +743,8 @@ class assets:
         work_versions = None
 
         if type(parent) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(parent)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                parent)
         else:
             work_env_id = parent
 
@@ -731,13 +773,15 @@ class assets:
         export_versions = None
 
         if type(parent) == str:
-            instance_type, export_id = core.assets.string_to_export_instance(parent)
+            instance_type, export_id = core.assets.string_to_export_instance(
+                parent)
         else:
             export_id = parent
 
         if export_id:
             export_versions = core.project.get_export_childs(export_id, column)
         return export_versions
+
 
 class tracking:
     def __init__(self):
@@ -764,7 +808,7 @@ class tracking:
             return core.project.get_stage_data(stage_id, 'state')
 
     def get_task_work_time(self, stage):
-        
+
         if type(stage) == str:
             instance_type, stage_id = core.assets.string_to_instance(stage)
         else:
@@ -774,7 +818,7 @@ class tracking:
             return core.project.get_stage_data(stage_id, 'work_time')
 
     def get_task_estimated_time(self, stage):
-        
+
         if type(stage) == str:
             instance_type, stage_id = core.assets.string_to_instance(stage)
         else:
@@ -795,7 +839,7 @@ class tracking:
             core.assets.modify_stage_assignment(stage_id, user)
 
     def set_task_state(self, stage, state, comment=''):
-        
+
         if type(stage) == str:
             instance_type, stage_id = core.assets.string_to_instance(stage)
         else:
@@ -805,24 +849,25 @@ class tracking:
             core.assets.modify_stage_state(stage_id, state, comment)
 
     def estimate_task_time(self, stage, time):
-        
+
         if type(stage) == str:
             instance_type, stage_id = core.assets.string_to_instance(stage)
         else:
             stage_id = stage
 
         if stage_id:
-            core.assets.modify_stage_estimation(stage_id, time)    
+            core.assets.modify_stage_estimation(stage_id, time)
 
     def add_task_comment(self, stage, comment):
-        
+
         if type(stage) == str:
             instance_type, stage_id = core.assets.string_to_instance(stage)
         else:
             stage_id = stage
 
         if stage_id:
-            core.assets.add_stage_comment(stage_id, comment)    
+            core.assets.add_stage_comment(stage_id, comment)
+
 
 class launch:
     def __init__(self):
@@ -832,12 +877,14 @@ class launch:
         # Run the last version of the given work environment related software
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
         if work_env_id:
-            last_work_version_id = core.project.get_last_work_version(work_env_id, 'id')
+            last_work_version_id = core.project.get_last_work_version(
+                work_env_id, 'id')
             if last_work_version_id:
                 core.launch.launch_work_version(last_work_version_id[0])
 
@@ -845,7 +892,8 @@ class launch:
         # Run the given work version related software
 
         if type(work_version) == str:
-            instance_type, work_version_id = core.assets.string_to_work_instance(work_version)
+            instance_type, work_version_id = core.assets.string_to_work_instance(
+                work_version)
         else:
             work_version_id = work_version
 
@@ -856,7 +904,8 @@ class launch:
         # Terminate the given work environment related software instance
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -874,14 +923,15 @@ class launch:
         if running_work_env_ids:
             for work_env_id in running_work_env_ids:
                 running_work_envs.append(core.assets.instance_to_string(('work_env',
-                                                                            work_env_id)))
+                                                                         work_env_id)))
         return running_work_envs
 
     def lock_work_env(self, work_env):
         # Lock the given work environment for the current user
 
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -890,9 +940,10 @@ class launch:
 
     def unlock_work_env(self, work_env):
         # Unlock the given work environment if it is locked by the current user
-        
+
         if type(work_env) == str:
-            instance_type, work_env_id = core.assets.string_to_work_instance(work_env)
+            instance_type, work_env_id = core.assets.string_to_work_instance(
+                work_env)
         else:
             work_env_id = work_env
 
@@ -902,6 +953,7 @@ class launch:
     def unlock_all(self):
         # Unlock all the work environments locked by the current user
         core.project.unlock_all()
+
 
 class team:
     def __init__(self):
@@ -922,6 +974,7 @@ class team:
             return core.environment.get_team_dns()
         else:
             return None
+
 
 class ui:
     def __init__(self):
@@ -972,7 +1025,8 @@ class ui:
         # Focus on the given variant in wizard
 
         if type(variant) == str:
-            instance_type, instance_id = core.assets.string_to_instance(variant)
+            instance_type, instance_id = core.assets.string_to_instance(
+                variant)
         else:
             instance_type = 'variant'
             instance_id = variant
@@ -984,13 +1038,15 @@ class ui:
         # Focus on the given work version in the work versions tab
 
         if type(work_version) == str:
-            instance_type, instance_id = core.assets.string_to_work_instance(work_version)
+            instance_type, instance_id = core.assets.string_to_work_instance(
+                work_version)
         else:
             instance_type = 'work_version'
             instance_id = work_version
 
         if instance_type == 'work_version':
             gui.gui_server.focus_work_version(instance_id)
+
 
 repository = repository()
 user = user()

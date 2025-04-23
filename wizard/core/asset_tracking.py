@@ -39,41 +39,49 @@ import logging
 from wizard.core import assets
 from wizard.core import repository
 from wizard.core import environment
+
 logger = logging.getLogger(__name__)
 
+
 def add_assignment_event(stage_id, assigned_user, comment=''):
-	event_type = 'assignment'
-	data = assigned_user
-	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    event_type = 'assignment'
+    data = assigned_user
+    assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 
 def add_estimation_event(stage_id, estimation_time, comment=''):
-	event_type = 'estimation'
-	data = str(estimation_time)
-	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    event_type = 'estimation'
+    data = str(estimation_time)
+    assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 
 def add_start_date_event(stage_id, start_date, comment=''):
-	event_type = 'start_date'
-	data = str(start_date)
-	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    event_type = 'start_date'
+    data = str(start_date)
+    assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 
 def add_state_switch_event(stage_id, new_state, comment=''):
-	event_type = 'state_switch'
-	data = new_state
-	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    event_type = 'state_switch'
+    data = new_state
+    assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 
 def add_priority_switch_event(stage_id, new_priority, comment=''):
-	event_type = 'priority_switch'
-	data = new_priority
-	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    event_type = 'priority_switch'
+    data = new_priority
+    assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+
 
 def add_work_session_event(stage_id, work_time, comment=''):
-	if work_time > 120:
-		event_type = 'work_session'
-		data = work_time
-		assets.add_asset_tracking_event(stage_id, event_type, data, comment)
-	repository.add_user_work_time(environment.get_user(), work_time)
+    if work_time > 120:
+        event_type = 'work_session'
+        data = work_time
+        assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    repository.add_user_work_time(environment.get_user(), work_time)
+
 
 def add_comment_event(stage_id, comment):
-	event_type = 'comment'
-	data = comment
-	assets.add_asset_tracking_event(stage_id, event_type, data, comment)
+    event_type = 'comment'
+    data = comment
+    assets.add_asset_tracking_event(stage_id, event_type, data, comment)

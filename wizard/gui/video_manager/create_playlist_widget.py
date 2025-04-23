@@ -3,13 +3,13 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 
 # Wizard modules
-from wizard.core import project
 from wizard.core import assets
 from wizard.vars import ressources
 from wizard.gui import gui_server
+
 
 class create_playlist_widget(QtWidgets.QDialog):
     def __init__(self, data="{}", thumbnail_temp_path=None, parent=None):
@@ -33,7 +33,8 @@ class create_playlist_widget(QtWidgets.QDialog):
     def create_playlist(self):
         playlist_name = self.playlist_name_field.text()
         print(self.thumbnail_temp_path)
-        playlist_id = assets.create_playlist(name=playlist_name, data=self.data, thumbnail_temp_path=self.thumbnail_temp_path)
+        playlist_id = assets.create_playlist(
+            name=playlist_name, data=self.data, thumbnail_temp_path=self.thumbnail_temp_path)
         if playlist_id:
             self.playlist_id = playlist_id
             self.playlist_name = playlist_name
@@ -50,17 +51,18 @@ class create_playlist_widget(QtWidgets.QDialog):
         self.playlist_name_field.setPlaceholderText("Playlist name")
         self.main_layout.addWidget(self.playlist_name_field)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding,
-                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding,
+                                                             QtWidgets.QSizePolicy.Policy.MinimumExpanding))
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.cancel_button.setDefault(False)

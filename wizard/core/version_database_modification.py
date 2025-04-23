@@ -27,51 +27,48 @@
 # SOFTWARE.
 
 # Python modules
-import traceback
-import json
-import time
 import logging
+
+# Wizard modules
+from wizard.core import db_utils
+from wizard.core import environment
 
 logger = logging.getLogger(__name__)
 
-# Wizard modules
-from wizard.core import environment
-from wizard.core import repository
-from wizard.core import project
-from wizard.core import assets
-from wizard.core import db_utils
 
 def main():
-	add_rendering_extensions()
-	add_OCIO_project_settings()
-	add_render_nodes_number_project_settings()
-	add_mean_render_time_project_settings()
+    add_rendering_extensions()
+    add_OCIO_project_settings()
+    add_render_nodes_number_project_settings()
+    add_mean_render_time_project_settings()
+
 
 def add_rendering_extensions():
-	from wizard.core import project
-	from wizard.vars import softwares_vars
-	from wizard.vars import assets_vars
+    from wizard.core import project
+    from wizard.vars import softwares_vars
+    from wizard.vars import assets_vars
 
+    for software in softwares_vars._softwares_list_:
+        for stage in assets_vars._ext_dic_.keys():
+            if stage != 'rendering':
+                continue
+            software_id = project.get_software_data_by_name(software, 'id')
+            if software in assets_vars._ext_dic_[stage].keys():
+                extension = assets_vars._ext_dic_[stage][software][0]
+                if not project.get_default_extension_row(stage, software_id, ignore_warning=True):
+                    project.create_extension_row(stage, software_id, extension)
 
-	for software in softwares_vars._softwares_list_:
-		for stage in assets_vars._ext_dic_.keys():
-			if stage != 'rendering':
-				continue
-			software_id = project.get_software_data_by_name(software,'id')
-			if software in assets_vars._ext_dic_[stage].keys():
-				extension = assets_vars._ext_dic_[stage][software][0]
-				if not project.get_default_extension_row(stage, software_id, ignore_warning=True):
-					project.create_extension_row(stage, software_id, extension)
 
 def add_OCIO_project_settings():
-	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS OCIO text;"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
+    sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS OCIO text;"""
+    db_utils.create_table(environment.get_project_name(), sql_cmd)
+
 
 def add_render_nodes_number_project_settings():
-	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS render_nodes_number integer NOT NULL DEFAULT 1;"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
+    sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS render_nodes_number integer NOT NULL DEFAULT 1;"""
+    db_utils.create_table(environment.get_project_name(), sql_cmd)
+
 
 def add_mean_render_time_project_settings():
-	sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS mean_render_time integer DEFAULT 1800;"""
-	db_utils.create_table(environment.get_project_name(), sql_cmd)
-
+    sql_cmd = """ALTER TABLE settings ADD COLUMN IF NOT EXISTS mean_render_time integer DEFAULT 1800;"""
+    db_utils.create_table(environment.get_project_name(), sql_cmd)

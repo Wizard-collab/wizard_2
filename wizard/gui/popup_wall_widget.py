@@ -6,8 +6,6 @@
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
 import json
-import traceback
-import os
 import time
 import logging
 
@@ -32,11 +30,13 @@ from wizard.gui import tag_label
 
 logger = logging.getLogger(__name__)
 
+
 class popup_wall_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(popup_wall_widget, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint |
+                            QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.popup_ids = dict()
@@ -50,7 +50,7 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.setMinimumWidth(400)
         self.setObjectName('transparent_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -59,18 +59,22 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.popup_scrollBar = self.popups_scrollArea.verticalScrollBar()
 
         self.popups_scrollArea_widget = QtWidgets.QWidget()
-        self.popups_scrollArea_widget.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
+        self.popups_scrollArea_widget.setLayoutDirection(
+            QtCore.Qt.LayoutDirection.RightToLeft)
         self.popups_scrollArea_widget.setObjectName('transparent_widget')
         self.popups_scrollArea_layout = QtWidgets.QVBoxLayout()
         self.popups_scrollArea_layout.setSpacing(6)
         self.popups_scrollArea_widget.setLayout(self.popups_scrollArea_layout)
 
-        self.popups_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.popups_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.popups_scrollArea.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.popups_scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.popups_scrollArea.setWidgetResizable(True)
         self.popups_scrollArea.setWidget(self.popups_scrollArea_widget)
 
-        self.popups_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.popups_scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(self.popups_scrollArea)
 
@@ -100,7 +104,8 @@ class popup_wall_widget(QtWidgets.QWidget):
     def add_custom_popup(self, data):
         if user.user().get_popups_enabled():
             popup_id = time.time()
-            widget = popup_custom_widget(data[0], data[1], data[2], data[3], popup_id)
+            widget = popup_custom_widget(
+                data[0], data[1], data[2], data[3], popup_id)
             self.popup_ids[popup_id] = widget
             self.popups_scrollArea_layout.addWidget(widget)
             self.popup_ids[popup_id].time_out.connect(self.remove_popup)
@@ -110,10 +115,11 @@ class popup_wall_widget(QtWidgets.QWidget):
             widget = popup_save_widget(version_id)
             self.popup_save_ids[version_id] = widget
             self.popups_scrollArea_layout.addWidget(widget)
-            self.popup_save_ids[version_id].time_out.connect(self.remove_save_popup)
+            self.popup_save_ids[version_id].time_out.connect(
+                self.remove_save_popup)
         else:
             gui_server.refresh_only_team_ui()
-            
+
     def remove_popup(self, popup_id):
         if popup_id in self.popup_ids.keys():
             widget = self.popup_ids[popup_id]
@@ -140,6 +146,7 @@ class popup_wall_widget(QtWidgets.QWidget):
             widget.setParent(None)
             widget.deleteLater()
             gui_server.refresh_team_ui()
+
 
 class popup_save_widget(QtWidgets.QFrame):
 
@@ -173,7 +180,7 @@ class popup_save_widget(QtWidgets.QFrame):
     def init_clock(self):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(lambda: self.time_out.emit(self.version_id))
-    
+
     def start_clock(self):
         keep_until_comment = user.user().get_keep_until_comment()
         if keep_until_comment and self.is_comment:
@@ -200,17 +207,20 @@ class popup_save_widget(QtWidgets.QFrame):
 
     def connect_functions(self):
         self.update_comment_button.clicked.connect(self.update_comment)
-        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.version_id))
-        #self.comment_textEdit.textChanged.connect(self.propose_tags)
+        self.quit_button.clicked.connect(
+            lambda: self.time_out.emit(self.version_id))
+        # self.comment_textEdit.textChanged.connect(self.propose_tags)
         self.comment_textEdit.textChanged.connect(self.update_comment_validity)
         self.comment_textEdit.apply_signal.connect(self.update_comment)
 
     def propose_tags(self):
         text = self.comment_textEdit.toPlainText()
         position_rect = self.comment_textEdit.cursorRect()
-        pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+        pos = self.comment_textEdit.mapToGlobal(
+            QtCore.QPoint(position_rect.x()+20, position_rect.y()))
         self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
-        self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
+        self.tags_widget.other_key_pressed.connect(
+            self.comment_textEdit.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
         self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.exec()
@@ -223,8 +233,9 @@ class popup_save_widget(QtWidgets.QFrame):
         else:
             color = '#95d859'
             self.warning_text.setText("Perfect !")
-        self.comment_textEdit.setStyleSheet('#comment_textEdit{border:1px solid %s}' %color)
-        self.warning_text.setStyleSheet('color: %s' %color)
+        self.comment_textEdit.setStyleSheet(
+            '#comment_textEdit{border:1px solid %s}' % color)
+        self.warning_text.setStyleSheet('color: %s' % color)
 
     def move_cursor_to_end(self):
         self.comment_textEdit.moveCursor(QtGui.QTextCursor.MoveOperation.End)
@@ -246,57 +257,61 @@ class popup_save_widget(QtWidgets.QFrame):
         else:
             color = '#23232b'
         self.blink_state = 1-self.blink_state
-        self.setStyleSheet("#popup_event_frame{background-color:%s}" %color)
+        self.setStyleSheet("#popup_event_frame{background-color:%s}" % color)
 
     def build_ui(self):
         self.setMinimumWidth(320)
         self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(17,17,17,17)
+        self.main_layout.setContentsMargins(17, 17, 17, 17)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
         self.save_image = QtWidgets.QLabel()
-        self.save_image.setPixmap(QtGui.QIcon(ressources._save_icon_).pixmap(22))
+        self.save_image.setPixmap(QtGui.QIcon(
+            ressources._save_icon_).pixmap(22))
         self.header_layout.addWidget(self.save_image)
 
         self.version_name_label = QtWidgets.QLabel()
         self.version_name_label.setWordWrap(True)
-        self.version_name_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.version_name_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_layout.addWidget(self.version_name_label)
 
         self.decoration_content = QtWidgets.QWidget()
         self.decoration_content.setObjectName('transparent_widget')
         self.decoration_content_layout = QtWidgets.QVBoxLayout()
-        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setContentsMargins(0, 0, 0, 0)
         self.decoration_content_layout.setSpacing(0)
         self.decoration_content.setLayout(self.decoration_content_layout)
         self.header_layout.addWidget(self.decoration_content)
 
         self.quit_button = gui_utils.close_button()
-        self.quit_button.setIconSize(QtCore.QSize(12,12))
+        self.quit_button.setIconSize(QtCore.QSize(12, 12))
         self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout.addWidget(self.quit_button)
 
         self.comment_label = QtWidgets.QLabel()
         self.main_layout.addWidget(self.comment_label)
-        
-        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.comment_widget = QtWidgets.QWidget()
         self.comment_widget.setObjectName('transparent_widget')
         self.comment_layout = QtWidgets.QVBoxLayout()
-        self.comment_layout.setContentsMargins(0,0,0,0)
+        self.comment_layout.setContentsMargins(0, 0, 0, 0)
         self.comment_layout.setSpacing(6)
         self.comment_widget.setLayout(self.comment_layout)
         self.main_layout.addWidget(self.comment_widget)
@@ -312,6 +327,7 @@ class popup_save_widget(QtWidgets.QFrame):
 
         self.update_comment_button = QtWidgets.QPushButton('Comment')
         self.comment_layout.addWidget(self.update_comment_button)
+
 
 class popup_event_widget(QtWidgets.QFrame):
 
@@ -345,8 +361,9 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def init_clock(self):
         self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(lambda: self.time_out.emit(self.event_row['id']))
-    
+        self.timer.timeout.connect(
+            lambda: self.time_out.emit(self.event_row['id']))
+
     def start_clock(self):
         keep_until_comment = user.user().get_keep_until_comment()
         start_timer = True
@@ -357,8 +374,10 @@ class popup_event_widget(QtWidgets.QFrame):
             self.timer.start(duration*1000)
 
     def fill_ui(self):
-        profile_image = repository.get_user_row_by_name(self.event_row['creation_user'], 'profile_picture')
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
+        profile_image = repository.get_user_row_by_name(
+            self.event_row['creation_user'], 'profile_picture')
+        pm = gui_utils.mask_image(
+            image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
         self.profile_picture.setPixmap(pm)
         self.user_name_label.setText(self.event_row['creation_user'])
         self.event_title_label.setText(self.event_row['title'])
@@ -369,7 +388,8 @@ class popup_event_widget(QtWidgets.QFrame):
         if self.event_row['additional_message'] is not None and self.event_row['additional_message'] != '':
             self.event_additional_content_label.setVisible(1)
             self.content_widget.setVisible(1)
-            self.event_additional_content_label.setText(self.event_row['additional_message'])
+            self.event_additional_content_label.setText(
+                self.event_row['additional_message'])
 
         if self.event_row['type'] == 'creation':
             profile_color = '#77c5f2'
@@ -394,7 +414,8 @@ class popup_event_widget(QtWidgets.QFrame):
         elif self.event_row['type'] == 'tag':
             profile_color = '#f0d969'
 
-        self.profile_frame.setStyleSheet('#wall_profile_frame{background-color:%s;border-radius:17px;}'%profile_color)
+        self.profile_frame.setStyleSheet(
+            '#wall_profile_frame{background-color:%s;border-radius:17px;}' % profile_color)
         if self.is_comment:
             self.comment_widget.setVisible(True)
             if user.user().get_popups_blink_enabled():
@@ -403,17 +424,20 @@ class popup_event_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.comment_button.clicked.connect(self.update_comment)
         self.comment_textEdit.apply_signal.connect(self.update_comment)
-        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.event_row['id']))
+        self.quit_button.clicked.connect(
+            lambda: self.time_out.emit(self.event_row['id']))
         self.action_button.clicked.connect(self.action)
-        #self.comment_textEdit.textChanged.connect(self.propose_tags)
+        # self.comment_textEdit.textChanged.connect(self.propose_tags)
         self.comment_textEdit.textChanged.connect(self.update_comment_validity)
 
     def propose_tags(self):
         text = self.comment_textEdit.toPlainText()
         position_rect = self.comment_textEdit.cursorRect()
-        pos = self.comment_textEdit.mapToGlobal(QtCore.QPoint(position_rect.x()+20, position_rect.y()))
+        pos = self.comment_textEdit.mapToGlobal(
+            QtCore.QPoint(position_rect.x()+20, position_rect.y()))
         self.tags_widget = tags_widget.tags_widget(pos=pos, text=text)
-        self.tags_widget.other_key_pressed.connect(self.comment_textEdit.keyPressEvent)
+        self.tags_widget.other_key_pressed.connect(
+            self.comment_textEdit.keyPressEvent)
         self.tags_widget.returned_text.connect(self.comment_textEdit.setText)
         self.tags_widget.returned_text.connect(self.move_cursor_to_end)
         self.tags_widget.exec()
@@ -429,8 +453,9 @@ class popup_event_widget(QtWidgets.QFrame):
         else:
             color = '#95d859'
             self.warning_text.setText("Perfect !")
-        self.comment_textEdit.setStyleSheet('#comment_textEdit{border:1px solid %s}' %color)
-        self.warning_text.setStyleSheet('color: %s' %color)
+        self.comment_textEdit.setStyleSheet(
+            '#comment_textEdit{border:1px solid %s}' % color)
+        self.warning_text.setStyleSheet('color: %s' % color)
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
@@ -456,7 +481,7 @@ class popup_event_widget(QtWidgets.QFrame):
         else:
             color = '#23232b'
         self.blink_state = 1-self.blink_state
-        self.setStyleSheet("#popup_event_frame{background-color:%s}" %color)
+        self.setStyleSheet("#popup_event_frame{background-color:%s}" % color)
 
     def action(self):
         if self.event_row['type'] == 'archive':
@@ -490,9 +515,10 @@ class popup_event_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.setMinimumWidth(320)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -507,19 +533,19 @@ class popup_event_widget(QtWidgets.QFrame):
         self.profile_frame.setObjectName('transparent_widget')
         self.profile_frame.setObjectName('wall_profile_frame')
         self.profile_layout = QtWidgets.QHBoxLayout()
-        self.profile_layout.setContentsMargins(0,0,0,0)
+        self.profile_layout.setContentsMargins(0, 0, 0, 0)
         self.profile_frame.setLayout(self.profile_layout)
-        self.profile_frame.setFixedSize(34,34)
+        self.profile_frame.setFixedSize(34, 34)
         self.header_layout.addWidget(self.profile_frame)
 
         self.profile_picture = QtWidgets.QLabel()
-        self.profile_picture.setFixedSize(30,30)
+        self.profile_picture.setFixedSize(30, 30)
         self.profile_layout.addWidget(self.profile_picture)
 
         self.title_widget = QtWidgets.QWidget()
         self.title_widget.setObjectName('transparent_widget')
         self.title_layout = QtWidgets.QVBoxLayout()
-        self.title_layout.setContentsMargins(0,0,0,0)
+        self.title_layout.setContentsMargins(0, 0, 0, 0)
         self.title_layout.setSpacing(2)
         self.title_widget.setLayout(self.title_layout)
         self.header_layout.addWidget(self.title_widget)
@@ -533,12 +559,13 @@ class popup_event_widget(QtWidgets.QFrame):
         self.user_name_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.user_name_label)
 
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.decoration_content = QtWidgets.QWidget()
         self.decoration_content.setObjectName('transparent_widget')
         self.decoration_content_layout = QtWidgets.QVBoxLayout()
-        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setContentsMargins(0, 0, 0, 0)
         self.decoration_content_layout.setSpacing(0)
         self.decoration_content.setLayout(self.decoration_content_layout)
         self.header_layout.addWidget(self.decoration_content)
@@ -546,30 +573,31 @@ class popup_event_widget(QtWidgets.QFrame):
         self.decoration_content_2 = QtWidgets.QWidget()
         self.decoration_content_2.setObjectName('transparent_widget')
         self.decoration_content_layout_2 = QtWidgets.QHBoxLayout()
-        self.decoration_content_layout_2.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout_2.setContentsMargins(0, 0, 0, 0)
         self.decoration_content_layout_2.setSpacing(0)
         self.decoration_content_2.setLayout(self.decoration_content_layout_2)
         self.decoration_content_layout.addWidget(self.decoration_content_2)
 
-        self.action_button = gui_utils.transparent_button(ressources._rigth_arrow_transparent_icon_, 
-                                                            ressources._rigth_arrow_icon_)
-        self.action_button.setIconSize(QtCore.QSize(18,18))
+        self.action_button = gui_utils.transparent_button(ressources._rigth_arrow_transparent_icon_,
+                                                          ressources._rigth_arrow_icon_)
+        self.action_button.setIconSize(QtCore.QSize(18, 18))
         self.action_button.setFixedSize(16, 16)
         self.decoration_content_layout_2.addWidget(self.action_button)
 
         self.quit_button = gui_utils.close_button()
-        self.quit_button.setIconSize(QtCore.QSize(12,12))
+        self.quit_button.setIconSize(QtCore.QSize(12, 12))
         self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout_2.addWidget(self.quit_button)
-        
-        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.content_widget = QtWidgets.QWidget()
         self.content_widget.setVisible(0)
         self.content_widget.setObjectName('transparent_widget')
         self.content_layout = QtWidgets.QVBoxLayout()
-        self.content_layout.setContentsMargins(56,0,11,11)
+        self.content_layout.setContentsMargins(56, 0, 11, 11)
         self.content_layout.setSpacing(12)
         self.content_widget.setLayout(self.content_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -591,7 +619,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_widget = QtWidgets.QWidget()
         self.comment_widget.setObjectName('transparent_widget')
         self.comment_widget_layout = QtWidgets.QVBoxLayout()
-        self.comment_widget_layout.setContentsMargins(56,0,11,11)
+        self.comment_widget_layout.setContentsMargins(56, 0, 11, 11)
         self.comment_widget_layout.setSpacing(4)
         self.comment_widget.setLayout(self.comment_widget_layout)
         self.main_layout.addWidget(self.comment_widget)
@@ -609,6 +637,7 @@ class popup_event_widget(QtWidgets.QFrame):
         self.comment_button = QtWidgets.QPushButton('Comment')
         self.comment_widget_layout.addWidget(self.comment_button)
 
+
 class popup_custom_widget(QtWidgets.QFrame):
 
     time_out = pyqtSignal(float)
@@ -621,7 +650,7 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.icon = icon
         self.profile_picture = profile_picture
         self.popup_id = popup_id
-        
+
         self.is_comment = False
 
         self.shadow = QtWidgets.QGraphicsDropShadowEffect()
@@ -647,7 +676,7 @@ class popup_custom_widget(QtWidgets.QFrame):
     def init_clock(self):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(lambda: self.time_out.emit(self.popup_id))
-    
+
     def start_clock(self):
         duration = user.user().get_popups_duration()
         self.timer.start(duration*1000)
@@ -656,21 +685,25 @@ class popup_custom_widget(QtWidgets.QFrame):
         if self.icon:
             self.icon_picture.setPixmap(QtGui.QIcon(self.icon).pixmap(30))
         if self.profile_picture:
-            profile_image = repository.get_user_row_by_name(self.profile_picture, 'profile_picture')
-            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
+            profile_image = repository.get_user_row_by_name(
+                self.profile_picture, 'profile_picture')
+            pm = gui_utils.mask_image(
+                image.convert_str_data_to_image_bytes(profile_image), 'png', 30)
             self.icon_picture.setPixmap(pm)
         self.event_title_label.setText(self.title)
         self.msg_label.setText(self.msg)
 
     def connect_functions(self):
-        self.quit_button.clicked.connect(lambda: self.time_out.emit(self.popup_id))
+        self.quit_button.clicked.connect(
+            lambda: self.time_out.emit(self.popup_id))
 
     def build_ui(self):
         self.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.setMinimumWidth(320)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -682,13 +715,13 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.header_widget)
 
         self.icon_picture = QtWidgets.QLabel()
-        self.icon_picture.setFixedSize(30,30)
+        self.icon_picture.setFixedSize(30, 30)
         self.header_layout.addWidget(self.icon_picture)
 
         self.title_widget = QtWidgets.QWidget()
         self.title_widget.setObjectName('transparent_widget')
         self.title_layout = QtWidgets.QVBoxLayout()
-        self.title_layout.setContentsMargins(0,0,0,0)
+        self.title_layout.setContentsMargins(0, 0, 0, 0)
         self.title_layout.setSpacing(2)
         self.title_widget.setLayout(self.title_layout)
         self.header_layout.addWidget(self.title_widget)
@@ -703,20 +736,22 @@ class popup_custom_widget(QtWidgets.QFrame):
         self.msg_label.setObjectName('gray_label')
         self.title_layout.addWidget(self.msg_label)
 
-        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.title_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.decoration_content = QtWidgets.QWidget()
         self.decoration_content.setObjectName('transparent_widget')
         self.decoration_content_layout = QtWidgets.QVBoxLayout()
-        self.decoration_content_layout.setContentsMargins(0,0,0,0)
+        self.decoration_content_layout.setContentsMargins(0, 0, 0, 0)
         self.decoration_content_layout.setSpacing(0)
         self.decoration_content.setLayout(self.decoration_content_layout)
         self.header_layout.addWidget(self.decoration_content)
 
         self.quit_button = gui_utils.close_button()
-        self.quit_button.setIconSize(QtCore.QSize(12,12))
+        self.quit_button.setIconSize(QtCore.QSize(12, 12))
         self.quit_button.setObjectName('quit_button')
         self.quit_button.setFixedSize(16, 16)
         self.decoration_content_layout.addWidget(self.quit_button)
-        
-        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+
+        self.decoration_content_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))

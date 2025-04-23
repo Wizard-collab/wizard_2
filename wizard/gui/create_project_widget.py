@@ -24,6 +24,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class create_project_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_project_widget, self).__init__()
@@ -43,13 +44,15 @@ class create_project_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.title_label = QtWidgets.QLabel("Create project")
         self.title_label.setObjectName("title_label_2")
         self.main_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            0, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Project credentials")
@@ -58,24 +61,27 @@ class create_project_widget(QtWidgets.QDialog):
         self.project_name_lineEdit = QtWidgets.QLineEdit()
         self.project_name_lineEdit.setPlaceholderText('Project name')
         self.main_layout.addWidget(self.project_name_lineEdit)
-        
+
         self.password_lineEdit = gui_utils.password_lineEdit()
         self.password_lineEdit.setPlaceholderText('Project password')
         self.main_layout.addWidget(self.password_lineEdit)
 
         self.password_confirm_lineEdit = gui_utils.password_lineEdit()
-        self.password_confirm_lineEdit.setPlaceholderText('Confirm project password')
+        self.password_confirm_lineEdit.setPlaceholderText(
+            'Confirm project password')
         self.main_layout.addWidget(self.password_confirm_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
-        self.project_path_label = QtWidgets.QLabel("The directory of your project")
+        self.project_path_label = QtWidgets.QLabel(
+            "The directory of your project")
         self.main_layout.addWidget(self.project_path_label)
 
         self.path_widget = QtWidgets.QWidget()
         self.path_layout = QtWidgets.QHBoxLayout()
-        self.path_layout.setContentsMargins(0,0,0,0)
+        self.path_layout.setContentsMargins(0, 0, 0, 0)
         self.path_layout.setSpacing(4)
         self.path_widget.setLayout(self.path_layout)
         self.main_layout.addWidget(self.path_widget)
@@ -87,11 +93,12 @@ class create_project_widget(QtWidgets.QDialog):
 
         self.folder_button = QtWidgets.QPushButton()
         self.folder_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
-        self.folder_button.setIconSize(QtCore.QSize(20,20))
-        self.folder_button.setFixedSize(28,28)
+        self.folder_button.setIconSize(QtCore.QSize(20, 20))
+        self.folder_button.setFixedSize(28, 28)
         self.path_layout.addWidget(self.folder_button)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.project_settings_label = QtWidgets.QLabel("Project settings")
@@ -99,7 +106,7 @@ class create_project_widget(QtWidgets.QDialog):
 
         self.settings_widget = QtWidgets.QWidget()
         self.settings_layout = QtWidgets.QFormLayout()
-        self.settings_layout.setContentsMargins(0,0,0,0)
+        self.settings_layout.setContentsMargins(0, 0, 0, 0)
         self.settings_layout.setSpacing(4)
         self.settings_widget.setLayout(self.settings_layout)
         self.main_layout.addWidget(self.settings_widget)
@@ -113,26 +120,30 @@ class create_project_widget(QtWidgets.QDialog):
 
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
         self.frame_rate_spinBox.setRange(1, 300)
-        self.frame_rate_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.frame_rate_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.frame_rate_spinBox.setValue(24)
-        self.settings_layout.addRow(self.frame_rate_label, self.frame_rate_spinBox)
+        self.settings_layout.addRow(
+            self.frame_rate_label, self.frame_rate_spinBox)
 
         self.format_widget = QtWidgets.QWidget()
         self.format_layout = QtWidgets.QHBoxLayout()
-        self.format_layout.setContentsMargins(0,0,0,0)
+        self.format_layout.setContentsMargins(0, 0, 0, 0)
         self.format_layout.setSpacing(4)
         self.format_widget.setLayout(self.format_layout)
         self.settings_layout.addRow(self.format_label, self.format_widget)
 
         self.format_width = QtWidgets.QSpinBox()
         self.format_width.setRange(1, 100000)
-        self.format_width.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.format_width.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.format_width.setValue(1920)
         self.format_layout.addWidget(self.format_width)
 
         self.format_height = QtWidgets.QSpinBox()
         self.format_height.setRange(1, 100000)
-        self.format_height.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.format_height.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.format_height.setValue(1080)
         self.format_layout.addWidget(self.format_height)
 
@@ -141,9 +152,11 @@ class create_project_widget(QtWidgets.QDialog):
         self.deadline_label.setObjectName('gray_label')
         self.deadline_lineedit = QtWidgets.QLineEdit()
         self.deadline_lineedit.setPlaceholderText('day/month/year')
-        self.settings_layout.addRow(self.deadline_label, self.deadline_lineedit)
+        self.settings_layout.addRow(
+            self.deadline_label, self.deadline_lineedit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.main_layout.addWidget(QtWidgets.QLabel('Project Image'))
@@ -153,31 +166,33 @@ class create_project_widget(QtWidgets.QDialog):
 
         self.image_buttons_widget = QtWidgets.QWidget()
         self.image_buttons_layout = QtWidgets.QHBoxLayout()
-        self.image_buttons_layout.setContentsMargins(0,0,0,0)
+        self.image_buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.image_buttons_layout.setSpacing(4)
         self.image_buttons_widget.setLayout(self.image_buttons_layout)
         self.main_layout.addWidget(self.image_buttons_widget)
 
         self.folder_image_button = QtWidgets.QPushButton()
         self.folder_image_button.setIcon(QtGui.QIcon(ressources._folder_icon_))
-        self.folder_image_button.setIconSize(QtCore.QSize(20,20))
-        self.folder_image_button.setFixedSize(28,28)
+        self.folder_image_button.setIconSize(QtCore.QSize(20, 20))
+        self.folder_image_button.setFixedSize(28, 28)
         self.image_buttons_layout.addWidget(self.folder_image_button)
 
         self.random_image_button = QtWidgets.QPushButton()
         self.random_image_button.setIcon(QtGui.QIcon(ressources._random_icon_))
-        self.random_image_button.setIconSize(QtCore.QSize(20,20))
-        self.random_image_button.setFixedSize(28,28)
+        self.random_image_button.setIconSize(QtCore.QSize(20, 20))
+        self.random_image_button.setFixedSize(28, 28)
         self.image_buttons_layout.addWidget(self.random_image_button)
 
-        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.image_buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -207,7 +222,7 @@ class create_project_widget(QtWidgets.QDialog):
 
     def open_image(self):
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select project image", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
+                                                              "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
@@ -215,7 +230,8 @@ class create_project_widget(QtWidgets.QDialog):
                 self.use_image_file = 1
                 self.update_image()
             else:
-                logger.warning('{} is not a valid image file...'.format(image_file))
+                logger.warning(
+                    '{} is not a valid image file...'.format(image_file))
 
     def update_image(self):
         str_image = repository.process_project_image(self.image)
@@ -226,11 +242,15 @@ class create_project_widget(QtWidgets.QDialog):
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)
         self.create_button.clicked.connect(self.apply)
-        self.project_name_lineEdit.textChanged.connect(self.normalise_project_name)
-        self.project_name_lineEdit.textChanged.connect(lambda:self.get_random_image(force=0))
+        self.project_name_lineEdit.textChanged.connect(
+            self.normalise_project_name)
+        self.project_name_lineEdit.textChanged.connect(
+            lambda: self.get_random_image(force=0))
         self.folder_button.clicked.connect(self.open_explorer)
-        self.project_name_lineEdit.textChanged.connect(self.update_project_path)
-        self.random_image_button.clicked.connect(lambda:self.get_random_image(force=1))
+        self.project_name_lineEdit.textChanged.connect(
+            self.update_project_path)
+        self.random_image_button.clicked.connect(
+            lambda: self.get_random_image(force=1))
         self.folder_image_button.clicked.connect(self.open_image)
 
     def update_project_path(self):
@@ -242,9 +262,9 @@ class create_project_widget(QtWidgets.QDialog):
 
     def open_explorer(self):
         project_path = QtWidgets.QFileDialog.getExistingDirectory(self, "Open project directory",
-                                       "",
-                                       QtWidgets.QFileDialog.Option.ShowDirsOnly
-                                       | QtWidgets.QFileDialog.Option.DontResolveSymlinks)
+                                                                  "",
+                                                                  QtWidgets.QFileDialog.Option.ShowDirsOnly
+                                                                  | QtWidgets.QFileDialog.Option.DontResolveSymlinks)
         if project_path:
             self.project_path = project_path + '/'
             self.update_project_path()
@@ -281,18 +301,19 @@ class create_project_widget(QtWidgets.QDialog):
         if done:
             self.accept()
 
+
 class create_project_thread(QtCore.QThread):
 
     done_signal = pyqtSignal(int)
 
     def __init__(self, project_name,
-                        project_path,
-                        project_password,
-                        project_image,
-                        frame_rate,
-                        image_format,
-                        deadline_string,
-                        parent=None):
+                 project_path,
+                 project_password,
+                 project_image,
+                 frame_rate,
+                 image_format,
+                 deadline_string,
+                 parent=None):
 
         super(create_project_thread, self).__init__(parent)
         self.deadline_string = deadline_string
@@ -305,12 +326,12 @@ class create_project_thread(QtCore.QThread):
 
     def run(self):
         if create_project.create_project(project_name=self.project_name,
-                                                project_path=self.project_path,
-                                                project_password=self.project_password,
-                                                project_image=self.project_image,
-                                                frame_rate=self.frame_rate,
-                                                image_format=self.image_format,
-                                                deadline=self.deadline_string):
+                                         project_path=self.project_path,
+                                         project_password=self.project_password,
+                                         project_image=self.project_image,
+                                         frame_rate=self.frame_rate,
+                                         image_format=self.image_format,
+                                         deadline=self.deadline_string):
             self.done_signal.emit(1)
         else:
             self.done_signal.emit(0)

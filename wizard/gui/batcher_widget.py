@@ -19,6 +19,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class batcher_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(batcher_widget, self).__init__(parent)
@@ -57,15 +58,18 @@ class batcher_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.description_label)
 
         self.scripts_widgets_frame = QtWidgets.QFrame()
-        self.scripts_widgets_frame.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.scripts_widgets_frame.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.scripts_widgets_frame.setObjectName("dark_round_frame")
-        self.scripts_widgets_frame.setStyleSheet("#dark_round_frame{border:1px solid rgba(255,255,255,10);}")
+        self.scripts_widgets_frame.setStyleSheet(
+            "#dark_round_frame{border:1px solid rgba(255,255,255,10);}")
         self.scripts_widgets_layout = QtWidgets.QHBoxLayout()
         self.scripts_widgets_frame.setLayout(self.scripts_widgets_layout)
         self.main_layout.addWidget(self.scripts_widgets_frame)
 
     def connect_functions(self):
-        self.scripts_comboBox.currentTextChanged.connect(self.current_script_item_changed)
+        self.scripts_comboBox.currentTextChanged.connect(
+            self.current_script_item_changed)
 
     def refresh(self):
         scripts = []
@@ -83,7 +87,8 @@ class batcher_widget(QtWidgets.QWidget):
             if batch_script_name in self.scripts_dic.keys():
                 continue
             self.scripts_dic[batch_script_name] = module
-            self.scripts_comboBox.addItem(QtGui.QIcon(module.icon), batch_script_name)
+            self.scripts_comboBox.addItem(
+                QtGui.QIcon(module.icon), batch_script_name)
 
     def current_script_item_changed(self):
         if self.current_script_widget is not None:
@@ -96,6 +101,7 @@ class batcher_widget(QtWidgets.QWidget):
         self.current_script_widget = module.widget()
         self.scripts_widgets_layout.addWidget(self.current_script_widget)
 
+
 def load_module(module_path):
     try:
         if not os.path.isfile(module_path):
@@ -103,9 +109,10 @@ def load_module(module_path):
             return None
         else:
             module_name = path_utils.basename(module_path).split('.')[0]
-            spec = importlib.util.spec_from_file_location(module_name, module_path)
+            spec = importlib.util.spec_from_file_location(
+                module_name, module_path)
             module = importlib.util.module_from_spec(spec)
-            sys.modules[spec.name] = module 
+            sys.modules[spec.name] = module
             spec.loader.exec_module(module)
             return module
     except:

@@ -28,12 +28,12 @@
 
 # Python modules
 import logging
-import os
 import sys
 
 # Wizard modules
 from wizard.vars import user_vars
 from wizard.core import path_utils
+
 
 def get_root_logger():
     create_prefs_folder()
@@ -44,11 +44,14 @@ def get_root_logger():
         root_logger.setLevel(logging.INFO)
 
     file_handler = logging.FileHandler(user_vars._user_logger_file_)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
     root_logger.addHandler(file_handler)
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(logging.Formatter('%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
+    stream_handler.setFormatter(logging.Formatter(
+        '%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s'))
     root_logger.addHandler(stream_handler)
+
 
 def create_prefs_folder():
     if not path_utils.isdir(user_vars._user_path_):

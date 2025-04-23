@@ -13,6 +13,7 @@ from wizard.core import image
 # Wizard gui modules
 from wizard.gui import gui_utils
 
+
 class tag_label(QtWidgets.QWidget):
 
     enter = pyqtSignal(int)
@@ -54,7 +55,8 @@ class tag_label(QtWidgets.QWidget):
         return larger
 
     def calculate_height(self):
-        heigth = (len(self.tokens)*self.font_height)+(len(self.tokens)*self.tag_block_margin)+self.tag_block_margin
+        heigth = (len(self.tokens)*self.font_height) + \
+            (len(self.tokens)*self.tag_block_margin)+self.tag_block_margin
         self.setMinimumHeight(heigth)
 
     def setNoMultipleLines(self, no_multiple_lines=True):
@@ -112,7 +114,7 @@ class tag_label(QtWidgets.QWidget):
         pos[1] += self.font_height
         space_width = self.font_metric.horizontalAdvance(' ')
         painter.setFont(self.font)
-        
+
         # Draw tokens
         for line in self.tokens:
             if self.align_right and not self.no_multiple_lines:
@@ -145,7 +147,7 @@ class tag_label(QtWidgets.QWidget):
         if item.startswith('@'):
             width += self.tag_block_margin*2
         return width
-                    
+
     def draw_item(self, item, pos, item_width, painter):
         if item.startswith('@'):
             pos_to_draw = [pos[0], pos[1]]
@@ -158,22 +160,25 @@ class tag_label(QtWidgets.QWidget):
             painter.setPen(pen)
             bouding_rect = self.font_metric.boundingRect(item)
             rect = QtCore.QRect((pos_to_draw[0]+bouding_rect.x()),
-                                    (pos_to_draw[1]+bouding_rect.y())-self.tag_block_margin,
-                                    (bouding_rect.width())+self.tag_block_margin*2,
-                                    (bouding_rect.height())+self.tag_block_margin*2)
+                                (pos_to_draw[1]+bouding_rect.y()) -
+                                self.tag_block_margin,
+                                (bouding_rect.width())+self.tag_block_margin*2,
+                                (bouding_rect.height())+self.tag_block_margin*2)
             painter.drawRoundedRect(rect, 3, 3)
             painter.setPen(QtGui.QPen(QtGui.QColor('white'), 0))
             pos_to_draw[0] += self.tag_block_margin
             painter.drawText(pos_to_draw[0], pos_to_draw[1], item)
         else:
             painter.drawText(pos[0], pos[1], item)
-        pos[0] += item_width 
+        pos[0] += item_width
         return pos
+
 
 class view_comment_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(view_comment_widget, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(
+            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setMaximumWidth(300)
         self.build_ui()
@@ -182,12 +187,14 @@ class view_comment_widget(QtWidgets.QWidget):
     def init_users_images(self):
         self.users_images_dic = dict()
         for user_row in repository.get_users_list():
-            user_image =  user_row['profile_picture']
-            pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 18)
+            user_image = user_row['profile_picture']
+            pixmap = gui_utils.mask_image(
+                image.convert_str_data_to_image_bytes(user_image), 'png', 18)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def build_ui(self):
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_widget_layout = QtWidgets.QHBoxLayout()
         self.main_widget_layout.setContentsMargins(12, 12, 12, 12)
         self.setLayout(self.main_widget_layout)
@@ -200,12 +207,12 @@ class view_comment_widget(QtWidgets.QWidget):
         self.main_widget_layout.addWidget(self.main_widget)
 
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(6)
         self.main_layout.addLayout(self.header_layout)
 
         self.user_image_label = QtWidgets.QLabel()
-        self.user_image_label.setFixedSize(18,18)
+        self.user_image_label.setFixedSize(18, 18)
         self.header_layout.addWidget(self.user_image_label)
 
         self.user_name_label = QtWidgets.QLabel()

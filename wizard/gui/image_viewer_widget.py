@@ -9,6 +9,7 @@ import os
 # Wizard modules
 from wizard.vars import ressources
 
+
 class image_viewer_widget(QtWidgets.QGraphicsView):
     def __init__(self, image, parent=None):
         super(image_viewer_widget, self).__init__(parent)
@@ -23,10 +24,14 @@ class image_viewer_widget(QtWidgets.QGraphicsView):
         self.photo = QtWidgets.QGraphicsPixmapItem()
         self.scene.addItem(self.photo)
         self.setScene(self.scene)
-        self.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setResizeAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setTransformationAnchor(
+            QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setResizeAnchor(
+            QtWidgets.QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
 
         self.setPhoto(QtGui.QPixmap(image))

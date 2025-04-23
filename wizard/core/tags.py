@@ -28,29 +28,30 @@
 
 # Python modules
 import logging
+
+# Wizard modules
+from wizard.core import events
+from wizard.core import project
+from wizard.core import repository
+
 logger = logging.getLogger(__name__)
 
-from wizard.core import repository
-from wizard.core import project
-from wizard.core import events
 
 def analyse_comment(comment, instance_type, instance_id):
-	comment_words = comment.replace('\n', ' ').replace('\r', ' ').split(' ')
-	for word in comment_words:
-		if not word.startswith('@'):
-			continue
-		user = word.replace('@', '')
-		user = user.replace('\r', '')
-		user = user.replace('\n', '')
-		if user in repository.get_user_names_list():
-			user_id = repository.get_user_row_by_name(user, 'id')
-			if user_id in project.get_users_ids_list():
-				events.add_tag_event(instance_type, instance_id, comment, user)
-		elif user == 'all':
-			events.add_tag_event(instance_type, instance_id, comment, user)
-		all_tag_groups = project.get_all_tag_groups()
-		for tag_group_row in all_tag_groups:
-			if user in tag_group_row['name']:
-				events.add_tag_event(instance_type, instance_id, comment, user)
-
-
+    comment_words = comment.replace('\n', ' ').replace('\r', ' ').split(' ')
+    for word in comment_words:
+        if not word.startswith('@'):
+            continue
+        user = word.replace('@', '')
+        user = user.replace('\r', '')
+        user = user.replace('\n', '')
+        if user in repository.get_user_names_list():
+            user_id = repository.get_user_row_by_name(user, 'id')
+            if user_id in project.get_users_ids_list():
+                events.add_tag_event(instance_type, instance_id, comment, user)
+        elif user == 'all':
+            events.add_tag_event(instance_type, instance_id, comment, user)
+        all_tag_groups = project.get_all_tag_groups()
+        for tag_group_row in all_tag_groups:
+            if user in tag_group_row['name']:
+                events.add_tag_event(instance_type, instance_id, comment, user)

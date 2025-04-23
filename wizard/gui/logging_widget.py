@@ -5,11 +5,11 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
-import sys
 import logging
 
 # Wizard gui modules
 from wizard.gui import gui_utils
+
 
 class custom_handler(QtCore.QObject, logging.Handler):
 
@@ -18,7 +18,8 @@ class custom_handler(QtCore.QObject, logging.Handler):
     def __init__(self, long_formatter, parent):
         super(custom_handler, self).__init__(parent)
         if long_formatter:
-            self.setFormatter(logging.Formatter('[%(name)-23.23s] %(message)s'))
+            self.setFormatter(logging.Formatter(
+                '[%(name)-23.23s] %(message)s'))
         else:
             self.setFormatter(logging.Formatter('%(message)s'))
 
@@ -27,6 +28,7 @@ class custom_handler(QtCore.QObject, logging.Handler):
             self.log_record.emit((record.levelname, self.format(record)))
         except RuntimeError:
             pass
+
 
 class logging_widget(QtWidgets.QFrame):
     def __init__(self, long_formatter=False, parent=None):
@@ -42,7 +44,7 @@ class logging_widget(QtWidgets.QFrame):
     def build_ui(self):
         gui_utils.application_tooltip(self, "See logs here")
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.setLayout(self.main_layout)
         self.log_label = gui_utils.ElidedLabel()
         self.main_layout.addWidget(self.log_label)

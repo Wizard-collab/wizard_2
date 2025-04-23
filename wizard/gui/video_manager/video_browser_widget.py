@@ -23,6 +23,7 @@ from wizard.vars import user_vars
 
 logger = logging.getLogger(__name__)
 
+
 class video_browser_widget(QtWidgets.QWidget):
 
     add_videos = pyqtSignal(object)
@@ -44,8 +45,10 @@ class video_browser_widget(QtWidgets.QWidget):
         self.connect_functions()
 
     def connect_functions(self):
-        self.icon_view.itemDoubleClicked.connect(lambda:self.create_playlist(add=False))
-        self.icon_view.customContextMenuRequested.connect(self.context_menu_requested)
+        self.icon_view.itemDoubleClicked.connect(
+            lambda: self.create_playlist(add=False))
+        self.icon_view.customContextMenuRequested.connect(
+            self.context_menu_requested)
         self.search_bar.textChanged.connect(self.update_search)
 
     def set_context(self):
@@ -65,18 +68,23 @@ class video_browser_widget(QtWidgets.QWidget):
         self.search_start_time = time.perf_counter()
         self.accept_item_from_thread = False
         if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
-            self.search_threads[self.old_thread_id].show_variant_signal.disconnect()
-            self.search_threads[self.old_thread_id].hide_variant_signal.disconnect()
+            self.search_threads[self.old_thread_id].show_variant_signal.disconnect(
+            )
+            self.search_threads[self.old_thread_id].hide_variant_signal.disconnect(
+            )
         thread_id = time.time()
         self.search_threads[thread_id] = search_thread()
-        self.search_threads[thread_id].show_variant_signal.connect(self.show_variant)
-        self.search_threads[thread_id].hide_variant_signal.connect(self.hide_variant)
+        self.search_threads[thread_id].show_variant_signal.connect(
+            self.show_variant)
+        self.search_threads[thread_id].hide_variant_signal.connect(
+            self.hide_variant)
         self.old_thread_id = thread_id
         if len(search_data) > 0:
             self.accept_item_from_thread = True
-            self.search_threads[thread_id].update_search(self.comb_rows_for_search, search_data)
+            self.search_threads[thread_id].update_search(
+                self.comb_rows_for_search, search_data)
         else:
-            self.search_threads[thread_id].running=False
+            self.search_threads[thread_id].running = False
             self.show_all_variants()
         self.clean_threads()
 
@@ -102,9 +110,11 @@ class video_browser_widget(QtWidgets.QWidget):
     def context_menu_requested(self):
         selection = self.icon_view.selectedItems()
         menu = gui_utils.QMenu(self)
-        if len(selection)>=1:
-            create_playlist_action = menu.addAction(QtGui.QIcon(ressources._playlist_icon_), 'Create playlist')
-            add_to_playlist_action = menu.addAction(QtGui.QIcon(ressources._tool_add_), 'Add to playlist')
+        if len(selection) >= 1:
+            create_playlist_action = menu.addAction(QtGui.QIcon(
+                ressources._playlist_icon_), 'Create playlist')
+            add_to_playlist_action = menu.addAction(
+                QtGui.QIcon(ressources._tool_add_), 'Add to playlist')
         else:
             return
 
@@ -137,7 +147,7 @@ class video_browser_widget(QtWidgets.QWidget):
         self.setObjectName('dark_widget')
         self.setMinimumWidth(380)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -151,25 +161,28 @@ class video_browser_widget(QtWidgets.QWidget):
         self.header_layout.addWidget(self.search_bar)
 
         self.content_widget = QtWidgets.QWidget()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.content_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.content_widget.setObjectName('dark_widget')
         self.content_layout = QtWidgets.QHBoxLayout()
-        self.content_layout.setContentsMargins(0,0,0,0)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_widget.setLayout(self.content_layout)
 
         self.main_layout.addWidget(self.content_widget)
 
         self.icon_view = QtWidgets.QListWidget()
-        self.icon_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.icon_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.icon_view.setObjectName('icon_view')
         self.icon_view.setStyleSheet("#icon_view::item{padding:0px;}")
         self.icon_view.setSpacing(4)
-        self.icon_view.setContentsMargins(4,4,4,4)
-        self.icon_view.setIconSize(QtCore.QSize(200,200))
+        self.icon_view.setContentsMargins(4, 4, 4, 4)
+        self.icon_view.setIconSize(QtCore.QSize(200, 200))
         self.icon_view.setMovement(QtWidgets.QListView.Movement.Static)
         self.icon_view.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
         self.icon_view.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
-        self.icon_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.icon_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.icon_view_scrollBar = self.icon_view.verticalScrollBar()
         self.content_layout.addWidget(self.icon_view)
 
@@ -186,23 +199,34 @@ class video_browser_widget(QtWidgets.QWidget):
         for video_row in project.get_all_videos():
             if video_row['variant_id'] not in self.variants_ids.keys():
                 self.variants_ids[video_row['variant_id']] = dict()
-                self.variants_ids[video_row['variant_id']]['last_video'] = video_row
-                self.variants_ids[video_row['variant_id']]['asset_name'] = variants[video_row['variant_id']]['string']
-                self.variants_ids[video_row['variant_id']]['variant_row'] = variants[video_row['variant_id']]
-                self.variants_ids[video_row['variant_id']]['stage_row'] = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
-                comb_row = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
+                self.variants_ids[video_row['variant_id']
+                                  ]['last_video'] = video_row
+                self.variants_ids[video_row['variant_id']
+                                  ]['asset_name'] = variants[video_row['variant_id']]['string']
+                self.variants_ids[video_row['variant_id']
+                                  ]['variant_row'] = variants[video_row['variant_id']]
+                self.variants_ids[video_row['variant_id']
+                                  ]['stage_row'] = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
+                comb_row = stages[self.variants_ids[video_row['variant_id']]
+                                  ['variant_row']['stage_id']]
                 comb_row['variant'] = variants[video_row['variant_id']]['name']
                 comb_row['variant_id'] = variants[video_row['variant_id']]['id']
                 self.comb_rows_for_search.append(comb_row)
                 video_item = custom_video_icon_item(video_row,
-                                                self.variants_ids[video_row['variant_id']]['asset_name'],
-                                                self.variants_ids[video_row['variant_id']]['stage_row'],
-                                                self.icon_view)
-                self.variants_ids[video_row['variant_id']]['video_item'] = video_item
+                                                    self.variants_ids[video_row['variant_id']
+                                                                      ]['asset_name'],
+                                                    self.variants_ids[video_row['variant_id']
+                                                                      ]['stage_row'],
+                                                    self.icon_view)
+                self.variants_ids[video_row['variant_id']
+                                  ]['video_item'] = video_item
             else:
                 if int(video_row['name']) > int(self.variants_ids[video_row['variant_id']]['last_video']['name']):
-                    self.variants_ids[video_row['variant_id']]['last_video'] = video_row
-                    self.variants_ids[video_row['variant_id']]['video_item'].update_row(video_row)
+                    self.variants_ids[video_row['variant_id']
+                                      ]['last_video'] = video_row
+                    self.variants_ids[video_row['variant_id']
+                                      ]['video_item'].update_row(video_row)
+
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
     def __init__(self, video_row, asset_name, stage_row, parent=None):
@@ -226,11 +250,14 @@ class custom_video_icon_item(QtWidgets.QListWidgetItem):
         self.widget.image_label.setPixmap(pixmap)
         self.widget.stage_label.setText(f"{self.stage_row['name']}")
         self.widget.asset_name_label.setText(f"{self.asset_name}")
-        self.widget.infos_label.setText(f"{self.video_row['name']} - {self.video_row['creation_user']} - {tools.time_ago_from_timestamp(self.video_row['creation_time'])}")
-        self.widget.set_background(ressources._stages_colors_[self.stage_row['name']])
+        self.widget.infos_label.setText(
+            f"{self.video_row['name']} - {self.video_row['creation_user']} - {tools.time_ago_from_timestamp(self.video_row['creation_time'])}")
+        self.widget.set_background(ressources._stages_colors_[
+                                   self.stage_row['name']])
         self.widget.set_state(self.stage_row['state'])
         self.setSizeHint(self.widget.size())
         print(self.widget.size())
+
 
 class video_item_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -238,16 +265,17 @@ class video_item_widget(QtWidgets.QWidget):
         self.build_ui()
 
     def set_background(self, color):
-        self.stage_label.setStyleSheet("color: %s"%color)
+        self.stage_label.setStyleSheet("color: %s" % color)
 
     def set_state(self, state):
         self.state_label.setText(state)
-        self.state_label.setStyleSheet("background-color:%s;font: bold;border-radius:4px;padding:3px"%ressources._states_colors_[state])
+        self.state_label.setStyleSheet(
+            "background-color:%s;font: bold;border-radius:4px;padding:3px" % ressources._states_colors_[state])
 
     def build_ui(self):
-        self.setFixedSize(172,140)
+        self.setFixedSize(172, 140)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(6,6,6,6)
+        self.main_layout.setContentsMargins(6, 6, 6, 6)
         self.main_layout.setSpacing(3)
         self.setLayout(self.main_layout)
 
@@ -257,14 +285,15 @@ class video_item_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.asset_name_label)
 
         self.infos_layout = QtWidgets.QHBoxLayout()
-        self.infos_layout.setContentsMargins(0,0,0,0)
+        self.infos_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(self.infos_layout)
-        
+
         self.stage_label = QtWidgets.QLabel()
         self.infos_layout.addWidget(self.stage_label)
 
         self.state_label = QtWidgets.QLabel()
-        self.state_label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.state_label.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.infos_layout.addWidget(self.state_label)
 
         self.image_label = QtWidgets.QLabel()
@@ -275,6 +304,7 @@ class video_item_widget(QtWidgets.QWidget):
         self.infos_label = QtWidgets.QLabel()
         self.infos_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.infos_label)
+
 
 class search_thread(QtCore.QThread):
 

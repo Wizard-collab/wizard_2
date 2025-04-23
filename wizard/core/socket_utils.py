@@ -44,23 +44,28 @@ def get_local_ip():
     except:
         logger.error(str(traceback.format_exc()))
 
+
 def get_connection(DNS, timeout=5.0, only_debug=False):
     try:
-        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         connection.settimeout(timeout)
         connection.connect((DNS[0], DNS[1]))
         return connection
     except ConnectionRefusedError:
         if only_debug:
-            logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+            logger.debug(
+                f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         else:
-            logger.info(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+            logger.info(
+                f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return
     except socket.timeout:
         if only_debug:
-            logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
-        else:    
-            logger.info(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+            logger.debug(
+                f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        else:
+            logger.info(
+                f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
         return
     except:
         if only_debug:
@@ -69,31 +74,32 @@ def get_connection(DNS, timeout=5.0, only_debug=False):
             logger.error(str(traceback.format_exc()))
         return
 
+
 def get_port(ip_adress):
     port = 11111
     while get_connection(('localhost', port),
-                            timeout=0.02,
-                            only_debug=True):
-        port+=1
+                         timeout=0.02,
+                         only_debug=True):
+        port += 1
     return port
+
 
 def get_server(DNS):
     try:
         server_address = socket.gethostbyname(DNS[0])
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind(DNS)
         server.listen(100)
         return server, server_address
     except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
-        return None, None
-    except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return None, None
     except:
         logger.debug(str(traceback.format_exc()))
         return None, None
+
 
 def send_bottle(DNS, msg_raw, timeout=0.01):
     server = None
@@ -106,10 +112,12 @@ def send_bottle(DNS, msg_raw, timeout=0.01):
         server.sendall(msg)
         return 1
     except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return
     except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        logger.debug(
+            f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
         return
     except:
         logger.debug(str(traceback.format_exc()))
@@ -117,6 +125,7 @@ def send_bottle(DNS, msg_raw, timeout=0.01):
     finally:
         if server:
             server.close()
+
 
 def send_signal(DNS, msg_raw, timeout=5.0):
     server = None
@@ -133,10 +142,12 @@ def send_signal(DNS, msg_raw, timeout=5.0):
         else:
             return
     except ConnectionRefusedError:
-        logger.error(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
+        logger.error(
+            f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
         return
     except socket.timeout:
-        logger.error(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
+        logger.error(
+            f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
         return
     except:
         logger.error(str(traceback.format_exc()))
@@ -145,30 +156,20 @@ def send_signal(DNS, msg_raw, timeout=5.0):
         if server:
             server.close()
 
-def send_signal_with_conn(conn, msg_raw, only_debug = False):
+
+def send_signal_with_conn(conn, msg_raw, only_debug=False):
     try:
         msg = json.dumps(msg_raw).encode('utf8')
         msg = struct.pack('>I', len(msg)) + msg
         conn.sendall(msg)
         return 1
-    except ConnectionRefusedError:
-        if only_debug:
-            logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
-        else:
-            logger.error(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
-        return
-    except socket.timeout:
-        if only_debug:
-            logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
-        else:    
-            logger.error(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
-        return
     except:
         if only_debug:
             logger.debug(str(traceback.format_exc()))
         else:
             logger.error(str(traceback.format_exc()))
         return
+
 
 def recvall(sock):
     try:
@@ -177,15 +178,10 @@ def recvall(sock):
             return
         msglen = struct.unpack('>I', raw_msglen)[0]
         return recvall_with_given_len(sock, msglen)
-    except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
-        return
-    except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
-        return
     except:
         logger.debug(str(traceback.format_exc()))
         return
+
 
 def recvall_with_given_len(sock, n):
     try:
@@ -196,12 +192,6 @@ def recvall_with_given_len(sock, n):
                 return
             data.extend(packet)
         return data
-    except ConnectionRefusedError:
-        logger.debug(f"Socket connection refused : host={DNS[0]}, port={DNS[1]}")
-        return
-    except socket.timeout:
-        logger.debug(f"Socket timeout ({str(timeout)}s) : host={DNS[0]}, port={DNS[1]}")
-        return
     except:
         logger.debug(str(traceback.format_exc()))
         return

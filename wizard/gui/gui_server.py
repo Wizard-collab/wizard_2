@@ -3,7 +3,7 @@
 # Contact: contact@leobrunel.com
 
 # This module is used to handle third party softwares commands
-# For example if you want to save a version within a 
+# For example if you want to save a version within a
 # Maya, the software plugin sends a socket signal
 # here and waits for a return ( also socket signal )
 
@@ -12,9 +12,7 @@
 # Python modules
 from PyQt6 import QtCore
 from PyQt6.QtCore import QThread, pyqtSignal
-import socket
 import sys
-import time
 import traceback
 import json
 import logging
@@ -25,6 +23,7 @@ from wizard.core import environment
 from wizard.core import socket_utils
 
 logger = logging.getLogger(__name__)
+
 
 class streamHandler(QtCore.QObject):
 
@@ -37,6 +36,7 @@ class streamHandler(QtCore.QObject):
         self.stream.emit(('STDOUT', str(stream)))
         real_write = type(sys.__stdout__).write
         real_write(sys.__stdout__, stream)
+
 
 class gui_server(QThread):
 
@@ -59,12 +59,13 @@ class gui_server(QThread):
         super(gui_server, self).__init__()
 
         self.streamHandler = streamHandler()
-        #sys.stdout = self.streamHandler
-        #sys.stderr = self.streamHandler
+        # sys.stdout = self.streamHandler
+        # sys.stderr = self.streamHandler
 
         self.port = socket_utils.get_port('localhost')
         environment.set_gui_server_port(self.port)
-        self.server, self.server_address = socket_utils.get_server(('localhost', self.port))
+        self.server, self.server_address = socket_utils.get_server(
+            ('localhost', self.port))
         self.running = True
 
         self.connect_functions()
@@ -103,7 +104,8 @@ class gui_server(QThread):
             self.focus_instance_signal.emit(signal_dic['instance_tuple'])
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'export_version_focus':
-            self.export_version_focus_signal.emit(signal_dic['export_version_id'])
+            self.export_version_focus_signal.emit(
+                signal_dic['export_version_id'])
             self.raise_ui_signal.emit(1)
         elif signal_dic['function'] == 'video_focus':
             self.video_focus_signal.emit(signal_dic['video_id'])
@@ -120,25 +122,20 @@ class gui_server(QThread):
         elif signal_dic['function'] == 'popup':
             self.popup_signal.emit(signal_dic['data'])
         elif signal_dic['function'] == 'create_playlist_from_stages':
-            self.create_playlist_from_stages_signal.emit(signal_dic['stages_ids_list'])
+            self.create_playlist_from_stages_signal.emit(
+                signal_dic['stages_ids_list'])
         elif signal_dic['function'] == 'show_video':
             self.show_video_signal.emit(signal_dic['video_id'])
 
     def connect_functions(self):
         self.streamHandler.stream.connect(self.stdout_signal.emit)
 
-def try_connection():
-    conn = socket_utils.get_connection(_DNS_, timeout=0.5, only_debug=True)
-    if conn:
-        conn.close()
-        return 1
-    else:
-        return None
 
 def refresh_ui():
     signal_dic = dict()
     signal_dic['function'] = 'refresh'
     send_signal(signal_dic)
+
 
 def refresh_team_ui():
     refresh_ui()
@@ -146,15 +143,18 @@ def refresh_team_ui():
     signal_dic['function'] = 'refresh_team'
     send_signal(signal_dic)
 
+
 def refresh_only_team_ui():
     signal_dic = dict()
     signal_dic['function'] = 'refresh_team'
     send_signal(signal_dic)
 
+
 def restart_ui():
     signal_dic = dict()
     signal_dic['function'] = 'restart'
     send_signal(signal_dic)
+
 
 def save_popup(version_id):
     signal_dic = dict()
@@ -162,11 +162,13 @@ def save_popup(version_id):
     signal_dic['version_id'] = version_id
     send_signal(signal_dic)
 
+
 def custom_popup(title, msg, icon=ressources._info_icon_, profile_picture=None):
     signal_dic = dict()
     signal_dic['function'] = 'popup'
     signal_dic['data'] = [title, msg, icon, profile_picture]
     send_signal(signal_dic)
+
 
 def tooltip(tooltip):
     signal_dic = dict()
@@ -174,11 +176,13 @@ def tooltip(tooltip):
     signal_dic['tooltip'] = tooltip
     send_signal(signal_dic)
 
+
 def focus_instance(instance_tuple):
     signal_dic = dict()
     signal_dic['function'] = 'focus_instance'
     signal_dic['instance_tuple'] = instance_tuple
     send_signal(signal_dic)
+
 
 def create_playlist_from_stages(stages_ids_list):
     signal_dic = dict()
@@ -186,11 +190,13 @@ def create_playlist_from_stages(stages_ids_list):
     signal_dic['stages_ids_list'] = stages_ids_list
     send_signal(signal_dic)
 
+
 def show_video(video_id):
     signal_dic = dict()
     signal_dic['function'] = 'show_video'
     signal_dic['video_id'] = video_id
     send_signal(signal_dic)
+
 
 def focus_export_version(export_version_id):
     signal_dic = dict()
@@ -198,11 +204,13 @@ def focus_export_version(export_version_id):
     signal_dic['export_version_id'] = export_version_id
     send_signal(signal_dic)
 
+
 def focus_video(video_id):
     signal_dic = dict()
     signal_dic['function'] = 'video_focus'
     signal_dic['video_id'] = video_id
     send_signal(signal_dic)
+
 
 def focus_work_version(work_version_id):
     signal_dic = dict()
@@ -210,11 +218,13 @@ def focus_work_version(work_version_id):
     signal_dic['work_version_id'] = work_version_id
     send_signal(signal_dic)
 
+
 def raise_ui():
     signal_dic = dict()
     signal_dic['function'] = 'raise'
     send_signal(signal_dic)
 
-def send_signal(signal_dic):
-    socket_utils.send_bottle(('localhost', environment.get_gui_server_port()), signal_dic, timeout=0.5)
 
+def send_signal(signal_dic):
+    socket_utils.send_bottle(
+        ('localhost', environment.get_gui_server_port()), signal_dic, timeout=0.5)

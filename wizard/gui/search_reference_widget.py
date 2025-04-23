@@ -10,7 +10,6 @@ import time
 import traceback
 
 # Wizard modules
-from wizard.core import assets
 from wizard.core import user
 from wizard.core import project
 from wizard.vars import ressources
@@ -21,12 +20,13 @@ from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
+
 class search_reference_widget(QtWidgets.QWidget):
 
     stage_ids_signal = pyqtSignal(list)
     groups_ids_signal = pyqtSignal(list)
 
-    def __init__(self, context, parent = None):
+    def __init__(self, context, parent=None):
         super(search_reference_widget, self).__init__(parent)
 
         self.init_icons_dic()
@@ -39,10 +39,10 @@ class search_reference_widget(QtWidgets.QWidget):
         self.setWindowIcon(QtGui.QIcon(ressources._wizard_ico_))
         self.setWindowTitle(f"Create references")
 
-        self.accept_item_from_thread = True      
+        self.accept_item_from_thread = True
 
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)       
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.stage_ids = dict()
         self.groups_ids = dict()
@@ -57,7 +57,8 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def load_context(self):
         reference_auto_update_default = user.user().get_reference_auto_update_default()
-        self.reference_with_auto_update_checkBox.setChecked(reference_auto_update_default)
+        self.reference_with_auto_update_checkBox.setChecked(
+            reference_auto_update_default)
 
     def set_context(self):
         reference_auto_update_default = self.reference_with_auto_update_checkBox.isChecked()
@@ -66,7 +67,8 @@ class search_reference_widget(QtWidgets.QWidget):
     def init_icons_dic(self):
         self.icons_dic = dict()
         for stage in assets_vars._all_stages_:
-            self.icons_dic[stage] = QtGui.QIcon(ressources._stage_icons_dic_[stage])
+            self.icons_dic[stage] = QtGui.QIcon(
+                ressources._stage_icons_dic_[stage])
 
     def move_ui(self):
         cursor = self.mapFromGlobal(QtGui.QCursor.pos())
@@ -109,10 +111,13 @@ class search_reference_widget(QtWidgets.QWidget):
         self.close()
 
     def search_ended(self):
-        search_time = str(round((time.perf_counter()-self.search_start_time), 3))
-        self.found_label.setText(f"Found {self.list_view.invisibleRootItem().childCount()} occurences in {search_time}s")
+        search_time = str(
+            round((time.perf_counter()-self.search_start_time), 3))
+        self.found_label.setText(
+            f"Found {self.list_view.invisibleRootItem().childCount()} occurences in {search_time}s")
         if self.list_view.invisibleRootItem().childCount() == 0:
-            self.show_info_mode('No export found...', ressources._nothing_info_)
+            self.show_info_mode('No export found...',
+                                ressources._nothing_info_)
         else:
             self.hide_info_mode()
 
@@ -143,26 +148,29 @@ class search_reference_widget(QtWidgets.QWidget):
             self.accept_item_from_thread = True
             self.search_threads[thread_id].update_search(search)
         else:
-            self.search_threads[thread_id].running=False
+            self.search_threads[thread_id].running = False
             self.search_ended()
         self.clean_threads()
 
     def add_item(self, item_list):
         if self.accept_item_from_thread:
             if item_list[2]['id'] not in self.stage_ids.keys():
-                stage_item = custom_item(item_list[0], item_list[1], item_list[2], self.icons_dic, self.list_view.invisibleRootItem())
+                stage_item = custom_item(
+                    item_list[0], item_list[1], item_list[2], self.icons_dic, self.list_view.invisibleRootItem())
                 self.stage_ids[item_list[2]['id']] = stage_item
 
     def add_group(self, group_row):
         if self.accept_item_from_thread:
             if group_row['id'] not in self.groups_ids.keys():
-                group_item = custom_group_item(group_row, self.list_view.invisibleRootItem())
+                group_item = custom_group_item(
+                    group_row, self.list_view.invisibleRootItem())
                 self.groups_ids[group_row['id']] = group_item
 
     def connect_functions(self):
         self.search_bar.textChanged.connect(self.search_asset)
         self.list_view.itemDoubleClicked.connect(self.return_references)
-        self.reference_with_auto_update_checkBox.stateChanged.connect(self.set_context)
+        self.reference_with_auto_update_checkBox.stateChanged.connect(
+            self.set_context)
         self.click_detector.clicked_outside.connect(self.focus_out)
 
     def keyPressEvent(self, event):
@@ -176,7 +184,7 @@ class search_reference_widget(QtWidgets.QWidget):
 
     def return_references(self):
         selected_items = self.list_view.selectedItems()
-        if selected_items is not None and len(selected_items)>=1:
+        if selected_items is not None and len(selected_items) >= 1:
             stage_ids = []
             groups_ids = []
             for selected_item in selected_items:
@@ -203,10 +211,11 @@ class search_reference_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setMinimumWidth(550)
         self.setMinimumHeight(500)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Preferred)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum,
+                           QtWidgets.QSizePolicy.Policy.Preferred)
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(12,12,12,12)
+        self.main_layout.setContentsMargins(12, 12, 12, 12)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
@@ -214,7 +223,7 @@ class search_reference_widget(QtWidgets.QWidget):
         self.main_widget.setObjectName('dark_widget')
         self.main_widget.setStyleSheet('border-radius:5px;')
         self.main_widget_layout = QtWidgets.QVBoxLayout()
-        self.main_widget_layout.setContentsMargins(0,0,0,0)
+        self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.main_widget_layout.setSpacing(0)
         self.main_widget.setLayout(self.main_widget_layout)
         self.main_layout.addWidget(self.main_widget)
@@ -227,7 +236,8 @@ class search_reference_widget(QtWidgets.QWidget):
         self.main_widget.setGraphicsEffect(self.shadow)
 
         self.search_bar = gui_utils.search_bar()
-        self.search_bar.setPlaceholderText('"Joe", "characters&Joe", "INTRO&animation"')
+        self.search_bar.setPlaceholderText(
+            '"Joe", "characters&Joe", "INTRO&animation"')
         self.main_widget_layout.addWidget(self.search_bar)
 
         self.found_widget = QtWidgets.QWidget()
@@ -245,14 +255,16 @@ class search_reference_widget(QtWidgets.QWidget):
 
         self.list_view = QtWidgets.QTreeWidget()
         self.list_view.setObjectName('tree_as_list_widget')
-        self.list_view.setStyleSheet('border-top-left-radius:0px;border-top-right-radius:0px;')
+        self.list_view.setStyleSheet(
+            'border-top-left-radius:0px;border-top-right-radius:0px;')
         self.list_view.setColumnCount(4)
         self.list_view.setHeaderHidden(True)
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
         self.list_view.header().resizeSection(0, 100)
         self.list_view.header().resizeSection(1, 150)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.main_widget_layout.addWidget(self.list_view)
         self.show_info_mode('No export found...', ressources._nothing_info_)
 
@@ -261,10 +273,14 @@ class search_reference_widget(QtWidgets.QWidget):
         self.settings_widget.setLayout(self.settings_layout)
         self.main_widget_layout.addWidget(self.settings_widget)
 
-        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.settings_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.reference_with_auto_update_checkBox = QtWidgets.QCheckBox("Reference with auto update")
-        self.settings_layout.addWidget(self.reference_with_auto_update_checkBox)
+        self.reference_with_auto_update_checkBox = QtWidgets.QCheckBox(
+            "Reference with auto update")
+        self.settings_layout.addWidget(
+            self.reference_with_auto_update_checkBox)
+
 
 class search_thread(QtCore.QThread):
 
@@ -283,9 +299,10 @@ class search_thread(QtCore.QThread):
 
     def run(self):
         try:
-            keywords = self.string.split('&') 
-            all_export_versions_stage_ids = project.get_all_export_versions('stage_id')
-            #all_variants = project.get_all_variants()
+            keywords = self.string.split('&')
+            all_export_versions_stage_ids = project.get_all_export_versions(
+                'stage_id')
+            # all_variants = project.get_all_variants()
             all_stages = project.get_all_stages()
             all_assets = project.get_all_assets()
             all_categories = project.get_all_categories()
@@ -294,7 +311,7 @@ class search_thread(QtCore.QThread):
                 stages[stage_row['id']] = stage_row
             assets = dict()
             for asset_row in all_assets:
-                assets[asset_row['id']] = asset_row    
+                assets[asset_row['id']] = asset_row
             categories = dict()
             for category_row in all_categories:
                 categories[category_row['id']] = category_row
@@ -303,16 +320,18 @@ class search_thread(QtCore.QThread):
                     if all(keyword.upper() in stage_row['string'].upper() for keyword in keywords):
                         asset_row = assets[stage_row['asset_id']]
                         category_row = categories[asset_row['category_id']]
-                        self.item_signal.emit([category_row, asset_row, stage_row])
+                        self.item_signal.emit(
+                            [category_row, asset_row, stage_row])
             if (self.context == 'work_env'):
-                    groups_rows = project.get_groups()
-                    for group_row in groups_rows:
-                        if all(keyword.upper() in group_row['name'].upper()+'GROUPS' for keyword in keywords):
-                            self.group_signal.emit(group_row)
+                groups_rows = project.get_groups()
+                for group_row in groups_rows:
+                    if all(keyword.upper() in group_row['name'].upper()+'GROUPS' for keyword in keywords):
+                        self.group_signal.emit(group_row)
             self.search_ended.emit(1)
             self.running = False
         except:
             logger.critical(str(traceback.format_exc()))
+
 
 class custom_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, category_row, asset_row, stage_row, icons_dic, parent=None):
@@ -327,11 +346,12 @@ class custom_item(QtWidgets.QTreeWidgetItem):
     def fill_ui(self):
         self.setText(0, self.category_row['name'])
         self.setText(1, self.asset_row['name'])
-        bold_font=QtGui.QFont()
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
         self.setText(2, self.stage_row['name'])
         self.setIcon(2, self.icons_dic[self.stage_row['name']])
+
 
 class custom_group_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, group_row, parent=None):
@@ -344,7 +364,7 @@ class custom_group_item(QtWidgets.QTreeWidgetItem):
         self.setText(1, self.group_row['name'])
         self.setText(0, 'group')
         self.setIcon(1, gui_utils.QIcon_from_svg(ressources._group_icon_,
-                                                    self.group_row['color']))
-        bold_font=QtGui.QFont()
+                                                 self.group_row['color']))
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)

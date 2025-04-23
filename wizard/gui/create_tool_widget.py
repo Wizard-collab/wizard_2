@@ -21,6 +21,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class create_tool_widget(QtWidgets.QWidget):
     def __init__(self, parent=None, script_id=None):
         super(create_tool_widget, self).__init__(parent)
@@ -51,7 +52,8 @@ class create_tool_widget(QtWidgets.QWidget):
             self.name_field.setText(self.script_row['name'])
             self.name_field.setEnabled(False)
             self.help_textEdit.setText(self.script_row['help'])
-            self.only_subtask_checkBox.setChecked(self.script_row['only_subprocess'])
+            self.only_subtask_checkBox.setChecked(
+                self.script_row['only_subprocess'])
             if path_utils.isfile(self.script_row['py_file']):
                 with open(self.script_row['py_file']) as f:
                     script_data = f.read()
@@ -90,7 +92,7 @@ class create_tool_widget(QtWidgets.QWidget):
 
     def custom_icon(self):
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select tool icon", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.svg);;Images Files (*.jpg);;Images Files (*.jpeg)")
+                                                              "All Files (*);;Images Files (*.png);;Images Files (*.svg);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             self.icon = image_file
             self.icon_button.setIcon(QtGui.QIcon(self.icon))
@@ -110,47 +112,52 @@ class create_tool_widget(QtWidgets.QWidget):
         self.header = QtWidgets.QWidget()
         self.header.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(3)
         self.header.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header)
 
         self.icon_button = QtWidgets.QPushButton()
-        self.icon_button.setFixedSize(QtCore.QSize(26,26))
+        self.icon_button.setFixedSize(QtCore.QSize(26, 26))
         self.header_layout.addWidget(self.icon_button)
         self.name_field = QtWidgets.QLineEdit()
         self.name_field.setPlaceholderText('Tool name')
         self.header_layout.addWidget(self.name_field)
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.script_editor_widget = script_editor_widget.script_editor_widget()
         self.main_layout.addWidget(self.script_editor_widget)
 
         self.help_textEdit = QtWidgets.QTextEdit()
         self.help_textEdit.setMaximumHeight(200)
-        self.help_textEdit.setPlaceholderText('Please enter a comment about your tool and how to use it.')
+        self.help_textEdit.setPlaceholderText(
+            'Please enter a comment about your tool and how to use it.')
         self.main_layout.addWidget(self.help_textEdit)
 
         self.subtask_widget = QtWidgets.QWidget()
         self.subtask_layout = QtWidgets.QHBoxLayout()
-        self.subtask_layout.setContentsMargins(0,0,0,0)
+        self.subtask_layout.setContentsMargins(0, 0, 0, 0)
         self.subtask_layout.setSpacing(6)
         self.subtask_widget.setLayout(self.subtask_layout)
         self.main_layout.addWidget(self.subtask_widget)
 
-        self.subtask_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
-        self.only_subtask_checkBox = QtWidgets.QCheckBox('Only execute as subtask')
+        self.subtask_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.only_subtask_checkBox = QtWidgets.QCheckBox(
+            'Only execute as subtask')
         self.subtask_layout.addWidget(self.only_subtask_checkBox)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(6)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.cancel_button = QtWidgets.QPushButton('Cancel')
         self.cancel_button.setDefault(False)

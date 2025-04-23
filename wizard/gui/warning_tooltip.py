@@ -16,11 +16,13 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class warning_tooltip(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(warning_tooltip, self).__init__(parent)
 
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint |
+                            QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self.additional_labels = []
@@ -47,20 +49,22 @@ class warning_tooltip(QtWidgets.QWidget):
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
 
         self.icon_label = QtWidgets.QLabel()
-        self.icon_label.setPixmap(QtGui.QIcon(ressources._info_icon_).pixmap(18))
+        self.icon_label.setPixmap(QtGui.QIcon(
+            ressources._info_icon_).pixmap(18))
         self.header_layout.addWidget(self.icon_label)
 
         self.log_level = QtWidgets.QLabel()
         self.log_level.setObjectName('bold_label')
         self.header_layout.addWidget(self.log_level)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.line_frame = QtWidgets.QFrame()
         self.line_frame.setFixedHeight(1)
@@ -71,9 +75,11 @@ class warning_tooltip(QtWidgets.QWidget):
         self.log_msg.setWordWrap(True)
         self.main_layout.addWidget(self.log_msg)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
-        self.open_console_label = QtWidgets.QLabel('Open console for more informations')
+        self.open_console_label = QtWidgets.QLabel(
+            'Open console for more informations')
         self.open_console_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.open_console_label)
         self.main_widget.setVisible(0)
@@ -95,7 +101,7 @@ class warning_tooltip(QtWidgets.QWidget):
                 record_msg = f'<strong><span style="color:#f0605b;">{record_msg}</strong>'
 
             if not self.main_widget.isVisible():
-                self.resize(QtCore.QSize(10,10))
+                self.resize(QtCore.QSize(10, 10))
                 QtWidgets.QApplication.processEvents()
                 self.log_level.setText(level)
                 self.log_msg.setText(record_msg)
@@ -108,11 +114,13 @@ class warning_tooltip(QtWidgets.QWidget):
                 new_label = QtWidgets.QLabel(record_msg)
                 new_label.setWordWrap(True)
                 self.additional_labels.append(new_label)
-                self.main_layout.insertWidget(self.main_layout.count()-2, new_label)
+                self.main_layout.insertWidget(
+                    self.main_layout.count()-2, new_label)
                 QtWidgets.QApplication.processEvents()
                 gui_utils.move_ui(self, 4)
                 gui_utils.move_ui(self, 5)
                 QtWidgets.QApplication.processEvents()
+
 
 class custom_leave_thread(QtCore.QThread):
 

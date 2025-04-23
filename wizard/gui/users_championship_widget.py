@@ -4,7 +4,6 @@
 
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
-import time
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -15,8 +14,9 @@ from wizard.core import image
 from wizard.core import tools
 from wizard.vars import ressources
 
+
 class users_championship_widget(QtWidgets.QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(users_championship_widget, self).__init__(parent)
         self.user_ids = dict()
         self.init_icons_dic()
@@ -31,20 +31,23 @@ class users_championship_widget(QtWidgets.QWidget):
         self.setObjectName('dark_widget')
 
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.list_view = QtWidgets.QTreeWidget()
-        self.list_view.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.list_view.setContextMenuPolicy(
+            QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_view.setObjectName('tree_as_list_widget_no_hover')
         self.list_view.setColumnCount(9)
-        self.list_view.setIconSize(QtCore.QSize(30,30))
+        self.list_view.setIconSize(QtCore.QSize(30, 30))
         self.list_view.setIndentation(0)
         self.list_view.setAlternatingRowColors(True)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
+        self.list_view.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
 
-        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience', 'Comments', 'Work time', 'Deaths', 'Life', 'Coins', 'Participation'])
+        self.list_view.setHeaderLabels(['Profile picture', 'User name', 'Level', 'Experience',
+                                       'Comments', 'Work time', 'Deaths', 'Life', 'Coins', 'Participation'])
         self.main_layout.addWidget(self.list_view)
 
     def refresh(self):
@@ -63,14 +66,16 @@ class users_championship_widget(QtWidgets.QWidget):
                     if user_row['total_xp'] not in xp_dic.keys():
                         xp_dic[user_row['total_xp']] = user_row['id']
                     if user_row['comments_count'] not in comments_dic.keys():
-                        comments_dic[user_row['comments_count']] = user_row['id']
+                        comments_dic[user_row['comments_count']
+                                     ] = user_row['id']
                     if user_row['work_time'] not in work_time_dic.keys():
                         work_time_dic[user_row['work_time']] = user_row['id']
                     if user_row['deaths'] not in deaths_dic.keys():
                         deaths_dic[user_row['deaths']] = user_row['id']
 
                     if user_row['id'] not in self.user_ids.keys():
-                        item = custom_user_tree_item(user_row, self.icons_dic, self.list_view.invisibleRootItem())
+                        item = custom_user_tree_item(
+                            user_row, self.icons_dic, self.list_view.invisibleRootItem())
                         index = self.list_view.invisibleRootItem().indexOfChild(item)
                         self.list_view.invisibleRootItem().takeChild(index)
                         self.user_ids[user_row['id']] = item
@@ -87,19 +92,23 @@ class users_championship_widget(QtWidgets.QWidget):
                 self.list_view.invisibleRootItem().insertChild(index, item)
 
             self.user_ids[all_user_rows[0]['id']].set_crown(1)
-            if len(all_user_rows)>=2:
+            if len(all_user_rows) >= 2:
                 self.user_ids[all_user_rows[1]['id']].set_crown(2)
-            if len(all_user_rows)>=3:
+            if len(all_user_rows) >= 3:
                 self.user_ids[all_user_rows[2]['id']].set_crown(3)
 
             first_xp_user_id = xp_dic[sorted(list(xp_dic.keys()))[-1]]
             self.user_ids[first_xp_user_id].set_xp_item()
-            first_comment_user_id = comments_dic[sorted(list(comments_dic.keys()))[-1]]
+            first_comment_user_id = comments_dic[sorted(
+                list(comments_dic.keys()))[-1]]
             self.user_ids[first_comment_user_id].set_comment_item()
-            first_worker_user_id = work_time_dic[sorted(list(work_time_dic.keys()))[-1]]
+            first_worker_user_id = work_time_dic[sorted(
+                list(work_time_dic.keys()))[-1]]
             self.user_ids[first_worker_user_id].set_work_time_item()
-            first_deaths_user_id = deaths_dic[sorted(list(deaths_dic.keys()))[-1]]
+            first_deaths_user_id = deaths_dic[sorted(
+                list(deaths_dic.keys()))[-1]]
             self.user_ids[first_deaths_user_id].set_death_item()
+
 
 class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
     def __init__(self, user_row, icons_dic, parent=None):
@@ -110,7 +119,7 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.fill_ui()
 
     def setup_ui(self):
-        bold_font=QtGui.QFont()
+        bold_font = QtGui.QFont()
         bold_font.setBold(True)
         self.setFont(1, bold_font)
 
@@ -136,7 +145,8 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
 
     def fill_ui(self):
         user_icon = QtGui.QIcon()
-        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(self.user_row['profile_picture']), 'png', 30)
+        pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(
+            self.user_row['profile_picture']), 'png', 30)
         user_icon.addPixmap(pm)
         self.setIcon(0, user_icon)
         self.setText(1, self.user_row['user_name'])
@@ -147,7 +157,8 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
         self.setIcon(4, QtGui.QIcon())
         self.setText(4, f"{str(self.user_row['comments_count'])}")
         self.setIcon(5, QtGui.QIcon())
-        string_time = tools.convert_seconds_to_string_time(float(self.user_row['work_time']))
+        string_time = tools.convert_seconds_to_string_time(
+            float(self.user_row['work_time']))
         self.setText(5, string_time)
         self.setIcon(6, QtGui.QIcon())
         self.setText(6, f"{str(self.user_row['deaths'])}")
@@ -162,4 +173,3 @@ class custom_user_tree_item(QtWidgets.QTreeWidgetItem):
             participation = 'No'
             self.setForeground(9, QtGui.QColor('#f0605b'))
         self.setText(9, participation)
-

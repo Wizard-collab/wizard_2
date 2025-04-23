@@ -17,6 +17,7 @@ from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
 
+
 class batch_settings_widget(QtWidgets.QDialog):
     def __init__(self, work_env_id, stage_to_export, parent=None):
         super(batch_settings_widget, self).__init__()
@@ -43,7 +44,8 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.refresh()
 
     def apply(self):
-        self.frange = [self.inrollframe_spinBox.value(), self.outrollframe_spinBox.value()]
+        self.frange = [self.inrollframe_spinBox.value(
+        ), self.outrollframe_spinBox.value()]
         self.refresh_assets = self.refresh_assets_checkbox.isChecked()
         self.nspace_list = self.get_selected_nspaces()
         self.render_type = self.render_type_combo.currentText()
@@ -76,11 +78,13 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.reject_button.clicked.connect(self.reject)
 
     def fill_ui(self):
-        self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage_to_export]).pixmap(22))
-        self.header_text.setText(f"Please set the {self.stage_to_export} export settings")
+        self.stage_icon_label.setPixmap(QtGui.QIcon(
+            ressources._stage_icons_dic_[self.stage_to_export]).pixmap(22))
+        self.header_text.setText(
+            f"Please set the {self.stage_to_export} export settings")
 
         if self.stage_to_export in self.stages_relations_dic:
-            self.need_nspace_list=True
+            self.need_nspace_list = True
             stages_list = self.stages_relations_dic[self.stage_to_export]
             references = []
             all_references = assets.get_references_files(self.work_env_id)
@@ -88,7 +92,7 @@ class batch_settings_widget(QtWidgets.QDialog):
                 if stage in stages_list:
                     for reference_row in all_references[stage]:
                         item = QtWidgets.QListWidgetItem(QtGui.QIcon(ressources._stage_icons_dic_[stage]),
-                                                                    reference_row['namespace'])
+                                                         reference_row['namespace'])
                         self.assets_list.addItem(item)
         else:
             self.need_nspace_list = False
@@ -131,7 +135,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName('transparent_widget')
         self.header_layout = QtWidgets.QHBoxLayout()
-        self.header_layout.setContentsMargins(0,0,0,0)
+        self.header_layout.setContentsMargins(0, 0, 0, 0)
         self.header_layout.setSpacing(8)
         self.header_widget.setLayout(self.header_layout)
         self.main_layout.addWidget(self.header_widget)
@@ -142,15 +146,17 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.header_text = QtWidgets.QLabel()
         self.header_layout.addWidget(self.header_text)
 
-        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         # Refresh assets section
 
         self.refresh_assets_label = QtWidgets.QLabel('References settings')
         self.refresh_assets_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.refresh_assets_label)
-        
-        self.refresh_assets_checkbox = QtWidgets.QCheckBox('Refresh assets in scene')
+
+        self.refresh_assets_checkbox = QtWidgets.QCheckBox(
+            'Refresh assets in scene')
         self.refresh_assets_checkbox.setObjectName('transparent_widget')
         self.main_layout.addWidget(self.refresh_assets_checkbox)
 
@@ -159,7 +165,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.range_setup_widget = QtWidgets.QWidget()
         self.range_setup_widget.setObjectName('transparent_widget')
         self.range_setup_layout = QtWidgets.QVBoxLayout()
-        self.range_setup_layout.setContentsMargins(0,0,0,0)
+        self.range_setup_layout.setContentsMargins(0, 0, 0, 0)
         self.range_setup_layout.setSpacing(8)
         self.range_setup_widget.setLayout(self.range_setup_layout)
         self.main_layout.addWidget(self.range_setup_widget)
@@ -168,13 +174,14 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.frame_range_label.setObjectName('gray_label')
         self.range_setup_layout.addWidget(self.frame_range_label)
 
-        self.rolls_checkbox = QtWidgets.QCheckBox('Export with prerolls and postrolls')
+        self.rolls_checkbox = QtWidgets.QCheckBox(
+            'Export with prerolls and postrolls')
         self.rolls_checkbox.setObjectName('transparent_widget')
         self.range_setup_layout.addWidget(self.rolls_checkbox)
         self.range_widget = QtWidgets.QWidget()
         self.range_widget.setObjectName('transparent_widget')
         self.range_layout = QtWidgets.QHBoxLayout()
-        self.range_layout.setContentsMargins(0,0,0,0)
+        self.range_layout.setContentsMargins(0, 0, 0, 0)
         self.range_layout.setSpacing(8)
         self.range_widget.setLayout(self.range_layout)
         self.range_setup_layout.addWidget(self.range_widget)
@@ -183,24 +190,28 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.inrollframe_spinBox.setEnabled(False)
         self.inrollframe_spinBox.setObjectName('gray_label')
         self.inrollframe_spinBox.setRange(-1000000, 1000000)
-        self.inrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.inrollframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inrollframe_spinBox)
 
         self.inframe_spinBox = QtWidgets.QSpinBox()
         self.inframe_spinBox.setRange(-1000000, 1000000)
-        self.inframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.inframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.inframe_spinBox)
 
         self.outframe_spinBox = QtWidgets.QSpinBox()
         self.outframe_spinBox.setRange(-1000000, 1000000)
-        self.outframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.outframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outframe_spinBox)
 
         self.outrollframe_spinBox = QtWidgets.QSpinBox()
         self.outrollframe_spinBox.setEnabled(False)
         self.outrollframe_spinBox.setObjectName('gray_label')
         self.outrollframe_spinBox.setRange(-1000000, 1000000)
-        self.outrollframe_spinBox.setButtonSymbols(QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.outrollframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
         self.range_layout.addWidget(self.outrollframe_spinBox)
 
         # Render section
@@ -208,7 +219,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.render_type_widget = QtWidgets.QWidget()
         self.render_type_widget.setObjectName('transparent_widget')
         self.render_type_layout = QtWidgets.QVBoxLayout()
-        self.render_type_layout.setContentsMargins(0,0,0,0)
+        self.render_type_layout.setContentsMargins(0, 0, 0, 0)
         self.render_type_layout.setSpacing(8)
         self.render_type_widget.setLayout(self.render_type_layout)
         self.main_layout.addWidget(self.render_type_widget)
@@ -226,7 +237,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.guerilla_deadline_widget = QtWidgets.QWidget()
         self.guerilla_deadline_widget.setObjectName('transparent_widget')
         self.guerilla_deadline_layout = QtWidgets.QVBoxLayout()
-        self.guerilla_deadline_layout.setContentsMargins(0,0,0,0)
+        self.guerilla_deadline_layout.setContentsMargins(0, 0, 0, 0)
         self.guerilla_deadline_layout.setSpacing(8)
         self.guerilla_deadline_widget.setLayout(self.guerilla_deadline_layout)
         self.main_layout.addWidget(self.guerilla_deadline_widget)
@@ -235,17 +246,19 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.guerilla_deadline_label.setObjectName('gray_label')
         self.guerilla_deadline_layout.addWidget(self.guerilla_deadline_label)
 
-        self.guerilla_deadline_checkbox = QtWidgets.QCheckBox('Submit to deadline')
+        self.guerilla_deadline_checkbox = QtWidgets.QCheckBox(
+            'Submit to deadline')
         self.guerilla_deadline_checkbox.setObjectName('transparent_widget')
         self.guerilla_deadline_checkbox.setChecked(True)
-        self.guerilla_deadline_layout.addWidget(self.guerilla_deadline_checkbox)
+        self.guerilla_deadline_layout.addWidget(
+            self.guerilla_deadline_checkbox)
 
         # Namespaces selection section
 
         self.nspace_list_widget = QtWidgets.QWidget()
         self.nspace_list_widget.setObjectName('transparent_widget')
         self.nspace_list_layout = QtWidgets.QVBoxLayout()
-        self.nspace_list_layout.setContentsMargins(0,0,0,0)
+        self.nspace_list_layout.setContentsMargins(0, 0, 0, 0)
         self.nspace_list_layout.setSpacing(8)
         self.nspace_list_widget.setLayout(self.nspace_list_layout)
         self.main_layout.addWidget(self.nspace_list_widget)
@@ -255,7 +268,8 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.nspace_list_layout.addWidget(self.infos_label)
 
         self.assets_list = QtWidgets.QListWidget()
-        self.assets_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.assets_list.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.nspace_list_layout.addWidget(self.assets_list)
 
         # Deadline section
@@ -263,7 +277,7 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.deadline_widget = QtWidgets.QWidget()
         self.deadline_widget.setObjectName('transparent_widget')
         self.deadline_layout = QtWidgets.QVBoxLayout()
-        self.deadline_layout.setContentsMargins(0,0,0,0)
+        self.deadline_layout.setContentsMargins(0, 0, 0, 0)
         self.deadline_layout.setSpacing(8)
         self.deadline_widget.setLayout(self.deadline_layout)
         self.main_layout.addWidget(self.deadline_widget)
@@ -287,12 +301,13 @@ class batch_settings_widget(QtWidgets.QDialog):
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_widget.setObjectName('transparent_widget')
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
 
-        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.reject_button = QtWidgets.QPushButton('Cancel')
         self.reject_button.setDefault(False)

@@ -3,19 +3,16 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtCore
 from PyQt6.QtCore import pyqtSignal
 import traceback
-import sys
-import uuid
-import time
 import logging
 
 # Wizard core modules
-from wizard.core import path_utils
 from wizard.core import ffmpeg_utils
 
 logger = logging.getLogger(__name__)
+
 
 class concat_thread(QtCore.QThread):
 
@@ -45,7 +42,8 @@ class concat_thread(QtCore.QThread):
             self.running = True
             while self.to_concat != []:
                 logger.debug(f"Creating concat file")
-                concat_video_file = ffmpeg_utils.concatenate_videos(self.temp_dir, self.player_id, self.to_concat[0], self.fps)
+                concat_video_file = ffmpeg_utils.concatenate_videos(
+                    self.temp_dir, self.player_id, self.to_concat[0], self.fps)
                 self.on_concat_ready.emit(concat_video_file)
                 self.to_concat.pop(0)
             self.running = False

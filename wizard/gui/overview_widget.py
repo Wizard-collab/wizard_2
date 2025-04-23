@@ -4,13 +4,10 @@
 
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import pyqtSignal
 import statistics
 import time
-import datetime
 import json
 import copy
-import logging
 
 # Wizard core modules
 from wizard.vars import ressources
@@ -20,12 +17,12 @@ from wizard.core import repository
 from wizard.core import project
 from wizard.core import tools
 from wizard.core import image
-from wizard.core import assets
 from wizard.core import stats
 
 # Wizard gui modules
 from wizard.gui import gui_utils
 from wizard.gui import chart_utils
+
 
 class overview_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -41,17 +38,18 @@ class overview_widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setObjectName('dark_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,11,11,11)
+        self.main_layout.setContentsMargins(0, 11, 11, 11)
         self.setLayout(self.main_layout)
 
         self.horizontal_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.horizontal_layout)
 
         self.vertical_widget_1 = QtWidgets.QWidget()
-        self.vertical_widget_1.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.vertical_widget_1.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.vertical_widget_1.setObjectName('transparent_widget')
         self.vertical_layout_1 = QtWidgets.QVBoxLayout()
-        self.vertical_layout_1.setContentsMargins(0,0,0,0)
+        self.vertical_layout_1.setContentsMargins(0, 0, 0, 0)
         self.vertical_widget_1.setLayout(self.vertical_layout_1)
         self.horizontal_layout.addWidget(self.vertical_widget_1)
 
@@ -62,20 +60,22 @@ class overview_widget(QtWidgets.QWidget):
         self.project_quickstats_widget = project_quickstats_widget()
         self.vertical_layout_1.addWidget(self.project_quickstats_widget)
 
-        self.vertical_layout_1.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.vertical_layout_1.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.vertical_layout_2 = QtWidgets.QVBoxLayout()
-        self.vertical_layout_2.setContentsMargins(0,0,0,0)
+        self.vertical_layout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontal_layout.addLayout(self.vertical_layout_2)
 
         self.vertical_layout_2.addWidget(self.user_progress_widget)
         self.vertical_layout_2.addWidget(self.progress_curves_widget)
 
         self.footer_layout = QtWidgets.QHBoxLayout()
-        self.footer_layout.setContentsMargins(0,0,0,0)
+        self.footer_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(self.footer_layout)
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.refresh_label = QtWidgets.QLabel()
         self.refresh_label.setObjectName('gray_label')
@@ -99,6 +99,7 @@ class overview_widget(QtWidgets.QWidget):
             self.time_left_overview_widget.refresh()
             self.update_refresh_time(start_time)
 
+
 class project_quickstats_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(project_quickstats_widget, self).__init__(parent)
@@ -107,7 +108,7 @@ class project_quickstats_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -124,11 +125,13 @@ class project_quickstats_widget(QtWidgets.QFrame):
         self.grid_layout.addWidget(self.assignments_widget, 0, 0)
 
         self.total_work_time_widget = quickstats_widget()
-        self.total_work_time_widget.description_label.setText("Total work time")
+        self.total_work_time_widget.description_label.setText(
+            "Total work time")
         self.grid_layout.addWidget(self.total_work_time_widget, 0, 1)
 
         self.average_work_time_widget = quickstats_widget()
-        self.average_work_time_widget.description_label.setText("Time per asset")
+        self.average_work_time_widget.description_label.setText(
+            "Time per asset")
         self.grid_layout.addWidget(self.average_work_time_widget, 1, 0)
 
         self.all_versions_widget = quickstats_widget()
@@ -156,23 +159,28 @@ class project_quickstats_widget(QtWidgets.QFrame):
                 all_work_times.append(stage_row['work_time'])
                 total_work_time += stage_row['work_time']
                 if stage_row['state'] == 'done':
-                    tasks_done+=1
+                    tasks_done += 1
 
         if all_work_times == []:
             all_work_times = [0]
 
         work_time_mean = statistics.mean(all_work_times)
         self.assignments_widget.stat_label.setText(f"{len(all_work_times)}")
-        self.total_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
-        self.average_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(work_time_mean)}")
+        self.total_work_time_widget.stat_label.setText(
+            f"{tools.convert_seconds_to_string_time(total_work_time)}")
+        self.average_work_time_widget.stat_label.setText(
+            f"{tools.convert_seconds_to_string_time(work_time_mean)}")
 
         all_work_versions = project.get_all_work_versions('id')
-        self.all_versions_widget.stat_label.setText(f"{len(all_work_versions)}")
+        self.all_versions_widget.stat_label.setText(
+            f"{len(all_work_versions)}")
 
         all_exports = project.get_all_export_versions('id')
         self.all_exports_widget.stat_label.setText(f"{len(all_exports)}")
 
-        self.tasks_done_widget.stat_label.setText(f"{tasks_done}/{len(all_work_times)}")
+        self.tasks_done_widget.stat_label.setText(
+            f"{tasks_done}/{len(all_work_times)}")
+
 
 class main_progress_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -181,14 +189,15 @@ class main_progress_widget(QtWidgets.QFrame):
 
     def build_ui(self):
         self.setObjectName('round_frame')
-        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                           QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout = QtWidgets.QHBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(self.main_layout)
 
         self.progress_bar = gui_utils.RoundProgress()
-        self.progress_bar.setFixedSize(60,60)
+        self.progress_bar.setFixedSize(60, 60)
         self.progress_bar.lineWidth = 12
         self.progress_bar.setValue(0)
         self.progress_bar.setChunckColor('#d7d7d7')
@@ -198,7 +207,7 @@ class main_progress_widget(QtWidgets.QFrame):
 
         self.text_widget = QtWidgets.QWidget()
         self.text_widget_layout = QtWidgets.QVBoxLayout()
-        self.text_widget_layout.setContentsMargins(0,0,0,0)
+        self.text_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.text_widget_layout.setSpacing(2)
         self.text_widget.setLayout(self.text_widget_layout)
         self.main_layout.addWidget(self.text_widget)
@@ -211,7 +220,8 @@ class main_progress_widget(QtWidgets.QFrame):
         self.progress_label.setObjectName('title_label_gray')
         self.text_widget_layout.addWidget(self.progress_label)
 
-        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         stage_rows = project.get_all_stages()
@@ -223,7 +233,7 @@ class main_progress_widget(QtWidgets.QFrame):
             if stage_row['state'] == 'omt':
                 continue
             if stage_row['name'] in assets_vars._assets_stages_list_:
-                progress = (stage_row['progress'],1)
+                progress = (stage_row['progress'], 1)
             elif stage_row['name'] in assets_vars._sequences_stages_list_:
                 asset_row = project.get_asset_data(stage_row['asset_id'])
                 asset_frames = asset_row['outframe'] - asset_row['inframe']
@@ -235,6 +245,7 @@ class main_progress_widget(QtWidgets.QFrame):
         self.progress_bar.setValue(int(mean))
         self.progress_label.setText(f"{round(mean, 1)} %")
 
+
 class user_progress_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(user_progress_widget, self).__init__(parent)
@@ -244,24 +255,25 @@ class user_progress_widget(QtWidgets.QFrame):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
-        self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
+        self.header_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         self.header_widget_layout = QtWidgets.QHBoxLayout()
-        self.header_widget_layout.setContentsMargins(0,0,0,0)
+        self.header_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.header_widget_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_widget_layout)
         self.main_layout.addWidget(self.header_widget)
 
         self.user_image_label = QtWidgets.QLabel()
-        self.user_image_label.setFixedSize(60,60)
+        self.user_image_label.setFixedSize(60, 60)
         self.header_widget_layout.addWidget(self.user_image_label)
 
         self.text_widget = QtWidgets.QWidget()
         self.text_widget_layout = QtWidgets.QVBoxLayout()
-        self.text_widget_layout.setContentsMargins(0,0,0,0)
+        self.text_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.text_widget_layout.setSpacing(2)
         self.text_widget.setLayout(self.text_widget_layout)
         self.header_widget_layout.addWidget(self.text_widget)
@@ -272,13 +284,13 @@ class user_progress_widget(QtWidgets.QFrame):
 
         self.main_progress_widget = QtWidgets.QWidget()
         self.main_progress_widget_layout = QtWidgets.QHBoxLayout()
-        self.main_progress_widget_layout.setContentsMargins(0,0,0,0)
+        self.main_progress_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.main_progress_widget_layout.setSpacing(6)
         self.main_progress_widget.setLayout(self.main_progress_widget_layout)
         self.text_widget_layout.addWidget(self.main_progress_widget)
 
         self.main_progress_bar = gui_utils.RoundProgress()
-        self.main_progress_bar.setFixedSize(30,30)
+        self.main_progress_bar.setFixedSize(30, 30)
         self.main_progress_bar.set_line_width(8)
         self.main_progress_bar.setValue(0)
         self.main_progress_bar.setChunckColor('#d7d7d7')
@@ -288,7 +300,8 @@ class user_progress_widget(QtWidgets.QFrame):
         self.main_progress_label.setObjectName('title_label_gray')
         self.main_progress_widget_layout.addWidget(self.main_progress_label)
 
-        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.text_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.main_layout.addWidget(gui_utils.separator())
 
@@ -298,7 +311,7 @@ class user_progress_widget(QtWidgets.QFrame):
 
         self.quick_stats_widget = QtWidgets.QWidget()
         self.quick_stats_widget_layout = QtWidgets.QHBoxLayout()
-        self.quick_stats_widget_layout.setContentsMargins(0,0,0,0)
+        self.quick_stats_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.quick_stats_widget_layout.setSpacing(6)
         self.quick_stats_widget.setLayout(self.quick_stats_widget_layout)
         self.main_layout.addWidget(self.quick_stats_widget)
@@ -308,11 +321,13 @@ class user_progress_widget(QtWidgets.QFrame):
         self.quick_stats_widget_layout.addWidget(self.assignments_widget)
 
         self.total_work_time_widget = quickstats_widget()
-        self.total_work_time_widget.description_label.setText("Total work time")
+        self.total_work_time_widget.description_label.setText(
+            "Total work time")
         self.quick_stats_widget_layout.addWidget(self.total_work_time_widget)
 
         self.average_work_time_widget = quickstats_widget()
-        self.average_work_time_widget.description_label.setText("Time per asset")
+        self.average_work_time_widget.description_label.setText(
+            "Time per asset")
         self.quick_stats_widget_layout.addWidget(self.average_work_time_widget)
 
         self.all_versions_widget = quickstats_widget()
@@ -335,17 +350,22 @@ class user_progress_widget(QtWidgets.QFrame):
 
         self.assets_stats_content_widget = QtWidgets.QWidget()
         self.assets_stats_content_layout = QtWidgets.QHBoxLayout()
-        self.assets_stats_content_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        self.assets_stats_content_layout.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignTop)
         self.assets_stats_content_layout.setSpacing(6)
-        self.assets_stats_content_layout.setContentsMargins(0,0,0,0)
-        self.assets_stats_content_widget.setLayout(self.assets_stats_content_layout)
+        self.assets_stats_content_layout.setContentsMargins(0, 0, 0, 0)
+        self.assets_stats_content_widget.setLayout(
+            self.assets_stats_content_layout)
         self.main_layout.addWidget(self.assets_stats_content_widget)
 
         self.stages_piechart_widget_layout = QtWidgets.QVBoxLayout()
-        self.stages_piechart_widget_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        self.stages_piechart_widget_layout.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignTop)
         self.stages_piechart_widget = stages_piechart()
-        self.stages_piechart_widget_layout.addWidget(self.stages_piechart_widget)
-        self.assets_stats_content_layout.addLayout(self.stages_piechart_widget_layout)
+        self.stages_piechart_widget_layout.addWidget(
+            self.stages_piechart_widget)
+        self.assets_stats_content_layout.addLayout(
+            self.stages_piechart_widget_layout)
 
         self.assets_stats_widget = QtWidgets.QWidget()
         self.assets_stats_widget_layout = gui_utils.QFlowLayout()
@@ -359,13 +379,15 @@ class user_progress_widget(QtWidgets.QFrame):
             self.stages_widgets_dic[stage] = stage_widget
             stage_widget.setVisible(0)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         self.stages_piechart_widget.pie_chart.clear()
         user_row = repository.get_user_row_by_name(environment.get_user())
-        user_image =  user_row['profile_picture']
-        pixmap = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_image), 'png', 60)
+        user_image = user_row['profile_picture']
+        pixmap = gui_utils.mask_image(
+            image.convert_str_data_to_image_bytes(user_image), 'png', 60)
         self.user_image_label.setPixmap(pixmap)
 
         stage_rows = project.get_all_stages()
@@ -374,7 +396,7 @@ class user_progress_widget(QtWidgets.QFrame):
         tasks_done = 0
         total_work_time = 0
         all_frames = stats.get_all_frames()
-        
+
         stages_dic = dict()
 
         for stage_row in stage_rows:
@@ -384,7 +406,7 @@ class user_progress_widget(QtWidgets.QFrame):
                 continue
             if stage_row['assignment'] == environment.get_user():
                 if stage_row['name'] in assets_vars._assets_stages_list_:
-                    progress = (stage_row['progress'],1)
+                    progress = (stage_row['progress'], 1)
                 elif stage_row['name'] in assets_vars._sequences_stages_list_:
                     asset_row = project.get_asset_data(stage_row['asset_id'])
                     asset_frames = asset_row['outframe'] - asset_row['inframe']
@@ -394,7 +416,7 @@ class user_progress_widget(QtWidgets.QFrame):
                 all_work_times.append(stage_row['work_time'])
                 total_work_time += stage_row['work_time']
                 if stage_row['state'] == 'done':
-                    tasks_done+=1
+                    tasks_done += 1
 
                 if stage_row['name'] not in stages_dic.keys():
                     stages_dic[stage_row['name']] = dict()
@@ -402,12 +424,15 @@ class user_progress_widget(QtWidgets.QFrame):
                     stages_dic[stage_row['name']]['all_work_times'] = []
                     stages_dic[stage_row['name']]['total_work_time'] = 0
 
-                stages_dic[stage_row['name']]['all_progresses'].append(progress)
-                stages_dic[stage_row['name']]['all_work_times'].append(stage_row['work_time'])
-                stages_dic[stage_row['name']]['total_work_time'] += stage_row['work_time']
+                stages_dic[stage_row['name']
+                           ]['all_progresses'].append(progress)
+                stages_dic[stage_row['name']]['all_work_times'].append(
+                    stage_row['work_time'])
+                stages_dic[stage_row['name']
+                           ]['total_work_time'] += stage_row['work_time']
 
         if all_progresses == []:
-            all_progresses = [(0,1)]
+            all_progresses = [(0, 1)]
         if all_work_times == []:
             all_work_times = [0]
 
@@ -417,31 +442,45 @@ class user_progress_widget(QtWidgets.QFrame):
 
         work_time_mean = statistics.mean(all_work_times)
         self.assignments_widget.stat_label.setText(f"{len(all_progresses)}")
-        self.total_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
-        self.average_work_time_widget.stat_label.setText(f"{tools.convert_seconds_to_string_time(work_time_mean)}")
+        self.total_work_time_widget.stat_label.setText(
+            f"{tools.convert_seconds_to_string_time(total_work_time)}")
+        self.average_work_time_widget.stat_label.setText(
+            f"{tools.convert_seconds_to_string_time(work_time_mean)}")
 
-        all_work_versions = project.get_work_versions_by_user(environment.get_user(), 'id')
-        self.all_versions_widget.stat_label.setText(f"{len(all_work_versions)}")
+        all_work_versions = project.get_work_versions_by_user(
+            environment.get_user(), 'id')
+        self.all_versions_widget.stat_label.setText(
+            f"{len(all_work_versions)}")
 
-        all_exports = project.get_export_versions_by_user_name(environment.get_user(), 'id')
+        all_exports = project.get_export_versions_by_user_name(
+            environment.get_user(), 'id')
         self.all_exports_widget.stat_label.setText(f"{len(all_exports)}")
 
-        self.tasks_done_widget.stat_label.setText(f"{tasks_done}/{len(all_progresses)}")
+        self.tasks_done_widget.stat_label.setText(
+            f"{tasks_done}/{len(all_progresses)}")
 
         for stage in stages_dic.keys():
             mean = stats.get_mean(stages_dic[stage]['all_progresses'])
-            work_time_mean = statistics.mean(stages_dic[stage]['all_work_times'])
+            work_time_mean = statistics.mean(
+                stages_dic[stage]['all_work_times'])
             total_work_time = stages_dic[stage]['total_work_time']
             self.stages_widgets_dic[stage].progress_bar.setValue(int(mean))
-            self.stages_widgets_dic[stage].progress_label.setText(f"{int(mean)}%")
-            self.stages_widgets_dic[stage].total_work_time.setText(f"{tools.convert_seconds_to_string_time(total_work_time)}")
-            self.stages_widgets_dic[stage].tasks_count.setText(f"{len(stages_dic[stage]['all_progresses'])}")
-            self.stages_widgets_dic[stage].average_work_time.setText(f"{tools.convert_seconds_to_string_time(work_time_mean)}")
-            self.assets_stats_widget_layout.addWidget(self.stages_widgets_dic[stage])
+            self.stages_widgets_dic[stage].progress_label.setText(
+                f"{int(mean)}%")
+            self.stages_widgets_dic[stage].total_work_time.setText(
+                f"{tools.convert_seconds_to_string_time(total_work_time)}")
+            self.stages_widgets_dic[stage].tasks_count.setText(
+                f"{len(stages_dic[stage]['all_progresses'])}")
+            self.stages_widgets_dic[stage].average_work_time.setText(
+                f"{tools.convert_seconds_to_string_time(work_time_mean)}")
+            self.assets_stats_widget_layout.addWidget(
+                self.stages_widgets_dic[stage])
             self.stages_widgets_dic[stage].setVisible(1)
 
-            stage_repartition_percent = (len(stages_dic[stage]['all_progresses'])/len(all_progresses))*100
-            self.stages_piechart_widget.pie_chart.add_pie(stage_repartition_percent, ressources._stages_colors_[stage])
+            stage_repartition_percent = (
+                len(stages_dic[stage]['all_progresses'])/len(all_progresses))*100
+            self.stages_piechart_widget.pie_chart.add_pie(
+                stage_repartition_percent, ressources._stages_colors_[stage])
         stages_list = list(self.stages_widgets_dic.keys())
         for stage in stages_list:
             if stage not in stages_dic.keys():
@@ -450,6 +489,7 @@ class user_progress_widget(QtWidgets.QFrame):
     def remove_stage(self, stage):
         self.stages_widgets_dic[stage].setVisible(0)
         self.stages_widgets_dic[stage].setParent(self)
+
 
 class quickstats_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -467,9 +507,11 @@ class quickstats_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.stat_label)
 
         self.description_label = QtWidgets.QLabel()
-        self.description_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.description_label.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignCenter)
         self.description_label.setObjectName('gray_label')
         self.main_layout.addWidget(self.description_label)
+
 
 class stages_piechart(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -477,16 +519,17 @@ class stages_piechart(QtWidgets.QFrame):
         self.build_ui()
 
     def build_ui(self):
-        self.setFixedSize(140,140)
+        self.setFixedSize(140, 140)
         self.setObjectName("quickstats_widget")
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.setLayout(self.main_layout)
 
         self.pie_chart = chart_utils.pie_chart()
 
         self.main_layout.addWidget(self.pie_chart)
+
 
 class progress_curves_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -500,13 +543,13 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.setObjectName('round_frame')
         self.setMinimumHeight(400)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
         self.header_widget = QtWidgets.QWidget()
         self.header_widget_layout = QtWidgets.QHBoxLayout()
-        self.header_widget_layout.setContentsMargins(0,0,0,0)
+        self.header_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.header_widget.setLayout(self.header_widget_layout)
         self.main_layout.addWidget(self.header_widget)
 
@@ -514,16 +557,18 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.title_label.setObjectName("title_label")
         self.header_widget_layout.addWidget(self.title_label)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(30,0,QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            30, 0, QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.context_comboBox = gui_utils.QComboBox()
         self.context_comboBox.setFixedWidth(140)
         self.header_widget_layout.addWidget(self.context_comboBox)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.chart_layout = QtWidgets.QHBoxLayout()
-        self.chart_layout.setContentsMargins(0,0,0,0)
+        self.chart_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(self.chart_layout)
 
         self.chart = chart_utils.curves_chart()
@@ -531,15 +576,16 @@ class progress_curves_widget(QtWidgets.QFrame):
         self.chart.set_ordonea_headers(["0%", "25%", "50%", "75%", "100%"])
         self.chart.set_margin(40)
         self.chart.set_points_thickness(0)
-        self.chart.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.chart.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.chart_layout.addWidget(self.chart)
 
         self.settings_layout = QtWidgets.QVBoxLayout()
-        self.settings_layout.setContentsMargins(0,0,0,0)
+        self.settings_layout.setContentsMargins(0, 0, 0, 0)
         self.chart_layout.addLayout(self.settings_layout)
 
         self.settings_content_layout = QtWidgets.QVBoxLayout()
-        self.settings_content_layout.setContentsMargins(0,0,0,0)
+        self.settings_content_layout.setContentsMargins(0, 0, 0, 0)
         self.settings_content_layout.setSpacing(2)
         self.settings_layout.addLayout(self.settings_content_layout)
 
@@ -549,15 +595,20 @@ class progress_curves_widget(QtWidgets.QFrame):
 
         self.stages_selection_list = QtWidgets.QListWidget()
         self.stages_selection_list.setObjectName('transparent_widget')
-        self.stages_selection_list.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
+        self.stages_selection_list.setSelectionMode(
+            QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
         self.stages_selection_list.setFixedWidth(120)
-        self.stages_selection_list.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.stages_selection_list.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         self.settings_content_layout.addWidget(self.stages_selection_list)
 
     def connect_functions(self):
-        self.prevision_check_box.stateChanged.connect(self.chart.set_prevision_visibility)
-        self.context_comboBox.currentTextChanged.connect(lambda:self.context_changed(None))
-        self.stages_selection_list.itemSelectionChanged.connect(self.update_data_visibility)
+        self.prevision_check_box.stateChanged.connect(
+            self.chart.set_prevision_visibility)
+        self.context_comboBox.currentTextChanged.connect(
+            lambda: self.context_changed(None))
+        self.stages_selection_list.itemSelectionChanged.connect(
+            self.update_data_visibility)
 
     def refresh(self):
         all_progress_events_rows = project.get_all_progress_events()
@@ -595,12 +646,15 @@ class progress_curves_widget(QtWidgets.QFrame):
         if time_range > 0:
             for progress_event_row in all_progress_events_rows:
                 if progress_event_row['name'] == self.context:
-                    time_percent = (progress_event_row['creation_time'] - start_time)/time_range*100
-                    project_datas_dic = json.loads(progress_event_row['datas_dic'])
+                    time_percent = (
+                        progress_event_row['creation_time'] - start_time)/time_range*100
+                    project_datas_dic = json.loads(
+                        progress_event_row['datas_dic'])
                     for data_name in project_datas_dic.keys():
                         if data_name not in datas_dic.keys():
                             datas_dic[data_name] = []
-                        datas_dic[data_name].append((time_percent, project_datas_dic[data_name]))
+                        datas_dic[data_name].append(
+                            (time_percent, project_datas_dic[data_name]))
 
         for data_name in datas_dic.keys():
             if data_name == 'total':
@@ -611,7 +665,7 @@ class progress_curves_widget(QtWidgets.QFrame):
                 width = 1
             self.chart.add_line(datas_dic[data_name], color, width, data_name)
             self.add_data(data_name, color)
-        
+
         data_list = list(self.data_dic.keys())
         for data in data_list:
             if data not in datas_dic.keys():
@@ -648,12 +702,13 @@ class progress_curves_widget(QtWidgets.QFrame):
 
     def add_data(self, data, color):
         if data not in self.data_dic.keys():
-            #item = data_item(data, color)
-            #item.stateChanged.connect(self.update_data_visibility)
-            #item.setChecked(True)
-            #self.settings_content_layout.addWidget(item)
+            # item = data_item(data, color)
+            # item.stateChanged.connect(self.update_data_visibility)
+            # item.setChecked(True)
+            # self.settings_content_layout.addWidget(item)
             if data in ressources._stage_icons_dic_.keys():
-                icon = gui_utils.QIcon_from_svg(ressources._stage_icons_dic_[data], color)
+                icon = gui_utils.QIcon_from_svg(
+                    ressources._stage_icons_dic_[data], color)
             if data == 'total':
                 icon = gui_utils.QIcon_from_svg(ressources._guess_icon_, color)
             item = QtWidgets.QListWidgetItem(QtGui.QIcon(icon), data)
@@ -667,12 +722,14 @@ class progress_curves_widget(QtWidgets.QFrame):
 
     def remove_data(self, data):
         if data in self.data_dic.keys():
-            self.stages_selection_list.takeItem(self.stages_selection_list.row(self.data_dic[data]))
+            self.stages_selection_list.takeItem(
+                self.stages_selection_list.row(self.data_dic[data]))
             del self.data_dic[data]
 
     def update_data_visibility(self):
         for data in self.data_dic.keys():
             self.chart.set_data_visible(data, self.data_dic[data].isSelected())
+
 
 class stage_stats_widget(QtWidgets.QWidget):
     def __init__(self, stage, parent=None):
@@ -685,13 +742,13 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.setFixedWidth(250)
         self.main_layout = QtWidgets.QVBoxLayout()
         self.main_layout.setSpacing(6)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         self.content_widget = QtWidgets.QFrame()
         self.content_widget.setObjectName("quickstats_widget")
         self.content_widget_widget_layout = QtWidgets.QHBoxLayout()
-        self.content_widget_widget_layout.setContentsMargins(0,0,0,0)
+        self.content_widget_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.content_widget_widget_layout.setSpacing(4)
         self.content_widget.setLayout(self.content_widget_widget_layout)
         self.main_layout.addWidget(self.content_widget)
@@ -709,36 +766,39 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setObjectName("transparent_widget")
         self.header_widget_layout = QtWidgets.QHBoxLayout()
-        self.header_widget_layout.setContentsMargins(0,0,0,0)
+        self.header_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.header_widget_layout.setSpacing(6)
         self.header_widget.setLayout(self.header_widget_layout)
         self.content_1_widget_layout.addWidget(self.header_widget)
 
         self.stage_icon_label = QtWidgets.QLabel()
-        self.stage_icon_label.setFixedSize(18,18)
+        self.stage_icon_label.setFixedSize(18, 18)
         self.header_widget_layout.addWidget(self.stage_icon_label)
 
         self.stage_name_label = QtWidgets.QLabel()
         self.stage_name_label.setObjectName('title_label_2')
         self.header_widget_layout.addWidget(self.stage_name_label)
 
-        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.header_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
         self.progress_label = QtWidgets.QLabel()
-        #self.progress_label.setObjectName('title_label_gray')
+        # self.progress_label.setObjectName('title_label_gray')
         self.header_widget_layout.addWidget(self.progress_label)
 
         self.progress_bar = gui_utils.QProgressBar()
-        self.progress_bar.setStyleSheet("QProgressBar::chunk{background-color:#d7d7d7;}")
+        self.progress_bar.setStyleSheet(
+            "QProgressBar::chunk{background-color:#d7d7d7;}")
         self.progress_bar.setFixedHeight(6)
         self.content_1_widget_layout.addWidget(self.progress_bar)
 
         self.additionnal_infos_widget = QtWidgets.QWidget()
         self.additionnal_infos_widget.setObjectName("transparent_widget")
         self.additionnal_infos_widget_layout = QtWidgets.QHBoxLayout()
-        self.additionnal_infos_widget_layout.setContentsMargins(0,0,0,0)
+        self.additionnal_infos_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.additionnal_infos_widget_layout.setSpacing(2)
-        self.additionnal_infos_widget.setLayout(self.additionnal_infos_widget_layout)
+        self.additionnal_infos_widget.setLayout(
+            self.additionnal_infos_widget_layout)
         self.content_1_widget_layout.addWidget(self.additionnal_infos_widget)
 
         self.total_work_time = QtWidgets.QLabel()
@@ -746,18 +806,22 @@ class stage_stats_widget(QtWidgets.QWidget):
 
         self.total_work_time_label = QtWidgets.QLabel("-")
         self.total_work_time_label.setObjectName('gray_label')
-        self.additionnal_infos_widget_layout.addWidget(self.total_work_time_label)
+        self.additionnal_infos_widget_layout.addWidget(
+            self.total_work_time_label)
 
-        self.additionnal_infos_widget_layout.addWidget(gui_utils.vertical_separator())
+        self.additionnal_infos_widget_layout.addWidget(
+            gui_utils.vertical_separator())
 
         self.average_work_time = QtWidgets.QLabel()
         self.additionnal_infos_widget_layout.addWidget(self.average_work_time)
 
         self.average_work_time_label = QtWidgets.QLabel("/ asset")
         self.average_work_time_label.setObjectName('gray_label')
-        self.additionnal_infos_widget_layout.addWidget(self.average_work_time_label)
+        self.additionnal_infos_widget_layout.addWidget(
+            self.average_work_time_label)
 
-        self.additionnal_infos_widget_layout.addWidget(gui_utils.vertical_separator())
+        self.additionnal_infos_widget_layout.addWidget(
+            gui_utils.vertical_separator())
 
         self.tasks_count = QtWidgets.QLabel()
         self.additionnal_infos_widget_layout.addWidget(self.tasks_count)
@@ -766,12 +830,16 @@ class stage_stats_widget(QtWidgets.QWidget):
         self.tasks_count_label.setObjectName('gray_label')
         self.additionnal_infos_widget_layout.addWidget(self.tasks_count_label)
 
-        self.additionnal_infos_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.additionnal_infos_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def fill_ui(self):
-        self.stage_icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[self.stage]).pixmap(18))
+        self.stage_icon_label.setPixmap(QtGui.QIcon(
+            ressources._stage_icons_dic_[self.stage]).pixmap(18))
         self.stage_name_label.setText(self.stage.capitalize())
-        self.color_frame.setStyleSheet(f"border-top-left-radius:4px;border-bottom-left-radius:4px;background-color:{ressources._stages_colors_[self.stage]}")
+        self.color_frame.setStyleSheet(
+            f"border-top-left-radius:4px;border-bottom-left-radius:4px;background-color:{ressources._stages_colors_[self.stage]}")
+
 
 class time_left_overview_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -781,7 +849,7 @@ class time_left_overview_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(30,30,30,30)
+        self.main_layout.setContentsMargins(30, 30, 30, 30)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -803,7 +871,8 @@ class time_left_overview_widget(QtWidgets.QFrame):
         self.main_layout.addWidget(self.data_label)
 
     def refresh(self):
-        creation_time = repository.get_project_row_by_name(environment.get_project_name())['creation_time']
+        creation_time = repository.get_project_row_by_name(
+            environment.get_project_name())['creation_time']
         deadline = project.get_deadline()
         self.time_left_chart.refresh(creation_time, deadline)
 
@@ -814,7 +883,7 @@ class time_left_overview_widget(QtWidgets.QFrame):
         time_delta = deadline - time.time()
         days_left = int(time_delta/86400)
         months_left = int(days_left/30.5)
-        
+
         if months_spent == 0:
             string = f"{days_spent} days spent"
         else:
@@ -826,6 +895,7 @@ class time_left_overview_widget(QtWidgets.QFrame):
             string += f" - {months_left} months left ( {days_left} days )"
         self.data_label.setText(string)
 
+
 class progress_overview_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super(progress_overview_widget, self).__init__(parent)
@@ -834,7 +904,7 @@ class progress_overview_widget(QtWidgets.QFrame):
     def build_ui(self):
         self.setObjectName('round_frame')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(30,30,30,30)
+        self.main_layout.setContentsMargins(30, 30, 30, 30)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -845,13 +915,14 @@ class progress_overview_widget(QtWidgets.QFrame):
             domain_header = QtWidgets.QWidget()
             domain_header.setObjectName('transparent_widget')
             domain_header_layout = QtWidgets.QHBoxLayout()
-            domain_header_layout.setContentsMargins(0,0,0,0)
+            domain_header_layout.setContentsMargins(0, 0, 0, 0)
             domain_header_layout.setSpacing(10)
             domain_header.setLayout(domain_header_layout)
             self.main_layout.addWidget(domain_header)
 
             domain_icon_label = QtWidgets.QLabel()
-            domain_icon_label.setPixmap(QtGui.QIcon(ressources._domains_icons_dic_[domain]).pixmap(24))
+            domain_icon_label.setPixmap(QtGui.QIcon(
+                ressources._domains_icons_dic_[domain]).pixmap(24))
             domain_header_layout.addWidget(domain_icon_label)
 
             domain_title_label = QtWidgets.QLabel(domain.capitalize())
@@ -859,7 +930,8 @@ class progress_overview_widget(QtWidgets.QFrame):
             domain_title_label.setFixedWidth(80)
             domain_header_layout.addWidget(domain_title_label)
 
-            domain_header_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+            domain_header_layout.addSpacerItem(QtWidgets.QSpacerItem(
+                0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
             domain_progress_label = QtWidgets.QLabel()
             domain_header_layout.addWidget(domain_progress_label)
@@ -868,7 +940,7 @@ class progress_overview_widget(QtWidgets.QFrame):
 
             progress_bar = gui_utils.RoundProgress()
             progress_bar.setChunckColor("#d7d7d7")
-            progress_bar.setFixedSize(22,22)
+            progress_bar.setFixedSize(22, 22)
             progress_bar.set_line_width(6)
             progress_bar.setValue(0)
             domain_header_layout.addWidget(progress_bar)
@@ -878,14 +950,14 @@ class progress_overview_widget(QtWidgets.QFrame):
 
             domain_stages_widget = QtWidgets.QWidget()
             domain_stages_widget_layout = QtWidgets.QVBoxLayout()
-            domain_stages_widget_layout.setContentsMargins(0,0,0,0)
+            domain_stages_widget_layout.setContentsMargins(0, 0, 0, 0)
             domain_stages_widget.setLayout(domain_stages_widget_layout)
             self.main_layout.addWidget(domain_stages_widget)
 
             for stage in assets_vars._stages_list_[domain]:
                 main_widget = QtWidgets.QWidget()
                 main_widget_layout = QtWidgets.QHBoxLayout()
-                main_widget_layout.setContentsMargins(0,0,0,0)
+                main_widget_layout.setContentsMargins(0, 0, 0, 0)
                 main_widget.setLayout(main_widget_layout)
                 main_widget.setVisible(0)
                 domain_stages_widget_layout.addWidget(main_widget)
@@ -893,31 +965,36 @@ class progress_overview_widget(QtWidgets.QFrame):
                 self.stages_dic[stage]['widget'] = main_widget
 
                 icon_label = QtWidgets.QLabel()
-                icon_label.setPixmap(QtGui.QIcon(ressources._stage_icons_dic_[stage]).pixmap(20))
+                icon_label.setPixmap(QtGui.QIcon(
+                    ressources._stage_icons_dic_[stage]).pixmap(20))
                 main_widget_layout.addWidget(icon_label)
 
                 title_label = QtWidgets.QLabel(stage.capitalize())
                 title_label.setFixedWidth(80)
                 main_widget_layout.addWidget(title_label)
 
-                main_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+                main_widget_layout.addSpacerItem(QtWidgets.QSpacerItem(
+                    0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
                 progress_label = QtWidgets.QLabel()
                 main_widget_layout.addWidget(progress_label)
                 self.stages_dic[stage]['progress_label'] = progress_label
 
                 progress_bar = gui_utils.QProgressBar()
-                progress_bar.setStyleSheet("QProgressBar::chunk{background-color:#d7d7d7;}")
+                progress_bar.setStyleSheet(
+                    "QProgressBar::chunk{background-color:#d7d7d7;}")
                 progress_bar.setFixedHeight(6)
                 main_widget_layout.addWidget(progress_bar)
                 self.stages_dic[stage]['progress_bar'] = progress_bar
 
                 color_frame = QtWidgets.QFrame()
-                color_frame.setFixedSize(8,8)
-                color_frame.setStyleSheet(f"background-color:{ressources._stages_colors_[stage]};border-radius:4px;")
+                color_frame.setFixedSize(8, 8)
+                color_frame.setStyleSheet(
+                    f"background-color:{ressources._stages_colors_[stage]};border-radius:4px;")
                 main_widget_layout.addWidget(color_frame)
 
-        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
 
     def refresh(self):
         stages_rows = project.get_all_stages()
@@ -932,7 +1009,7 @@ class progress_overview_widget(QtWidgets.QFrame):
                 if stage_row['name'] not in stages_progresses_dic.keys():
                     stages_progresses_dic[stage_row['name']] = []
                 if stage_row['name'] in assets_vars._assets_stages_list_:
-                    progress = (stage_row['progress'],1)
+                    progress = (stage_row['progress'], 1)
                 elif stage_row['name'] in assets_vars._sequences_stages_list_:
                     asset_row = project.get_asset_data(stage_row['asset_id'])
                     asset_frames = asset_row['outframe'] - asset_row['inframe']
@@ -950,10 +1027,12 @@ class progress_overview_widget(QtWidgets.QFrame):
         for stage in stages_progresses_dic.keys():
             mean = stats.get_mean(stages_progresses_dic[stage])
             self.stages_dic[stage]['progress_bar'].setValue(int(mean))
-            self.stages_dic[stage]['progress_label'].setText(f"{round(mean, 1)} %")
+            self.stages_dic[stage]['progress_label'].setText(
+                f"{round(mean, 1)} %")
             self.stages_dic[stage]['widget'].setVisible(True)
 
         for domain in domains_progresses_dic.keys():
             mean = stats.get_mean(domains_progresses_dic[domain])
             self.domains_dic[domain]['progress_bar'].setValue(int(mean))
-            self.domains_dic[domain]['progress_label'].setText(f"{round(mean, 1)} %")
+            self.domains_dic[domain]['progress_label'].setText(
+                f"{round(mean, 1)} %")

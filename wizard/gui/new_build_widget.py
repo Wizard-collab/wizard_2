@@ -13,6 +13,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class new_build_widget(QtWidgets.QWidget):
     def __init__(self, build, link, parent=None):
         super(new_build_widget, self).__init__(parent)
@@ -34,11 +35,12 @@ class new_build_widget(QtWidgets.QWidget):
         screenRect = screen.availableGeometry()
         screen_maxX = screenRect.bottomRight().x()
         screen_maxY = screenRect.bottomRight().y()
-        self.move(int((screenRect.x()+screen_maxX-self.width())/2), int((screenRect.y()+screen_maxY-self.height())/2))
+        self.move(int((screenRect.x()+screen_maxX-self.width())/2),
+                  int((screenRect.y()+screen_maxY-self.height())/2))
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(20,20,20,20)
+        self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -53,8 +55,9 @@ class new_build_widget(QtWidgets.QWidget):
 
         self.download_button = QtWidgets.QPushButton('Download')
         self.download_button.setObjectName('blue_button')
-        self.download_button.setIconSize(QtCore.QSize(20,20))
-        self.download_button.setIcon(QtGui.QIcon(ressources._wizard_setup_icon_))
+        self.download_button.setIconSize(QtCore.QSize(20, 20))
+        self.download_button.setIcon(
+            QtGui.QIcon(ressources._wizard_setup_icon_))
         self.main_layout.addWidget(self.download_button)
 
         self.link_label = QtWidgets.QLabel()
@@ -62,19 +65,22 @@ class new_build_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.link_label)
 
         self.ignore_layout = QtWidgets.QHBoxLayout()
-        self.ignore_layout.setContentsMargins(0,0,0,0)
+        self.ignore_layout.setContentsMargins(0, 0, 0, 0)
         self.ignore_layout.setSpacing(0)
         self.main_layout.addLayout(self.ignore_layout)
 
-        self.ignore_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.ignore_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.ignore_checkbox = QtWidgets.QCheckBox('Ignore this alert')
         self.ignore_layout.addWidget(self.ignore_checkbox)
 
     def fill_ui(self):
         self.link_label.setText(self.link)
-        self.build_label.setText(f"Build {self.build['MAJOR']}.{self.build['MINOR']}.{self.build['PATCH']}.{str(self.build['builds']).zfill(4)}")
-        self.ignore_checkbox.setChecked(not user.user().get_show_latest_build())
+        self.build_label.setText(
+            f"Build {self.build['MAJOR']}.{self.build['MINOR']}.{self.build['PATCH']}.{str(self.build['builds']).zfill(4)}")
+        self.ignore_checkbox.setChecked(
+            not user.user().get_show_latest_build())
 
     def download(self):
         webbrowser.open_new_tab(self.link)
@@ -85,4 +91,5 @@ class new_build_widget(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.download_button.clicked.connect(self.download)
-        self.ignore_checkbox.stateChanged.connect(self.modify_ignore_latest_build)
+        self.ignore_checkbox.stateChanged.connect(
+            self.modify_ignore_latest_build)

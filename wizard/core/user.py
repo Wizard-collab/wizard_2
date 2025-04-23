@@ -38,18 +38,13 @@
 
 # Python modules
 import yaml
-import json
 import ast
-import os
 import importlib
 import sys
-import shutil
 import logging
 
 # Wizard modules
 from wizard.vars import user_vars
-from wizard.vars import ressources
-from wizard.core import image
 from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import environment
@@ -61,19 +56,22 @@ from wizard.core import team_client
 
 logger = logging.getLogger(__name__)
 
+
 def create_user_folders():
     path_utils.makedirs(user_vars._script_path_)
     sys.path.append(user_vars._script_path_)
     path_utils.makedirs(user_vars._icons_path_)
 
+
 def init_user_session():
     with open(user_vars._session_file_, 'w') as f:
         f.write('')
+    import session
+
 
 create_user_folders()
 init_user_session()
 
-import session
 
 class user:
     def __init__(self):
@@ -112,7 +110,8 @@ class user:
             logger.warning(f'Please provide a repository name')
             return
         if not tools.is_dbname_safe(repository):
-            logger.warning(f'Please enter a repository name with only lowercase characters, numbers and "_"')
+            logger.warning(
+                f'Please enter a repository name with only lowercase characters, numbers and "_"')
             return
         self.prefs_dic[user_vars._repository_] = repository
         environment.set_repository(self.prefs_dic[user_vars._repository_])
@@ -135,7 +134,8 @@ class user:
             return
         if not team_client.try_connection(self.prefs_dic[user_vars._team_dns_]):
             environment.set_team_dns(self.prefs_dic[user_vars._team_dns_])
-            logger.info(f"Can't reach team server with this DNS : {self.prefs_dic[user_vars._team_dns_]}")
+            logger.info(
+                f"Can't reach team server with this DNS : {self.prefs_dic[user_vars._team_dns_]}")
             return
         environment.set_team_dns(self.prefs_dic[user_vars._team_dns_])
         return 1
@@ -219,14 +219,19 @@ class user:
         if user_vars._recent_work_envs_ not in self.prefs_dic.keys():
             self.prefs_dic[user_vars._recent_work_envs_] = dict()
         if environment.get_project_name() not in self.prefs_dic[user_vars._recent_work_envs_].keys():
-            self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()] = []
+            self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()] = [
+            ]
         while len(self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()]) > 4:
-            self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].pop(0)
-            print(self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()])
+            self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].pop(
+                0)
+            print(self.prefs_dic[user_vars._recent_work_envs_]
+                  [environment.get_project_name()])
         for existing_tuple in self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()]:
             if work_env_tuple[0] == existing_tuple[0]:
-                self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].remove(existing_tuple)
-        self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].append(work_env_tuple)
+                self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].remove(
+                    existing_tuple)
+        self.prefs_dic[user_vars._recent_work_envs_][environment.get_project_name()].append(
+            work_env_tuple)
         self.write_prefs_dic()
 
     def get_recent_scenes(self):
@@ -362,10 +367,10 @@ class user:
             f.write(script)
         try:
             if not analyze_module(script,
-                                    forbidden_modules=['wizard.core.game'],
-                                    ignore_nest=['wizard.core.assets',
-                                                'wapi',
-                                                'wizard.core.project']):
+                                  forbidden_modules=['wizard.core.game'],
+                                  ignore_nest=['wizard.core.assets',
+                                               'wapi',
+                                               'wizard.core.project']):
                 logger.info("Skipping script execution")
                 return
             importlib.reload(session)
@@ -381,6 +386,7 @@ class user:
         with open(file, 'r') as f:
             data = f.read()
         self.execute_session(data)
+
 
 def analyze_module(script, forbidden_modules, ignore_nest=[]):
     # Use a set to store all dependencies, including nested ones
@@ -419,9 +425,11 @@ def analyze_module(script, forbidden_modules, ignore_nest=[]):
     authorized = 1
     for module_name in forbidden_modules:
         if module_name in all_dependencies:
-            logger.error(f"You are trying to use a forbidden module : {module_name}")
+            logger.error(
+                f"You are trying to use a forbidden module : {module_name}")
             authorized = 0
     return authorized
+
 
 def log_user(user_name, password):
     if user_name not in repository.get_user_names_list():
@@ -429,7 +437,7 @@ def log_user(user_name, password):
         return
     user_row = repository.get_user_row_by_name(user_name)
     if not tools.decrypt_string(user_row['pass'],
-                            password):
+                                password):
         logger.warning(f'Wrong password for {user_name}')
         return
     repository.update_current_ip_data('user_id', user_row['id'])
@@ -437,9 +445,11 @@ def log_user(user_name, password):
     logger.info(f'{user_name} signed in')
     return 1
 
+
 def disconnect_user():
     repository.update_current_ip_data('user_id', None)
     logger.info('You are now disconnected')
+
 
 def get_user():
     user_id = repository.get_current_ip_data('user_id')
@@ -448,23 +458,26 @@ def get_user():
     environment.build_user_env(user_row=repository.get_user_data(user_id))
     return 1
 
+
 def log_project(project_name, password, wait_for_restart=False):
     if project_name not in repository.get_projects_names_list():
         logger.error(f"{project_name} doesn't exists")
         return
     project_row = repository.get_project_row_by_name(project_name)
     if not tools.decrypt_string(project_row['project_password'],
-                            password):
+                                password):
         logger.warning(f'Wrong password for {project_name}')
         return
     repository.update_current_ip_data('project_id', project_row['id'])
     logger.info(f'Successfully signed in {project_name} project')
     if not wait_for_restart:
-        environment.build_project_env(project_name, project_row['project_path'])
+        environment.build_project_env(
+            project_name, project_row['project_path'])
         db_utils.modify_db_name('project', project_name)
         project.add_user(repository.get_user_row_by_name(environment.get_user(),
-                                                        'id'))
+                                                         'id'))
     return 1
+
 
 def log_project_without_cred(project_name):
     if project_name not in repository.get_projects_names_list():
@@ -476,18 +489,20 @@ def log_project_without_cred(project_name):
     db_utils.modify_db_name('project', project_name)
     logger.info(f'Successfully signed in {project_name} project')
     project.add_user(repository.get_user_row_by_name(environment.get_user(),
-                                                        'id'))
+                                                     'id'))
     return 1
+
 
 def disconnect_project():
     repository.update_current_ip_data('project_id', None)
     logger.info('Successfully disconnect from project')
 
+
 def get_project():
     project_id = repository.get_current_ip_data('project_id')
     if not project_id:
         return
-    project_row = repository.get_project_row(project_id) 
+    project_row = repository.get_project_row(project_id)
     environment.build_project_env(project_name=project_row['project_name'],
-                                    project_path=project_row['project_path'])
+                                  project_path=project_row['project_path'])
     return 1

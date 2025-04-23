@@ -3,10 +3,9 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtCore, QtGui
 from PyQt6.QtCore import pyqtSignal
 import logging
-import re
 
 # Wizard core modules
 from wizard.core import repository
@@ -18,6 +17,7 @@ from wizard.vars import ressources
 from wizard.gui import gui_utils
 
 logger = logging.getLogger(__name__)
+
 
 class tags_widget(gui_utils.QMenu):
 
@@ -35,7 +35,7 @@ class tags_widget(gui_utils.QMenu):
         if key == QtCore.Qt.Key.Key_Up or key == QtCore.Qt.Key.Key_Down or key == QtCore.Qt.Key.Key_Return or key == QtCore.Qt.Key.Key_Enter:
             super().keyPressEvent(event)
         else:
-            self.close() 
+            self.close()
             self.other_key_pressed.emit(event)
 
     def execute(self):
@@ -60,22 +60,24 @@ class tags_widget(gui_utils.QMenu):
         if token.startswith('@'):
             token = token[1:]
             if token in 'all':
-                action = self.addAction(QtGui.QIcon(ressources._guess_icon_), "all")
+                action = self.addAction(QtGui.QIcon(
+                    ressources._guess_icon_), "all")
                 self.addSeparator()
                 self.actions.append(action)
             for user_id in project.get_users_ids_list():
                 user_row = repository.get_user_data(user_id)
                 if token in user_row['user_name']:
                     icon = QtGui.QIcon()
-                    pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(user_row['profile_picture']), 'png', 24)
+                    pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(
+                        user_row['profile_picture']), 'png', 24)
                     icon.addPixmap(pm)
                     action = self.addAction(icon, f"{user_row['user_name']}")
                     self.actions.append(action)
             self.addSeparator()
             for tag_group_name in project.get_all_tag_groups('name'):
                 if token in tag_group_name:
-                    action = self.addAction(QtGui.QIcon(ressources._tag_icon_), tag_group_name)
+                    action = self.addAction(QtGui.QIcon(
+                        ressources._tag_icon_), tag_group_name)
                     self.actions.append(action)
             if len(self.actions) > 0:
                 self.setActiveAction(self.actions[0])
-

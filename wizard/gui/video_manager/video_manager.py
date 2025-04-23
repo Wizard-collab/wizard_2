@@ -4,7 +4,6 @@
 
 # Python modules
 from PyQt6 import QtWidgets, QtGui, QtCore
-from PyQt6.QtCore import pyqtSignal
 import logging
 
 # Wizard core modules
@@ -23,12 +22,16 @@ from wizard.gui import asset_tracking_widget
 
 logger = logging.getLogger(__name__)
 
+
 class Singleton(type):
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
 
 class video_player_instances(metaclass=Singleton):
     def __init__(self, parent=None):
@@ -41,6 +44,7 @@ class video_player_instances(metaclass=Singleton):
         instance_id = instance.player_id
         self.players_dic[instance_id] = instance
         return instance
+
 
 class video_manager(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -58,17 +62,23 @@ class video_manager(QtWidgets.QWidget):
 
     def connect_functions(self):
         self.video_browser.add_videos.connect(self.add_videos)
-        self.video_browser.create_playlist_and_add_videos.connect(self.clear_and_add_videos)
-        self.video_player.current_stage.connect(self.asset_tracking_widget.change_stage)
-        self.video_player.current_video_row.connect(self.video_history_widget.change_video_row)
-        self.video_history_widget.replace_current_video.connect(self.video_player.replace_current_video)
-        self.playlist_browser.load_playlist.connect(self.video_player.load_playlist)
+        self.video_browser.create_playlist_and_add_videos.connect(
+            self.clear_and_add_videos)
+        self.video_player.current_stage.connect(
+            self.asset_tracking_widget.change_stage)
+        self.video_player.current_video_row.connect(
+            self.video_history_widget.change_video_row)
+        self.video_history_widget.replace_current_video.connect(
+            self.video_player.replace_current_video)
+        self.playlist_browser.load_playlist.connect(
+            self.video_player.load_playlist)
 
     def add_videos(self, video_tuples):
         if len(video_tuples) == 0:
             return
         for video_tuple in video_tuples:
-            self.video_player.add_video(video_file=video_tuple[0], project_video_id=video_tuple[1])
+            self.video_player.add_video(
+                video_file=video_tuple[0], project_video_id=video_tuple[1])
         self.video_player.update_concat()
 
     def clear_and_add_videos(self, video_tuples):
@@ -86,7 +96,8 @@ class video_manager(QtWidgets.QWidget):
                 video_rows = project.get_videos(variant_id)
                 if len(video_rows) == 0:
                     continue
-                video_tuples.append((video_rows[-1]['file_path'], video_rows[-1]['id']))
+                video_tuples.append(
+                    (video_rows[-1]['file_path'], video_rows[-1]['id']))
         if len(video_tuples) == 0:
             logger.warning("No videos found")
         self.show()
@@ -108,7 +119,7 @@ class video_manager(QtWidgets.QWidget):
         self.video_player.get_context()
         self.video_browser.get_context()
         self.playlist_browser.get_context()
-        
+
         context_dic = user.user().get_context(user_vars._video_manager_context_)
         if context_dic is None:
             return
@@ -145,23 +156,26 @@ class video_manager(QtWidgets.QWidget):
             self.raise_()
 
     def build_ui(self):
-        self.resize(1280,720)
+        self.resize(1280, 720)
         self.setObjectName('main_widget')
         self.main_layout = QtWidgets.QHBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(1)
         self.setLayout(self.main_layout)
 
         self.content_widget = gui_utils.QSplitter()
-        self.content_widget.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.content_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
         self.main_layout.addWidget(self.content_widget)
 
         self.tabs_widget = QtWidgets.QTabWidget()
-        self.tabs_widget.setIconSize(QtCore.QSize(16,16))
+        self.tabs_widget.setIconSize(QtCore.QSize(16, 16))
         self.content_widget.addWidget(self.tabs_widget)
 
-        self.tabs_widget.addTab(self.video_browser, QtGui.QIcon(ressources._videos_icon_), "Videos")
-        self.tabs_widget.addTab(self.playlist_browser, QtGui.QIcon(ressources._playlist_icon_), "Playlists")
+        self.tabs_widget.addTab(self.video_browser, QtGui.QIcon(
+            ressources._videos_icon_), "Videos")
+        self.tabs_widget.addTab(self.playlist_browser, QtGui.QIcon(
+            ressources._playlist_icon_), "Playlists")
 
         self.video_player = video_player_instances().get_instance(self)
         self.content_widget.addWidget(self.video_player)

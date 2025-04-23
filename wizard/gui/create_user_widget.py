@@ -16,6 +16,7 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+
 class create_user_widget(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(create_user_widget, self).__init__()
@@ -35,14 +36,15 @@ class create_user_widget(QtWidgets.QDialog):
         self.main_layout.setSpacing(4)
         self.setLayout(self.main_layout)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,12,QtWidgets.QSizePolicy.Policy.Expanding,
-                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100, 12, QtWidgets.QSizePolicy.Policy.Expanding,
+                                               QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.title_label = QtWidgets.QLabel("Create user")
         self.title_label.setObjectName("title_label_2")
         self.main_layout.addWidget(self.title_label)
-        self.spaceItem = QtWidgets.QSpacerItem(0,12,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            0, 12, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Credentials")
@@ -64,48 +66,50 @@ class create_user_widget(QtWidgets.QDialog):
         self.email_lineEdit.setPlaceholderText('User Email')
         self.main_layout.addWidget(self.email_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Policy.Fixed,
-                                                    QtWidgets.QSizePolicy.Policy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Policy.Fixed,
+                                               QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.credentials_label = QtWidgets.QLabel("Profile picture")
         self.main_layout.addWidget(self.credentials_label)
 
         self.profile_picture_button = QtWidgets.QPushButton()
-        self.profile_picture_button.setFixedSize(60,60)
+        self.profile_picture_button.setFixedSize(60, 60)
         self.profile_picture_button.setStyleSheet('border-radius:30px;')
-        self.profile_picture_button.setIconSize(QtCore.QSize(54,54))
+        self.profile_picture_button.setIconSize(QtCore.QSize(54, 54))
         self.main_layout.addWidget(self.profile_picture_button)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding,
-                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100, 25, QtWidgets.QSizePolicy.Policy.Expanding,
+                                               QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.championship_label = QtWidgets.QLabel("Championship")
         self.main_layout.addWidget(self.championship_label)
 
-        self.championship_participation = QtWidgets.QCheckBox('Championship participation')
+        self.championship_participation = QtWidgets.QCheckBox(
+            'Championship participation')
         self.championship_participation.setObjectName('android_checkbox')
         self.main_layout.addWidget(self.championship_participation)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,20,QtWidgets.QSizePolicy.Policy.Fixed,
-                                                    QtWidgets.QSizePolicy.Policy.Fixed)
+        self.spaceItem = QtWidgets.QSpacerItem(100, 20, QtWidgets.QSizePolicy.Policy.Fixed,
+                                               QtWidgets.QSizePolicy.Policy.Fixed)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.admin_label = QtWidgets.QLabel("The section below is optional")
         self.main_layout.addWidget(self.admin_label)
 
         self.admin_password_lineEdit = gui_utils.password_lineEdit()
-        self.admin_password_lineEdit.setPlaceholderText('Administrator Password')
+        self.admin_password_lineEdit.setPlaceholderText(
+            'Administrator Password')
         self.main_layout.addWidget(self.admin_password_lineEdit)
 
-        self.spaceItem = QtWidgets.QSpacerItem(100,25,QtWidgets.QSizePolicy.Policy.Expanding,
-                                                    QtWidgets.QSizePolicy.Policy.MinimumExpanding)
+        self.spaceItem = QtWidgets.QSpacerItem(100, 25, QtWidgets.QSizePolicy.Policy.Expanding,
+                                               QtWidgets.QSizePolicy.Policy.MinimumExpanding)
         self.main_layout.addSpacerItem(self.spaceItem)
 
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
-        self.buttons_layout.setContentsMargins(0,0,0,0)
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.buttons_layout.setSpacing(4)
         self.buttons_widget.setLayout(self.buttons_layout)
         self.main_layout.addWidget(self.buttons_widget)
@@ -123,8 +127,10 @@ class create_user_widget(QtWidgets.QDialog):
     def connect_functions(self):
         self.quit_button.clicked.connect(self.reject)
         self.sign_up_button.clicked.connect(self.apply)
-        self.profile_picture_button.clicked.connect(self.update_profile_picture)
-        self.user_name_lineEdit.textChanged.connect(lambda:self.get_random_profile_picture(force=0))
+        self.profile_picture_button.clicked.connect(
+            self.update_profile_picture)
+        self.user_name_lineEdit.textChanged.connect(
+            lambda: self.get_random_profile_picture(force=0))
 
     def apply(self):
         user_name = self.user_name_lineEdit.text()
@@ -135,11 +141,11 @@ class create_user_widget(QtWidgets.QDialog):
         championship_participation = self.championship_participation.isChecked()
         if confirm_password == password:
             if repository.create_user(user_name,
-                                    password,
-                                    email,
-                                    admin_password,
-                                    self.image_file,
-                                    championship_participation):
+                                      password,
+                                      email,
+                                      admin_password,
+                                      self.image_file,
+                                      championship_participation):
                 self.accept()
         else:
             logger.warning("User passwords doesn't matches")
@@ -155,13 +161,14 @@ class create_user_widget(QtWidgets.QDialog):
 
     def update_profile_button(self):
         icon = QtGui.QIcon()
-        pm = gui_utils.mask_image(image.convert_image_to_bytes(self.image_file), 'png', 54)
+        pm = gui_utils.mask_image(
+            image.convert_image_to_bytes(self.image_file), 'png', 54)
         icon.addPixmap(pm)
         self.profile_picture_button.setIcon(icon)
 
     def update_profile_picture(self):
         image_file, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select profile picture", "",
-                            "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
+                                                              "All Files (*);;Images Files (*.png);;Images Files (*.jpg);;Images Files (*.jpeg)")
         if image_file:
             extension = image_file.split('.')[-1].upper()
             if (extension == 'PNG') or (extension == 'JPG') or (extension == 'JPEG'):
@@ -169,6 +176,5 @@ class create_user_widget(QtWidgets.QDialog):
                 self.use_image_file = 1
                 self.update_profile_button()
             else:
-                logger.warning('{} is not a valid image file...'.format(image_file))
-
-
+                logger.warning(
+                    '{} is not a valid image file...'.format(image_file))

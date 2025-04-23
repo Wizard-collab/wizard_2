@@ -3,12 +3,11 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtGui
 import os
 import logging
 
 # Wizard gui modules
-from wizard.gui import gui_utils
 from wizard.gui import custom_tab_widget
 from wizard.gui import softwares_preferences_widget
 from wizard.gui import project_general_preferences_widget
@@ -19,13 +18,9 @@ from wizard.gui import project_users_widget
 
 # Wizard modules
 from wizard.vars import ressources
-from wizard.core import application
-from wizard.core import user
-from wizard.core import repository
-from wizard.core import environment
-from wizard.core import image
 
 logger = logging.getLogger(__name__)
+
 
 class project_preferences_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -66,9 +61,9 @@ class project_preferences_widget(QtWidgets.QWidget):
             self.project_users_widget.refresh()
 
     def build_ui(self):
-        self.resize(600,800)
+        self.resize(600, 800)
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(6)
         self.setLayout(self.main_layout)
 
@@ -76,21 +71,20 @@ class project_preferences_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.tabs_widget)
 
         self.general_tab_index = self.tabs_widget.addTab(self.project_general_preferences_widget,
-                                                            'General',
-                                                            QtGui.QIcon(ressources._settings_icon_))
+                                                         'General',
+                                                         QtGui.QIcon(ressources._settings_icon_))
         self.softwares_tab_index = self.tabs_widget.addTab(self.softwares_preferences_widget,
-                                                            'Softwares',
-                                                            QtGui.QIcon(ressources._plug_icon_))
+                                                           'Softwares',
+                                                           QtGui.QIcon(ressources._plug_icon_))
         self.exports_tab_index = self.tabs_widget.addTab(self.export_preferences_widget,
-                                                            'Exports',
-                                                            QtGui.QIcon(ressources._exports_icon_))
+                                                         'Exports',
+                                                         QtGui.QIcon(ressources._exports_icon_))
         self.hooks_tab_index = self.tabs_widget.addTab(self.project_hooks_widget,
-                                                            'Hooks',
-                                                            QtGui.QIcon(ressources._hook_icon_))
+                                                       'Hooks',
+                                                       QtGui.QIcon(ressources._hook_icon_))
         self.security_tab_index = self.tabs_widget.addTab(self.project_security_widget,
-                                                            'Security',
-                                                            QtGui.QIcon(ressources._lock_icons_[1]))
+                                                          'Security',
+                                                          QtGui.QIcon(ressources._lock_icons_[1]))
         self.users_tab_index = self.tabs_widget.addTab(self.project_users_widget,
-                                                            'Users',
-                                                            QtGui.QIcon(ressources._user_icon_))
-
+                                                       'Users',
+                                                       QtGui.QIcon(ressources._user_icon_))

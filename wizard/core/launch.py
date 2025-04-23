@@ -32,7 +32,7 @@
 # call
 
 # If no file is found for the given version id
-# it launches the software without a file but 
+# it launches the software without a file but
 # with the correct environment in order to save
 # a version later within the software
 
@@ -42,7 +42,6 @@ import subprocess
 import shlex
 import json
 import traceback
-import copy
 import time
 from threading import Thread
 import logging
@@ -61,6 +60,7 @@ from wizard.gui import gui_server
 
 logger = logging.getLogger(__name__)
 
+
 def launch_work_version(version_id):
     signal_dic = dict()
     signal_dic['function'] = 'launch'
@@ -69,6 +69,7 @@ def launch_work_version(version_id):
                                     environment.get_softwares_server_port()),
                                     signal_dic,
                                     timeout=0.5)
+
 
 def kill(work_env_id):
     signal_dic = dict()
@@ -79,6 +80,7 @@ def kill(work_env_id):
                                     signal_dic,
                                     timeout=100)
 
+
 def kill_all():
     signal_dic = dict()
     signal_dic['function'] = 'kill_all'
@@ -86,6 +88,7 @@ def kill_all():
                                     environment.get_softwares_server_port()),
                                     signal_dic,
                                     timeout=100)
+
 
 def died(work_env_id):
     signal_dic = dict()
@@ -96,6 +99,7 @@ def died(work_env_id):
                                     signal_dic,
                                     timeout=0.5)
 
+
 def get():
     signal_dic = dict()
     signal_dic['function'] = 'get'
@@ -104,8 +108,10 @@ def get():
                                     signal_dic,
                                     timeout=0.5)
 
+
 def core_kill_software_thread(software_thread):
     return software_thread.kill()
+
 
 def core_launch_version(version_id):
     work_version_row = project.get_version_data(version_id)
@@ -121,20 +127,22 @@ def core_launch_version(version_id):
     software_row = project.get_software_data(software_id)
     command = build_command(file_path, software_row, version_id)
     env = build_env(work_env_id, software_row, version_id)
-    if not command :
+    if not command:
         return None, None
     thread = software_thread(command,
-                                env,
-                                software_row['name'],
-                                work_env_id)
+                             env,
+                             software_row['name'],
+                             work_env_id)
     thread.start()
     logger.info(f"{software_row['name']} launched")
     return thread, work_env_id
 
+
 def build_command(file_path, software_row, version_id):
     software_path = software_row['path']
     if not os.path.isfile(software_path):
-        logger.warning(f"{software_row['name']} not found ( {software_path} does not exists )")
+        logger.warning(
+            f"{software_row['name']} not found ( {software_path} does not exists )")
         return
     if software_path == '':
         logger.warning(f"{software_row['name']} path not defined")
@@ -145,24 +153,27 @@ def build_command(file_path, software_row, version_id):
         raw_command = software_row['no_file_command']
         logger.info("File not existing, launching software with empty scene")
 
-    raw_command = raw_command.replace(softwares_vars._executable_key_, software_path)
+    raw_command = raw_command.replace(
+        softwares_vars._executable_key_, software_path)
     raw_command = raw_command.replace(softwares_vars._file_key_, file_path)
 
     # Substance Painter specific launch
     if software_row['name'] == softwares_vars._substance_painter_:
         work_env_id = project.get_version_data(version_id, 'work_env_id')
-        references_dic = assets.get_references_files(work_env_id) 
+        references_dic = assets.get_references_files(work_env_id)
         if 'modeling' in references_dic.keys():
             reference_file = references_dic['modeling'][0]['files'][0]
             raw_command = raw_command.replace(softwares_vars._reference_key_,
-                                                reference_file.replace('\\', '/'))
+                                              reference_file.replace('\\', '/'))
         else:
-            logger.warning('Please create ONE modeling reference to launch Substance Painter')
+            logger.warning(
+                'Please create ONE modeling reference to launch Substance Painter')
 
     if software_row['name'] in softwares_vars._scripts_dic_.keys():
         raw_command = raw_command.replace(softwares_vars._script_key_,
-                            softwares_vars._scripts_dic_[software_row['name']])
+                                          softwares_vars._scripts_dic_[software_row['name']])
     return raw_command
+
 
 def build_env(work_env_id, software_row, version_id, mode='gui'):
     # Building the default software environment for wizard workflow
@@ -182,12 +193,15 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     env['wizard_asset_name'] = str(asset_row['name'])
     env['wizard_category_name'] = str(category_row['name'])
 
-    env[softwares_vars._script_env_dic_[software_row['name']]] = softwares_vars._main_script_path_
-    env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + project.get_hooks_folder()
+    env[softwares_vars._script_env_dic_[software_row['name']]
+        ] = softwares_vars._main_script_path_
+    env[softwares_vars._script_env_dic_[software_row['name']]
+        ] += os.pathsep + project.get_hooks_folder()
 
     # Substance Painter specific env
     if software_row['name'] == softwares_vars._substance_painter_:
-        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep + softwares_vars._plugins_path_[software_row['name']]
+        env[softwares_vars._script_env_dic_[software_row['name']]
+            ] += os.pathsep + softwares_vars._plugins_path_[software_row['name']]
 
     # Houdini specific env
     if software_row['name'] == softwares_vars._houdini_:
@@ -196,7 +210,8 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     # Nuke specific env
     if software_row['name'] == softwares_vars._nuke_:
         if 'NUKE_PATH' in env.keys():
-            env['NUKE_PATH'] += os.pathsep + softwares_vars._plugins_path_[software_row['name']]
+            env['NUKE_PATH'] += os.pathsep + \
+                softwares_vars._plugins_path_[software_row['name']]
 
     if software_row['name'] == softwares_vars._maya_:
         if 'OCIO' in env.keys():
@@ -205,7 +220,8 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     # Getting the project software additionnal environment
     additionnal_script_paths = []
     if software_row['additionnal_scripts']:
-        additionnal_script_paths = json.loads(software_row['additionnal_scripts'])
+        additionnal_script_paths = json.loads(
+            software_row['additionnal_scripts'])
     additionnal_env = dict()
     if software_row['additionnal_env']:
         additionnal_env = json.loads(software_row['additionnal_env'])
@@ -215,7 +231,8 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     if type(additionnal_script_paths) == str:
         additionnal_script_paths = additionnal_script_paths.split('\n')
     for script_path in additionnal_script_paths:
-        env[softwares_vars._script_env_dic_[software_row['name']]] += os.pathsep+script_path
+        env[softwares_vars._script_env_dic_[
+            software_row['name']]] += os.pathsep+script_path
 
     for key in additionnal_env.keys():
         if key in env.keys():
@@ -229,7 +246,7 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
             if 'Wizard/_internal' in path:
                 python_path_list.remove(path)
         env['PYTHONPATH'] = (';').join(python_path_list)
-    
+
     '''
     if software_row['name'] == 'blender':
         import PyQt6
@@ -250,10 +267,12 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
 
     return env
 
+
 class software_thread(Thread):
     ''' A thread that runs until the given software process is active
     When the software process is exited, the thread is deleted
     '''
+
     def __init__(self, command, env, software, work_env_id):
         super(software_thread, self).__init__()
         self.command = command
@@ -265,7 +284,8 @@ class software_thread(Thread):
         print(self.command)
 
     def run(self):
-        self.process = subprocess.Popen(args = shlex.split(self.command), env=self.env, cwd=path_utils.abspath('softwares'))
+        self.process = subprocess.Popen(args=shlex.split(
+            self.command), env=self.env, cwd=path_utils.abspath('softwares'))
         self.process.wait()
         died(self.work_env_id)
         if not self.killed:
@@ -287,10 +307,12 @@ class software_thread(Thread):
         logger.info(f"{self.software} killed")
         return 1
 
+
 class softwares_server(Thread):
     ''' A "server" thread that manage softwares processes
     It permits to launch and kill software subprocesses
     '''
+
     def __init__(self):
         super(softwares_server, self).__init__()
         self.port = socket_utils.get_port('localhost')
@@ -343,7 +365,8 @@ class softwares_server(Thread):
         if not work_env_id:
             return
         if work_env_id in self.software_threads_dic.keys():
-            logger.warning(f"You are already running a work instance of this asset")
+            logger.warning(
+                f"You are already running a work instance of this asset")
             return
         software_thread, work_env_id = core_launch_version(version_id)
         if software_thread is not None:
