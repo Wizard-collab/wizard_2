@@ -18,6 +18,7 @@ import substance_painter.logging as logging
 # Wizard modules
 from substance_painter_wizard import wizard_tools
 
+
 def init_project(mesh_file, template_file):
     ogl_normal_map_format = substance_painter.project.NormalMapFormat.OpenGL
     per_vertex_tangent = substance_painter.project.TangentSpace.PerVertex
@@ -30,9 +31,10 @@ def init_project(mesh_file, template_file):
         project_workflow=workflow)
 
     substance_painter.project.create(
-        mesh_file_path = mesh_file,
-        settings = project_settings,
+        mesh_file_path=mesh_file,
+        settings=project_settings,
         template_file_path=template_file)
+
 
 def on_mesh_reload(status: substance_painter.project.ReloadMeshStatus):
     import substance_painter.project
@@ -40,6 +42,7 @@ def on_mesh_reload(status: substance_painter.project.ReloadMeshStatus):
         logging.info("The mesh was reloaded successfully.")
     else:
         logging.error("The mesh couldn't be reloaded.")
+
 
 def update_mesh(mesh_file):
     mesh_reloading_settings = substance_painter.project.MeshReloadingSettings(
@@ -51,9 +54,11 @@ def update_mesh(mesh_file):
         mesh_reloading_settings,
         on_mesh_reload)
 
+
 def invoke_init_project_widget(mesh_file):
     widget = init_project_widget(mesh_file)
     widget.exec()
+
 
 class init_project_widget(QtWidgets.QDialog):
     def __init__(self, mesh_file):

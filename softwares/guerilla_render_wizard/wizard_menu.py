@@ -5,7 +5,6 @@
 # Python modules
 import os
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 from guerilla_render_wizard import wizard_plugin
@@ -13,6 +12,9 @@ from guerilla_render_wizard import wizard_render
 
 # Guerilla modules
 from guerilla import command
+
+logger = logging.getLogger(__name__)
+
 
 class menu():
     class save_increment(command):
@@ -187,14 +189,13 @@ class menu():
 
     cmd = save_increment('Save', 'icons/save_increment.png')
     cmd.install('Wizard')
-    
+
     if os.environ['wizard_stage_name'] not in ['rendering']:
         cmd = export_data('Export data', 'icons/export.png')
         cmd.install('Wizard')
 
-
     if os.environ['wizard_stage_name'] in ['shading', 'lighting', 'rendering']:
-        command.addseparator ('Wizard')
+        command.addseparator('Wizard')
         cmd = setup_render_FML('Setup render FML', 'icons/export.png')
         cmd.install('Wizard', 'Rendering')
         cmd = setup_render_LD('Setup render LD', 'icons/export.png')
@@ -202,7 +203,7 @@ class menu():
         cmd = setup_render_HD('Setup render HD', 'icons/export.png')
         cmd.install('Wizard', 'Rendering')
 
-    command.addseparator ('Wizard')
+    command.addseparator('Wizard')
     cmd = import_and_update_all('Import and update all', 'icons/all.png')
     cmd.install('Wizard')
     cmd = import_all('Import all', 'icons/all.png')
@@ -253,12 +254,13 @@ class menu():
     cmd.install('Wizard', ' Update')
     cmd = update_lighting('Update lighting', 'icons/lighting.png')
     cmd.install('Wizard', ' Update')
-    command.addseparator ('Wizard')
+    command.addseparator('Wizard')
     cmd = set_image_format('Set image size', 'icons/set_image_size.png')
     cmd.install('Wizard')
     cmd = set_frame_rate('Set frame rate', 'icons/set_frame_rate.png')
     cmd.install('Wizard')
     cmd = set_frame_range('Set frame range', 'icons/set_frame_range.png')
     cmd.install('Wizard')
-    cmd = set_frame_range_with_rolls('Set frame range with rolls', 'icons/set_frame_range.png')
+    cmd = set_frame_range_with_rolls(
+        'Set frame range with rolls', 'icons/set_frame_range.png')
     cmd.install('Wizard')

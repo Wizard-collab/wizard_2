@@ -5,7 +5,6 @@
 # Python modules
 import os
 import logging
-logger = logging.getLogger(__name__)
 
 # Blender modules
 import bpy
@@ -14,6 +13,9 @@ import bpy
 import wizard_communicate
 from blender_wizard import wizard_tools
 
+logger = logging.getLogger(__name__)
+
+
 def invoke_settings_widget(*args):
     from wizard_widgets import video_settings_widget
     video_settings_widget_win = video_settings_widget.video_settings_widget()
@@ -21,6 +23,7 @@ def invoke_settings_widget(*args):
         frange = video_settings_widget_win.frange
         nspace_list = video_settings_widget_win.nspace_list
         create_videos(frange, nspace_list)
+
 
 def create_videos(frange, nspace_list, comment=''):
     if nspace_list == []:
@@ -37,13 +40,17 @@ def create_videos(frange, nspace_list, comment=''):
             return
         create_video(frange, camera, comment=comment)
 
+
 def create_video(frange, camera, comment=''):
-    directory = wizard_communicate.request_video(int(os.environ['wizard_work_env_id']))
+    directory = wizard_communicate.request_video(
+        int(os.environ['wizard_work_env_id']))
     logger.info("Playblasting at {}...".format(directory))
     bpy.context.scene.camera = camera
     playblast(directory, frange)
     focal_lengths_dic = get_focal_length(frange, camera)
-    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(os.environ['wizard_version_id']), focal_lengths_dic=focal_lengths_dic, comment=comment)
+    wizard_communicate.add_video(int(os.environ['wizard_work_env_id']), directory, frange, int(
+        os.environ['wizard_version_id']), focal_lengths_dic=focal_lengths_dic, comment=comment)
+
 
 def get_focal_length(frange, camera):
     focal_lengths_dic = dict()
@@ -51,6 +58,7 @@ def get_focal_length(frange, camera):
         bpy.context.scene.frame_set(frame)
         focal_lengths_dic[frame] = round(camera.data.lens, 1)
     return focal_lengths_dic
+
 
 def playblast(directory, frange):
     bpy.context.scene.render.engine = 'BLENDER_WORKBENCH'
@@ -65,11 +73,13 @@ def playblast(directory, frange):
     bpy.context.scene.frame_end = frange[1]
     bpy.ops.render.render(animation=True)
 
+
 def select_cam(camrig_nspace):
     if not is_referenced(camrig_nspace):
         return
     namespace_collection = bpy.data.collections[camrig_nspace]
-    render_set_collection = wizard_tools.get_render_set_collection(namespace_collection)
+    render_set_collection = wizard_tools.get_render_set_collection(
+        namespace_collection)
     if not render_set_collection:
         logger.warning("{}/render_set not found".format(camrig_nspace))
         return
@@ -79,9 +89,11 @@ def select_cam(camrig_nspace):
         logger.warning("{} is empty".format(render_set_collection))
         return
     if len(cameras) > 1:
-        logger.warning("More than one camera found in {}, skipping".format(render_set_collection))
+        logger.warning("More than one camera found in {}, skipping".format(
+            render_set_collection))
         return
     return cameras[0]
+
 
 def is_referenced(camrig_nspace):
     if not wizard_tools.namespace_exists(camrig_nspace):
@@ -89,15 +101,18 @@ def is_referenced(camrig_nspace):
         return
     return 1
 
+
 def select_default_cam():
     default_camera = None
     for obj in bpy.context.scene.objects:
         if obj.type == 'CAMERA':
-            logger.info(f"No namespace given, creating video trough {default_camera}")
+            logger.info(
+                f"No namespace given, creating video trough {default_camera}")
             return obj
 
     for collection in bpy.data.collections:
         for obj in collection.objects:
             if obj.type == 'CAMERA' and obj.name not in camera_names:
-                logger.info(f"No namespace given, creating video trough {default_camera}")
+                logger.info(
+                    f"No namespace given, creating video trough {default_camera}")
                 return obj

@@ -4,13 +4,15 @@
 import os
 
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 from guerilla_render_wizard import wizard_tools
 
 # Guerilla render modules
 from guerilla import Document, Modifier, pynode, Node, Plug
+
+logger = logging.getLogger(__name__)
+
 
 def add_yeti_fur(namespace, referenced_stage_name, file):
     GRP = wizard_tools.add_GRP(referenced_stage_name.upper())
@@ -21,11 +23,13 @@ def add_yeti_fur(namespace, referenced_stage_name, file):
         if node_name not in wizard_tools.get_all_nodes():
             yeti_node = mod.createnode(node_name, "Yeti", namespace_GRP)
             yeti_node.HierarchyMode.set(2)
-            tags = wizard_tools.get_tags_for_yeti_or_vdb_node(namespace, fur_name)
+            tags = wizard_tools.get_tags_for_yeti_or_vdb_node(
+                namespace, fur_name)
             yeti_node.Membership.set((',').join(tags))
         else:
             yeti_node = wizard_tools.get_node_from_name(node_name)
         yeti_node.File.set(file)
+
 
 def after_scene_openning(stage_name, string_asset):
     ''' This function is triggered
@@ -39,7 +43,8 @@ def after_scene_openning(stage_name, string_asset):
 
         The "scene_path" argument is the scene path, 
         if there is no scene, it will be 'None' '''
-    pass    
+    pass
+
 
 def after_save(stage_name, string_asset, scene_path):
     ''' This function is triggered
@@ -53,14 +58,15 @@ def after_save(stage_name, string_asset, scene_path):
 
         The "scene_path" argument is the saved 
         incremental file'''
-    pass        
+    pass
+
 
 def sanity(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
         before the export and will stop the
         export process if the returned data is 
         "False"
-        
+
         The "stage_name" argument is the name
         of the exported stage
 
@@ -70,6 +76,7 @@ def sanity(stage_name, string_asset, exported_string_asset):
         The "exported_string_asset" argument is the
         asset wizard will export represented as string'''
     return True
+
 
 def before_export(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -88,6 +95,7 @@ def before_export(stage_name, string_asset, exported_string_asset):
         asset wizard will export represented as string'''
     return []
 
+
 def after_export(stage_name, export_dir, string_asset, exported_string_asset):
     ''' This function is triggered
         after the export
@@ -105,13 +113,14 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
         asset wizard just exported represented as string'''
     pass
 
-def after_reference(stage_name, 
-                        referenced_stage_name, 
-                        referenced_files_dir,
-                        namespace, 
-                        new_objects,
-                        string_asset,
-                        referenced_string_asset):
+
+def after_reference(stage_name,
+                    referenced_stage_name,
+                    referenced_files_dir,
+                    namespace,
+                    new_objects,
+                    string_asset,
+                    referenced_string_asset):
     ''' This function is triggered
         after referencing from wizard
 
@@ -137,4 +146,5 @@ def after_reference(stage_name,
     if referenced_stage_name == 'grooming':
         for file in os.listdir(referenced_files_dir):
             if file.endswith('.fur'):
-                add_yeti_fur(namespace, referenced_stage_name, os.path.join(referenced_files_dir, file))
+                add_yeti_fur(namespace, referenced_stage_name,
+                             os.path.join(referenced_files_dir, file))

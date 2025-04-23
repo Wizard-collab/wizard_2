@@ -2,10 +2,12 @@
 # Wizard commands hook
 
 import logging
-logger = logging.getLogger(__name__)
 
 import hou
 from houdini_wizard import wizard_tools
+
+logger = logging.getLogger(__name__)
+
 
 def hip_command(export_file):
     ''' This function is used to store 
@@ -13,6 +15,7 @@ def hip_command(export_file):
     You can modify it from here
     Be carreful on what you are modifying'''
     hou.hipFile.save(file_name=export_file)
+
 
 def abc_command(wizard_abc_output, frange, export_file, prepare_only=False):
     ''' This function is used to store 
@@ -32,6 +35,7 @@ def abc_command(wizard_abc_output, frange, export_file, prepare_only=False):
         return
     wizard_abc_output.parm("execute").pressButton()
 
+
 def vdb_command(wizard_vdb_output, frange, export_dir, prepare_only=False):
     ''' This function is used to store 
     a default vdb export command.
@@ -44,7 +48,8 @@ def vdb_command(wizard_vdb_output, frange, export_dir, prepare_only=False):
     wizard_vdb_output.parm("f1").setExpression('$FSTART')
     wizard_vdb_output.parm("f2").setExpression('$FEND')
     wizard_vdb_output.parm('lpostframe').set("python")
-    wizard_vdb_output.parm('postframe').set(wizard_tools.by_frame_progress_script())
+    wizard_vdb_output.parm('postframe').set(
+        wizard_tools.by_frame_progress_script())
     if prepare_only:
         return
     wizard_vdb_output.parm("execute").pressButton()

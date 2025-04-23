@@ -1,9 +1,8 @@
 # Update and export multiple stages
 
 # Python modules
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard core modules
 from wizard.core import assets
@@ -14,13 +13,16 @@ from wizard.core import team_client
 from wizard.core import environment
 from wizard.core import subtask
 from wizard.core import deadline
-from wizard.vars import assets_vars
 from wizard.vars import ressources
+
+logger = logging.getLogger(__name__)
+
 
 name = "Exports"
 icon = ressources._tool_batch_publish_
 description = """Do a batch export of the selected stages
 """
+
 
 class widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -32,7 +34,7 @@ class widget(QtWidgets.QWidget):
     def build_ui(self):
         self.setObjectName('transparent_widget')
         self.main_layout = QtWidgets.QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.main_layout)
 
         self.info_label_1 = QtWidgets.QLabel("""Select the stages you want to update and export below and
@@ -63,7 +65,8 @@ then click on execute""")
         self.deadline_checkbox = QtWidgets.QCheckBox("Deadline")
         self.footer_layout.addWidget(self.deadline_checkbox)
 
-        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(0,0,QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        self.footer_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
         self.execute_button = QtWidgets.QPushButton("Execute")
         self.execute_button.setObjectName("blue_button")
@@ -77,7 +80,8 @@ then click on execute""")
         all_domains = project.get_domains()
         for domain_row in all_domains:
             categories = project.get_domain_childs(domain_row['id'])
-            domain_item = QtWidgets.QTreeWidgetItem(self.project_tree.invisibleRootItem())
+            domain_item = QtWidgets.QTreeWidgetItem(
+                self.project_tree.invisibleRootItem())
             domain_item.setText(0, domain_row['name'])
             for category_row in categories:
                 assets = project.get_category_childs(category_row['id'])
@@ -91,11 +95,13 @@ then click on execute""")
                         stage_item = QtWidgets.QTreeWidgetItem(asset_item)
                         check_box = QtWidgets.QCheckBox(stage_row['name'])
                         check_box.stateChanged.connect(self.refresh)
-                        self.project_tree.setItemWidget(stage_item, 0, check_box)
+                        self.project_tree.setItemWidget(
+                            stage_item, 0, check_box)
                         self.stages_dic[stage_row['id']] = dict()
                         self.stages_dic[stage_row['id']]['row'] = stage_row
                         self.stages_dic[stage_row['id']]['item'] = stage_item
-                        self.stages_dic[stage_row['id']]['check_box'] = check_box
+                        self.stages_dic[stage_row['id']
+                                        ]['check_box'] = check_box
 
     def refresh(self):
         stage_ids = self.get_selected_stages_ids()
@@ -127,6 +133,7 @@ then click on execute""")
         task = subtask.subtask(pycmd=command, print_stdout=False)
         task.start()
 
+
 def main(stages_ids_list, refresh_assets, comment=''):
     logger.info("Starting update_and_export batcher script")
     percent = 0.0
@@ -137,27 +144,34 @@ def main(stages_ids_list, refresh_assets, comment=''):
             logger.info(f"Stage id {stage_row['name']} not found, skipping.")
             continue
         asset_row = project.get_asset_data(stage_row['asset_id'])
-        default_variant_row = project.get_variant_data(stage_row['default_variant_id'])
+        default_variant_row = project.get_variant_data(
+            stage_row['default_variant_id'])
         if not default_variant_row:
-            logger.info(f"Default variant of {stage_row['name']} not found, skipping.")
+            logger.info(
+                f"Default variant of {stage_row['name']} not found, skipping.")
             continue
-        default_work_env_row = project.get_work_env_data(default_variant_row['default_work_env_id'])
+        default_work_env_row = project.get_work_env_data(
+            default_variant_row['default_work_env_id'])
         if not default_work_env_row:
-            logger.info(f"Default work environment of {stage_row['name']}/{default_variant_row['name']} not found, skipping.")
+            logger.info(
+                f"Default work environment of {stage_row['name']}/{default_variant_row['name']} not found, skipping.")
             continue
-        last_version_id = project.get_last_work_version(default_work_env_row['id'], 'id')[0]
+        last_version_id = project.get_last_work_version(
+            default_work_env_row['id'], 'id')[0]
         if not last_version_id:
-            logger.info(f"No work version found for {stage_row['name']}/{default_variant_row['name']}/{default_work_env_row['name']}, skipping.")
+            logger.info(
+                f"No work version found for {stage_row['name']}/{default_variant_row['name']}/{default_work_env_row['name']}, skipping.")
             continue
 
         frange = [asset_row['inframe'], asset_row['outframe']]
         namespaces_list = []
         if stage_row['name'] in ['animation', 'cfx']:
-            references_dic = assets.get_references_files(default_work_env_row['id'])
+            references_dic = assets.get_references_files(
+                default_work_env_row['id'])
             for reference_type in references_dic.keys():
                 if reference_type != 'rigging':
                     continue
-                for reference_dic in references_dic[reference_type]: 
+                for reference_dic in references_dic[reference_type]:
                     namespaces_list.append(reference_dic['namespace'])
 
         settings_dic = dict()
@@ -168,10 +182,11 @@ def main(stages_ids_list, refresh_assets, comment=''):
         settings_dic['comment'] = comment
         settings_dic['stage_to_export'] = stage_row['name']
 
-        print(f"wizard_task_name:Exporting {asset_row['name']}/{stage_row['name']}")
+        print(
+            f"wizard_task_name:Exporting {asset_row['name']}/{stage_row['name']}")
         launch_batch.batch_export(last_version_id, settings_dic)
         tools.wait_for_child_processes()
 
         team_client.refresh_team(environment.get_team_dns())
-        percent+=percent_step
+        percent += percent_step
         print(f"wizard_task_percent:{percent}")

@@ -6,7 +6,6 @@
 import os
 import traceback
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
@@ -15,6 +14,9 @@ from maya_wizard import wizard_export
 
 # Maya modules
 import pymel.core as pm
+
+logger = logging.getLogger(__name__)
+
 
 def main(comment=''):
     scene = wizard_export.save_or_save_increment()
@@ -35,12 +37,16 @@ def main(comment=''):
                 render_set_node = pm.PyNode(render_set)
                 asset_name = os.environ['wizard_asset_name']
                 rigging_GRP_node.rename(asset_name)
-                main_render_set_obj = wizard_tools.rename_render_set(render_set_node)
+                main_render_set_obj = wizard_tools.rename_render_set(
+                    render_set_node)
                 export_GRP_list = [asset_name, 'render_set']
-                exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
-                additionnal_objects = wizard_export.trigger_before_export_hook('camrig', exported_string_asset)
+                exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+                    os.environ['wizard_work_env_id'])
+                additionnal_objects = wizard_export.trigger_before_export_hook(
+                    'camrig', exported_string_asset)
                 export_GRP_list += additionnal_objects
-                wizard_export.export('camrig', export_name, exported_string_asset, export_GRP_list, comment=comment)
+                wizard_export.export(
+                    'camrig', export_name, exported_string_asset, export_GRP_list, comment=comment)
                 rigging_GRP_node.rename(grp_name)
                 render_set_node.rename(render_set)
                 if main_render_set_obj is not None:
@@ -49,4 +55,3 @@ def main(comment=''):
         logger.error(str(traceback.format_exc()))
     finally:
         wizard_export.reopen(scene)
-

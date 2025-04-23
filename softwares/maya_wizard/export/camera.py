@@ -7,7 +7,6 @@ import json
 import os
 import traceback
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
@@ -16,6 +15,9 @@ from maya_wizard import wizard_export
 
 # Maya modules
 import pymel.core as pm
+
+logger = logging.getLogger(__name__)
+
 
 def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
@@ -28,7 +30,8 @@ def main(nspace_list, frange, comment=''):
                     at_least_one = True
                     export_camera(camrig_reference, frange, comment=comment)
             if not at_least_one:
-                logger.warning("Nothing to export from namespace list : {}".format(nspace_list))
+                logger.warning(
+                    "Nothing to export from namespace list : {}".format(nspace_list))
         else:
             logger.warning("No camrig references found in wizard description")
     except:
@@ -36,13 +39,16 @@ def main(nspace_list, frange, comment=''):
     finally:
         wizard_export.reopen(scene)
 
+
 def invoke_settings_widget():
     from wizard_widgets import export_settings_widget
-    export_settings_widget_win = export_settings_widget.export_settings_widget('camera', parent=wizard_tools.maya_main_window())
+    export_settings_widget_win = export_settings_widget.export_settings_widget(
+        'camera', parent=wizard_tools.maya_main_window())
     if export_settings_widget_win.exec() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(nspace_list, frange)
+
 
 def export_camera(camrig_reference, frange, comment=''):
     camrig_nspace = camrig_reference['namespace']
@@ -51,24 +57,30 @@ def export_camera(camrig_reference, frange, comment=''):
     count = camrig_reference['count']
     if is_referenced(camrig_nspace):
         if os.environ['wizard_stage_name'] != 'camera':
-            camera_work_env_id = wizard_communicate.create_or_get_camera_work_env(int(os.environ['wizard_work_env_id']))
+            camera_work_env_id = wizard_communicate.create_or_get_camera_work_env(
+                int(os.environ['wizard_work_env_id']))
         else:
             camera_work_env_id = int(os.environ['wizard_work_env_id'])
         export_GRP_list = get_objects_to_export(camrig_nspace)
         if export_GRP_list:
             logger.info("Exporting {}".format(camrig_nspace))
-            additionnal_objects = wizard_export.trigger_before_export_hook('camera', exported_string_asset)
+            additionnal_objects = wizard_export.trigger_before_export_hook(
+                'camera', exported_string_asset)
             export_GRP_list += additionnal_objects
             export_name = buid_export_name(asset_name, count)
-            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list, frange, custom_work_env_id = camera_work_env_id, comment=comment)
+            wizard_export.export('camera', export_name, exported_string_asset, export_GRP_list,
+                                 frange, custom_work_env_id=camera_work_env_id, comment=comment)
         else:
-            logger.warning("No objects to export in '{}:render_set'".format(camrig_nspace))
+            logger.warning(
+                "No objects to export in '{}:render_set'".format(camrig_nspace))
+
 
 def buid_export_name(asset_name, count):
     export_name = asset_name
     if count != '0':
         export_name += "_{}".format(count)
     return export_name
+
 
 def get_objects_to_export(camrig_nspace):
     objects_to_export = None
@@ -82,6 +94,7 @@ def get_objects_to_export(camrig_nspace):
         logger.warning("{} not found".format(render_set))
     return objects_to_export
 
+
 def is_referenced(camrig_nspace):
     exists = False
     if pm.namespace(exists=camrig_nspace):
@@ -91,8 +104,10 @@ def is_referenced(camrig_nspace):
         logger.warning("{} not found in current scene".format(camrig_nspace))
     return exists
 
+
 def get_camrig_nspaces():
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    references = wizard_communicate.get_references(
+        int(os.environ['wizard_work_env_id']))
     if 'camrig' in references.keys():
         return references['camrig']
     else:

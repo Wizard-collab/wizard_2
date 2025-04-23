@@ -6,7 +6,6 @@
 import traceback
 import os
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
@@ -15,6 +14,9 @@ from maya_wizard import wizard_export
 
 # Maya modules
 import pymel.core as pm
+
+logger = logging.getLogger(__name__)
+
 
 def main(comment=''):
     scene = wizard_export.save_or_save_increment()
@@ -29,17 +31,20 @@ def main(comment=''):
             asset_name = os.environ['wizard_asset_name']
             grp_obj.rename(asset_name)
             object_list = [grp_obj] + pm.listRelatives(grp_obj,
-                                                        allDescendents=True)
+                                                       allDescendents=True)
             export_name = groups_dic[grp_name]
 
-            exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(os.environ['wizard_work_env_id'])
+            exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+                os.environ['wizard_work_env_id'])
 
             export_GRP_list = [grp_obj]
-            additionnal_objects = wizard_export.trigger_before_export_hook('layout', exported_string_asset)
+            additionnal_objects = wizard_export.trigger_before_export_hook(
+                'layout', exported_string_asset)
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
 
-            wizard_export.export('layout', export_name, exported_string_asset, [grp_obj], comment='')
+            wizard_export.export('layout', export_name,
+                                 exported_string_asset, [grp_obj], comment='')
             grp_obj.rename(grp_name)
     except:
         logger.error(str(traceback.format_exc()))

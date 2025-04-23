@@ -7,8 +7,6 @@ import os
 import logging
 import json
 
-logger = logging.getLogger('batch_startup')
-
 # Wizard modules
 from maya_wizard import wizard_plugin
 from maya_wizard import wizard_tools
@@ -24,7 +22,9 @@ from maya_wizard.export import fx
 from maya_wizard.export import cfx
 from maya_wizard.export import camera
 
+logger = logging.getLogger('batch_startup')
 wizard_tools.trigger_after_scene_openning_hook()
+
 
 def main():
     # Checking settings dic existence
@@ -32,7 +32,7 @@ def main():
         logger.error("Batch settings dic not found")
         return
     settings_dic = json.loads(os.environ['wizard_json_settings'])
-    comment=''
+    comment = ''
     if 'comment' in settings_dic.keys():
         comment = settings_dic['comment']
     if 'refresh_assets' in settings_dic.keys():
@@ -50,8 +50,8 @@ def main():
             logger.error("nspace_list parameter not found")
             return
         wizard_video.create_videos(settings_dic['frange'],
-                                    settings_dic['nspace_list'],
-                                    comment=comment)
+                                   settings_dic['nspace_list'],
+                                   comment=comment)
     if settings_dic['batch_type'] == 'import_update_and_save':
         wizard_plugin.reference_and_update_all()
         wizard_plugin.save_increment(comment=comment)
@@ -80,21 +80,22 @@ def main():
             layout.main(comment=comment)
         elif stage_name == 'animation':
             animation.main(nspace_list=settings_dic['nspace_list'],
-                                frange=settings_dic['frange'],
-                                comment=comment)
+                           frange=settings_dic['frange'],
+                           comment=comment)
         elif stage_name == 'cfx':
             cfx.main(nspace_list=settings_dic['nspace_list'],
-                                frange=settings_dic['frange'],
-                                comment=comment)
+                     frange=settings_dic['frange'],
+                     comment=comment)
         elif stage_name == 'fx':
             fx.main(frange=settings_dic['frange'])
         elif stage_name == 'camera':
             camera.main(nspace_list=settings_dic['nspace_list'],
-                                frange=settings_dic['frange'],
-                                comment=comment)
+                        frange=settings_dic['frange'],
+                        comment=comment)
         else:
             logger.warning("Unplugged stage : {}".format(stage_name))
             return
+
 
 main()
 logger.info("Quitting batch")

@@ -6,7 +6,6 @@
 import os
 import traceback
 import logging
-logger = logging.getLogger(__name__)
 
 # Nuke modules
 import nuke
@@ -16,7 +15,10 @@ import wizard_hooks
 import wizard_communicate
 from nuke_wizard import wizard_tools
 
-def export(stage_name, export_name, exported_string_asset, frange=[0,0], custom_work_env_id = None, comment=''):
+logger = logging.getLogger(__name__)
+
+
+def export(stage_name, export_name, exported_string_asset, frange=[0, 0], custom_work_env_id=None, comment=''):
     if trigger_sanity_hook(stage_name, exported_string_asset):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
@@ -25,20 +27,23 @@ def export(stage_name, export_name, exported_string_asset, frange=[0,0], custom_
 
         if wizard_communicate.get_export_format(work_env_id) == 'exr':
             export_dir = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
-                                                            work_env_id,
-                                                            export_name,
-                                                            comment=comment)
+                                                           work_env_id,
+                                                           export_name,
+                                                           comment=comment)
             export_exr(export_dir, frange)
         else:
             export_file = wizard_communicate.request_export(work_env_id,
-                                                                    export_name)
+                                                            export_name)
             export_by_extension(export_file, frange)
             export_dir = wizard_communicate.add_export_version(export_name,
-                                                    [export_file],
-                                                    work_env_id,
-                                                    int(os.environ['wizard_version_id']),
-                                                    comment=comment)
-        trigger_after_export_hook(stage_name, export_dir, exported_string_asset)
+                                                               [export_file],
+                                                               work_env_id,
+                                                               int(
+                                                                   os.environ['wizard_version_id']),
+                                                               comment=comment)
+        trigger_after_export_hook(
+            stage_name, export_dir, exported_string_asset)
+
 
 def export_by_extension(export_file, frange):
     if export_file.endswith('.nk'):
@@ -46,9 +51,11 @@ def export_by_extension(export_file, frange):
     else:
         logger.info("{} extension is unkown".format(export_file))
 
+
 def after_exr_render(frange):
     nuke.removeAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
     nuke.removeAfterRender(after_exr_render, args=(frange))
+
 
 def export_exr(export_dir, frange):
     render_node_name = 'wizard_render_node'
@@ -59,14 +66,16 @@ def export_exr(export_dir, frange):
         render_node.knob('afterFrameRender')
         nuke.addAfterRender(after_exr_render, args=(frange))
         nuke.addAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
-        nuke.execute(render_node_name,frange[0],frange[1],1)
+        nuke.execute(render_node_name, frange[0], frange[1], 1)
     else:
         logger.warning(f"{render_node_name} not found")
+
 
 def reopen(scene):
     nuke.scriptClear()
     nuke.scriptOpen(scene)
     logger.info("Opening file {}".format(scene))
+
 
 def save_or_save_increment():
     scene = nuke.root()['name'].value()
@@ -76,23 +85,34 @@ def save_or_save_increment():
     else:
         nuke.scriptSave()
         if os.environ["wizard_launch_mode"] == 'gui':
-            wizard_communicate.screen_over_version(int(os.environ['wizard_version_id']))
+            wizard_communicate.screen_over_version(
+                int(os.environ['wizard_version_id']))
         logger.info("Saving file {}".format(scene))
     return scene
+
 
 def export_nk(export_file, frange):
     logger.info("Exporting .nk")
     nuke.scriptSaveAs(export_file)
 
+
 def trigger_sanity_hook(stage_name, exported_string_asset):
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
     return wizard_hooks.sanity_hooks('nuke', stage_name, string_asset, exported_string_asset)
 
+
 def trigger_before_export_hook(stage_name, exported_string_asset):
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
-    wizard_hooks.before_export_hooks('nuke', stage_name, string_asset, exported_string_asset)
-    logger.warning("Ignoring additionnal objects from before export hooks. ( Wizard/Nuke exception )")
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
+    wizard_hooks.before_export_hooks(
+        'nuke', stage_name, string_asset, exported_string_asset)
+    logger.warning(
+        "Ignoring additionnal objects from before export hooks. ( Wizard/Nuke exception )")
+
 
 def trigger_after_export_hook(stage_name, export_dir, exported_string_asset):
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
-    wizard_hooks.after_export_hooks('nuke', stage_name, export_dir, string_asset, exported_string_asset)
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
+    wizard_hooks.after_export_hooks(
+        'nuke', stage_name, export_dir, string_asset, exported_string_asset)

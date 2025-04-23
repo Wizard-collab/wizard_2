@@ -12,19 +12,23 @@ import wizard_hooks
 # Python modules
 import os
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def get_file_dir(file):
     directory = os.path.dirname(file)
     directory.replace('\\', '/')
     return directory
 
+
 def maya_main_window():
     from maya import OpenMayaUI as omui
     from PySide2 import QtWidgets, QtCore, QtGui
-    from shiboken2 import wrapInstance 
+    from shiboken2 import wrapInstance
     main_window_ptr = omui.MQtUtil.mainWindow()
     return wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
+
 
 def get_new_objects(old_objects):
     new_objects = []
@@ -33,6 +37,7 @@ def get_new_objects(old_objects):
         if object not in old_objects:
             new_objects.append(object)
     return new_objects
+
 
 def rename_render_set(obj):
     if obj.name() == 'render_set':
@@ -48,9 +53,11 @@ def rename_render_set(obj):
             obj.rename('render_set')
             return main_set
 
+
 def reassign_old_name_to_objects(objects_dic):
     for object in objects_dic.keys():
         pm.rename(object.name(), objects_dic[object])
+
 
 def get_selection_nspace_list():
     namespaces_list = []
@@ -60,6 +67,7 @@ def get_selection_nspace_list():
             namespaces_list.append(object.namespace().replace(':', ''))
     return namespaces_list
 
+
 def check_obj_list_existence(object_list):
     success = True
     for obj_name in object_list:
@@ -68,8 +76,10 @@ def check_obj_list_existence(object_list):
             success = False
     return success
 
+
 def save_increment(comment=''):
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']), comment=comment)
+    file_path, version_id = wizard_communicate.add_version(
+        int(os.environ['wizard_work_env_id']), comment=comment)
     if file_path and version_id:
         logger.info("Saving file {}".format(file_path))
         pm.saveAs(file_path)
@@ -79,15 +89,20 @@ def save_increment(comment=''):
     else:
         logger.warning("Can't save increment")
 
+
 def trigger_after_save_hook(scene_path):
     stage_name = os.environ['wizard_stage_name']
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
     return wizard_hooks.after_save_hooks('maya', stage_name, string_asset, scene_path)
+
 
 def trigger_after_scene_openning_hook():
     stage_name = os.environ['wizard_stage_name']
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
     return wizard_hooks.after_scene_openning_hooks('maya', stage_name, string_asset)
+
 
 def apply_tags(object_list):
     all_objects = []
@@ -100,22 +115,28 @@ def apply_tags(object_list):
         existing_tags = []
         if pm.getAttr(object + '.wizardTags'):
             existing_tags = pm.getAttr(object + '.wizardTags').split(',')
-        asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+        asset_tag = "{}_{}".format(
+            os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':
             asset_tag += f"_{os.environ['wizard_variant_name']}"
-        to_tag = [os.environ['wizard_category_name'], asset_tag, object.name().split(':')[-1].split('|')[-1]]
+        to_tag = [os.environ['wizard_category_name'], asset_tag,
+                  object.name().split(':')[-1].split('|')[-1]]
         tags = existing_tags + to_tag
-        pm.setAttr(object + '.wizardTags', (',').join(set(tags)), type="string")
+        pm.setAttr(object + '.wizardTags',
+                   (',').join(set(tags)), type="string")
+
 
 def by_frame_progress_script(frange, percent_factor):
     command = 'range = {} - {}\\n'.format(frange[1], frange[0])
-    command+= 'if range != 0:\\n'
-    command+= '    frame = #FRAME#-{}\\n'.format(frange[0])
-    command+= '    to_add = ({}/{})*100\\n'.format(percent_factor[0], percent_factor[1])
-    command+= '    factor = 1/{}\\n'.format(percent_factor[1])
-    command+= '    percent = (frame/range)*100.0*factor+to_add\\n'
-    command+= '    print("wizard_task_percent:{}".format(percent))\\n'
+    command += 'if range != 0:\\n'
+    command += '    frame = #FRAME#-{}\\n'.format(frange[0])
+    command += '    to_add = ({}/{})*100\\n'.format(
+        percent_factor[0], percent_factor[1])
+    command += '    factor = 1/{}\\n'.format(percent_factor[1])
+    command += '    percent = (frame/range)*100.0*factor+to_add\\n'
+    command += '    print("wizard_task_percent:{}".format(percent))\\n'
     return command
+
 
 def get_export_grps(base_name):
     grp_dic = dict()

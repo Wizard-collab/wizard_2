@@ -6,12 +6,14 @@
 import traceback
 import os
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
 from houdini_wizard import wizard_tools
 from houdini_wizard import wizard_export
+
+logger = logging.getLogger(__name__)
+
 
 def main(nspace_list, frange, comment='', prepare_only=False):
     scene = wizard_export.save_or_save_increment()
@@ -22,24 +24,30 @@ def main(nspace_list, frange, comment='', prepare_only=False):
             for rigging_reference in rigging_references:
                 if rigging_reference['namespace'] in nspace_list:
                     at_least_one = True
-                    export_cfx(rigging_reference, frange, comment=comment, prepare_only=prepare_only)
+                    export_cfx(rigging_reference, frange,
+                               comment=comment, prepare_only=prepare_only)
             if not at_least_one:
-                logger.warning(f"Nothing to export from namespace list : {nspace_list}")
+                logger.warning(
+                    f"Nothing to export from namespace list : {nspace_list}")
         else:
-            logger.warning("No rigging or grooming references found in wizard description")
+            logger.warning(
+                "No rigging or grooming references found in wizard description")
     except:
         logger.error(str(traceback.format_exc()))
     finally:
         pass
-        #wizard_export.reopen(scene)
+        # wizard_export.reopen(scene)
+
 
 def invoke_settings_widget(prepare_only=False):
     from wizard_widgets import export_settings_widget
-    export_settings_widget_win = export_settings_widget.export_settings_widget('cfx')
+    export_settings_widget_win = export_settings_widget.export_settings_widget(
+        'cfx')
     if export_settings_widget_win.exec() == export_settings_widget.dialog_accepted:
         nspace_list = export_settings_widget_win.nspace_list
         frange = export_settings_widget_win.frange
         main(nspace_list, frange, prepare_only=prepare_only)
+
 
 def export_cfx(rigging_reference, frange, comment='', prepare_only=False):
     rig_nspace = rigging_reference['namespace']
@@ -47,15 +55,19 @@ def export_cfx(rigging_reference, frange, comment='', prepare_only=False):
     exported_string_asset = rigging_reference['string_stage']
     count = rigging_reference['count']
 
-    out_nodes_dic = wizard_tools.get_export_nodes('wizard_cfx_output', parent=wizard_tools.look_for_node(rig_nspace))
+    out_nodes_dic = wizard_tools.get_export_nodes(
+        'wizard_cfx_output', parent=wizard_tools.look_for_node(rig_nspace))
     if out_nodes_dic == dict():
         logger.warning("No export nodes found...")
         return
     for out_node_name in out_nodes_dic.keys():
         logger.info(f"Exporting {rig_nspace} | {out_node_name}")
         wizard_export.trigger_before_export_hook('cfx', exported_string_asset)
-        export_name = buid_export_name(asset_name, count, out_nodes_dic[out_node_name])
-        wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name, exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace, comment=comment, prepare_only=prepare_only)
+        export_name = buid_export_name(
+            asset_name, count, out_nodes_dic[out_node_name])
+        wizard_export.export(stage_name='cfx', export_name=export_name, out_node=out_node_name,
+                             exported_string_asset=exported_string_asset, frange=frange, parent=rig_nspace, comment=comment, prepare_only=prepare_only)
+
 
 def buid_export_name(asset_name, count, var):
     export_name = asset_name
@@ -64,8 +76,10 @@ def buid_export_name(asset_name, count, var):
     export_name += f"_{var}"
     return export_name
 
+
 def get_rig_nspaces():
-    references = wizard_communicate.get_references(int(os.environ['wizard_work_env_id']))
+    references = wizard_communicate.get_references(
+        int(os.environ['wizard_work_env_id']))
     to_return = []
     if 'rigging' not in references.keys() and 'grooming' not in references.keys():
         logger.warning("No rigging or grooming references found")

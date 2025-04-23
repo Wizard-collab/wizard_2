@@ -7,8 +7,6 @@ import os
 import logging
 import json
 
-logger = logging.getLogger('batch_startup')
-
 # Wizard modules
 import wizard_communicate
 from nuke_wizard import wizard_plugin
@@ -20,10 +18,13 @@ from nuke_wizard.export import custom
 # Nuke modules
 import nuke
 
+logger = logging.getLogger('batch_startup')
+
 # Open version file
 nuke.scriptOpen(wizard_communicate.get_file(os.environ['wizard_version_id']))
 
 wizard_tools.trigger_after_scene_openning_hook()
+
 
 def main():
     # Checking settings dic existence
@@ -31,7 +32,7 @@ def main():
         logger.error("Batch settings dic not found")
         return
     settings_dic = json.loads(os.environ['wizard_json_settings'])
-    comment=''
+    comment = ''
     if 'comment' in settings_dic.keys():
         comment = settings_dic['comment']
     if 'refresh_assets' in settings_dic.keys():
@@ -70,5 +71,7 @@ def main():
         else:
             logger.warning("Unplugged stage : {}".format(stage_name))
             return
+
+
 main()
 logger.info("Quitting batch")

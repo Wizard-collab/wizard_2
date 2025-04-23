@@ -16,45 +16,63 @@ nuke.menu('Nuke').addMenu("Wizard")
 nuke.menu('Nuke').addCommand("Wizard/Save", "wizard_plugin.save_increment()")
 nuke.menu('Nuke').addCommand("Wizard/Export data", "wizard_plugin.export()")
 
-menu = nuke.menu( 'Nuke' ).findItem( 'Wizard' )
+menu = nuke.menu('Nuke').findItem('Wizard')
 menu.addSeparator()
 
-nuke.menu('Nuke').addCommand("Wizard/Import and update all", "wizard_plugin.reference_and_update_all()")
+nuke.menu('Nuke').addCommand("Wizard/Import and update all",
+                             "wizard_plugin.reference_and_update_all()")
 
 menu.addSeparator()
 
-nuke.menu('Nuke').addCommand("Wizard/Mirror renders to local", "wizard_plugin.update_rendering()")
-nuke.menu('Nuke').addCommand("Wizard/Use project renders ( Not recommended )", "wizard_plugin.update_rendering(local=False)")
+nuke.menu('Nuke').addCommand("Wizard/Mirror renders to local",
+                             "wizard_plugin.update_rendering()")
+nuke.menu('Nuke').addCommand("Wizard/Use project renders ( Not recommended )",
+                             "wizard_plugin.update_rendering(local=False)")
 
 menu.addSeparator()
 
 menu.addMenu("Import")
-nuke.menu('Nuke').addCommand("Wizard/Import/Import all", "wizard_plugin.reference_all()")
-nuke.menu('Nuke').addCommand("Wizard/Import/Import custom", "wizard_plugin.reference_custom()")
-nuke.menu('Nuke').addCommand("Wizard/Import/Import camera", "wizard_plugin.reference_camera()")
-nuke.menu('Nuke').addCommand("Wizard/Import/Import rendering", "wizard_plugin.reference_rendering()")
+nuke.menu('Nuke').addCommand("Wizard/Import/Import all",
+                             "wizard_plugin.reference_all()")
+nuke.menu('Nuke').addCommand("Wizard/Import/Import custom",
+                             "wizard_plugin.reference_custom()")
+nuke.menu('Nuke').addCommand("Wizard/Import/Import camera",
+                             "wizard_plugin.reference_camera()")
+nuke.menu('Nuke').addCommand("Wizard/Import/Import rendering",
+                             "wizard_plugin.reference_rendering()")
 
 menu.addMenu("Update")
-nuke.menu('Nuke').addCommand("Wizard/Update/Update all", "wizard_plugin.update_all()")
-nuke.menu('Nuke').addCommand("Wizard/Update/Update custom", "wizard_plugin.update_custom()")
-nuke.menu('Nuke').addCommand("Wizard/Update/Update camera", "wizard_plugin.update_camera()")
-nuke.menu('Nuke').addCommand("Wizard/Update/Update rendering", "wizard_plugin.update_rendering()")
+nuke.menu('Nuke').addCommand(
+    "Wizard/Update/Update all", "wizard_plugin.update_all()")
+nuke.menu('Nuke').addCommand("Wizard/Update/Update custom",
+                             "wizard_plugin.update_custom()")
+nuke.menu('Nuke').addCommand("Wizard/Update/Update camera",
+                             "wizard_plugin.update_camera()")
+nuke.menu('Nuke').addCommand("Wizard/Update/Update rendering",
+                             "wizard_plugin.update_rendering()")
 
 menu.addSeparator()
 
 menu.addMenu("Exr options")
-nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to DeepRead", "wizard_tools.switch_selection_to_deepRead()")
-nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to Read", "wizard_tools.switch_selection_to_read()")
+nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to DeepRead",
+                             "wizard_tools.switch_selection_to_deepRead()")
+nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to Read",
+                             "wizard_tools.switch_selection_to_read()")
 
 menu.addSeparator()
 
-nuke.menu('Nuke').addCommand("Wizard/Set frame rate", "wizard_plugin.set_frame_rate()")
-nuke.menu('Nuke').addCommand("Wizard/Set frame range", "wizard_plugin.set_frame_range()")
-nuke.menu('Nuke').addCommand("Wizard/Set frame range with rolls", "wizard_plugin.set_frame_range(rolls=1)")
-nuke.menu('Nuke').addCommand("Wizard/Set image format", "wizard_plugin.set_image_format()")
+nuke.menu('Nuke').addCommand("Wizard/Set frame rate",
+                             "wizard_plugin.set_frame_rate()")
+nuke.menu('Nuke').addCommand("Wizard/Set frame range",
+                             "wizard_plugin.set_frame_range()")
+nuke.menu('Nuke').addCommand("Wizard/Set frame range with rolls",
+                             "wizard_plugin.set_frame_range(rolls=1)")
+nuke.menu('Nuke').addCommand("Wizard/Set image format",
+                             "wizard_plugin.set_image_format()")
 
 menu.addSeparator()
 
-nuke.menu('Nuke').addCommand("Wizard/Create video", "wizard_video.invoke_settings_widget()")
+nuke.menu('Nuke').addCommand("Wizard/Create video",
+                             "wizard_video.invoke_settings_widget()")
 
 wizard_tools.trigger_after_scene_openning_hook()

@@ -13,14 +13,18 @@ plugin_widgets = []
 
 WIZARD_TOOLBAR = None
 
+
 def start_plugin():
-	global WIZARD_TOOLBAR
-	WIZARD_TOOLBAR = wizard_plugin.tool_bar()
-	substance_painter.event.DISPATCHER.connect(event_cls=substance_painter.event.ProjectSaved, callback=wizard_plugin.copy_save)
+    global WIZARD_TOOLBAR
+    WIZARD_TOOLBAR = wizard_plugin.tool_bar()
+    substance_painter.event.DISPATCHER.connect(
+        event_cls=substance_painter.event.ProjectSaved, callback=wizard_plugin.copy_save)
+
 
 def close_plugin():
-	global WIZARD_TOOLBAR
-	del WIZARD_TOOLBAR
+    global WIZARD_TOOLBAR
+    del WIZARD_TOOLBAR
+
 
 if __name__ == "__main__":
     start_plugin()

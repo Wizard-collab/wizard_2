@@ -1,7 +1,7 @@
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
-    
+
 # Python modules
 import os
 import logging
@@ -20,8 +20,10 @@ logger.addHandler(ctx.createRuntimeLogHandler())
 logger.propagate = False
 logger.setLevel(logging.INFO)
 
+
 def save():
     wizard_tools.save()
+
 
 def export():
     stage_name = os.environ['wizard_stage_name']
@@ -30,6 +32,7 @@ def export():
     else:
         logger.warning("Unplugged stage : {}".format(stage_name))
 
+
 def init_scene():
     # Create new empy package
     pkgMgr = wizard_tools.get_packageMgr()
@@ -37,4 +40,5 @@ def init_scene():
         logger.warning("A wizard scene already exists, skipping init.")
         return
     empty_package = pkgMgr.newUserPackage()
-    pkgMgr.savePackageAs(empty_package, wizard_communicate.get_file(os.environ["wizard_version_id"]))
+    pkgMgr.savePackageAs(empty_package, wizard_communicate.get_file(
+        os.environ["wizard_version_id"]))

@@ -2,12 +2,14 @@
 # Wizard plugin hook
 
 import logging
-logger = logging.getLogger(__name__)
 
 import pymel.core as pm
 import maya.cmds as cmds
 
 import os
+
+logger = logging.getLogger(__name__)
+
 
 def after_scene_openning(stage_name, string_asset):
     ''' This function is triggered
@@ -21,7 +23,8 @@ def after_scene_openning(stage_name, string_asset):
 
         The "scene_path" argument is the scene path, 
         if there is no scene, it will be 'None' '''
-    pass    
+    pass
+
 
 def after_save(stage_name, string_asset, scene_path):
     ''' This function is triggered
@@ -35,14 +38,15 @@ def after_save(stage_name, string_asset, scene_path):
 
         The "scene_path" argument is the saved 
         incremental file'''
-    pass        
+    pass
+
 
 def sanity(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
         before the export and will stop the
         export process if the returned data is 
         "False"
-        
+
         The "stage_name" argument is the name
         of the exported stage
 
@@ -52,6 +56,7 @@ def sanity(stage_name, string_asset, exported_string_asset):
         The "exported_string_asset" argument is the
         asset wizard will export represented as string'''
     return True
+
 
 def before_export(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -69,6 +74,7 @@ def before_export(stage_name, string_asset, exported_string_asset):
         The "exported_string_asset" argument is the
         asset wizard will export represented as string'''
     return []
+
 
 def after_export(stage_name, export_dir, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -100,18 +106,20 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
             if len(parents) == 0:
                 continue
             fur_export_name = f"{node.getName().split(':')[-1]}"
-            file_path = os.path.join(export_dir, f'yeti_cache__{fur_export_name}.fur')
+            file_path = os.path.join(
+                export_dir, f'yeti_cache__{fur_export_name}.fur')
             yeti_node = pm.listRelatives(node, shapes=True)[0]
             pm.select(yeti_node, r=True)
-            cmds.pgYetiCommand(writeCache=file_path, range=(0,0), samples=1)
+            cmds.pgYetiCommand(writeCache=file_path, range=(0, 0), samples=1)
 
-def after_reference(stage_name, 
-                        referenced_stage_name, 
-                        referenced_files_dir,
-                        namespace, 
-                        new_objects,
-                        string_asset,
-                        referenced_string_asset):
+
+def after_reference(stage_name,
+                    referenced_stage_name,
+                    referenced_files_dir,
+                    namespace,
+                    new_objects,
+                    string_asset,
+                    referenced_string_asset):
     ''' This function is triggered
         after referencing from wizard
 

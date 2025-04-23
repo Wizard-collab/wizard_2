@@ -7,8 +7,6 @@ import os
 import logging
 import json
 
-logger = logging.getLogger('batch_startup')
-
 # Wizard modules
 from guerilla_render_wizard import wizard_plugin
 from guerilla_render_wizard import wizard_tools
@@ -16,7 +14,9 @@ from guerilla_render_wizard.export import shading
 from guerilla_render_wizard.export import custom
 from guerilla_render_wizard.export import lighting
 
+logger = logging.getLogger('batch_startup')
 wizard_tools.trigger_after_scene_openning_hook()
+
 
 def main():
     # Checking settings dic existence
@@ -24,7 +24,7 @@ def main():
         logger.error("Batch settings dic not found")
         return
     settings_dic = json.loads(os.environ['wizard_json_settings'])
-    comment=''
+    comment = ''
     if 'comment' in settings_dic.keys():
         comment = settings_dic['comment']
     if 'refresh_assets' in settings_dic.keys():
@@ -71,11 +71,12 @@ def main():
             render_type = settings_dic['render_type']
             farm = settings_dic['farm']
             lighting.main(settings_dic['render_type'],
-                            settings_dic['frange'],
-                            settings_dic['farm'])
+                          settings_dic['frange'],
+                          settings_dic['farm'])
         else:
             logger.warning("Unplugged stage : {}".format(stage_name))
             return
+
 
 main()
 logger.info("Quitting batch")

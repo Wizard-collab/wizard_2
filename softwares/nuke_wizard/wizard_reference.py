@@ -4,9 +4,7 @@
 
 # Python modules
 import os
-import traceback
 import logging
-logger = logging.getLogger(__name__)
 
 # Wizard modules
 import wizard_communicate
@@ -17,23 +15,38 @@ from nuke_wizard import wizard_mirror
 # Nuke modules
 import nuke
 
+logger = logging.getLogger(__name__)
+
+
 def reference_custom(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
+    import_from_extension(
+        reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
+
 
 def update_custom(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
+    update_from_extension(
+        reference_dic['namespace'], reference_dic['files'], 'custom', reference_dic['string_stage'])
+
 
 def reference_camera(reference_dic):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
+    import_from_extension(
+        reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
+
 
 def update_camera(reference_dic):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
+    update_from_extension(
+        reference_dic['namespace'], reference_dic['files'], 'camera', reference_dic['string_stage'])
+
 
 def reference_rendering(reference_dic, local):
-    import_from_extension(reference_dic['namespace'], reference_dic['files'], 'rendering', reference_dic['string_stage'], local)
+    import_from_extension(reference_dic['namespace'], reference_dic['files'],
+                          'rendering', reference_dic['string_stage'], local)
+
 
 def update_rendering(reference_dic, local):
-    update_from_extension(reference_dic['namespace'], reference_dic['files'], 'rendering', reference_dic['string_stage'], local)
+    update_from_extension(reference_dic['namespace'], reference_dic['files'],
+                          'rendering', reference_dic['string_stage'], local)
+
 
 def import_from_extension(namespace, files_list, stage_name, referenced_string_asset, local=True):
     old_nodes = wizard_tools.get_all_nodes()
@@ -46,10 +59,11 @@ def import_from_extension(namespace, files_list, stage_name, referenced_string_a
         if stage_name == 'camera':
             reference_abc_camera(namespace, files_list)
     trigger_after_reference_hook(stage_name,
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_nodes),
-                                    referenced_string_asset)
+                                 files_list,
+                                 namespace,
+                                 wizard_tools.get_new_objects(old_nodes),
+                                 referenced_string_asset)
+
 
 def update_from_extension(namespace, files_list, stage_name, referenced_string_asset, local=True):
     old_nodes = wizard_tools.get_all_nodes()
@@ -62,10 +76,11 @@ def update_from_extension(namespace, files_list, stage_name, referenced_string_a
         if stage_name == 'camera':
             update_abc_camera(namespace, files_list)
     trigger_after_reference_hook(stage_name,
-                                    files_list,
-                                    namespace,
-                                    wizard_tools.get_new_objects(old_nodes),
-                                    referenced_string_asset)
+                                 files_list,
+                                 namespace,
+                                 wizard_tools.get_new_objects(old_nodes),
+                                 referenced_string_asset)
+
 
 def import_nk(namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
@@ -73,13 +88,16 @@ def import_nk(namespace, files_list):
             old_nodes = wizard_tools.get_all_nodes()
             nuke.scriptSource(files_list[0])
             new_nodes = wizard_tools.get_new_objects(old_nodes)
-            wizard_tools.backdrop_nodes(new_nodes, namespace, namespace_knob = True)
+            wizard_tools.backdrop_nodes(
+                new_nodes, namespace, namespace_knob=True)
         else:
             logger.warning("Can't merge multiple files")
+
 
 def update_nk(namespace, files_list):
     if namespace in wizard_tools.get_all_namespaces().keys():
         logger.info(f"Can't update {namespace} since it is merged")
+
 
 def reference_abc_camera(namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
@@ -95,6 +113,7 @@ def reference_abc_camera(namespace, files_list):
         else:
             logger.warning("Can't merge multiple files")
 
+
 def update_abc_camera(namespace, files_list):
     if namespace in wizard_tools.get_all_namespaces().keys():
         if len(files_list) == 1:
@@ -103,11 +122,13 @@ def update_abc_camera(namespace, files_list):
         else:
             logger.warning("Can't merge multiple files")
 
-def reference_exr(namespace, files_list, local=True ):
+
+def reference_exr(namespace, files_list, local=True):
     if namespace not in wizard_tools.get_all_namespaces().keys():
         # Mirror exrs in localdir
         if local:
-            local_files_list = wizard_mirror.mirror_files_to_local(files_list).mirror()
+            local_files_list = wizard_mirror.mirror_files_to_local(
+                files_list).mirror()
             if len(local_files_list) == len(files_list):
                 files_list = local_files_list
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
@@ -122,12 +143,14 @@ def reference_exr(namespace, files_list, local=True ):
             wizard_tools.align_nodes(reads_list)
             wizard_tools.backdrop_nodes(reads_list, namespace)
 
+
 def update_exr(namespace, files_list, local=True):
     all_namespaces = wizard_tools.get_all_namespaces()
     if namespace in all_namespaces.keys():
         # Mirror exrs in localdir
         if local:
-            local_files_list = wizard_mirror.mirror_files_to_local(files_list).mirror()
+            local_files_list = wizard_mirror.mirror_files_to_local(
+                files_list).mirror()
             if len(local_files_list) == len(files_list):
                 files_list = local_files_list
         existing_reads_list = all_namespaces[namespace]
@@ -156,19 +179,21 @@ def update_exr(namespace, files_list, local=True):
         if len(reads_list) > 1:
             wizard_tools.backdrop_nodes(reads_list, namespace)
 
+
 def trigger_after_reference_hook(referenced_stage_name,
-                                    files_list,
-                                    namespace,
-                                    new_objects,
-                                    referenced_string_asset):
+                                 files_list,
+                                 namespace,
+                                 new_objects,
+                                 referenced_string_asset):
     stage_name = os.environ['wizard_stage_name']
     referenced_files_dir = wizard_tools.get_file_dir(files_list[0])
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
     wizard_hooks.after_reference_hooks('nuke',
-                                stage_name,
-                                referenced_stage_name,
-                                referenced_files_dir,
-                                namespace,
-                                new_objects,
-                                string_asset,
-                                referenced_string_asset)
+                                       stage_name,
+                                       referenced_stage_name,
+                                       referenced_files_dir,
+                                       namespace,
+                                       new_objects,
+                                       string_asset,
+                                       referenced_string_asset)

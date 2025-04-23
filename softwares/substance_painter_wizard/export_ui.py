@@ -1,7 +1,7 @@
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
-    
+
 # Python modules
 try:
     from PySide6 import QtWidgets, QtGui
@@ -18,33 +18,34 @@ from substance_painter_wizard import wizard_tools
 import wizard_communicate
 
 image_sizes = ['128',
-                '256',
-                '512',
-                '1024',
-                '2048',
-                '4096',
-                '8192']
+               '256',
+               '512',
+               '1024',
+               '2048',
+               '4096',
+               '8192']
 file_types = ['bmp',
-                'ico',
-                'jpeg',
-                'jng',
-                'pbm',
-                'pgm',
-                'png',
-                'ppm',
-                'targa',
-                'tiff',
-                'wbmp',
-                'xpm',
-                'gif',
-                'hdr',
-                'exr',
-                'j2k',
-                'jp2',
-                'pfm',
-                'webp',
-                'jpeg-xr',
-                'psd']
+              'ico',
+              'jpeg',
+              'jng',
+              'pbm',
+              'pgm',
+              'png',
+              'ppm',
+              'targa',
+              'tiff',
+              'wbmp',
+              'xpm',
+              'gif',
+              'hdr',
+              'exr',
+              'j2k',
+              'jp2',
+              'pfm',
+              'webp',
+              'jpeg-xr',
+              'psd']
+
 
 class export_ui(QtWidgets.QDialog):
     def __init__(self):
@@ -98,7 +99,7 @@ class export_ui(QtWidgets.QDialog):
 
     def get_settings_file(self):
         user_folder = os.path.join(wizard_communicate.get_user_folder(),
-                                    'substance_painter')
+                                   'substance_painter')
         self.settings_file = os.path.join(user_folder, 'preferences.json')
         if not os.path.isdir(user_folder):
             os.makedirs(user_folder)

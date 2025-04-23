@@ -12,15 +12,19 @@ import bpy
 # Python modules
 import os
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def get_file_dir(file):
     directory = os.path.dirname(file)
     directory.replace('\\', '/')
     return directory
 
+
 def save_increment(comment=''):
-    file_path, version_id = wizard_communicate.add_version(int(os.environ['wizard_work_env_id']), comment)
+    file_path, version_id = wizard_communicate.add_version(
+        int(os.environ['wizard_work_env_id']), comment)
     if file_path and version_id:
         logger.info("Saving file {}".format(file_path))
         bpy.ops.wm.save_as_mainfile(filepath=file_path)
@@ -30,15 +34,20 @@ def save_increment(comment=''):
     else:
         logger.warning("Can't save increment")
 
+
 def trigger_after_save_hook(scene_path):
     stage_name = os.environ['wizard_stage_name']
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
     return wizard_hooks.after_save_hooks('blender', stage_name, string_asset, scene_path)
+
 
 def trigger_after_scene_openning_hook():
     stage_name = os.environ['wizard_stage_name']
-    string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+    string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+        int(os.environ['wizard_work_env_id']))
     return wizard_hooks.after_scene_openning_hooks('blender', stage_name, string_asset)
+
 
 def check_obj_list_existence(object_list):
     success = True
@@ -49,12 +58,14 @@ def check_obj_list_existence(object_list):
             success = False
     return success
 
-def get_direct_children(obj): 
-    children = [] 
-    for ob in bpy.data.objects: 
-        if ob.parent == obj: 
-            children.append(ob) 
+
+def get_direct_children(obj):
+    children = []
+    for ob in bpy.data.objects:
+        if ob.parent == obj:
+            children.append(ob)
     return children
+
 
 def get_all_nodes():
     all_objects = []
@@ -68,6 +79,7 @@ def get_all_nodes():
         all_objects.append(image)
     return all_objects
 
+
 def get_new_objects(old_objects):
     all_objects = get_all_nodes()
     new_objects = []
@@ -75,6 +87,7 @@ def get_new_objects(old_objects):
         if obj not in old_objects:
             new_objects.append(obj)
     return new_objects
+
 
 def get_render_set_collection(namespace_collection):
     all_children = namespace_collection.children_recursive
@@ -86,6 +99,7 @@ def get_render_set_collection(namespace_collection):
         return child
     logger.warning(f"{namespace_collection}/render_set not found")
     return
+
 
 def get_all_children(obj, meshes=0):
     if type(obj) == bpy.types.Collection:
@@ -104,7 +118,8 @@ def get_all_children(obj, meshes=0):
                     if meshes:
                         children.append(ob.data)
                     break
-        return(children)
+        return (children)
+
 
 def select_all_children(objects_list):
     bpy.ops.object.select_all(action='DESELECT')
@@ -113,10 +128,12 @@ def select_all_children(objects_list):
             obj.select_set(True)
         for obj in get_all_children(obj):
             obj.select_set(True)
-        #bpy.context.view_layer.objects.active = GRP
-        
+        # bpy.context.view_layer.objects.active = GRP
+
+
 def namespace_exists(namespace):
     return namespace in bpy.data.collections
+
 
 def create_collection_if_not_exists(collection_name, parent=None):
     if parent is None:
@@ -128,6 +145,7 @@ def create_collection_if_not_exists(collection_name, parent=None):
         new_collection = bpy.data.collections[collection_name]
     return new_collection
 
+
 def set_collection_active(collection):
     if not collection:
         return
@@ -135,11 +153,13 @@ def set_collection_active(collection):
     layerColl = recurLayerCollection(layer_collection, collection.name)
     bpy.context.view_layer.active_layer_collection = layerColl
 
+
 def find_library(file_path):
     for lib in bpy.data.libraries:
         if lib.filepath == file_path:
             return 1
     return 0
+
 
 def recurLayerCollection(layerColl, collName):
     found = None
@@ -149,7 +169,8 @@ def recurLayerCollection(layerColl, collName):
         found = recurLayerCollection(layer, collName)
         if found:
             return found
-            
+
+
 def remove_export_name_from_names(object_list, export_name):
     objects_dic = dict()
     for obj in object_list:
@@ -159,9 +180,11 @@ def remove_export_name_from_names(object_list, export_name):
         objects_dic[obj] = old_name
     return objects_dic
 
+
 def reassign_old_name_to_objects(objects_dic):
     for obj in objects_dic.keys():
         obj.name = objects_dic[obj]
+
 
 def apply_tags(object_list):
     all_objects = []
@@ -175,16 +198,19 @@ def apply_tags(object_list):
             existing_tags = []
         else:
             existing_tags = obj['wizardTags'].split(',')
-        asset_tag = "{}_{}".format(os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
+        asset_tag = "{}_{}".format(
+            os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':
             asset_tag += f"_{os.environ['wizard_variant_name']}"
         to_tag = [os.environ['wizard_category_name'], asset_tag, obj.name]
         tags = existing_tags + to_tag
         obj['wizardTags'] = (',').join(set(tags))
 
+
 def get_all_collections():
     collections = bpy.data.collections
     return collections
+
 
 def get_export_grps(base_name):
     grp_dic = dict()
@@ -202,6 +228,7 @@ def get_export_grps(base_name):
                 continue
             grp_dic[collection_name] = export_name
     return grp_dic
+
 
 def group_objects_before_export(export_GRP_list):
     new_export_GRP_list = []
@@ -222,6 +249,7 @@ def group_objects_before_export(export_GRP_list):
             new_export_GRP_list.append(obj)
     return new_export_GRP_list
 
+
 def get_meshes_in_collection(collection):
     meshes = []
     for obj in collection.objects:
@@ -230,6 +258,7 @@ def get_meshes_in_collection(collection):
     for child_collection in collection.children:
         meshes.extend(get_meshes_in_collection(child_collection))
     return meshes
+
 
 def get_objects_in_collection(collection):
     objects = []

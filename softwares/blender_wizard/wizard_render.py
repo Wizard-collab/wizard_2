@@ -4,9 +4,7 @@
 
 # Python modules
 import os
-import traceback
 import logging
-logger = logging.getLogger(__name__)
 
 # Blender modules
 import bpy
@@ -14,18 +12,22 @@ import bpy
 # Wizard modules
 import wizard_communicate
 
+logger = logging.getLogger(__name__)
+
+
 def __init__():
     pass
+
 
 def setup_render_directory(stage_name, export_name):
     if os.environ['wizard_stage_name'] == 'rendering':
         rendering_work_env_id = int(os.environ['wizard_work_env_id'])
     else:
-        rendering_work_env_id = wizard_communicate.create_or_get_rendering_work_env(int(os.environ['wizard_work_env_id']))
+        rendering_work_env_id = wizard_communicate.create_or_get_rendering_work_env(
+            int(os.environ['wizard_work_env_id']))
     render_directory = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
-                                                                rendering_work_env_id,
-                                                                export_name)
-
+                                                         rendering_work_env_id,
+                                                         export_name)
 
     if render_directory:
         extension = wizard_communicate.get_export_format(rendering_work_env_id)
@@ -35,9 +37,11 @@ def setup_render_directory(stage_name, export_name):
         bpy.context.scene.render.image_settings.file_format = "OPEN_EXR"
         return render_directory
 
+
 def setup_frame_range(render_type, frame_range=None):
     if not frame_range:
-        frame_range = wizard_communicate.get_frame_range(os.environ['wizard_work_env_id'])
+        frame_range = wizard_communicate.get_frame_range(
+            os.environ['wizard_work_env_id'])
     if render_type == 'FML':
         frame_step = int((frame_range[2] - frame_range[1])/2)
     elif render_type == 'HD' or render_type == 'LD':
@@ -48,6 +52,7 @@ def setup_frame_range(render_type, frame_range=None):
     bpy.context.scene.frame_start = frame_range[1]
     bpy.context.scene.frame_end = frame_range[2]
     bpy.context.scene.frame_step = frame_step
+
 
 def setup_image_format(render_type):
     image_format = wizard_communicate.get_image_format()
@@ -63,13 +68,16 @@ def setup_image_format(render_type):
         bpy.context.scene.render.resolution_x = image_format[0]
         bpy.context.scene.render.resolution_y = image_format[1]
 
+
 def setup_FML():
     setup_frame_range('FML')
     setup_image_format('FML')
 
+
 def setup_HD():
     setup_frame_range('HD')
     setup_image_format('HD')
+
 
 def setup_LD():
     setup_frame_range('LD')

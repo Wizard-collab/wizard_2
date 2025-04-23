@@ -4,8 +4,9 @@
 
 # Python modules
 import os
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets
 import logging
+
 
 class mirror_loading_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):

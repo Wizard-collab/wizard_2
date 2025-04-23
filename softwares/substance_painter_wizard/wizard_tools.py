@@ -8,6 +8,7 @@ import os
 # Substance Painter modules
 import substance_painter.resource
 
+
 def get_export_presets_list():
     presets_list = []
     all_presets = substance_painter.export.list_resource_export_presets()
@@ -15,11 +16,13 @@ def get_export_presets_list():
         presets_list.append(preset.resource_id.name)
     return presets_list
 
+
 def get_export_preset_url(preset_name):
     all_presets = substance_painter.export.list_resource_export_presets()
     for preset in all_presets:
         if preset.resource_id.name == preset_name:
             return preset.resource_id.url()
+
 
 def get_templates_dic():
     templates_dic = dict()

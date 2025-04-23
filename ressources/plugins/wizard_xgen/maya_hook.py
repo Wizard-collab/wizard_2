@@ -2,11 +2,13 @@
 # Wizard hook
 
 import logging
-logger = logging.getLogger(__name__)
 
 import pymel.core as pm
 import maya.cmds as cmds
 import os
+
+logger = logging.getLogger(__name__)
+
 
 def after_scene_openning(stage_name, string_asset):
     ''' This function is triggered
@@ -22,6 +24,7 @@ def after_scene_openning(stage_name, string_asset):
         if there is no scene, it will be 'None' '''
     pass
 
+
 def after_save(stage_name, string_asset, scene_path):
     ''' This function is triggered
         after an incremental save.
@@ -34,14 +37,15 @@ def after_save(stage_name, string_asset, scene_path):
 
         The "scene_path" argument is the saved 
         incremental file'''
-    pass        
+    pass
+
 
 def sanity(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
         before the export and will stop the
         export process if the returned data is 
         "False"
-        
+
         The "stage_name" argument is the name
         of the exported stage
 
@@ -49,9 +53,10 @@ def sanity(stage_name, string_asset, exported_string_asset):
         asset represented as string
 
         The "exported_string_asset" argument is the
-        asset wizard will export represented as string'''        
+        asset wizard will export represented as string'''
 
     return True
+
 
 def before_export(stage_name, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -69,6 +74,7 @@ def before_export(stage_name, string_asset, exported_string_asset):
         The "exported_string_asset" argument is the
         asset wizard will export represented as string'''
     return []
+
 
 def after_export(stage_name, export_dir, string_asset, exported_string_asset):
     ''' This function is triggered
@@ -100,7 +106,8 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
             if len(parents) == 0:
                 continue
             fur_export_name = f"{node.getName().split(':')[-1]}"
-            file_path = os.path.join(export_dir, f'xgen_cache__{fur_export_name}.abc')
+            file_path = os.path.join(
+                export_dir, f'xgen_cache__{fur_export_name}.abc')
             command = f"-obj {node.getName()} "
             command += f"-file {file_path} "
             command += f"-df 'ogawa' "
@@ -110,13 +117,14 @@ def after_export(stage_name, export_dir, string_asset, exported_string_asset):
             cmds.xgmSplineCache(export=True, j=command)
     pass
 
-def after_reference(stage_name, 
-                        referenced_stage_name, 
-                        referenced_files_dir,
-                        namespace, 
-                         new_objects,
-                         string_asset,
-                         referenced_string_asset):
+
+def after_reference(stage_name,
+                    referenced_stage_name,
+                    referenced_files_dir,
+                    namespace,
+                    new_objects,
+                    string_asset,
+                    referenced_string_asset):
     ''' This function is triggered
         after referencing from wizard
 
