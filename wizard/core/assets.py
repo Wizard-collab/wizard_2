@@ -27,29 +27,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# This module is the main instances management module
-# You can create, get the path and archive the following instances
-# /domains
-# /categories
-# /assets
-# /stages
-# /variants
-# /work env
-# /versions
-# /export assets
-# /export versions
+"""
+This module provides a comprehensive set of functions for managing assets, stages, categories, domains, 
+and other project-related entities in a production pipeline. It includes functionality for creating, 
+modifying, archiving, and retrieving data related to various project components. The module also 
+handles file system operations, database interactions, and event logging.
 
-# The creation of an instance basically log the instance
-# in the project database and create the corresponding folders
-# on the file system
+Key Features:
+- Asset Management: Create, archive, and modify assets, categories, and domains.
+- Stage and Variant Management: Create and manage stages, variants, and their associated data.
+- Work Environment: Manage work environments, including creating, duplicating, and archiving versions.
+- Export and Reference Management: Handle exports, references, and grouped references.
+- Event Logging: Log events related to asset tracking, creation, and modifications.
+- File System Integration: Manage file paths, directories, and file operations for project components.
+- User Interaction: Handle clipboard operations, user activity, and recent scenes.
+- Hooks and Extensions: Trigger hooks for post-creation and modification events.
 
-# The archiving of an instance basically archive the corresponding
-# folder, delete the original folder from the file
-# system and remove the instance from the project database
+Dependencies:
+- Python modules: os, time, json, logging, clipboard, traceback, uuid
+- Wizard modules: environment, events, project, repository, tools, path_utils, image, game, tags, stats, asset_tracking, hooks, user, subtasks_library
+- Wizard variables: assets_vars, game_vars, project_vars
 
-# The path query of an instance will only access the database and
-# construct the directory name, this modules doesn't
-# query the file system
+Note:
+- This module assumes a specific project structure and database schema.
+- It relies on external modules and variables for functionality and configuration.
+"""
 
 # Python modules
 import os

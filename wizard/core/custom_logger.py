@@ -26,6 +26,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module provides custom logging functionality for the Wizard application.
+
+It includes the following features:
+1. A root logger configuration function (`get_root_logger`) that sets up logging
+    to both a file and the console, with log levels determined by command-line arguments.
+2. A utility function (`create_prefs_folder`) to ensure the existence of the user
+    preferences folder required for logging.
+
+Dependencies:
+- Python's built-in `logging` module for log handling.
+- `sys` module for accessing command-line arguments.
+- `wizard.vars.user_vars` for user-specific variables like log file paths.
+- `wizard.core.path_utils` for file system path operations.
+
+Usage:
+- Call `get_root_logger()` to configure and retrieve the root logger.
+- The logger writes logs to a file and outputs them to the console.
+- Ensure the user preferences folder exists by invoking `create_prefs_folder()`.
+"""
+
 # Python modules
 import logging
 import sys
@@ -36,6 +57,22 @@ from wizard.core import path_utils
 
 
 def get_root_logger():
+    """
+    Configures and returns the root logger for the application.
+    This function sets up the root logger with two handlers:
+    1. A file handler that writes log messages to a file specified by 
+       `user_vars._user_logger_file_`.
+    2. A stream handler that outputs log messages to the console.
+    The log level is determined based on the presence of 'DEBUG' in the 
+    command-line arguments (`sys.argv`). If 'DEBUG' is present, the log 
+    level is set to `DEBUG`. Otherwise, it defaults to `INFO`.
+    The log message format for both handlers is:
+    `%(asctime)s [%(name)-23.23s] [%(levelname)-5.5s] %(message)s`.
+    Additionally, this function ensures that the preferences folder is 
+    created by calling `create_prefs_folder()`.
+    Returns:
+        logging.Logger: The configured root logger instance.
+    """
     create_prefs_folder()
     root_logger = logging.getLogger()
     if 'DEBUG' in sys.argv:
@@ -54,5 +91,19 @@ def get_root_logger():
 
 
 def create_prefs_folder():
+    """
+    Ensures that the user preferences folder exists. If the folder does not exist,
+    it creates the necessary directories.
+
+    This function checks the directory path specified in `user_vars._user_path_`.
+    If the directory does not exist, it uses `path_utils.makedirs` to create it.
+
+    Dependencies:
+        - `path_utils`: A module providing utilities for file system path operations.
+        - `user_vars._user_path_`: A variable containing the path to the user preferences folder.
+
+    Raises:
+        OSError: If the directory cannot be created due to file system permissions or other issues.
+    """
     if not path_utils.isdir(user_vars._user_path_):
         path_utils.makedirs(user_vars._user_path_)
