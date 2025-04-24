@@ -26,6 +26,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module provides support functionalities for the Wizard application.
+
+It includes methods to:
+- Fetch the latest build information from a remote server.
+- Send log messages to a support server with user and application details.
+- Submit user quotes to a predefined server.
+
+The module handles network-related exceptions and logs errors or success messages
+to ensure robustness and traceability.
+
+Dependencies:
+- Python modules: requests, traceback, logging
+- Wizard modules: application, environment, ressources
+"""
+
 # Python modules
 import requests
 import traceback
@@ -40,6 +56,22 @@ logger = logging.getLogger(__name__)
 
 
 def get_latest_build():
+    """
+    Fetches the latest build information from a predefined web server URL.
+
+    This function sends a POST request to the server's "latest_build" endpoint
+    and attempts to retrieve the response in JSON format. It handles various
+    exceptions to ensure robustness in case of network issues or other errors.
+
+    Returns:
+        dict: The JSON response from the server if the request is successful.
+        None: If an exception occurs or the request fails.
+
+    Exceptions Handled:
+        - requests.Timeout: Logs an error if the connection times out.
+        - requests.ConnectionError: Logs an error if there is no network connection.
+        - Other exceptions: Logs the full traceback of the error.
+    """
     URL = f"{ressources._web_server_url_}latest_build/"
     try:
         response = requests.post(URL, timeout=3)
@@ -55,22 +87,27 @@ def get_latest_build():
         return
 
 
-'''
-def download_install_latest_build():
-    latest_build = get_latest_build()
-    file_name = latest_build[0]['setup_name']
-    url = latest_build[1]
-    destination = path_utils.join(tools.temp_dir(), file_name)
-    r = requests.get(url)
-    r = requests.get(url)
-    with open(destination,'wb') as f:
-        f.write(r.content)
-    os.startfile(destination)
-    sys.exit()
-'''
-
-
 def send_log(log, type, additionnal_message=''):
+    """
+    Sends a log message along with additional information to a remote support server.
+
+    Args:
+        log (str): The log message to be sent.
+        type (str): The type/category of the log (e.g., error, info, warning).
+        additionnal_message (str, optional): An additional message provided by the user. 
+            Defaults to 'No message from user' if not specified.
+
+    Raises:
+        requests.Timeout: If the connection to the server times out.
+        requests.ConnectionError: If there is no network connection.
+        Exception: For any other unexpected errors.
+
+    Notes:
+        - The function gathers user, project, repository, and application version information 
+          to include in the log submission.
+        - Logs are sent as a POST request to a predefined support server URL.
+        - Logs the success or failure of the submission process.
+    """
     URL = f"{ressources._web_server_url_}support/"
     contact_dic = dict()
     contact_dic['username'] = environment.get_user()
@@ -104,6 +141,24 @@ def send_log(log, type, additionnal_message=''):
 
 
 def send_quote(quote):
+    """
+    Sends a quote to a predefined web server URL.
+
+    This function constructs a dictionary containing user information and the
+    quote content, then sends it as a POST request to the server. It handles
+    various exceptions that may occur during the request and logs the outcome.
+
+    Args:
+        quote (str): The content of the quote to be sent.
+
+    Raises:
+        None: This function does not raise exceptions but logs errors instead.
+
+    Logs:
+        - Logs a success message if the quote is successfully submitted.
+        - Logs an error message if the server returns an error, the connection
+          times out, there is no network connection, or any other exception occurs.
+    """
     URL = f"{ressources._web_server_url_}quotes/"
     contact_dic = dict()
     contact_dic['username'] = environment.get_user()

@@ -26,6 +26,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module provides core database functionalities for the Wizard application.
+It includes classes and functions for managing database connections, executing
+SQL commands, and handling database-related operations such as creating databases
+and tables. The module uses PostgreSQL as the database backend and includes
+retry logic for handling connection issues.
+
+Classes:
+    Singleton: A metaclass for implementing the Singleton design pattern.
+    db_access_singleton: A singleton class for managing database access and executing SQL commands.
+
+Functions:
+    create_connection(database=None): Establishes a connection to a PostgreSQL database.
+    try_connection(DNS): Attempts to establish a connection to a PostgreSQL server.
+    create_database(database): Creates a new PostgreSQL database with the specified name.
+    create_table(database, cmd): Creates a table in the specified database by executing the provided SQL command.
+
+Dependencies:
+    - Python modules: time, logging
+    - PostgreSQL modules: psycopg2, psycopg2.extras
+    - Wizard modules: environment
+
+Logging:
+    The module uses Python's logging library to log informational messages, warnings,
+    and errors related to database operations.
+"""
+
+
 # Python modules
 import time
 import logging

@@ -26,11 +26,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# This module build the wizard environment
-# ( Current project and current user )
-# It permits to avoid some database access
-# during the use of the application
-
 """
 This module is responsible for building and managing the Wizard environment.
 It provides functions to set and retrieve various environment variables 
