@@ -109,11 +109,11 @@ def init_user_session():
     """
     with open(user_vars._session_file_, 'w') as f:
         f.write('')
-    import session
 
 
 create_user_folders()
 init_user_session()
+import session  # noqa: E402
 
 
 class user:

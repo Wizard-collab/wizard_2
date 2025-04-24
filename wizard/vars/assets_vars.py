@@ -26,6 +26,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines various constants and dictionaries used in the Wizard software.
+It includes definitions for software names, domain variables, asset categories, 
+asset stages, stage rules, file extensions, stage software rules, asset states, 
+and asset urgencies. These constants and dictionaries are used throughout the 
+Wizard software to standardize and manage data related to assets, sequences, 
+and libraries in a production pipeline.
+"""
+
 # Softwares
 _maya_ = 'maya'
 _guerilla_render_ = 'guerilla_render'

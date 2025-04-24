@@ -48,10 +48,9 @@ from wizard.core import path_utils  # Custom module for path-related utilities
 # Initialize a logger for this module
 logger = logging.getLogger(__name__)
 
-# Function to retrieve the version information from a YAML file
-
 
 def get_version():
+    # Function to retrieve the version information from a YAML file
     version_file = 'ressources/version.yaml'  # Path to the version file
     if not path_utils.isfile(version_file):  # Check if the file exists
         # Log an error if the file is missing
@@ -62,38 +61,34 @@ def get_version():
         version_dic = yaml.load(f, Loader=yaml.Loader)
     return version_dic  # Return the parsed version dictionary
 
-# Function to add the 'binaries' directory to the system PATH
-
 
 def add_binaries_to_path():
+    # Function to add the 'binaries' directory to the system PATH
     # Get the absolute path of the 'binaries' directory
     binaries_path = os.path.abspath('binaries')
     # Append the path to the system PATH environment variable
     os.environ['PATH'] += os.pathsep + binaries_path
 
-# Function to log application information
-
 
 def log_app_infos():
+    # Function to log application information
     print('')  # Print an empty line for formatting
     log_version()  # Log the version information
     print('')  # Print another empty line
     log_license()  # Log the license information
     print('')  # Print another empty line
 
-# Function to log the version information
-
 
 def log_version():
+    # Function to log the version information
     version_dic = get_version()  # Retrieve the version dictionary
     # Print the version details in a formatted string
     print(
         f"Wizard {version_dic['MAJOR']}.{version_dic['MINOR']}.{version_dic['PATCH']} build {version_dic['builds']},{time.ctime(version_dic['date'])}")
 
-# Function to log the license information
-
 
 def log_license():
+    # Function to log the license information
     with open('ressources/LICENSE', 'r') as f:  # Open the LICENSE file in read mode
         print(f.read())  # Print the contents of the LICENSE file
 

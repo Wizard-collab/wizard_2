@@ -173,6 +173,8 @@ def add_progress_event(new_stage=None, removed_stage=None):
             datas_dic = json.loads(progress_row['datas_dic'])
             original_datas_dic = datas_dic.copy()
 
+            if stage_name not in datas_dic:
+                continue
             # Update progress for asset stages
             if stage_name in assets_vars._assets_stages_list_:
                 datas_dic[stage_name] *= (stage_len - 1) / stage_len
@@ -181,6 +183,8 @@ def add_progress_event(new_stage=None, removed_stage=None):
 
             # Update progress for sequence stages
             elif stage_name in assets_vars._sequences_stages_list_:
+                print(datas_dic)
+
                 asset_row = assets[new_stage_row['asset_id']]
                 frames_number = asset_row['outframe'] - asset_row['inframe']
                 datas_dic[stage_name] *= (all_frames -
