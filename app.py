@@ -6,47 +6,29 @@
 
 # MIT License
 
-# Copyright (c) 2021 Leo brunel
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
 # Python modules
-import PyOpenColorIO
-import sys
-import time
-from PyQt6 import QtWidgets, QtCore, QtGui
-import logging
+import PyOpenColorIO  # For OpenColorIO configuration
+import sys  # For system-specific parameters and functions
+import time  # For measuring performance and handling time
+from PyQt6 import QtWidgets, QtCore, QtGui  # For GUI components
+import logging  # For logging messages
 
-# Wizard modules
-from wizard.core import application
-from wizard.core import custom_logger
+# Wizard core modules
+from wizard.core import application  # Core application utilities
+from wizard.core import custom_logger  # Custom logging setup
+# Handles version database updates
 from wizard.core import version_database_modification
 
-# Wizard gui modules
-from wizard.gui import app_utils
-from wizard.gui import loading_widget
-from wizard.gui import main_widget
-from wizard.gui import table_viewer_widget
-import error_handler
+# Wizard GUI modules
+from wizard.gui import app_utils  # GUI utility functions
+from wizard.gui import loading_widget  # Loading screen widget
+from wizard.gui import main_widget  # Main application widget
+from wizard.gui import table_viewer_widget  # Table viewer widget
+import error_handler  # Error handling utilities
 
+# Initialize the root logger for the application
 custom_logger.get_root_logger()
-logger = logging.getLogger('wizard')
+logger = logging.getLogger('wizard')  # Logger for this module
 
 
 class app():
@@ -55,50 +37,65 @@ class app():
                  change_repo,
                  change_psql,
                  table_viewer):
+        # Initialize application attributes
         self.stats_schedule = None
 
-        # Init
-        self.app = app_utils.get_app()
+        # Initialize the main application
+        self.app = app_utils.get_app()  # Create the main QApplication instance
+        # Initialize warning tooltips
         self.warning_tooltip = app_utils.init_warning_tooltip()
-        app_utils.set_wizard_gui()
-        app_utils.init_psql_dns(self, change_psql)
+        app_utils.set_wizard_gui()  # Set up the GUI environment
+        app_utils.init_psql_dns(self, change_psql)  # Initialize PostgreSQL DNS
+        # Initialize the repository
         app_utils.init_repository(self, change_repo)
-        app_utils.init_user(self, log_user)
-        app_utils.init_project(self, project_manager)
-        app_utils.init_OCIO()
-        self.stats_schedule = app_utils.init_stats()
-        # Main gui app
-        start_time = time.perf_counter()
-        self.loading_widget = loading_widget.loading_widget()
-        self.loading_widget.show()
-        logger.info("Openning Wizard")
-        QtWidgets.QApplication.processEvents()
+        app_utils.init_user(self, log_user)  # Initialize user settings
+        app_utils.init_project(self, project_manager)  # Initialize the project
+        app_utils.init_OCIO()  # Initialize OpenColorIO configuration
+        self.stats_schedule = app_utils.init_stats()  # Initialize statistics scheduler
 
+        # Main GUI application setup
+        start_time = time.perf_counter()  # Start measuring application load time
+        self.loading_widget = loading_widget.loading_widget()  # Create a loading widget
+        self.loading_widget.show()  # Display the loading widget
+        logger.info("Opening Wizard")  # Log the application start
+        QtWidgets.QApplication.processEvents()  # Process pending GUI events
+
+        # Perform version database modifications
         version_database_modification.main()
 
+        # Initialize the table viewer if requested
         if table_viewer:
             self.table_viewer = table_viewer_widget.table_viewer_widget()
 
+        # Set up the main application widget
         self.main_widget = main_widget.main_widget()
-        self.main_widget.stop_threads.connect(self.stats_schedule.stop)
-        self.main_widget.refresh()
-        self.main_widget.init_floating_windows()
-        QtWidgets.QApplication.processEvents()
-        self.main_widget.init_contexts()
-        self.loading_widget.close()
-        self.main_widget.whatsnew()
+        self.main_widget.stop_threads.connect(
+            self.stats_schedule.stop)  # Connect thread stopping
+        self.main_widget.refresh()  # Refresh the main widget
+        self.main_widget.init_floating_windows()  # Initialize floating windows
+        QtWidgets.QApplication.processEvents()  # Process pending GUI events
+        self.main_widget.init_contexts()  # Initialize application contexts
+        self.loading_widget.close()  # Close the loading widget
+        self.main_widget.whatsnew()  # Display "What's New" information
+        # Check if the build is the latest
         self.main_widget.is_latest_build(force=0)
         logger.info(
+            # Log the startup time
             f"Wizard start time : {str(round((time.perf_counter()-start_time), 1))}s")
 
     def quit(self):
+        # Restore standard output and error streams
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
+
+        # Stop the statistics scheduler if it exists
         if self.stats_schedule:
             self.stats_schedule.stop()
+
+        # Close all application windows and quit
         QtWidgets.QApplication.closeAllWindows()
         QtWidgets.QApplication.quit()
-        sys.exit()
+        sys.exit()  # Exit the application
 
 
 def main(project_manager=False,
@@ -106,16 +103,21 @@ def main(project_manager=False,
          change_repo=False,
          change_psql=False,
          table_viewer=False):
+    # Set the exception hook for the application
     sys.excepthook = app_utils.excepthook
+
+    # Log application information
     application.log_app_infos()
+
+    # Create and run the main application
     wizard_app = app(project_manager,
                      log_user,
                      change_repo,
                      change_psql,
                      table_viewer)
-    ret = wizard_app.app.exec()
-    sys.exit(ret)
+    ret = wizard_app.app.exec()  # Execute the application event loop
+    sys.exit(ret)  # Exit with the return code
 
 
 if __name__ == '__main__':
-    main()
+    main()  # Run the main function if this script is executed directly
