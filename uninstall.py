@@ -26,6 +26,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module provides functionality for uninstalling the Wizard application on Windows.
+
+It includes:
+- Functions to check administrative privileges, manage registry keys, and delete files.
+- A PyQt-based GUI for user interaction during the uninstallation process.
+- A bootstrap mechanism to ensure the script runs in the correct context.
+
+Main Components:
+1. Helper Functions:
+    - `is_bootsrap()`: Determines if the script is running in a bootstrap context.
+    - `create_bootstrap()`: Creates a temporary bootstrap executable.
+    - `is_admin()`: Checks if the user has administrative privileges.
+    - `ressources_path()`: Resolves resource paths for bundled applications.
+    - `remove_install_dir()`: Deletes the installation directory.
+    - `delete_reg_keys()`: Removes registry keys related to the application.
+    - `delete_shortcuts()` and `delete_shortcut()`: Deletes desktop shortcuts.
+    - `get_current_install()`: Retrieves installation details from the registry.
+
+2. Main Uninstallation Logic:
+    - `uninstall()`: Handles the uninstallation process, including privilege escalation.
+
+3. PyQt GUI:
+    - `uninstaller`: A QWidget-based class for the uninstaller GUI.
+    - Provides a progress bar, status messages, and buttons for user interaction.
+
+4. Entry Point:
+    - `main()`: Determines the execution context and starts the uninstallation process.
+
+Note:
+- The script is designed for Windows and requires administrative privileges.
+- It uses PyQt6 for the GUI and interacts with the Windows registry and file system.
+"""
+
 # Python modules
 from PyQt6 import QtWidgets, QtGui
 import os
@@ -38,10 +72,21 @@ from win32com.client import Dispatch
 import time
 import tempfile
 
-# CHECK ADMIN
-
 
 def is_bootsrap():
+    """
+    Determines whether the script is running in a "bootstrap" context.
+
+    This function checks several conditions to identify if the script is being executed
+    in a specific environment or directory structure that indicates a bootstrap state.
+
+    Returns:
+        bool: 
+            - True if the script is running in a bootstrap context or if the script's 
+              filename ends with '.py'.
+            - False if the script is not in a bootstrap context and is running from 
+              specific directories  like the current installation path.
+    """
     if not sys.argv[0].endswith('.py'):
         if os.path.normpath(os.path.abspath('')) != os.path.normpath(get_current_install()[3]):
             if os.path.normpath(os.path.abspath('')) == os.path.normpath('C:/Windows/ImmersiveControlPanel'):
@@ -55,6 +100,24 @@ def is_bootsrap():
 
 
 def create_bootstrap():
+    """
+    Creates a temporary bootstrap executable for the uninstallation process.
+
+    This function performs the following steps:
+    1. Creates a temporary directory.
+    2. Checks if the current script is not a Python file (i.e., not ending with '.py').
+    3. Copies the current executable to the temporary directory as 'uninstall.exe'.
+    4. Changes the working directory to the temporary directory.
+    5. Starts the copied executable ('uninstall.exe') from the temporary directory.
+    6. Exits the current script.
+
+    Note:
+    - This function is designed to handle cases where the script is packaged as an executable.
+    - It ensures that the uninstallation process runs from a temporary location.
+
+    Raises:
+    - SystemExit: Terminates the current script after starting the bootstrap executable.
+    """
     tempdir = tempfile.mkdtemp()
     if not sys.argv[0].endswith('.py'):
         bootstrap = os.path.join(tempdir, 'uninstall.exe')
@@ -66,6 +129,13 @@ def create_bootstrap():
 
 
 def is_admin():
+    """
+    Checks if the current user has administrative privileges.
+
+    Returns:
+        bool: True if the user has administrative privileges, False otherwise.
+              If an exception occurs during the check, it will return False.
+    """
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
@@ -73,12 +143,41 @@ def is_admin():
 
 
 def ressources_path(relative_path):
+    """
+    Get the absolute path to a resource, handling cases where the script is 
+    bundled using PyInstaller.
+
+    If the script is running in a PyInstaller bundle, the resource path is 
+    resolved relative to the `_MEIPASS` directory. Otherwise, it is resolved 
+    relative to the current working directory.
+
+    Args:
+        relative_path (str): The relative path to the resource.
+
+    Returns:
+        str: The absolute path to the resource.
+    """
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
 
 
 def remove_install_dir():
+    """
+    Removes the installation directory of the Wizard application.
+
+    This function retrieves the current installation directory using the 
+    `get_current_install` function. If the directory exists, it deletes 
+    the entire directory and its contents. If the directory does not exist, 
+    it prints a message indicating that the directory was not found.
+
+    Note:
+    - This function uses `shutil.rmtree` to remove the directory, which 
+      deletes all files and subdirectories within the specified directory.
+
+    Raises:
+    - OSError: If an error occurs during the removal of the directory.
+    """
     install_dir = get_current_install()[3]
     if os.path.isdir(install_dir):
         shutil.rmtree(install_dir)
@@ -88,6 +187,22 @@ def remove_install_dir():
 
 
 def delete_reg_keys():
+    """
+    Deletes specific registry keys related to the "Wizard" application from the Windows registry.
+
+    This function targets the registry path:
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Wizard"
+    under HKEY_LOCAL_MACHINE and removes it. It requires administrative privileges
+    to execute successfully.
+
+    Raises:
+        FileNotFoundError: If the specified registry key does not exist.
+        PermissionError: If the function lacks the necessary permissions to modify the registry.
+
+    Note:
+        Ensure that the `winreg` module is imported and that the script is run with
+        administrative privileges to avoid errors.
+    """
     KEY = "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Wizard"
     registry_key = winreg.OpenKey(
         winreg.HKEY_LOCAL_MACHINE, KEY, 0, winreg.KEY_ALL_ACCESS)
@@ -97,6 +212,22 @@ def delete_reg_keys():
 
 
 def delete_shortcuts():
+    """
+    Deletes specific shortcuts related to the Wizard application from the desktop.
+
+    This function targets the following shortcuts:
+    - 'Wizard'
+    - 'PyWizard'
+    - 'server'
+    - 'Create Repository'
+    - 'Change Repository'
+
+    If any of these shortcuts exist on the desktop, they will be removed.
+
+    Note:
+    - This function uses the `delete_shortcut` helper function to remove each shortcut.
+    - Ensure that the `winshell` module is properly installed and accessible.
+    """
     delete_shortcut('Wizard')
     delete_shortcut('PyWizard')
     delete_shortcut('server')
@@ -105,6 +236,25 @@ def delete_shortcuts():
 
 
 def delete_shortcut(name):
+    """
+    Deletes a shortcut file from the desktop.
+
+    This function locates a shortcut file with the specified name
+    on the user's desktop and deletes it if it exists.
+
+    Args:
+        name (str): The name of the shortcut (without the .lnk extension).
+
+    Returns:
+        None
+
+    Side Effects:
+        - Removes the shortcut file from the desktop if it exists.
+        - Prints a message indicating the shortcut was deleted.
+
+    Raises:
+        None
+    """
     desktop = winshell.desktop()
     path = os.path.join(desktop, f"{name}.lnk")
     if os.path.isfile(path):
@@ -113,6 +263,19 @@ def delete_shortcut(name):
 
 
 def get_current_install():
+    """
+    Retrieves information about the current installation of the Wizard application 
+    from the Windows registry and checks the existence of the installation directory.
+    Returns:
+        tuple: A tuple containing the following:
+            - is_reg (bool or None): True if the registry key for the application exists, 
+              otherwise None.
+            - version (str or None): The version of the application as retrieved from the 
+              registry, or None if not found.
+            - is_files (bool or None): True if the installation directory exists, otherwise None.
+            - install_dir (str or None): The path to the installation directory as retrieved 
+              from the registry, or None if not found.
+    """
     is_reg = None
     version = None
     is_files = None
@@ -135,6 +298,24 @@ def get_current_install():
 
 
 def uninstall():
+    """
+    Handles the uninstallation process for the wizard application.
+
+    This function checks if the script is running with administrative privileges.
+    If not, it attempts to restart itself with elevated permissions. Once running
+    as an administrator, it performs the following steps:
+
+    1. Removes the installation directory.
+    2. Deletes associated registry keys.
+    3. Deletes any created shortcuts.
+
+    Finally, it prints a confirmation message indicating the uninstallation is complete.
+
+    Note:
+        - This function assumes the presence of helper functions:
+          `is_admin()`, `remove_install_dir()`, `delete_reg_keys()`, and `delete_shortcuts()`.
+        - It uses `ctypes` and `sys` modules to handle privilege escalation on Windows.
+    """
     if not is_admin():
         ctypes.windll.shell32.ShellExecuteW(
             None, "runas", sys.executable, " ".join(sys.argv), None, 1)
@@ -147,6 +328,42 @@ def uninstall():
 
 
 class uninstaller(QtWidgets.QWidget):
+    """
+    A QWidget-based class for the Wizard uninstaller GUI.
+    This class provides a graphical interface to uninstall the Wizard application. 
+    It includes functionality to display the current version, show progress during 
+    the uninstallation process, and handle user interactions.
+    Methods:
+        __init__(parent=None):
+            Initializes the uninstaller widget, sets up the UI, and connects signals to slots.
+        showEvent(event):
+            Centers the widget on the primary screen when it is shown.
+        fill_ui():
+            Fills the UI with the current installed version of the Wizard application.
+        process():
+            Executes the uninstallation process, including removing files, deleting registry keys, 
+            and removing shortcuts. Updates the progress bar and status messages during the process.
+        connect_functions():
+            Connects button click events to their respective functions.
+        build_ui():
+            Constructs the user interface, including layouts, labels, progress bar, and buttons.
+    Attributes:
+        main_layout (QtWidgets.QVBoxLayout): The main layout of the widget.
+        datas_widget (QtWidgets.QWidget): A widget containing the image and information layout.
+        datas_layout (QtWidgets.QHBoxLayout): The layout for the datas_widget.
+        image_label (QtWidgets.QLabel): A label displaying the Wizard icon.
+        infos_widget (QtWidgets.QWidget): A widget containing the information layout.
+        infos_layout (QtWidgets.QVBoxLayout): The layout for the infos_widget.
+        infos_label (QtWidgets.QLabel): A label displaying the current status or prompt.
+        version_label (QtWidgets.QLabel): A label displaying the current installed version.
+        progress_bar (QtWidgets.QProgressBar): A progress bar to show uninstallation progress.
+        buttons_widget (QtWidgets.QWidget): A widget containing the buttons layout.
+        buttons_layout (QtWidgets.QHBoxLayout): The layout for the buttons_widget.
+        cancel_button (QtWidgets.QPushButton): A button to cancel the uninstallation process.
+        uninstall_button (QtWidgets.QPushButton): A button to start the uninstallation process.
+        close_button (QtWidgets.QPushButton): A button to close the uninstaller after completion.
+    """
+
     def __init__(self, parent=None):
         super(uninstaller, self).__init__(parent)
         self.setWindowIcon(QtGui.QIcon(ressources_path(
@@ -291,6 +508,24 @@ QProgressBar::chunk {background-color:
 
 
 def main():
+    """
+    Entry point for the uninstaller script.
+
+    This function determines the execution context and handles the uninstallation process:
+    1. Checks if the script is running in a bootstrap context using `is_bootsrap()`.
+    2. If running in a bootstrap context:
+        - Checks if the script has administrative privileges using `is_admin()`.
+        - If it has admin privileges, initializes the PyQt application, applies the stylesheet,
+          and displays the uninstaller GUI.
+        - If not, restarts the script with elevated privileges.
+    3. If not running in a bootstrap context, creates a temporary bootstrap executable
+       using `create_bootstrap()`.
+
+    Note:
+    - This function ensures that the uninstallation process is executed with the necessary
+      permissions and in the correct environment.
+    - The script exits after the PyQt application is closed or after restarting with admin privileges.
+    """
     if is_bootsrap():
         if is_admin():
             os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "0.75"

@@ -26,6 +26,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines environment variable names used throughout the Wizard application.
+These variables are used to configure and manage various aspects of the application,
+such as repository paths, user information, project details, and server configurations.
+"""
+
 _repository_env_ = 'wizard_repository'
 _username_env_ = 'wizard_user'
 _useremail_env_ = 'wizard_user_email'

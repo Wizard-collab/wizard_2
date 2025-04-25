@@ -26,6 +26,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines various game variables and artefacts used in the Wizard game.
+It includes artefacts with different types (attack, protection, booster), their properties,
+and other game-related constants such as experience points, coins, penalties, and taxes.
+"""
+
 # Wizard core modules
 from wizard.vars import ressources
 

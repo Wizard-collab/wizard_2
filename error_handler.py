@@ -26,6 +26,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines the `error_handler` class, which provides a graphical interface for handling errors in the Wizard application.
+It includes functionality to display error messages, allow users to add additional details, and send error reports to support.
+The module also contains a `main` function to initialize and display the error handler widget.
+
+Classes:
+    error_handler: A QWidget-based class for displaying and managing error messages.
+
+Functions:
+    main(): Initializes the application and displays the error handler widget.
+
+Dependencies:
+    - PyQt6.QtWidgets
+    - PyQt6.QtCore
+    - PyQt6.QtGui
+    - os
+    - sys
+    - wizard.gui.app_utils
+    - wizard.vars.ressources
+    - wizard.core.support
+    - wizard.core.environment
+"""
+
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 import os
@@ -41,6 +64,39 @@ from wizard.core import environment
 
 
 class error_handler(QtWidgets.QWidget):
+    """
+    error_handler is a QWidget-based class that provides a graphical interface for handling errors in the Wizard application.
+    It displays the error message, allows the user to add additional details, and provides options to either close the window
+    or send the error details to support.
+    Attributes:
+        error (str): The error message to be displayed in the error handler window.
+        main_layout (QVBoxLayout): The main layout of the widget.
+        header_widget (QWidget): The header section of the widget containing the title and crash icon.
+        crash_image (QLabel): A label displaying the crash icon.
+        header_content_widget (QWidget): A widget containing the title and informational text.
+        title_label (QLabel): A label displaying the title of the error handler.
+        info_label (QLabel): A label displaying additional information about the error.
+        error_label (QTextEdit): A text edit widget displaying the error message.
+        additionnal_message_field (QTextEdit): A text edit widget for the user to add additional details about the error.
+        close_button (QPushButton): A button to close the error handler window.
+        send_to_support_button (QPushButton): A button to send the error details to support.
+    Methods:
+        __init__(error, parent=None):
+            Initializes the error_handler instance with the given error message and parent widget.
+        connect_functions():
+            Connects the buttons to their respective functions.
+        send_to_support():
+            Sends the error details and additional message to support and closes the window.
+        build_ui():
+            Builds the user interface of the error handler.
+        closeEvent(event):
+            Closes all application windows when the error handler is closed.
+        showEvent(event):
+            Centers the error handler window on the screen when it is shown.
+        center():
+            Centers the error handler window on the screen.
+    """
+
     def __init__(self, error, parent=None):
         super(error_handler, self).__init__(parent)
 
@@ -159,11 +215,24 @@ class error_handler(QtWidgets.QWidget):
 
 
 def main():
-    app = app_utils.get_app()
+    """
+    The main function initializes the application, retrieves the error message
+    from the command-line arguments, and displays the error handler widget.
+
+    Steps:
+    1. Initializes the QApplication instance using app_utils.get_app().
+    2. Retrieves the error message passed as a command-line argument.
+    3. Creates an instance of the error_handler widget with the error message.
+    4. Displays the error handler widget.
+    5. Starts the application's event loop and exits when the application is closed.
+    """
+    app = app_utils.get_app()  # Initialize the application
+    # Retrieve the error message from command-line arguments
     error = sys.argv[1]
-    error_handler_widget = error_handler(error)
-    error_handler_widget.show()
-    sys.exit(app.exec())
+    error_handler_widget = error_handler(
+        error)  # Create the error handler widget
+    error_handler_widget.show()  # Display the error handler widget
+    sys.exit(app.exec())  # Start the application's event loop
 
 
 if __name__ == '__main__':

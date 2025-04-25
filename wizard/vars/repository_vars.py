@@ -26,6 +26,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines constants used in the Wizard application.
+These constants include the repository database file name and
+default motivational quotes displayed to the user.
+"""
 # repository constants
 _repository_database_file_ = 'repository.db'
 

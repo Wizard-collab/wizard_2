@@ -26,6 +26,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines various resources and configurations used in the Wizard application.
+
+It includes:
+- URLs for the web server and documentation.
+- Definitions for supported software and their icons.
+- Paths to resources such as stylesheets, icons, and images.
+- Dictionaries for domain and stage icons and colors.
+- State icons and colors for production management.
+- Priority icons for urgency levels.
+- A list of available icons for use in the application.
+
+The module relies on the `path_utils` module for constructing absolute paths.
+"""
+
 # Python modules
 import os
 

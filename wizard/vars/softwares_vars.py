@@ -26,6 +26,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines variables and configurations for various software integrations
+used in the Wizard project. It includes definitions for available software, file
+extensions, launch commands, environment variables, plugin paths, script files,
+and hook files.
+
+The module is structured as follows:
+- Available software and their identifiers
+- File extensions for each software
+- Launch commands for different modes (file, no file, batch)
+- Environment variable mappings for each software
+- Plugin paths for each software
+- Script files for startup and batch modes
+- Hook files for software-specific integrations
+"""
+
 # Python modules
 import os
 

@@ -26,6 +26,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+"""
+This module defines user-specific variables and constants for the Wizard application.
+It includes paths for user preferences, logs, scripts, and other resources, as well as
+dictionary keys used throughout the application for various contexts and settings.
+
+The module also imports necessary Python and Wizard modules to handle file paths and
+other utilities.
+"""
+
 # Python modules
 import os
 

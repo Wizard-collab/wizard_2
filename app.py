@@ -6,6 +6,43 @@
 
 # MIT License
 
+# Copyright (c) 2021 Leo brunel
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+"""
+This module defines the main application logic for the Wizard software.
+It includes the initialization of the application, GUI setup, and the main event loop.
+The module also handles logging, error handling, and database modifications.
+
+Classes:
+    app: Represents the main application, managing initialization, GUI setup, and quitting.
+
+Functions:
+    main: Entry point for the application, setting up the app instance and running the event loop.
+
+Modules Imported:
+    - Python modules: PyOpenColorIO, sys, time, PyQt6, logging
+    - Wizard core modules: application, custom_logger, version_database_modification
+    - Wizard GUI modules: app_utils, loading_widget, main_widget, table_viewer_widget, error_handler
+"""
+
 # Python modules
 import PyOpenColorIO  # For OpenColorIO configuration
 import sys  # For system-specific parameters and functions
@@ -32,6 +69,23 @@ logger = logging.getLogger('wizard')  # Logger for this module
 
 
 class app():
+    """
+    The `app` class serves as the main entry point for initializing and managing the Wizard application. 
+    It sets up the application's GUI, initializes various components, and handles the application's lifecycle.
+    Attributes:
+        stats_schedule (object): Scheduler for managing application statistics.
+        app (QApplication): The main Qt application instance.
+        warning_tooltip (object): Tooltip for displaying warnings.
+        loading_widget (object): Widget displayed during application loading.
+        table_viewer (object, optional): Widget for viewing tables, initialized if requested.
+        main_widget (object): The main application widget.
+    Methods:
+        __init__(project_manager, log_user, change_repo, change_psql, table_viewer):
+            Initializes the application, sets up the GUI, and configures various components.
+        quit():
+            Cleans up resources, stops threads, and exits the application.
+    """
+
     def __init__(self, project_manager,
                  log_user,
                  change_repo,
@@ -103,6 +157,20 @@ def main(project_manager=False,
          change_repo=False,
          change_psql=False,
          table_viewer=False):
+    """
+    Entry point for the wizard application.
+    This function initializes the application, sets up the exception hook,
+    logs application information, and starts the main event loop.
+    Args:
+        project_manager (bool): If True, enables project manager functionality.
+        log_user (bool): If True, enables user logging functionality.
+        change_repo (bool): If True, enables repository change functionality.
+        change_psql (bool): If True, enables PostgreSQL change functionality.
+        table_viewer (bool): If True, enables table viewer functionality.
+    Returns:
+        None: The function does not return a value. It exits the program with
+        the application's return code.
+    """
     # Set the exception hook for the application
     sys.excepthook = app_utils.excepthook
 

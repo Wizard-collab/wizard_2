@@ -26,9 +26,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# PyWizard is the wizard application without GUI
-# Use PyWizard to execute batch commands like
-# large amount of instances creation or archiving
+"""
+PyWizard Application Module
+
+This module defines the main application logic for PyWizard, a software tool designed to manage
+projects, users, and tasks in a collaborative environment. It includes the initialization of 
+various components such as servers, user settings, project settings, and an interactive console.
+
+Classes:
+    app: Represents the main application logic for PyWizard, managing initialization, 
+         server setup, and graceful shutdown.
+
+Usage:
+    Run this module as the main script to start the PyWizard application.
+"""
 
 # Python modules
 import sys
@@ -67,7 +78,39 @@ sys.path.append(os.path.abspath(''))
 
 
 class app():
+    """
+    A class representing the main application logic for PyWizard.
+    This class initializes and manages various components of the application, 
+    including servers, user settings, project settings, and interactive console. 
+    It also handles the proper shutdown of all components when the application quits.
+    Attributes:
+        stats_schedule: An object for managing application statistics scheduling.
+        softwares_server: A server object for managing software-related tasks.
+        communicate_server: A server object for handling communication tasks.
+        tasks_server: A server object for managing subtasks.
+    Methods:
+        __init__():
+            Initializes the application, sets up servers, and starts an interactive console.
+        quit():
+            Stops all running servers and gracefully exits the application.
+    """
+
     def __init__(self):
+        """
+        Initializes the PyWizard application.
+        This constructor sets up the necessary components and servers required for the application to function.
+        It performs the following tasks:
+        - Logs application information.
+        - Retrieves the application instance.
+        - Configures the PyWizard environment.
+        - Initializes PostgreSQL DNS, repository, user, project, and OCIO settings.
+        - Sets up the statistics scheduler.
+        - Starts the communication server for inter-process communication.
+        - Launches the software server for managing software-related tasks.
+        - Starts the tasks server for handling subtasks.
+        - Opens an interactive Python console for debugging or interaction.
+        - Ensures proper cleanup and exit when the console is closed.
+        """
         self.stats_schedule = None
         self.softwares_server = None
         self.communicate_server = None
@@ -96,6 +139,22 @@ class app():
         self.quit()
 
     def quit(self):
+        """
+        Gracefully shuts down the application by stopping all active servers and schedules,
+        and then exits the application.
+
+        This method performs the following steps:
+        1. Stops the `stats_schedule` if it is running.
+        2. Stops the `softwares_server` if it is running.
+        3. Stops the `communicate_server` if it is running.
+        4. Stops the `tasks_server` if it is running.
+        5. Quits the Qt application.
+        6. Exits the Python interpreter.
+
+        Note:
+            Ensure that all servers and schedules are properly initialized before calling
+            this method to avoid potential errors during shutdown.
+        """
         if self.stats_schedule:
             self.stats_schedule.stop()
         if self.softwares_server:
