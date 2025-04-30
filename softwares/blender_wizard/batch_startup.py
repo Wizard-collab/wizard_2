@@ -2,7 +2,23 @@
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
 
+# Ensure PYTHONPATH environment variable paths are added to sys.path
 # Python modules
+
+# Python modules
+import os
+import logging
+import json
+import sys
+
+# Ensure PYTHONPATH environment variable paths are added to sys.path
+pythonpath_env = os.getenv('PYTHONPATH')  # noqa
+if pythonpath_env:  # noqa
+    for path in pythonpath_env.split(os.pathsep):  # noqa
+        if path not in sys.path:  # noqa
+            sys.path.append(path)  # noqa
+
+# Wizard modules
 from blender_wizard.export import shading
 from blender_wizard.export import camera
 from blender_wizard.export import animation
@@ -14,20 +30,8 @@ from blender_wizard.export import modeling
 from blender_wizard import wizard_video
 from blender_wizard import wizard_tools
 from blender_wizard import wizard_plugin
-import os
-import logging
-import json
-import sys
+
 logger = logging.getLogger('batch_startup')
-
-pythonpath_env = os.getenv('PYTHONPATH')
-if pythonpath_env:
-    for path in pythonpath_env.split(os.pathsep):
-        if path not in sys.path:
-            sys.path.append(path)
-
-# Wizard modules
-
 wizard_tools.trigger_after_scene_openning_hook()
 
 
