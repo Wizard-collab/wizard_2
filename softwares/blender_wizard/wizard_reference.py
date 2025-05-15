@@ -234,7 +234,6 @@ def link_blend(file_path, reference_dic, parent_collection=None):
 
 def library_override(collection_name):
     for object in bpy.data.collections[collection_name].all_objects:
-        print(object)
         bpy.data.objects[object.name].override_create(
             remap_local_usages=True)
         object.data.override_create(remap_local_usages=True)
