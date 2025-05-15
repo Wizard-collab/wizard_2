@@ -225,15 +225,19 @@ def link_blend(file_path, reference_dic, parent_collection=None):
             parent_collection.children.link(override_collection)
             bpy.context.view_layer.update()
 
-    for object in bpy.data.collections[reference_dic['namespace']].all_objects:
-        print(object)
-        bpy.data.objects[object.name].override_create(
-            remap_local_usages=True)
-        object.data.override_create(remap_local_usages=True)
+    library_override(reference_dic['namespace'])
 
     if os.path.basename(file_path) in bpy.data.libraries.keys():
         lib = bpy.data.libraries[os.path.basename(file_path)]
         lib.name = reference_dic['namespace']
+
+
+def library_override(collection_name):
+    for object in bpy.data.collections[collection_name].all_objects:
+        print(object)
+        bpy.data.objects[object.name].override_create(
+            remap_local_usages=True)
+        object.data.override_create(remap_local_usages=True)
 
 
 def update_blend(file_path, namespace):
@@ -243,6 +247,7 @@ def update_blend(file_path, namespace):
         lib.reload()
         lib = bpy.data.libraries[os.path.basename(file_path)]
         lib.name = namespace
+        library_override(namespace)
     except KeyError:
         logger.error(f"Library {namespace} not found")
 
@@ -274,6 +279,8 @@ def apply_shaders():
 
     all_objects = bpy.context.scene.objects
     for sh_obj in shading_meshes:
+        if 'wizardTags' not in sh_obj.keys():
+            continue
         sh_tags = (sh_obj['wizardTags']).split(',')
         sh_tags.sort()
         for target_obj in all_objects:
@@ -283,7 +290,30 @@ def apply_shaders():
                 continue
             tags = (target_obj['wizardTags']).split(',')
             tags.sort()
-            if tags == sh_tags:
+            OBJECT_tag = []
+            ASSET_tag = []
+            sh_OBJECT_tag = []
+            sh_ASSET_tag = []
+            for tag in tags:
+                if "OBJECT" in tag:
+                    OBJECT_tag.append(tag)
+                if "ASSET" in tag:
+                    ASSET_tag.append(tag)
+            for sh_tag in sh_tags:
+                if "OBJECT" in sh_tag:
+                    sh_OBJECT_tag.append(sh_tag)
+                if "ASSET" in sh_tag:
+                    sh_ASSET_tag.append(sh_tag)
+            if not OBJECT_tag or not ASSET_tag or not sh_OBJECT_tag or not sh_ASSET_tag:
+                continue
+            match = 0
+            for tag in OBJECT_tag:
+                if tag in sh_OBJECT_tag:
+                    match += 1
+            for tag in ASSET_tag:
+                if tag in sh_ASSET_tag:
+                    match += 1
+            if match == 2:
                 target_obj.data.materials.clear()
                 for material in sh_obj.data.materials:
                     target_obj.data.materials.append(material)

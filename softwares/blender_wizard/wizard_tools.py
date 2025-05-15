@@ -135,14 +135,15 @@ def namespace_exists(namespace):
     return namespace in list_all_collections(bpy.context.scene.collection)
 
 
-def list_all_collections(collection, all_collections=None, depth=0, max_depth=2):
+def list_all_collections(collection, all_collections=None):
     if all_collections is None:
         all_collections = []
-    all_collections.append(collection.name)
-    if depth >= max_depth:
-        return all_collections
+    if collection.override_library:
+        pass
+    else:
+        all_collections.append(collection.name.split('.')[0])
     for child in collection.children:
-        list_all_collections(child, all_collections, depth + 1, max_depth)
+        list_all_collections(child, all_collections)
     return all_collections
 
 
@@ -214,12 +215,15 @@ def apply_tags(object_list):
         if 'wizardTags' not in obj.keys():
             existing_tags = []
         else:
-            return
+            existing_tags = obj['wizardTags'].split(',')
         asset_tag = "{}_{}".format(
             os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':
             asset_tag += f"_{os.environ['wizard_variant_name']}"
-        to_tag = [os.environ['wizard_category_name'], asset_tag, obj.name]
+        to_tag = [f"CATEGORY={os.environ['wizard_category_name']}",
+                  f"ASSET={asset_tag}", f"OBJECT={obj.name}"]
+        to_tag += [f"{os.environ['wizard_category_name']}",
+                   asset_tag, obj.name]
         tags = existing_tags + to_tag
         obj['wizardTags'] = (',').join(set(tags))
 
