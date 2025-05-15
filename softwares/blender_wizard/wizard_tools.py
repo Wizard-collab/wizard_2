@@ -131,6 +131,21 @@ def select_all_children(objects_list):
         # bpy.context.view_layer.objects.active = GRP
 
 
+def add_default_shader(objects_list):
+    all_objects = []
+    for obj in objects_list:
+        all_objects.append(obj)
+        all_objects += get_all_children(obj, meshes=1)
+    for obj in all_objects:
+        if type(obj) == bpy.types.Collection:
+            continue
+        if obj.type == 'MESH':
+            if not obj.data.materials:
+                mat = bpy.data.materials.new(name="DefaultMaterial")
+                mat.use_nodes = False
+                obj.data.materials.append(mat)
+
+
 def namespace_exists(namespace):
     return namespace in list_all_collections(bpy.context.scene.collection)
 

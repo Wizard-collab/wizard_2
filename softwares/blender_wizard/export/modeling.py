@@ -48,6 +48,7 @@ def main(comment=''):
                 'modeling', exported_string_asset)
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
+            wizard_tools.add_default_shader(export_GRP_list)
 
             wizard_export.export(
                 'modeling', export_name, exported_string_asset, export_GRP_list, comment=comment)
