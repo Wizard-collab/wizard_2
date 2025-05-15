@@ -27,6 +27,8 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
                                                         export_name)
         if export_file.endswith('.abc'):
             export_abc(export_GRP_list, export_file, frange)
+        if export_file.endswith('.usd'):
+            export_usd(export_GRP_list, export_file, frange)
         elif export_file.endswith('.fbx'):
             export_fbx(export_GRP_list, export_file, frange)
         elif export_file.endswith('.blend'):
@@ -41,11 +43,17 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
 
 
 def export_abc(export_GRP_list, export_file, frange):
-    export_GRP_list = wizard_tools.group_objects_before_export(export_GRP_list)
     abc_command = wizard_hooks.get_abc_command("blender")
     if abc_command is None:
         abc_command = default_abc_command
     abc_command(export_GRP_list, export_file, frange)
+
+
+def export_usd(export_GRP_list, export_file, frange):
+    usd_command = wizard_hooks.get_usd_command("blender")
+    if usd_command is None:
+        usd_command = default_usd_command
+    usd_command(export_GRP_list, export_file)
 
 
 def export_fbx(export_GRP_list, export_file, frange):
@@ -144,6 +152,19 @@ def default_abc_command(export_GRP_list, export_file, frange):
                               end=frange[1],
                               sh_open=-0.2,
                               sh_close=0.2)
+
+
+def default_usd_command(export_GRP_list, export_file):
+    wizard_tools.select_all_children(export_GRP_list)
+    bpy.ops.wm.usd_export(filepath=export_file,
+                          selected_objects_only=True,
+                          export_animation=True,
+                          export_uvmaps=True,
+                          export_normals=True,
+                          export_materials=False,
+                          export_custom_properties=True,
+                          export_subdivision='IGNORE',
+                          export_armatures=False)
 
 
 def default_fbx_command(export_GRP_list, export_file, frange):

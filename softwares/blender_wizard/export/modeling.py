@@ -3,18 +3,19 @@
 # Contact: contact@leobrunel.com
 
 # Python modules
+import bpy
+from blender_wizard import wizard_export
+from blender_wizard import wizard_tools
+import wizard_communicate
 import traceback
 import os
 import logging
 logger = logging.getLogger(__name__)
 
 # Wizard modules
-import wizard_communicate
-from blender_wizard import wizard_tools
-from blender_wizard import wizard_export
 
 # Blender modules
-import bpy
+
 
 def main(comment=''):
     scene = wizard_export.save_or_save_increment()
@@ -34,18 +35,22 @@ def main(comment=''):
 
             export_name = collections_dic[collection_name]
 
-            object_list = wizard_tools.get_all_children(collection_obj, meshes=1)
-            objects_dic = wizard_tools.remove_export_name_from_names(object_list, export_name)
+            object_list = wizard_tools.get_all_children(
+                collection_obj, meshes=1)
+            objects_dic = wizard_tools.remove_export_name_from_names(
+                object_list, export_name)
 
-
-            exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(int(os.environ['wizard_work_env_id']))
+            exported_string_asset = wizard_communicate.get_string_variant_from_work_env_id(
+                int(os.environ['wizard_work_env_id']))
 
             export_GRP_list = [collection_obj]
-            additionnal_objects = wizard_export.trigger_before_export_hook('modeling', exported_string_asset)
+            additionnal_objects = wizard_export.trigger_before_export_hook(
+                'modeling', exported_string_asset)
             export_GRP_list += additionnal_objects
             wizard_tools.apply_tags(export_GRP_list)
 
-            wizard_export.export('modeling', export_name, exported_string_asset, export_GRP_list, comment=comment)
+            wizard_export.export(
+                'modeling', export_name, exported_string_asset, export_GRP_list, comment=comment)
     except:
         logger.error(str(traceback.format_exc()))
     finally:

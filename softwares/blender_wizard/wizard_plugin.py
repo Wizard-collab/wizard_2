@@ -76,7 +76,6 @@ def import_and_update_all():
     reference_modeling(references)
     reference_rigging(references)
     reference_grooming(references)
-    reference_shading(references)
     reference_layout(references)
     reference_animation(references)
     reference_camera(references)
@@ -86,12 +85,13 @@ def import_and_update_all():
     update_modeling(references)
     update_rigging(references)
     update_grooming(references)
-    update_shading(references)
     update_layout(references)
     update_animation(references)
     update_camera(references)
     update_custom(references)
     update_camrig(references)
+    reference_shading(references)
+    update_shading(references)
 
 
 def update_all():
@@ -101,12 +101,12 @@ def update_all():
     update_modeling(references)
     update_rigging(references)
     update_grooming(references)
-    update_shading(references)
     update_layout(references)
     update_animation(references)
     update_camera(references)
     update_custom(references)
     update_camrig(references)
+    update_shading(references)
 
 
 def set_image_size():

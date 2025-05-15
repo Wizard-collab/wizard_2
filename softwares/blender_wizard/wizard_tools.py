@@ -122,7 +122,7 @@ def get_all_children(obj, meshes=0):
 
 
 def select_all_children(objects_list):
-    bpy.ops.object.select_all(action='DESELECT')
+    # bpy.ops.object.select_all(action='DESELECT')
     for obj in objects_list:
         if type(obj) != bpy.types.Collection:
             obj.select_set(True)
@@ -132,17 +132,34 @@ def select_all_children(objects_list):
 
 
 def namespace_exists(namespace):
-    return namespace in bpy.data.collections
+    return namespace in list_all_collections(bpy.context.scene.collection)
+
+
+def list_all_collections(collection, all_collections=None, depth=0, max_depth=2):
+    if all_collections is None:
+        all_collections = []
+    all_collections.append(collection.name)
+    if depth >= max_depth:
+        return all_collections
+    for child in collection.children:
+        list_all_collections(child, all_collections, depth + 1, max_depth)
+    return all_collections
 
 
 def create_collection_if_not_exists(collection_name, parent=None):
     if parent is None:
         parent = bpy.context.scene.collection
-    if collection_name not in bpy.data.collections:
+
+    new_collection = None
+    for coll in parent.children.keys():
+        if collection_name == coll.split('.')[0] or collection_name == coll:
+            new_collection = bpy.data.collections[coll]
+        else:
+            continue
+
+    if new_collection is None:
         new_collection = bpy.data.collections.new(collection_name)
         parent.children.link(new_collection)
-    else:
-        new_collection = bpy.data.collections[collection_name]
     return new_collection
 
 
@@ -197,7 +214,7 @@ def apply_tags(object_list):
         if 'wizardTags' not in obj.keys():
             existing_tags = []
         else:
-            existing_tags = obj['wizardTags'].split(',')
+            return
         asset_tag = "{}_{}".format(
             os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':

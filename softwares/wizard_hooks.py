@@ -157,6 +157,19 @@ def get_abc_command(software):
             logger.error(traceback.format_exc())
 
 
+def get_usd_command(software):
+    command_hooks_modules = get_command_hook_module(software)
+    for module_name in command_hooks_modules.keys():
+        try:
+            logger.info("Getting usd export command from {0} at {1}".format(module_name,
+                                                                            command_hooks_modules[module_name]['path']))
+            return command_hooks_modules[module_name]['module'].usd_command
+        except:
+            logger.error("Can't get usd export command from {0} at {1}, skipping".format(module_name,
+                                                                                         command_hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+
 def get_fbx_command(software):
     command_hooks_modules = get_command_hook_module(software)
     for module_name in command_hooks_modules.keys():

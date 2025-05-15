@@ -545,7 +545,19 @@ class software_thread(Thread):
         self.work_env_id = work_env_id
         self.killed = False
         self.start_time = time.perf_counter()
-        print(self.command)
+
+        # Log the command and environment if the app is launched with the DEBUG argument
+        logger.debug('_______________COMMAND_______________')
+        logger.debug(self.command)
+        logger.debug('_______________COMMAND_______________')
+        logger.debug('_______________ENV_______________')
+        for key in self.env.keys():
+            logger.debug(f"{key} = {self.env[key]}")
+        logger.debug('_______________ENV_______________')
+        logger.debug('_______________PATH ENV_______________')
+        for path in env['PATH'].split(';'):
+            logger.debug(f"{path}")
+        logger.debug('_______________PATH ENV_______________')
 
     def run(self):
         """
