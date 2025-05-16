@@ -8,8 +8,6 @@ import os
 # Blender modules
 import bpy
 
-# Create a Material:
-
 
 def get_blender_material(mat_name, update):
     if (mat_name not in bpy.data.materials) and (not update):
@@ -55,7 +53,10 @@ def get_blender_material(mat_name, update):
         nt.links.new(get_output(displacement_node, 'Displacement'),
                      get_input(output_node, "Displacement"))
         displacement_node.location = [540.0, 200.0]
+        displacement_node.inputs[1].default_value = 0.0
+        displacement_node.inputs[2].default_value = 0.01
         displacement_node.name = "Wizard Displacement"
+        material.displacement_method = 'BOTH'
 
         displacement_texture_node = nt.nodes.new('ShaderNodeTexImage')
         nt.links.new(get_output(displacement_texture_node, 'Color'),
@@ -91,101 +92,61 @@ def find_image(full_name):
 
 
 def get_textures_dic(files_list, namespace):
-    textures_dic = dict()
-
-    diffuse_maps = []
-    roughness_maps = []
-    metalness_maps = []
-    normal_maps = []
-    height_maps = []
+    textures_dic = {}
 
     for file in files_list:
         file = file.replace('\\', '/')
-        if 'COLOR' in file.upper():
-            diffuse_maps.append(file)
-        if 'ROUGHNESS' in file.upper():
-            roughness_maps.append(file)
-        if 'METAL' in file.upper():
-            metalness_maps.append(file)
-        if 'NORMAL' in file.upper():
-            normal_maps.append(file)
-        if 'HEIGHT' in file.upper():
-            height_maps.append(file)
+        type = os.path.basename(file).split('.')[0]
+        if type not in textures_dic.keys():
+            textures_dic[type] = []
+        textures_dic[type].append(file)
 
-    if len(diffuse_maps) >= 1:
-        if f'{namespace}:diffuse_maps' in bpy.data.images:
-            bpy.data.images.remove(
-                bpy.data.images[f'{namespace}:diffuse_maps'])
-        bpy.ops.image.open(filepath=diffuse_maps[0], directory=os.path.dirname(
-            diffuse_maps[0]), use_udim_detecting=True, relative_path=False)
-        image = find_image(os.path.basename(diffuse_maps[0]))
-        if image:
-            image.name = f'{namespace}:diffuse_maps'
-            textures_dic['diffuse'] = image
-        else:
-            textures_dic['diffuse'] = None
-    else:
-        textures_dic['diffuse'] = None
+    for type, maps in textures_dic.items():
+        if len(maps) >= 1:
 
-    if len(roughness_maps) >= 1:
-        if f'{namespace}:roughness_maps' in bpy.data.images:
-            bpy.data.images.remove(
-                bpy.data.images[f'{namespace}:roughness_maps'])
-        bpy.ops.image.open(filepath=roughness_maps[0], directory=os.path.dirname(
-            roughness_maps[0]), use_udim_detecting=True, relative_path=False)
-        image = find_image(os.path.basename(roughness_maps[0]))
-        if image:
-            image.name = f'{namespace}:roughness_maps'
-            textures_dic['roughness'] = image
-        else:
-            textures_dic['roughness'] = None
-    else:
-        textures_dic['roughness'] = None
+            image_name = f'{namespace}:{type}_maps'
 
-    if len(metalness_maps) >= 1:
-        if f'{namespace}:metalness_maps' in bpy.data.images:
-            bpy.data.images.remove(
-                bpy.data.images[f'{namespace}:metalness_maps'])
-        bpy.ops.image.open(filepath=metalness_maps[0], directory=os.path.dirname(
-            metalness_maps[0]), use_udim_detecting=True, relative_path=False)
-        image = find_image(os.path.basename(metalness_maps[0]))
-        if image:
-            image.name = f'{namespace}:metalness_maps'
-            textures_dic['metalness'] = image
-        else:
-            textures_dic['metalness'] = None
-    else:
-        textures_dic['metalness'] = None
+            nodes_with_image = []
+            if image_name in bpy.data.images:
+                nodes_with_image = get_nodes_with_image(image_name)
+                bpy.data.images.remove(
+                    bpy.data.images[image_name])
 
-    if len(normal_maps) >= 1:
-        if f'{namespace}:normal_maps' in bpy.data.images:
-            bpy.data.images.remove(bpy.data.images[f'{namespace}:normal_maps'])
-        bpy.ops.image.open(filepath=normal_maps[0], directory=os.path.dirname(
-            normal_maps[0]), use_udim_detecting=True, relative_path=False)
-        image = find_image(os.path.basename(normal_maps[0]))
-        if image:
-            image.name = f'{namespace}:normal_maps'
-            textures_dic['normal_map'] = image
-        else:
-            textures_dic['normal_map'] = None
-    else:
-        textures_dic['normal_map'] = None
+            bpy.ops.image.open(filepath=maps[0], directory=os.path.dirname(
+                maps[0]), use_udim_detecting=True, relative_path=False)
 
-    if len(height_maps) >= 1:
-        if f'{namespace}:height_maps' in bpy.data.images:
-            bpy.data.images.remove(bpy.data.images[f'{namespace}:height_maps'])
-        bpy.ops.image.open(filepath=height_maps[0], directory=os.path.dirname(
-            height_maps[0]), use_udim_detecting=True, relative_path=False)
-        image = find_image(os.path.basename(height_maps[0]))
-        if image:
-            image.name = f'{namespace}:height_maps'
-            textures_dic['height_map'] = image
+            image = find_image(os.path.basename(maps[0]))
+
+            if image:
+                image.name = image_name
+                textures_dic[type] = image
+                reassign_image_to_nodes(nodes_with_image, image)
+            else:
+                textures_dic[type] = None
+
         else:
-            textures_dic['height_map'] = None
-    else:
-        textures_dic['height_map'] = None
+            textures_dic[type] = None
 
     return textures_dic
+
+
+def get_nodes_with_image(image_name):
+    nodes_using_image = []
+    for material in bpy.data.materials:
+        if material.use_nodes:
+            for node in material.node_tree.nodes:
+                if node.type == 'TEX_IMAGE' and node.image and node.image.name == image_name:
+                    nodes_using_image.append(node)
+    return nodes_using_image
+
+
+def reassign_image_to_nodes(nodes, image):
+    for node in nodes:
+        node.image = image
+
+
+def reload_textures(namespace, files_list, update=None):
+    textures_dic = get_textures_dic(files_list, namespace)
 
 
 def plug_textures(namespace, files_list, update=None):
@@ -193,23 +154,18 @@ def plug_textures(namespace, files_list, update=None):
 
     if material:
         textures_dic = get_textures_dic(files_list, namespace)
-        # Plug diffuse
-        if textures_dic['diffuse']:
-            diffuse_texture_node = material.node_tree.nodes['Wizard Diffuse Texture']
-            diffuse_texture_node.image = textures_dic['diffuse']
-        # Plug roughness
-        if textures_dic['roughness']:
-            roughness_texture_node = material.node_tree.nodes['Wizard Roughness Texture']
-            roughness_texture_node.image = textures_dic['roughness']
-        # Plug metalness
-        if textures_dic['metalness']:
-            metallic_texture_node = material.node_tree.nodes['Wizard Metallic Texture']
-            metallic_texture_node.image = textures_dic['metalness']
-        # Plug normal
-        if textures_dic['normal_map']:
-            normal_map_node = material.node_tree.nodes['Wizard Normal Texture']
-            normal_map_node.image = textures_dic['normal_map']
-        # Plug displacement
-        if textures_dic['height_map']:
-            displacement_texture_node = material.node_tree.nodes['Wizard Displacement Texture']
-            displacement_texture_node.image = textures_dic['height_map']
+        for type, maps in textures_dic.items():
+            image_node = None
+            if "BASECOLOR" in type.upper():
+                image_node = material.node_tree.nodes['Wizard Diffuse Texture']
+            if "ROUGHNESS" in type.upper() and "SHEEN" not in type.upper():
+                image_node = material.node_tree.nodes['Wizard Roughness Texture']
+            if "METAL" in type.upper():
+                image_node = material.node_tree.nodes['Wizard Metallic Texture']
+            if "NORMAL" in type.upper():
+                image_node = material.node_tree.nodes['Wizard Normal Texture']
+            if "HEIGHT" in type.upper():
+                image_node = material.node_tree.nodes['Wizard Displacement Texture']
+            if not image_node:
+                continue
+            image_node.image = maps

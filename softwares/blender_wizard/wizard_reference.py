@@ -31,7 +31,7 @@ def reference_texturing(reference_dic):
 
 def update_texturing(reference_dic):
     old_objects = wizard_tools.get_all_nodes()
-    cycles_shader.plug_textures(
+    cycles_shader.reload_textures(
         reference_dic['namespace'], reference_dic['files'], update=True)
     trigger_after_reference_hook('texturing',
                                  reference_dic['files'],
