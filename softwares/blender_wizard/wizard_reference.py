@@ -183,7 +183,13 @@ def import_usd(file_path, reference_dic, parent_collection=None):
 
 def update_abc(file_path, namespace):
     file_cache_name = f"{namespace}:cache_file"
-    if file_cache_name not in bpy.data.cache_files.keys():
+    is_cache = False
+    for cache in bpy.data.cache_files:
+        if cache.name.split('.')[0] == file_cache_name:
+            file_cache_name = cache.name
+            is_cache = True
+            break
+    if not is_cache:
         logger.warning(
             f"{file_cache_name} not found. Can't update Alembic file.")
         return
@@ -193,7 +199,13 @@ def update_abc(file_path, namespace):
 
 def update_usd(file_path, namespace):
     file_cache_name = f"{namespace}:cache_file"
-    if file_cache_name not in bpy.data.cache_files.keys():
+    is_cache = False
+    for cache in bpy.data.cache_files:
+        if cache.name.split('.')[0] == file_cache_name:
+            file_cache_name = cache.name
+            is_cache = True
+            break
+    if not is_cache:
         logger.warning(
             f"{file_cache_name} not found. Can't update USD file.")
         return

@@ -85,6 +85,7 @@ from wizard.vars import softwares_vars
 
 # Wizard gui modules
 from wizard.gui import gui_server
+import sys
 
 logger = logging.getLogger(__name__)
 
