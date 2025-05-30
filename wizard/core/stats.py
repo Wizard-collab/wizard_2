@@ -183,7 +183,6 @@ def add_progress_event(new_stage=None, removed_stage=None):
 
             # Update progress for sequence stages
             elif stage_name in assets_vars._sequences_stages_list_:
-                print(datas_dic)
 
                 asset_row = assets[new_stage_row['asset_id']]
                 frames_number = asset_row['outframe'] - asset_row['inframe']

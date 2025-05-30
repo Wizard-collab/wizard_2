@@ -557,26 +557,37 @@ def register():
     # Register icons
     global wizard_icons
     wizard_icons = bpy.utils.previews.new()
-    wizard_icons.load("save_increment", 'icons/save_increment.png', 'IMAGE')
-    wizard_icons.load("import_and_update_all", 'icons/all.png', 'IMAGE')
-    wizard_icons.load("export", 'icons/export.png', 'IMAGE')
-    wizard_icons.load("import", 'icons/import.png', 'IMAGE')
-    wizard_icons.load("update", 'icons/update.png', 'IMAGE')
-    wizard_icons.load("modeling", 'icons/modeling.png', 'IMAGE')
-    wizard_icons.load("shading", 'icons/shading.png', 'IMAGE')
-    wizard_icons.load("rigging", 'icons/rigging.png', 'IMAGE')
-    wizard_icons.load("grooming", 'icons/grooming.png', 'IMAGE')
-    wizard_icons.load("layout", 'icons/wlayout.png', 'IMAGE')
-    wizard_icons.load("animation", 'icons/animation.png', 'IMAGE')
-    wizard_icons.load("camera", 'icons/camera.png', 'IMAGE')
-    wizard_icons.load("custom", 'icons/custom.png', 'IMAGE')
-    wizard_icons.load("camrig", 'icons/camera_rig.png', 'IMAGE')
-    wizard_icons.load("texturing", 'icons/texturing.png', 'IMAGE')
-    wizard_icons.load("rendering", 'icons/rendering.png', 'IMAGE')
-    wizard_icons.load("set_image_size", 'icons/set_image_size.png', 'IMAGE')
-    wizard_icons.load("set_frame_rate", 'icons/set_frame_rate.png', 'IMAGE')
-    wizard_icons.load("set_frame_range", 'icons/set_frame_range.png', 'IMAGE')
-    wizard_icons.load("video", 'icons/video.png', 'IMAGE')
+    wizard_icons.load("save_increment", os.path.abspath(
+        'icons/save_increment.png'), 'IMAGE')
+    wizard_icons.load("import_and_update_all",
+                      os.path.abspath('icons/all.png'), 'IMAGE')
+    wizard_icons.load("export", os.path.abspath('icons/export.png'), 'IMAGE')
+    wizard_icons.load("import", os.path.abspath('icons/import.png'), 'IMAGE')
+    wizard_icons.load("update", os.path.abspath('icons/update.png'), 'IMAGE')
+    wizard_icons.load("modeling", os.path.abspath(
+        'icons/modeling.png'), 'IMAGE')
+    wizard_icons.load("shading", os.path.abspath('icons/shading.png'), 'IMAGE')
+    wizard_icons.load("rigging", os.path.abspath('icons/rigging.png'), 'IMAGE')
+    wizard_icons.load("grooming", os.path.abspath(
+        'icons/grooming.png'), 'IMAGE')
+    wizard_icons.load("layout", os.path.abspath('icons/wlayout.png'), 'IMAGE')
+    wizard_icons.load("animation", os.path.abspath(
+        'icons/animation.png'), 'IMAGE')
+    wizard_icons.load("camera", os.path.abspath('icons/camera.png'), 'IMAGE')
+    wizard_icons.load("custom", os.path.abspath('icons/custom.png'), 'IMAGE')
+    wizard_icons.load("camrig", os.path.abspath(
+        'icons/camera_rig.png'), 'IMAGE')
+    wizard_icons.load("texturing", os.path.abspath(
+        'icons/texturing.png'), 'IMAGE')
+    wizard_icons.load("rendering", os.path.abspath(
+        'icons/rendering.png'), 'IMAGE')
+    wizard_icons.load("set_image_size", os.path.abspath(
+        'icons/set_image_size.png'), 'IMAGE')
+    wizard_icons.load("set_frame_rate", os.path.abspath(
+        'icons/set_frame_rate.png'), 'IMAGE')
+    wizard_icons.load("set_frame_range", os.path.abspath(
+        'icons/set_frame_range.png'), 'IMAGE')
+    wizard_icons.load("video", os.path.abspath('icons/video.png'), 'IMAGE')
 
 
 def unregister():
