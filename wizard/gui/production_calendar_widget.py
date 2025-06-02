@@ -506,6 +506,11 @@ class calendar_widget(QtWidgets.QWidget):
         if not self.isVisible():
             return
 
+        deadline = datetime.datetime.fromtimestamp(project.get_deadline())
+        self.header_view.set_deadline(deadline)
+        self.header_view.update()
+        self.view.set_deadline(deadline)
+
         start_time = time.perf_counter()
 
         filter_dic = self.get_current_filter_dic()

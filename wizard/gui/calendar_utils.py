@@ -81,6 +81,9 @@ class custom_graphic_item(QtWidgets.QGraphicsItem):
 class calendar_header(QtWidgets.QGraphicsView):
     def __init__(self):
         super(calendar_header, self).__init__()
+
+        self.deadline = datetime.datetime.today()
+
         self.setObjectName('dark_widget')
         self.setFixedHeight(120)
         self.scene = header_scene()
@@ -104,6 +107,10 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.today_item = today_item()
         self.today_item.setZValue(1.0)
         self.scene.addItem(self.today_item)
+
+        self.deadline_item = deadline_item()
+        self.deadline_item.setZValue(1.0)
+        self.scene.addItem(self.deadline_item)
 
         self.day_items = []
         self.week_items = []
@@ -131,12 +138,23 @@ class calendar_header(QtWidgets.QGraphicsView):
         self.update_months()
         self.update_days()
         self.update_weeks()
+        self.update_deadline_item()
         self.update_today_item()
         self.resize_header()
+
+    def set_deadline(self, deadline):
+        self.deadline = deadline
+        self.update_deadline_item()
 
     def update_today_item(self):
         self.today_item.setRect(
             0, 0, int(self.column_width*self.zoom_factor), self.height())
+
+    def update_deadline_item(self):
+        pos_x = ((datetime.datetime.today() - self.deadline).days) * - \
+            self.column_width
+        self.deadline_item.setRect(
+            int(pos_x*self.zoom_factor), 0, int(self.column_width*self.zoom_factor), self.height())
 
     def resize_header(self):
         self.setFixedHeight(self.pos_y)
@@ -574,6 +592,7 @@ class calendar_viewport(QtWidgets.QGraphicsView):
         self.start_selection_drag = None
         self.movement = False
         self.selection_item = selection_item()
+        self.deadline = datetime.datetime.today()
 
         empty_item = custom_graphic_item()
         self.scene.addItem(empty_item)
@@ -588,6 +607,10 @@ class calendar_viewport(QtWidgets.QGraphicsView):
     def connect_functions(self):
         self.viewport_helper.reset_view.connect(self.reset_view)
         self.viewport_helper.goto_today.connect(self.goto_today)
+
+    def set_deadline(self, deadline):
+        self.deadline = deadline
+        self.scene.set_deadline(deadline)
 
     def update_infos(self):
         selection_list = []
@@ -1177,6 +1200,7 @@ class scene(QtWidgets.QGraphicsScene):
     def __init__(self):
         super(scene, self).__init__()
         self.cache_scene_painting()
+        self.deadline = datetime.datetime.today()
 
     def cache_scene_painting(self):
         self.color1 = QtGui.QColor('#2c2c33')
@@ -1184,8 +1208,14 @@ class scene(QtWidgets.QGraphicsScene):
         self.line_color = QtGui.QColor('#36363b')
         self.today_color = QtGui.QColor(255, 255, 255, 6)
         self.today_line_color = QtGui.QColor(255, 255, 255, 40)
+        self.deadline_color = QtGui.QColor(255, 0, 0, 40)
+        self.deadline_line_color = QtGui.QColor(255, 0, 0, 60)
         self.column_width = 100
         self.row_height = 40
+        self.deadline = datetime.datetime.today()
+
+    def set_deadline(self, deadline):
+        self.deadline = deadline
 
     def set_column_width(self, column_width):
         self.column_width = column_width
@@ -1207,8 +1237,15 @@ class scene(QtWidgets.QGraphicsScene):
                 painter.fillRect(column_rect, self.color2)
         first_column_rect = QtCore.QRectF(
             0, rect.top(), self.column_width, rect.height())
+
+        pos_x = ((datetime.datetime.today() - self.deadline).days) * - \
+            self.column_width
+        deadline_column_rect = QtCore.QRectF(
+            pos_x, rect.top(), self.column_width, rect.height())
         draw_rect(painter, first_column_rect, bg_color=self.today_color,
                   outline=self.today_line_color)
+        draw_rect(painter, deadline_column_rect, bg_color=self.deadline_color,
+                  outline=self.deadline_line_color)
 
 
 class selection_item(custom_graphic_item):
@@ -1230,6 +1267,22 @@ class today_item(custom_graphic_item):
     def paint(self, painter, option, widget):
         color = QtGui.QColor(QtGui.QColor(255, 255, 255, 20))
         pen = QtGui.QPen(QtGui.QColor(255, 255, 255, 60),
+                         1, QtCore.Qt.PenStyle.SolidLine)
+        brush = QtGui.QBrush(color)
+        painter.setPen(pen)
+        painter.setBrush(brush)
+        painter.drawRect(self.x, self.y, self.width, self.height)
+
+
+class deadline_item(custom_graphic_item):
+    def __init__(self):
+        super(deadline_item, self).__init__()
+        self.setFlag(
+            QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIgnoresTransformations)
+
+    def paint(self, painter, option, widget):
+        color = QtGui.QColor(QtGui.QColor(255, 0, 0, 20))
+        pen = QtGui.QPen(QtGui.QColor(255, 0, 0, 60),
                          1, QtCore.Qt.PenStyle.SolidLine)
         brush = QtGui.QBrush(color)
         painter.setPen(pen)
