@@ -53,7 +53,7 @@ def export_usd(export_GRP_list, export_file, frange):
     usd_command = wizard_hooks.get_usd_command("blender")
     if usd_command is None:
         usd_command = default_usd_command
-    usd_command(export_GRP_list, export_file)
+    usd_command(export_GRP_list, export_file, frange)
 
 
 def export_fbx(export_GRP_list, export_file, frange):
@@ -154,7 +154,9 @@ def default_abc_command(export_GRP_list, export_file, frange):
                               sh_close=0.2)
 
 
-def default_usd_command(export_GRP_list, export_file):
+def default_usd_command(export_GRP_list, export_file, frange):
+    bpy.context.scene.frame_start = frange[0]
+    bpy.context.scene.frame_end = frange[1]
     wizard_tools.select_all_children(export_GRP_list)
     bpy.ops.wm.usd_export(filepath=export_file,
                           selected_objects_only=True,
@@ -164,7 +166,8 @@ def default_usd_command(export_GRP_list, export_file):
                           export_materials=False,
                           export_custom_properties=True,
                           export_subdivision='IGNORE',
-                          export_armatures=False)
+                          export_armatures=False,
+                          export_shapekeys=False)
 
 
 def default_fbx_command(export_GRP_list, export_file, frange):

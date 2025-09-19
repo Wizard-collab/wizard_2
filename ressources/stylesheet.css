@@ -116,6 +116,7 @@ QListView {
 	outline:none;
 	padding:2px;
 	border-radius:5px;
+	alternate-background-color: rgba(0,0,0,15);
 }
  
 QListView::item {
@@ -149,6 +150,7 @@ QListView::item:selected:!active {
 QTreeView {
 	background-color:#24242b;
 	show-decoration-selected: 0;
+	alternate-background-color: rgba(0,0,0,15);
 	outline:none;
 	padding:10px;
 }
@@ -514,6 +516,7 @@ QSlider::handle:horizontal {
 QTableWidget{
 	outline: none;
 	background-color:#24242b;
+	alternate-background-color: rgba(0,0,0,15);
 	gridline-color: rgba(0,0,0,80);
 }
 

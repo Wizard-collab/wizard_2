@@ -23,6 +23,7 @@ from blender_wizard.export import animation
 from blender_wizard.export import camrig
 from blender_wizard.export import camera
 from blender_wizard.export import rendering
+from blender_wizard.export import compositing
 
 logger = logging.getLogger(__name__)
 
@@ -57,10 +58,13 @@ def export():
 
 def setup_render(render_type):
     stage_name = os.environ['wizard_stage_name']
-    if stage_name in ['lighting', 'shading', 'rendering']:
+    if stage_name in ['lighting', 'shading', 'rendering', 'compositing']:
         frame_range = wizard_communicate.get_frame_range(
             int(os.environ['wizard_work_env_id']))
-        rendering.setup_render_directory(render_type, frame_range)
+        if stage_name == 'compositing':
+            compositing.setup_compositing_directory(render_type, frame_range)
+        else:
+            rendering.setup_render_directory(render_type, frame_range)
     else:
         logger.warning("Unplugged stage : {0}".format(stage_name))
 

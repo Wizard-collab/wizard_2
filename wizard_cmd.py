@@ -47,6 +47,7 @@ Modules used:
 """
 
 # Python modules
+import PyOpenColorIO  # For OpenColorIO configuration
 import argparse
 import traceback
 import json

@@ -34,8 +34,22 @@ def setup_render_directory(stage_name, export_name):
         file_name = f"{os.environ['wizard_asset_name']}_{os.environ['wizard_stage_name']}"
         file_path = f"{render_directory}/{file_name}.####.{extension}"
         bpy.context.scene.render.filepath = file_path
-        bpy.context.scene.render.image_settings.file_format = "OPEN_EXR"
+        bpy.context.scene.render.image_settings.file_format = "OPEN_EXR_MULTILAYER"
         return render_directory
+
+def setup_compositing_directory(stage_name, export_name):
+    compositing_work_env_id = int(os.environ['wizard_work_env_id'])
+    compositing_directory = wizard_communicate.request_render(int(os.environ['wizard_version_id']),
+                                                         compositing_work_env_id,
+                                                         export_name)
+
+    if compositing_directory:
+        extension = wizard_communicate.get_export_format(compositing_work_env_id)
+        file_name = f"{os.environ['wizard_asset_name']}_{os.environ['wizard_stage_name']}"
+        file_path = f"{compositing_directory}/{file_name}.####.{extension}"
+        bpy.context.scene.render.filepath = file_path
+        bpy.context.scene.render.image_settings.file_format = "OPEN_EXR"
+        return compositing_directory
 
 
 def setup_frame_range(render_type, frame_range=None):
