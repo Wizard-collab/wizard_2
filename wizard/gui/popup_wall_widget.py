@@ -242,6 +242,9 @@ class popup_save_widget(QtWidgets.QFrame):
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
+        if len(comment) > 200:
+            logger.warning("Comment with 200 characters maximum")
+            return
         assets.modify_version_comment(self.version_id, comment)
         self.time_out.emit(self.version_id)
 
@@ -459,6 +462,9 @@ class popup_event_widget(QtWidgets.QFrame):
 
     def update_comment(self):
         comment = self.comment_textEdit.toPlainText()
+        if len(comment) > 200:
+            logger.warning("Comment with 200 characters maximum")
+            return
         if self.event_row['type'] == 'export':
             export_version_id = self.event_row['data']
             assets.modify_export_version_comment(export_version_id, comment)

@@ -539,6 +539,41 @@ QTableCornerButton::section {
 	border: 1px solid rgba(0,0,0,80);
 }
 
+QTableView{
+	outline: none;
+	background-color:#24242b;
+	alternate-background-color: rgba(0,0,0,15);
+	gridline-color: rgba(0,0,0,80);
+}
+
+QTableView::item:focus{
+	outline: none;
+	border: none;
+}
+
+QTableView::item:alternate{
+	background-color: rgba(0,0,0,15);
+}
+
+QTableView::item:hover{
+	background-color: transparent;
+}
+
+QTableView::item:selected{
+	outline: none;
+	background-color: rgba(255,255,255,40);
+}
+
+QTableView::item:selected:active{
+	outline: none;
+	background-color: rgba(255,255,255,40);
+}
+
+QTableView::item:selected:!active{
+	outline: none;
+	background-color: rgba(255,255,255,40);
+}
+
 #tag_label{
 	background-color: rgba(119, 133, 222, 100);
 	padding: 3px;
