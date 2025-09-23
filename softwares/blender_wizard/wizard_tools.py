@@ -122,7 +122,7 @@ def get_all_children(obj, meshes=0):
 
 
 def select_all_children(objects_list):
-    # bpy.ops.object.select_all(action='DESELECT')
+    bpy.ops.object.select_all(action='DESELECT')
     for obj in objects_list:
         if type(obj) != bpy.types.Collection:
             obj.select_set(True)
