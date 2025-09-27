@@ -44,7 +44,7 @@ Modules Imported:
 """
 
 # Python modules
-import PyOpenColorIO  # For OpenColorIO configuration
+# import PyOpenColorIO  # For OpenColorIO configuration
 import sys  # For system-specific parameters and functions
 import time  # For measuring performance and handling time
 from PyQt6 import QtWidgets, QtCore, QtGui  # For GUI components

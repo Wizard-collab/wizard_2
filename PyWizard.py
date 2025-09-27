@@ -42,7 +42,6 @@ Usage:
 """
 
 # Python modules
-import PyOpenColorIO  # For OpenColorIO configuration
 import sys
 import os
 import traceback

@@ -1,6 +1,12 @@
 'last':
   update_list:
   - !!python/tuple
+    - New
+    - Wizard version 5.0 ( 2026 )
+  time: 1758978270.8489175
+'4.4.0.0412':
+  update_list:
+  - !!python/tuple
     - Debug
     - Added custom to stage colors
   time: 1739875037.6205983

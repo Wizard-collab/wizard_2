@@ -13,6 +13,6 @@ rotate-screen
 pywin32
 PyInstaller
 winshell
-opencolorio
+opencolorio==2.3.2
 OpenExr
 python-mpv
