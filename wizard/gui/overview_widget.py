@@ -232,9 +232,11 @@ class main_progress_widget(QtWidgets.QFrame):
                 continue
             if stage_row['state'] == 'omt':
                 continue
-            if stage_row['name'] in assets_vars._assets_stages_list_:
+            if stage_row['domain_id'] == 1 and stage_row['name'] in ['rendering', 'compositing']:
+                continue
+            if stage_row['domain_id'] == 1:
                 progress = (stage_row['progress'], 1)
-            elif stage_row['name'] in assets_vars._sequences_stages_list_:
+            elif stage_row['domain_id'] == 3:
                 asset_row = project.get_asset_data(stage_row['asset_id'])
                 asset_frames = asset_row['outframe'] - asset_row['inframe']
                 progress = (stage_row['progress'], asset_frames/all_frames)
@@ -404,10 +406,12 @@ class user_progress_widget(QtWidgets.QFrame):
                 continue
             if stage_row['state'] == 'omt':
                 continue
+            if stage_row['domain_id'] == 1 and stage_row['name'] in ['rendering', 'compositing']:
+                continue
             if stage_row['assignment'] == environment.get_user():
-                if stage_row['name'] in assets_vars._assets_stages_list_:
+                if stage_row['domain_id'] == 1:
                     progress = (stage_row['progress'], 1)
-                elif stage_row['name'] in assets_vars._sequences_stages_list_:
+                if stage_row['domain_id'] == 3:
                     asset_row = project.get_asset_data(stage_row['asset_id'])
                     asset_frames = asset_row['outframe'] - asset_row['inframe']
                     progress = (stage_row['progress'], asset_frames/all_frames)
@@ -1005,24 +1009,27 @@ class progress_overview_widget(QtWidgets.QFrame):
         for stage_row in stages_rows:
             if stage_row['state'] == 'omt':
                 continue
-            if stage_row['name'] in assets_vars._assets_stages_list_ or stage_row['name'] in assets_vars._sequences_stages_list_:
-                if stage_row['name'] not in stages_progresses_dic.keys():
-                    stages_progresses_dic[stage_row['name']] = []
-                if stage_row['name'] in assets_vars._assets_stages_list_:
-                    progress = (stage_row['progress'], 1)
-                elif stage_row['name'] in assets_vars._sequences_stages_list_:
-                    asset_row = project.get_asset_data(stage_row['asset_id'])
-                    asset_frames = asset_row['outframe'] - asset_row['inframe']
-                    progress = (stage_row['progress'], asset_frames/all_frames)
-                stages_progresses_dic[stage_row['name']].append(progress)
-                if stage_row['name'] in assets_vars._assets_stages_list_:
-                    if 'assets' not in domains_progresses_dic.keys():
-                        domains_progresses_dic['assets'] = []
-                    domains_progresses_dic['assets'].append(progress)
-                elif stage_row['name'] in assets_vars._sequences_stages_list_:
-                    if 'sequences' not in domains_progresses_dic.keys():
-                        domains_progresses_dic['sequences'] = []
-                    domains_progresses_dic['sequences'].append(progress)
+            if stage_row['domain_id'] == 1 and stage_row['name'] in ['rendering', 'compositing']:
+                continue
+            if stage_row['domain_id'] == 2:
+                continue
+            if stage_row['name'] not in stages_progresses_dic.keys():
+                stages_progresses_dic[stage_row['name']] = []
+            if stage_row['domain_id'] == 1:
+                progress = (stage_row['progress'], 1)
+            elif stage_row['domain_id'] == 3:
+                asset_row = project.get_asset_data(stage_row['asset_id'])
+                asset_frames = asset_row['outframe'] - asset_row['inframe']
+                progress = (stage_row['progress'], asset_frames/all_frames)
+            stages_progresses_dic[stage_row['name']].append(progress)
+            if stage_row['domain_id'] == 1:
+                if 'assets' not in domains_progresses_dic.keys():
+                    domains_progresses_dic['assets'] = []
+                domains_progresses_dic['assets'].append(progress)
+            elif stage_row['domain_id'] == 3:
+                if 'sequences' not in domains_progresses_dic.keys():
+                    domains_progresses_dic['sequences'] = []
+                domains_progresses_dic['sequences'].append(progress)
 
         for stage in stages_progresses_dic.keys():
             mean = stats.get_mean(stages_progresses_dic[stage])

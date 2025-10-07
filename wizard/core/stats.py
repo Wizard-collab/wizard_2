@@ -254,6 +254,8 @@ def add_progress_event(new_stage=None, removed_stage=None):
         # Skip library and omt stages
         if domain == assets_vars._library_ or stage_row['state'] == 'omt':
             continue
+        if domain == assets_vars._assets_ and stage in ['rendering', 'compositing']:
+            continue
 
         # Calculate weighted progress for sequence stages
         if domain == assets_vars._sequences_:
@@ -278,6 +280,7 @@ def add_progress_event(new_stage=None, removed_stage=None):
             domain, {}).setdefault('total', []).append(progress)
         domains_progresses_dic[domain].setdefault(stage, []).append(progress)
 
+    '''
     # Ensure all stages are present in the progress dictionaries
     for domain_row in domains_rows:
         if domain_row['name'] == 'library':
@@ -300,6 +303,7 @@ def add_progress_event(new_stage=None, removed_stage=None):
     total_progresses_dic.setdefault('total', [])
     for stage in (assets_vars._assets_stages_list_ + assets_vars._sequences_stages_list_):
         total_progresses_dic.setdefault(stage, [])
+    '''
 
     # Calculate mean progress for each stage, category, and domain
     for stage in total_progresses_dic.keys():
