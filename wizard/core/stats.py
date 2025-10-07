@@ -84,6 +84,8 @@ def get_all_progresses(to_round=1):
     # Iterate through each stage to calculate progress for assets, categories, and domains
     for stage_row in stages_rows:
         asset_id = stage_row['asset_id']
+        if stage_row['state'] == 'omt':
+            continue
 
         # Initialize progress list for the asset if not already present
         if asset_id not in assets_progresses_lists.keys():
@@ -94,7 +96,11 @@ def get_all_progresses(to_round=1):
         frames_number = asset_row['outframe'] - asset_row['inframe']
 
         # Add the stage progress to the asset's progress list
-        assets_progresses_lists[asset_id].append((stage_row['progress'], 1))
+        if project.get_domain_data(stage_row['domain_id'])['name'] == assets_vars._sequences_:
+            assets_progresses_lists[asset_id].append(
+                (stage_row['progress'], frames_number / all_frames))
+        else:
+            assets_progresses_lists[asset_id].append((stage_row['progress'], 1))
 
         # Retrieve domain data for the stage
         domain_row = project.get_domain_data(stage_row['domain_id'])
