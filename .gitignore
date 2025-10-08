@@ -3,4 +3,4 @@ compile/
 python3_wizard_venv
 binaries/
 .vs/
-shared_python/
+python/

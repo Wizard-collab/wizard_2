@@ -557,7 +557,7 @@ class subtask(Thread):
             py_file = tools.temp_file_from_pycmd(self.pycmd)
 
         if sys.argv[0].endswith('.py'):
-            executable = 'python wizard_cmd.py'
+            executable = 'python/python.exe wizard_cmd.py'
         else:
             executable = 'wizard_cmd'
 
