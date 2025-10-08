@@ -239,12 +239,14 @@ _asset_state_error_ = 'error'
 _asset_state_rtk_ = 'rtk'
 _asset_state_wfa_ = 'wfa'
 _asset_state_omt_ = 'omt'
+_asset_state_rfns_ = 'rfns'
 _asset_states_list_ = [_asset_state_todo_,
                        _asset_state_wip_,
-                       _asset_state_done_,
                        _asset_state_error_,
                        _asset_state_rtk_,
                        _asset_state_wfa_,
+                       _asset_state_rfns_,
+                       _asset_state_done_,
                        _asset_state_omt_]
 
 # Asset urgence
