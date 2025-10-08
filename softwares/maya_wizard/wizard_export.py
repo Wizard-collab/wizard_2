@@ -42,6 +42,9 @@ def export_by_extension(export_GRP_list, export_file, frange, percent_factor):
     if export_file.endswith('.abc'):
         export_files_list = export_abc(
             export_GRP_list, export_file, frange, percent_factor)
+    elif export_file.endswith('.usd'):
+        export_files_list = export_usd(
+            export_GRP_list, export_file, frange, percent_factor)
     elif export_file.endswith('.ma'):
         export_files_list = export_ma(export_GRP_list, export_file)
     elif export_file.endswith('.obj'):
@@ -91,6 +94,18 @@ def export_abc(export_GRP_list, export_file, frange, percent_factor):
                 export_GRP_list,
                 export_file,
                 wizard_tools.by_frame_progress_script(frange, percent_factor))
+    return [export_file]
+
+
+def export_usd(export_GRP_list, export_file, frange, percent_factor):
+    logger.info("Exporting .usd")
+    usd_command = wizard_hooks.get_usd_command('maya')
+    if usd_command is None:
+        usd_command = default_usd_command
+    usd_command(frange[0],
+                frange[1],
+                export_GRP_list,
+                export_file)
     return [export_file]
 
 
@@ -165,6 +180,27 @@ def default_abc_command(start,
                                      perFrameCallback=perFrameCallback)
     cmds.AbcExport(j=abc_command)
 
+def default_usd_command(start,
+                        end,
+                        export_GRP_list,
+                        export_file):
+
+    pm.select(export_GRP_list, replace=True, noExpand=True)
+
+    wizard_tools.add_USD_attribute_to_objects(export_GRP_list)
+
+    cmds.mayaUSDExport(
+        selection=True,
+        file=export_file,
+        exportUVs=True,
+        exportColorSets=False,
+        exportDisplayColor=False,
+        exportBlendShapes=False,
+        exportMaterials=False,
+        exportSkin=None,
+        frameRange=(start, end),
+        frameStride=1,
+    )
 
 def default_fbx_command(export_GRP_list,
                         export_file):

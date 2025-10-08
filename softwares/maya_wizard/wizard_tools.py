@@ -4,6 +4,7 @@
 
 # Maya modules
 import pymel.core as pm
+import json
 
 # Wizard modules
 import wizard_communicate
@@ -15,6 +16,48 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def add_USD_attribute_to_objects(object_list):
+    all_objects = []
+    for object in object_list:
+        all_objects.append(object)
+        all_objects += pm.listRelatives(object, allDescendents=True)
+    for object in all_objects:
+        custom_attrs = [attr for attr in pm.listAttr(object, userDefined=True)]
+        if custom_attrs:
+            if not pm.attributeQuery('USD_UserExportedAttributesJson', node=object, exists=True):
+                pm.addAttr(object, ln='USD_UserExportedAttributesJson', dt='string')
+                attr_dict = {}
+                for attr in custom_attrs:
+                    # Original attribute
+                    attr_dict[attr] = {"usdAttrName": attr, "usdAttrType": "userProperty"}
+                    # Duplicated attribute with _MAYA_USD suffix
+                    maya_usd_attr = f"{attr}_MAYA_USD"
+                    attr_dict[maya_usd_attr] = {"usdAttrName": "primvars:" + attr, "usdAttrType": "userProperty"}
+                    # Actually duplicate the attribute and its value
+                    if not pm.attributeQuery(maya_usd_attr, node=object, exists=True):
+                        # Get the attribute type and value
+                        attr_type = pm.getAttr(object + '.' + attr, type=True)
+                        attr_value = pm.getAttr(object + '.' + attr)
+                        # Add the new attribute with the same type
+                        if attr_type == 'string':
+                            pm.addAttr(object, ln=maya_usd_attr, dt='string')
+                            pm.setAttr(object + '.' + maya_usd_attr, attr_value, type='string')
+                        elif attr_type == 'double':
+                            pm.addAttr(object, ln=maya_usd_attr, at='double')
+                            pm.setAttr(object + '.' + maya_usd_attr, attr_value)
+                        elif attr_type == 'long':
+                            pm.addAttr(object, ln=maya_usd_attr, at='long')
+                            pm.setAttr(object + '.' + maya_usd_attr, attr_value)
+                        elif attr_type == 'bool':
+                            pm.addAttr(object, ln=maya_usd_attr, at='bool')
+                            pm.setAttr(object + '.' + maya_usd_attr, attr_value)
+                        else:
+                            # Fallback: try to add as string
+                            pm.addAttr(object, ln=maya_usd_attr, dt='string')
+                            pm.setAttr(object + '.' + maya_usd_attr, str(attr_value), type='string')
+                json_str = json.dumps(attr_dict)
+                print(json_str)
+                pm.setAttr(object + '.USD_UserExportedAttributesJson', json_str, type="string")
 
 def get_file_dir(file):
     directory = os.path.dirname(file)

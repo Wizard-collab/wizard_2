@@ -158,6 +158,7 @@ def default_usd_command(export_GRP_list, export_file, frange):
     bpy.context.scene.frame_start = frange[0]
     bpy.context.scene.frame_end = frange[1]
     wizard_tools.select_all_children(export_GRP_list)
+    wizard_tools.add_MAYA_USD_attribute_to_objects(export_GRP_list)
     bpy.ops.wm.usd_export(filepath=export_file,
                           selected_objects_only=True,
                           export_animation=True,

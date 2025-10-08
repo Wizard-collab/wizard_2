@@ -16,6 +16,25 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def add_MAYA_USD_attribute_to_objects(object_list):
+    all_objects = []
+    for object in object_list:
+        all_objects.append(object)
+        all_objects += get_all_children(object)
+    for obj in all_objects:
+        if type(obj) == bpy.types.Collection:
+            continue
+        shape = getattr(obj, 'data', None)
+        if shape is None:
+            continue
+        for attr in list(shape.keys()):
+            if attr.startswith("_") or attr.startswith("primvars:"):
+                continue
+            primvar_attr = f"primvars:{attr}"
+            # Actually create a new attribute with the same content
+            if primvar_attr not in shape.keys():
+                shape[primvar_attr] = shape[attr]
+
 def get_file_dir(file):
     directory = os.path.dirname(file)
     directory.replace('\\', '/')
@@ -227,10 +246,14 @@ def apply_tags(object_list):
     for obj in all_objects:
         if type(obj) == bpy.types.Collection:
             continue
-        if 'wizardTags' not in obj.keys():
+        # Add tags to the shape (obj.data) if it exists
+        shape = getattr(obj, 'data', None)
+        if shape is None:
+            continue
+        if 'wizardTags' not in shape.keys():
             existing_tags = []
         else:
-            existing_tags = obj['wizardTags'].split(',')
+            existing_tags = shape['wizardTags'].split(',')
         asset_tag = "{}_{}".format(
             os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':
@@ -240,7 +263,7 @@ def apply_tags(object_list):
         to_tag += [f"{os.environ['wizard_category_name']}",
                    asset_tag, obj.name]
         tags = existing_tags + to_tag
-        obj['wizardTags'] = (',').join(set(tags))
+        shape['wizardTags'] = (',').join(set(tags))
 
 
 def get_all_collections():
