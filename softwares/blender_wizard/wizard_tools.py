@@ -12,9 +12,48 @@ import bpy
 # Python modules
 import os
 import logging
+import json
+import re
 
 logger = logging.getLogger(__name__)
 
+def check_points_in_names(export_GRP_list):
+    for grp in export_GRP_list:
+        for obj in get_all_children(grp):
+            if '.' in obj.name:
+                logger.warning(f"Object '{obj.name}' contains a '.' in its name.")
+                return True
+    return False
+
+def export_object_attributes_to_json(object_list, export_file):
+    # Collect all descendants
+    all_objects = []
+    for obj in object_list:
+        all_objects.append(obj)
+        all_objects += get_all_children(obj)
+    # Remove duplicates and ensure unique objects
+    all_objects = list(set(all_objects))
+    # Collect only custom (extra) attributes for each object
+    attributes_dict = {}
+    for obj in all_objects:
+        obj_name = obj.name if hasattr(obj, 'name') else str(obj)
+        json_obj_name = obj_name.replace('.', '_')
+        # Blender custom attributes are stored in obj.keys(), but skip Blender's internal keys (start with '_')
+        extra_attrs = [k for k in obj.keys() if not k.startswith('_')]
+        attr_values = {}
+        for attr in extra_attrs:
+            try:
+                attr_values[attr] = obj[attr]
+            except Exception:
+                attr_values[attr] = None
+        attributes_dict[json_obj_name] = attr_values
+    # Save to JSON file in same folder as export_file
+    export_dir = os.path.dirname(export_file)
+    json_path = os.path.join(export_dir, 'attributes.json')
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(attributes_dict, f, indent=2, ensure_ascii=False)
+    print(f"Attributes exported to {json_path}")
+    return json_path
 
 def add_MAYA_USD_attribute_to_objects(object_list):
     all_objects = []
@@ -246,14 +285,11 @@ def apply_tags(object_list):
     for obj in all_objects:
         if type(obj) == bpy.types.Collection:
             continue
-        # Add tags to the shape (obj.data) if it exists
-        shape = getattr(obj, 'data', None)
-        if shape is None:
-            continue
-        if 'wizardTags' not in shape.keys():
+        # Add tags directly to the object
+        if 'wizardTags' not in obj.keys():
             existing_tags = []
         else:
-            existing_tags = shape['wizardTags'].split(',')
+            existing_tags = obj['wizardTags'].split(',')
         asset_tag = "{}_{}".format(
             os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':
@@ -263,7 +299,7 @@ def apply_tags(object_list):
         to_tag += [f"{os.environ['wizard_category_name']}",
                    asset_tag, obj.name]
         tags = existing_tags + to_tag
-        shape['wizardTags'] = (',').join(set(tags))
+        obj['wizardTags'] = (',').join(set(tags))
 
 
 def get_all_collections():
@@ -326,3 +362,18 @@ def get_objects_in_collection(collection):
     for child_collection in collection.children:
         objects.extend(get_objects_in_collection(child_collection))
     return objects
+
+def apply_json_attr_to_new_objects(new_objects, file_path):
+    # Get the directory of the file_path
+    attributes_path = os.path.join(os.path.dirname(file_path), "attributes.json")
+    if os.path.exists(attributes_path):
+        with open(attributes_path, "r", encoding="utf-8") as f:
+            attributes_data = json.load(f)
+
+        # Assign attributes from JSON to matching objects
+        for obj in new_objects:
+            # Helper to strip Blender's numeric suffixes (.001, .002, etc.)
+            obj_base_name = re.sub(r"\.\d+$", "", obj.name)
+            if obj_base_name in attributes_data:
+                for attr, value in attributes_data[obj_base_name].items():
+                    obj[attr] = value

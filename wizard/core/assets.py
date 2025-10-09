@@ -1449,6 +1449,7 @@ def add_export_version(raw_export_name, files, stage_id, version_id, comment='',
     for software in assets_vars._ext_dic_[stage_name].keys():
         extensions_rules += assets_vars._ext_dic_[stage_name][software]
     extensions_rules = list(dict.fromkeys(extensions_rules))
+    extensions_rules.append('json')
 
     # Check if files match the allowed extensions
     for file in files:

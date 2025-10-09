@@ -23,18 +23,22 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
             work_env_id = custom_work_env_id
         else:
             work_env_id = int(os.environ['wizard_work_env_id'])
+        
+        #if wizard_tools.check_points_in_names(export_GRP_list):
+        #    return
+
         export_file = wizard_communicate.request_export(work_env_id,
                                                         export_name)
         if export_file.endswith('.abc'):
-            export_abc(export_GRP_list, export_file, frange)
+            export_files = export_abc(export_GRP_list, export_file, frange)
         if export_file.endswith('.usd'):
-            export_usd(export_GRP_list, export_file, frange)
+            export_files = export_usd(export_GRP_list, export_file, frange)
         elif export_file.endswith('.fbx'):
-            export_fbx(export_GRP_list, export_file, frange)
+            export_files = export_fbx(export_GRP_list, export_file, frange)
         elif export_file.endswith('.blend'):
-            export_blend(export_GRP_list, export_file)
+            export_files = export_blend(export_GRP_list, export_file)
         export_dir = wizard_communicate.add_export_version(export_name,
-                                                           [export_file],
+                                                           export_files,
                                                            work_env_id,
                                                            int(os.environ['wizard_version_id']),
                                                            comment=comment)
@@ -48,12 +52,18 @@ def export_abc(export_GRP_list, export_file, frange):
         abc_command = default_abc_command
     abc_command(export_GRP_list, export_file, frange)
 
+    json_file = wizard_tools.export_object_attributes_to_json(
+        export_GRP_list, export_file)
+    
+    return [export_file, json_file]
+
 
 def export_usd(export_GRP_list, export_file, frange):
     usd_command = wizard_hooks.get_usd_command("blender")
     if usd_command is None:
         usd_command = default_usd_command
     usd_command(export_GRP_list, export_file, frange)
+    return [export_file]
 
 
 def export_fbx(export_GRP_list, export_file, frange):
@@ -62,6 +72,7 @@ def export_fbx(export_GRP_list, export_file, frange):
     if fbx_command is None:
         fbx_command = default_fbx_command
     fbx_command(export_GRP_list, export_file, frange)
+    return [export_file]
 
 
 def export_blend(export_GRP_list, export_file):
@@ -93,6 +104,7 @@ def export_blend(export_GRP_list, export_file):
     bpy.data.collections[collection_name]["main_collection_tag"] = 1
 
     bpy.ops.wm.save_as_mainfile(filepath=export_file, relative_remap=False)
+    return [export_file]
 
 
 def reopen(scene):

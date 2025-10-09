@@ -94,7 +94,10 @@ def export_abc(export_GRP_list, export_file, frange, percent_factor):
                 export_GRP_list,
                 export_file,
                 wizard_tools.by_frame_progress_script(frange, percent_factor))
-    return [export_file]
+
+    json_file = wizard_tools.export_object_attributes_to_json(export_GRP_list, export_file)
+
+    return [export_file, json_file]
 
 
 def export_usd(export_GRP_list, export_file, frange, percent_factor):
@@ -198,6 +201,7 @@ def default_usd_command(start,
         exportBlendShapes=False,
         exportMaterials=False,
         exportSkin=None,
+        mergeTransformAndShape=True,
         frameRange=(start, end),
         frameStride=1,
     )

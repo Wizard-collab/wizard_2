@@ -1,3 +1,4 @@
+
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
@@ -15,6 +16,34 @@ import os
 import logging
 
 logger = logging.getLogger(__name__)
+
+def export_object_attributes_to_json(object_list, export_file):
+    # Collect all descendants
+    all_objects = []
+    for obj in object_list:
+        all_objects.append(obj)
+        all_objects += pm.listRelatives(obj, allDescendents=True)
+    # Remove duplicates and ensure unique objects
+    all_objects = list(set(all_objects))
+    # Collect only user-defined (extra) attributes for each object
+    attributes_dict = {}
+    for obj in all_objects:
+        obj_name = obj.name() if hasattr(obj, 'name') else str(obj)
+        extra_attrs = pm.listAttr(obj, userDefined=True)
+        attr_values = {}
+        for attr in extra_attrs:
+            try:
+                attr_values[attr] = pm.getAttr(obj + '.' + attr)
+            except Exception:
+                attr_values[attr] = None
+        attributes_dict[obj_name] = attr_values
+    # Save to JSON file in same folder as export_file
+    export_dir = os.path.dirname(export_file)
+    json_path = os.path.join(export_dir, 'attributes.json')
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(attributes_dict, f, indent=2, ensure_ascii=False)
+    print(f"Attributes exported to {json_path}")
+    return json_path
 
 def add_USD_attribute_to_objects(object_list):
     all_objects = []
@@ -157,7 +186,8 @@ def apply_tags(object_list):
         all_objects.append(object)
         all_objects += pm.listRelatives(object, allDescendents=True)
     for object in all_objects:
-        if pm.attributeQuery('wizardTags', node=object, exists=1) == 0:
+        # Set the tag on the object itself
+        if pm.attributeQuery('wizardTags', node=object, exists=True) == 0:
             pm.addAttr(object, ln="wizardTags", dt="string")
         existing_tags = []
         if pm.getAttr(object + '.wizardTags'):
@@ -166,11 +196,13 @@ def apply_tags(object_list):
             os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
         if os.environ['wizard_variant_name'] != 'main':
             asset_tag += f"_{os.environ['wizard_variant_name']}"
-        to_tag = [os.environ['wizard_category_name'], asset_tag,
-                  object.name().split(':')[-1].split('|')[-1]]
+        obj_name = object.name().split(':')[-1].split('|')[-1]
+        to_tag = [f"CATEGORY={os.environ['wizard_category_name']}",
+                  f"ASSET={asset_tag}", f"OBJECT={obj_name}",
+                  f"{os.environ['wizard_category_name']}",
+                  asset_tag, obj_name]
         tags = existing_tags + to_tag
-        pm.setAttr(object + '.wizardTags',
-                   (',').join(set(tags)), type="string")
+        pm.setAttr(object + '.wizardTags', (',').join(set(tags)), type="string")
 
 
 def by_frame_progress_script(frange, percent_factor):
