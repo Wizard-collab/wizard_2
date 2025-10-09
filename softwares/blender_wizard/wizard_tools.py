@@ -33,7 +33,7 @@ def export_object_attributes_to_json(object_list, export_file):
         all_objects += get_all_children(obj)
     # Remove duplicates and ensure unique objects
     all_objects = list(set(all_objects))
-    # Collect only custom (extra) attributes for each object
+    # Collect only custom (extra) string attributes for each object
     attributes_dict = {}
     for obj in all_objects:
         obj_name = obj.name if hasattr(obj, 'name') else str(obj)
@@ -43,9 +43,11 @@ def export_object_attributes_to_json(object_list, export_file):
         attr_values = {}
         for attr in extra_attrs:
             try:
-                attr_values[attr] = obj[attr]
+                value = obj[attr]
+                if isinstance(value, str):
+                    attr_values[attr] = value
             except Exception:
-                attr_values[attr] = None
+                pass
         attributes_dict[json_obj_name] = attr_values
     # Save to JSON file in same folder as export_file
     export_dir = os.path.dirname(export_file)
