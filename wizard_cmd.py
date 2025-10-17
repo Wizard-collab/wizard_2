@@ -47,6 +47,7 @@ Modules used:
 """
 
 # Python modules
+import OpenEXR
 import argparse
 import traceback
 import json
