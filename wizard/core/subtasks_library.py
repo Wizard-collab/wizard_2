@@ -473,7 +473,7 @@ def threaded_copy(files_list, destination, max_threads=16, print_stdout=False):
         'Threaded copy started as subtask, open the subtask manager to get more informations')
 
 
-def create_video_from_render(export_version_id, ics, ocs, frame_rate, comment='', overlay=True, print_stdout=False):
+def create_video_from_render(export_version_id, ics, ocs, channel, frame_rate, comment='', overlay=True, print_stdout=False):
     """
     Starts a subtask to create a video from a render.
 
@@ -503,7 +503,7 @@ def create_video_from_render(export_version_id, ics, ocs, frame_rate, comment=''
     command = "# coding: utf-8\n"
     command += "from wizard.gui import gui_server\n"
     command += "from wizard.core import video\n"
-    command += f"video.video_from_render({export_version_id}, '{ics}', '{ocs}', {frame_rate}, comment='''{comment}''', overlay={overlay})\n"
+    command += f"video.video_from_render({export_version_id}, '{ics}', '{ocs}', '{channel}', {frame_rate}, comment='''{comment}''', overlay={overlay})\n"
     command += "gui_server.refresh_team_ui()\n"
     command += "print('wizard_task_status:done')\n"
     task = subtask.subtask(pycmd=command, print_stdout=print_stdout)

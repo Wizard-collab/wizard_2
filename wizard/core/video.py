@@ -184,7 +184,7 @@ def add_overlay(file, string_asset, frame_number, frange, frame_rate, focal_len)
     return out
 
 
-def video_from_render(export_version_id, ics, ocs, frame_rate, comment='', overlay=True):
+def video_from_render(export_version_id, ics, ocs, channel, frame_rate, comment='', overlay=True):
 
     directory = assets.get_export_version_path(export_version_id)
     export_id = project.get_export_version_data(export_version_id, 'export_id')
@@ -209,7 +209,8 @@ def video_from_render(export_version_id, ics, ocs, frame_rate, comment='', overl
             ocio_utils.exr_to_png(files=files_dic[extension],
                                   output_dir=temp_dir,
                                   ics=ics,
-                                  ocs=ocs)
+                                  ocs=ocs, 
+                                  channel=channel)
             string_asset = assets.instance_to_string(
                 ('export_version', export_version_id))
 

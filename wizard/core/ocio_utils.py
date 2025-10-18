@@ -53,6 +53,9 @@ from PIL import Image
 from wizard.core import path_utils
 from wizard.core import project
 
+import logging 
+logger = logging.getLogger(__name__)
+
 
 def save_as_png(image_array, output_path):
     """
@@ -78,8 +81,19 @@ def save_as_png(image_array, output_path):
     # Save the image
     image.save(output_path)
 
+def _find_channel_name(header_channels, short_name):
+        short = short_name.lower()
+        for name in header_channels.keys():
+            try:
+                if name.split('.')[-1].lower() == short:
+                    return name
+            except Exception:
+                # fallback to direct comparison
+                if name.lower() == short:
+                    return name
+        return None
 
-def exr_to_rgba_array(file_path):
+def exr_to_rgba_array(file_path, channel=None):
     """
     Converts an OpenEXR file to a 4-channel RGBA numpy array.
     Args:
@@ -109,16 +123,57 @@ def exr_to_rgba_array(file_path):
     # Define the channel type for R, G, B, and A (float)
     FLOAT = Imath.PixelType(Imath.PixelType.FLOAT)
 
-    # Read the color channels from the EXR file
-    r_channel = exr_file.channel('R', FLOAT)
-    g_channel = exr_file.channel('G', FLOAT)
-    b_channel = exr_file.channel('B', FLOAT)
+    header_channels = header['channels']
+
+    # Find actual channel names for R, G, B based on channel parameter
+    if channel:
+        # If channel is specified, look for RGB channels with that prefix (case-insensitive)
+        r_name = None
+        g_name = None
+        b_name = None
+        a_name = None
+        
+        # Check both uppercase and lowercase variants
+        for suffix_upper, suffix_lower in [('R', 'r'), ('G', 'g'), ('B', 'b'), ('A', 'a')]:
+            channel_upper = f"{channel}.{suffix_upper}"
+            channel_lower = f"{channel}.{suffix_lower}"
+            
+            if suffix_upper == 'R':
+                r_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+            elif suffix_upper == 'G':
+                g_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+            elif suffix_upper == 'B':
+                b_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+            elif suffix_upper == 'A':
+                a_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+    else:
+        # Default behavior: find any R, G, B channels using the helper
+        r_name = _find_channel_name(header_channels, 'R')
+        g_name = _find_channel_name(header_channels, 'G')
+        b_name = _find_channel_name(header_channels, 'B')
+        a_name = _find_channel_name(header_channels, 'A')
+
+    if not (r_name and g_name and b_name):
+        available = list(header_channels.keys())
+        if channel:
+            raise ValueError(
+                "Could not find R/G/B channels for '{}' in EXR header. Available channels: {}".format(channel, available)
+            )
+        else:
+            raise ValueError(
+                "Could not find R/G/B channels in EXR header. Available channels: {}".format(available)
+            )
+
+    # Read the found channels
+    r_channel = exr_file.channel(r_name, FLOAT)
+    g_channel = exr_file.channel(g_name, FLOAT)
+    b_channel = exr_file.channel(b_name, FLOAT)
 
     # Read alpha channel if it exists
-    try:
-        a_channel = exr_file.channel('A', FLOAT)
+    if a_name:
+        a_channel = exr_file.channel(a_name, FLOAT)
         has_alpha = True
-    except:
+    else:
         # Default alpha is 1.0 if absent
         a_channel = np.full((width * height), 1.0, dtype=np.float32)
         has_alpha = False
@@ -135,8 +190,66 @@ def exr_to_rgba_array(file_path):
 
     return rgba_array
 
+def list_exr_channels(file_path):
+    """
+    Lists all available channels in an OpenEXR file.
+    
+    Args:
+        file_path (str): Path to the EXR file
+        
+    Returns:
+        list: List of channel names available in the EXR file
+    """
+    try:
+        exr_file = OpenEXR.InputFile(file_path)
+        header = exr_file.header()
+        channels = header['channels']
+        return list(channels.keys())
+    except Exception as e:
+        print(f"Error reading EXR file: {e}")
+        return []
 
-def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs, OCIO_config_file):
+
+def get_exr_channel_groups(file_path):
+    """
+    Gets unique channel group prefixes by removing common color suffixes (.R, .G, .B, .A).
+    
+    For example:
+    - 'ViewLayer.Combined.R', 'ViewLayer.Combined.G', 'ViewLayer.Combined.B' -> 'ViewLayer.Combined'
+    - 'layer.R', 'layer.G', 'layer.B' -> 'layer'
+    - 'Depth' -> 'Depth' (no suffix to remove)
+    
+    Args:
+        file_path (str): Path to the EXR file
+        
+    Returns:
+        list: List of unique channel group prefixes (base layer names)
+    """
+    try:
+        channels = list_exr_channels(file_path)
+        if not channels:
+            return []
+        
+        # Color channel suffixes to remove (both uppercase and lowercase)
+        color_suffixes = ['.R', '.G', '.B', '.A', '.r', '.g', '.b', '.a']
+        
+        groups = set()
+        for channel in channels:
+            # Check if channel ends with a color suffix
+            base_name = channel
+            for suffix in color_suffixes:
+                if channel.endswith(suffix):
+                    base_name = channel[:-len(suffix)]
+                    break
+            groups.add(base_name)
+        
+        return sorted(list(groups))
+    
+    except Exception as e:
+        print(f"Error reading EXR channel groups: {e}")
+        return []
+
+def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs, channel, OCIO_config_file):
     """
     Converts a list of EXR files to PNG format while applying a color transformation
     using OpenColorIO (OCIO).
@@ -173,7 +286,7 @@ def convert_exr_to_png_with_color_transform(files, output_dir, ics, ocs, OCIO_co
 
         # Apply the color transform to the existing RGBA pixel data
         for file in files:
-            img = exr_to_rgba_array(file)
+            img = exr_to_rgba_array(file, channel=channel)
             cpu.applyRGBA(img)
             file_path = path_utils.join(
                 output_dir, f"{path_utils.basename(path_utils.splitext(file)[0])}.png")
@@ -201,6 +314,7 @@ def convert_exr_to_png(files, output_dir):
         - The output PNG files will have the same base name as the input EXR files.
     """
     for file in files:
+        logger.info(f"Converting EXR to PNG: {file}")
         img = exr_to_rgba_array(file)
         file_path = path_utils.join(
             output_dir, f"{path_utils.basename(path_utils.splitext(file)[0])}.png")
@@ -208,7 +322,7 @@ def convert_exr_to_png(files, output_dir):
     return 1
 
 
-def exr_to_png(files, output_dir, ics=None, ocs=None):
+def exr_to_png(files, output_dir, ics=None, ocs=None, channel=None):
     """
     Converts a list of EXR files to PNG format, optionally applying a color 
     transformation using an OpenColorIO (OCIO) configuration.
@@ -235,6 +349,7 @@ def exr_to_png(files, output_dir, ics=None, ocs=None):
                                                    output_dir=output_dir,
                                                    ics=ics,
                                                    ocs=ocs,
+                                                   channel=channel,
                                                    OCIO_config_file=OCIO_config_file)
 
 

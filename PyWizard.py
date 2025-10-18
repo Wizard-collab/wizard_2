@@ -42,6 +42,7 @@ Usage:
 """
 
 # Python modules
+import OpenEXR
 import sys
 import os
 import traceback

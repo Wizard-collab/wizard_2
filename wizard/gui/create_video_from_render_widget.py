@@ -13,6 +13,8 @@ from wizard.gui import gui_utils
 from wizard.core import ocio_utils
 from wizard.core import video
 from wizard.core import project
+from wizard.core import assets
+from wizard.core import path_utils
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 
@@ -50,12 +52,25 @@ class create_video_from_render_widget(QtWidgets.QDialog):
             self.output_color_space_combobox.setCurrentText('out_srgb')
         frame_rate = project.get_frame_rate()
         self.frame_rate_spinBox.setValue(frame_rate)
+        self.fill_channels()
+
+    def fill_channels(self):
+        directory = assets.get_export_version_path(self.export_version_id)
+        file = None
+        for file in path_utils.listdir(directory):
+            if file.endswith('.exr'):
+                break
+        if not file:
+            return 
+        file = path_utils.join(directory, file)
+        self.channel_combobox.addItems(ocio_utils.get_exr_channel_groups(file))
 
     def create_video(self):
         subtasks_library.create_video_from_render(self.export_version_id,
                                                   self.input_color_space_combobox.currentText(),
                                                   self.output_color_space_combobox.currentText(),
-                                                  self.frame_rate_spinBox.value(),
+                                                  channel=self.channel_combobox.currentText(),
+                                                  frame_rate=self.frame_rate_spinBox.value(),
                                                   comment=self.comment_textEdit.toPlainText(),
                                                   overlay=self.burn_details_checkbox.isChecked())
         self.accept()
@@ -76,6 +91,10 @@ class create_video_from_render_widget(QtWidgets.QDialog):
         self.output_color_space_combobox = gui_utils.QComboBox()
         self.form_layout.addRow(QtWidgets.QLabel(
             'Output color space'), self.output_color_space_combobox)
+
+        self.channel_combobox = gui_utils.QComboBox()
+        self.form_layout.addRow(QtWidgets.QLabel(
+            'Channel'), self.channel_combobox)
 
         self.frame_rate_spinBox = QtWidgets.QSpinBox()
         self.frame_rate_spinBox.setButtonSymbols(
