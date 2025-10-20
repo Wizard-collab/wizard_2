@@ -50,13 +50,15 @@ class production_table_widget(QtWidgets.QWidget):
         self.show_states = 1
         self.show_assignments = 1
         self.show_priorities = 1
-        self.init_users_images()
+        self.users_images_dic = dict()
+        self.refresh_users_images()
         self.build_ui()
         self.connect_functions()
 
-    def init_users_images(self):
-        self.users_images_dic = dict()
+    def refresh_users_images(self):
         for user_row in repository.get_users_list():
+            if user_row['user_name'] in self.users_images_dic.keys():
+                    continue
             user_image = user_row['profile_picture']
             pixmap = gui_utils.mask_image(
                 image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
@@ -315,7 +317,7 @@ class production_table_widget(QtWidgets.QWidget):
 
     def refresh(self):
         if self.isVisible():
-            self.init_users_images()
+            self.refresh_users_images()
             self.update_assets = False
             domain_rows = project.get_domains()
             for domain_row in domain_rows:
