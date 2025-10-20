@@ -156,7 +156,7 @@ def get_domain_data(domain_id, column='*'):
         return
 
 
-def get_domain_childs(domain_id, column='*'):
+def get_domain_childs(domain_id, column='*', order='id'):
     """
     Retrieve child categories for a given domain ID from the 'categories' table.
 
@@ -170,7 +170,8 @@ def get_domain_childs(domain_id, column='*'):
     categories_rows = db_utils.get_row_by_column_data('project',
                                                       'categories',
                                                       ('domain_id', domain_id),
-                                                      column)
+                                                      column,
+                                                      order)
     return categories_rows
 
 
