@@ -6160,6 +6160,77 @@ def delete_tag_group(group_name):
         return
     logger.info(f"{group_name} deleted")
 
+def remove_user_from_tag_group(group_name, user_id):
+    """
+    Removes a specified user from a tag group.
+
+    This function retrieves the tag group by its name and checks if the specified
+    user is subscribed to it. If the user is found in the subscribers list, they are
+    removed from the tag group's list of subscribers, and the updated list is saved 
+    to the database.
+
+    Args:
+        group_name (str): The name of the tag group to remove the user from.
+        user_name (str): The name of the user to remove from the tag group.
+
+    Returns:
+        None: The function does not return a value. It logs messages to indicate
+        the removal status.
+
+    Logs:
+        - Logs an info message if the user is not subscribed to the tag group.
+        - Logs an info message when the user is successfully removed from the tag group.
+    """
+    tag_group_row = get_tag_group_by_name(group_name)
+    if not tag_group_row:
+        return
+    user_ids = json.loads(tag_group_row['user_ids'])
+    user_name = repository.get_user_data(user_id, 'user_name')
+    if user_id not in user_ids:
+        logger.info(f"User {user_name} is not subscribed to this tag group")
+        return
+    user_ids.remove(user_id)
+    if db_utils.update_data('project',
+                            'tag_groups',
+                            ('user_ids', json.dumps(user_ids)),
+                            ('id', tag_group_row['id'])):
+        logger.info(f"{user_name} removed from {group_name} tag group.")
+
+def add_user_to_tag_group(group_name, user_name):
+    """
+    Adds a specified user to a tag group.
+
+    This function retrieves the tag group by its name and checks if the specified
+    user is already subscribed to it. If not, the user is added to the tag group's
+    list of subscribers, and the updated list is saved to the database.
+
+    Args:
+        group_name (str): The name of the tag group to add the user to.
+        user_name (str): The name of the user to add to the tag group.
+
+    Returns:
+        None: The function does not return a value. It logs messages to indicate
+        the subscription status.
+
+    Logs:
+        - Logs an info message if the user is already subscribed to the tag group.
+        - Logs an info message when the user is successfully added to the tag group.
+    """
+    tag_group_row = get_tag_group_by_name(group_name)
+    if not tag_group_row:
+        return
+    user_ids = json.loads(tag_group_row['user_ids'])
+    user_id = repository.get_user_row_by_name(user_name, 'id')
+    if user_id in user_ids:
+        logger.info(f"{user_name} already subscribed to this tag group")
+        return
+    user_ids.append(user_id)
+    if db_utils.update_data('project',
+                            'tag_groups',
+                            ('user_ids', json.dumps(user_ids)),
+                            ('id', tag_group_row['id'])):
+        logger.info(f"{user_name} added to {group_name} tag group.")
+
 
 def suscribe_to_tag_group(group_name):
     """

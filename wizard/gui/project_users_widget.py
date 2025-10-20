@@ -199,7 +199,7 @@ class tag_group_widget(QtWidgets.QFrame):
         self.connect_functions()
 
     def build_ui(self):
-        self.setObjectName('dark_round_frame')
+        self.setObjectName('darker_round_frame')
         self.group_tag_layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.group_tag_layout)
 
@@ -220,6 +220,12 @@ class tag_group_widget(QtWidgets.QFrame):
 
         self.header_layout.addSpacerItem(QtWidgets.QSpacerItem(
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+        
+        self.add_user_button = QtWidgets.QPushButton()
+        self.add_user_button.setFixedSize(QtCore.QSize(23, 23))
+        self.add_user_button.setIconSize(QtCore.QSize(15, 15))
+        self.add_user_button.setIcon(QtGui.QIcon(ressources._add_icon_))
+        self.header_layout.addWidget(self.add_user_button)
 
         self.suscribe_button = QtWidgets.QPushButton('')
         self.suscribe_button.setStyleSheet('padding:2px;')
@@ -234,7 +240,7 @@ class tag_group_widget(QtWidgets.QFrame):
 
         self.group_tag_layout.addWidget(gui_utils.separator())
 
-        self.users_layout = QtWidgets.QHBoxLayout()
+        self.users_layout = QtWidgets.QVBoxLayout()
         self.users_layout.setContentsMargins(0, 0, 0, 0)
         self.users_layout.setSpacing(6)
         self.group_tag_layout.addLayout(self.users_layout)
@@ -245,6 +251,24 @@ class tag_group_widget(QtWidgets.QFrame):
     def connect_functions(self):
         self.suscribe_button.clicked.connect(self.suscribe)
         self.delete_tag_group_button.clicked.connect(self.delete_tag_group)
+        self.add_user_button.clicked.connect(self.add_user)
+    
+    def add_user(self):
+        users_actions = []
+        menu = gui_utils.QMenu(self)
+        users_ids = project.get_users_ids_list()
+        for user_id in users_ids:
+            user_row = repository.get_user_data(user_id)
+            icon = QtGui.QIcon()
+            pm = gui_utils.mask_image(image.convert_str_data_to_image_bytes(
+                user_row['profile_picture']), 'png', 24)
+            icon.addPixmap(pm)
+            menu.addAction(icon, user_row['user_name'])
+        action = menu.exec(QtGui.QCursor().pos())
+        if action is not None:
+            selected_user_name = action.text()
+            project.add_user_to_tag_group(self.tag_group_row['name'], selected_user_name)
+            gui_server.refresh_team_ui()
 
     def suscribe(self):
         my_id = repository.get_user_row_by_name(environment.get_user(), 'id')
@@ -253,6 +277,11 @@ class tag_group_widget(QtWidgets.QFrame):
             project.unsuscribe_from_tag_group(self.tag_group_row['name'])
         else:
             project.suscribe_to_tag_group(self.tag_group_row['name'])
+        gui_server.refresh_team_ui()
+    
+    def remove_user_from_tag_group(self, user_id):
+        project.remove_user_from_tag_group(
+            self.tag_group_row['name'], user_id)
         gui_server.refresh_team_ui()
 
     def refresh(self):
@@ -265,9 +294,10 @@ class tag_group_widget(QtWidgets.QFrame):
             self.suscribe_button.setText("Suscribe")
         for user_id in users:
             if user_id not in self.suscribed_users:
-                self.suscribed_users[user_id] = QtWidgets.QLabel()
-                self.suscribed_users[user_id].setPixmap(
-                    self.users_ids[user_id]['pixmap'])
+                self.suscribed_users[user_id] = user_widget(
+                    self.users_ids[user_id]['row'], self.users_ids[user_id]['pixmap'])
+                self.suscribed_users[user_id].remove_user_signal.connect(
+                    self.remove_user_from_tag_group)
                 self.users_layout.insertWidget(
                     0, self.suscribed_users[user_id])
         ui_users = list(self.suscribed_users.keys())
@@ -285,7 +315,6 @@ class tag_group_widget(QtWidgets.QFrame):
     def delete_tag_group(self):
         project.delete_tag_group(self.tag_group_row['name'])
         gui_server.refresh_team_ui()
-
 
 class user_widget(QtWidgets.QFrame):
 

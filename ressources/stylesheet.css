@@ -1047,9 +1047,9 @@ QTableView::item:selected:!active{
 	background-color: #19191f;
 }
 
-#dark_round_frame{
+#darker_round_frame{
 	border-radius: 8px;
-	background-color: #24242b;
+	background-color: #1d1d23;
 }
 
 #reference_edit_widget{
