@@ -430,9 +430,9 @@ class production_table_widget(QtWidgets.QWidget):
                     self.asset_ids[asset_row['id']]['row'] = asset_row
                     self.asset_ids[asset_row['id']
                                    ]['preview_row'] = assets_preview[asset_row['id']]
-                    if self.domain == assets_vars._sequences_:
-                        self.asset_ids[asset_row['id']
-                                       ]['frame_range_widget'].refresh(asset_row)
+                if self.domain == assets_vars._sequences_:
+                    self.asset_ids[asset_row['id']
+                                    ]['frame_range_widget'].refresh(asset_row)
 
         self.update_layout()
 
@@ -723,6 +723,22 @@ class frame_range_widget(QtWidgets.QWidget):
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+    
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
+            self.show_context_menu()
+
+    def show_context_menu(self):
+        menu = gui_utils.QMenu(self)
+        edit_frame_range_action = menu.addAction(
+            QtGui.QIcon(ressources._tool_frame_range_), 'Edit frame range')
+        action = menu.exec(QtGui.QCursor().pos())
+        if action is not None:
+            if action == edit_frame_range_action:
+                self.edit_frame_range_widget = edit_frame_range_widget(
+                    asset_id=self.asset_row['id'])
+                self.edit_frame_range_widget.exec()
+                gui_server.refresh_ui()
 
     def fill_ui(self):
         self.frame_range_label.setText(
@@ -734,6 +750,132 @@ class frame_range_widget(QtWidgets.QWidget):
         self.asset_row = asset_row
         self.fill_ui()
 
+
+class edit_frame_range_widget(QtWidgets.QDialog):
+    def __init__(self, parent=None, asset_id=None):
+        super(edit_frame_range_widget, self).__init__(parent)
+        self.asset_id = asset_id
+        self.build_ui()
+        self.load_old_range()
+        self.connect_functions()
+
+        self.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint |
+                            QtCore.Qt.WindowType.FramelessWindowHint | QtCore.Qt.WindowType.Dialog)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+
+    def load_old_range(self):
+        asset_row = project.get_asset_data(self.asset_id)
+        self.inframe_spinBox.setValue(asset_row['inframe'])
+        self.outframe_spinBox.setValue(asset_row['outframe'])
+        self.preroll_spinBox.setValue(asset_row['preroll'])
+        self.postroll_spinBox.setValue(asset_row['postroll'])
+
+    def connect_functions(self):
+        self.accept_button.clicked.connect(self.edit_frame_range)
+        self.close_pushButton.clicked.connect(self.reject)
+
+    def edit_frame_range(self):
+        inframe = self.inframe_spinBox.value()
+        outframe = self.outframe_spinBox.value()
+        preroll = self.preroll_spinBox.value()
+        postroll = self.postroll_spinBox.value()
+        if outframe <= inframe:
+            logger.warning("Can't set an outframe inferior to an inframe")
+            return
+        if assets.modify_asset_frame_range(self.asset_id, inframe, outframe, preroll, postroll):
+            self.accept()
+
+    def showEvent(self, event):
+        corner = gui_utils.move_ui(self)
+        self.apply_round_corners(corner)
+        event.accept()
+
+    def apply_round_corners(self, corner):
+        self.main_frame.setStyleSheet(
+            "#instance_creation_frame{border-%s-radius:0px;}" % corner)
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
+        self.setLayout(self.main_layout)
+        self.main_frame = QtWidgets.QFrame()
+        self.main_frame.setObjectName('instance_creation_frame')
+        self.frame_layout = QtWidgets.QVBoxLayout()
+        self.frame_layout.setSpacing(6)
+        self.main_frame.setLayout(self.frame_layout)
+        self.main_layout.addWidget(self.main_frame)
+
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect()
+        self.shadow.setBlurRadius(70)
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 80))
+        self.shadow.setXOffset(2)
+        self.shadow.setYOffset(2)
+        self.main_frame.setGraphicsEffect(self.shadow)
+
+        self.close_frame = QtWidgets.QFrame()
+        self.close_layout = QtWidgets.QHBoxLayout()
+        self.close_layout.setContentsMargins(2, 2, 2, 2)
+        self.close_layout.setSpacing(2)
+        self.close_frame.setLayout(self.close_layout)
+        self.title_label = QtWidgets.QLabel("Edit frame range")
+        self.close_layout.addWidget(self.title_label)
+        self.spaceItem = QtWidgets.QSpacerItem(
+            100, 10, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.close_layout.addSpacerItem(self.spaceItem)
+        self.close_pushButton = gui_utils.transparent_button(
+            ressources._close_tranparent_icon_, ressources._close_icon_)
+        self.close_pushButton.setFixedSize(16, 16)
+        self.close_pushButton.setIconSize(QtCore.QSize(12, 12))
+        self.close_layout.addWidget(self.close_pushButton)
+        self.frame_layout.addWidget(self.close_frame)
+
+        self.frange_frame = QtWidgets.QFrame()
+        self.frange_layout = QtWidgets.QHBoxLayout()
+        self.frange_layout.setContentsMargins(0, 0, 0, 0)
+        self.frange_layout.setSpacing(6)
+        self.frange_frame.setLayout(self.frange_layout)
+
+        frange_label = QtWidgets.QLabel("Frame range")
+        frange_label.setStyleSheet('color:gray;')
+        self.frange_layout.addWidget(frange_label)
+
+        self.preroll_spinBox = QtWidgets.QSpinBox()
+        self.preroll_spinBox.setObjectName('gray_label')
+        self.preroll_spinBox.setRange(0, 1000000)
+        self.preroll_spinBox.setValue(100)
+        self.preroll_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.frange_layout.addWidget(self.preroll_spinBox)
+
+        self.inframe_spinBox = QtWidgets.QSpinBox()
+        self.inframe_spinBox.setRange(-100000, 100000)
+        self.inframe_spinBox.setValue(100)
+        self.inframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.frange_layout.addWidget(self.inframe_spinBox)
+
+        self.outframe_spinBox = QtWidgets.QSpinBox()
+        self.outframe_spinBox.setRange(-1000000, 100000)
+        self.outframe_spinBox.setValue(220)
+        self.outframe_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.frange_layout.addWidget(self.outframe_spinBox)
+
+        self.postroll_spinBox = QtWidgets.QSpinBox()
+        self.postroll_spinBox.setObjectName('gray_label')
+        self.postroll_spinBox.setRange(0, 1000000)
+        self.postroll_spinBox.setValue(0)
+        self.postroll_spinBox.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        self.frange_layout.addWidget(self.postroll_spinBox)
+
+        self.frame_layout.addWidget(self.frange_frame)
+
+        self.accept_button = QtWidgets.QPushButton('Modify')
+        self.accept_button.setObjectName("blue_button")
+        self.accept_button.setDefault(True)
+        self.accept_button.setAutoDefault(True)
+        self.frame_layout.addWidget(self.accept_button)
 
 class stage_widget(QtWidgets.QWidget):
 
