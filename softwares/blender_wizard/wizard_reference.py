@@ -122,6 +122,7 @@ def create_reference(reference_dic, referenced_stage):
     if not wizard_tools.namespace_exists(reference_dic['namespace']):
         group_collection = wizard_tools.create_collection_if_not_exists(
             referenced_stage, parent=None)
+        group_collection.color_tag = 'COLOR_04'  # Green color tag
         namespace_collection = wizard_tools.create_collection_if_not_exists(
             reference_dic['namespace'], parent=group_collection)
         wizard_tools.set_collection_active(namespace_collection)
