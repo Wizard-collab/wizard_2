@@ -315,6 +315,7 @@ class production_table_widget(QtWidgets.QWidget):
 
     def refresh(self):
         if self.isVisible():
+            self.init_users_images()
             self.update_assets = False
             domain_rows = project.get_domains()
             for domain_row in domain_rows:
