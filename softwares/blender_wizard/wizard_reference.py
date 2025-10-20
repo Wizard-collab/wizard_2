@@ -233,7 +233,7 @@ def link_blend(file_path, reference_dic, parent_collection=None):
         logger.warning(f"Ressource already existing, skipping...")
         return
     '''
-
+    wizard_tools.set_mode_to_object()
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection
     wizard_tools.set_collection_active(parent_collection)
@@ -259,15 +259,44 @@ def link_blend(file_path, reference_dic, parent_collection=None):
 
 
 def library_override(collection_name):
-    for object in bpy.data.collections[collection_name].all_objects:
-        bpy.data.objects[object.name].override_create(
-            remap_local_usages=True)
-        object.data.override_create(remap_local_usages=True)
+    try:
+        # ensure collection exists
+        if collection_name not in bpy.data.collections:
+            logger.warning(f"Collection '{collection_name}' not found for library_override")
+            return
+
+        coll = bpy.data.collections[collection_name]
+
+        # snapshot objects to avoid C-level iterator invalidation
+        objs = list(coll.all_objects)
+
+        for obj in objs:
+            if obj is None:
+                continue
+            try:
+                # make sure object exists in bpy.data.objects and has override_create
+                if obj.name in bpy.data.objects:
+                    bpy_obj = bpy.data.objects[obj.name]
+                    if hasattr(bpy_obj, "override_create"):
+                        bpy_obj.override_create(remap_local_usages=True)
+
+                # ensure data exists and supports override_create
+                if getattr(obj, "data", None) is not None and hasattr(obj.data, "override_create"):
+                    obj.data.override_create(remap_local_usages=True)
+            except Exception as exc:
+                # log full exception to help debugging; avoid silent pass
+                logger.exception(f"Override failed for {getattr(obj, 'name', '<unknown>')}: {exc}")
+    except Exception:
+        # top-level guard: log and return - cannot recover from C-level segfaults here
+        logger.exception("Unexpected error in library_override")
+        return
 
 
 def update_blend(file_path, namespace):
     try:
         lib = bpy.data.libraries[namespace]
+        if lib.filepath == file_path:
+            return
         lib.filepath = file_path
         lib.reload()
         lib = bpy.data.libraries[os.path.basename(file_path)]

@@ -379,3 +379,32 @@ def apply_json_attr_to_new_objects(new_objects, file_path):
             if obj_base_name in attributes_data:
                 for attr, value in attributes_data[obj_base_name].items():
                     obj[attr] = value
+
+def set_mode_to_object():
+    # Ensure there is an active object for the operator poll to succeed.
+    # If none, try to pick one from the view_layer or scene. If still none, do nothing.
+    try:
+        active = bpy.context.view_layer.objects.active
+    except Exception:
+        active = None
+
+    if active is None:
+        # try to find any object in the current view layer
+        objs = [o for o in bpy.context.view_layer.objects if o is not None]
+        if not objs:
+            # try scene objects as last resort
+            objs = [o for o in bpy.context.scene.objects if o is not None]
+        if objs:
+            bpy.context.view_layer.objects.active = objs[0]
+        else:
+            logger.debug("set_mode_to_object: no objects available to set active, skipping mode change")
+            return
+
+    # Only call the operator if we are not already in OBJECT mode
+    try:
+        if bpy.context.mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
+    except RuntimeError as exc:
+        # log and continue to avoid crashing callers
+        logger.exception("Failed to set mode to OBJECT: %s", exc)
+        return
