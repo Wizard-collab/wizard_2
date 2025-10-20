@@ -397,7 +397,7 @@ def remove_category(category_id, force=0):
     return 1
 
 
-def get_category_childs(category_id, column="*"):
+def get_category_childs(category_id, column="*", order='id'):
     """
     Retrieve child assets of a given category from the database.
 
@@ -412,7 +412,8 @@ def get_category_childs(category_id, column="*"):
     assets_rows = db_utils.get_row_by_column_data('project',
                                                   'assets',
                                                   ('category_id', category_id),
-                                                  column)
+                                                  column,
+                                                  order)
     return assets_rows
 
 

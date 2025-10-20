@@ -134,7 +134,8 @@ def get_rows(level, table, column='*', order='id', sort=''):
 def get_row_by_column_data(level,
                            table,
                            column_tuple,
-                           column='*'):
+                           column='*',
+                           order='id'):
     """
     Retrieve rows from a database table based on a specific column value.
 
@@ -155,9 +156,9 @@ def get_row_by_column_data(level,
         - The function uses parameterized queries to prevent SQL injection.
     """
     if type(column) == list:
-        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY id"
+        sql_cmd = f"SELECT {(', ').join(column)} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY {order}"
     else:
-        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY id"
+        sql_cmd = f"SELECT {column} FROM {table} WHERE {column_tuple[0]}=%s ORDER BY {order}"
     if column != '*':
         as_dict = 0
     else:

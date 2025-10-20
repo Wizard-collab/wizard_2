@@ -369,7 +369,7 @@ class production_table_widget(QtWidgets.QWidget):
         self.category_rows = dict()
         for category_row in project.get_domain_childs(domain_id):
             self.category_rows[category_row['id']] = category_row
-            self.asset_rows += project.get_category_childs(category_row['id'])
+            self.asset_rows += project.get_category_childs(category_row['id'], order='name')
 
         for assets_preview_row in assets_preview_rows:
             assets_preview[assets_preview_row['asset_id']] = assets_preview_row
