@@ -355,7 +355,7 @@ class main_widget(QtWidgets.QWidget):
         self.close()
         command = 'wizard.exe'
         if sys.argv[0].endswith('.py'):
-            command = 'python/python.exe app.py'
+            command = 'python\\python.exe app.py'
         subprocess.Popen(command, shell=True)
 
     def raise_window(self):
