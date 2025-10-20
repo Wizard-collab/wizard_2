@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def main(comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
-
+        wizard_tools.set_mode_to_object()
         collections_dic = wizard_tools.get_export_grps('modeling_GRP')
         if collections_dic == dict():
             logger.warning("No group to export...")

@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
+        wizard_tools.set_mode_to_object()
         at_least_one = False
         camrig_references = get_camrig_nspaces()
         if camrig_references:

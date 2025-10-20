@@ -117,6 +117,7 @@ def update_custom(reference_dic):
 
 
 def create_reference(reference_dic, referenced_stage):
+    wizard_tools.set_mode_to_object()
     old_objects = wizard_tools.get_all_nodes()
     if not wizard_tools.namespace_exists(reference_dic['namespace']):
         group_collection = wizard_tools.create_collection_if_not_exists(
@@ -141,6 +142,7 @@ def create_reference(reference_dic, referenced_stage):
 
 
 def update_reference(reference_dic, referenced_stage):
+    wizard_tools.set_mode_to_object()
     old_objects = wizard_tools.get_all_nodes()
     if wizard_tools.namespace_exists(reference_dic['namespace']):
         for file in reference_dic['files']:
@@ -161,7 +163,6 @@ def update_reference(reference_dic, referenced_stage):
 
 def import_abc(file_path, reference_dic, parent_collection=None):
     all_objects = list(bpy.context.scene.objects)
-    print(all_objects)
 
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection

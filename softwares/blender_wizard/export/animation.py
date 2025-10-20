@@ -21,6 +21,7 @@ import bpy
 def main(nspace_list, frange, comment=''):
     scene = wizard_export.save_or_save_increment()
     try:
+        wizard_tools.set_mode_to_object()
         at_least_one = False
         rigging_references = get_rig_nspaces()
         if rigging_references:
