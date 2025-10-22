@@ -98,7 +98,7 @@ class video_settings_widget(QtWidgets.QDialog):
         outrollframe = self.outframe_spinBox.value()
         if self.rolls_checkbox.isChecked():
             inrollframe = inrollframe-self.preroll
-            outrollframe = outrollframe-self.postroll
+            outrollframe = outrollframe+self.postroll
         self.inrollframe_spinBox.setValue(inrollframe)
         self.outrollframe_spinBox.setValue(outrollframe)
 
