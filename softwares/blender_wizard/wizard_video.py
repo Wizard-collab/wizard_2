@@ -62,6 +62,9 @@ def get_focal_length(frange, camera):
 
 def playblast(directory, frange):
     bpy.context.scene.render.engine = 'BLENDER_WORKBENCH'
+
+    bpy.context.scene.display.shading.use_dof = True
+
     bpy.context.scene.render.image_settings.file_format = 'PNG'
     bpy.context.scene.render.image_settings.color_mode = 'RGB'
     temp_dir = os.path.join(directory, 'tmp_playblast').replace('\\', '/')
