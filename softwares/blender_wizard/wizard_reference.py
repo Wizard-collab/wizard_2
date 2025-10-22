@@ -165,6 +165,8 @@ def update_reference(reference_dic, referenced_stage):
 def import_abc(file_path, reference_dic, parent_collection=None):
     all_objects = list(bpy.context.scene.objects)
 
+    print(file_path)
+
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection
     bpy.ops.object.select_all(action='DESELECT')
@@ -173,13 +175,9 @@ def import_abc(file_path, reference_dic, parent_collection=None):
     cache = bpy.data.cache_files[os.path.basename(file_path)]
     cache.name = f"{reference_dic['namespace']}:cache_file"
 
-    print('bonsoir')
-    all_object_names = [o.name for o in all_objects]
-    print(all_object_names)
-    new_objects = [obj for obj in bpy.context.scene.objects if obj.name not in all_object_names]
-    print(new_objects)
-    wizard_tools.apply_json_attr_to_new_objects(new_objects, file_path)
-    print('zizi')
+    namespace_objects = wizard_tools.get_objects_in_collection(bpy.data.collections[reference_dic['namespace']])
+    wizard_tools.apply_json_attr_to_new_objects(namespace_objects, file_path)
+    wizard_tools.apply_json_camera_data_to_new_cameras(namespace_objects, file_path)
 
     return cache
 
@@ -211,6 +209,11 @@ def update_abc(file_path, namespace):
         return
     cache = bpy.data.cache_files[file_cache_name]
     cache.filepath = file_path
+
+    # Get all objects in the namespace collection and apply JSON attributes
+    namespace_objects = wizard_tools.get_objects_in_collection(bpy.data.collections[namespace])
+    wizard_tools.apply_json_attr_to_new_objects(namespace_objects, file_path)
+    wizard_tools.apply_json_camera_data_to_new_cameras(namespace_objects, file_path)
 
 
 def update_usd(file_path, namespace):

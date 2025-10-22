@@ -17,6 +17,73 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def export_camera_data_to_json(object_list, output_file):
+    """Export camera focal length and focus distance data to JSON files for each camera in the object list."""
+    output_dir = os.path.dirname(output_file)
+    camera_json_files = []
+
+    # Get all objects including children
+    all_objects = []
+    for obj in object_list:
+        all_objects.append(obj)
+        all_objects += pm.listRelatives(obj, allDescendents=True, type='transform') or []
+    
+    # Remove duplicates
+    all_objects = list(set(all_objects))
+    
+    # Process each camera
+    for obj in all_objects:
+        # Check if object is a camera transform or has camera shape
+        camera_shapes = pm.listRelatives(obj, shapes=True, type='camera')
+        if camera_shapes:
+            camera_shape = camera_shapes[0]
+            camera_data = {}
+            
+            # Get frame range from scene
+            start_frame = int(pm.playbackOptions(query=True, minTime=True))
+            end_frame = int(pm.playbackOptions(query=True, maxTime=True))
+            
+            # Store current frame to restore later
+            current_frame = pm.currentTime(query=True)
+            
+            # Collect data for each frame
+            for frame in range(start_frame, end_frame + 1):
+                pm.currentTime(frame)
+                
+                # Get focal length (lens value in mm)
+                focal_length = pm.getAttr(camera_shape + '.focalLength')
+                
+                # Get focus distance (focusDistance)
+                focus_distance = pm.getAttr(camera_shape + '.focusDistance')
+                
+                # Get f-stop (aperture value)
+                fstop = pm.getAttr(camera_shape + '.fStop')
+                
+                camera_data[str(frame)] = {
+                    'focal_length': focal_length,
+                    'focus_distance': focus_distance,
+                    'fstop': fstop
+                }
+            
+            # Restore original frame
+            pm.currentTime(current_frame)
+            
+            # Remove namespace from object name for filename
+            obj_name = obj.name().split(':')[-1]
+            
+            # Save to JSON file
+            json_filename = f"{obj_name}.json"
+            json_path = os.path.join(output_dir, json_filename)
+            
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(camera_data, f, indent=2, ensure_ascii=False)
+            
+            camera_json_files.append(json_path)
+            
+            logger.info(f"Camera data exported to {json_path}")
+    
+    return camera_json_files
+
 def export_object_attributes_to_json(object_list, export_file):
     # Collect all descendants
     all_objects = []

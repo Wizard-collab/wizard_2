@@ -54,8 +54,11 @@ def export_abc(export_GRP_list, export_file, frange):
 
     json_file = wizard_tools.export_object_attributes_to_json(
         export_GRP_list, export_file)
-    
-    return [export_file, json_file]
+    camera_json_files = wizard_tools.export_camera_data_to_json(
+        export_GRP_list, os.path.dirname(export_file))
+
+
+    return [export_file, json_file, *camera_json_files]
 
 
 def export_usd(export_GRP_list, export_file, frange):

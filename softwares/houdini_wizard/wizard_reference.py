@@ -132,12 +132,20 @@ def update_from_extension(namespace, files_list, parent_GRP_name, stage_name, re
 
 
 def reference_abc(namespace, files_list):
-    if len(files_list) == 1:
+
+    abc_files = []
+
+    for file in files_list:
+        if not file.endswith('.abc'):
+            continue
+        abc_files.append(file)
+
+    if len(abc_files) == 1:
         wizard_ref_node = wizard_tools.get_wizard_ref_node()
         if not wizard_tools.node_exists(namespace, parent=wizard_ref_node):
             abc_node = wizard_tools.create_node_without_duplicate(
                 'alembic', namespace, wizard_ref_node)
-            abc_node.parm("fileName").set(files_list[0])
+            abc_node.parm("fileName").set(abc_files[0])
             convert_node = wizard_tools.create_node_without_duplicate(
                 'convert', namespace+"_convert", wizard_ref_node)
             convert_node.setInput(0, abc_node)
@@ -150,11 +158,19 @@ def reference_abc(namespace, files_list):
 
 
 def update_abc(namespace, files_list):
-    if len(files_list) == 1:
+
+    abc_files = []
+
+    for file in files_list:
+        if not file.endswith('.abc'):
+            continue
+        abc_files.append(file)
+
+    if len(abc_files) == 1:
         wizard_ref_node = wizard_tools.get_wizard_ref_node()
         abc_node = wizard_tools.node_exists(namespace, parent=wizard_ref_node)
         if abc_node:
-            abc_node.parm("fileName").set(files_list[0])
+            abc_node.parm("fileName").set(abc_files[0])
         else:
             logger.warning(f"{namespace} not found")
     else:
