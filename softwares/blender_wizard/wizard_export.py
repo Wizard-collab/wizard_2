@@ -47,6 +47,8 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
 
 
 def export_abc(export_GRP_list, export_file, frange):
+    # Unhide all objects and descendants in export_GRP_list
+    wizard_tools.unhide_all_children(export_GRP_list)
     abc_command = wizard_hooks.get_abc_command("blender")
     if abc_command is None:
         abc_command = default_abc_command
@@ -56,6 +58,7 @@ def export_abc(export_GRP_list, export_file, frange):
         export_GRP_list, export_file)
     camera_json_files = wizard_tools.export_camera_data_to_json(
         export_GRP_list, os.path.dirname(export_file))
+    
 
 
     return [export_file, json_file, *camera_json_files]

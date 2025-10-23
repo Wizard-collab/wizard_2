@@ -146,6 +146,15 @@ def get_file_dir(file):
     directory.replace('\\', '/')
     return directory
 
+def unhide_all_children(object_list):
+    for obj in object_list:
+        obj.hide_set(False)
+        obj.hide_viewport = False
+        obj.hide_render = False
+        for child in get_all_children(obj):
+            child.hide_set(False)
+            child.hide_viewport = False
+            child.hide_render = False
 
 def save_increment(comment=''):
     file_path, version_id = wizard_communicate.add_version(
