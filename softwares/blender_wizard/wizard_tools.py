@@ -17,13 +17,16 @@ import re
 
 logger = logging.getLogger(__name__)
 
+
 def check_points_in_names(export_GRP_list):
     for grp in export_GRP_list:
         for obj in get_all_children(grp):
             if '.' in obj.name:
-                logger.warning(f"Object '{obj.name}' contains a '.' in its name.")
+                logger.warning(
+                    f"Object '{obj.name}' contains a '.' in its name.")
                 return True
     return False
+
 
 def export_object_attributes_to_json(object_list, export_file):
     # Collect all descendants
@@ -63,61 +66,64 @@ def export_camera_data_to_json(object_list, output_dir):
 
     camera_json_files = []
 
-
     # Get all objects including children
     all_objects = []
     for obj in object_list:
         all_objects.append(obj)
         all_objects += get_all_children(obj)
-    
+
     # Remove duplicates
     all_objects = list(set(all_objects))
-    
+
     # Process each camera
     for obj in all_objects:
+        if not hasattr(obj, "type"):
+            continue
         if obj.type == 'CAMERA':
             camera_data = {}
             camera = obj.data
-            
+
             # Get frame range from scene
             scene = bpy.context.scene
             start_frame = scene.frame_start
             end_frame = scene.frame_end
-            
+
             # Store current frame to restore later
             current_frame = scene.frame_current
-            
+
             # Collect data for each frame
             for frame in range(start_frame, end_frame + 1):
                 scene.frame_set(frame)
-                
+
                 # Get focal length (lens value in mm)
                 focal_length = camera.lens
-                
+
                 # Get focus distance (dof_distance)
-                focus_distance = camera.dof.focus_distance if hasattr(camera.dof, 'focus_distance') else 0.0
-                
+                focus_distance = camera.dof.focus_distance if hasattr(
+                    camera.dof, 'focus_distance') else 0.0
+
                 # Get f-stop (aperture fstop)
-                fstop = camera.dof.aperture_fstop if hasattr(camera.dof, 'aperture_fstop') else 2.8
-                
+                fstop = camera.dof.aperture_fstop if hasattr(
+                    camera.dof, 'aperture_fstop') else 2.8
+
                 camera_data[str(frame)] = {
                     'focal_length': focal_length,
                     'focus_distance': focus_distance,
                     'fstop': fstop
                 }
-            
+
             # Restore original frame
             scene.frame_set(current_frame)
-            
+
             # Save to JSON file
             json_filename = f"{obj.name}.json"
             json_path = os.path.join(output_dir, json_filename)
-            
+
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(camera_data, f, indent=2, ensure_ascii=False)
-            
+
             camera_json_files.append(json_path)
-            
+
             logger.info(f"Camera data exported to {json_path}")
     return camera_json_files
 
@@ -141,20 +147,37 @@ def add_MAYA_USD_attribute_to_objects(object_list):
             if primvar_attr not in shape.keys():
                 shape[primvar_attr] = shape[attr]
 
+
 def get_file_dir(file):
     directory = os.path.dirname(file)
     directory.replace('\\', '/')
     return directory
 
+
 def unhide_all_children(object_list):
+    def _unhide(obj):
+        # hide_set is a method on objects, hide_viewport/hide_render are attributes on objects/collections
+        try:
+            if hasattr(obj, "hide_set") and callable(getattr(obj, "hide_set")):
+                obj.hide_set(False)
+        except Exception:
+            pass
+        try:
+            if hasattr(obj, "hide_viewport"):
+                obj.hide_viewport = False
+        except Exception:
+            pass
+        try:
+            if hasattr(obj, "hide_render"):
+                obj.hide_render = False
+        except Exception:
+            pass
+
     for obj in object_list:
-        obj.hide_set(False)
-        obj.hide_viewport = False
-        obj.hide_render = False
+        _unhide(obj)
         for child in get_all_children(obj):
-            child.hide_set(False)
-            child.hide_viewport = False
-            child.hide_render = False
+            _unhide(child)
+
 
 def save_increment(comment=''):
     file_path, version_id = wizard_communicate.add_version(
@@ -439,9 +462,11 @@ def get_objects_in_collection(collection):
         objects.extend(get_objects_in_collection(child_collection))
     return objects
 
+
 def apply_json_attr_to_new_objects(new_objects, file_path):
     # Get the directory of the file_path
-    attributes_path = os.path.join(os.path.dirname(file_path), "attributes.json")
+    attributes_path = os.path.join(
+        os.path.dirname(file_path), "attributes.json")
     if os.path.exists(attributes_path):
         with open(attributes_path, "r", encoding="utf-8") as f:
             attributes_data = json.load(f)
@@ -454,6 +479,7 @@ def apply_json_attr_to_new_objects(new_objects, file_path):
                 for attr, value in attributes_data[obj_base_name].items():
                     obj[attr] = value
 
+
 def apply_json_camera_data_to_new_cameras(new_objects, file_path):
     # Get the directory of the file_path
     output_dir = os.path.dirname(file_path)
@@ -465,25 +491,32 @@ def apply_json_camera_data_to_new_cameras(new_objects, file_path):
             json_filename = None
             potential_names = [
                 obj.name,  # Exact match
-                re.sub(r"\.\d+$", "", obj.name),  # Remove Blender suffix (.001, .002, etc.)
+                # Remove Blender suffix (.001, .002, etc.)
+                re.sub(r"\.\d+$", "", obj.name),
                 obj.name.replace("_", "."),  # Convert underscores to dots
-                re.sub(r"\.\d+$", "", obj.name).replace("_", "."),  # Remove suffix and convert underscores
+                # Remove suffix and convert underscores
+                re.sub(r"\.\d+$", "", obj.name).replace("_", "."),
                 obj.name.replace(".", "_"),  # Convert dots to underscores
-                re.sub(r"_\d+$", "", obj.name),  # Remove underscore suffix (_001, _002, etc.)
-                obj.name.split(":")[-1] if ":" in obj.name else None,  # Extract name after namespace (e.g., "namespace:camera" -> "camera")
-                obj.name.split(":")[-1].title() if ":" in obj.name else None,  # Capitalize first letter (e.g., "camera" -> "Camera")
+                # Remove underscore suffix (_001, _002, etc.)
+                re.sub(r"_\d+$", "", obj.name),
+                # Extract name after namespace (e.g., "namespace:camera" -> "camera")
+                obj.name.split(":")[-1] if ":" in obj.name else None,
+                # Capitalize first letter (e.g., "camera" -> "Camera")
+                obj.name.split(":")[-1].title() if ":" in obj.name else None,
             ]
             # Remove None values from the list
-            potential_names = [name for name in potential_names if name is not None]
+            potential_names = [
+                name for name in potential_names if name is not None]
             for name in potential_names:
                 test_filename = f"{name}.json"
                 test_path = os.path.join(output_dir, test_filename)
                 if os.path.exists(test_path):
                     json_filename = test_filename
                     break
-            
+
             if json_filename is None:
-                logger.warning(f"No matching JSON file found for camera '{obj.name}'")
+                logger.warning(
+                    f"No matching JSON file found for camera '{obj.name}'")
                 continue
             json_path = os.path.join(output_dir, json_filename)
 
@@ -512,16 +545,21 @@ def apply_json_camera_data_to_new_cameras(new_objects, file_path):
 
                         # Set focus distance (dof_distance)
                         if hasattr(camera.dof, 'focus_distance'):
-                            camera.dof.focus_distance = camera_data[str(frame)]['focus_distance']
-                            camera.dof.keyframe_insert(data_path="focus_distance", frame=frame)
+                            camera.dof.focus_distance = camera_data[str(
+                                frame)]['focus_distance']
+                            camera.dof.keyframe_insert(
+                                data_path="focus_distance", frame=frame)
 
                         # Set f-stop (aperture fstop)
                         if 'fstop' in camera_data[str(frame)] and hasattr(camera.dof, 'aperture_fstop'):
-                            camera.dof.aperture_fstop = camera_data[str(frame)]['fstop']
-                            camera.dof.keyframe_insert(data_path="aperture_fstop", frame=frame)
+                            camera.dof.aperture_fstop = camera_data[str(
+                                frame)]['fstop']
+                            camera.dof.keyframe_insert(
+                                data_path="aperture_fstop", frame=frame)
 
                 # Restore original frame
                 scene.frame_set(current_frame)
+
 
 def set_mode_to_object():
     # Ensure there is an active object for the operator poll to succeed.
@@ -540,7 +578,8 @@ def set_mode_to_object():
         if objs:
             bpy.context.view_layer.objects.active = objs[0]
         else:
-            logger.debug("set_mode_to_object: no objects available to set active, skipping mode change")
+            logger.debug(
+                "set_mode_to_object: no objects available to set active, skipping mode change")
             return
 
     # Only call the operator if we are not already in OBJECT mode
