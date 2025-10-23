@@ -87,7 +87,7 @@ def select_cam(camrig_nspace):
         logger.warning("{}/render_set not found".format(camrig_nspace))
         return
 
-    cameras = list(render_set_collection.all_objects)
+    cameras = [obj for obj in render_set_collection.all_objects if obj.type == 'CAMERA']
     if len(cameras) == 0:
         logger.warning("{} is empty".format(render_set_collection))
         return
