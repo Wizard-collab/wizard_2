@@ -142,6 +142,11 @@ class video_player_widget(QtWidgets.QFrame):
     def update_concat(self):
         logger.debug("Updating player content")
         self.set_info("Updating player content", 2)
+        all_project_videos_ids = project.get_all_videos('id')
+        video_ids = list(self.videos_dic.keys())
+        for video_id in video_ids:
+            if self.videos_dic[video_id]['project_video_id'] not in all_project_videos_ids:
+                del self.videos_dic[video_id]
         self.timeline_widget.update_videos_dic(self.videos_dic)
         self.video_player.load_video(ffmpeg_utils.concatenate_videos(
             self.temp_dir, self.player_id, self.videos_dic, self.fps), self.first_load)
