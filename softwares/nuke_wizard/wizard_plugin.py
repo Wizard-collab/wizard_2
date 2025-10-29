@@ -23,10 +23,10 @@ def save_increment(comment=''):
     wizard_tools.save_increment(comment=comment)
 
 
-def export():
+def export(prepare_only=False):
     stage_name = os.environ['wizard_stage_name']
     if stage_name == 'compositing':
-        compositing.invoke_settings_widget()
+        compositing.invoke_settings_widget(prepare_only=prepare_only)
     elif stage_name == 'custom':
         custom.main()
     else:

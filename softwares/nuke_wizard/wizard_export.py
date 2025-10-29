@@ -18,7 +18,7 @@ from nuke_wizard import wizard_tools
 logger = logging.getLogger(__name__)
 
 
-def export(stage_name, export_name, exported_string_asset, frange=[0, 0], custom_work_env_id=None, comment=''):
+def export(stage_name, export_name, exported_string_asset, frange=[0, 0], custom_work_env_id=None, comment='', prepare_only=False):
     if trigger_sanity_hook(stage_name, exported_string_asset):
         if custom_work_env_id:
             work_env_id = custom_work_env_id
@@ -30,7 +30,7 @@ def export(stage_name, export_name, exported_string_asset, frange=[0, 0], custom
                                                            work_env_id,
                                                            export_name,
                                                            comment=comment)
-            export_exr(export_dir, frange)
+            export_exr(export_dir, frange, prepare_only)
         else:
             export_file = wizard_communicate.request_export(work_env_id,
                                                             export_name)
@@ -57,15 +57,21 @@ def after_exr_render(frange):
     nuke.removeAfterRender(after_exr_render, args=(frange))
 
 
-def export_exr(export_dir, frange):
+def export_exr(export_dir, frange, prepare_only=False):
     render_node_name = 'wizard_render_node'
     if render_node_name in wizard_tools.get_all_nodes_names():
         render_node = nuke.toNode(render_node_name)
         file = f"{export_dir}/%05d.exr"
         render_node['file'].setValue(file)
+        render_node['first'].setValue(frange[0])
+        render_node['last'].setValue(frange[1])
+        render_node['use_limit'].setValue(True)
         render_node.knob('afterFrameRender')
         nuke.addAfterRender(after_exr_render, args=(frange))
         nuke.addAfterFrameRender(wizard_tools.by_frame_progress, args=(frange))
+        if prepare_only:
+            logger.info(f"Prepared EXR export to {export_dir}")
+            return
         nuke.execute(render_node_name, frange[0], frange[1], 1)
     else:
         logger.warning(f"{render_node_name} not found")

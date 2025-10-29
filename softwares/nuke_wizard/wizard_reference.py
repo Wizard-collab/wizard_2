@@ -101,12 +101,13 @@ def update_nk(namespace, files_list):
 
 def reference_abc_camera(namespace, files_list):
     if namespace not in wizard_tools.get_all_namespaces().keys():
-        if len(files_list) == 1:
+        abc_files = [f for f in files_list if f.endswith('.abc')]
+        if len(abc_files) == 1:
             old_nodes = wizard_tools.get_all_nodes()
             camera_node = nuke.createNode('Camera3')
             camera_node['name'].setValue(namespace+'_CAMERA')
             camera_node['read_from_file_link'].setValue(True)
-            camera_node['file_link'].setValue(files_list[0])
+            camera_node['file_link'].setValue(abc_files[0])
             wizard_tools.add_namespace_knob(camera_node, namespace)
             new_nodes = wizard_tools.get_new_objects(old_nodes)
             wizard_tools.backdrop_nodes(new_nodes, namespace)
@@ -116,9 +117,10 @@ def reference_abc_camera(namespace, files_list):
 
 def update_abc_camera(namespace, files_list):
     if namespace in wizard_tools.get_all_namespaces().keys():
-        if len(files_list) == 1:
+        abc_files = [f for f in files_list if f.endswith('.abc')]
+        if len(abc_files) == 1:
             camera_node = wizard_tools.get_all_namespaces()[namespace][0]
-            camera_node['file_link'].setValue(files_list[0])
+            camera_node['file_link'].setValue(abc_files[0])
         else:
             logger.warning("Can't merge multiple files")
 

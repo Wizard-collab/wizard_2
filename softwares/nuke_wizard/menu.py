@@ -15,6 +15,7 @@ from nuke_wizard import wizard_video
 nuke.menu('Nuke').addMenu("Wizard")
 nuke.menu('Nuke').addCommand("Wizard/Save", "wizard_plugin.save_increment()")
 nuke.menu('Nuke').addCommand("Wizard/Export data", "wizard_plugin.export()")
+nuke.menu('Nuke').addCommand("Wizard/Prepare export", "wizard_plugin.export(prepare_only=True)")
 
 menu = nuke.menu('Nuke').findItem('Wizard')
 menu.addSeparator()
