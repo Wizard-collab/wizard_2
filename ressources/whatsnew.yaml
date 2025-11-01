@@ -2,6 +2,24 @@
   update_list:
   - !!python/tuple
     - New
+    - Attribute handling in abc import and export ( Blender | Maya )
+  - !!python/tuple
+    - New
+    - Frame ranges are now editable in the production manager
+  - !!python/tuple
+    - New
+    - Production table is now sorted in alphabetical order
+  - !!python/tuple
+    - Debug
+    - Fixed some crashes at blender imports and updates
+  - !!python/tuple
+    - Debug
+    - Fixed some crashes at production manager openning
+  time: 1761248257.233087
+'5.0.1.417':
+  update_list:
+  - !!python/tuple
+    - New
     - Wizard version 5.0 ( 2026 )
   time: 1758978270.8489175
 '4.4.0.0412':
