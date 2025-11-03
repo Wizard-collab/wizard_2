@@ -1,4 +1,3 @@
-
 # coding: utf-8
 # Author: Leo BRUNEL
 # Contact: contact@leobrunel.com
@@ -100,9 +99,16 @@ def export_object_attributes_to_json(object_list, export_file):
         attr_values = {}
         for attr in extra_attrs:
             try:
-                attr_values[attr] = pm.getAttr(obj + '.' + attr)
+                val = pm.getAttr(obj + '.' + attr)
+                # Only store integer or string attribute values (bool is subclass of int and will be included)
+                if isinstance(val, (int, str, float)):
+                    attr_values[attr] = val
+                else:
+                    # skip other types (lists, vectors, PyNodes, etc.)
+                    continue
             except Exception:
-                attr_values[attr] = None
+                # ignore attributes we can't read
+                continue
         attributes_dict[obj_name] = attr_values
     # Save to JSON file in same folder as export_file
     export_dir = os.path.dirname(export_file)
