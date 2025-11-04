@@ -199,11 +199,19 @@ def merge(namespace, files_list):
 
 
 def reference_abc_camera(namespace, files_list):
-    if len(files_list) == 1:
+
+    abc_files = []
+
+    for file in files_list:
+        if not file.endswith('.abc'):
+            continue
+        abc_files.append(file)
+
+    if len(abc_files) == 1:
         cam_main_node = wizard_tools.create_node_without_duplicate(
             "alembicarchive", namespace)
         parameter = cam_main_node.parm('fileName')
-        parameter.set(files_list[0])
+        parameter.set(abc_files[0])
 
         cam_main_node.parm('buildHierarchy').pressButton()
         cam_main_node.layoutChildren()
@@ -219,10 +227,18 @@ def reference_abc_camera(namespace, files_list):
 
 
 def update_abc_camera(namespace, files_list):
-    if len(files_list) == 1:
+
+    abc_files = []
+
+    for file in files_list:
+        if not file.endswith('.abc'):
+            continue
+        abc_files.append(file)
+
+    if len(abc_files) == 1:
         cam_main_node = wizard_tools.node_exists(namespace, parent=None)
         if cam_main_node:
-            cam_main_node.parm("fileName").set(files_list[0])
+            cam_main_node.parm("fileName").set(abc_files[0])
             cam_main_node.parm('buildHierarchy').pressButton()
             image_format = wizard_communicate.get_image_format()
             hou_camera_node = wizard_tools.look_for_nodetype(
