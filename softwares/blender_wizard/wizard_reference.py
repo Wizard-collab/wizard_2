@@ -145,13 +145,17 @@ def create_reference(reference_dic, referenced_stage):
 def update_reference(reference_dic, referenced_stage):
     wizard_tools.set_mode_to_object()
     old_objects = wizard_tools.get_all_nodes()
+    print(reference_dic)
+    print(wizard_tools.namespace_exists(reference_dic['namespace']))
+    print(bpy.data.libraries.keys())
+
     if wizard_tools.namespace_exists(reference_dic['namespace']):
         for file in reference_dic['files']:
             if file.endswith('.blend'):
                 update_blend(file, reference_dic['namespace'])
-            if file.endswith('.abc'):
+            elif file.endswith('.abc'):
                 update_abc(file, reference_dic['namespace'])
-            if file.endswith('.usd'):
+            elif file.endswith('.usd'):
                 update_usd(file, reference_dic['namespace'])
             else:
                 logger.info('{} extension is not updatable'.format(file))
@@ -297,15 +301,59 @@ def library_override(collection_name):
         return
 
 
+def fix_library_names():
+    for lib in bpy.data.libraries:
+        print(f"Processing library: {lib.name}")
+
+        # 1) Try to find a collection that contains an object whose .library is this lib
+        found_collection = None
+        for collection in bpy.data.collections:
+            # snapshot to avoid iterator invalidation
+            for o in list(collection.all_objects):
+                if getattr(o, 'library', None) == lib:
+                    found_collection = collection
+                    break
+            if found_collection:
+                break
+
+        print(f"Initial collection: {found_collection.name if found_collection else 'None'}")
+
+        # Traverse up the collection hierarchy to find non-linked parent
+        def find_parent_collection(target_collection):
+            """Find the direct parent collection of target_collection"""
+            for collection in bpy.data.collections:
+                for child in collection.children:
+                    if child.name == target_collection.name:
+                        return collection
+            # Check scene collection as well
+            if target_collection.name in bpy.context.scene.collection.children:
+                return bpy.context.scene.collection
+            return None
+        
+        current_collection = found_collection
+        while current_collection and getattr(current_collection, "library", None):
+            parent_collection = find_parent_collection(current_collection)
+            if parent_collection is None:
+                break
+            current_collection = parent_collection
+        
+        
+        # Rename the library with the namespace (collection name)
+        if current_collection and not getattr(current_collection, "library", None):
+            print(f"Renaming library {lib.name} to {current_collection.name}")
+            lib.name = current_collection.name
+        else:
+            print(f"No suitable collection found for library: {lib.name}")
+
 def update_blend(file_path, namespace):
+    fix_library_names()
     try:
         lib = bpy.data.libraries[namespace]
         if lib.filepath == file_path:
             return
         lib.filepath = file_path
         lib.reload()
-        lib = bpy.data.libraries[os.path.basename(file_path)]
-        lib.name = namespace
+        fix_library_names()
         library_override(namespace)
     except KeyError:
         logger.error(f"Library {namespace} not found")
