@@ -115,17 +115,26 @@ def export_usd(export_GRP_list, export_file, frange, percent_factor):
 
 
 def reopen(scene):
-    pm.openFile(scene, force=True)
+    cmds.file(scene, open=True, force=True, prompt=False, ignoreVersion=True)
     logger.info("Opening file {}".format(scene))
 
 
 def save_or_save_increment():
     scene = pm.sceneName()
-    if scene == '':
+    if scene == '' or str(scene) == 'untitled':
         wizard_tools.save_increment()
         scene = pm.sceneName()
     else:
-        pm.saveFile(force=True)
+        print("saving {}".format(scene))
+        try:
+            pm.saveFile(force=True)
+        except RuntimeError as e:
+            if "A file must be given a name before saving" in str(e):
+                logger.warning("File has no proper name, using save_increment instead")
+                wizard_tools.save_increment()
+                scene = pm.sceneName()
+            else:
+                raise e
         if os.environ["wizard_launch_mode"] == 'gui':
             wizard_communicate.screen_over_version(
                 int(os.environ['wizard_version_id']))
