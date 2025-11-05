@@ -127,25 +127,33 @@ def exr_to_rgba_array(file_path, channel=None):
 
     # Find actual channel names for R, G, B based on channel parameter
     if channel:
-        # If channel is specified, look for RGB channels with that prefix (case-insensitive)
-        r_name = None
-        g_name = None
-        b_name = None
-        a_name = None
-        
-        # Check both uppercase and lowercase variants
-        for suffix_upper, suffix_lower in [('R', 'r'), ('G', 'g'), ('B', 'b'), ('A', 'a')]:
-            channel_upper = f"{channel}.{suffix_upper}"
-            channel_lower = f"{channel}.{suffix_lower}"
+        # Special handling for basic RGB/RGBA channel groups
+        if channel in ['RGB', 'RGBA']:
+            # For basic channel groups, look for direct R, G, B, A channels
+            r_name = 'R' if 'R' in header_channels else ('r' if 'r' in header_channels else None)
+            g_name = 'G' if 'G' in header_channels else ('g' if 'g' in header_channels else None)
+            b_name = 'B' if 'B' in header_channels else ('b' if 'b' in header_channels else None)
+            a_name = 'A' if 'A' in header_channels else ('a' if 'a' in header_channels else None)
+        else:
+            # If channel is specified, look for RGB channels with that prefix (case-insensitive)
+            r_name = None
+            g_name = None
+            b_name = None
+            a_name = None
             
-            if suffix_upper == 'R':
-                r_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
-            elif suffix_upper == 'G':
-                g_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
-            elif suffix_upper == 'B':
-                b_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
-            elif suffix_upper == 'A':
-                a_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+            # Check both uppercase and lowercase variants
+            for suffix_upper, suffix_lower in [('R', 'r'), ('G', 'g'), ('B', 'b'), ('A', 'a')]:
+                channel_upper = f"{channel}.{suffix_upper}"
+                channel_lower = f"{channel}.{suffix_lower}"
+                
+                if suffix_upper == 'R':
+                    r_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+                elif suffix_upper == 'G':
+                    g_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+                elif suffix_upper == 'B':
+                    b_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
+                elif suffix_upper == 'A':
+                    a_name = channel_upper if channel_upper in header_channels else (channel_lower if channel_lower in header_channels else None)
     else:
         # Default behavior: find any R, G, B channels using the helper
         r_name = _find_channel_name(header_channels, 'R')
@@ -217,6 +225,8 @@ def get_exr_channel_groups(file_path):
     For example:
     - 'ViewLayer.Combined.R', 'ViewLayer.Combined.G', 'ViewLayer.Combined.B' -> 'ViewLayer.Combined'
     - 'layer.R', 'layer.G', 'layer.B' -> 'layer'
+    - 'R', 'G', 'B', 'A' -> 'RGBA' (basic channels group with alpha)
+    - 'R', 'G', 'B' -> 'RGB' (basic channels group without alpha)
     - 'Depth' -> 'Depth' (no suffix to remove)
     
     Args:
@@ -232,9 +242,17 @@ def get_exr_channel_groups(file_path):
         
         # Color channel suffixes to remove (both uppercase and lowercase)
         color_suffixes = ['.R', '.G', '.B', '.A', '.r', '.g', '.b', '.a']
+        basic_color_channels = {'R', 'G', 'B', 'A', 'r', 'g', 'b', 'a'}
         
         groups = set()
+        basic_channels_found = set()
+        
         for channel in channels:
+            # Check if this is a basic color channel (R, G, B, A without prefix)
+            if channel in basic_color_channels:
+                basic_channels_found.add(channel.upper())
+                continue
+            
             # Check if channel ends with a color suffix
             base_name = channel
             for suffix in color_suffixes:
@@ -242,6 +260,16 @@ def get_exr_channel_groups(file_path):
                     base_name = channel[:-len(suffix)]
                     break
             groups.add(base_name)
+        
+        # If we found basic R, G, B (and optionally A) channels, add them as a group
+        if basic_channels_found:
+            # Check if we have at least R, G, B
+            if {'R', 'G', 'B'}.issubset(basic_channels_found):
+                # Use 'RGBA' if alpha is present, otherwise 'RGB'
+                if 'A' in basic_channels_found:
+                    groups.add('RGBA')
+                else:
+                    groups.add('RGB')
         
         return sorted(list(groups))
     
