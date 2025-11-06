@@ -209,12 +209,13 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.fps = 24
         self.build_ui()
         self.connect_functions()
+        self.users_images_dic = dict()
         self.refresh_users_images()
 
     def refresh_users_images(self):
         for user_row in repository.get_users_list():
             if user_row['user_name'] in self.users_images_dic.keys():
-                    continue
+                continue
             user_image = user_row['profile_picture']
             pixmap = gui_utils.mask_image(
                 image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)

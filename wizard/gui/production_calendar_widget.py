@@ -63,6 +63,7 @@ class calendar_widget(QtWidgets.QWidget):
         self.old_thread_id = None
         self.search_threads = dict()
 
+        self.users_images_dic = dict()
         self.refresh_users_images()
         self.init_priority_images_dic()
         self.build_ui()
