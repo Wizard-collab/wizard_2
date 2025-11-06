@@ -145,9 +145,6 @@ def create_reference(reference_dic, referenced_stage):
 def update_reference(reference_dic, referenced_stage):
     wizard_tools.set_mode_to_object()
     old_objects = wizard_tools.get_all_nodes()
-    print(reference_dic)
-    print(wizard_tools.namespace_exists(reference_dic['namespace']))
-    print(bpy.data.libraries.keys())
 
     if wizard_tools.namespace_exists(reference_dic['namespace']):
         for file in reference_dic['files']:
