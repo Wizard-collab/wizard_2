@@ -209,14 +209,15 @@ class playing_infos_widget(QtWidgets.QWidget):
         self.fps = 24
         self.build_ui()
         self.connect_functions()
-        self.init_users_images()
+        self.refresh_users_images()
 
-    def init_users_images(self):
-        self.users_images_dic = dict()
+    def refresh_users_images(self):
         for user_row in repository.get_users_list():
+            if user_row['user_name'] in self.users_images_dic.keys():
+                    continue
             user_image = user_row['profile_picture']
             pixmap = gui_utils.mask_image(
-                image.convert_str_data_to_image_bytes(user_image), 'png', 22, 8)
+                image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def build_ui(self):
@@ -387,6 +388,7 @@ class playing_infos_widget(QtWidgets.QWidget):
             tools.time_ago_from_timestamp(video_row['creation_time']))
 
     def update_current_stage_row(self, stage_row):
+        self.refresh_users_images()
         self.assignment_label.setPixmap(
             self.users_images_dic[stage_row['assignment']])
         self.state_label.setText(stage_row['state'])
