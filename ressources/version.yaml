@@ -1,7 +1,7 @@
-BUILDS: 418
+BUILDS: 419
 MAJOR: 5
 MINOR: 1
-PATCH: 0
-builds: 418
-date: 1761248329.1820982
-setup_name: 5.1.0.0418-setup.exe
+PATCH: 1
+builds: 419
+date: 1762274565.4204273
+setup_name: 5.1.1.0419-setup.exe
