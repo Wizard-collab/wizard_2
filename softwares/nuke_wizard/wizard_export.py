@@ -61,7 +61,9 @@ def export_exr(export_dir, frange, prepare_only=False):
     render_node_name = 'wizard_render_node'
     if render_node_name in wizard_tools.get_all_nodes_names():
         render_node = nuke.toNode(render_node_name)
-        file = f"{export_dir}/%05d.exr"
+        rendering_work_env_id = int(os.environ['wizard_work_env_id'])
+        file_name = f"{os.environ['wizard_category_name']}_{os.environ['wizard_asset_name']}_{os.environ['wizard_stage_name']}"
+        file = f"{export_dir}/{file_name}_%05d.exr"
         render_node['file'].setValue(file)
         render_node['first'].setValue(frange[0])
         render_node['last'].setValue(frange[1])

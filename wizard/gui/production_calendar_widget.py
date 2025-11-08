@@ -63,7 +63,8 @@ class calendar_widget(QtWidgets.QWidget):
         self.old_thread_id = None
         self.search_threads = dict()
 
-        self.init_users_images()
+        self.users_images_dic = dict()
+        self.refresh_users_images()
         self.init_priority_images_dic()
         self.build_ui()
         self.connect_functions()
@@ -111,12 +112,13 @@ class calendar_widget(QtWidgets.QWidget):
             self.refresh()
         self.asset_tracking_widget.get_context()
 
-    def init_users_images(self):
-        self.users_images_dic = dict()
+    def refresh_users_images(self):
         for user_row in repository.get_users_list():
+            if user_row['user_name'] in self.users_images_dic.keys():
+                    continue
             user_image = user_row['profile_picture']
             pixmap = gui_utils.mask_image(
-                image.convert_str_data_to_image_bytes(user_image), 'png', 28, 12)
+                image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
             self.users_images_dic[user_row['user_name']] = pixmap
 
     def init_priority_images_dic(self):
@@ -505,6 +507,8 @@ class calendar_widget(QtWidgets.QWidget):
     def refresh(self):
         if not self.isVisible():
             return
+
+        self.refresh_users_images()
 
         deadline = datetime.datetime.fromtimestamp(project.get_deadline())
         self.header_view.set_deadline(deadline)
