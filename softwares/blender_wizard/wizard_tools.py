@@ -173,8 +173,30 @@ def unhide_all_children(object_list):
         except Exception:
             pass
 
+    def _unhide_parent_collections(obj):
+        # Get all collections that contain this object
+        if hasattr(obj, "users_collection"):
+            for collection in obj.users_collection:
+                _unhide(collection)
+                # Recursively unhide parent collections
+                _unhide_parent_collections_recursive(collection)
+    
+    def _unhide_parent_collections_recursive(collection):
+        # Find parent collections of this collection
+        for parent_collection in bpy.data.collections:
+            if collection.name in parent_collection.children.keys():
+                _unhide(parent_collection)
+                _unhide_parent_collections_recursive(parent_collection)
+        # Also check scene collection
+        if collection.name in bpy.context.scene.collection.children.keys():
+            _unhide(bpy.context.scene.collection)
+
     for obj in object_list:
+        # Unhide parent collections
+        _unhide_parent_collections(obj)
+        # Unhide the object itself
         _unhide(obj)
+        # Unhide all children
         for child in get_all_children(obj):
             _unhide(child)
 
