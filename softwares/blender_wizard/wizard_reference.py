@@ -328,12 +328,12 @@ def fix_library_names():
             return None
         
         current_collection = found_collection
-        while current_collection and getattr(current_collection, "library", None):
+        while current_collection and (getattr(current_collection, "library", None) or getattr(current_collection, "override_library", None)):
             parent_collection = find_parent_collection(current_collection)
+            print(f"Current collection: {current_collection.name}, Parent collection: {parent_collection.name if parent_collection else 'None'}")
             if parent_collection is None:
                 break
             current_collection = parent_collection
-        
         
         # Rename the library with the namespace (collection name)
         if current_collection and not getattr(current_collection, "library", None):
