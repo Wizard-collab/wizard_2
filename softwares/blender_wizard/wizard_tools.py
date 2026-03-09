@@ -28,7 +28,15 @@ def check_points_in_names(export_GRP_list):
     return False
 
 
-def export_object_attributes_to_json(object_list, export_file):
+def export_object_attributes_to_json(object_list, export_file, frange=None, visibility_data=None):
+    """Export object attributes to JSON file.
+    
+    Args:
+        object_list: List of objects to export attributes from
+        export_file: Path to the export file (used to determine output directory)
+        frange: Optional frame range [start, end] for per-frame attribute export
+        visibility_data: Optional dict of visibility data to include in export
+    """
     # Collect all descendants
     all_objects = []
     for obj in object_list:
@@ -36,9 +44,12 @@ def export_object_attributes_to_json(object_list, export_file):
         all_objects += get_all_children(obj)
     # Remove duplicates and ensure unique objects
     all_objects = list(set(all_objects))
+    
     # Collect only custom (extra) string attributes for each object
     attributes_dict = {}
     for obj in all_objects:
+        if type(obj) == bpy.types.Collection:
+            continue
         obj_name = obj.name if hasattr(obj, 'name') else str(obj)
         json_obj_name = obj_name.replace('.', '_')
         # Blender custom attributes are stored in obj.keys(), but skip Blender's internal keys (start with '_')
@@ -52,6 +63,15 @@ def export_object_attributes_to_json(object_list, export_file):
             except Exception:
                 pass
         attributes_dict[json_obj_name] = attr_values
+    
+    # Add visibility data if provided
+    if visibility_data:
+        for obj_name, vis_data in visibility_data.items():
+            json_obj_name = obj_name.replace('.', '_')
+            if json_obj_name not in attributes_dict:
+                attributes_dict[json_obj_name] = {}
+            attributes_dict[json_obj_name]['visibility'] = vis_data
+    
     # Save to JSON file in same folder as export_file
     export_dir = os.path.dirname(export_file)
     json_path = os.path.join(export_dir, 'attributes.json')
@@ -493,13 +513,28 @@ def apply_json_attr_to_new_objects(new_objects, file_path):
         with open(attributes_path, "r", encoding="utf-8") as f:
             attributes_data = json.load(f)
 
+        # Extract visibility data separately
+        visibility_data = {}
+        for obj_name, attrs in attributes_data.items():
+            if 'visibility' in attrs:
+                visibility_data[obj_name] = attrs['visibility']
+
         # Assign attributes from JSON to matching objects
         for obj in new_objects:
+            if type(obj) == bpy.types.Collection:
+                continue
             # Helper to strip Blender's numeric suffixes (.001, .002, etc.)
             obj_base_name = re.sub(r"\.\d+$", "", obj.name)
             if obj_base_name in attributes_data:
                 for attr, value in attributes_data[obj_base_name].items():
+                    if attr == 'visibility':
+                        # Skip visibility here, it's handled separately
+                        continue
                     obj[attr] = value
+        
+        # Apply visibility data to objects
+        if visibility_data:
+            apply_visibility_data_to_objects(new_objects, visibility_data)
 
 
 def apply_json_camera_data_to_new_cameras(new_objects, file_path):
@@ -612,3 +647,199 @@ def set_mode_to_object():
         # log and continue to avoid crashing callers
         logger.exception("Failed to set mode to OBJECT: %s", exc)
         return
+
+
+# =============================================================================
+# VISIBILITY HANDLING FUNCTIONS
+# =============================================================================
+
+def store_visibility_data(object_list, frange):
+    """Store visibility data for all objects in the list, per frame.
+    
+    This function captures viewport visibility (hide_viewport) and render
+    visibility (hide_render) for every frame in the range. This is needed
+    because Blender's ABC export stops writing data when objects become hidden.
+    
+    Args:
+        object_list: List of root objects/collections to process
+        frange: [start_frame, end_frame]
+    
+    Returns:
+        dict: {object_name: {frame: {'hide_viewport': bool, 'hide_render': bool}}}
+    """
+    visibility_data = {}
+    
+    # Collect all descendants
+    all_objects = []
+    for obj in object_list:
+        all_objects.append(obj)
+        all_objects += get_all_children(obj)
+    # Remove duplicates and filter out collections
+    all_objects = [obj for obj in set(all_objects) if type(obj) != bpy.types.Collection]
+    
+    scene = bpy.context.scene
+    current_frame = scene.frame_current
+    start_frame = frange[0]
+    end_frame = frange[1]
+    
+    for obj in all_objects:
+        obj_name = obj.name
+        visibility_data[obj_name] = {}
+        
+        for frame in range(start_frame, end_frame + 1):
+            scene.frame_set(frame)
+            visibility_data[obj_name][str(frame)] = {
+                'hide_viewport': obj.hide_viewport,
+                'hide_render': obj.hide_render
+            }
+    
+    # Restore original frame
+    scene.frame_set(current_frame)
+    
+    return visibility_data
+
+
+def remove_visibility_animation(object_list):
+    """Remove visibility animation/drivers and force all objects visible.
+    
+    This function removes all keyframes and drivers on hide_viewport and 
+    hide_render, and sets all objects to visible. This is necessary because 
+    Blender's ABC exporter stops writing object data when objects become 
+    hidden mid-animation.
+    
+    Note: The scene is typically reopened after export, so no restoration
+    is performed.
+    
+    Args:
+        object_list: List of root objects/collections to process
+    """
+    # Collect all descendants
+    all_objects = []
+    for obj in object_list:
+        all_objects.append(obj)
+        all_objects += get_all_children(obj)
+    # Remove duplicates and filter out collections
+    all_objects = [obj for obj in set(all_objects) if type(obj) != bpy.types.Collection]
+    
+    for obj in all_objects:
+        # Remove drivers on visibility properties
+        if obj.animation_data:
+            drivers_to_remove = []
+            for driver in obj.animation_data.drivers:
+                if driver.data_path in ('hide_viewport', 'hide_render'):
+                    drivers_to_remove.append(driver.data_path)
+            for data_path in drivers_to_remove:
+                obj.driver_remove(data_path)
+        
+        # Remove keyframe animation on visibility properties
+        if obj.animation_data and obj.animation_data.action:
+            action = obj.animation_data.action
+            
+            # Remove hide_viewport fcurve
+            for fcurve in list(action.fcurves):
+                if fcurve.data_path == 'hide_viewport':
+                    action.fcurves.remove(fcurve)
+                    break
+            
+            # Remove hide_render fcurve
+            for fcurve in list(action.fcurves):
+                if fcurve.data_path == 'hide_render':
+                    action.fcurves.remove(fcurve)
+                    break
+        
+        # Force objects visible for export
+        obj.hide_viewport = False
+        obj.hide_render = False
+
+
+def apply_visibility_data_to_objects(new_objects, visibility_data):
+    """Apply per-frame visibility data to imported objects.
+    
+    This function reads the visibility data from the JSON and creates
+    keyframe animation on hide_viewport and hide_render for each object.
+    
+    Args:
+        new_objects: List of imported objects
+        visibility_data: dict {object_name: {frame: {'hide_viewport': bool, 'hide_render': bool}}}
+    """
+    scene = bpy.context.scene
+    current_frame = scene.frame_current
+    
+    for obj in new_objects:
+        if type(obj) == bpy.types.Collection:
+            continue
+        
+        # Try to find matching visibility data
+        obj_base_name = re.sub(r"\.(\d+)$", "", obj.name)
+        obj_base_name_underscore = obj_base_name.replace('.', '_')
+        
+        vis_data = None
+        for name_variant in [obj.name, obj_base_name, obj.name.replace('.', '_'), obj_base_name_underscore]:
+            if name_variant in visibility_data:
+                vis_data = visibility_data[name_variant]
+                break
+        
+        if vis_data is None:
+            continue
+        
+        # Check if there's any actual animation (values change across frames)
+        frames = sorted(vis_data.keys(), key=int)
+        if not frames:
+            continue
+        
+        hide_viewport_values = [vis_data[f]['hide_viewport'] for f in frames]
+        hide_render_values = [vis_data[f]['hide_render'] for f in frames]
+        
+        has_viewport_animation = len(set(hide_viewport_values)) > 1
+        has_render_animation = len(set(hide_render_values)) > 1
+        
+        if not has_viewport_animation and not has_render_animation:
+            # Just set static values
+            obj.hide_viewport = hide_viewport_values[0]
+            obj.hide_render = hide_render_values[0]
+            continue
+        
+        # Remove existing visibility animation/drivers before applying new ones
+        if obj.animation_data:
+            # Remove drivers on visibility
+            for data_path in ['hide_viewport', 'hide_render']:
+                try:
+                    obj.driver_remove(data_path)
+                except:
+                    pass
+            
+            # Remove existing visibility fcurves
+            if obj.animation_data.action:
+                action = obj.animation_data.action
+                for fcurve in list(action.fcurves):
+                    if fcurve.data_path.startswith('hide_viewport') or fcurve.data_path.startswith('hide_render'):
+                        action.fcurves.remove(fcurve)
+        
+        # Use keyframe_insert method which is more reliable
+        for frame_str in frames:
+            frame = int(frame_str)
+            scene.frame_set(frame)
+            
+            if has_viewport_animation:
+                obj.hide_viewport = vis_data[frame_str]['hide_viewport']
+                obj.keyframe_insert(data_path='hide_viewport', frame=frame)
+            
+            if has_render_animation:
+                obj.hide_render = vis_data[frame_str]['hide_render']
+                obj.keyframe_insert(data_path='hide_render', frame=frame)
+        
+        # Set interpolation to CONSTANT for visibility keyframes
+        if obj.animation_data and obj.animation_data.action:
+            action = obj.animation_data.action
+            for fcurve in action.fcurves:
+                if fcurve.data_path in ('hide_viewport', 'hide_render'):
+                    for kp in fcurve.keyframe_points:
+                        kp.interpolation = 'CONSTANT'
+        
+        # Set static values if not animated
+        if not has_viewport_animation:
+            obj.hide_viewport = hide_viewport_values[0]
+        if not has_render_animation:
+            obj.hide_render = hide_render_values[0]
+    
+    scene.frame_set(current_frame)

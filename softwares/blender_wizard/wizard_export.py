@@ -49,17 +49,27 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
 def export_abc(export_GRP_list, export_file, frange):
     # Unhide all objects and descendants in export_GRP_list
     wizard_tools.unhide_all_children(export_GRP_list)
+    
+    # Store visibility data per frame BEFORE removing animation
+    # This captures the intended visibility state for each frame
+    visibility_data = wizard_tools.store_visibility_data(export_GRP_list, frange)
+    
+    # Remove visibility animation/drivers and force objects visible for export
+    # This is needed because Blender's ABC exporter stops writing data
+    # when objects become hidden mid-animation
+    wizard_tools.remove_visibility_animation(export_GRP_list)
+    
+    # Export the ABC file
     abc_command = wizard_hooks.get_abc_command("blender")
     if abc_command is None:
         abc_command = default_abc_command
     abc_command(export_GRP_list, export_file, frange)
 
+    # Export attributes to JSON with visibility data included
     json_file = wizard_tools.export_object_attributes_to_json(
-        export_GRP_list, export_file)
+        export_GRP_list, export_file, frange=frange, visibility_data=visibility_data)
     camera_json_files = wizard_tools.export_camera_data_to_json(
         export_GRP_list, os.path.dirname(export_file))
-    
-
 
     return [export_file, json_file, *camera_json_files]
 
