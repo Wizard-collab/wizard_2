@@ -171,6 +171,7 @@ def update_exr(namespace, files_list, local=True):
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
         reads_list = []
         new_reads_list = []
+        primary_reads_list = []
         for path in paths_dic.keys():
             read_name = os.path.basename(path).split('.')[0]
             frange = paths_dic[path]
@@ -179,6 +180,13 @@ def update_exr(namespace, files_list, local=True):
             else:
                 matching_reads = [wizard_tools.create_read(read_name, namespace)]
                 new_reads_list.append(matching_reads[0])
+            # Use the node whose Nuke node name still matches the read name
+            # as the reference for the backdrop bounding box. Clones keep
+            # their own xpos/ypos and can be moved anywhere in the graph by
+            # the user, so they must not stretch the backdrop.
+            primary_read = next(
+                (read for read in matching_reads if read['name'].value() == read_name), matching_reads[0])
+            primary_reads_list.append(primary_read)
             for read in matching_reads:
                 wizard_tools.set_read_data(read, path, frange)
                 reads_list.append(read)
@@ -187,8 +195,8 @@ def update_exr(namespace, files_list, local=True):
                 nuke.delete(read)
         if len(new_reads_list) > 0:
             wizard_tools.align_nodes(new_reads_list)
-        if len(reads_list) > 1:
-            wizard_tools.backdrop_nodes(reads_list, namespace)
+        if len(primary_reads_list) > 1:
+            wizard_tools.backdrop_nodes(primary_reads_list, namespace)
 
 
 def trigger_after_reference_hook(referenced_stage_name,
