@@ -156,23 +156,32 @@ def update_exr(namespace, files_list, local=True):
             if len(local_files_list) == len(files_list):
                 files_list = local_files_list
         existing_reads_list = all_namespaces[namespace]
-        existing_read_names_dic = dict()
+        # Group existing reads by their current file basename instead of by
+        # their Nuke node name. A "duplicate linked" (Alt+K clone) shares its
+        # 'file' knob with the original read but always gets its own,
+        # auto-incremented node name, so matching on node name would only
+        # ever find the original and would cause every clone to be treated
+        # as obsolete and deleted below.
+        existing_reads_by_file_dic = dict()
         for read in existing_reads_list:
-            read_name = read['name'].value()
-            existing_read_names_dic[read_name] = read
+            current_file = read['file'].value()
+            read_name = os.path.basename(
+                current_file).split('.')[0] if current_file else read['name'].value()
+            existing_reads_by_file_dic.setdefault(read_name, []).append(read)
         paths_dic = wizard_tools.exr_list_to_paths_list(files_list)
         reads_list = []
         new_reads_list = []
         for path in paths_dic.keys():
             read_name = os.path.basename(path).split('.')[0]
             frange = paths_dic[path]
-            if read_name in existing_read_names_dic.keys():
-                read = existing_read_names_dic[read_name]
+            if read_name in existing_reads_by_file_dic.keys():
+                matching_reads = existing_reads_by_file_dic[read_name]
             else:
-                read = wizard_tools.create_read(read_name, namespace)
-                new_reads_list.append(read)
-            wizard_tools.set_read_data(read, path, frange)
-            reads_list.append(read)
+                matching_reads = [wizard_tools.create_read(read_name, namespace)]
+                new_reads_list.append(matching_reads[0])
+            for read in matching_reads:
+                wizard_tools.set_read_data(read, path, frange)
+                reads_list.append(read)
         for read in existing_reads_list:
             if read not in reads_list:
                 nuke.delete(read)
