@@ -160,6 +160,55 @@ def replace_node(node, new_node, all_nodes):
     new_node['name'].setValue(name)
 
 
+def switch_selection_to_new_node():
+    # Replaces the node to replace ( and every clone of it, wherever it is
+    # in the node graph ) with the other selected node, without touching the
+    # new node's own knobs ( file, colorspace, frame range, etc ).
+    # Usage : select the new node first, then the node to replace, so it
+    # ends up as nuke.selectedNode() ( the last node clicked ).
+    selection = nuke.selectedNodes()
+    if len(selection) != 2:
+        logger.warning(
+            "Select the new node first, then the node to replace")
+        return
+
+    old_node = nuke.selectedNode()
+    new_node = selection[0] if selection[1] == old_node else selection[1]
+
+    old_instances = old_node.baseNode().cloneInstances()
+    if new_node in old_instances:
+        logger.warning("The new node can't be a clone of the node to replace")
+        return
+
+    all_nodes = nuke.allNodes()
+    replacements = []
+    for old_instance in old_instances:
+        # Reuse the new node itself for the first instance and create
+        # linked clones of it for the other ones, so the replaced nodes
+        # keep behaving like clones of each other.
+        replacement = new_node if not replacements else nuke.clone(new_node)
+        reconnect_and_delete_node(old_instance, replacement, all_nodes)
+        replacements.append(replacement)
+
+    unselect_all()
+    for replacement in replacements:
+        replacement.setSelected(True)
+
+
+def reconnect_and_delete_node(node, new_node, all_nodes):
+    for other_node in all_nodes:
+        if other_node in (node, new_node):
+            continue
+        try:
+            for i in range(other_node.inputs()):
+                if other_node.input(i) == node:
+                    other_node.setInput(i, new_node)
+        except ValueError:
+            pass
+    new_node.setXYpos(int(node['xpos'].value()), int(node['ypos'].value()))
+    nuke.delete(node)
+
+
 def add_namespace_knob(node, namespace):
     namespace_knob = nuke.String_Knob('wizard_namespace', 'wizard_namespace')
     node.addKnob(namespace_knob)

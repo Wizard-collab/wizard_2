@@ -62,6 +62,11 @@ nuke.menu('Nuke').addCommand("Wizard/Exr options/Switch selection to Read",
 
 menu.addSeparator()
 
+nuke.menu('Nuke').addCommand("Wizard/Switch node ( select new node then node to replace )",
+                             "wizard_tools.switch_selection_to_new_node()")
+
+menu.addSeparator()
+
 nuke.menu('Nuke').addCommand("Wizard/Set frame rate",
                              "wizard_plugin.set_frame_rate()")
 nuke.menu('Nuke').addCommand("Wizard/Set frame range",
