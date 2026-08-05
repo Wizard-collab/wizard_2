@@ -335,14 +335,22 @@ def add_default_shader(objects_list):
     for obj in objects_list:
         all_objects.append(obj)
         all_objects += get_all_children(obj, meshes=1)
+    mat = bpy.data.materials.get("DefaultMaterial")
     for obj in all_objects:
         if type(obj) == bpy.types.Collection:
             continue
         if obj.type == 'MESH':
             if not obj.data.materials:
-                mat = bpy.data.materials.new(name="DefaultMaterial")
-                mat.use_nodes = False
+                if mat is None:
+                    mat = bpy.data.materials.new(name="DefaultMaterial")
+                    mat.use_nodes = False
                 obj.data.materials.append(mat)
+                # Assign the material in both object and data link modes
+                # so it shows up regardless of the slot's link setting.
+                slot = obj.material_slots[0]
+                slot.link = 'OBJECT'
+                slot.material = mat
+                slot.link = 'DATA'
 
 
 def namespace_exists(namespace):
