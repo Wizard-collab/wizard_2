@@ -19,6 +19,21 @@ def __init__():
     pass
 
 
+def set_exr_multilayer_format(image_settings):
+    """Set the given image_settings to multilayer OpenEXR.
+
+    Blender 5.0 removed the 'OPEN_EXR_MULTILAYER' file_format enum and
+    replaced it with ImageFormatSettings.media_type = 'MULTI_LAYER_IMAGE'
+    (used together with file_format = 'OPEN_EXR'). This helper stays
+    compatible with both older and newer Blender versions.
+    """
+    if hasattr(image_settings, 'media_type'):
+        image_settings.file_format = "OPEN_EXR"
+        image_settings.media_type = 'MULTI_LAYER_IMAGE'
+    else:
+        image_settings.file_format = "OPEN_EXR_MULTILAYER"
+
+
 def setup_render_directory(stage_name, export_name):
     if os.environ['wizard_stage_name'] == 'rendering':
         rendering_work_env_id = int(os.environ['wizard_work_env_id'])
@@ -34,7 +49,7 @@ def setup_render_directory(stage_name, export_name):
         file_name = f"{os.environ['wizard_asset_name']}_{os.environ['wizard_stage_name']}"
         file_path = f"{render_directory}/{file_name}.####.{extension}"
         bpy.context.scene.render.filepath = file_path
-        bpy.context.scene.render.image_settings.file_format = "OPEN_EXR_MULTILAYER"
+        set_exr_multilayer_format(bpy.context.scene.render.image_settings)
         return render_directory
 
 def setup_compositing_directory(stage_name, export_name):
