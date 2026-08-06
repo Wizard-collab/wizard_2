@@ -8,6 +8,7 @@ import wizard_hooks
 
 # Blender modules
 import bpy
+from bpy_extras import anim_utils
 
 # Python modules
 import os
@@ -16,6 +17,25 @@ import json
 import re
 
 logger = logging.getLogger(__name__)
+
+
+def get_object_fcurve_owner(obj):
+    """Return the fcurves collection animating obj, handling both legacy
+    Actions (action.fcurves) and Blender 4.4+ slotted/layered Actions
+    (action.layers[0].strips[0].channelbag(slot).fcurves).
+    """
+    if not obj.animation_data or not obj.animation_data.action:
+        return None
+    action = obj.animation_data.action
+    if hasattr(action, 'fcurves'):
+        return action.fcurves
+    action_slot = obj.animation_data.action_slot
+    if not action_slot:
+        return None
+    channelbag = anim_utils.action_get_channelbag_for_slot(action, action_slot)
+    if channelbag is None:
+        return None
+    return channelbag.fcurves
 
 
 def check_points_in_names(export_GRP_list):
@@ -740,20 +760,11 @@ def remove_visibility_animation(object_list):
                 obj.driver_remove(data_path)
         
         # Remove keyframe animation on visibility properties
-        if obj.animation_data and obj.animation_data.action:
-            action = obj.animation_data.action
-            
-            # Remove hide_viewport fcurve
-            for fcurve in list(action.fcurves):
-                if fcurve.data_path == 'hide_viewport':
-                    action.fcurves.remove(fcurve)
-                    break
-            
-            # Remove hide_render fcurve
-            for fcurve in list(action.fcurves):
-                if fcurve.data_path == 'hide_render':
-                    action.fcurves.remove(fcurve)
-                    break
+        fcurve_owner = get_object_fcurve_owner(obj)
+        if fcurve_owner is not None:
+            for fcurve in list(fcurve_owner):
+                if fcurve.data_path in ('hide_viewport', 'hide_render'):
+                    fcurve_owner.remove(fcurve)
         
         # Force objects visible for export
         obj.hide_viewport = False
@@ -817,11 +828,11 @@ def apply_visibility_data_to_objects(new_objects, visibility_data):
                     pass
             
             # Remove existing visibility fcurves
-            if obj.animation_data.action:
-                action = obj.animation_data.action
-                for fcurve in list(action.fcurves):
+            fcurve_owner = get_object_fcurve_owner(obj)
+            if fcurve_owner is not None:
+                for fcurve in list(fcurve_owner):
                     if fcurve.data_path.startswith('hide_viewport') or fcurve.data_path.startswith('hide_render'):
-                        action.fcurves.remove(fcurve)
+                        fcurve_owner.remove(fcurve)
         
         # Use keyframe_insert method which is more reliable
         for frame_str in frames:
@@ -837,9 +848,9 @@ def apply_visibility_data_to_objects(new_objects, visibility_data):
                 obj.keyframe_insert(data_path='hide_render', frame=frame)
         
         # Set interpolation to CONSTANT for visibility keyframes
-        if obj.animation_data and obj.animation_data.action:
-            action = obj.animation_data.action
-            for fcurve in action.fcurves:
+        fcurve_owner = get_object_fcurve_owner(obj)
+        if fcurve_owner is not None:
+            for fcurve in fcurve_owner:
                 if fcurve.data_path in ('hide_viewport', 'hide_render'):
                     for kp in fcurve.keyframe_points:
                         kp.interpolation = 'CONSTANT'
