@@ -68,12 +68,10 @@ def update_camrig(reference_dic):
 
 def import_shading(reference_dic):
     create_reference(reference_dic, 'SHADING')
-    apply_shaders()
 
 
 def update_shading(reference_dic):
     update_reference(reference_dic, 'SHADING')
-    apply_shaders()
 
 
 def import_grooming(reference_dic):

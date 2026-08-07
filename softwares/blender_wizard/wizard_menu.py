@@ -338,6 +338,18 @@ class update_texturing(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class apply_shaders(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.apply_shaders"
+    bl_label = "Apply shaders"
+    bl_description = "Apply shaders from the SHADING collection to tagged objects"
+
+    def execute(self, context):
+        wizard_plugin.apply_shaders()
+        return {'FINISHED'}
+
+
 class set_image_size(bpy.types.Operator):
     '''The set image size operator that call wizard function'''
 
@@ -492,6 +504,11 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
         layout.separator()
 
+        if os.environ['wizard_stage_name'] in ['shading', 'lighting', 'rendering', 'compositing']:
+            layout.operator("wizard.apply_shaders",
+                            icon_value=wizard_icons["shading"].icon_id)
+            layout.separator()
+
         layout.operator("wizard.set_image_size",
                         icon_value=wizard_icons["set_image_size"].icon_id)
         layout.operator("wizard.set_frame_rate",
@@ -528,6 +545,7 @@ classes = (save_increment,
            import_camrig,
            import_texturing,
            update_texturing,
+           apply_shaders,
            update_modeling,
            update_shading,
            update_rigging,

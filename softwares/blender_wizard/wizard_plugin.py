@@ -246,6 +246,10 @@ def update_shading(references=None):
             wizard_reference.update_shading(reference)
 
 
+def apply_shaders():
+    wizard_reference.apply_shaders()
+
+
 def reference_layout(references=None):
     if not references:
         references = wizard_communicate.get_references(
