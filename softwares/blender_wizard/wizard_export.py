@@ -47,12 +47,13 @@ def export(stage_name, export_name, exported_string_asset, export_GRP_list, fran
 
 
 def export_abc(export_GRP_list, export_file, frange):
-    # Unhide all objects and descendants in export_GRP_list
-    wizard_tools.unhide_all_children(export_GRP_list)
     
     # Store visibility data per frame BEFORE removing animation
     # This captures the intended visibility state for each frame
     visibility_data = wizard_tools.store_visibility_data(export_GRP_list, frange)
+
+    # Unhide all objects and descendants in export_GRP_list
+    wizard_tools.unhide_all_children(export_GRP_list)
     
     # Remove visibility animation/drivers and force objects visible for export
     # This is needed because Blender's ABC exporter stops writing data
