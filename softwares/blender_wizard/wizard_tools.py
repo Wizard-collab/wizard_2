@@ -728,12 +728,13 @@ def store_visibility_data(object_list, frange):
 
 
 def remove_visibility_animation(object_list):
-    """Remove visibility animation/drivers and force all objects visible.
+    """Remove visibility animation/drivers and force all objects visible/selectable.
     
-    This function removes all keyframes and drivers on hide_viewport and 
-    hide_render, and sets all objects to visible. This is necessary because 
-    Blender's ABC exporter stops writing object data when objects become 
-    hidden mid-animation.
+    This function removes all keyframes and drivers on hide_viewport, 
+    hide_render and hide_select, and resets all objects to visible/selectable.
+    This is necessary because Blender's ABC exporter stops writing object data
+    when objects become hidden mid-animation, and drivers can also be set on
+    the selection and render visibility toggles.
     
     Note: The scene is typically reopened after export, so no restoration
     is performed.
@@ -741,6 +742,8 @@ def remove_visibility_animation(object_list):
     Args:
         object_list: List of root objects/collections to process
     """
+    visibility_data_paths = ('hide_viewport', 'hide_render', 'hide_select')
+
     # Collect all descendants
     all_objects = []
     for obj in object_list:
@@ -754,7 +757,7 @@ def remove_visibility_animation(object_list):
         if obj.animation_data:
             drivers_to_remove = []
             for driver in obj.animation_data.drivers:
-                if driver.data_path in ('hide_viewport', 'hide_render'):
+                if driver.data_path in visibility_data_paths:
                     drivers_to_remove.append(driver.data_path)
             for data_path in drivers_to_remove:
                 obj.driver_remove(data_path)
@@ -763,12 +766,13 @@ def remove_visibility_animation(object_list):
         fcurve_owner = get_object_fcurve_owner(obj)
         if fcurve_owner is not None:
             for fcurve in list(fcurve_owner):
-                if fcurve.data_path in ('hide_viewport', 'hide_render'):
+                if fcurve.data_path in visibility_data_paths:
                     fcurve_owner.remove(fcurve)
         
-        # Force objects visible for export
+        # Force objects visible and selectable for export
         obj.hide_viewport = False
         obj.hide_render = False
+        obj.hide_select = False
 
 
 def apply_visibility_data_to_objects(new_objects, visibility_data):
