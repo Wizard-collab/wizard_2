@@ -98,6 +98,14 @@ def update_animation(reference_dic):
     update_reference(reference_dic, 'ANIMATION')
 
 
+def import_cfx(reference_dic):
+    create_reference(reference_dic, 'CFX')
+
+
+def update_cfx(reference_dic):
+    update_reference(reference_dic, 'CFX')
+
+
 def import_camera(reference_dic):
     create_reference(reference_dic, 'CAMERA')
 

@@ -82,6 +82,7 @@ def import_and_update_all():
     reference_grooming(references)
     reference_layout(references)
     reference_animation(references)
+    reference_cfx(references)
     reference_camera(references)
     reference_custom(references)
     reference_camrig(references)
@@ -91,6 +92,7 @@ def import_and_update_all():
     update_grooming(references)
     update_layout(references)
     update_animation(references)
+    update_cfx(references)
     update_camera(references)
     update_custom(references)
     update_camrig(references)
@@ -107,6 +109,7 @@ def update_all():
     update_grooming(references)
     update_layout(references)
     update_animation(references)
+    update_cfx(references)
     update_camera(references)
     update_custom(references)
     update_camrig(references)
@@ -284,6 +287,24 @@ def update_animation(references=None):
     if 'animation' in references.keys():
         for reference in references['animation']:
             wizard_reference.update_animation(reference)
+
+
+def reference_cfx(references=None):
+    if not references:
+        references = wizard_communicate.get_references(
+            int(os.environ['wizard_work_env_id']))
+    if 'cfx' in references.keys():
+        for reference in references['cfx']:
+            wizard_reference.import_cfx(reference)
+
+
+def update_cfx(references=None):
+    if not references:
+        references = wizard_communicate.get_references(
+            int(os.environ['wizard_work_env_id']))
+    if 'cfx' in references.keys():
+        for reference in references['cfx']:
+            wizard_reference.update_cfx(reference)
 
 
 def reference_camera(references=None):

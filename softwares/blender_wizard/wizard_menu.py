@@ -182,6 +182,18 @@ class import_animation(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class import_cfx(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_cfx"
+    bl_label = "Import cfx"
+    bl_description = "Import cfx"
+
+    def execute(self, context):
+        wizard_plugin.reference_cfx()
+        return {'FINISHED'}
+
+
 class import_camera(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
@@ -299,6 +311,18 @@ class update_animation(bpy.types.Operator):
 
     def execute(self, context):
         wizard_plugin.update_animation()
+        return {'FINISHED'}
+
+
+class update_cfx(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_cfx"
+    bl_label = "Update cfx"
+    bl_description = "Update existing cfx"
+
+    def execute(self, context):
+        wizard_plugin.update_cfx()
         return {'FINISHED'}
 
 
@@ -425,6 +449,8 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
                         icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.import_animation",
                         icon_value=wizard_icons["animation"].icon_id)
+        layout.operator("wizard.import_cfx",
+                        icon_value=wizard_icons["cfx"].icon_id)
         layout.operator("wizard.import_camera",
                         icon_value=wizard_icons["camera"].icon_id)
         layout.operator("wizard.import_custom",
@@ -452,6 +478,8 @@ class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
                         icon_value=wizard_icons["layout"].icon_id)
         layout.operator("wizard.update_animation",
                         icon_value=wizard_icons["animation"].icon_id)
+        layout.operator("wizard.update_cfx",
+                        icon_value=wizard_icons["cfx"].icon_id)
         layout.operator("wizard.update_camera",
                         icon_value=wizard_icons["camera"].icon_id)
         layout.operator("wizard.update_custom",
@@ -540,6 +568,7 @@ classes = (save_increment,
            import_grooming,
            import_layout,
            import_animation,
+           import_cfx,
            import_camera,
            import_custom,
            import_camrig,
@@ -552,6 +581,7 @@ classes = (save_increment,
            update_grooming,
            update_layout,
            update_animation,
+           update_cfx,
            update_camera,
            update_custom,
            update_camrig,
@@ -591,6 +621,7 @@ def register():
     wizard_icons.load("layout", os.path.abspath('icons/wlayout.png'), 'IMAGE')
     wizard_icons.load("animation", os.path.abspath(
         'icons/animation.png'), 'IMAGE')
+    wizard_icons.load("cfx", os.path.abspath('icons/cfx.png'), 'IMAGE')
     wizard_icons.load("camera", os.path.abspath('icons/camera.png'), 'IMAGE')
     wizard_icons.load("custom", os.path.abspath('icons/custom.png'), 'IMAGE')
     wizard_icons.load("camrig", os.path.abspath(
