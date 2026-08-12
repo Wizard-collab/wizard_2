@@ -30,7 +30,7 @@ def set_exr_multilayer_format(image_settings):
     if hasattr(image_settings, 'media_type'):
         # media_type must be set first, it filters the valid file_format enum values
         image_settings.media_type = 'MULTI_LAYER_IMAGE'
-        image_settings.file_format = "OPEN_EXR"
+        #image_settings.file_format = "OPEN_EXR"
     else:
         image_settings.file_format = "OPEN_EXR_MULTILAYER"
 
