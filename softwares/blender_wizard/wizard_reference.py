@@ -240,13 +240,11 @@ def update_usd(file_path, namespace):
 
 
 def link_blend(file_path, reference_dic, parent_collection=None):
-    # namespace (not file_path) is the unique key: the same .blend can be
-    # linked under several namespaces (instances), but never linking the
-    # same namespace twice avoids the '.001' duplicate library names
-    if reference_dic['namespace'] in bpy.data.libraries.keys():
-        logger.warning(
-            f"Library '{reference_dic['namespace']}' already linked, skipping...")
+    '''
+    if wizard_tools.find_library(file_path):
+        logger.warning(f"Ressource already existing, skipping...")
         return
+    '''
     wizard_tools.set_mode_to_object()
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection
@@ -352,21 +350,16 @@ def fix_library_names():
 
 def update_blend(file_path, namespace):
     fix_library_names()
-    # match on base name in case leftover duplicate libraries (namespace.001, .002, ...)
-    # already exist from before the link_blend duplicate-guard fix, so none of them
-    # are left stale/unreloaded
-    matching_libs = [lib for lib in bpy.data.libraries
-                     if lib.name.split('.')[0] == namespace]
-    if not matching_libs:
-        logger.error(f"Library {namespace} not found")
-        return
-    for lib in matching_libs:
+    try:
+        lib = bpy.data.libraries[namespace]
         if lib.filepath == file_path:
-            continue
+            return
         lib.filepath = file_path
         lib.reload()
-    fix_library_names()
-    library_override(namespace)
+        fix_library_names()
+        library_override(namespace)
+    except KeyError:
+        logger.error(f"Library {namespace} not found")
 
 
 def trigger_after_reference_hook(referenced_stage_name,
