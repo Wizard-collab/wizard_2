@@ -240,17 +240,23 @@ def update_usd(file_path, namespace):
 
 
 def link_blend(file_path, reference_dic, parent_collection=None):
-    '''
-    if wizard_tools.find_library(file_path):
-        logger.warning(f"Ressource already existing, skipping...")
-        return
-    '''
     wizard_tools.set_mode_to_object()
     if parent_collection is None:
         parent_collection = bpy.context.scene.collection
     wizard_tools.set_collection_active(parent_collection)
     with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
         data_to.collections = [c for c in data_from.collections]
+
+    # grab the library bpy.data.libraries.load() just created for THIS call
+    # directly from the freshly linked collections: a lookup by file basename
+    # afterward can grab the wrong library (lookdev files often embed nested
+    # copies of sibling variants sharing the same collection names)
+    linked_lib = None
+    for coll in data_to.collections:
+        if coll is not None and coll.library is not None:
+            linked_lib = coll.library
+            break
+
     for coll in data_to.collections:
         if coll is not None:
 
@@ -265,9 +271,8 @@ def link_blend(file_path, reference_dic, parent_collection=None):
 
     library_override(reference_dic['namespace'])
 
-    if os.path.basename(file_path) in bpy.data.libraries.keys():
-        lib = bpy.data.libraries[os.path.basename(file_path)]
-        lib.name = reference_dic['namespace']
+    if linked_lib is not None:
+        linked_lib.name = reference_dic['namespace']
 
 
 def library_override(collection_name):
@@ -354,14 +359,16 @@ def fix_library_names():
             print(f"No suitable collection found for library: {lib.name}")
 
 def update_blend(file_path, namespace):
-    fix_library_names()
+    # namespace is already known precisely (it comes straight from the wizard
+    # database), so there's no need to reverse-engineer it via fix_library_names():
+    # that heuristic can't reliably tell apart the real namespace collection from
+    # an unrelated embedded/nested copy of the same hierarchy in another lookdev file
     try:
         lib = bpy.data.libraries[namespace]
         if lib.filepath == file_path:
             return
         lib.filepath = file_path
         lib.reload()
-        fix_library_names()
         library_override(namespace)
     except KeyError:
         logger.error(f"Library {namespace} not found")
