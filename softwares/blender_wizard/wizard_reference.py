@@ -369,6 +369,9 @@ def update_blend(file_path, namespace):
             return
         lib.filepath = file_path
         lib.reload()
+        # reload() re-links the file internally and resets the library's name
+        # back to the new file's basename, so it must be restored right after
+        lib.name = namespace
         library_override(namespace)
     except KeyError:
         logger.error(f"Library {namespace} not found")
