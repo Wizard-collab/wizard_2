@@ -324,13 +324,18 @@ def fix_library_names():
         # Traverse up the collection hierarchy to find non-linked parent
         def find_parent_collection(target_collection):
             """Find the direct parent collection of target_collection"""
+            # compare by object identity, not name: different libraries can
+            # link in same-named collections (e.g. a shading file embedding
+            # its own copy of 'MODELING'), and name matching would wrongly
+            # hop into that unrelated hierarchy
             for collection in bpy.data.collections:
                 for child in collection.children:
-                    if child.name == target_collection.name:
+                    if child == target_collection:
                         return collection
             # Check scene collection as well
-            if target_collection.name in bpy.context.scene.collection.children:
-                return bpy.context.scene.collection
+            for child in bpy.context.scene.collection.children:
+                if child == target_collection:
+                    return bpy.context.scene.collection
             return None
         
         current_collection = found_collection
