@@ -369,8 +369,17 @@ def update_blend(file_path, namespace):
             return
         lib.filepath = file_path
         lib.reload()
-        # reload() re-links the file internally and resets the library's name
-        # back to the new file's basename, so it must be restored right after
+        # reload() can fully recreate the underlying Library ID, invalidating
+        # the Python reference above, and always resets the name back to the
+        # new file's basename - re-fetch it by filepath before renaming
+        lib = None
+        for candidate in bpy.data.libraries:
+            if candidate.filepath == file_path:
+                lib = candidate
+                break
+        if lib is None:
+            logger.error(f"Library for {file_path} not found after reload")
+            return
         lib.name = namespace
         library_override(namespace)
     except KeyError:
