@@ -246,6 +246,11 @@ def link_blend(file_path, reference_dic, parent_collection=None):
     wizard_tools.set_collection_active(parent_collection)
     with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
         data_to.collections = [c for c in data_from.collections]
+        data_to.worlds = [world for world in data_from.worlds
+                          if world != 'World']
+
+    if data_to.worlds:
+        bpy.context.scene.world = data_to.worlds[0]
 
     # grab the library bpy.data.libraries.load() just created for THIS call
     # directly from the freshly linked collections: a lookup by file basename
