@@ -97,6 +97,7 @@ def export_blend(export_GRP_list, export_file):
     temp_file = export_file.replace(os.path.basename(export_file), 'temp')
     bpy.ops.wm.save_as_mainfile(filepath=temp_file)
     collection_name = export_GRP_list[0].name
+    world_name = bpy.context.scene.world.name if bpy.context.scene.world else None
     bpy.ops.wm.read_homefile()
     objects = bpy.data.objects
     for obj in objects:
@@ -106,8 +107,12 @@ def export_blend(export_GRP_list, export_file):
         bpy.data.collections.remove(collection, do_unlink=True)
     with bpy.data.libraries.load(temp_file, link=False) as (data_from, data_to):
         data_to.collections = [collection_name]
+        if world_name and world_name != 'World':
+            data_to.worlds = [world_name]
     for collection in data_to.collections:
         bpy.context.collection.children.link(collection)
+    if data_to.worlds:
+        bpy.context.scene.world = data_to.worlds[0]
 
     # Make everything local
     bpy.ops.object.select_all(action='SELECT')
