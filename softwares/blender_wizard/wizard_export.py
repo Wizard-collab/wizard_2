@@ -118,6 +118,18 @@ def export_blend(export_GRP_list, export_file):
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.make_local(type='ALL')
 
+    # Shading is consumed from mesh data materials.  Linked modeling objects
+    # can keep their published material in an object-level slot, so bake the
+    # current slot assignments into a local mesh datablock for this export.
+    for obj in bpy.data.objects:
+        if obj.type != 'MESH':
+            continue
+        materials = [slot.material for slot in obj.material_slots]
+        obj.data = obj.data.copy()
+        for index, material in enumerate(materials):
+            obj.data.materials[index] = material
+            obj.material_slots[index].link = 'DATA'
+
     for col in bpy.data.collections:
         if "main_collection_tag" in col.keys():
             del col["main_collection_tag"]
