@@ -93,6 +93,15 @@ def export_fbx(export_GRP_list, export_file, frange):
 
 
 def export_blend(export_GRP_list, export_file):
+    material_assignments = {}
+    for export_group in export_GRP_list:
+        for obj in wizard_tools.get_all_children(export_group, meshes=1):
+            if obj.type != 'MESH':
+                continue
+            material_assignments[obj.name] = [
+                slot.material.name if slot.material else None
+                for slot in obj.material_slots]
+
     file_name = bpy.data.filepath
     temp_file = export_file.replace(os.path.basename(export_file), 'temp')
     bpy.ops.wm.save_as_mainfile(filepath=temp_file)
@@ -118,17 +127,20 @@ def export_blend(export_GRP_list, export_file):
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.make_local(type='ALL')
 
-    # Shading is consumed from mesh data materials.  Linked modeling objects
-    # can keep their published material in an object-level slot, so bake the
-    # current slot assignments into a local mesh datablock for this export.
-    for obj in bpy.data.objects:
-        if obj.type != 'MESH':
+    for object_name, assignments in material_assignments.items():
+        obj = bpy.data.objects.get(object_name)
+        if obj is None:
+            logger.warning("Cannot restore materials: object '%s' was not appended.",
+                           object_name)
             continue
-        materials = [slot.material for slot in obj.material_slots]
-        obj.data = obj.data.copy()
-        for index, material in enumerate(materials):
-            obj.data.materials[index] = material
-            obj.material_slots[index].link = 'DATA'
+        if len(obj.material_slots) != len(assignments):
+            logger.warning("Cannot restore materials on '%s': material slot counts differ.",
+                           object_name)
+            continue
+        for index, material_name in enumerate(assignments):
+            slot = obj.material_slots[index]
+            slot.link = 'OBJECT'
+            slot.material = bpy.data.materials.get(material_name) if material_name else None
 
     for col in bpy.data.collections:
         if "main_collection_tag" in col.keys():
