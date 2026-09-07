@@ -453,6 +453,12 @@ def apply_shaders():
                 if tag in sh_ASSET_tag:
                     match += 1
             if match == 2:
-                target_obj.data.materials.clear()
-                for material in sh_obj.data.materials:
-                    target_obj.data.materials.append(material)
+                if len(target_obj.material_slots) != len(sh_obj.material_slots):
+                    logger.warning(
+                        "Cannot apply shading from '%s' to '%s': material slot counts differ.",
+                        sh_obj.name, target_obj.name)
+                    continue
+                for index, shading_slot in enumerate(sh_obj.material_slots):
+                    target_slot = target_obj.material_slots[index]
+                    target_slot.link = 'OBJECT'
+                    target_slot.material = shading_slot.material
