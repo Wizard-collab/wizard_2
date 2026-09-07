@@ -138,9 +138,9 @@ def export_blend(export_GRP_list, export_file):
                            object_name)
             continue
         for index, material_name in enumerate(assignments):
-            slot = obj.material_slots[index]
-            slot.link = 'OBJECT'
-            slot.material = bpy.data.materials.get(material_name) if material_name else None
+            obj.data.materials[index] = (
+                bpy.data.materials.get(material_name) if material_name else None)
+            obj.material_slots[index].link = 'DATA'
 
     for col in bpy.data.collections:
         if "main_collection_tag" in col.keys():
