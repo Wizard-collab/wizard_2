@@ -207,8 +207,8 @@ class video_browser_widget(QtWidgets.QWidget):
                                   ]['variant_row'] = variants[video_row['variant_id']]
                 self.variants_ids[video_row['variant_id']
                                   ]['stage_row'] = stages[self.variants_ids[video_row['variant_id']]['variant_row']['stage_id']]
-                comb_row = stages[self.variants_ids[video_row['variant_id']]
-                                  ['variant_row']['stage_id']]
+                comb_row = dict(stages[self.variants_ids[video_row['variant_id']]
+                                       ['variant_row']['stage_id']])
                 comb_row['variant'] = variants[video_row['variant_id']]['name']
                 comb_row['variant_id'] = variants[video_row['variant_id']]['id']
                 self.comb_rows_for_search.append(comb_row)
@@ -348,13 +348,11 @@ class search_thread(QtCore.QThread):
                     if all(keyword.upper() in data.upper() for keyword in keywords):
                         variants_to_show.append(variant_id)
 
-            QtWidgets.QApplication.processEvents()
-            time.sleep(0.01)
             for comb_row in self.comb_rows:
-                if comb_row['id'] in variants_to_show:
-                    self.show_variant_signal.emit(comb_row['id'])
+                if comb_row['variant_id'] in variants_to_show:
+                    self.show_variant_signal.emit(comb_row['variant_id'])
                 else:
-                    self.hide_variant_signal.emit(comb_row['id'])
+                    self.hide_variant_signal.emit(comb_row['variant_id'])
             self.search_ended.emit(1)
 
         except:

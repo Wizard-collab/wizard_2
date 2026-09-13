@@ -1174,8 +1174,6 @@ class search_thread(QtCore.QThread):
                     self.show_task_signal.emit(task)
                 else:
                     self.hide_task_signal.emit(task)
-            QtWidgets.QApplication.processEvents()
-            time.sleep(0.1)
             for stage_row in self.stage_rows:
                 if stage_row['id'] in stages_to_show:
                     self.show_stage_signal.emit(stage_row['id'])

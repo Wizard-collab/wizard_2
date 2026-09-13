@@ -8,7 +8,8 @@
     - Improves software launch lookup by returning an empty list when the local server is unreachable.
   - !!python/tuple
     - Debug
-    - In the production table widget, stage/asset coordinates now rely on stored QTableWidgetItem references instead of widget positions, fixing stale row/column resolution issues after table row changes.
+    - In the production table widget, stage/asset coordinates now rely on stored QTableWidgetItem references instead
+      of widget positions, fixing stale row/column resolution issues after table row changes.
   time: 1789333513.6445076
 '5.1.1.419':
   update_list:

@@ -212,7 +212,9 @@ class splash_screen_widget(QtWidgets.QDialog):
         self.update_areas = []
         for update in whats_new_dic.keys():
             widget = update_area(whats_new_dic[update], update, version_key)
-            self.updates_scrollArea_layout.addWidget(widget)
+            # insert before the trailing expanding spacer so it stays at the bottom
+            self.updates_scrollArea_layout.insertWidget(
+                self.updates_scrollArea_layout.count() - 1, widget)
             self.update_areas.append(widget)
 
     def connect_functions(self):
@@ -347,6 +349,7 @@ class update_frame(QtWidgets.QFrame):
         self.header_layout.addWidget(self.update_type_label)
 
         self.update_label = QtWidgets.QLabel()
+        self.update_label.setWordWrap(True)
         self.update_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
         self.main_layout.addWidget(self.update_label)
 

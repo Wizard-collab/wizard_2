@@ -741,5 +741,8 @@ class search_thread(QtCore.QThread):
                     self.show_id_signal.emit(video_id)
                 else:
                     self.hide_id_signal.emit(video_id)
+
+                if not self.running:
+                    break
         except:
             logger.debug(str(traceback.format_exc()))
