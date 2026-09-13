@@ -2,6 +2,12 @@
   update_list:
   - !!python/tuple
     - New
+    - Wizard version 6.0 ( 2027 )
+  time: 1789333513.6445076
+'5.1.1.419':
+  update_list:
+  - !!python/tuple
+    - New
     - Attribute handling in abc import and export ( Blender | Maya )
   - !!python/tuple
     - New

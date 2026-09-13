@@ -58,7 +58,7 @@ class production_table_widget(QtWidgets.QWidget):
     def refresh_users_images(self):
         for user_row in repository.get_users_list():
             if user_row['user_name'] in self.users_images_dic.keys():
-                    continue
+                continue
             user_image = user_row['profile_picture']
             pixmap = gui_utils.mask_image(
                 image.convert_str_data_to_image_bytes(user_image), 'png', 30, 8)
@@ -369,7 +369,8 @@ class production_table_widget(QtWidgets.QWidget):
         self.category_rows = dict()
         for category_row in project.get_domain_childs(domain_id, order='name'):
             self.category_rows[category_row['id']] = category_row
-            self.asset_rows += project.get_category_childs(category_row['id'], order='name')
+            self.asset_rows += project.get_category_childs(
+                category_row['id'], order='name')
 
         for assets_preview_row in assets_preview_rows:
             assets_preview[assets_preview_row['asset_id']] = assets_preview_row
@@ -417,6 +418,7 @@ class production_table_widget(QtWidgets.QWidget):
                 self.asset_ids[asset_row['id']
                                ]['preview_row'] = assets_preview[asset_row['id']]
                 self.asset_ids[asset_row['id']]['widget'] = widget
+                self.asset_ids[asset_row['id']]['item'] = item
                 if self.domain == assets_vars._sequences_:
                     item = QtWidgets.QTableWidgetItem()
                     item.setFlags(
@@ -435,7 +437,7 @@ class production_table_widget(QtWidgets.QWidget):
                                    ]['preview_row'] = assets_preview[asset_row['id']]
                 if self.domain == assets_vars._sequences_:
                     self.asset_ids[asset_row['id']
-                                    ]['frame_range_widget'].refresh(asset_row)
+                                   ]['frame_range_widget'].refresh(asset_row)
 
         self.update_layout()
 
@@ -448,12 +450,16 @@ class production_table_widget(QtWidgets.QWidget):
                 if stage_row['id'] not in self.stage_ids.keys():
                     row_index = self.get_asset_coord(
                         stage_row['asset_id']).row()
+                    column_index = self.task_list.index(stage_row['name'])
+                    item = QtWidgets.QTableWidgetItem()
+                    self.table_widget.setItem(row_index, column_index, item)
                     self.stage_ids[stage_row['id']] = dict()
                     self.stage_ids[stage_row['id']]['row'] = stage_row
+                    self.stage_ids[stage_row['id']]['item'] = item
                     self.stage_ids[stage_row['id']]['widget'] = stage_widget(
                         stage_row, self.users_images_dic)
-                    self.table_widget.setCellWidget(row_index, self.task_list.index(
-                        stage_row['name']), self.stage_ids[stage_row['id']]['widget'])
+                    self.table_widget.setCellWidget(row_index, column_index,
+                                                    self.stage_ids[stage_row['id']]['widget'])
                     self.stage_ids[stage_row['id']]['widget'].show_comment_signal.connect(
                         self.view_comment_widget.show_comment)
                     self.stage_ids[stage_row['id']]['widget'].hide_comment_signal.connect(
@@ -483,28 +489,26 @@ class production_table_widget(QtWidgets.QWidget):
         self.refresh_label.setText(f" refresh : {refresh_time}s")
 
     def get_asset_coord(self, asset_id):
+        # Row is resolved from the item's model index, which QTableWidget keeps
+        # in sync immediately on row removal, unlike widget.pos() which only
+        # reflects the next paint/layout pass.
         if asset_id in self.asset_ids.keys():
-            widget = self.asset_ids[asset_id]['widget']
-            model_index = self.table_widget.indexAt(widget.pos())
-            return model_index
+            item = self.asset_ids[asset_id]['item']
+            return self.table_widget.indexFromItem(item)
 
     def get_asset_row(self, asset_id):
         if asset_id in self.asset_ids.keys():
-            widget = self.asset_ids[asset_id]['widget']
-            row = self.table_widget.rowAt(widget.pos().y())
-            return row
+            item = self.asset_ids[asset_id]['item']
+            return self.table_widget.row(item)
 
     def get_stage_coord(self, stage_id):
         if stage_id in self.stage_ids.keys():
-            widget = self.stage_ids[stage_id]['widget']
-            model_index = self.table_widget.indexAt(widget.pos())
-            return model_index
+            item = self.stage_ids[stage_id]['item']
+            return self.table_widget.indexFromItem(item)
 
     def get_stage_item(self, stage_id):
         if stage_id in self.stage_ids.keys():
-            widget = self.stage_ids[stage_id]['widget']
-            item = self.table_widget.itemAt(widget.pos())
-            return item
+            return self.stage_ids[stage_id]['item']
 
     def remove_stage(self, stage_id):
         if stage_id in self.stage_ids.keys():
@@ -726,7 +730,7 @@ class frame_range_widget(QtWidgets.QWidget):
 
         self.main_layout.addSpacerItem(QtWidgets.QSpacerItem(
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
-    
+
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.RightButton:
             self.show_context_menu()
@@ -879,6 +883,7 @@ class edit_frame_range_widget(QtWidgets.QDialog):
         self.accept_button.setDefault(True)
         self.accept_button.setAutoDefault(True)
         self.frame_layout.addWidget(self.accept_button)
+
 
 class stage_widget(QtWidgets.QWidget):
 

@@ -201,17 +201,19 @@ def get():
     is applied to the signal transmission.
 
     Returns:
-        The response from the server after sending the signal.
+        list: The list of running work_env_ids, or an empty list if the
+        server could not be reached.
 
     Raises:
         Any exceptions raised by `socket_utils.send_signal` if the operation fails.
     """
     signal_dic = dict()
     signal_dic['function'] = 'get'
-    return socket_utils.send_signal(('localhost',
-                                    environment.get_softwares_server_port()),
-                                    signal_dic,
-                                    timeout=0.5)
+    response = socket_utils.send_signal(('localhost',
+                                         environment.get_softwares_server_port()),
+                                        signal_dic,
+                                        timeout=0.5)
+    return response if response is not None else []
 
 
 def core_kill_software_thread(software_thread):
