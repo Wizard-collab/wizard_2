@@ -44,7 +44,7 @@ def get_app():
     os.environ['PATH'] += os.pathsep + \
         path_utils.abspath("binaries/ffmpeg/bin")
 
-    if not path_utils.isfile("binaries/mpv-2.dll"):
+    if not path_utils.isfile("binaries/libmpv-2.dll"):
         logger.error("MPV not found")
         sys.exit()
     os.environ['PATH'] += os.pathsep + path_utils.abspath("binaries")
