@@ -8,6 +8,7 @@ from PyQt6.QtCore import pyqtSignal
 import time
 import subprocess
 import sys
+import os
 import logging
 import webbrowser
 
@@ -345,8 +346,10 @@ class main_widget(QtWidgets.QWidget):
         webbrowser.open_new_tab(ressources._documentation_url_)
 
     def show_pywizard(self):
+        # WIZARD_PYTHON points to the local-disk python cache set up by Wizard.bat
+        python_exe = os.environ.get('WIZARD_PYTHON', 'python\\python.exe')
         if sys.argv[0].endswith('.py'):
-            subprocess.Popen('python/python.exe PyWizard.py',
+            subprocess.Popen(f'"{python_exe}" PyWizard.py',
                              creationflags=subprocess.CREATE_NEW_CONSOLE)
         elif sys.argv[0].endswith('.exe'):
             path_utils.startfile('PyWizard.exe')
@@ -355,7 +358,8 @@ class main_widget(QtWidgets.QWidget):
         self.close()
         command = 'wizard.exe'
         if sys.argv[0].endswith('.py'):
-            command = 'python\\python.exe app.py'
+            python_exe = os.environ.get('WIZARD_PYTHON', 'python\\python.exe')
+            command = f'"{python_exe}" app.py'
         subprocess.Popen(command, shell=True)
 
     def raise_window(self):

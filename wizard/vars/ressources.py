@@ -565,6 +565,7 @@ _states_colors_['rtk'] = '#4768b5'
 _states_colors_['wfa'] = '#8047b5'
 _states_colors_['omt'] = '#2e2e2e'
 _states_colors_['rfns'] = '#2cdbad'
+_states_colors_['rts'] = '#2cdbad'
 
 _states_icons_ = dict()
 _states_icons_['todo'] = _state_todo_
@@ -575,6 +576,7 @@ _states_icons_['rtk'] = _state_rtk_
 _states_icons_['wfa'] = _state_wfa_
 _states_icons_['omt'] = _state_omt_
 _states_icons_['rfns'] = _state_rfns_
+_states_icons_['rts'] = _state_rts_
 
 _stages_colors_ = dict()
 _stages_colors_['modeling'] = '#f87474'
