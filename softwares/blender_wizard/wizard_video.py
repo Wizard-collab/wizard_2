@@ -83,17 +83,16 @@ def select_cam(camrig_nspace):
     namespace_collection = bpy.data.collections[camrig_nspace]
     render_set_collection = wizard_tools.get_render_set_collection(
         namespace_collection)
-    if not render_set_collection:
-        logger.warning("{}/render_set not found".format(camrig_nspace))
-        return
+    # Fallback to the whole namespace collection ( alembic cameras have no render_set )
+    search_collection = render_set_collection if render_set_collection else namespace_collection
 
-    cameras = [obj for obj in render_set_collection.all_objects if obj.type == 'CAMERA']
+    cameras = [obj for obj in search_collection.all_objects if obj.type == 'CAMERA']
     if len(cameras) == 0:
-        logger.warning("{} is empty".format(render_set_collection))
+        logger.warning("{} is empty".format(search_collection))
         return
     if len(cameras) > 1:
         logger.warning("More than one camera found in {}, skipping".format(
-            render_set_collection))
+            search_collection))
         return
     return cameras[0]
 

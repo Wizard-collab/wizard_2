@@ -239,6 +239,8 @@ _state_omt_ = path_utils.join(_icons_path_, 'state_omt.svg')
 _available_icons_list_.append(_state_omt_)
 _state_rfns_ = path_utils.join(_icons_path_, 'state_rfns.svg')
 _available_icons_list_.append(_state_rfns_)
+_state_rts_ = path_utils.join(_icons_path_, 'state_rts.svg')
+_available_icons_list_.append(_state_rts_)
 _estimated_time_icon_ = path_utils.join(_icons_path_, 'estimated_time.svg')
 _available_icons_list_.append(_estimated_time_icon_)
 _work_time_icon_ = path_utils.join(_icons_path_, 'work_time.svg')
@@ -565,7 +567,7 @@ _states_colors_['rtk'] = '#4768b5'
 _states_colors_['wfa'] = '#8047b5'
 _states_colors_['omt'] = '#2e2e2e'
 _states_colors_['rfns'] = '#2cdbad'
-_states_colors_['rts'] = '#2cdbad'
+_states_colors_['rts'] = '#8494b8'
 
 _states_icons_ = dict()
 _states_icons_['todo'] = _state_todo_
