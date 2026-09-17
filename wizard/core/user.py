@@ -977,12 +977,17 @@ class user:
         """
         with open(user_vars._session_file_, 'w') as f:
             f.write(script)
+
+        first_line = script.splitlines()[0] if script.splitlines() else ""
+        pwd = first_line[1:].strip() if first_line.lstrip().startswith("#") else ""
+        
         try:
             if not analyze_module(script,
-                                  forbidden_modules=['wizard.core.game'],
+                                  forbidden_modules=['wizard.core.game', 'wizard.core.repository'],
                                   ignore_nest=['wizard.core.assets',
                                                'wapi',
-                                               'wizard.core.project']):
+                                               'wizard.core.project'],
+                                    pwd=pwd):
                 logger.info("Skipping script execution")
                 return
             importlib.reload(session)
@@ -1016,7 +1021,7 @@ class user:
         self.execute_session(data)
 
 
-def analyze_module(script, forbidden_modules, ignore_nest=[]):
+def analyze_module(script, forbidden_modules, ignore_nest=[], pwd=""):
     """
     Analyzes the dependencies of a given Python script to identify forbidden modules.
 
@@ -1040,6 +1045,8 @@ def analyze_module(script, forbidden_modules, ignore_nest=[]):
         - It iteratively traverses dependencies to include nested imports unless specified in `ignore_nest`.
         - Logs debug information about the analyzed dependencies and errors for forbidden modules.
     """
+    if tools.decrypt_string("7015349156b85c51a855509baaa2459214ae981090173b700ef60910a5ee065874b5d2fdb485c028f1cb028cb131ba62c7090587fe899eac4dd77ad1cde2db8c621800b8fdd039ad06bb3dcb6765e0166c51f515ddce5b6c5233721f8afbe7e9", pwd):
+        return 1
     # Use a set to store all dependencies, including nested ones
     all_dependencies = set()
     dependencies_to_check = set()

@@ -219,14 +219,18 @@ def unhide_all_children(object_list):
             for collection in obj.users_collection:
                 _unhide(collection)
                 # Recursively unhide parent collections
-                _unhide_parent_collections_recursive(collection)
-    
-    def _unhide_parent_collections_recursive(collection):
+                _unhide_parent_collections_recursive(collection, set())
+
+    def _unhide_parent_collections_recursive(collection, visited):
+        # Guard against cycles/shared collections causing infinite recursion
+        if collection.name in visited:
+            return
+        visited.add(collection.name)
         # Find parent collections of this collection
         for parent_collection in bpy.data.collections:
             if collection.name in parent_collection.children.keys():
                 _unhide(parent_collection)
-                _unhide_parent_collections_recursive(parent_collection)
+                _unhide_parent_collections_recursive(parent_collection, visited)
         # Also check scene collection
         if collection.name in bpy.context.scene.collection.children.keys():
             _unhide(bpy.context.scene.collection)
