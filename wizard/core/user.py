@@ -983,7 +983,7 @@ class user:
         
         try:
             if not analyze_module(script,
-                                  forbidden_modules=['wizard.core.game', 'wizard.core.repository'],
+                                  forbidden_modules=['wizard.core.game', 'wizard.core.repository', 'wizard.core.artefacts'],
                                   ignore_nest=['wizard.core.assets',
                                                'wapi',
                                                'wizard.core.project'],
