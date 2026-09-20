@@ -1060,8 +1060,21 @@ def analyze_module(script, forbidden_modules, ignore_nest=[], pwd=""):
             if node.module is not None:
                 module_path = node.module
                 for name in node.names:
-                    all_dependencies.add(f"{module_path}.{name.name}")
-                    dependencies_to_check.add(f"{module_path}.{name.name}")
+                    subdependency = f"{module_path}.{name.name}"
+                    try:
+                        if not importlib.util.find_spec(subdependency):
+                            # Module's unknown, skip it
+                            continue
+                        # Subdependency is a module, add it to the dependencies to check
+                        all_dependencies.add(subdependency)
+                        dependencies_to_check.add(subdependency)
+
+                    except ModuleNotFoundError:
+                        # Subdependency's unknown (may be a function)
+                        # Checking module path instead
+                        all_dependencies.add(module_path)
+                        dependencies_to_check.add(module_path)
+
     # Traverse the dependencies iteratively
     while dependencies_to_check:
         dependency = dependencies_to_check.pop()
