@@ -89,6 +89,7 @@ def import_and_update_all():
     reference_camera(references)
     reference_custom(references)
     reference_camrig(references)
+    reference_lighting(references)
     update_texturing(references)
     update_modeling(references)
     update_rigging(references)
@@ -99,6 +100,7 @@ def import_and_update_all():
     update_camera(references)
     update_custom(references)
     update_camrig(references)
+    update_lighting(references)
     reference_shading(references)
     update_shading(references)
 
@@ -116,6 +118,7 @@ def update_all():
     update_camera(references)
     update_custom(references)
     update_camrig(references)
+    update_lighting(references)
     update_shading(references)
 
 
@@ -344,3 +347,21 @@ def update_custom(references=None):
     if 'custom' in references.keys():
         for reference in references['custom']:
             wizard_reference.update_custom(reference)
+
+
+def reference_lighting(references=None):
+    if not references:
+        references = wizard_communicate.get_references(
+            int(os.environ['wizard_work_env_id']))
+    if 'lighting' in references.keys():
+        for reference in references['lighting']:
+            wizard_reference.import_lighting(reference)
+
+
+def update_lighting(references=None):
+    if not references:
+        references = wizard_communicate.get_references(
+            int(os.environ['wizard_work_env_id']))
+    if 'lighting' in references.keys():
+        for reference in references['lighting']:
+            wizard_reference.update_lighting(reference)

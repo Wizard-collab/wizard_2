@@ -218,6 +218,18 @@ class import_custom(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class import_lighting(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.import_lighting"
+    bl_label = "Import lighting"
+    bl_description = "Import lighting"
+
+    def execute(self, context):
+        wizard_plugin.reference_lighting()
+        return {'FINISHED'}
+
+
 class import_texturing(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
@@ -350,6 +362,18 @@ class update_custom(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class update_lighting(bpy.types.Operator):
+    '''The save operator that call wizard function'''
+
+    bl_idname = "wizard.update_lighting"
+    bl_label = "Update lighting"
+    bl_description = "Update existing lighting"
+
+    def execute(self, context):
+        wizard_plugin.update_lighting()
+        return {'FINISHED'}
+
+
 class update_texturing(bpy.types.Operator):
     '''The save operator that call wizard function'''
 
@@ -455,6 +479,8 @@ class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
                         icon_value=wizard_icons["camera"].icon_id)
         layout.operator("wizard.import_custom",
                         icon_value=wizard_icons["custom"].icon_id)
+        layout.operator("wizard.import_lighting",
+                icon_value=wizard_icons["lighting"].icon_id)
         layout.operator("wizard.import_camrig",
                         icon_value=wizard_icons["camrig"].icon_id)
 
@@ -484,6 +510,8 @@ class TOPBAR_MT_wizard_update_submenu(bpy.types.Menu):
                         icon_value=wizard_icons["camera"].icon_id)
         layout.operator("wizard.update_custom",
                         icon_value=wizard_icons["custom"].icon_id)
+        layout.operator("wizard.update_lighting",
+                icon_value=wizard_icons["lighting"].icon_id)
         layout.operator("wizard.update_camrig",
                         icon_value=wizard_icons["camrig"].icon_id)
 
@@ -571,6 +599,7 @@ classes = (save_increment,
            import_cfx,
            import_camera,
            import_custom,
+           import_lighting,
            import_camrig,
            import_texturing,
            update_texturing,
@@ -584,6 +613,7 @@ classes = (save_increment,
            update_cfx,
            update_camera,
            update_custom,
+           update_lighting,
            update_camrig,
            set_image_size,
            set_frame_rate,
