@@ -18,6 +18,7 @@ from blender_wizard.export import shading
 from blender_wizard.export import rigging
 from blender_wizard.export import layout
 from blender_wizard.export import custom
+from blender_wizard.export import lighting
 from blender_wizard.export import grooming
 from blender_wizard.export import animation
 from blender_wizard.export import camrig
@@ -48,6 +49,8 @@ def export():
         layout.main()
     elif stage_name == 'custom':
         custom.main()
+    elif stage_name == 'lighting':
+        lighting.main()
     elif stage_name == 'animation':
         animation.invoke_settings_widget()
     elif stage_name == 'camera':
