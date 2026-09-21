@@ -654,6 +654,8 @@ def register():
     wizard_icons.load("cfx", os.path.abspath('icons/cfx.png'), 'IMAGE')
     wizard_icons.load("camera", os.path.abspath('icons/camera.png'), 'IMAGE')
     wizard_icons.load("custom", os.path.abspath('icons/custom.png'), 'IMAGE')
+    wizard_icons.load("lighting", os.path.abspath(
+        'icons/lighting.png'), 'IMAGE')
     wizard_icons.load("camrig", os.path.abspath(
         'icons/camera_rig.png'), 'IMAGE')
     wizard_icons.load("texturing", os.path.abspath(
