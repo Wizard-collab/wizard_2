@@ -37,6 +37,7 @@ class video_browser_widget(QtWidgets.QWidget):
 
         self.variants_ids = dict()
         self.comb_rows_for_search = []
+        self.search_id = 0
 
         self.old_thread_id = None
         self.search_threads = dict()
@@ -65,9 +66,11 @@ class video_browser_widget(QtWidgets.QWidget):
 
     def update_search(self):
         search_data = self.search_bar.text()
+        self.search_id += 1
         self.search_start_time = time.perf_counter()
         self.accept_item_from_thread = False
         if self.old_thread_id and self.old_thread_id in self.search_threads.keys():
+            self.search_threads[self.old_thread_id].requestInterruption()
             self.search_threads[self.old_thread_id].show_variant_signal.disconnect(
             )
             self.search_threads[self.old_thread_id].hide_variant_signal.disconnect(
@@ -82,7 +85,7 @@ class video_browser_widget(QtWidgets.QWidget):
         if len(search_data) > 0:
             self.accept_item_from_thread = True
             self.search_threads[thread_id].update_search(
-                self.comb_rows_for_search, search_data)
+                self.comb_rows_for_search, search_data, thread_id)
         else:
             self.search_threads[thread_id].running = False
             self.show_all_variants()
@@ -95,11 +98,15 @@ class video_browser_widget(QtWidgets.QWidget):
                 self.search_threads[thread_id].terminate()
                 del self.search_threads[thread_id]
 
-    def show_variant(self, variant_id):
+    def show_variant(self, search_id, variant_id):
+        if search_id != self.old_thread_id:
+            return
         if variant_id in self.variants_ids.keys():
             self.variants_ids[variant_id]['video_item'].setHidden(False)
 
-    def hide_variant(self, variant_id):
+    def hide_variant(self, search_id, variant_id):
+        if search_id != self.old_thread_id:
+            return
         if variant_id in self.variants_ids.keys():
             self.variants_ids[variant_id]['video_item'].setHidden(True)
 
@@ -226,6 +233,10 @@ class video_browser_widget(QtWidgets.QWidget):
                                       ]['last_video'] = video_row
                     self.variants_ids[video_row['variant_id']
                                       ]['video_item'].update_row(video_row)
+        if self.search_bar.text():
+            self.update_search()
+        else:
+            self.show_all_variants()
 
 
 class custom_video_icon_item(QtWidgets.QListWidgetItem):
@@ -308,17 +319,18 @@ class video_item_widget(QtWidgets.QWidget):
 
 class search_thread(QtCore.QThread):
 
-    show_variant_signal = pyqtSignal(int)
-    hide_variant_signal = pyqtSignal(int)
+    show_variant_signal = pyqtSignal(object, int)
+    hide_variant_signal = pyqtSignal(object, int)
     search_ended = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
         self.running = True
 
-    def update_search(self, comb_rows, search_data):
+    def update_search(self, comb_rows, search_data, search_id):
         self.search_data = search_data
         self.comb_rows = copy.deepcopy(comb_rows)
+        self.search_id = search_id
         self.start()
 
     def run(self):
@@ -328,6 +340,9 @@ class search_thread(QtCore.QThread):
 
             keywords_sets = self.search_data.split('+')
             for comb_row in self.comb_rows:
+
+                if self.isInterruptionRequested():
+                    return
 
                 variant_id = comb_row['variant_id']
                 values = []
@@ -349,12 +364,17 @@ class search_thread(QtCore.QThread):
                         variants_to_show.append(variant_id)
 
             for comb_row in self.comb_rows:
+                if self.isInterruptionRequested():
+                    return
                 if comb_row['variant_id'] in variants_to_show:
-                    self.show_variant_signal.emit(comb_row['variant_id'])
+                    self.show_variant_signal.emit(
+                        self.search_id, comb_row['variant_id'])
                 else:
-                    self.hide_variant_signal.emit(comb_row['variant_id'])
+                    self.hide_variant_signal.emit(
+                        self.search_id, comb_row['variant_id'])
             self.search_ended.emit(1)
 
         except:
             logger.info(str(traceback.format_exc()))
-        self.running = False
+        finally:
+            self.running = False
