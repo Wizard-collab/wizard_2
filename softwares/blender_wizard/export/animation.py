@@ -57,11 +57,34 @@ def export_animation(rigging_reference, frange, percent_factor, comment=''):
         if export_GRP_list:
             logger.info("Exporting {}".format(rig_nspace))
             additionnal_objects = wizard_export.trigger_before_export_hook('animation', exported_string_asset)
+
+            
+            
             export_GRP_list += additionnal_objects
+            disable_local_subdivision_modifiers(export_GRP_list)
             export_name = buid_export_name(asset_name, count)
             wizard_export.export('animation', export_name, exported_string_asset, export_GRP_list, frange, comment=comment)
         else:
             logger.warning("No objects to export in '{}/render_set' collection".format(rig_nspace))
+
+def disable_local_subdivision_modifiers(objects):
+    for obj in objects:
+        original_obj = getattr(getattr(obj, 'override_library', None), 'reference', None)
+        if original_obj is None:
+            continue
+
+        original_modifiers = {
+            (modifier.name, modifier.type)
+            for modifier in original_obj.modifiers
+        }
+        for modifier in obj.modifiers:
+            if modifier.type != 'SUBSURF':
+                continue
+            if (modifier.name, modifier.type) in original_modifiers:
+                continue
+            modifier.show_viewport = False
+            modifier.show_render = False
+            print("Disabled local subdivision modifier on object: {}".format(obj.name))
 
 def buid_export_name(asset_name, count):
     export_name = asset_name
