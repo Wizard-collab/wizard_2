@@ -112,7 +112,7 @@ class video_browser_widget(QtWidgets.QWidget):
 
     def show_all_variants(self):
         for variant_id in self.variants_ids.keys():
-            self.show_variant(variant_id)
+            self.variants_ids[variant_id]['video_item'].setHidden(False)
 
     def context_menu_requested(self):
         selection = self.icon_view.selectedItems()
