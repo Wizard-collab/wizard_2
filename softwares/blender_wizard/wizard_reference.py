@@ -394,7 +394,6 @@ def update_blend(file_path, namespace):
             logger.error(f"Library for {file_path} not found after reload")
             return
         lib.name = namespace
-        library_override(namespace)
     except KeyError:
         logger.error(f"Library {namespace} not found")
 
