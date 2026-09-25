@@ -282,8 +282,6 @@ def link_blend(file_path, reference_dic, parent_collection=None):
             parent_collection.children.link(override_collection)
             bpy.context.view_layer.update()
 
-    library_override(reference_dic['namespace'])
-
     if linked_lib is not None:
         linked_lib.name = reference_dic['namespace']
 
