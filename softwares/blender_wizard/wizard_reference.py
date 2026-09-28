@@ -122,6 +122,14 @@ def update_custom(reference_dic):
     update_reference(reference_dic, 'CUSTOM')
 
 
+def import_lighting(reference_dic):
+    create_reference(reference_dic, 'LIGHTING')
+
+
+def update_lighting(reference_dic):
+    update_reference(reference_dic, 'LIGHTING')
+
+
 def create_reference(reference_dic, referenced_stage):
     wizard_tools.set_mode_to_object()
     old_objects = wizard_tools.get_all_nodes()
@@ -274,8 +282,6 @@ def link_blend(file_path, reference_dic, parent_collection=None):
             parent_collection.children.link(override_collection)
             bpy.context.view_layer.update()
 
-    library_override(reference_dic['namespace'])
-
     if linked_lib is not None:
         linked_lib.name = reference_dic['namespace']
 
@@ -386,7 +392,6 @@ def update_blend(file_path, namespace):
             logger.error(f"Library for {file_path} not found after reload")
             return
         lib.name = namespace
-        library_override(namespace)
     except KeyError:
         logger.error(f"Library {namespace} not found")
 
