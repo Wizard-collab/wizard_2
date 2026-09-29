@@ -3,4 +3,6 @@ compile/
 python3_wizard_venv
 binaries/
 .vs/
+.venv/
 python/
+.vscode/
