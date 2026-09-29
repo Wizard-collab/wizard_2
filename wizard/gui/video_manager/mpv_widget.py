@@ -174,13 +174,16 @@ class mpv_widget(QtWidgets.QWidget):
         if not self.player.duration:
             return
 
+        lower_bound, upper_bound = self.bounds_range
+        if lower_bound > upper_bound:
+            logger.warning("Ignoring seek with invalid frame bounds: %s", self.bounds_range)
+            return
+        if frame > upper_bound:
+            frame = lower_bound
+        elif frame < lower_bound:
+            frame = upper_bound
+
         t_value = frame/self.fps
-        if frame > self.bounds_range[1]:
-            self.seek_frame(self.bounds_range[0])
-            return
-        if frame < self.bounds_range[0]:
-            self.seek_frame(self.bounds_range[1])
-            return
 
         self.update_ui_progress = False
         self.player.seek(t_value, reference="absolute", precision="exact")
