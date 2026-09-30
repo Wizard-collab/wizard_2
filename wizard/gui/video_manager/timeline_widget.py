@@ -125,6 +125,8 @@ class timeline_widget(QtWidgets.QWidget):
             self.bounds_range[0] = int(self.frame_range[0])
         if self.bounds_range[1] > self.frame_range[1]:
             self.bounds_range[1] = int(self.frame_range[1])
+        if self.bounds_range[0] > self.bounds_range[1]:
+            self.bounds_range[1] = self.bounds_range[0]
         self.timeline_viewport.set_bounds_range(self.bounds_range)
         self.playing_infos_widget.set_bounds_range(self.bounds_range)
         self.on_bounds_change.emit(self.bounds_range)
