@@ -28,6 +28,7 @@ def main(render_type, frange, farm=0):
 
             wizard_render.setup_frame_range(render_type, frange)
             wizard_render.setup_image_format(render_type)
+            wizard_render.setup_renderfarm_settings(render_type)
 
             string_asset = wizard_communicate.get_string_variant_from_work_env_id(
                 int(os.environ['wizard_work_env_id']))
@@ -57,6 +58,7 @@ def setup_render_directory(render_type, frange):
             'lighting', export_name)
         wizard_render.setup_frame_range(render_type, frange)
         wizard_render.setup_image_format(render_type)
+        wizard_render.setup_renderfarm_settings(render_type)
         return render_directory
 
 
