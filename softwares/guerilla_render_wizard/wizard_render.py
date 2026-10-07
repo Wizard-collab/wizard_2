@@ -90,6 +90,37 @@ def setup_image_format(render_type):
         Document().ProjectAspectRatio.set(1)
 
 
+def setup_renderfarm_settings(render_type: str):
+    """
+    Sets the render farm settings.
+    
+    Workflow:
+        1. RenderfarmSequence attribute: \<project\>_\<render_type\>_\<category\>_\<asset\>
+    """
+    project = os.environ.get("wizard_project", "")
+    category = os.environ.get("wizard_category_name", "")
+    asset = os.environ.get("wizard_asset_name", "")
+
+    # Checking if the required environment variables are set
+    for prop in ["project", "category", "asset"]:
+        value = locals().get(prop, "")
+        if not value:
+            logger.warning(f"No '{prop}' environment variable set.")
+            return
+
+    prefs = guerilla.getpreferences()
+    if not prefs:
+        logger.error("Could not retrieve Guerilla filescene preferences.")
+        return
+
+    plug: guerilla.Plug = prefs.RenderfarmSequence
+    if not plug:
+        logger.warning("RenderfarmSequence attribute not found in preferences.")
+        return
+
+    plug.set(f"{project}_{render_type}_{category}_{asset}")
+
+
 def setup_FML():
     setup_frame_range('FML')
     setup_image_format('FML')
