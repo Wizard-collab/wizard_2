@@ -8,7 +8,7 @@ import logging
 
 # Guerilla modules
 import guerilla
-from guerilla import Document, pynode, Modifier
+from guerilla import Document, pynode, Modifier, RenderPass, LayerOut
 
 # Wizard modules
 import wizard_communicate
@@ -32,13 +32,21 @@ def setup_render_directory(stage_name, export_name):
                                                          export_name)
     if render_directory:
         render_pass_list = wizard_tools.get_all_render_passes()
-        for render_pass in render_pass_list:
-            old_file_pattern = render_pass.FileName.get()
+
+        layer_out_list = [
+            layer for layer in wizard_tools.get_all_layer_out()
+            if layer.OverrideSettings.get() == 1  # Filtering in layer out nodes
+                                                  # with OverrideSettings enabled
+        ]
+
+        for node in render_pass_list + layer_out_list:
+            node: RenderPass | LayerOut
+            old_file_pattern = node.FileName.get()
             if old_file_pattern != '':
                 file_pattern = os.path.basename(old_file_pattern)
             else:
                 file_pattern = "$L_$n_$o.$05f.$x"
-            render_pass.FileName.set(os.path.join(
+            node.FileName.set(os.path.join(
                 render_directory, file_pattern))
         return render_directory
 
