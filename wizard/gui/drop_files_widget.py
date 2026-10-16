@@ -162,7 +162,7 @@ class drop_files_button(QtWidgets.QPushButton):
         software_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select software executable", "",
                                                                  "All Files (*);;")
         if software_path:
-            self.path_lineEdit.setText(software_path.replace('\\', '/'))
+            self.new_file.emit(software_path.replace('\\', '/'))
 
 
 class drop_widget(QtWidgets.QFrame):
