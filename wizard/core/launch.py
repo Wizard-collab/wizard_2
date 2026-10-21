@@ -477,7 +477,8 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     # Merge additional environment variables
     for key, value in additionnal_env.items():
         value = os.path.expandvars(value)
-        if key in env.keys():
+        if key in env.keys() and key.lower() != "ocio":  # OCIO is a single path variable,
+                                                         # so we don't want to append to it
             env[key] = value + os.pathsep + env[key]
         else:
             env[key] = value
