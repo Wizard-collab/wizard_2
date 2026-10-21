@@ -41,15 +41,40 @@ def vdb_command(wizard_vdb_output, frange, export_dir, prepare_only=False):
     a default vdb export command.
     You can modify it from here
     Be carreful on what you are modifying'''
+    # OUTPUT
     file = f"{export_dir}/fx_export.$F4.vdb"
-    wizard_vdb_output.parm('sopoutput').set(file)
-    wizard_vdb_output.parm("trange").set('normal')
+    parm_output = wizard_vdb_output.parm('sopoutput')
+    parm_output.deleteAllKeyframes()  # Prevents any expression from overriding the constant value
+    parm_output.set(file)
+
+    # FRAME RANGE
     hou.playbar.setFrameRange(frange[0], frange[1])
-    wizard_vdb_output.parm("f1").setExpression('$FSTART')
-    wizard_vdb_output.parm("f2").setExpression('$FEND')
+    hou.setFrame(frange[0])
+
+    wizard_vdb_output.parm("trange").set('normal')
+    start, end = map(int, frange)
+    for name, value in (("f1", start), ("f2", end), ("f3", 1)):
+        parm = wizard_vdb_output.parm(name)
+        parm.deleteAllKeyframes()
+        parm.set(value)
+
+    # POST FRAME SCRIPT
     wizard_vdb_output.parm('lpostframe').set("python")
     wizard_vdb_output.parm('postframe').set(
         wizard_tools.by_frame_progress_script())
+
     if prepare_only:
         return
+
+    # LOAD FROM DISK
+    load_parm = wizard_vdb_output.parm('loadfromdisk')
+    if load_parm is not None:
+        load_parm.set(0)  # Makes sure the VDB is not loaded from disk before the export,
+                          # which would prevent the export from happening
+
+    # EXECUTING THE EXPORT
     wizard_vdb_output.parm("execute").pressButton()
+
+    # \/ not useful as houdini automatically sets the load from disk parameter to 1 after the export
+    # if load_parm is not None:
+    #     load_parm.set(1)
