@@ -104,6 +104,20 @@ def before_export_hooks(software, stage_name, string_asset, exported_string_asse
     return list(set(additionnal_objects))
 
 
+def before_render_hooks(software, stage_name, string_asset, rendered_string_asset):
+    hooks_modules = get_hooks_modules(software)
+    for module_name in hooks_modules.keys():
+        try:
+            logger.info("Executing {0} before render hook from {1}".format(module_name,
+                                                                           hooks_modules[module_name]['path']))
+            hooks_modules[module_name]['module'].before_render(
+                stage_name, string_asset, rendered_string_asset)
+        except:
+            logger.error("Can't execute module {0} from {1}, skipping".format(module_name,
+                                                                              hooks_modules[module_name]['path']))
+            logger.error(traceback.format_exc())
+
+
 def after_export_hooks(software, stage_name, export_dir, string_asset, exported_string_asset):
     hooks_modules = get_hooks_modules(software)
     for module_name in hooks_modules.keys():

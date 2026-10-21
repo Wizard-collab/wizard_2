@@ -12,6 +12,7 @@ import wizard_hooks
 
 # Guerilla modules
 from guerilla import Document, Modifier, pynode, Node, Plug
+from guerilla import LayerOut
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,12 @@ def get_all_render_passes():
     for rp in Document().children(recursive=True, type="RenderPass"):
         rp_list.append(rp)
     return rp_list
+
+def get_all_layer_out() -> list[LayerOut]:
+    layer_out_list = []
+    for layer_out in Document().children(recursive=True, type="LayerOut"):
+        layer_out_list.append(layer_out)
+    return layer_out_list
 
 
 def get_all_nodes(name=True):
