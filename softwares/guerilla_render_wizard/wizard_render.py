@@ -21,7 +21,7 @@ def __init__():
     pass
 
 
-def setup_render_directory(stage_name, export_name):
+def setup_render_directory(stage_name, export_name) -> str:
     if os.environ['wizard_stage_name'] == 'rendering':
         rendering_work_env_id = int(os.environ['wizard_work_env_id'])
     else:
@@ -51,7 +51,7 @@ def setup_render_directory(stage_name, export_name):
         return render_directory
 
 
-def setup_frame_range(render_type, frame_range=None):
+def setup_frame_range(render_type, frame_range=None) -> str:
     if not frame_range:
         frame_range = wizard_communicate.get_frame_range(
             os.environ['wizard_work_env_id'])
@@ -71,8 +71,10 @@ def setup_frame_range(render_type, frame_range=None):
             preferences_node = wizard_tools.get_node_from_name('Preferences')
             preferences_node.RenderRange.set(frames)
 
+    return frames
 
-def setup_image_format(render_type):
+
+def setup_image_format(render_type) -> tuple[int, int] | None:
     image_format = wizard_communicate.get_image_format()
     if render_type == 'LD':
         image_format = [int(image_format[0]/2), int(image_format[1]/2)]
@@ -88,6 +90,8 @@ def setup_image_format(render_type):
         Document().ProjectWidth.set(width)
         Document().ProjectHeight.set(height)
         Document().ProjectAspectRatio.set(1)
+        return (width, height)
+    return None
 
 
 def setup_renderfarm_settings(render_type: str):
