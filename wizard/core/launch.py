@@ -475,11 +475,13 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
             software_row['name']]] += os.pathsep+script_path
 
     # Merge additional environment variables
-    for key in additionnal_env.keys():
-        if key in env.keys():
-            env[key] += os.pathsep+additionnal_env[key]
+    for key, value in additionnal_env.items():
+        value = os.path.expandvars(value)
+        if key in env.keys() and key.lower() != "ocio":  # OCIO is a single path variable,
+                                                         # so we don't want to append to it
+            env[key] = value + os.pathsep + env[key]
         else:
-            env[key] = additionnal_env[key]
+            env[key] = value
 
     # Clean up PYTHONPATH by removing any 'Wizard/_internal' paths
     if 'PYTHONPATH' in env.keys():
