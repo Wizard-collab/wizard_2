@@ -248,6 +248,9 @@ class communicate_server(Thread):
         elif signal_dic['function'] == 'get_string_variant_from_work_env_id':
             returned = get_string_variant_from_work_env_id(
                 signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'get_variant_id_from_work_env_id':
+            returned = get_variant_id_from_work_env_id(
+                signal_dic['work_env_id'])
         elif signal_dic['function'] == 'get_local_path':
             returned = get_local_path()
         elif signal_dic['function'] == 'get_project_path':
@@ -287,6 +290,18 @@ def get_string_variant_from_work_env_id(work_env_id):
         ('variant', work_env_row['variant_id']))
     return string_variant
 
+def get_variant_id_from_work_env_id(work_env_id):
+    """
+    Retrieve the ID of a variant associated with a given work environment ID.
+
+    Args:
+        work_env_id (int): The ID of the work environment.
+
+    Returns:
+        int: The ID of the variant associated with the work environment.
+    """
+    work_env_row = project.get_work_env_data(work_env_id)
+    return work_env_row['variant_id']
 
 def get_file(version_id):
     """

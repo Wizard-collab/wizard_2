@@ -199,6 +199,12 @@ def get_string_variant_from_work_env_id(work_env_id):
     returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
     return returned
 
+def get_variant_id_from_work_env_id(work_env_id):
+    signal_dic = dict()
+    signal_dic['function'] = 'get_variant_id_from_work_env_id'
+    signal_dic['work_env_id'] = work_env_id
+    returned = socket_utils.send_signal(('localhost', get_port()), signal_dic)
+    return returned
 
 def get_hooks_folder():
     signal_dic = dict()
