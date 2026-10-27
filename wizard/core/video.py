@@ -34,6 +34,7 @@ import numpy as np
 import shutil
 from PIL import Image, ImageFont, ImageDraw
 import re
+import typing
 
 # Wizard modules
 from wizard.core import assets
@@ -234,7 +235,13 @@ def find_frame_number(filename):
         return 0
 
 
-def generate_thumbnail(video_path, thumbnail_path: str = None) -> str:
+THUMBNAIL_METHODS = typing.Literal[
+    "first_frame",
+    "last_frame",
+    "middle_frame"
+]
+
+def generate_thumbnail(video_path, thumbnail_path: str = None, thumbnail_method: THUMBNAIL_METHODS = "first_frame") -> str:
     """
     Generate a thumbnail image from the first frame of a video file.
 
@@ -242,7 +249,8 @@ def generate_thumbnail(video_path, thumbnail_path: str = None) -> str:
         video_path (str): The path to the video file.
         thumbnail_path (str, optional): The path to save the generated thumbnail image. 
                                          If not provided, the thumbnail will be saved in the same directory as the video file with a "_thumbnail.png" suffix.
-    
+        thumbnail_method (str, optional): The method to generate the thumbnail. Defaults to "first_frame
+                                             
     Returns:
         str: The path to the generated thumbnail image.
     """
@@ -252,7 +260,14 @@ def generate_thumbnail(video_path, thumbnail_path: str = None) -> str:
         logger.error(f"Error opening video file: {video_path}")
         return None
 
-    # Read the first frame
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if thumbnail_method == "first_frame":
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    elif thumbnail_method == "last_frame":
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count - 1)
+    elif thumbnail_method == "middle_frame":
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(frame_count / 2))
+
     ret, frame = cap.read()
     cap.release()
 

@@ -480,7 +480,9 @@ class videos_widget(QtWidgets.QWidget):
                 path_utils.copyfile(file, video_path)
 
             # Generate thumbnail
-            video.generate_thumbnail(video_path, video_thumbnail)
+            video.generate_thumbnail(video_path,
+                                     video_thumbnail,
+                                     "middle_frame")
 
         gui_server.refresh_team_ui()
 
