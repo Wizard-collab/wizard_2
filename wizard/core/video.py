@@ -232,3 +232,37 @@ def find_frame_number(filename):
     else:
         # Return None if no valid frame number is found
         return 0
+
+
+def generate_thumbnail(video_path, thumbnail_path: str = None) -> str:
+    """
+    Generate a thumbnail image from the first frame of a video file.
+
+    Args:
+        video_path (str): The path to the video file.
+        thumbnail_path (str, optional): The path to save the generated thumbnail image. 
+                                         If not provided, the thumbnail will be saved in the same directory as the video file with a "_thumbnail.png" suffix.
+    
+    Returns:
+        str: The path to the generated thumbnail image.
+    """
+    cap = cv2.VideoCapture(video_path)
+
+    if not cap.isOpened():
+        logger.error(f"Error opening video file: {video_path}")
+        return None
+
+    # Read the first frame
+    ret, frame = cap.read()
+    cap.release()
+
+    if not ret:
+        logger.error(f"Error reading frame from video file: {video_path}")
+        return None
+
+    # Generate a default thumbnail path if not provided
+    if thumbnail_path is None:
+        thumbnail_path = path_utils.splitext(video_path)[0] + "_thumbnail.png"
+
+    cv2.imwrite(thumbnail_path, frame)
+    return thumbnail_path
