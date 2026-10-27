@@ -382,6 +382,15 @@ class videos_widget(QtWidgets.QWidget):
             '"0023", "j.smith&maya", "retake eye"')
         self.buttons_layout.addWidget(self.search_bar)
 
+        self.manual_merge_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(
+            self.manual_merge_button, "Manually add a video")
+        self.manual_merge_button.setFixedSize(35, 35)
+        self.manual_merge_button.setIconSize(QtCore.QSize(25, 25))
+        self.manual_merge_button.setIcon(
+            QtGui.QIcon(ressources._tool_manually_publish_))
+        self.buttons_layout.addWidget(self.manual_merge_button)
+
         self.toggle_view_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(
             self.toggle_view_button, "Switch to list view")
