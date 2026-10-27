@@ -18,6 +18,7 @@ from wizard.core import user
 from wizard.core import project
 from wizard.core import tools
 from wizard.core import path_utils
+from wizard.core import video
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.vars import user_vars
@@ -30,6 +31,7 @@ from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import tag_label
 from wizard.gui import current_asset_viewer
+from wizard.gui import warning_tooltip
 
 logger = logging.getLogger(__name__)
 
@@ -270,6 +272,7 @@ class videos_widget(QtWidgets.QWidget):
         self.icon_view.customContextMenuRequested.connect(
             self.context_menu_requested)
 
+        self.manual_merge_button.clicked.connect(self.open_files)
         self.archive_button.clicked.connect(self.archive)
         self.folder_button.clicked.connect(self.open_folder)
         self.toggle_view_button.clicked.connect(self.toggle_view)
@@ -448,6 +451,38 @@ class videos_widget(QtWidgets.QWidget):
                 self.archive()
             elif action == comment_action:
                 self.modify_comment(pos)
+
+    def open_files(self):
+        if not self.variant_id:
+            warning_tooltip.warning_tooltip().invoke(
+                ("WARNING", "Select a stage before merging files !"))
+            return
+
+        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select files", "",
+                                                                "Video (*.mp4 *.mov *.avi);")
+        if fileList:
+            self.merge_files(fileList)
+
+    def merge_files(self, files=[]):
+        if not self.variant_id:
+                    warning_tooltip.warning_tooltip().invoke(
+                        ("WARNING", "Select a stage before merging files !"))
+                    return
+
+        for file in files:
+            video_id = assets.add_video(self.variant_id)
+            video_row: dict = project.get_video_data(video_id)
+            video_path = video_row.get("file_path")
+            video_thumbnail = video_row.get("thumbnail_path")
+
+            # Copy video file
+            if path_utils.isfile(file):
+                path_utils.copyfile(file, video_path)
+
+            # Generate thumbnail
+            video.generate_thumbnail(video_path, video_thumbnail)
+
+        gui_server.refresh_team_ui()
 
     def modify_comment(self, pos=None):
         items = self.get_selection()
