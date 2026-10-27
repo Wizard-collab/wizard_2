@@ -281,3 +281,36 @@ def generate_thumbnail(video_path, thumbnail_path: str = None, thumbnail_method:
 
     cv2.imwrite(thumbnail_path, frame)
     return thumbnail_path
+
+
+def import_video(variant_id, video_path, comment="", analyse_comment=None):
+    """
+    Imports a video file into the project, generates necessary directories and files, 
+    and handles associated events, rewards, and tags.
+
+    Args:
+        variant_id (str): The identifier for the video variant.
+        video_path (str): The file path of the video to be imported.
+        comment (str, optional): A comment associated with the video. Defaults to an empty string.
+        analyse_comment (bool, optional): If True, analyzes the comment for penalties. Defaults to None.
+
+    Returns:
+        int or None: The ID of the newly imported video if successful, otherwise None.        
+    """
+
+    video_id = assets.add_video(variant_id, comment, analyse_comment)
+    if not video_id:
+        return  # Exit if the video creation fails
+
+    video_row: dict = project.get_video_data(video_id)
+    if not video_row:
+        return  # Exit if the video data retrieval fails
+
+    dest_path, thumbnail_path = video_row['file_path'], video_row['thumbnail_path']
+
+    if path_utils.isfile(video_path):
+        path_utils.copyfile(video_path, dest_path)
+
+    generate_thumbnail(dest_path, thumbnail_path, "middle_frame")
+
+    return video_id

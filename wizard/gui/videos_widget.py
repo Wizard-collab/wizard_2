@@ -470,19 +470,9 @@ class videos_widget(QtWidgets.QWidget):
                     return
 
         for file in files:
-            video_id = assets.add_video(self.variant_id)
-            video_row: dict = project.get_video_data(video_id)
-            video_path = video_row.get("file_path")
-            video_thumbnail = video_row.get("thumbnail_path")
-
-            # Copy video file
-            if path_utils.isfile(file):
-                path_utils.copyfile(file, video_path)
-
-            # Generate thumbnail
-            video.generate_thumbnail(video_path,
-                                     video_thumbnail,
-                                     "middle_frame")
+            video.import_video(
+                variant_id=self.variant_id,
+                video_path=file)
 
         gui_server.refresh_team_ui()
 
