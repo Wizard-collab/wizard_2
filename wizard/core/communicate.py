@@ -257,6 +257,10 @@ class communicate_server(Thread):
             returned = get_project_path()
         elif signal_dic['function'] == 'request_video':
             returned = request_video(signal_dic['work_env_id'])
+        elif signal_dic['function'] == 'import_video':
+            returned = video.import_video(signal_dic['variant_id'],
+                                          signal_dic['video_path'],
+                                          signal_dic['comment'])
         elif signal_dic['function'] == 'get_export_name_from_reference_namespace':
             returned = get_export_name_from_reference_namespace(
                 signal_dic['reference_namespace'], signal_dic['work_env_id'])
