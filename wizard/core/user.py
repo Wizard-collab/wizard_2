@@ -1352,3 +1352,56 @@ def set_software_env(software: str, env_dic: dict):
 
     with open(env_path, 'w') as f:
         json.dump(env_dic, f)
+
+
+def get_software_scripts(software: str) -> list:
+    """
+    Retrieves the script paths for a specified software for the current user.
+
+    This function checks if the software exists in the user's preferences and returns
+    its script paths. If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to retrieve.
+
+    Returns:
+        list: A list containing the script paths of the specified software if found, otherwise None.
+    """
+    folder_path = get_user_software(software)
+
+    if not folder_path:
+        return
+
+    scripts_path = os.path.join(folder_path, 'scripts.json')
+
+    if not path_utils.isfile(scripts_path):
+        logger.warning(f"{software} scripts.json doesn't exists in user preferences")
+        return
+
+    return json.load(open(scripts_path, 'r'))
+
+
+def set_software_scripts(software: str, scripts_list: list):
+    """
+    Sets the script paths for a specified software for the current user.
+
+    This function writes the provided script paths to a 'scripts.json' file.
+    If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to set.
+        scripts_list (list): A list containing the script paths to set.
+    
+    Returns:
+        None
+    """
+    folder_path = get_user_software(software)
+
+    if not folder_path:
+        return
+
+    scripts_path = os.path.join(folder_path, 'scripts.json')
+    path_utils.makedirs(os.path.dirname(scripts_path))
+
+    with open(scripts_path, 'w') as f:
+        json.dump(scripts_list, f)
