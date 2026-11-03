@@ -5,6 +5,7 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
+import json
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -13,6 +14,7 @@ from wizard.gui import custom_tab_widget
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.vars import softwares_vars
 from wizard.core import application
 from wizard.core import user
 from wizard.core import repository
@@ -774,6 +776,7 @@ class user_softwares_widget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(user_softwares_widget, self).__init__(parent)
         self.build_ui()
+        self.connect_functions()
 
     def build_ui(self):
         self.main_layout = QtWidgets.QVBoxLayout()
@@ -798,11 +801,11 @@ class user_softwares_widget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.scrollArea)
 
-        self.software_comboBox = QtWidgets.QComboBox()
-        self.software_comboBox.setObjectName(u"software_comboBox")
-        self.software_comboBox.setPlaceholderText(u"Software")
+        self.softwares_comboBox = QtWidgets.QComboBox()
+        self.softwares_comboBox.setObjectName(u"software_comboBox")
+        self.softwares_comboBox.setPlaceholderText(u"Software")
 
-        self.scrollArea_layout.addWidget(self.software_comboBox)
+        self.scrollArea_layout.addWidget(self.softwares_comboBox)
 
         self.main_layout.addWidget(gui_utils.separator())
 
@@ -833,3 +836,42 @@ class user_softwares_widget(QtWidgets.QWidget):
         self.apply_button.setDefault(True)
         self.apply_button.setAutoDefault(True)
         self.buttons_layout.addWidget(self.apply_button)
+
+    def fill_softwares(self):
+        self.softwares_comboBox.clear()
+        for software in softwares_vars._softwares_list_:
+            icon = ressources._softwares_icons_dic_[software]
+            self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
+
+    def showEvent(self, event):
+        self.fill_softwares()
+
+    def refresh(self):
+        if self.isVisible():
+            current_software = self.softwares_comboBox.currentText()
+            if current_software:
+                env = user.get_software_env(current_software)
+                if not env:
+                    env = {}
+
+                self.env_lineEdit.clear()
+                for key, value in env.items():
+                    self.env_lineEdit.append(f"{key}={value}")
+
+    def apply(self):
+        current_software = self.softwares_comboBox.currentText()
+        if current_software:
+            env_text = self.env_lineEdit.toPlainText()
+            env_dict = {}
+            for line in env_text.splitlines():
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    env_dict[key.strip()] = value.strip()
+
+            user.set_software_env(current_software, env_dict)
+            logger.info(f"Environment variables for {current_software} updated: {env_dict}")
+
+    def connect_functions(self):
+        self.softwares_comboBox.currentTextChanged.connect(self.refresh)
+        pass
+        self.apply_button.clicked.connect(self.apply)
