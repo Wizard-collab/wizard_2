@@ -820,7 +820,21 @@ class user_softwares_widget(QtWidgets.QWidget):
         self.env_lineEdit.setPlaceholderText(u"VARIABLE=%ANOTHER_VARIABLE%;path/to/folder")
 
         self.scrollArea_layout.addWidget(self.env_lineEdit)
-        
+
+        self.main_layout.addWidget(gui_utils.separator())
+
+        self.script_label = QtWidgets.QLabel()
+        self.script_label.setObjectName(u"script_label")
+        self.script_label.setText(u"Additionnal script paths")
+
+        self.scrollArea_layout.addWidget(self.script_label)
+
+        self.script_textEdit = QtWidgets.QTextEdit()
+        self.script_textEdit.setObjectName(u"script_textEdit")
+        self.script_textEdit.setPlaceholderText(u"path/to/script.py\nanother_path/to/another_script.py")
+
+        self.scrollArea_layout.addWidget(self.script_textEdit)
+
         self.buttons_widget = QtWidgets.QWidget()
         self.buttons_layout = QtWidgets.QHBoxLayout()
         self.buttons_layout.setContentsMargins(0, 0, 0, 0)
@@ -858,6 +872,14 @@ class user_softwares_widget(QtWidgets.QWidget):
                 for key, value in env.items():
                     self.env_lineEdit.append(f"{key}={value}")
 
+                scripts = user.get_software_scripts(current_software)
+                if not scripts:
+                    scripts = []
+
+                self.script_textEdit.clear()
+                for script in scripts:
+                    self.script_textEdit.append(script)
+
     def apply(self):
         current_software = self.softwares_comboBox.currentText()
         if current_software:
@@ -870,6 +892,11 @@ class user_softwares_widget(QtWidgets.QWidget):
 
             user.set_software_env(current_software, env_dict)
             logger.info(f"Environment variables for {current_software} updated: {env_dict}")
+
+            scripts_text = self.script_textEdit.toPlainText()
+            scripts_list = [line.strip() for line in scripts_text.splitlines() if line.strip()]
+            user.set_software_scripts(current_software, scripts_list)
+            logger.info(f"Scripts for {current_software} updated: {scripts_list}")
 
     def connect_functions(self):
         self.softwares_comboBox.currentTextChanged.connect(self.refresh)
