@@ -33,6 +33,7 @@ class user_preferences_widget(QtWidgets.QWidget):
 
         self.general_widget = general_widget()
         self.user_account_widget = user_account_widget()
+        self.instance_widget = user_softwares_widget()
 
         self.build_ui()
 
@@ -69,6 +70,8 @@ class user_preferences_widget(QtWidgets.QWidget):
             self.general_widget, 'General', QtGui.QIcon(ressources._settings_icon_))
         self.account_tab_index = self.tabs_widget.addTab(
             self.user_account_widget, 'Account', QtGui.QIcon(ressources._user_icon_))
+        self.instance_tab_index = self.tabs_widget.addTab(
+            self.instance_widget, 'Instance', QtGui.QIcon(ressources._sandbox_icon_))
 
 
 class general_widget(QtWidgets.QWidget):
@@ -764,3 +767,69 @@ class user_account_widget(QtWidgets.QWidget):
 
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+
+
+class user_softwares_widget(QtWidgets.QWidget):
+    
+    def __init__(self, parent=None):
+        super(user_softwares_widget, self).__init__(parent)
+        self.build_ui()
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+        self.setLayout(self.main_layout)
+
+        self.scrollArea = QtWidgets.QScrollArea()
+        self.scrollBar = self.scrollArea.verticalScrollBar()
+
+        self.scrollArea_widget = QtWidgets.QWidget()
+        self.scrollArea_widget.setObjectName('transparent_widget')
+        self.scrollArea_layout = QtWidgets.QVBoxLayout()
+        self.scrollArea_layout.setContentsMargins(24, 24, 24, 24)
+        self.scrollArea_layout.setSpacing(12)
+        self.scrollArea_widget.setLayout(self.scrollArea_layout)
+
+        self.scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.scrollArea_widget)
+
+        self.main_layout.addWidget(self.scrollArea)
+
+        self.software_comboBox = QtWidgets.QComboBox()
+        self.software_comboBox.setObjectName(u"software_comboBox")
+        self.software_comboBox.setPlaceholderText(u"Software")
+
+        self.scrollArea_layout.addWidget(self.software_comboBox)
+
+        self.main_layout.addWidget(gui_utils.separator())
+
+        self.env_label = QtWidgets.QLabel()
+        self.env_label.setObjectName(u"env_label")
+        self.env_label.setText(u"Additionnal environment variables")
+
+        self.scrollArea_layout.addWidget(self.env_label)
+
+        self.env_lineEdit = QtWidgets.QTextEdit()
+        self.env_lineEdit.setObjectName(u"env_lineEdit")
+        self.env_lineEdit.setPlaceholderText(u"VARIABLE=%ANOTHER_VARIABLE%;path/to/folder")
+
+        self.scrollArea_layout.addWidget(self.env_lineEdit)
+        
+        self.buttons_widget = QtWidgets.QWidget()
+        self.buttons_layout = QtWidgets.QHBoxLayout()
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
+        self.buttons_layout.setSpacing(6)
+        self.buttons_widget.setLayout(self.buttons_layout)
+        self.scrollArea_layout.addWidget(self.buttons_widget)
+
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
+        self.apply_button = QtWidgets.QPushButton('Apply')
+        self.apply_button.setObjectName('blue_button')
+        self.apply_button.setDefault(True)
+        self.apply_button.setAutoDefault(True)
+        self.buttons_layout.addWidget(self.apply_button)
