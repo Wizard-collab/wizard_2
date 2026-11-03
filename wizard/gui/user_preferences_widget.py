@@ -817,7 +817,7 @@ class user_softwares_widget(QtWidgets.QWidget):
 
         self.env_lineEdit = QtWidgets.QTextEdit()
         self.env_lineEdit.setObjectName(u"env_lineEdit")
-        self.env_lineEdit.setPlaceholderText(u"VARIABLE=%ANOTHER_VARIABLE%;path/to/folder")
+        self.env_lineEdit.setPlaceholderText("VARIABLE=%APPDATA%/some/folder;path/to/another/folder\nANOTHER_VARIABLE=some_value\n#COMMENTED_VARIABLE=some_value (this line will be ignored)")
 
         self.scrollArea_layout.addWidget(self.env_lineEdit)
 
@@ -831,7 +831,7 @@ class user_softwares_widget(QtWidgets.QWidget):
 
         self.script_textEdit = QtWidgets.QTextEdit()
         self.script_textEdit.setObjectName(u"script_textEdit")
-        self.script_textEdit.setPlaceholderText(u"path/to/script.py\nanother_path/to/another_script.py")
+        self.script_textEdit.setPlaceholderText("path/to/script.py\nanother_path/to/another_script.py")
 
         self.scrollArea_layout.addWidget(self.script_textEdit)
 
