@@ -467,6 +467,13 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     if software_row['additionnal_env']:
         additionnal_env = json.loads(software_row['additionnal_env'])
 
+    # Merge user-specific environment variables
+    additionnal_env_user = user.get_software_env(software_row['name'])
+    if additionnal_env_user is not None:
+        for key, value in additionnal_env_user.items():
+            if not key.startswith("#"):
+                additionnal_env[key] = value
+
     # Handle additional script paths
     if type(additionnal_script_paths) == str:
         additionnal_script_paths = additionnal_script_paths.split('\n')
