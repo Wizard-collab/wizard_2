@@ -24,6 +24,9 @@ class custom_handler(QtCore.QObject, logging.Handler):
             self.setFormatter(logging.Formatter('%(message)s'))
 
     def emit(self, record):
+        if getattr(record, 'hide_from_status', False):
+            return
+
         try:
             self.log_record.emit((record.levelname, self.format(record)))
         except RuntimeError:
