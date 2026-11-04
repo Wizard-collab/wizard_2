@@ -463,13 +463,27 @@ def build_env(work_env_id, software_row, version_id, mode='gui'):
     if software_row['additionnal_scripts']:
         additionnal_script_paths = json.loads(
             software_row['additionnal_scripts'])
+    if type(additionnal_script_paths) == str:
+        additionnal_script_paths = additionnal_script_paths.split('\n')
     additionnal_env = dict()
+
     if software_row['additionnal_env']:
         additionnal_env = json.loads(software_row['additionnal_env'])
 
+    # Merge user-specific environment variables and scripts
+    additionnal_env_user = user.get_software_env(software_row['name'])
+    if additionnal_env_user is not None:
+        for key, value in additionnal_env_user.items():
+            if not key.startswith("#"):
+                additionnal_env[key] = value
+
+    additionnal_script_paths_user = user.get_software_scripts(software_row['name'])
+    if additionnal_script_paths_user is not None:
+        for script in additionnal_script_paths_user:
+            if not script.startswith("#"):
+                additionnal_script_paths.append(script)
+
     # Handle additional script paths
-    if type(additionnal_script_paths) == str:
-        additionnal_script_paths = additionnal_script_paths.split('\n')
     for script_path in additionnal_script_paths:
         env[softwares_vars._script_env_dic_[
             software_row['name']]] += os.pathsep+script_path

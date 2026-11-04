@@ -345,6 +345,40 @@ class QRightClickButton(QtWidgets.QPushButton):
             self.leftClicked.emit(1)
         super().mouseReleaseEvent(event)
 
+class QMultilineTextEdit(QtWidgets.QTextEdit):
+    def __init__(self, parent=None):
+        super(QMultilineTextEdit, self).__init__(parent)
+        self._placeholder = ''
+
+    def setMultilinePlaceholderText(self, text):
+        self._placeholder = text
+        self.update()
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+
+        if self.toPlainText():
+            return
+
+        painter = QtGui.QPainter(self.viewport())
+        try:
+            painter.setPen(
+                self.palette().color(QtGui.QPalette.ColorRole.PlaceholderText)
+            )
+
+            margin = self.document().documentMargin()
+            rect = QtCore.QRectF(self.viewport().rect()).adjusted(
+                margin, margin, -margin, -margin
+            )
+
+            painter.drawText(
+                rect,
+                QtCore.Qt.AlignmentFlag.AlignTop
+                | QtCore.Qt.AlignmentFlag.AlignLeft,
+                self._placeholder,
+            )
+        finally:
+            painter.end()
 
 class password_lineEdit(QtWidgets.QFrame):
     def __init__(self, parent=None):

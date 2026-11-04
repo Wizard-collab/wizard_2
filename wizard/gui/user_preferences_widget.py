@@ -5,6 +5,7 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
+import json
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -13,6 +14,7 @@ from wizard.gui import custom_tab_widget
 
 # Wizard modules
 from wizard.vars import ressources
+from wizard.vars import softwares_vars
 from wizard.core import application
 from wizard.core import user
 from wizard.core import repository
@@ -33,6 +35,7 @@ class user_preferences_widget(QtWidgets.QWidget):
 
         self.general_widget = general_widget()
         self.user_account_widget = user_account_widget()
+        self.instance_widget = user_softwares_widget()
 
         self.build_ui()
 
@@ -69,6 +72,8 @@ class user_preferences_widget(QtWidgets.QWidget):
             self.general_widget, 'General', QtGui.QIcon(ressources._settings_icon_))
         self.account_tab_index = self.tabs_widget.addTab(
             self.user_account_widget, 'Account', QtGui.QIcon(ressources._user_icon_))
+        self.instance_tab_index = self.tabs_widget.addTab(
+            self.instance_widget, 'Softwares', QtGui.QIcon(ressources._plug_icon_))
 
 
 class general_widget(QtWidgets.QWidget):
@@ -764,3 +769,158 @@ class user_account_widget(QtWidgets.QWidget):
 
         self.scrollArea_layout.addSpacerItem(QtWidgets.QSpacerItem(
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+
+
+class user_softwares_widget(QtWidgets.QWidget):
+    
+    def __init__(self, parent=None):
+        super(user_softwares_widget, self).__init__(parent)
+        self.build_ui()
+        self.connect_functions()
+
+    def build_ui(self):
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+        self.setLayout(self.main_layout)
+
+        self.scrollArea = QtWidgets.QScrollArea()
+        self.scrollBar = self.scrollArea.verticalScrollBar()
+
+        self.scrollArea_widget = QtWidgets.QWidget()
+        self.scrollArea_widget.setObjectName('transparent_widget')
+        self.scrollArea_layout = QtWidgets.QVBoxLayout()
+        self.scrollArea_layout.setContentsMargins(24, 24, 24, 24)
+        self.scrollArea_layout.setSpacing(12)
+        self.scrollArea_widget.setLayout(self.scrollArea_layout)
+
+        self.scrollArea.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.scrollArea_widget)
+
+        self.main_layout.addWidget(self.scrollArea)
+
+        self.softwares_comboBox = QtWidgets.QComboBox()
+        self.softwares_comboBox.setObjectName(u"software_comboBox")
+        self.softwares_comboBox.setPlaceholderText(u"Software")
+
+        self.scrollArea_layout.addWidget(self.softwares_comboBox)
+
+        self.main_layout.addWidget(gui_utils.separator())
+
+        self.env_label = QtWidgets.QLabel()
+        self.env_label.setObjectName(u"env_label")
+        self.env_label.setText(u"Additionnal environment variables")
+
+        self.scrollArea_layout.addWidget(self.env_label)
+
+        self.env_lineEdit = gui_utils.QMultilineTextEdit()
+        self.env_lineEdit.setObjectName(u"env_lineEdit")
+        self.env_lineEdit.setMultilinePlaceholderText("VARIABLE=%APPDATA%/some/folder;path/to/another/folder\nANOTHER_VARIABLE=some_value\n#COMMENTED_VARIABLE=some_value (this line will be ignored)")
+
+        self.scrollArea_layout.addWidget(self.env_lineEdit)
+
+        self.main_layout.addWidget(gui_utils.separator())
+
+        self.script_label = QtWidgets.QLabel()
+        self.script_label.setObjectName(u"script_label")
+        self.script_label.setText(u"Additionnal script paths")
+
+        self.scrollArea_layout.addWidget(self.script_label)
+
+        self.script_textEdit = gui_utils.QMultilineTextEdit()
+        self.script_textEdit.setObjectName(u"script_textEdit")
+        self.script_textEdit.setMultilinePlaceholderText("path/to/script.py\nanother_path/to/another_script.py")
+
+        self.scrollArea_layout.addWidget(self.script_textEdit)
+
+        self.buttons_widget = QtWidgets.QWidget()
+        self.buttons_layout = QtWidgets.QHBoxLayout()
+        self.buttons_layout.setContentsMargins(0, 0, 0, 0)
+        self.buttons_layout.setSpacing(6)
+        self.buttons_widget.setLayout(self.buttons_layout)
+        self.scrollArea_layout.addWidget(self.buttons_widget)
+
+        self.buttons_layout.addSpacerItem(QtWidgets.QSpacerItem(
+            0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
+
+        self.apply_button = QtWidgets.QPushButton('Apply')
+        self.apply_button.setObjectName('blue_button')
+        self.apply_button.setDefault(True)
+        self.apply_button.setAutoDefault(True)
+        self.buttons_layout.addWidget(self.apply_button)
+
+    def fill_softwares(self):
+        self.softwares_comboBox.clear()
+        software_list = sorted(softwares_vars._softwares_list_)
+        for i, software in enumerate(software_list):
+            icon = ressources._softwares_icons_dic_[software]
+            self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
+            if i == 0:
+                self.softwares_comboBox.setCurrentIndex(0)
+
+    def showEvent(self, event):
+        self.fill_softwares()
+
+    def refresh(self):
+        if self.isVisible():
+            current_software = self.softwares_comboBox.currentText()
+            if current_software:
+                env = user.get_software_env(current_software)
+                if not env:
+                    env = {}
+
+                self.env_lineEdit.clear()
+                for key, value in env.items():
+                    self.env_lineEdit.append(f"{key}={value}")
+
+                scripts = user.get_software_scripts(current_software)
+                if not scripts:
+                    scripts = []
+
+                self.script_textEdit.clear()
+                for script in scripts:
+                    self.script_textEdit.append(script)
+
+    def save_env(self, software) -> dict | None:
+        """ Saves the environment variables for the given software. Returns env_dict if successful, None otherwise. """
+        env_text = self.env_lineEdit.toPlainText()
+        env_dict = {}
+        for i, line in enumerate(env_text.splitlines()):
+            if '=' in line:
+                key, value = line.split('=', 1)
+                env_dict[key.strip()] = value.strip()
+            else:
+                logger.error(f"Invalid environment variable format in line {i + 1}: '{line}'. Each line must be in the format 'KEY=VALUE'.")
+                return None
+
+        user.set_software_env(software, env_dict)
+        return env_dict
+
+    def save_scripts(self, software) -> list[str]:
+        """ Saves the script paths for the given software. Returns scripts_list if successful, empty list otherwise. """
+        scripts_text = self.script_textEdit.toPlainText()
+        for i, line in enumerate(scripts_text.splitlines()):
+            if not line.strip():
+                logger.error(f"Empty script line {i + 1}.")
+                return []
+        scripts_list = [line.strip() for line in scripts_text.splitlines() if line.strip()]
+        user.set_software_scripts(software, scripts_list)
+        return scripts_list
+
+    def apply(self):
+        current_software = self.softwares_comboBox.currentText()
+        if current_software:
+            env_dict = self.save_env(current_software)
+            if env_dict:
+                logger.info(f"Environment variables for {current_software} updated: {env_dict}")
+
+            scripts_list = self.save_scripts(current_software)
+            if scripts_list:
+                logger.info(f"Scripts for {current_software} updated: {scripts_list}")
+
+    def connect_functions(self):
+        self.softwares_comboBox.currentTextChanged.connect(self.refresh)
+        pass
+        self.apply_button.clicked.connect(self.apply)

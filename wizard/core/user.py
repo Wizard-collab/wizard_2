@@ -50,10 +50,12 @@ import yaml
 import ast
 import importlib
 import sys
+import os
+import json
 import logging
 
 # Wizard modules
-from wizard.vars import user_vars
+from wizard.vars import softwares_vars, user_vars
 from wizard.core import tools
 from wizard.core import path_utils
 from wizard.core import environment
@@ -1275,3 +1277,133 @@ def get_project():
     environment.build_project_env(project_name=project_row['project_name'],
                                   project_path=project_row['project_path'])
     return 1
+
+
+def get_user_software(software: str) -> str:
+    """
+    Retrieves the path of a specified software for the current user.
+
+    This function checks if the software exists in the user's preferences and returns
+    its path. If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to retrieve.
+
+    Returns:
+        str: The path of the specified software if found, otherwise None.
+    """
+    if software not in softwares_vars._softwares_list_:
+        logger.error(f"{software} doesn't exists in user preferences")
+        return
+
+    path = os.path.join(user_vars._user_path_, software)
+
+    return path
+
+
+def get_software_env(software: str) -> dict:
+    """
+    Retrieves the environment variables for a specified software for the current user.
+
+    This function checks if the software exists in the user's preferences and returns
+    its environment variables. If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to retrieve.
+
+    Returns:
+        dict: A dictionary containing the environment variables of the specified software if found, otherwise None.
+    """
+    folder_path = get_user_software(software)
+
+    if not folder_path:
+        return
+
+    env_path = os.path.join(folder_path, 'env.json')
+
+    if not path_utils.isfile(env_path):
+        logger.warning(f"{software} env.json doesn't exists in user preferences",
+                       extra={'hide_from_status': True})
+        return
+
+    return json.load(open(env_path, 'r'))
+
+
+def set_software_env(software: str, env_dic: dict):
+    """
+    Sets the environment variables for a specified software for the current user.
+
+    This function writes the provided environment variables to an 'env.json' file.
+    If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to set.
+        env_dic (dict): A dictionary containing the environment variables to set.
+
+    Returns:
+        None
+    """
+    folder_path = get_user_software(software)
+
+    if not folder_path:
+        return
+
+    env_path = os.path.join(folder_path, 'env.json')
+    path_utils.makedirs(os.path.dirname(env_path))
+
+    with open(env_path, 'w') as f:
+        json.dump(env_dic, f)
+
+
+def get_software_scripts(software: str) -> list:
+    """
+    Retrieves the script paths for a specified software for the current user.
+
+    This function checks if the software exists in the user's preferences and returns
+    its script paths. If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to retrieve.
+
+    Returns:
+        list: A list containing the script paths of the specified software if found, otherwise None.
+    """
+    folder_path = get_user_software(software)
+
+    if not folder_path:
+        return
+
+    scripts_path = os.path.join(folder_path, 'scripts.json')
+
+    if not path_utils.isfile(scripts_path):
+        logger.warning(f"{software} scripts.json doesn't exists in user preferences",
+                       extra={'hide_from_status': True})
+        return
+
+    return json.load(open(scripts_path, 'r'))
+
+
+def set_software_scripts(software: str, scripts_list: list):
+    """
+    Sets the script paths for a specified software for the current user.
+
+    This function writes the provided script paths to a 'scripts.json' file.
+    If the software is not found, it logs an error message.
+
+    Args:
+        software (str): The name of the software to set.
+        scripts_list (list): A list containing the script paths to set.
+    
+    Returns:
+        None
+    """
+    folder_path = get_user_software(software)
+
+    if not folder_path:
+        return
+
+    scripts_path = os.path.join(folder_path, 'scripts.json')
+    path_utils.makedirs(os.path.dirname(scripts_path))
+
+    with open(scripts_path, 'w') as f:
+        json.dump(scripts_list, f)
