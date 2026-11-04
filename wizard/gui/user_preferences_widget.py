@@ -880,23 +880,42 @@ class user_softwares_widget(QtWidgets.QWidget):
                 for script in scripts:
                     self.script_textEdit.append(script)
 
+    def save_env(self, software) -> dict | None:
+        """ Saves the environment variables for the given software. Returns env_dict if successful, None otherwise. """
+        env_text = self.env_lineEdit.toPlainText()
+        env_dict = {}
+        for i, line in enumerate(env_text.splitlines()):
+            if '=' in line:
+                key, value = line.split('=', 1)
+                env_dict[key.strip()] = value.strip()
+            else:
+                logger.error(f"Invalid environment variable format in line {i + 1}: '{line}'. Each line must be in the format 'KEY=VALUE'.")
+                return None
+
+        user.set_software_env(software, env_dict)
+        return env_dict
+
+    def save_scripts(self, software) -> list[str]:
+        """ Saves the script paths for the given software. Returns scripts_list if successful, empty list otherwise. """
+        scripts_text = self.script_textEdit.toPlainText()
+        for i, line in enumerate(scripts_text.splitlines()):
+            if not line.strip():
+                logger.error(f"Empty script line {i + 1}.")
+                return []
+        scripts_list = [line.strip() for line in scripts_text.splitlines() if line.strip()]
+        user.set_software_scripts(software, scripts_list)
+        return scripts_list
+
     def apply(self):
         current_software = self.softwares_comboBox.currentText()
         if current_software:
-            env_text = self.env_lineEdit.toPlainText()
-            env_dict = {}
-            for line in env_text.splitlines():
-                if '=' in line:
-                    key, value = line.split('=', 1)
-                    env_dict[key.strip()] = value.strip()
+            env_dict = self.save_env(current_software)
+            if env_dict:
+                logger.info(f"Environment variables for {current_software} updated: {env_dict}")
 
-            user.set_software_env(current_software, env_dict)
-            logger.info(f"Environment variables for {current_software} updated: {env_dict}")
-
-            scripts_text = self.script_textEdit.toPlainText()
-            scripts_list = [line.strip() for line in scripts_text.splitlines() if line.strip()]
-            user.set_software_scripts(current_software, scripts_list)
-            logger.info(f"Scripts for {current_software} updated: {scripts_list}")
+            scripts_list = self.save_scripts(current_software)
+            if scripts_list:
+                logger.info(f"Scripts for {current_software} updated: {scripts_list}")
 
     def connect_functions(self):
         self.softwares_comboBox.currentTextChanged.connect(self.refresh)
