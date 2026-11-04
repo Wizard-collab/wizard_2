@@ -1322,7 +1322,8 @@ def get_software_env(software: str) -> dict:
     env_path = os.path.join(folder_path, 'env.json')
 
     if not path_utils.isfile(env_path):
-        logger.warning(f"{software} env.json doesn't exists in user preferences")
+        logger.warning(f"{software} env.json doesn't exists in user preferences",
+                       extra={'hide_from_status': True})
         return
 
     return json.load(open(env_path, 'r'))
@@ -1375,7 +1376,8 @@ def get_software_scripts(software: str) -> list:
     scripts_path = os.path.join(folder_path, 'scripts.json')
 
     if not path_utils.isfile(scripts_path):
-        logger.warning(f"{software} scripts.json doesn't exists in user preferences")
+        logger.warning(f"{software} scripts.json doesn't exists in user preferences",
+                       extra={'hide_from_status': True})
         return
 
     return json.load(open(scripts_path, 'r'))
