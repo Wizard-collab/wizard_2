@@ -73,7 +73,7 @@ class user_preferences_widget(QtWidgets.QWidget):
         self.account_tab_index = self.tabs_widget.addTab(
             self.user_account_widget, 'Account', QtGui.QIcon(ressources._user_icon_))
         self.instance_tab_index = self.tabs_widget.addTab(
-            self.instance_widget, 'Softwares', QtGui.QIcon(ressources._sandbox_icon_))
+            self.instance_widget, 'Softwares', QtGui.QIcon(ressources._plug_icon_))
 
 
 class general_widget(QtWidgets.QWidget):
