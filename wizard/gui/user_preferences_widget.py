@@ -853,9 +853,12 @@ class user_softwares_widget(QtWidgets.QWidget):
 
     def fill_softwares(self):
         self.softwares_comboBox.clear()
-        for software in softwares_vars._softwares_list_:
+        software_list = sorted(softwares_vars._softwares_list_)
+        for i, software in enumerate(software_list):
             icon = ressources._softwares_icons_dic_[software]
             self.softwares_comboBox.addItem(QtGui.QIcon(icon), software)
+            if i == 0:
+                self.softwares_comboBox.setCurrentIndex(0)
 
     def showEvent(self, event):
         self.fill_softwares()
