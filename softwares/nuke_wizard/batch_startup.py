@@ -35,9 +35,11 @@ def main():
     comment = ''
     if 'comment' in settings_dic.keys():
         comment = settings_dic['comment']
-    if 'refresh_assets' in settings_dic.keys():
-        if settings_dic['refresh_assets']:
-            wizard_plugin.update_all()
+    # Import / update all references before the action when requested
+    if settings_dic.get('import_all'):
+        wizard_plugin.reference_all()
+    if settings_dic.get('update_all'):
+        wizard_plugin.update_all()
     if 'batch_type' not in settings_dic.keys():
         logger.error("Batch type setting not found")
         return
@@ -52,6 +54,8 @@ def main():
         wizard_video.create_video(settings_dic['frange'], comment=comment)
     if settings_dic['batch_type'] == 'import_update_and_save':
         wizard_plugin.reference_and_update_all()
+        wizard_plugin.save_increment(comment=comment)
+    if settings_dic['batch_type'] == 'save':
         wizard_plugin.save_increment(comment=comment)
     if settings_dic['batch_type'] == 'export':
         if 'frange' not in settings_dic.keys():

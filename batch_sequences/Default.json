@@ -1,0 +1,25 @@
+{
+  "name": "Default",
+  "blocks": [
+    {
+      "type": "stage_selection",
+      "data": {
+        "filter": ""
+      }
+    },
+    {
+      "type": "comment",
+      "data": {
+        "comment": ""
+      }
+    },
+    {
+      "type": "import_and_update_all",
+      "data": {}
+    },
+    {
+      "type": "open_and_save",
+      "data": {}
+    }
+  ]
+}
