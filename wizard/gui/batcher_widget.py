@@ -78,6 +78,7 @@ class batcher_widget(QtWidgets.QWidget):
 
         self.build_ui()
         self.connect_functions()
+        self.populate_blocks_library()
 
         # Load the sequences saved in the project batch_sequences folder
         self.load_sequences()
@@ -128,16 +129,6 @@ class batcher_widget(QtWidgets.QWidget):
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding,
             QtWidgets.QSizePolicy.Policy.Fixed))
 
-        self.add_block_button = QtWidgets.QPushButton("＋ Add block")
-        self.add_block_button.setObjectName('blue_button')
-        self.header_layout.addWidget(self.add_block_button)
-
-        self.new_sequence_button = QtWidgets.QPushButton("New")
-        self.header_layout.addWidget(self.new_sequence_button)
-
-        self.delete_sequence_button = QtWidgets.QPushButton("Delete")
-        self.header_layout.addWidget(self.delete_sequence_button)
-
         self.header_widget.setFixedHeight(40)
         self.main_layout.addWidget(self.header_widget)
 
@@ -161,6 +152,23 @@ class batcher_widget(QtWidgets.QWidget):
 
         self.splitter.addWidget(self.library_widget)
 
+        # --- Blocks library ---
+        self.blocks_library_widget = QtWidgets.QWidget()
+        self.blocks_library_widget.setObjectName('round_frame')
+        self.blocks_library_layout = QtWidgets.QVBoxLayout()
+        self.blocks_library_layout.setContentsMargins(8, 8, 8, 8)
+        self.blocks_library_layout.setSpacing(6)
+        self.blocks_library_widget.setLayout(self.blocks_library_layout)
+
+        self.blocks_library_title = QtWidgets.QLabel("Blocks library")
+        self.blocks_library_title.setStyleSheet("font-weight: bold;")
+        self.blocks_library_layout.addWidget(self.blocks_library_title)
+
+        self.blocks_list = QtWidgets.QListWidget()
+        self.blocks_library_layout.addWidget(self.blocks_list)
+
+        self.splitter.addWidget(self.blocks_library_widget)
+
         # --- Blocks editor ---
         self.blocks_scrollArea = QtWidgets.QScrollArea()
         self.blocks_scrollBar = self.blocks_scrollArea.verticalScrollBar()
@@ -176,16 +184,36 @@ class batcher_widget(QtWidgets.QWidget):
         self.blocks_scrollArea.setWidgetResizable(True)
         self.blocks_scrollArea.setWidget(self.blocks_scrollArea_widget)
 
-        self.splitter.addWidget(self.blocks_scrollArea)
-        self.splitter.setSizes([220, 600])
+        # Wrap the editor in a container that puts the Execute button at the
+        # bottom-right of the editor pane.
+        self.editor_widget = QtWidgets.QWidget()
+        self.editor_layout = QtWidgets.QVBoxLayout()
+        self.editor_layout.setContentsMargins(0, 0, 0, 0)
+        self.editor_layout.setSpacing(6)
+        self.editor_widget.setLayout(self.editor_layout)
 
-        self.main_layout.addWidget(self.splitter)
+        self.editor_layout.addWidget(self.blocks_scrollArea)
 
-        # Execute button at the bottom
+        self.execute_row = QtWidgets.QWidget()
+        self.execute_row.setObjectName('transparent_widget')
+        self.execute_row_layout = QtWidgets.QHBoxLayout()
+        self.execute_row_layout.setContentsMargins(0, 0, 0, 0)
+        self.execute_row_layout.setSpacing(0)
+        self.execute_row.setLayout(self.execute_row_layout)
+
         self.execute_button = QtWidgets.QPushButton("Execute")
         self.execute_button.setObjectName('blue_button')
-        self.execute_button.setMinimumHeight(36)
-        self.main_layout.addWidget(self.execute_button)
+        self.execute_button.setFixedHeight(36)
+        self.execute_button.setMinimumWidth(120)
+        self.execute_row_layout.addStretch()
+        self.execute_row_layout.addWidget(self.execute_button)
+
+        self.editor_layout.addWidget(self.execute_row)
+
+        self.splitter.addWidget(self.editor_widget)
+        self.splitter.setSizes([200, 180, 480])
+
+        self.main_layout.addWidget(self.splitter)
 
     # ------------------------------------------------------------------
     # Sequence management
@@ -232,17 +260,51 @@ class batcher_widget(QtWidgets.QWidget):
         migrated = []
         for block in blocks:
             block_type = block.get('type', '')
-            if block_type == 'import_and_update_all':
-                # Old block = import ALL + update ALL, now two separate blocks.
-                migrated.append({'type': 'import_all', 'data': {}})
-                migrated.append({'type': 'update_all', 'data': {}})
-            else:
-                migrated.append(block)
+            if block_type in ('import_all', 'update_all',
+                              'import_and_update_all',
+                              'category_selection', 'domain_selection',
+                              'variable_string', 'variable_int',
+                              'variable_float', 'variable_bool'):
+                # Obsolete argument/filter/variable blocks removed from the
+                # batcher: drop them on load, the flags now live as checkboxes
+                # directly on the process blocks.
+                continue
+            migrated.append(block)
         return migrated
 
     @staticmethod
     def block_record(block_widget):
         return getattr(block_widget, '_record', None)
+
+    # ------------------------------------------------------------------
+    # Blocks library
+    # ------------------------------------------------------------------
+    def populate_blocks_library(self):
+        self.blocks_list.clear()
+        for cat, label, type_name in get_block_library():
+            item = QtWidgets.QListWidgetItem()
+            item.setText('')
+            item.setSizeHint(QtCore.QSize(0, 26))
+            item.setData(QtCore.Qt.ItemDataRole.UserRole, type_name)
+            self.blocks_list.addItem(item)
+
+            bg = _CATEGORY_BACKGROUNDS.get(cat, 'rgba(75, 75, 87, 45)')
+            row = QtWidgets.QWidget()
+            row.setStyleSheet(
+                f"background-color: {bg}; border-radius: 4px;")
+            row_layout = QtWidgets.QHBoxLayout()
+            row_layout.setContentsMargins(8, 2, 8, 2)
+            row_layout.setSpacing(0)
+            name_label = QtWidgets.QLabel(label)
+            row_layout.addWidget(name_label)
+            row_layout.addStretch()
+            row.setLayout(row_layout)
+            self.blocks_list.setItemWidget(item, row)
+
+    def on_block_library_clicked(self, item):
+        type_name = item.data(QtCore.Qt.ItemDataRole.UserRole)
+        if type_name:
+            self.add_block_from_library(type_name)
 
     # ------------------------------------------------------------------
     # Add / remove blocks
@@ -276,19 +338,6 @@ class batcher_widget(QtWidgets.QWidget):
             blocks.insert(new_index, record)
         self.rebuild_blocks()
 
-    def show_block_info(self, block_widget):
-        type_name = getattr(block_widget, 'type_name', '')
-        title = getattr(block_widget, 'title', 'Block')
-        inputs, outputs = batcher.get_block_io(type_name)
-        text = f"{title}  ({type_name})\n\n"
-        text += "Inputs (reads):\n"
-        text += ('\n'.join(f"  • {i[0]}  ({i[1]})" for i in inputs)
-                 or "  none") + "\n\n"
-        text += "Outputs (writes):\n"
-        text += ('\n'.join(f"  • {o[0]}  ({o[1]})" for o in outputs)
-                 or "  none")
-        QtWidgets.QMessageBox.information(self, title, text)
-
     def on_block_data_changed(self, block_widget):
         # During a rebuild the widgets are just being re-created from the
         # saved records; don't trigger a save for each one. A single save
@@ -299,25 +348,6 @@ class batcher_widget(QtWidgets.QWidget):
         if record is not None:
             record['data'] = block_widget.get_data()
         self.save_current_sequence()
-
-    def show_library_menu(self):
-        menu = gui_utils.QMenu(self)
-        grouped = {}
-        for cat, label, type_name in get_block_library():
-            grouped.setdefault(cat, []).append((label, type_name))
-        first = True
-        for cat in [FILTER, ARGUMENT, WIZARD_ACTION, PROCESS]:
-            if cat not in grouped:
-                continue
-            if not first:
-                menu.addSeparator()
-            first = False
-            for label, type_name in grouped[cat]:
-                action = menu.addAction(label)
-                action.type_name = type_name
-        action = menu.exec(QtGui.QCursor().pos())
-        if action is not None and hasattr(action, 'type_name'):
-            self.add_block_from_library(action.type_name)
 
     # ------------------------------------------------------------------
     # Build the UI from the current sequence
@@ -361,8 +391,8 @@ class batcher_widget(QtWidgets.QWidget):
                     lambda b=block: self.move_block_in_sequence(b, -1))
                 block.move_down.connect(
                     lambda b=block: self.move_block_in_sequence(b, 1))
-                block.info_requested.connect(self.show_block_info)
-                assignment = assignments[i] if i < len(assignments) else None
+                assignment = (assignments[i]
+                              if i < len(assignments) else None)
                 if assignment:
                     block.setup_io(assignment['available'],
                                    assignment['inputs'],
@@ -470,24 +500,29 @@ class batcher_widget(QtWidgets.QWidget):
         if ok and name:
             self.new_sequence(name=name, blocks=[])
 
-    def on_delete_sequence(self):
-        if not self.sequences or self.current_sequence is None:
+    def delete_sequence_by_name(self, seq_name):
+        """Delete the named sequence and its persisted file."""
+        if not seq_name:
             return
-        index = self.sequences.index(self.current_sequence)
-        seq_name = self.current_sequence['name']
-        self.sequences.pop(index)
-        # Remove the persisted file too
-        file_path = os.path.join(get_sequences_dir(), f"{seq_name}.json")
-        if os.path.isfile(file_path):
-            try:
-                os.remove(file_path)
-            except Exception as e:
-                logger.error(f"Failed to delete sequence file: {e}")
-        self.refresh_library()
-        if not self.sequences:
-            self.new_sequence(name="Default", blocks=[])
-        else:
-            self.set_current_sequence(min(index, len(self.sequences) - 1))
+        for index, seq in enumerate(self.sequences):
+            if seq['name'] != seq_name:
+                continue
+            self.sequences.pop(index)
+            # Remove the persisted file too
+            file_path = os.path.join(
+                get_sequences_dir(), f"{seq_name}.json")
+            if os.path.isfile(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    logger.error(f"Failed to delete sequence file: {e}")
+            self.refresh_library()
+            if not self.sequences:
+                self.new_sequence(name="Default", blocks=[])
+            else:
+                self.set_current_sequence(
+                    min(index, len(self.sequences) - 1))
+            return
 
     # ------------------------------------------------------------------
     # Execution
@@ -520,12 +555,13 @@ class batcher_widget(QtWidgets.QWidget):
         self.library_list.clear()
         for index in range(len(self.sequences)):
             self.add_library_sequence(index)
+        self.add_new_sequence_item()
 
     def add_library_sequence(self, index):
         sequence = self.sequences[index]
         item = QtWidgets.QListWidgetItem()
         item.setText('')
-        item.setSizeHint(QtCore.QSize(0, 30))
+        item.setSizeHint(QtCore.QSize(0, 34))
         # Bind to the sequence NAME, which is stable across list changes.
         item.setData(QtCore.Qt.ItemDataRole.UserRole, sequence['name'])
         self.library_list.addItem(item)
@@ -552,11 +588,53 @@ class batcher_widget(QtWidgets.QWidget):
             lambda _checked=False, name=sequence['name']: self.play_sequence(name))
         row_layout.addWidget(play_button)
 
+        delete_button = gui_utils.transparent_button(
+            ressources._remove_icon_, ressources._remove_icon_)
+        delete_button.setFixedSize(22, 22)
+        delete_button.setIconSize(QtCore.QSize(14, 14))
+        delete_button.setToolTip("Delete this sequence")
+        delete_button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        delete_button.clicked.connect(
+            lambda _checked=False, name=sequence['name']:
+                self.delete_sequence_by_name(name))
+        row_layout.addWidget(delete_button)
+
+        self.library_list.setItemWidget(item, row)
+
+    def add_new_sequence_item(self):
+        """A final '+' list item used to create a new sequence."""
+        item = QtWidgets.QListWidgetItem()
+        item.setText('')
+        item.setSizeHint(QtCore.QSize(0, 34))
+        item.setData(QtCore.Qt.ItemDataRole.UserRole, '__add__')
+        self.library_list.addItem(item)
+
+        row = QtWidgets.QWidget()
+        row_layout = QtWidgets.QHBoxLayout()
+        row_layout.setContentsMargins(8, 0, 8, 0)
+        row_layout.setSpacing(6)
+        row.setLayout(row_layout)
+
+        add_button = gui_utils.transparent_button(
+            ressources._add_icon_, ressources._add_icon_)
+        add_button.setFixedSize(24, 24)
+        add_button.setIconSize(QtCore.QSize(16, 16))
+        add_button.setToolTip("New sequence")
+        add_button.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        add_button.clicked.connect(self.on_new_sequence)
+        row_layout.addWidget(add_button)
+
+        hint_label = QtWidgets.QLabel("New sequence")
+        row_layout.addWidget(hint_label)
+        row_layout.addStretch()
+
         self.library_list.setItemWidget(item, row)
 
     def on_library_item_clicked(self, item):
         name = item.data(QtCore.Qt.ItemDataRole.UserRole)
-        if name:
+        if name == '__add__':
+            self.on_new_sequence()
+        elif name:
             self.set_current_sequence_by_name(name)
 
     # ------------------------------------------------------------------
@@ -564,10 +642,8 @@ class batcher_widget(QtWidgets.QWidget):
     # ------------------------------------------------------------------
     def connect_functions(self):
         self.execute_button.clicked.connect(self.execute_sequence)
-        self.add_block_button.clicked.connect(self.show_library_menu)
-        self.new_sequence_button.clicked.connect(self.on_new_sequence)
-        self.delete_sequence_button.clicked.connect(self.on_delete_sequence)
         self.library_list.itemClicked.connect(self.on_library_item_clicked)
+        self.blocks_list.itemClicked.connect(self.on_block_library_clicked)
 
     def refresh(self):
         pass
@@ -581,7 +657,6 @@ class blockWidget(QtWidgets.QFrame):
     data_changed = pyqtSignal()
     move_up = pyqtSignal(object)
     move_down = pyqtSignal(object)
-    info_requested = pyqtSignal(object)
 
     def __init__(self, title, parent=None):
         super(blockWidget, self).__init__(parent)
@@ -627,15 +702,6 @@ class blockWidget(QtWidgets.QFrame):
         self.title_label.setFixedHeight(18)
         self.title_layout.addWidget(self.title_label)
         self.title_layout.addStretch()
-
-        self.info_button = QtWidgets.QPushButton()
-        self.info_button.setFixedSize(16, 16)
-        self.info_button.setIcon(QtGui.QIcon(ressources._info_icon_))
-        self.info_button.setIconSize(QtCore.QSize(12, 12))
-        self.info_button.setToolTip("Show accepted inputs and outputs")
-        self.info_button.clicked.connect(
-            lambda: self.info_requested.emit(self))
-        self.title_layout.addWidget(self.info_button)
 
         self.up_button = QtWidgets.QPushButton()
         self.up_button.setFixedSize(16, 16)
@@ -837,51 +903,62 @@ class comment_blockWidget(blockWidget):
         return self
 
 
-class refresh_assets_blockWidget(blockWidget):
-    def __init__(self, title, parent=None):
-        super(refresh_assets_blockWidget, self).__init__(title, parent)
+class process_blockWidget(blockWidget):
+    """Base for process blocks: they carry their own 'import all' / 'update
+    all' checkboxes instead of relying on dedicated argument blocks."""
+    category = PROCESS
+
+    def build_ui(self):
+        super(process_blockWidget, self).build_ui()
+        self.import_all_checkbox = QtWidgets.QCheckBox("Import all")
+        self.update_all_checkbox = QtWidgets.QCheckBox("Update all")
+        self.content_layout.addWidget(self.import_all_checkbox)
+        self.content_layout.addWidget(self.update_all_checkbox)
+
+    def connect_functions(self):
+        self.import_all_checkbox.toggled.connect(self.data_changed.emit)
+        self.update_all_checkbox.toggled.connect(self.data_changed.emit)
+
+    def get_data(self):
+        return self._merge_io({
+            'import_all': self.import_all_checkbox.isChecked(),
+            'update_all': self.update_all_checkbox.isChecked(),
+        })
+
+    def set_data(self, data):
+        if data:
+            self.import_all_checkbox.setChecked(
+                bool(data.get('import_all', False)))
+            self.update_all_checkbox.setChecked(
+                bool(data.get('update_all', False)))
+        return self
 
 
-class batch_export_data_blockWidget(refresh_assets_blockWidget):
+class batch_export_data_blockWidget(process_blockWidget):
     type_name = 'batch_export_data'
     icon = ressources._exports_icon_
 
     def __init__(self, parent=None):
-        super(batch_export_data_blockWidget, self).__init__("Batch export data", parent)
+        super(batch_export_data_blockWidget, self).__init__(
+            "Batch export data", parent)
 
 
-class batch_video_blockWidget(refresh_assets_blockWidget):
+class batch_video_blockWidget(process_blockWidget):
     type_name = 'batch_video'
     icon = ressources._tool_video_
 
     def __init__(self, parent=None):
-        super(batch_video_blockWidget, self).__init__("Batch video", parent)
+        super(batch_video_blockWidget, self).__init__(
+            "Batch video", parent)
 
 
-class import_all_blockWidget(blockWidget):
-    type_name = 'import_all'
-    category = ARGUMENT
-    icon = ressources._tool_update_
-
-    def __init__(self, parent=None):
-        super(import_all_blockWidget, self).__init__("Import all", parent)
-
-
-class update_all_blockWidget(blockWidget):
-    type_name = 'update_all'
-    category = ARGUMENT
-    icon = ressources._tool_update_
-
-    def __init__(self, parent=None):
-        super(update_all_blockWidget, self).__init__("Update all", parent)
-
-
-class open_and_save_blockWidget(blockWidget):
+class open_and_save_blockWidget(process_blockWidget):
     type_name = 'open_and_save'
     icon = ressources._save_icon_
 
     def __init__(self, parent=None):
-        super(open_and_save_blockWidget, self).__init__("Open and save", parent)
+        super(open_and_save_blockWidget, self).__init__(
+            "Open and save", parent)
 
 
 class create_reference_blockWidget(blockWidget):
@@ -910,71 +987,6 @@ class create_reference_blockWidget(blockWidget):
 
     def get_data(self):
         return self._merge_io({})
-
-
-class category_selection_blockWidget(blockWidget):
-    type_name = 'category_selection'
-    category = FILTER
-    icon = ressources._folder_icon_
-
-    def __init__(self, parent=None):
-        self._categories = project.get_all_categories() or []
-        super(category_selection_blockWidget, self).__init__(
-            "Category selection", parent)
-
-    def build_ui(self):
-        super(category_selection_blockWidget, self).build_ui()
-        self.category_combo = QtWidgets.QComboBox()
-        for category_row in self._categories:
-            self.category_combo.addItem(category_row['name'],
-                                        category_row['id'])
-        self.content_layout.addWidget(self.category_combo)
-
-    def connect_functions(self):
-        self.category_combo.currentIndexChanged.connect(
-            self.data_changed.emit)
-
-    def get_data(self):
-        return self._merge_io({'category': self.category_combo.currentData()})
-
-    def set_data(self, data):
-        if data:
-            index = self.category_combo.findData(data.get('category'))
-            if index >= 0:
-                self.category_combo.setCurrentIndex(index)
-        return self
-
-
-class domain_selection_blockWidget(blockWidget):
-    type_name = 'domain_selection'
-    category = FILTER
-    icon = ressources._assets_group_icon_
-
-    def __init__(self, parent=None):
-        self._domains = project.get_domains() or []
-        super(domain_selection_blockWidget, self).__init__(
-            "Domain selection", parent)
-
-    def build_ui(self):
-        super(domain_selection_blockWidget, self).build_ui()
-        self.domain_combo = QtWidgets.QComboBox()
-        for domain_row in self._domains:
-            self.domain_combo.addItem(domain_row['name'], domain_row['id'])
-        self.content_layout.addWidget(self.domain_combo)
-
-    def connect_functions(self):
-        self.domain_combo.currentIndexChanged.connect(
-            self.data_changed.emit)
-
-    def get_data(self):
-        return self._merge_io({'domain': self.domain_combo.currentData()})
-
-    def set_data(self, data):
-        if data:
-            index = self.domain_combo.findData(data.get('domain'))
-            if index >= 0:
-                self.domain_combo.setCurrentIndex(index)
-        return self
 
 
 class assembly_blockWidget(blockWidget):
@@ -1111,11 +1123,7 @@ def get_block_library():
     """Return (category, label, type_name) for every available block."""
     return [
         (FILTER, 'Stage selection', 'stage_selection'),
-        (FILTER, 'Category selection', 'category_selection'),
-        (FILTER, 'Domain selection', 'domain_selection'),
         (ARGUMENT, 'Comment', 'comment'),
-        (ARGUMENT, 'Import all', 'import_all'),
-        (ARGUMENT, 'Update all', 'update_all'),
         (PROCESS, 'Batch export data', 'batch_export_data'),
         (PROCESS, 'Batch video', 'batch_video'),
         (PROCESS, 'Open and save', 'open_and_save'),
@@ -1127,11 +1135,7 @@ def get_block_library():
 
 _block_class_map = {
     'stage_selection': stage_selection_blockWidget,
-    'category_selection': category_selection_blockWidget,
-    'domain_selection': domain_selection_blockWidget,
     'comment': comment_blockWidget,
-    'import_all': import_all_blockWidget,
-    'update_all': update_all_blockWidget,
     'batch_export_data': batch_export_data_blockWidget,
     'batch_video': batch_video_blockWidget,
     'open_and_save': open_and_save_blockWidget,

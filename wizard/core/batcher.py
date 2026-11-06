@@ -29,15 +29,10 @@ OPEN_AND_SAVE = 'open_and_save'
 CREATE_REFERENCE = 'create_reference'
 ASSEMBLY = 'assembly'
 CODE = 'code'
-CATEGORY_SELECTION = 'category_selection'
-DOMAIN_SELECTION = 'domain_selection'
-# Legacy type (now split into import_all + update_all)
-IMPORT_AND_UPDATE_ALL = 'import_and_update_all'
 
 # Variable types used for the typed data-flow (iOS-shortcuts style).
 TYPE_STAGE_ID = 'stage_id'
 TYPE_COMMENT = 'comment'
-TYPE_BOOLEAN = 'boolean'
 TYPE_COUNT = 'count'
 TYPE_ANY = '*'
 
@@ -57,12 +52,7 @@ _CATEGORY_ORDER = {
 # Block type -> category (so the interpreter can order execution)
 _TYPE_CATEGORIES = {
     STAGE_SELECTION: CATEGORY_FILTER,
-    CATEGORY_SELECTION: CATEGORY_FILTER,
-    DOMAIN_SELECTION: CATEGORY_FILTER,
     COMMENT: CATEGORY_ARGUMENT,
-    IMPORT_ALL: CATEGORY_ARGUMENT,
-    UPDATE_ALL: CATEGORY_ARGUMENT,
-    IMPORT_AND_UPDATE_ALL: CATEGORY_ARGUMENT,
     BATCH_EXPORT_DATA: CATEGORY_PROCESS,
     BATCH_VIDEO: CATEGORY_PROCESS,
     OPEN_AND_SAVE: CATEGORY_PROCESS,
@@ -85,30 +75,9 @@ _BLOCK_SIGNATURES = {
         'inputs': [],
         'outputs': [('stages', TYPE_STAGE_ID)],
     },
-    CATEGORY_SELECTION: {
-        'inputs': [],
-        'outputs': [('stages', TYPE_STAGE_ID)],
-    },
-    DOMAIN_SELECTION: {
-        'inputs': [],
-        'outputs': [('stages', TYPE_STAGE_ID)],
-    },
     COMMENT: {
         'inputs': [],
         'outputs': [('comment', TYPE_COMMENT)],
-    },
-    IMPORT_ALL: {
-        'inputs': [],
-        'outputs': [('value', TYPE_BOOLEAN)],
-    },
-    UPDATE_ALL: {
-        'inputs': [],
-        'outputs': [('value', TYPE_BOOLEAN)],
-    },
-    IMPORT_AND_UPDATE_ALL: {
-        'inputs': [],
-        'outputs': [('import_all', TYPE_BOOLEAN),
-                    ('update_all', TYPE_BOOLEAN)],
     },
     CREATE_REFERENCE: {
         # 'reference_selection' -> source stages whose exports are referenced,
@@ -123,23 +92,17 @@ _BLOCK_SIGNATURES = {
     },
     BATCH_EXPORT_DATA: {
         'inputs': [('stages', TYPE_STAGE_ID),
-                   ('comment', TYPE_COMMENT),
-                   ('import_all', TYPE_BOOLEAN),
-                   ('update_all', TYPE_BOOLEAN)],
+                   ('comment', TYPE_COMMENT)],
         'outputs': [],
     },
     BATCH_VIDEO: {
         'inputs': [('stages', TYPE_STAGE_ID),
-                   ('comment', TYPE_COMMENT),
-                   ('import_all', TYPE_BOOLEAN),
-                   ('update_all', TYPE_BOOLEAN)],
+                   ('comment', TYPE_COMMENT)],
         'outputs': [],
     },
     OPEN_AND_SAVE: {
         'inputs': [('stages', TYPE_STAGE_ID),
-                   ('comment', TYPE_COMMENT),
-                   ('import_all', TYPE_BOOLEAN),
-                   ('update_all', TYPE_BOOLEAN)],
+                   ('comment', TYPE_COMMENT)],
         'outputs': [],
     },
     CODE: {
@@ -163,12 +126,7 @@ def _block_handlers():
     """Map block type -> handler(input_values, data, variables)."""
     return {
         STAGE_SELECTION: _handle_stage_selection,
-        CATEGORY_SELECTION: _handle_category_selection,
-        DOMAIN_SELECTION: _handle_domain_selection,
         COMMENT: _handle_comment,
-        IMPORT_ALL: _handle_import_all,
-        UPDATE_ALL: _handle_update_all,
-        IMPORT_AND_UPDATE_ALL: _handle_import_and_update_all,
         BATCH_EXPORT_DATA: _handle_batch_export_data,
         BATCH_VIDEO: _handle_batch_video,
         OPEN_AND_SAVE: _handle_open_and_save,
@@ -366,73 +324,29 @@ def _handle_stage_selection(input_values, data, variables):
     return {'stages': matched_ids}
 
 
-def _handle_category_selection(input_values, data, variables):
-    """Filter block : produce the stages of a category."""
-    category_id = data.get('category', '')
-    ids = _get_stages_in_category(category_id) if category_id else []
-    logger.info(f"Category selection matched {len(ids)} stages")
-    return {'stages': ids}
-
-
-def _handle_domain_selection(input_values, data, variables):
-    """Filter block : produce the stages of a domain."""
-    domain_id = data.get('domain', '')
-    ids = _get_stages_in_domain(domain_id) if domain_id else []
-    logger.info(f"Domain selection matched {len(ids)} stages")
-    return {'stages': ids}
-
-
-def _get_stages_in_category(category_id):
-    ids = []
-    for asset_row in project.get_category_childs(category_id):
-        for stage_row in project.get_asset_childs(asset_row['id']):
-            ids.append(stage_row['id'])
-    return ids
-
-
-def _get_stages_in_domain(domain_id):
-    ids = []
-    for category_row in project.get_domain_childs(domain_id):
-        ids.extend(_get_stages_in_category(category_row['id']))
-    return ids
-
-
 def _handle_comment(input_values, data, variables):
     """Argument block : produce the comment used for the export."""
     return {'comment': data.get('comment', '') or ''}
 
 
-def _handle_import_all(input_values, data, variables):
-    """Argument block : flag that process blocks must import all references."""
-    return {'value': True}
-
-
-def _handle_update_all(input_values, data, variables):
-    """Argument block : flag that process blocks must update all references."""
-    return {'value': True}
-
-
-def _handle_import_and_update_all(input_values, data, variables):
-    """Legacy block : produces BOTH import all and update all flags."""
-    return {'import_all': True, 'update_all': True}
-
-
 def _handle_batch_export_data(input_values, data, variables):
-    """Process block : batch export of the (bound) affected stages."""
+    """Process block : batch export of the (bound) affected stages.
+    The import/update flags come from the block's own checkboxes."""
     _batch_process_stages(input_values.get('stages') or [],
                           batch_type='export',
-                          import_all=1 if input_values.get('import_all') else 0,
-                          update_all=1 if input_values.get('update_all') else 0,
+                          import_all=1 if data.get('import_all') else 0,
+                          update_all=1 if data.get('update_all') else 0,
                           comment=input_values.get('comment') or '')
     return {}
 
 
 def _handle_batch_video(input_values, data, variables):
-    """Process block : create a video for each (bound) affected stage."""
+    """Process block : create a video for each (bound) affected stage.
+    The import/update flags come from the block's own checkboxes."""
     _batch_process_stages(input_values.get('stages') or [],
                           batch_type='video',
-                          import_all=1 if input_values.get('import_all') else 0,
-                          update_all=1 if input_values.get('update_all') else 0,
+                          import_all=1 if data.get('import_all') else 0,
+                          update_all=1 if data.get('update_all') else 0,
                           comment=input_values.get('comment') or '')
     return {}
 
@@ -562,8 +476,8 @@ def _handle_open_and_save(input_values, data, variables):
         logger.warning("No stage provided, skipping open and save")
         return {}
     comment = input_values.get('comment') or ''
-    import_all = 1 if input_values.get('import_all') else 0
-    update_all = 1 if input_values.get('update_all') else 0
+    import_all = 1 if data.get('import_all') else 0
+    update_all = 1 if data.get('update_all') else 0
     percent = 0.0
     percent_step = 100 / len(stages)
     for stage_id in stages:
