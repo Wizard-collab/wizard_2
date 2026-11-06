@@ -32,8 +32,10 @@ logger = logging.getLogger(__name__)
 
 
 class popup_wall_widget(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, main_window=None):
         super(popup_wall_widget, self).__init__(parent)
+
+        self._main_window = main_window if main_window is not None else parent
 
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint |
                             QtCore.Qt.WindowType.WindowStaysOnTopHint | QtCore.Qt.WindowType.ToolTip)
@@ -43,6 +45,32 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.popup_save_ids = dict()
 
         self.build_ui()
+        self.move_ui()
+
+    def _target_screen(self):
+        # Show notifications on the same screen as the wizard window, not on the
+        # primary one, and not on the ambiguous cursor position (mixed-DPI overlap).
+        if self._main_window is not None:
+            top = self._main_window.window()
+            screen = top.screen() if top is not None else None
+            if screen is not None:
+                return screen
+        screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+        if screen is not None:
+            return screen
+        return QtGui.QGuiApplication.primaryScreen()
+
+    def showEvent(self, event):
+        super(popup_wall_widget, self).showEvent(event)
+        screen = self._target_screen()
+        if screen is None:
+            return
+        window = self.windowHandle()
+        if window is not None and window.screen() is not screen:
+            try:
+                window.setScreen(screen)
+            except Exception:
+                pass
         self.move_ui()
 
     def build_ui(self):
@@ -79,7 +107,9 @@ class popup_wall_widget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.popups_scrollArea)
 
     def move_ui(self):
-        desktop = QtGui.QGuiApplication.screens()[0]
+        desktop = self._target_screen()
+        if desktop is None:
+            return
         screenRect = desktop.geometry()
         screen_minX = screenRect.topLeft().x()
         screen_minY = screenRect.topLeft().y()

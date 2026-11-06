@@ -95,7 +95,7 @@ class main_widget(QtWidgets.QWidget):
         self.context_widget = context_widget.context_widget(self)
         self.tabs_widget = tabs_widget.tabs_widget(self)
         self.wall_widget = wall_widget.wall_widget(self)
-        self.popup_wall_widget = popup_wall_widget.popup_wall_widget()
+        self.popup_wall_widget = popup_wall_widget.popup_wall_widget(main_window=self)
         self.footer_widget = footer_widget.footer_widget(self)
         self.header_widget = header_widget.header_widget(self)
         self.subtask_manager = subtask_manager.subtask_manager()

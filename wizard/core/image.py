@@ -75,18 +75,29 @@ def screenshot(file, thumbnail_file):
     """
     # Get the screen where the cursor is currently located
     screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+    if screen is None:
+        screen = QtGui.QGuiApplication.primaryScreen()
 
-    # Get the available geometry of the screen (position and size)
-    rect = screen.availableGeometry()
-    x = rect.x()
-    y = rect.y()
-    width = rect.width()
-    height = rect.height()
+    # Grab the whole screen at native resolution. grabWindow() on a specific
+    # screen uses coordinates relative to that screen, so feeding it global
+    # desktop coordinates (like the x offset of a secondary monitor) grabs an
+    # area that is partly out of range -> "big black part". We therefore grab
+    # the full screen and crop with the correct (DPI-aware) relative offsets.
+    pixmap = screen.grabWindow(0)
+    geom = screen.geometry()
+    avail = screen.availableGeometry()
+    dpr = pixmap.devicePixelRatio()
 
-    # Capture a screenshot of the entire screen
-    pixmap = screen.grabWindow(
-        0, x=x, y=y, width=width, height=height
-    )
+    x = int(round((avail.x() - geom.x()) * dpr))
+    y = int(round((avail.y() - geom.y()) * dpr))
+    width = int(round(avail.width() * dpr))
+    height = int(round(avail.height() * dpr))
+    x = max(0, min(x, pixmap.width() - 1))
+    y = max(0, min(y, pixmap.height() - 1))
+    width = max(1, min(width, pixmap.width() - x))
+    height = max(1, min(height, pixmap.height() - y))
+    pixmap = pixmap.copy(x, y, width, height)
+    pixmap.setDevicePixelRatio(1.0)
 
     # Convert the captured pixmap to a PIL image
     base_image = pixmap_to_PIL(pixmap)
