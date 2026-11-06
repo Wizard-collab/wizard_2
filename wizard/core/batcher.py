@@ -13,6 +13,7 @@ from wizard.core import launch_batch
 from wizard.core import tools
 from wizard.core import team_client
 from wizard.core import environment
+from wizard.core import video
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ IMPORT_ALL = 'import_all'
 UPDATE_ALL = 'update_all'
 BATCH_EXPORT_DATA = 'batch_export_data'
 BATCH_VIDEO = 'batch_video'
+CREATE_VIDEO_FROM_FILES = 'create_video_from_files'
 OPEN_AND_SAVE = 'open_and_save'
 CREATE_REFERENCE = 'create_reference'
 ASSEMBLY = 'assembly'
@@ -55,6 +57,7 @@ _TYPE_CATEGORIES = {
     COMMENT: CATEGORY_ARGUMENT,
     BATCH_EXPORT_DATA: CATEGORY_PROCESS,
     BATCH_VIDEO: CATEGORY_PROCESS,
+    CREATE_VIDEO_FROM_FILES: CATEGORY_PROCESS,
     OPEN_AND_SAVE: CATEGORY_PROCESS,
     CREATE_REFERENCE: CATEGORY_WIZARD_ACTION,
     ASSEMBLY: CATEGORY_WIZARD_ACTION,
@@ -100,6 +103,11 @@ _BLOCK_SIGNATURES = {
                    ('comment', TYPE_COMMENT)],
         'outputs': [],
     },
+    CREATE_VIDEO_FROM_FILES: {
+        'inputs': [('stages', TYPE_STAGE_ID),
+                   ('comment', TYPE_COMMENT)],
+        'outputs': [('videos', TYPE_COUNT)],
+    },
     OPEN_AND_SAVE: {
         'inputs': [('stages', TYPE_STAGE_ID),
                    ('comment', TYPE_COMMENT)],
@@ -129,6 +137,7 @@ def _block_handlers():
         COMMENT: _handle_comment,
         BATCH_EXPORT_DATA: _handle_batch_export_data,
         BATCH_VIDEO: _handle_batch_video,
+        CREATE_VIDEO_FROM_FILES: _handle_create_video_from_files,
         OPEN_AND_SAVE: _handle_open_and_save,
         CREATE_REFERENCE: _handle_create_reference,
         ASSEMBLY: _handle_assembly,
@@ -349,6 +358,37 @@ def _handle_batch_video(input_values, data, variables):
                           update_all=1 if data.get('update_all') else 0,
                           comment=input_values.get('comment') or '')
     return {}
+
+
+def _handle_create_video_from_files(input_values, data, variables):
+    """Process block : create a video from the render files of every export
+    version of the (bound) affected stages."""
+    stages = input_values.get('stages') or []
+    if not stages:
+        logger.warning("No stage provided, skipping create video from files")
+        return {'videos': 0}
+    ics = data.get('ics', '') or ''
+    ocs = data.get('ocs', '') or ''
+    channel = data.get('channel', '') or None
+    try:
+        frame_rate = float(data.get('frame_rate', 25) or 25)
+    except (TypeError, ValueError):
+        frame_rate = 25.0
+    comment = input_values.get('comment') or ''
+    created = 0
+    for stage_id in stages:
+        export_rows = project.get_stage_export_childs(stage_id)
+        for export_row in export_rows:
+            export_version_id = project.get_default_export_version(
+                export_row['id'], 'id')
+            if not export_version_id:
+                continue
+            print(f"wizard_task_name:Create video {_stage_label(stage_id)}")
+            video.video_from_render(export_version_id, ics, ocs, channel,
+                                    frame_rate, comment=comment, overlay=True)
+            created += 1
+    logger.info(f"Created {created} video(s) from render files")
+    return {'videos': created}
 
 
 def _get_default_work_env_id(stage_id):

@@ -24,6 +24,7 @@ from wizard.core import environment
 from wizard.core import repository
 from wizard.core import batcher
 from wizard.core import subtask
+from wizard.core import ocio_utils
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
@@ -961,6 +962,84 @@ class open_and_save_blockWidget(process_blockWidget):
             "Open and save", parent)
 
 
+class create_video_from_files_blockWidget(blockWidget):
+    type_name = 'create_video_from_files'
+    category = PROCESS
+    icon = ressources._videos_icon_
+
+    def __init__(self, parent=None):
+        super(create_video_from_files_blockWidget, self).__init__(
+            "Create video from files", parent)
+
+    def build_ui(self):
+        super(create_video_from_files_blockWidget, self).build_ui()
+        form = QtWidgets.QFormLayout()
+        form.setContentsMargins(0, 0, 0, 0)
+        form.setSpacing(6)
+
+        self.ics_combo = QtWidgets.QComboBox()
+        self.ocs_combo = QtWidgets.QComboBox()
+        available = ocio_utils.get_OCIO_available_color_spaces() or []
+        self.ics_combo.addItems(available)
+        self.ocs_combo.addItems(available)
+        if 'ACES - ACEScg' in available:
+            self.ics_combo.setCurrentText('ACES - ACEScg')
+        if 'out_srgb' in available:
+            self.ocs_combo.setCurrentText('out_srgb')
+
+        self.channel_edit = QtWidgets.QLineEdit()
+        self.channel_edit.setPlaceholderText("Optional channel")
+
+        # Same integer spin box (hidden buttons) as project settings, and
+        # the value defaults to the project frame rate.
+        self.frame_rate_spin = QtWidgets.QSpinBox()
+        self.frame_rate_spin.setRange(1, 300)
+        self.frame_rate_spin.setButtonSymbols(
+            QtWidgets.QSpinBox.ButtonSymbols.NoButtons)
+        try:
+            self.frame_rate_spin.setValue(
+                int(round(project.get_frame_rate() or 25)))
+        except (TypeError, ValueError):
+            self.frame_rate_spin.setValue(25)
+
+        form.addRow("Input color space", self.ics_combo)
+        form.addRow("Output color space", self.ocs_combo)
+        form.addRow("Channel", self.channel_edit)
+        form.addRow("Frame rate", self.frame_rate_spin)
+        self.content_layout.addLayout(form)
+
+    def connect_functions(self):
+        self.ics_combo.currentTextChanged.connect(self.data_changed.emit)
+        self.ocs_combo.currentTextChanged.connect(self.data_changed.emit)
+        self.channel_edit.textChanged.connect(self.data_changed.emit)
+        self.frame_rate_spin.valueChanged.connect(self.data_changed.emit)
+
+    def get_data(self):
+        return self._merge_io({
+            'ics': self.ics_combo.currentText(),
+            'ocs': self.ocs_combo.currentText(),
+            'channel': self.channel_edit.text(),
+            'frame_rate': int(self.frame_rate_spin.value()),
+        })
+
+    def set_data(self, data):
+        if data:
+            index = self.ics_combo.findText(data.get('ics', ''))
+            if index >= 0:
+                self.ics_combo.setCurrentIndex(index)
+            index = self.ocs_combo.findText(data.get('ocs', ''))
+            if index >= 0:
+                self.ocs_combo.setCurrentIndex(index)
+            if data.get('channel'):
+                self.channel_edit.setText(data.get('channel'))
+            try:
+                self.frame_rate_spin.setValue(
+                    int(round(data.get('frame_rate', 25) or 25)))
+            except (TypeError, ValueError):
+                pass
+        return self
+
+
 class create_reference_blockWidget(blockWidget):
     type_name = 'create_reference'
     category = WIZARD_ACTION
@@ -1126,6 +1205,7 @@ def get_block_library():
         (ARGUMENT, 'Comment', 'comment'),
         (PROCESS, 'Batch export data', 'batch_export_data'),
         (PROCESS, 'Batch video', 'batch_video'),
+        (PROCESS, 'Create video from files', 'create_video_from_files'),
         (PROCESS, 'Open and save', 'open_and_save'),
         (WIZARD_ACTION, 'Create reference', 'create_reference'),
         (WIZARD_ACTION, 'Assembly', 'assembly'),
@@ -1138,6 +1218,7 @@ _block_class_map = {
     'comment': comment_blockWidget,
     'batch_export_data': batch_export_data_blockWidget,
     'batch_video': batch_video_blockWidget,
+    'create_video_from_files': create_video_from_files_blockWidget,
     'open_and_save': open_and_save_blockWidget,
     'create_reference': create_reference_blockWidget,
     'assembly': assembly_blockWidget,
