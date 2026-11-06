@@ -105,6 +105,23 @@ def import_and_update_all():
     update_shading(references)
 
 
+def reference_all():
+    references = wizard_communicate.get_references(
+        int(os.environ['wizard_work_env_id']))
+    reference_texturing(references)
+    reference_modeling(references)
+    reference_rigging(references)
+    reference_grooming(references)
+    reference_layout(references)
+    reference_animation(references)
+    reference_cfx(references)
+    reference_camera(references)
+    reference_custom(references)
+    reference_camrig(references)
+    reference_lighting(references)
+    reference_shading(references)
+
+
 def update_all():
     references = wizard_communicate.get_references(
         int(os.environ['wizard_work_env_id']))

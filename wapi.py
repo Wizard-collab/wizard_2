@@ -1392,6 +1392,20 @@ class assets:
             stages = core.project.get_asset_childs(asset_id, column)
         return stages
 
+    def get_stage(self, stage_id, column='*'):
+        """
+        Retrieve a stage row from the project by its stage id.
+        Args:
+            stage_id (int): The id of the stage.
+            column (str, optional): The column(s) to retrieve. Defaults to '*',
+                which retrieves all columns.
+        Returns:
+            dict or None: The stage row, or None if not found.
+        """
+        if stage_id:
+            return core.project.get_stage_data(stage_id, column)
+        return None
+
     def list_variants(self, parent, column='*'):
         """
         Retrieves a list of variants associated with a given parent identifier.
