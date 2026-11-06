@@ -1,6 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
 
+rem Always run from this batch file's own folder so the relative paths below
+rem (python/, app.py and the wizard package) resolve to the right files
+rem regardless of where/how the batch is launched.
+cd /d "%~dp0"
+
 rem Running python.exe directly off the network share causes random
 rem access violation crashes (DLLs mapped over SMB). Instead, mirror the
 rem python/ folder to a local disk cache and run it from there, keeping

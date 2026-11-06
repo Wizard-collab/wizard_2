@@ -252,6 +252,14 @@ class QComboBox(QtWidgets.QComboBox):
             "QListView::item:hover{background:#4b4b57;color:white;}QListView::item:selected{background:#4b4b57;color:white;}")
         self.setItemDelegate(QtWidgets.QStyledItemDelegate())
 
+    def showPopup(self):
+        super(QComboBox, self).showPopup()
+        # Keep the dropdown on the cursor's screen (fixes mixed-DPI jumps).
+        QtCore.QTimer.singleShot(0, self._keep_popup_on_screen)
+
+    def _keep_popup_on_screen(self):
+        keep_menu_on_screen(self.view().window())
+
 
 class QMenu(QtWidgets.QMenu):
     def __init__(self, parent=None):
@@ -261,6 +269,18 @@ class QMenu(QtWidgets.QMenu):
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setStyleSheet(
             "QListView::item:hover{background:#4b4b57;}QListView::item:selected{background:#4b4b57;}")
+
+    def showEvent(self, event):
+        super(QMenu, self).showEvent(event)
+        # Anchor to the owner window's screen (reliable even on overlapping
+        # mixed-DPI monitors, where the cursor position can be ambiguous).
+        # Fall back to the cursor's screen if there is no owner widget.
+        parent = self.parentWidget()
+        screen = None
+        if parent is not None:
+            owner = parent.window() if parent.window() is not None else parent
+            screen = owner.screen()
+        keep_menu_on_screen(self, screen)
 
 
 class separator(QtWidgets.QFrame):
@@ -630,14 +650,69 @@ def modify_application_tooltip(widget, custom_tooltip):
     widget.application_tooltip = custom_tooltip
 
 
+def keep_menu_on_screen(menu, screen=None):
+    """Reposition ``menu`` so its popup stays on the requested ``screen``.
+
+    If ``screen`` is None, the screen under the cursor is used. The popup's OS
+    window is explicitly assigned to that screen (fixes rendering on the wrong
+    monitor when mixed-DPI monitors overlap in logical coordinates), then its
+    position is clamped inside the screen's usable area. Called from showEvent
+    because Qt re-applies its own (wrong-screen) positioning afterwards.
+    """
+    if screen is None:
+        screen = QtGui.QGuiApplication.screenAt(QtGui.QCursor().pos())
+        if screen is None:
+            screen = QtGui.QGuiApplication.primaryScreen()
+    if screen is None:
+        return
+
+    window = menu.windowHandle()
+    if window is not None and window.screen() is not screen:
+        try:
+            window.setScreen(screen)
+        except Exception:
+            pass
+
+    rect = screen.availableGeometry()
+    width = menu.width() or menu.sizeHint().width()
+    height = menu.height() or menu.sizeHint().height()
+    pos = menu.pos()
+    x = max(rect.left(), min(rect.right() - width, pos.x()))
+    y = max(rect.top(), min(rect.bottom() - height, pos.y()))
+    if (x, y) != (pos.x(), pos.y()):
+        menu.move(x, y)
+
+
+class QMenuBarMenu(QtWidgets.QMenu):
+    """QMenu used for menu-bar drop-downs.
+
+    Keeps the popup on the same screen as the window that owns the menu bar, so
+    that opening a menu near a screen edge doesn't make it jump to an adjacent
+    monitor.
+    """
+
+    def __init__(self, parent=None):
+        super(QMenuBarMenu, self).__init__(parent)
+        self._menu_bar = parent
+        self.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.FramelessWindowHint |
+                            QtCore.Qt.WindowType.NoDropShadowWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+
+    def showEvent(self, event):
+        super(QMenuBarMenu, self).showEvent(event)
+        # Anchor to the main window's own screen (reliable even on overlapping
+        # mixed-DPI monitors), so the menu stays on the right screen.
+        main_window = self._menu_bar.window() if self._menu_bar is not None else None
+        screen = main_window.screen() if main_window is not None else None
+        keep_menu_on_screen(self, screen)
+
+
 def add_menu_to_menu_bar(menu_bar, title, icon=None):
+    menu = QMenuBarMenu(menu_bar)
     if icon is not None:
-        menu = menu_bar.addMenu(icon, title)
-    else:
-        menu = menu_bar.addMenu(title)
-    menu.setWindowFlags(QtCore.Qt.WindowType.Popup | QtCore.Qt.WindowType.FramelessWindowHint |
-                        QtCore.Qt.WindowType.NoDropShadowWindowHint)
-    menu.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        menu.setIcon(icon)
+    menu.setTitle(title)
+    menu_bar.addMenu(menu)
     return menu
 
 
