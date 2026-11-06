@@ -801,7 +801,7 @@ class user_softwares_widget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.scrollArea)
 
-        self.softwares_comboBox = QtWidgets.QComboBox()
+        self.softwares_comboBox = gui_utils.QComboBox()
         self.softwares_comboBox.setObjectName(u"software_comboBox")
         self.softwares_comboBox.setPlaceholderText(u"Software")
 

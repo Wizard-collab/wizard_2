@@ -794,7 +794,7 @@ class blockWidget(QtWidgets.QFrame):
             lab.setObjectName('gray_label')
             row_l.addWidget(lab)
 
-            combo = QtWidgets.QComboBox()
+            combo = gui_utils.QComboBox()
             combo.addItem("— none —", None)
             for var_name, vtype in self._io_available:
                 if vtype == in_type:

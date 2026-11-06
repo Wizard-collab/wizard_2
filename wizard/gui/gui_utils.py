@@ -254,11 +254,13 @@ class QComboBox(QtWidgets.QComboBox):
 
     def showPopup(self):
         super(QComboBox, self).showPopup()
-        # Keep the dropdown on the cursor's screen (fixes mixed-DPI jumps).
+        # Keep the dropdown on the owner window's screen (fixes mixed-DPI jumps).
         QtCore.QTimer.singleShot(0, self._keep_popup_on_screen)
 
     def _keep_popup_on_screen(self):
-        keep_menu_on_screen(self.view().window())
+        owner = self.parentWidget().window() if self.parentWidget() is not None else None
+        screen = owner.screen() if owner is not None else None
+        keep_menu_on_screen(self.view().window(), screen)
 
 
 class QMenu(QtWidgets.QMenu):

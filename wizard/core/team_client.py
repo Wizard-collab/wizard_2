@@ -278,37 +278,27 @@ class team_client(QThread):
               (`self.conn`) is closed.
             - The `analyse_signal` method is called with the parsed JSON data for further processing.
         """
-        while self.running is True:
-            self.create_conn()
-            if self.conn is None:
-                # Could not reach the team server yet, back off and retry.
-                self.team_connection_status_signal.emit(False)
-                self.msleep(5000)
-                continue
-
-            self.team_connection_status_signal.emit(True)
-            while self.conn is not None and self.running is True:
-                conn = self.conn
-                raw_data = socket_utils.recvall(conn)
-                if raw_data is not None:
-                    try:
-                        data = json.loads(raw_data)
-                        self.analyse_signal(data)
-                    except json.decoder.JSONDecodeError:
-                        logger.debug("cannot read json data")
-                else:
-                    if self.running is not True:
-                        logger.info('Team connection closed')
-                        self._close_conn()
-                        break
-                    if self._is_connection_dead(conn):
-                        # The link was really lost (not just an idle recv
-                        # timeout): reconnect so notifications keep flowing.
-                        logger.info(
-                            "Team connection lost, trying to reconnect...")
-                        self._close_conn()
-                        break
-            # Loop back to re-establish the connection while we keep running.
+        self.create_conn()
+        self.team_connection_status_signal.emit(True)
+        while self.conn is not None and self.running is True:
+            raw_data = socket_utils.recvall(self.conn)
+            if raw_data is not None:
+                try:
+                    data = json.loads(raw_data)
+                    self.analyse_signal(data)
+                except json.decoder.JSONDecodeError:
+                    logger.debug("cannot read json data")
+            else:
+                if self.running != True:
+                    logger.info('Team connection closed')
+                    self.stop()
+                elif self._is_connection_dead(self.conn):
+                    logger.info("Team connection lost, reconnecting...")
+                    self._close_conn()
+                    # Reconnect immediately on the same thread.
+                    self.create_conn()
+                    if self.conn is None:
+                        self.team_connection_status_signal.emit(False)
         self.team_connection_status_signal.emit(False)
 
     def analyse_signal(self, data):
