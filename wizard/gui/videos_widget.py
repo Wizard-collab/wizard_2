@@ -18,6 +18,7 @@ from wizard.core import user
 from wizard.core import project
 from wizard.core import tools
 from wizard.core import path_utils
+from wizard.core import video
 from wizard.core import subtasks_library
 from wizard.vars import ressources
 from wizard.vars import user_vars
@@ -30,6 +31,7 @@ from wizard.gui import drop_files_widget
 from wizard.gui import comment_widget
 from wizard.gui import tag_label
 from wizard.gui import current_asset_viewer
+from wizard.gui import warning_tooltip
 
 logger = logging.getLogger(__name__)
 
@@ -270,6 +272,7 @@ class videos_widget(QtWidgets.QWidget):
         self.icon_view.customContextMenuRequested.connect(
             self.context_menu_requested)
 
+        self.manual_merge_button.clicked.connect(self.open_files)
         self.archive_button.clicked.connect(self.archive)
         self.folder_button.clicked.connect(self.open_folder)
         self.toggle_view_button.clicked.connect(self.toggle_view)
@@ -382,6 +385,15 @@ class videos_widget(QtWidgets.QWidget):
             '"0023", "j.smith&maya", "retake eye"')
         self.buttons_layout.addWidget(self.search_bar)
 
+        self.manual_merge_button = QtWidgets.QPushButton()
+        gui_utils.application_tooltip(
+            self.manual_merge_button, "Manually add a video")
+        self.manual_merge_button.setFixedSize(35, 35)
+        self.manual_merge_button.setIconSize(QtCore.QSize(25, 25))
+        self.manual_merge_button.setIcon(
+            QtGui.QIcon(ressources._tool_manually_publish_))
+        self.buttons_layout.addWidget(self.manual_merge_button)
+
         self.toggle_view_button = QtWidgets.QPushButton()
         gui_utils.application_tooltip(
             self.toggle_view_button, "Switch to list view")
@@ -439,6 +451,30 @@ class videos_widget(QtWidgets.QWidget):
                 self.archive()
             elif action == comment_action:
                 self.modify_comment(pos)
+
+    def open_files(self):
+        if not self.variant_id:
+            warning_tooltip.warning_tooltip().invoke(
+                ("WARNING", "Select a stage before merging files !"))
+            return
+
+        fileList, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "Select files", "",
+                                                                "Video (*.mp4 *.mov *.avi);")
+        if fileList:
+            self.merge_files(fileList)
+
+    def merge_files(self, files=[]):
+        if not self.variant_id:
+                    warning_tooltip.warning_tooltip().invoke(
+                        ("WARNING", "Select a stage before merging files !"))
+                    return
+
+        for file in files:
+            video.import_video(
+                variant_id=self.variant_id,
+                video_path=file)
+
+        gui_server.refresh_team_ui()
 
     def modify_comment(self, pos=None):
         items = self.get_selection()
