@@ -9,6 +9,7 @@ import json
 # Wizard modules
 import wizard_communicate
 import wizard_hooks
+import wizard_tags
 
 # Python modules
 import os
@@ -262,20 +263,15 @@ def apply_tags(object_list):
         # Set the tag on the object itself
         if pm.attributeQuery('wizardTags', node=object, exists=True) == 0:
             pm.addAttr(object, ln="wizardTags", dt="string")
-        existing_tags = []
-        if pm.getAttr(object + '.wizardTags'):
-            existing_tags = pm.getAttr(object + '.wizardTags').split(',')
-        asset_tag = "{}_{}".format(
-            os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
-        if os.environ['wizard_variant_name'] != 'main':
-            asset_tag += f"_{os.environ['wizard_variant_name']}"
+        tags = []
+        if (_ := pm.getAttr(object + '.wizardTags')):
+            tags = wizard_tags.read_tags(_)
+        
         obj_name = object.name().split(':')[-1].split('|')[-1]
-        to_tag = [f"CATEGORY={os.environ['wizard_category_name']}",
-                  f"ASSET={asset_tag}", f"OBJECT={obj_name}",
-                  f"{os.environ['wizard_category_name']}",
-                  asset_tag, obj_name]
-        tags = existing_tags + to_tag
-        pm.setAttr(object + '.wizardTags', (',').join(set(tags)), type="string")
+        tags += [f"OBJECT={obj_name}"]
+
+        tags_string = wizard_tags.generate_tags(tags)
+        pm.setAttr(object + '.wizardTags', tags_string, type="string")
 
 
 def by_frame_progress_script(frange, percent_factor):
