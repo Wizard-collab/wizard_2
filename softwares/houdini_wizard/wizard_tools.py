@@ -12,6 +12,7 @@ import hou
 # Wizard modules
 import wizard_communicate
 import wizard_hooks
+import wizard_tags
 
 logger = logging.getLogger(__name__)
 
@@ -166,13 +167,7 @@ def apply_tags(out_node):
         'attribwrangle', name, out_node_parent)
     tags_node.parm('class').set('detail')
 
-    asset_tag = "{}_{}".format(
-        os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
-    if os.environ['wizard_variant_name'] != 'main':
-        asset_tag += f"_{os.environ['wizard_variant_name']}"
-    to_tag = [os.environ['wizard_category_name'], asset_tag]
-
-    tags_list_string = (',').join(to_tag)
+    tags_list_string = wizard_tags.generate_tags()
 
     tags_node.parm('snippet').set(f'''s@wizardTags += "{tags_list_string}";''')
 
