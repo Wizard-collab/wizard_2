@@ -53,7 +53,7 @@ def read_tags(tag_string: str) -> list:
     return [tag.strip() for tag in tag_string.split(",") if tag.strip()]
 
 
-def generate_tags(tags: list = []) -> str:
+def generate_tags(tags: list = None) -> str:
     """ Generate a string of tags from the given list of tags.
     It cleans up the tags by removing any residual environement tags.
     
@@ -70,6 +70,9 @@ def generate_tags(tags: list = []) -> str:
         str: A string of tags.
         
     """
+
+    if tags is None:
+        tags = []
 
     _tags = tags.copy()  # We should not modify the original list of tags
     remove_env_tags(_tags)
