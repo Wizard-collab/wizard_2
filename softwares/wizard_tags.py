@@ -14,13 +14,17 @@ def get_env_tags() -> list:
 
     tags = []
 
-    for key in ENV_TAG_KEYS:
-        val = os.getenv(f"wizard_{key}_name", "")
+    vars = {
+        "category": os.getenv("wizard_category_name", ""),
+        "asset": os.getenv("wizard_asset_name", ""),
+        "variant": os.getenv("wizard_variant_name", "main"),
+        "stage": os.getenv("wizard_stage_name", "")
+    }
 
-        if not val:
-            continue
-
-        tags.append(f"{key.upper()}={val}")
+    tags.append(f"CATEGORY={vars['category']}")
+    tags.append(f"ASSET={vars['asset']}_{vars['variant']}")  # Varianted asset tag
+    tags.append(f"VARIANT={vars['variant']}")
+    tags.append(f"STAGE={vars['stage']}")
 
     return tags
 
