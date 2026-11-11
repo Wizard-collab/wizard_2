@@ -62,6 +62,35 @@ def read_tags(tag_string: str) -> list:
     return [tag.strip() for tag in tag_string.split(",") if tag.strip()]
 
 
+def sorted_tags(tags: list) -> list:
+    """ Sort a list of tags based.
+    It put first the environment tags, then the other tags in alphabetical order.
+
+    Args:
+        tags (list): A list of tags to be sorted.
+
+    Returns:
+        list: A sorted list of tags.
+    """
+
+    def sort_key(tag):
+        """
+        Define the sorting key for each tag.
+        """
+        # 
+        key = tag.split("=")[0].lower()
+        index = len(ENV_TAG_KEYS)  # Default index for non-environment tags
+        if key in ENV_TAG_KEYS:
+            index = ENV_TAG_KEYS.index(key)
+
+        return (
+            index,
+            tag.lower()
+        )
+
+    return sorted(tags, key=sort_key)
+
+
 def generate_tags(tags: list = None) -> str:
     """ Generate a string of tags from the given list of tags.
     It cleans up the tags by removing any residual environement tags.
@@ -88,5 +117,7 @@ def generate_tags(tags: list = None) -> str:
     env_tags = get_env_tags()
 
     all_tags = env_tags + _tags
+    deduplicated_tags = list(set(all_tags))  # Remove duplicates
 
-    return ",".join(set(all_tags))
+
+    return ",".join(sorted_tags(deduplicated_tags))  # Sort the tags and return as a string
