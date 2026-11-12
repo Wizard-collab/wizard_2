@@ -454,6 +454,16 @@ class create_video(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class reload_plugin(bpy.types.Operator):
+    bl_idname = "wizard.reload_plugin"
+    bl_label = "Reload plugin"
+    bl_description = "Reload wizard plugin"
+
+    def execute(self, context):
+        wizard_plugin.reload_plugin()
+        return {'FINISHED'}
+
+
 class TOPBAR_MT_wizard_import_submenu(bpy.types.Menu):
     bl_label = "Import"
 
@@ -534,6 +544,11 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+
+        if os.environ.get("WIZARD_DEBUGPY", "0") == "1":
+            layout.operator("wizard.reload_plugin", icon="FILE_REFRESH")
+            layout.separator()
+
         layout.operator("wizard.save_increment",
                         icon_value=wizard_icons["save_increment"].icon_id)
         layout.operator("wizard.export",
@@ -620,6 +635,7 @@ classes = (save_increment,
            set_frame_range,
            set_frame_range_with_rolls,
            create_video,
+           reload_plugin,
            TOPBAR_MT_wizard_import_submenu,
            TOPBAR_MT_wizard_update_submenu,
            TOPBAR_MT_wizard_render_submenu,
