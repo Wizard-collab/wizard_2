@@ -485,7 +485,7 @@ def get_export_grps(base_name):
     tokens_len = len(base_name.split('_'))
     for collection in get_all_collections():
         collection_name = collection.name
-        if base_name in collection_name:
+        if collection_name.startswith(base_name):
             object_name_tokens = collection_name.split('_')
             if len(object_name_tokens) == tokens_len:
                 export_name = 'main'
