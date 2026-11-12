@@ -544,6 +544,11 @@ class TOPBAR_MT_wizard_menu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+
+        if os.environ.get("WIZARD_DEBUGPY", "0") == "1":
+            layout.operator("wizard.reload_plugin", icon="FILE_REFRESH")
+            layout.separator()
+
         layout.operator("wizard.save_increment",
                         icon_value=wizard_icons["save_increment"].icon_id)
         layout.operator("wizard.export",
