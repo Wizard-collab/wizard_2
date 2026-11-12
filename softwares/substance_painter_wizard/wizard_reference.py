@@ -13,6 +13,7 @@ import wizard_hooks
 import substance_painter.logging as logging
 import substance_painter.resource
 
+MESH_FILE_FORMATS = ['.fbx', '.obj', '.abc', '.usd', '.usda', '.usdc', '.usdz']
 
 def get_mesh_file():
     references = wizard_communicate.get_references(
@@ -25,14 +26,17 @@ def get_mesh_file():
         return
     
     files_list = references['modeling'][0]['files']
-    abc_files = []
+    files = []
 
     for file in files_list:
-        if not file.endswith('.abc'):
+        _, ext = os.path.splitext(file)
+        if ext.lower() not in MESH_FILE_FORMATS:
+            logging.error(
+                "Unsupported file format: {}. Supported formats are: {}".format(ext, ', '.join(MESH_FILE_FORMATS)))
             continue
-        abc_files.append(file)
+        files.append(file)
 
-    mesh_file_path = abc_files[0]
+    mesh_file_path = files[0]
     return mesh_file_path
 
 
