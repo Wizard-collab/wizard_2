@@ -485,12 +485,13 @@ def get_export_grps(base_name):
     tokens_len = len(base_name.split('_'))
     for collection in get_all_collections():
         collection_name = collection.name
-        if base_name in collection_name:
+        if collection_name.startswith(base_name):
             object_name_tokens = collection_name.split('_')
             if len(object_name_tokens) == tokens_len:
                 export_name = 'main'
             elif len(object_name_tokens) > tokens_len:
-                export_name = object_name_tokens[-1]
+                exceding_tokens = len(object_name_tokens) - tokens_len
+                export_name = '_'.join(object_name_tokens[exceding_tokens:])
             if export_name in grp_dic.values():
                 logger.warning(f'{collection_name} already found.')
                 continue
