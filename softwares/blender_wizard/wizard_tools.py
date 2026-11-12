@@ -5,6 +5,7 @@
 # Wizard modules
 import wizard_communicate
 import wizard_hooks
+import wizard_tags
 
 # Blender modules
 import bpy
@@ -459,20 +460,10 @@ def apply_tags(object_list):
         if type(obj) == bpy.types.Collection:
             continue
         # Add tags directly to the object
-        if 'wizardTags' not in obj.keys():
-            existing_tags = []
-        else:
-            existing_tags = obj['wizardTags'].split(',')
-        asset_tag = "{}_{}".format(
-            os.environ['wizard_category_name'], os.environ['wizard_asset_name'])
-        if os.environ['wizard_variant_name'] != 'main':
-            asset_tag += f"_{os.environ['wizard_variant_name']}"
-        to_tag = [f"CATEGORY={os.environ['wizard_category_name']}",
-                  f"ASSET={asset_tag}", f"OBJECT={obj.name}"]
-        to_tag += [f"{os.environ['wizard_category_name']}",
-                   asset_tag, obj.name]
-        tags = existing_tags + to_tag
-        obj['wizardTags'] = (',').join(set(tags))
+        tags = wizard_tags.read_tags(obj.get('wizardTags', ''))
+        tags += [f"OBJECT={obj.name}"]
+
+        obj['wizardTags'] = wizard_tags.generate_tags(tags)
 
 
 def get_all_collections():
