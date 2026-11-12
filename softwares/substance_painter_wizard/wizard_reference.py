@@ -25,14 +25,12 @@ def get_mesh_file():
         return
     
     files_list = references['modeling'][0]['files']
-    abc_files = []
+    files = []
 
     for file in files_list:
-        if not file.endswith('.abc'):
-            continue
-        abc_files.append(file)
+        files.append(file)
 
-    mesh_file_path = abc_files[0]
+    mesh_file_path = files[0]
     return mesh_file_path
 
 
