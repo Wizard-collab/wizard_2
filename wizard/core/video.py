@@ -34,6 +34,7 @@ import numpy as np
 import shutil
 from PIL import Image, ImageFont, ImageDraw
 import re
+import typing
 
 # Wizard modules
 from wizard.core import assets
@@ -232,3 +233,84 @@ def find_frame_number(filename):
     else:
         # Return None if no valid frame number is found
         return 0
+
+
+THUMBNAIL_METHODS = typing.Literal[
+    "first_frame",
+    "last_frame",
+    "middle_frame"
+]
+
+def generate_thumbnail(video_path, thumbnail_path: str = None, thumbnail_method: THUMBNAIL_METHODS = "first_frame") -> str:
+    """
+    Generate a thumbnail image from the first frame of a video file.
+
+    Args:
+        video_path (str): The path to the video file.
+        thumbnail_path (str, optional): The path to save the generated thumbnail image. 
+                                         If not provided, the thumbnail will be saved in the same directory as the video file with a "_thumbnail.png" suffix.
+        thumbnail_method (str, optional): The method to generate the thumbnail. Defaults to "first_frame
+                                             
+    Returns:
+        str: The path to the generated thumbnail image.
+    """
+    cap = cv2.VideoCapture(video_path)
+
+    if not cap.isOpened():
+        logger.error(f"Error opening video file: {video_path}")
+        return None
+
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if thumbnail_method == "first_frame":
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    elif thumbnail_method == "last_frame":
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count - 1)
+    elif thumbnail_method == "middle_frame":
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(frame_count / 2))
+
+    ret, frame = cap.read()
+    cap.release()
+
+    if not ret:
+        logger.error(f"Error reading frame from video file: {video_path}")
+        return None
+
+    # Generate a default thumbnail path if not provided
+    if thumbnail_path is None:
+        thumbnail_path = path_utils.splitext(video_path)[0] + "_thumbnail.png"
+
+    cv2.imwrite(thumbnail_path, frame)
+    return thumbnail_path
+
+
+def import_video(variant_id, video_path, comment="", analyse_comment=None):
+    """
+    Imports a video file into the project, generates necessary directories and files, 
+    and handles associated events, rewards, and tags.
+
+    Args:
+        variant_id (str): The identifier for the video variant.
+        video_path (str): The file path of the video to be imported.
+        comment (str, optional): A comment associated with the video. Defaults to an empty string.
+        analyse_comment (bool, optional): If True, analyzes the comment for penalties. Defaults to None.
+
+    Returns:
+        int or None: The ID of the newly imported video if successful, otherwise None.        
+    """
+
+    video_id = assets.add_video(variant_id, comment, analyse_comment)
+    if not video_id:
+        return  # Exit if the video creation fails
+
+    video_row: dict = project.get_video_data(video_id)
+    if not video_row:
+        return  # Exit if the video data retrieval fails
+
+    dest_path, thumbnail_path = video_row['file_path'], video_row['thumbnail_path']
+
+    if path_utils.isfile(video_path):
+        path_utils.copyfile(video_path, dest_path)
+
+    generate_thumbnail(dest_path, thumbnail_path, "middle_frame")
+
+    return video_id
