@@ -83,6 +83,7 @@ def install_package(package_name):
     logger.debug(f"Using pip executable: {pip_executable}")
     if not os.path.isfile(pip_executable):
         logger.warning(f"pip executable was not found: {pip_executable}")
+        raise Exception(f"pip executable was not found: {pip_executable}")
 
     process = subprocess.Popen([pip_executable, "install", package_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
