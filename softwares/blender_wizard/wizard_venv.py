@@ -9,6 +9,7 @@ import venv
 import subprocess
 import logging
 import importlib.metadata
+import sysconfig
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,16 @@ def get_venv_path(*subdirectories):
     return os.fspath(venv_path)
 
 
+def get_venv_site_packages_path():
+    """Get the site-packages path for the virtual environment."""
+    venv_path = get_venv_path()
+    site_packages_path = sysconfig.get_path(
+        "purelib",
+        vars={"base": venv_path, "platbase": venv_path},
+    )
+    logger.debug(f"Virtual environment site-packages path: {site_packages_path}")
+    return site_packages_path
+
 def ensure_venv():
     """ Create a virtual environment for the wizard plugin if it does not exist and add it to sys.path. """
     venv_path = get_venv_path()
@@ -33,7 +44,7 @@ def ensure_venv():
     else:
         logger.debug(f"Virtual environment already exists at {venv_path}")
 
-    site_packages_path = os.path.join(venv_path, "Lib", "site-packages")
+    site_packages_path = get_venv_site_packages_path()
 
     if site_packages_path not in sys.path:
         logger.debug(f"Adding virtual environment site-packages to sys.path: {site_packages_path}")
