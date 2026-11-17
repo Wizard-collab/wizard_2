@@ -18,7 +18,10 @@ from blender_wizard import wizard_menu
 from blender_wizard import wizard_venv
 
 wizard_venv.ensure_venv()
-wizard_venv.install_package("PySide6")
+try:
+    wizard_venv.install_package("PySide6")
+except Exception as e:
+    print(f"Error occurred while installing PySide6: {e}")
 
 wizard_menu.register()
 wizard_tools.trigger_after_scene_openning_hook()
