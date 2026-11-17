@@ -15,6 +15,10 @@ if pythonpath_env:  # noqa
 # Wizard modules
 from blender_wizard import wizard_tools
 from blender_wizard import wizard_menu
+from blender_wizard import wizard_venv
+
+wizard_venv.ensure_venv()
+wizard_venv.install_package("PySide6")
 
 wizard_menu.register()
 wizard_tools.trigger_after_scene_openning_hook()
