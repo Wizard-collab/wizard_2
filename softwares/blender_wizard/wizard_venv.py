@@ -7,6 +7,7 @@ import os
 import sys
 import venv
 import subprocess
+import importlib.metadata
 
 
 def get_venv_path(*subdirectories):
@@ -31,8 +32,20 @@ def ensure_venv():
         sys.path.append(site_packages_path)
 
 
+def is_package_installed(package_name):
+    """ Check whether a package is installed in the virtual environment. """
+    try:
+        importlib.metadata.distribution(package_name)
+        return True
+    except importlib.metadata.PackageNotFoundError:
+        return False
+
+
 def install_package(package_name):
     """ Install a package in the virtual environment. """
+    if is_package_installed(package_name):
+        return
+
     pip_executable = get_venv_path("Scripts", "pip.exe")
 
     process = subprocess.Popen([pip_executable, "install", package_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
