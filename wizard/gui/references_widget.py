@@ -363,6 +363,8 @@ class references_widget(QtWidgets.QWidget):
         item: custom_reference_tree_item
 
         namespace = item.reference_row['namespace']
+        # A restricted rename widget is used to ensure that
+        # the new name is valid and does not contain any invalid characters.
         self.rename_widget = rename_widget.restricted_rename_widget(
             title=f"Renaming '{namespace}'",
             text=namespace,
@@ -496,8 +498,11 @@ class references_widget(QtWidgets.QWidget):
                 QtGui.QIcon(''), 'Dectivate selection')
             if len(selection) == 1:
                 if selection[0].type == 'reference':
+                    # The rename action is only available for references, not for groups.
+                    # In addition, the rename action is only available when a single reference is selected.
                     rename_action = menu.addAction(QtGui.QIcon(
                         ressources._tool_rename_), 'Rename namespace')
+
                     launch_action = menu.addAction(QtGui.QIcon(
                         ressources._launch_icon_), 'Launch related work version')
                     focus_action = menu.addAction(QtGui.QIcon(
