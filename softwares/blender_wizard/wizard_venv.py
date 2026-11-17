@@ -9,9 +9,17 @@ import venv
 import subprocess
 
 
+def get_venv_path(*subdirectories):
+    """ Get the path to the virtual environment (and its subdirectories) for the wizard plugin. """
+    venv_path = os.path.expanduser("~/Documents/wizard/blender/.venv")
+    for arg in subdirectories:
+        venv_path = os.path.join(venv_path, arg)
+    return venv_path
+
+
 def ensure_venv():
     """ Create a virtual environment for the wizard plugin if it does not exist and add it to sys.path. """
-    venv_path = os.path.expanduser("~/Documents/wizard/blender/.venv")
+    venv_path = get_venv_path()
 
     _venv = venv.EnvBuilder(with_pip=True)
     if not os.path.exists(venv_path):
@@ -25,8 +33,7 @@ def ensure_venv():
 
 def install_package(package_name):
     """ Install a package in the virtual environment. """
-    venv_path = os.path.expanduser("~/Documents/wizard/blender/.venv")
-    pip_executable = os.path.join(venv_path, "Scripts", "pip.exe")
+    pip_executable = get_venv_path("Scripts", "pip.exe")
 
     process = subprocess.Popen([pip_executable, "install", package_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
