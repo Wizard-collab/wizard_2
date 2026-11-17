@@ -900,6 +900,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
+        self.setText(1, infos_list[9])
         self.export_widget.setText(infos_list[1])
         self.version_widget.setText(infos_list[2])
         self.set_auto_update(infos_list[4])
@@ -1122,7 +1123,8 @@ class reference_infos_thread(QtCore.QThread):
                                                       asset_name,
                                                       stage_row,
                                                       extension,
-                                                      reference_row['activated']])
+                                                      reference_row['activated'],
+                                                      reference_row['namespace']])
         except:
             logger.error(str(traceback.format_exc()))
 
