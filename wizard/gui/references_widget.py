@@ -356,6 +356,9 @@ class references_widget(QtWidgets.QWidget):
                 assets.set_grouped_reference_last_version(reference_id)
         gui_server.refresh_team_ui()
 
+    def rename_selected_reference(self):
+        pass
+
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
@@ -475,6 +478,8 @@ class references_widget(QtWidgets.QWidget):
                 QtGui.QIcon(''), 'Dectivate selection')
             if len(selection) == 1:
                 if selection[0].type == 'reference':
+                    rename_action = menu.addAction(QtGui.QIcon(
+                        ressources._tool_rename_), 'Rename namespace')
                     launch_action = menu.addAction(QtGui.QIcon(
                         ressources._launch_icon_), 'Launch related work version')
                     focus_action = menu.addAction(QtGui.QIcon(
@@ -496,6 +501,8 @@ class references_widget(QtWidgets.QWidget):
                 self.search_reference()
             elif action == update_all_action:
                 self.update_all()
+            elif action == rename_action:
+                self.rename_selected_reference()
             elif action == launch_action:
                 self.launch_work_version()
             elif action == focus_action:
