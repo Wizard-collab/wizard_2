@@ -292,6 +292,9 @@ def core_launch_version(version_id):
 
     # Build the environment variables required for the software
     env = build_env(work_env_id, software_row, version_id)
+    if 'DEBUG' in sys.argv:
+        env['WIZARD_DEBUG'] = '1'  # Set the WIZARD_DEBUG environment variable if
+                                   # the app is launched with the DEBUG argument
 
     # If the command is invalid, return None
     if not command:

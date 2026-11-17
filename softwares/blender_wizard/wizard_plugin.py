@@ -4,7 +4,9 @@
 
 # Python modules
 import os
+import sys
 import logging
+from importlib import reload
 
 # Blender modules
 import bpy
@@ -31,6 +33,13 @@ logger = logging.getLogger(__name__)
 
 def save_increment(comment=''):
     wizard_tools.save_increment(comment)
+
+
+def reload_plugin():
+    for name, module in sys.modules.copy().items():
+        if name.startswith("blender_wizard"):
+            print(f"Reloading module: {name}")
+            reload(module)
 
 
 def export():
