@@ -7,7 +7,10 @@ import os
 import sys
 import venv
 import subprocess
+import logging
 import importlib.metadata
+
+logger = logging.getLogger(__name__)
 
 
 def get_venv_path(*subdirectories):
@@ -15,6 +18,7 @@ def get_venv_path(*subdirectories):
     venv_path = os.path.expanduser("~/Documents/wizard/blender/.venv")
     for arg in subdirectories:
         venv_path = os.path.join(venv_path, arg)
+    logger.debug(f"Virtual environment path: {venv_path}")
     return venv_path
 
 
@@ -24,20 +28,29 @@ def ensure_venv():
 
     _venv = venv.EnvBuilder(with_pip=True)
     if not os.path.exists(venv_path):
+        logger.info(f"Creating virtual environment at {venv_path}")
         _venv.create(venv_path)
+    else:
+        logger.debug(f"Virtual environment already exists at {venv_path}")
 
     site_packages_path = os.path.join(venv_path, "Lib", "site-packages")
 
     if site_packages_path not in sys.path:
+        logger.debug(f"Adding virtual environment site-packages to sys.path: {site_packages_path}")
         sys.path.append(site_packages_path)
+    else:
+        logger.debug("Virtual environment site-packages already in sys.path")
 
 
 def is_package_installed(package_name):
     """ Check whether a package is installed in the virtual environment. """
+    logger.debug(f"Checking whether package '{package_name}' is installed")
     try:
         importlib.metadata.distribution(package_name)
+        logger.info(f"Package '{package_name}' is already installed")
         return True
     except importlib.metadata.PackageNotFoundError:
+        logger.warning(f"Package '{package_name}' is not installed")
         return False
 
 
@@ -47,10 +60,16 @@ def install_package(package_name):
         return
 
     pip_executable = get_venv_path("Scripts", "pip.exe")
+    logger.info(f"Installing package '{package_name}'")
+    logger.debug(f"Using pip executable: {pip_executable}")
+    if not os.path.isfile(pip_executable):
+        logger.warning(f"pip executable was not found: {pip_executable}")
 
     process = subprocess.Popen([pip_executable, "install", package_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     stdout = stdout.decode('utf-8')
     stderr = stderr.decode('utf-8')
     if process.returncode != 0:
+        logger.warning(f"Failed to install package '{package_name}': {stderr.strip()}")
         raise Exception(f"Failed to install package {package_name}. Error: {stderr}")
+    logger.info(f"Successfully installed package '{package_name}'")
