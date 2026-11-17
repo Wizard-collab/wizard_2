@@ -81,4 +81,5 @@ menu.addSeparator()
 nuke.menu('Nuke').addCommand("Wizard/Create video",
                              "wizard_video.invoke_settings_widget()")
 
-wizard_tools.trigger_after_scene_openning_hook()
+nuke.addOnScriptLoad(wizard_tools.trigger_after_scene_openning_hook)
+nuke.addOnUserCreate(wizard_tools.trigger_after_scene_openning_hook, nodeClass='Root')
