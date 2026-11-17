@@ -28,6 +28,18 @@ REPLACE_CHARS_DICT = {
 }
 
 class rename_widget(QtWidgets.QDialog):
+    """    
+    A rename widget is a dialog that allows the user to rename an item.
+    It contains:
+
+        - a line edit for the new name,
+
+        - a label for the warning message,
+
+        - two buttons for accepting or rejecting the rename action.
+
+    This default rename widget does not constrain the new name.
+    """
     def __init__(self, title='Rename',
                  reject_text='Cancel', accept_text='Rename',
                  text: str = "",
@@ -96,6 +108,12 @@ class rename_widget(QtWidgets.QDialog):
 
 
 class constrained_rename_widget(rename_widget):
+    """
+    As the default one, this widget allows the user to rename an item, but it constrains the new name to be alphanumeric and underscores only (by default).
+    As the user types, the widget will automatically replace invalid characters with valid ones, and will disable the accept button if the new name is invalid.
+
+    This security ensures security while enabling the user to rename items without having to worry.
+    """
     def __init__(self, title='Rename',
                  reject_text='Cancel', accept_text='Rename',
                  text: str = "",
