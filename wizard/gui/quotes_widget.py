@@ -7,6 +7,7 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 import random
 import json
 import statistics
+import re
 
 # Wizard modules
 from wizard.core import repository
@@ -23,6 +24,7 @@ class quotes_widget(QtWidgets.QFrame):
         super(quotes_widget, self).__init__(parent)
         self.previous_quote_id = None
         self.timer = QtCore.QTimer(self)
+        self.show_quotes = True
         self.build_ui()
         self.connect_functions()
         self.get_new_random_quote(without_anim=1)
@@ -87,6 +89,14 @@ class quotes_widget(QtWidgets.QFrame):
             self)
         self.create_quote_widget.exec()
 
+
+    def show_content(self, content):
+        content = content.replace('\n', ' ')
+        content = content.replace('\r\n', ' ')
+        content = content.replace('\r', ' ')
+        if not self.show_quotes:
+            content = re.sub(r'\S', '█', content)
+        self.quote_label.setText(content)
     def vote(self, score):
         repository.add_quote_score(self.quote_row['id'], score)
         score_list = json.loads(repository.get_quote_data(
@@ -108,11 +118,7 @@ class quotes_widget(QtWidgets.QFrame):
                     self.previous_quote_id = self.random_index
                 self.quote_row = repository.get_quote_data(
                     quotes_ids[self.random_index])
-                content = self.quote_row['content']
-                content = content.replace('\n', ' ')
-                content = content.replace('\r\n', ' ')
-                content = content.replace('\r', ' ')
-                self.quote_label.setText(content)
+                self.show_content(self.quote_row['content'])
                 self.update_score_slider()
                 if not without_anim:
                     self.new_anim()
