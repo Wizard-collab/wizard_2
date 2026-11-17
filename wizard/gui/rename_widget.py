@@ -107,7 +107,7 @@ class rename_widget(QtWidgets.QDialog):
         self.accept()
 
 
-class constrained_rename_widget(rename_widget):
+class restricted_rename_widget(rename_widget):
     """
     As the default one, this widget allows the user to rename an item, but it constrains the new name to be alphanumeric and underscores only (by default).
     As the user types, the widget will automatically replace invalid characters with valid ones, and will disable the accept button if the new name is invalid.
@@ -121,7 +121,7 @@ class constrained_rename_widget(rename_widget):
                  warning_message: str = "",
                  replace_chars: dict = REPLACE_CHARS_DICT,
                  parent=None):
-        super(constrained_rename_widget, self).__init__(title=title,
+        super(restricted_rename_widget, self).__init__(title=title,
                                                         reject_text=reject_text,
                                                         accept_text=accept_text,
                                                         text=text,

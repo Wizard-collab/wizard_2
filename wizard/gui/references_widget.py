@@ -363,7 +363,7 @@ class references_widget(QtWidgets.QWidget):
         item: custom_reference_tree_item
 
         namespace = item.reference_row['namespace']
-        self.rename_widget = rename_widget.constrained_rename_widget(
+        self.rename_widget = rename_widget.restricted_rename_widget(
             title=f"Renaming '{namespace}'",
             text=namespace,
             warning_message="Warning: Renaming a reference will break the link with the original asset. Use with caution."
