@@ -7,6 +7,7 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 import random
 import json
 import statistics
+import logging
 import re
 
 # Wizard modules
@@ -18,6 +19,7 @@ from wizard.gui import gui_utils
 from wizard.gui import create_quote_widget
 from wizard.gui import stars_widget
 
+logger = logging.getLogger(__name__)
 
 class quotes_widget(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -74,6 +76,13 @@ class quotes_widget(QtWidgets.QFrame):
         self.add_button.setFixedSize(20, 20)
         self.animation_handler_layout.addWidget(self.add_button)
 
+        self.show_hide_quotes_button = QtWidgets.QPushButton()
+        self.show_hide_quotes_button.setCheckable(True)
+        self.show_hide_quotes_button.setChecked(not self.show_quotes)
+        self.show_hide_quotes_button.setFixedSize(20, 20)
+        self.update_quote_visibility_button()
+        self.animation_handler_layout.addWidget(self.show_hide_quotes_button)
+
         self.animation_handler_layout.addSpacerItem(QtWidgets.QSpacerItem(
             0, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Fixed))
 
@@ -83,12 +92,19 @@ class quotes_widget(QtWidgets.QFrame):
         self.random_button.clicked.connect(self.timer.stop)
         self.score_slider.rate_signal.connect(self.vote)
         self.add_button.clicked.connect(self.add_quote)
+        self.show_hide_quotes_button.clicked.connect(self.toggle_quote_visibility)
 
     def add_quote(self):
         self.create_quote_widget = create_quote_widget.create_quote_widget(
             self)
         self.create_quote_widget.exec()
 
+    def update_quote_visibility_button(self):
+        if self.show_quotes:
+            self.show_hide_quotes_button.setIcon(QtGui.QIcon(ressources._password_visibility_off_))
+        else:
+            self.show_hide_quotes_button.setIcon(QtGui.QIcon(ressources._password_visibility_on_))
+        self.show_hide_quotes_button.setIconSize(QtCore.QSize(14, 14))
 
     def show_content(self, content):
         content = content.replace('\n', ' ')
@@ -97,6 +113,13 @@ class quotes_widget(QtWidgets.QFrame):
         if not self.show_quotes:
             content = re.sub(r'\S', '█', content)
         self.quote_label.setText(content)
+
+    def toggle_quote_visibility(self):
+        self.show_quotes = not self.show_quotes
+        self.update_quote_visibility_button()
+        self.show_content(self.quote_row['content'])
+        logger.debug(f"Quote visibility toggled.")
+
     def vote(self, score):
         repository.add_quote_score(self.quote_row['id'], score)
         score_list = json.loads(repository.get_quote_data(
