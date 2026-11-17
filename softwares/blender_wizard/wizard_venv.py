@@ -9,17 +9,17 @@ import venv
 import subprocess
 import logging
 import importlib.metadata
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 
 def get_venv_path(*subdirectories):
     """ Get the path to the virtual environment (and its subdirectories) for the wizard plugin. """
-    venv_path = os.path.expanduser("~/Documents/wizard/blender/.venv")
-    for arg in subdirectories:
-        venv_path = os.path.join(venv_path, arg)
+    venv_path = Path.home() / "Documents" / "wizard" / "blender" / ".venv"
+    venv_path = venv_path.joinpath(*subdirectories)
     logger.debug(f"Virtual environment path: {venv_path}")
-    return venv_path
+    return os.fspath(venv_path)
 
 
 def ensure_venv():
