@@ -16,6 +16,7 @@ from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import comment_widget
+from wizard.gui import rename_widget
 from wizard.gui import tag_label
 from wizard.gui import current_asset_viewer
 
@@ -357,7 +358,24 @@ class references_widget(QtWidgets.QWidget):
         gui_server.refresh_team_ui()
 
     def rename_selected_reference(self):
-        pass
+        selected_items = self.list_view.selectedItems()
+        item = selected_items[0]
+        item: custom_reference_tree_item
+
+        namespace = item.reference_row['namespace']
+        self.rename_widget = rename_widget.constrained_rename_widget(
+            title=f"Renaming '{namespace}'",
+            text=namespace,
+            warning_message="Warning: Renaming a reference will break the link with the original asset. Use with caution."
+        )
+
+        if self.rename_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            item_id = item.reference_row['id']
+            new_name = self.rename_widget.rename_line_edit.text()
+
+            if project.rename_reference(item_id, new_name):
+                logger.info(f"Renamed reference '{namespace}' to '{new_name}'")
+            gui_server.refresh_team_ui()
 
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
