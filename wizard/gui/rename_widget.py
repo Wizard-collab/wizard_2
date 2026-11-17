@@ -88,6 +88,9 @@ class rename_widget(QtWidgets.QDialog):
     def confirm(self):
         if self.rename_line_edit.text() == "":
             return logger.warning("The new name is empty")
+
+        if self.rename_line_edit.text() == self.text:
+            return logger.warning("The new name is the same as the old name")
         
         self.accept()
 
