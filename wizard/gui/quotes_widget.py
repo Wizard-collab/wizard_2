@@ -12,7 +12,9 @@ import re
 
 # Wizard modules
 from wizard.core import repository
+from wizard.core import user
 from wizard.vars import ressources
+from wizard.vars import user_vars
 
 # Wizard gui modules
 from wizard.gui import gui_utils
@@ -26,7 +28,7 @@ class quotes_widget(QtWidgets.QFrame):
         super(quotes_widget, self).__init__(parent)
         self.previous_quote_id = None
         self.timer = QtCore.QTimer(self)
-        self.show_quotes = True
+        self.show_quotes = user.user().prefs_dic.get(user_vars._show_quotes_, 1)
         self.build_ui()
         self.connect_functions()
         self.get_new_random_quote(without_anim=1)
@@ -115,7 +117,13 @@ class quotes_widget(QtWidgets.QFrame):
         self.quote_label.setText(content)
 
     def toggle_quote_visibility(self):
-        self.show_quotes = not self.show_quotes
+        # Update and store value
+        self.show_quotes = 1 - self.show_quotes
+        _user = user.user()
+        _user.prefs_dic[user_vars._show_quotes_] = self.show_quotes
+        _user.write_prefs_dic()
+
+        # UI update
         self.update_quote_visibility_button()
         self.show_content(self.quote_row['content'])
         logger.debug(f"Quote visibility toggled.")
