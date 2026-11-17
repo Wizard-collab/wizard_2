@@ -5,27 +5,14 @@
 # Python modules
 from PyQt6 import QtWidgets, QtCore, QtGui
 import logging
+import re
 
 # Wizard modules
 from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
-REPLACE_CHARS_DICT = {
-    ' ': '_',
-    '.': '_',
-    '-': '_',
-    '_': '_',
-    '/': '',
-    '\\': '',
-    ':': '',
-    '*': '',
-    '?': '',
-    '"': '',
-    '<': '',
-    '>': '',
-    '|': ''
-}
+INVALID_CHARS = re.compile(r'[^a-zA-Z0-9_]')
 
 class rename_widget(QtWidgets.QDialog):
     """    
@@ -119,7 +106,7 @@ class restricted_rename_widget(rename_widget):
                  text: str = "",
                  placeholder: str = "",
                  warning_message: str = "",
-                 replace_chars: dict = REPLACE_CHARS_DICT,
+                 invalid_chars_regex: re.Pattern = INVALID_CHARS,
                  parent=None):
         super(restricted_rename_widget, self).__init__(title=title,
                                                         reject_text=reject_text,
@@ -128,7 +115,7 @@ class restricted_rename_widget(rename_widget):
                                                         placeholder=placeholder,
                                                         warning_message=warning_message,
                                                         parent=parent)
-        self.replace_chars = replace_chars
+        self.invalid_chars_regex = invalid_chars_regex
 
     def connect_functions(self):
         self.rename_line_edit.textChanged.connect(self.validate_name)
@@ -138,14 +125,14 @@ class restricted_rename_widget(rename_widget):
     def validate_name(self):
         new_name = self.rename_line_edit.text()
 
-        for char, new_char in self.replace_chars.items():
-            new_name = new_name.replace(char, new_char)
+        new_name = re.sub(self.invalid_chars_regex.pattern, "_", new_name)
 
         if new_name != self.rename_line_edit.text():
             self.rename_line_edit.setText(new_name)
             self.rename_line_edit.setCursorPosition(len(new_name))
 
-        if not new_name.isalnum() and '_' not in new_name:
+        full_pattern = f"^{self.invalid_chars_regex.pattern}+$"
+        if not INVALID_CHARS.match(full_pattern) and new_name != self.text:
             self.accept_button.setEnabled(False)
             self.rename_line_edit.setStyleSheet('border: 1px solid red;')
         else:
