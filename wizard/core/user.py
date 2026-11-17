@@ -942,6 +942,7 @@ class user:
             self.prefs_dic[user_vars._show_splash_screen_] = True
             self.prefs_dic[user_vars._user_build_] = None
             self.prefs_dic[user_vars._widgets_pos_] = dict()
+            self.prefs_dic[user_vars._show_quotes_] = 1
             self.write_prefs_dic()
         else:
             with open(self.user_prefs_file, 'r') as f:
