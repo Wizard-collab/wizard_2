@@ -33,6 +33,14 @@ def get_venv_site_packages_path():
     logger.debug(f"Virtual environment site-packages path: {site_packages_path}")
     return site_packages_path
 
+
+def get_venv_pip_path():
+    """Get the platform-specific pip executable path for the virtual environment."""
+    bin_directory = "Scripts" if os.name == "nt" else "bin"
+    pip_executable = "pip.exe" if os.name == "nt" else "pip"
+    return get_venv_path(bin_directory, pip_executable)
+
+
 def ensure_venv():
     """ Create a virtual environment for the wizard plugin if it does not exist and add it to sys.path. """
     venv_path = get_venv_path()
@@ -70,7 +78,7 @@ def install_package(package_name):
     if is_package_installed(package_name):
         return
 
-    pip_executable = get_venv_path("Scripts", "pip.exe")
+    pip_executable = get_venv_pip_path()
     logger.info(f"Installing package '{package_name}'")
     logger.debug(f"Using pip executable: {pip_executable}")
     if not os.path.isfile(pip_executable):
