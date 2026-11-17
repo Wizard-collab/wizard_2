@@ -11,6 +11,22 @@ from wizard.vars import ressources
 
 logger = logging.getLogger(__name__)
 
+REPLACE_CHARS_DICT = {
+    ' ': '_',
+    '.': '_',
+    '-': '_',
+    '_': '_',
+    '/': '',
+    '\\': '',
+    ':': '',
+    '*': '',
+    '?': '',
+    '"': '',
+    '<': '',
+    '>': '',
+    '|': ''
+}
+
 class rename_widget(QtWidgets.QDialog):
     def __init__(self, title='Rename',
                  reject_text='Cancel', accept_text='Rename',
@@ -74,3 +90,43 @@ class rename_widget(QtWidgets.QDialog):
             return logger.warning("The new name is empty")
         
         self.accept()
+
+
+class constrained_rename_widget(rename_widget):
+    def __init__(self, title='Rename',
+                 reject_text='Cancel', accept_text='Rename',
+                 text: str = "",
+                 placeholder: str = "",
+                 warning_message: str = "",
+                 replace_chars: dict = REPLACE_CHARS_DICT,
+                 parent=None):
+        super(constrained_rename_widget, self).__init__(title=title,
+                                                        reject_text=reject_text,
+                                                        accept_text=accept_text,
+                                                        text=text,
+                                                        placeholder=placeholder,
+                                                        warning_message=warning_message,
+                                                        parent=parent)
+        self.replace_chars = replace_chars
+
+    def connect_functions(self):
+        self.rename_line_edit.textChanged.connect(self.validate_name)
+        self.rename_line_edit.textEdited.connect(self.validate_name)
+        return super().connect_functions()
+
+    def validate_name(self):
+        new_name = self.rename_line_edit.text()
+
+        for char, new_char in self.replace_chars.items():
+            new_name = new_name.replace(char, new_char)
+
+        if new_name != self.rename_line_edit.text():
+            self.rename_line_edit.setText(new_name)
+            self.rename_line_edit.setCursorPosition(len(new_name))
+
+        if not new_name.isalnum() and '_' not in new_name:
+            self.accept_button.setEnabled(False)
+            self.rename_line_edit.setStyleSheet('border: 1px solid red;')
+        else:
+            self.accept_button.setEnabled(True)
+            self.rename_line_edit.setStyleSheet('')
