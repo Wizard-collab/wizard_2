@@ -86,7 +86,8 @@ _file_command_ = dict()
 _file_command_[
     _maya_] = f'"{_executable_key_}" -file "{_file_key_}" -script "{_script_key_}"'
 _file_command_[
-    _guerilla_render_] = f'''"{_executable_key_}" "{_file_key_}" --pycmd "execfile('{_script_key_}')"'''
+    _guerilla_render_] = f'''"{_executable_key_}" "{_file_key_}" --pycmd "import sys; print(sys.version); exec(compile(open(r'{_script_key_}', 'rb').read(), r'{_script_key_}', 'exec')) if sys.version_info[0] >= 3 else execfile('{_script_key_}')
+"'''
 _file_command_[_substance_painter_] = f'"{_executable_key_}" "{_file_key_}"'
 _file_command_[_substance_designer_] = f'"{_executable_key_}" "{_file_key_}"'
 _file_command_[_nuke_] = f'"{_executable_key_}" --nukex "{_file_key_}"'
@@ -98,7 +99,8 @@ _file_command_[
 _no_file_command_ = dict()
 _no_file_command_[_maya_] = f'"{_executable_key_}" -script "{_script_key_}"'
 _no_file_command_[
-    _guerilla_render_] = f'''"{_executable_key_}" --pycmd "execfile('{_script_key_}')"'''
+    _guerilla_render_] = f'''"{_executable_key_}" --pycmd "import sys; print(sys.version); exec(compile(open(r'{_script_key_}', 'rb').read(), r'{_script_key_}', 'exec')) if sys.version_info[0] >= 3 else execfile('{_script_key_}')
+"'''
 _no_file_command_[_substance_painter_] = f'"{_executable_key_}"'
 _no_file_command_[_substance_designer_] = f'"{_executable_key_}"'
 _no_file_command_[_nuke_] = f'"{_executable_key_}" --nukex'
@@ -111,7 +113,8 @@ _batch_file_command_ = dict()
 _batch_file_command_[
     _maya_] = f'"{_executable_key_}" -file "{_file_key_}" -script "{_script_key_}"'
 _batch_file_command_[
-    _guerilla_render_] = f'''"{_executable_key_}" "{_file_key_}" --nogui --pycmd "execfile('{_script_key_}')"'''
+    _guerilla_render_] = f'''"{_executable_key_}" "{_file_key_}" --nogui --pycmd "import sys; print(sys.version); exec(compile(open(r'{_script_key_}', 'rb').read(), r'{_script_key_}', 'exec')) if sys.version_info[0] >= 3 else execfile('{_script_key_}')
+"'''
 _batch_file_command_[_substance_painter_] = ''
 _batch_file_command_[_substance_designer_] = ''
 _batch_file_command_[
@@ -125,7 +128,8 @@ _batch_no_file_command_ = dict()
 _batch_no_file_command_[
     _maya_] = f'"{_executable_key_}" -script "{_script_key_}"'
 _batch_no_file_command_[
-    _guerilla_render_] = f'''"{_executable_key_}" --nogui --pycmd "execfile('{_script_key_}')"'''
+    _guerilla_render_] = f'''"{_executable_key_}" --nogui --pycmd "import sys; print(sys.version); exec(compile(open(r'{_script_key_}', 'rb').read(), r'{_script_key_}', 'exec')) if sys.version_info[0] >= 3 else execfile('{_script_key_}')
+"'''
 _batch_no_file_command_[_substance_painter_] = ''
 _batch_no_file_command_[_substance_designer_] = ''
 _batch_no_file_command_[_nuke_] = ''
