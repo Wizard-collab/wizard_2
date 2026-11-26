@@ -464,6 +464,7 @@ class references_widget(QtWidgets.QWidget):
         selection = self.list_view.selectedItems()
         menu = gui_utils.QMenu(self)
         remove_action = None
+        rename_action = None
         copy_references_action = None
         update_action = None
         launch_action = None
