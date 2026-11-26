@@ -149,6 +149,7 @@ _ext_dic_[_grooming_] = dict()
 _ext_dic_[_grooming_][_maya_] = ['ma', 'abc']
 _ext_dic_[_grooming_][_blender_] = ['blend', 'abc']
 _ext_dic_[_grooming_][_houdini_] = ['hip', 'abc']
+_ext_dic_[_grooming_][_guerilla_render_] = ['gproject', 'gnode']
 _ext_dic_[_texturing_] = dict()
 _ext_dic_[_texturing_][_maya_] = ['exr', 'png', 'tiff', 'jpg', 'jpeg']
 _ext_dic_[_texturing_][_blender_] = ['exr', 'png', 'jpg', 'jpeg']
