@@ -4,8 +4,6 @@
 
 Wizard is an autonomous software for managing CGI productions.
 
-🌏 Official windows installer here : http://54.39.96.76/
-
 ⚠️ For now it only works on Windows OS.
 
 * Use this repository:
