@@ -3006,6 +3006,27 @@ def update_reference(reference_id, export_version_id):
     return 1
 
 
+def rename_reference(reference_id, new_namespace):
+    """
+    Renames a reference in the 'references_data' table of the 'project' database.
+    
+    Args:
+        reference_id (int): The ID of the reference to be renamed.
+        new_namespace (str): The new namespace to assign to the reference.
+    
+    Returns:
+        int or None: Returns 1 if the reference was successfully renamed, 
+                     otherwise returns None if the update failed.
+    """
+    if not db_utils.update_data('project',
+                                'references_data',
+                                ('namespace', new_namespace),
+                                ('id', reference_id)):
+        return
+    logger.info('Reference renamed')
+    return 1
+
+
 def remove_work_env(work_env_id, force=0):
     """
     Remove a work environment from the project.

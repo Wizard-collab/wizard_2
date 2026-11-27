@@ -16,6 +16,7 @@ from wizard.gui import search_reference_widget
 from wizard.gui import gui_utils
 from wizard.gui import gui_server
 from wizard.gui import comment_widget
+from wizard.gui import rename_widget
 from wizard.gui import tag_label
 from wizard.gui import current_asset_viewer
 
@@ -90,6 +91,9 @@ class references_widget(QtWidgets.QWidget):
             self.show_search_referenced_group)
         self.search_thread.hide_group_signal.connect(
             self.hide_search_referenced_group)
+
+        self.rename_sc = QtGui.QShortcut(QtGui.QKeySequence('F2'), self)
+        self.rename_sc.activated.connect(self.rename_selected_reference)
 
     def update_search(self):
         if not self.reference_rows:
@@ -356,6 +360,28 @@ class references_widget(QtWidgets.QWidget):
                 assets.set_grouped_reference_last_version(reference_id)
         gui_server.refresh_team_ui()
 
+    def rename_selected_reference(self):
+        selected_items = self.list_view.selectedItems()
+        item = selected_items[0]
+        item: custom_reference_tree_item
+
+        namespace = item.reference_row['namespace']
+        # A restricted rename widget is used to ensure that
+        # the new name is valid and does not contain any invalid characters.
+        self.rename_widget = rename_widget.restricted_rename_widget(
+            title=f"Renaming '{namespace}'",
+            text=namespace,
+            warning_message="Warning: Renaming a reference will break the link with the original asset. Use with caution."
+        )
+
+        if self.rename_widget.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            item_id = item.reference_row['id']
+            new_name = self.rename_widget.rename_line_edit.text()
+
+            if project.rename_reference(item_id, new_name):
+                logger.info(f"Renamed reference '{namespace}' to '{new_name}'")
+            gui_server.refresh_team_ui()
+
     def launch_work_version(self):
         selected_items = self.list_view.selectedItems()
         for selected_item in selected_items:
@@ -441,6 +467,7 @@ class references_widget(QtWidgets.QWidget):
         selection = self.list_view.selectedItems()
         menu = gui_utils.QMenu(self)
         remove_action = None
+        rename_action = None
         copy_references_action = None
         update_action = None
         launch_action = None
@@ -475,6 +502,11 @@ class references_widget(QtWidgets.QWidget):
                 QtGui.QIcon(''), 'Dectivate selection')
             if len(selection) == 1:
                 if selection[0].type == 'reference':
+                    # The rename action is only available for references, not for groups.
+                    # In addition, the rename action is only available when a single reference is selected.
+                    rename_action = menu.addAction(QtGui.QIcon(
+                        ressources._tool_rename_), 'Rename namespace (F2)')
+
                     launch_action = menu.addAction(QtGui.QIcon(
                         ressources._launch_icon_), 'Launch related work version')
                     focus_action = menu.addAction(QtGui.QIcon(
@@ -496,6 +528,8 @@ class references_widget(QtWidgets.QWidget):
                 self.search_reference()
             elif action == update_all_action:
                 self.update_all()
+            elif action == rename_action:
+                self.rename_selected_reference()
             elif action == launch_action:
                 self.launch_work_version()
             elif action == focus_action:
@@ -875,6 +909,7 @@ class custom_reference_tree_item(QtWidgets.QTreeWidgetItem):
         self.setForeground(8, QtGui.QBrush(QtGui.QColor('gray')))
 
     def update_item_infos(self, infos_list):
+        self.setText(1, infos_list[9])
         self.export_widget.setText(infos_list[1])
         self.version_widget.setText(infos_list[2])
         self.set_auto_update(infos_list[4])
@@ -1097,7 +1132,8 @@ class reference_infos_thread(QtCore.QThread):
                                                       asset_name,
                                                       stage_row,
                                                       extension,
-                                                      reference_row['activated']])
+                                                      reference_row['activated'],
+                                                      reference_row['namespace']])
         except:
             logger.error(str(traceback.format_exc()))
 
