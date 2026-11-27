@@ -92,6 +92,9 @@ class references_widget(QtWidgets.QWidget):
         self.search_thread.hide_group_signal.connect(
             self.hide_search_referenced_group)
 
+        self.rename_sc = QtGui.QShortcut(QtGui.QKeySequence('F2'), self)
+        self.rename_sc.activated.connect(self.rename_selected_reference)
+
     def update_search(self):
         if not self.reference_rows:
             return
@@ -502,7 +505,7 @@ class references_widget(QtWidgets.QWidget):
                     # The rename action is only available for references, not for groups.
                     # In addition, the rename action is only available when a single reference is selected.
                     rename_action = menu.addAction(QtGui.QIcon(
-                        ressources._tool_rename_), 'Rename namespace')
+                        ressources._tool_rename_), 'Rename namespace (F2)')
 
                     launch_action = menu.addAction(QtGui.QIcon(
                         ressources._launch_icon_), 'Launch related work version')
